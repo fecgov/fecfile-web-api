@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from fecfiler.forms.models import CommitteeInfo
 from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
+import string
 import datetime
 import os
 import psycopg2
@@ -11288,15 +11289,321 @@ def get_f24_reports(request):
           status=status.HTTP_400_BAD_REQUEST
           )
 
+class NotificationsSwitch:
+
+    def switch(self, request):
+        viewtype = request.data.get("view", "Prior Notices")
+
+        pageNumber = int(request.data.get("page", 1))
+        sortColumn = request.data.get("sortColumnName", "") 
+        descending = request.data.get("descending", False)
+        itemsperpage = request.data.get("itemsPerPage", 10)
+
+        if str(sortColumn) == '':
+            self._orderby = None
+        else:
+            strbld = ' ORDER BY ' + sortColumn
+            if descending:
+                strbld = strbld + ' DESC '
+            else:
+                strbld = strbld + ' ASC '
+            self._orderby = strbld
+
+        strbld = " OFFSET "
+        if pageNumber > 0:
+            strbld = strbld + str((pageNumber - 1) * itemsperpage)
+        else:
+            strbld = strbld + str(0)
+        strbld = strbld + " ROWS FETCH FIRST " + str(itemsperpage) + " ROW ONLY "
+        self._pagination = strbld
+
+        default = "Incorrect view type"
+        viewtype = string.capwords(viewtype).replace(" ", "")
+        return getattr(self, 'case_' + viewtype, lambda: default)()
+
+    def case_PriorNotices(self):
+        c = 12
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "date_sent":"2020-8-{0}", 
+                "subject":"subject-{1}"  
+            """.format(i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                date_sent text,
+                subject text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "date_sent", "header": "Date Sent" },
+            { "name": "subject", "header": "Subject (Email Subject)" }
+        ]""")
+
+        return (sql_count, sql_items, keys)      
+ 
+    def case_ReminderEmails(self):
+        c = 15
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "form_name":"Form {0}", 
+                "report_type":"Report Type {1}",
+                "due_date":"07-7-{2}"
+            """.format(i, i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                form_name text,
+                report_type text,
+                due_date text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "due_date", "header": "Due Date" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+ 
+    def case_LateNotificationEmails(self):
+        c = 17
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "form_name":"Form {0}", 
+                "report_type":"Report Type {1}",
+                "past_due_days":"{2} Days"
+            """.format(i, i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                form_name text,
+                report_type text,
+                past_due_days text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "past_due_days", "header": "Past Due" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+
+    def case_FilingConfirmations(self):
+        c = 19
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "filing_id":"C00000{0}",
+                "form_name":"Form {1}", 
+                "report_type":"Report Type {2}",
+                "coverage_dates":"6/{3}/2020 - 6/{4}/2020", 
+                "filed_by":"Filer {5}",
+                "date_time":"08/{6}/2020 | 10:02 AM EST"
+            """.format(i, i, i, i, i, i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                filing_id text,
+                form_name text,
+                report_type text,
+                coverage_dates text,
+                filed_by text,
+                date_time text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "filing_id", "header": "Filing ID" },
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "coverage_dates", "header": "Coverage Dates" },
+            { "name": "filed_by", "header": "Filed By" },
+            { "name": "date_time", "header": "Date/Time" }
+        ]""")
+
+        return (sql_count, sql_items, keys) 
+
+    def case_Rfais(self):
+        c = 1
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "date_sent":"2020-8-{0}", 
+                "ref_report_type":"Report Type {1}",
+                "due_date":"08/{2}/2020"
+            """.format(i, i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                date_sent text,
+                ref_report_type text,
+                due_date text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "date_sent", "header": "Date Sent" },
+            { "name": "ref_report_type", "header": "Report Referenced" },
+            { "name": "due_date", "header": "Due Date (if Applicable)" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+
+    def case_ImportedTransactions(self):
+        c = 3
+
+        sql_count = """
+            SELECT {0} as count WHERE %s is not null
+        """.format(c)
+
+        q = "'["
+        for i in range(1, c+1):
+            if i > 1:
+                q = q + ","
+            q = q + "{"
+            q = q + """ 
+                "name":"2020-8-{0}", 
+                "uploader":"Report Type {1}",
+                "date_time":"08/{2}/2020 | 10:02 AM EST",
+                "check_sum":"N/A"
+            """.format(i, i, i)
+            q = q + "}"
+        q = q + "]'"
+
+        sql_items = """
+            select * from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                name text,
+                uploader text,
+                date_time text,
+                check_sum text
+            )
+            where %s is not null
+        """
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "name", "header": "Name" },
+            { "name": "uploader", "header": "Uploader" },
+            { "name": "date_time", "header": "Date/Time" },
+            { "name": "check_sum", "header": "Checksum" }
+        ]""")
+
+        return (sql_count, sql_items, keys) 
+
+def construct_notifications_response(request):
+    s = NotificationsSwitch()
+    return s.switch(request)
+
 @api_view(['GET'])
 def get_notifications_count(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        #cmte_id = 'C00111476'
-        _sql = """SELECT count(1) as count
-                  FROM public.core_filing_notification WHERE cmte_id = %s """
+
+        sql_count = """
+            SELECT 67 as count WHERE %s is not null
+        """     
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + _sql + """) t""", [cmte_id])
+            cursor.execute(sql, [cmte_id])
             row1=cursor.fetchone()[0]
             totalcount =  row1[0]['count']
 
@@ -11304,7 +11611,92 @@ def get_notifications_count(request):
 
         return Response(output, status=status.HTTP_200_OK)
     except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
         return Response(
           "The get_notifications_count API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
+
+@api_view(['GET'])
+def get_notifications_counts(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+
+        q = """'[
+            { "group_name": "Prior Notices", "count": 12 },
+            { "group_name": "Reminder Emails", "count": 15 },
+            { "group_name": "Late Notification Emails", "count": 17 },
+            { "group_name": "Filing Confirmations", "count": 19 },
+            { "group_name": "RFAIs", "count": 1 },
+            { "group_name": "Imported Transactions", "count": 3 }
+        ]'"""
+
+        sql_groups = """
+            select group_name as "groupName", count 
+            from json_populate_recordset(null::record,
+        """ + q + """
+            ) AS (
+                group_name text,
+                count int
+            )
+            where %s is not null
+        """
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [cmte_id])
+            result = cursor.fetchall()
+            items = [] if not result[0][0] else result[0][0]
+        itemsCount = len(items)
+
+        output = { 
+            'items': items,
+            'totalItems': itemsCount
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_notifications_counts API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(["POST"])
+def get_notifications(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        #viewtype = request.query_params.get('view')
+
+        (sql_count, sql_items, keys) = construct_notifications_response(request)
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [cmte_id])
+            row1=cursor.fetchone()[0]
+            totalCount =  row1[0]['count']
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_items + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [cmte_id])
+            result = cursor.fetchall()
+            items = [] if not result[0][0] else result[0][0]
+        #itemsCount = len(items)
+
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+
+        output = { 
+            'keys': keys,
+            'items': items,
+            'totalItems': totalCount
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notifications API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )          

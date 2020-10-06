@@ -8,6 +8,7 @@ import { AuthService } from '../../services/AuthService/auth.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
+import { NotificationsService } from 'src/app/notifications/notifications.service';
 
 @Component({
   selector: 'app-header',
@@ -21,13 +22,15 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
 
   public menuActive: boolean = false;
   routerSubscription: Subscription;
+  notificationsCount: number;
 
   constructor(
     private _messageService: MessageService,
     private _formService: FormsService,
     private _dialogService: DialogService,
     private _router: Router,
-    public _authService: AuthService
+    public _authService: AuthService,
+    public _notificationsService: NotificationsService
   ) {}
 
   ngOnInit(): void {
@@ -52,6 +55,11 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
           this._authService.doSignOut();
         }
       }
+    });
+
+    // Get notification count
+    this._notificationsService.getTotalCount().subscribe(response => {
+      this.notificationsCount = response.notification_count;
     });
   }
 
