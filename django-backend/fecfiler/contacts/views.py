@@ -144,6 +144,9 @@ def reorder_user_data(contacts_added, contact_list):
         if contact_list is not None:
             contacts_list_dict = pd.DataFrame.from_records(contact_list)
             contacts_list_dict['street_1'] = contacts_list_dict['street_1'].str.strip()
+            contacts_list_dict['street_2'] = contacts_list_dict['street_2'].str.strip()
+            contacts_list_dict['entity_name'] = contacts_list_dict['entity_name'].str.strip()
+            contacts_list_dict['city'] = contacts_list_dict['city'].str.strip()
             contacts_list_dict.zip_code = contacts_list_dict.zip_code.astype(str)
             contacts_added.reset_index(drop=True, inplace=True)
 
@@ -153,6 +156,10 @@ def reorder_user_data(contacts_added, contact_list):
             contact_list_dict = pd.read_json(json_contact)
             contact_list_dict.fillna(value=pd.np.nan, inplace=True)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
+            contacts_added_dict['street_1'] = contacts_added_dict['street_1'].str.strip()
+            contacts_added_dict['street_2'] = contacts_added_dict['street_2'].str.strip()
+            contacts_added_dict['entity_name'] = contacts_added_dict['entity_name'].str.strip()
+            contacts_added_dict['city'] = contacts_added_dict['city'].str.strip()
             contact_list_dict1 = contact_list_dict.replace(np.nan, '', regex=True)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
             contacts_added_dict1 = contacts_added_dict1[contacts_added_dict1.zip_code.notnull()]
@@ -175,7 +182,7 @@ def reorder_user_data(contacts_added, contact_list):
             contacts_added.reset_index(drop=True, inplace=True)
             json_added = contacts_added.to_json(orient='records')
             contacts_added_dict = pd.read_json(json_added)
-            contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
+            contacts_added_dict = contacts_added_dict[pd.notnull(contacts_added_dict['zip_code'])]
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(int)
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
@@ -183,7 +190,7 @@ def reorder_user_data(contacts_added, contact_list):
         return data
     except Exception as e:
         logger.debug(e)
-        raise NoOPError("Exception occurred while reformatting the data.")
+        raise NoOPError("Exception occurred while reformatting the data.", str(e))
 
 
 def create_db_model(contacts_final_dict):
@@ -244,7 +251,7 @@ def upload_contact(request):
                                       )
                 bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
                 file_name = request.data.get("fileName")
-                csv_obj = client.get_object(Bucket=bucket, Key=file_name)
+                csv_obj = client.get_object(Bucket=bucket, Key='contacts/' + cmte_id + '/' + file_name)
                 body = csv_obj['Body']
                 csv_string = body.read().decode('latin')
 
