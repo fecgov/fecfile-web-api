@@ -145,6 +145,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     let formType = this.extractFormType();
     // to refresh/clear Dash Board Filter options
     localStorage.removeItem('reports.filters');
+    localStorage.removeItem('notifications.filters');
     localStorage.removeItem('Reports.view');
 
     this._step = this._activatedRoute.snapshot.queryParams.step;

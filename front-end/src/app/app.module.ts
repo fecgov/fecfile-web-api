@@ -75,6 +75,8 @@ import { ReportheaderComponent } from './reports/reportheader/reportheader.compo
 import { ReportsComponent } from './reports/reports.component';
 import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { NotificationdetailsComponent } from './notifications/notificationdetails/notificationdetails.component';
+import { NotificationheaderComponent } from './notifications/notificationheader/notificationheader.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ExportDirective } from './shared/directives/export.directive';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
@@ -159,6 +161,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportsidebarComponent,
     ReportheaderComponent,
     ReportdetailsComponent,
+    NotificationheaderComponent,
+    NotificationdetailsComponent,
     SafeHTMLPipe,
     OrderByPipe,
     // PhonePipe,
@@ -193,7 +197,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     F24Component,
     ExportDirective,
     F24LinkModalComponent,
-    FormEntryComponent,
+    FormEntryComponent
   ],
   entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [

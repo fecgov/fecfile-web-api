@@ -829,6 +829,7 @@ export class FormsService {
   public clearDashBoardReportFilterOptions(): void {
     // to refresh/clear Dash Board Filter options
     localStorage.removeItem('reports.filters');
+    localStorage.removeItem('notifications.filters');
     localStorage.removeItem('Reports.view');
   }
 

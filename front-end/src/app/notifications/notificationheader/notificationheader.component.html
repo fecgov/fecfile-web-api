@@ -1,0 +1,40 @@
+<div class="notifications__main-container">
+  <div class="notifications__container">
+    <div class="header-content">
+      <header>
+        <div class="header-container">
+          <h1>Notifications</h1>
+          <hr />
+          <div>
+            The notifications below are emails and correspondence that the FEC sends to filers to
+            remind them of upcoming reports that are due, as well as other helpful information.
+          </div>
+        </div>
+      </header>
+      <div class="space"></div>
+      <div class="row notifications__container-row-equal">
+        <div class="col text-center notifications__container-col-equal" *ngFor="let item of viewTabs">
+          <button class="w-100 h-100" type="button" (click)="viewMode = 'tab-' + item.id"
+            [ngClass]="viewMode === 'tab-' + item.id ? 'btn btn-block btn-primary' : 'btn btn-block btn-link btn-outline-secondary'">
+            <span><span class="notifications__info_count">{{item.name}}</span>
+              <span class="ml-1 mr-1">&#40;{{item.count}}&#41;</span>
+              <span type="button" class="btn btn-info" ngbTooltip="{{item.toolTip}}" triggers="click"
+                ng-click="$event.stopPropagation();" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"
+                  [ngClass]="viewMode === 'tab-' + item.id ? 'notifications__info_icon_color_white ' : ''"></i>
+                <span class="sr-only">Click here for more information</span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="space"></div>
+      <div class="tab-container" [ngSwitch]="viewMode" *ngFor="let item of viewTabs; let i = index">
+        <div id="tab-{{item.id}}" *ngSwitchCase="'tab-' + item.id">
+          <app-notificationdetails (status)='onNotify($event)' view="{{item.name}}">
+          </app-notificationdetails>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

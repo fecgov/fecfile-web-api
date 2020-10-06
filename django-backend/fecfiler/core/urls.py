@@ -227,4 +227,14 @@ urlpatterns = [
         views.get_notifications_count,
         name="get_notifications_count",
     ),
+    url(
+        r"^core/get_notifications_counts$",
+        views.get_notifications_counts,
+        name="get_notifications_counts",
+    ),
+    url(
+        r"^core/get_notifications$",
+        views.get_notifications,
+        name="get_notifications",
+    ),
 ]
