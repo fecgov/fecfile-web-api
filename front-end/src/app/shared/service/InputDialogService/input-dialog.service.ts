@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {InputModalComponent} from '../../partials/input-modal/input-modal.component';
 import {Observable} from 'rxjs';
+import {ContactDetailsModalComponent} from '../../../contacts/contact-details-modal/contact-details-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,12 @@ export class InputDialogService {
     modalRef.componentInstance.setDialogTitle(data.title);
 
 
+    return modalRef.result;
+  }
+
+  openContactDetails(data: any): Promise<any> {
+    const modalRef = this.modalService.open(ContactDetailsModalComponent, {size: 'lg', centered: true, windowClass : 'maxWidthClass'});
+    modalRef.componentInstance.setContact(data.contact);
     return modalRef.result;
   }
 }
