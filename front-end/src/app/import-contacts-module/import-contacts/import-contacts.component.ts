@@ -217,27 +217,27 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-    // TODO check for form changes and set boolean property in this class.
-    // TODO need to determine if session timeout.  If true, don't show.
 
-    if (this.unsavedData) {
-      let result: boolean = null;
-      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
-        let val: boolean = null;
+    return true;
 
-        if (res === 'okay') {
-          val = true;
-        } else if (res === 'cancel') {
-          val = false;
-        }
+    // if (this.unsavedData) {
+    //   let result: boolean = null;
+    //   result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+    //     let val: boolean = null;
 
-        return val;
-      });
+    //     if (res === 'okay') {
+    //       val = true;
+    //     } else if (res === 'cancel') {
+    //       val = false;
+    //     }
 
-      return result;
-    } else {
-      return true;
-    }
+    //     return val;
+    //   });
+
+    //   return result;
+    // } else {
+    //   return true;
+    // }
 
   }
 
