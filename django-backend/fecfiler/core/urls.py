@@ -237,4 +237,14 @@ urlpatterns = [
         views.get_notifications,
         name="get_notifications",
     ),
+    url(
+        r"^core/cashOnHand$",
+        views.cashOnHand,
+        name="cashOnHand",
+    ),
+    url(
+        r"^core/cashOnHandInfoStatus$",
+        views.cashOnHandInfoStatus,
+        name="cashOnHandInfoStatus",
+    ),
 ]

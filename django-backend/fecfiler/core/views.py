@@ -5946,7 +5946,6 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
-
 def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5954,27 +5953,52 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
             cvg_start_date = datetime.date(cvg_end_date.year,1,1)
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
+                """SELECT COALESCE(t1.coh_cop, 0), rp.cvg_end_date FROM public.form_3x t1, public.reports rp 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
                 AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
-                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
+                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'
+                AND t1.report_id = rp.report_id""",
                 [cmte_id, cmte_id, cvg_start_date],
             )
             # print("prev_cash_on_hand_cop_3rd_nav")
             # print(cursor.query)
             if cursor.rowcount == 0:
-                coh_cop = 0
+                input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, False)
+                coh_cop = 0 if input_coh == None else input_coh
             else:
                 result = cursor.fetchone()
+                # print(result)
                 coh_cop = result[0]
+                if result[1].year < cvg_start_date.year:
+                    input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, True)
+                    if input_coh != None: coh_cop = input_coh
         return coh_cop
     except Exception as e:
         raise Exception(
             "The prev_cash_on_hand_cop_3rd_nav function is throwing an error: " + str(e)
         )
 
+def get_coh_f3x_table(cov_year, cmte_id, exact_match=True):
+    try:
+        check_filter = "=" if exact_match else "<="
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT coh FROM cash_on_hand_f3x WHERE cmte_id = %s AND coh_year {} %s
+                    ORDER BY coh_year DESC""".format(check_filter),
+                [cmte_id, cov_year],
+            )
+            if cursor.rowcount == 0:
+                coh = None
+            else:
+                result = cursor.fetchone()
+                coh = result[0]
+        return coh
+    except Exception as e:
+        raise Exception(
+            "The get_coh_f3x_table function is throwing an error: " + str(e)
+        )
 
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
@@ -11699,4 +11723,63 @@ def get_notifications(request):
         return Response(
           "The get_notifications API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
-          )          
+          )
+
+@api_view(['GET', 'PUT'])
+def cashOnHand(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        cmte_id = get_comittee_id(request.user.username)
+        if not request.data.get('year'): raise Exception('year field is mandatory')
+        coh_year = request.data.get('year')
+        if request.method == "GET":
+            _sql = """SELECT json_agg(t) FROM (
+                      SELECT coh as amount, coh_year as year FROM
+                      public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s) t"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+            result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+        if request.method == "PUT":
+            coh_amount = request.data.get('amount')
+            sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+            with connection.cursor() as cursor:
+                cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                if cursor.rowcount == 0:
+                    raise Exception('Failed to insert data into table')
+                _sql = """SELECT json_agg(t) FROM (
+                          SELECT coh as amount, coh_year as year FROM
+                          public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                          coh_year = %s) t"""
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+                result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+          "The cashOnHand API - {} is throwing an error: ".format(request.method) + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def cashOnHandInfoStatus(request):
+    try:
+        status_flag = False
+        user_name = request.user.username
+        _sql = """SELECT * FROM cash_on_hand_info_status WHERE username = %s"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [user_name])
+            if cursor.rowcount == 0: 
+                status_flag = True
+                _sql1 = """INSERT INTO cash_on_hand_info_status VALUES(%s)"""
+                cursor.execute(_sql1, [user_name])
+        return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
+    except Exception as e:
+        return Response(
+          "The cashOnHandInfoStatus API is throwing an error: ".format(request.method) + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
