@@ -171,5 +171,14 @@
       }
     }
   }
+.contact_link{
+  a{
+    color: #0062cc;
 
+  a:hover{
+    color: #0000FF;
+  }
+    cursor: pointer;
+  }
+}
 }
