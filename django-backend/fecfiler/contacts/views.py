@@ -274,9 +274,11 @@ def upload_contact(request):
                 save_duplicate = save_data.get("duplicate_contact_df")
 
                 if isinstance(duplicate_file, str) and not check_null_value(data.get("duplicates_files")):
-                    duplicates = save_data.get("duplicate_contact_df")
+                    duplicates = save_data.get("duplicate_contact_df").reset_index(
+                        drop=True).replace(np.nan, '', regex=True)
                 elif isinstance(save_duplicate, str) and not check_null_value(save_duplicate):
-                    duplicates = data.get("duplicates_files")
+                    duplicates = data.get("duplicates_files").reset_index(
+                        drop=True).replace(np.nan, '', regex=True)
                 else:
                     duplicates = pd.concat(
                         [data.get("duplicates_files"), save_data.get("duplicate_contact_df")]).reset_index(
