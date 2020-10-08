@@ -11729,6 +11729,82 @@ def cashOnHandInfoStatus(request):
         return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
     except Exception as e:
         return Response(
-          "The cashOnHandInfoStatus API is throwing an error: ".format(request.method) + str(e),
+          "The cashOnHandInfoStatus API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_logs(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+              c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              concat_ws(', ', e.last_name, e.first_name) AS user, c.logged_date AS modifieddate
+              FROM contacts_log_view c, authentication_account e
+              WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
+              ORDER BY c.logged_date DESC"""
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id')])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_log API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_report_details(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT concat_ws(' ', CASE WHEN r.form_type='F3X' THEN 'Form 3X:' 
+                                            WHEN r.form_type='F3L' THEN 'Form 3L:' 
+                                            WHEN r.form_type='F1M' THEN 'Form 1M:' 
+                                            WHEN r.form_type='F24' THEN 'Form 24:' 
+                                            ELSE 'Form' END,
+                                      concat(rrt.rpt_type_desc,','), 
+                                      concat_ws('-', to_char(r.cvg_start_date, 'MM/DD/YY'), 
+                                                      to_char(r.cvg_end_date, 'MM/DD/YY'))) 
+            AS formdetails, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+            c.city, c.state, c.zip, c.occupation, c.employer,c.phone_number, 
+            al.report_id, al.entity_id
+            FROM all_transactions_view al, reports r, ref_rpt_types rrt, contacts_log_view c
+            WHERE r.report_type = rrt.rpt_type 
+            AND c.id = al.entity_id 
+            AND al.entity_id = %s
+            AND c.logged_date = (
+                SELECT clv.logged_date 
+                FROM contacts_log_view clv 
+                WHERE clv.id = %s
+                AND al.last_update_date <= clv.logged_date 
+                ORDER BY clv.logged_date ASC LIMIT 1)
+            AND al.report_id = r.report_id 
+            AND al.delete_ind IS DISTINCT FROM 'Y' 
+            AND al.cmte_id = %s
+            ORDER BY r.cvg_start_date DESC
+            """
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id'),
+                request.query_params.get('entity_id'), cmte_id])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_report_details API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
