@@ -11346,33 +11346,16 @@ class NotificationsSwitch:
         return getattr(self, 'case_' + viewtype, lambda: default)()
 
     def case_PriorNotices(self):
-        c = 12
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "date_sent":"2020-8-{0}", 
-                "subject":"subject-{1}"  
-            """.format(i, i)
-            q = q + "}"
-        q = q + "]'"
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                date_sent text,
-                subject text
-            )
-            where %s is not null
+            select null as date_sent, null as subject
+            where 1=2 and %(cmte_id)s is not null
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11386,35 +11369,19 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)      
  
     def case_ReminderEmails(self):
-        c = 15
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "form_name":"Form {0}", 
-                "report_type":"Report Type {1}",
-                "due_date":"07-7-{2}"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                form_name text,
-                report_type text,
-                due_date text
-            )
-            where %s is not null
+            select form_tp as form_name, rpt_tp as report_type, due_date
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11429,35 +11396,20 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)
  
     def case_LateNotificationEmails(self):
-        c = 17
-
+        
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "form_name":"Form {0}", 
-                "report_type":"Report Type {1}",
-                "past_due_days":"{2} Days"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                form_name text,
-                report_type text,
-                past_due_days text
-            )
-            where %s is not null
+            select form_tp as form_name, rpt_tp as report_type,
+                ( current_date - due_date ) as past_due_days
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11472,41 +11424,24 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)
 
     def case_FilingConfirmations(self):
-        c = 19
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "filing_id":"C00000{0}",
-                "form_name":"Form {1}", 
-                "report_type":"Report Type {2}",
-                "coverage_dates":"6/{3}/2020 - 6/{4}/2020", 
-                "filed_by":"Filer {5}",
-                "date_time":"08/{6}/2020 | 10:02 AM EST"
-            """.format(i, i, i, i, i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_filing_confirmation
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                filing_id text,
-                form_name text,
-                report_type text,
-                coverage_dates text,
-                filed_by text,
-                date_time text
-            )
-            where %s is not null
+            select filing_id as filing_id,
+                form_tp as form_name,
+                rpt_tp as report_type,
+                null as coverage_dates,
+                null as filed_by,
+                null as date_time
+            from public.notifications_filing_confirmation
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11524,35 +11459,16 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys) 
 
     def case_Rfais(self):
-        c = 1
-
+        
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "date_sent":"2020-8-{0}", 
-                "ref_report_type":"Report Type {1}",
-                "due_date":"08/{2}/2020"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                date_sent text,
-                ref_report_type text,
-                due_date text
-            )
-            where %s is not null
+            select null as date_sent, null as ref_report_type, null as due_date
+            where 1=2 and %(cmte_id)s is not null
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11570,7 +11486,7 @@ class NotificationsSwitch:
         c = 3
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
+            SELECT {0} as count WHERE %(cmte_id)s is not null
         """.format(c)
 
         q = "'["
@@ -11596,7 +11512,7 @@ class NotificationsSwitch:
                 date_time text,
                 check_sum text
             )
-            where %s is not null
+            where %(cmte_id)s is not null
         """
         if self._orderby != None:
             sql_items = sql_items + self._orderby
@@ -11622,12 +11538,28 @@ def get_notifications_count(request):
         cmte_id = get_comittee_id(request.user.username)
 
         sql_count = """
-            SELECT 67 as count WHERE %s is not null
+            select sum(V.records_count) as count
+            from
+            (
+                select count(1) as records_count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+                union 
+                select count(1) as records_count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+                union 
+                select count(1) as records_count
+                from public.notifications_filing_confirmation
+                where cmte_id = %(cmte_id)s
+            ) as V
         """     
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
 
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             row1=cursor.fetchone()[0]
             totalcount =  row1[0]['count']
 
@@ -11647,29 +11579,40 @@ def get_notifications_counts(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
 
-        q = """'[
-            { "group_name": "Prior Notices", "count": 12 },
-            { "group_name": "Reminder Emails", "count": 15 },
-            { "group_name": "Late Notification Emails", "count": 17 },
-            { "group_name": "Filing Confirmations", "count": 19 },
-            { "group_name": "RFAIs", "count": 1 },
-            { "group_name": "Imported Transactions", "count": 3 }
-        ]'"""
-
         sql_groups = """
-            select group_name as "groupName", count 
-            from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                group_name text,
-                count int
-            )
-            where %s is not null
+            select 'Prior Notices' as "groupName", 0 as count
+            union
+            select 'Reminder Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Late Notification Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Filing Confirmations' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_filing_confirmation
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'RFAIs' as "groupName", 0 as count
+            union
+            select 'Imported Transactions' as "groupName", 12 as count
         """
 
         sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             result = cursor.fetchall()
             items = [] if not result[0][0] else result[0][0]
         itemsCount = len(items)
@@ -11681,6 +11624,8 @@ def get_notifications_counts(request):
 
         return Response(output, status=status.HTTP_200_OK)
     except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
         return Response(
           "The get_notifications_counts API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
@@ -11696,13 +11641,17 @@ def get_notifications(request):
 
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             row1=cursor.fetchone()[0]
             totalCount =  row1[0]['count']
 
         sql = """SELECT json_agg(t) FROM (""" + sql_items + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             result = cursor.fetchall()
             items = [] if not result[0][0] else result[0][0]
         #itemsCount = len(items)
