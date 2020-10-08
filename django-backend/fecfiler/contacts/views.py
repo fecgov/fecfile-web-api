@@ -81,11 +81,12 @@ def custom_validate_df(uploaded_df_orig, cmte_id):
         test_data_ind = test_data_temp.ENTITY_TYPE.str.contains('IND', case=False)
         test_data_ind1 = test_data_temp[test_data_ind]
 
-        test_data_ind_temp = test_data_ind_diff = test_data_org_temp = test_data_org_diff = pd.DataFrame(columns=['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
-                                                                        'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
-                                                                        'OCCUPATION',
-                                                                        'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
-                                                                        'MIDDLENAME', 'PREFIX', 'SUFFIX'])
+        test_data_ind_temp = test_data_ind_diff = test_data_org_temp = test_data_org_diff = pd.DataFrame(
+            columns=['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
+                     'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
+                     'OCCUPATION',
+                     'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
+                     'MIDDLENAME', 'PREFIX', 'SUFFIX'])
 
         if not test_data_ind1.empty:
             test_data_ind_temp = test_data_ind1.dropna(how='any',
@@ -264,10 +265,12 @@ def upload_contact(request):
                 contacts_added = data.get("final_list")
 
                 contacts_null_value = data.get("required_field_missing_list").replace(np.nan, '', regex=True)
+                failed_validation_size = len(contacts_null_value)
                 contacts_null_dict = contacts_null_value.to_dict(orient='records')
 
                 save_data = save_contact_db(contacts_added, cmte_id)
                 final_contact_list = save_data.get("final_contact_df")
+                total_records_size = len(final_contact_list)
                 final_contact_list_dict = final_contact_list.to_dict(orient='records')
 
                 duplicate_file = data.get("duplicates_files")
@@ -284,12 +287,41 @@ def upload_contact(request):
                         [data.get("duplicates_files"), save_data.get("duplicate_contact_df")]).reset_index(
                         drop=True).replace(np.nan, '', regex=True)
 
+                duplicate_record_size = len(duplicates)
                 duplicate_dict = duplicates.to_dict(orient='records')
-                contacts_temp = {"contacts": final_contact_list_dict, "contacts_failed_validation": contacts_null_dict,
-                                 "duplicate": duplicate_dict}
+                contacts_temp = {"contacts_saved": int(total_records_size),
+                                 "contacts_failed_validation": int(failed_validation_size),
+                                 "duplicate": int(duplicate_record_size)}
                 contacts = {"Response": contacts_temp}
 
                 return JsonResponse(contacts, status=status.HTTP_201_CREATED, safe=False)
+
+        except Exception as e:
+            json_result = {'message': str(e)}
+            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["DELETE"])
+def delete_contact(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        try:
+            if request.method == 'DELETE':
+                cmte_id = get_comittee_id(request.user.username)
+
+                with connection.cursor() as cursor:
+                    query_string = """delete from public.entity where cmte_id = %s"""
+                    cursor.execute(query_string, [cmte_id])
+                    if cursor.rowcount > 0:
+                        msg = "{} Contacts successfully deleted"
+                    else:
+                        msg = "Contacts were not deleted."
+
+                return JsonResponse(msg.format(cursor.rowcount), status=status.HTTP_201_CREATED, safe=False)
 
         except Exception as e:
             json_result = {'message': str(e)}
