@@ -5,13 +5,11 @@ from rest_framework.decorators import api_view
 from fecfiler.core.views import get_comittee_id, get_list_contact
 
 
-def get_contact_list(cmte_id, entity):
+def get_entity_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                    FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                "', '".join(entity)
-            )
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
             contact_list = cursor.fetchall()
@@ -34,7 +32,7 @@ def contact_details(request):
             entity_list = request.data.get("entity")
 
             if send_all_flag:
-                contact_list = get_contact_list(cmte_id)
+                contact_list = get_entity_contact_list(cmte_id)
                 return JsonResponse({'contacts': list(contact_list)}, status=status.HTTP_200_OK, safe=False)
             elif len(entity_list) > 0:
                 contact_list = get_list_contact(cmte_id, list(entity_list))
