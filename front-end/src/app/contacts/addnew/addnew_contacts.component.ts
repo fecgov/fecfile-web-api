@@ -1382,6 +1382,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
+          if (callFrom === 'contactDetails') {
+            // TODO: JSON format must match
+            // this.transactionToEdit = res;
+            this._messageService.sendMessage({messageFrom: 'contactDetails', message: 'updateContact' , contact: res });
+            this.disableForm();
+          } else {
           //console.log('_contactsService.saveContact res', res);
           this._contactToEdit = null;
           this.frmContact.reset();
@@ -1398,6 +1404,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           if (callFrom === 'viewContacts') {
             this._router.navigate([`/contacts`]);
           }}
+        }
       });
     } else {
       this.frmContact.markAsDirty();
@@ -1440,14 +1447,17 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
  }
 
  disableForm() {
-    this.frmContact.disable();
+   this.frmContact.disable();
  }
-
+ cancelEdit() {
+   this.populateFormForEditOrView(this.transactionToEdit);
+ }
   private enableFrom() {
    this.frmContact.enable();
   }
 
   saveContactDetails() {
-
+  this.doValidateContact('contactDetails');
   }
+
 }

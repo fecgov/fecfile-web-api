@@ -24,7 +24,7 @@
     max-width: 850px;
     tbody{
       display: block;
-      height: 300px;
+      max-height: 300px;
       overflow-y: auto;
       overflow-x: hidden;
     }
@@ -37,13 +37,14 @@
       border-radius:6px;
       -moz-border-radius:6px;
     }
-
     td, th {
       border-left:solid black 1px;
       border-top:solid black 1px;
     }
-
-    td:first-child, th:first-child {
+    tr:first-child > td {
+      border: none;
+    }
+    td:first-child, td:first-child {
       border-left: none;
     }
   }

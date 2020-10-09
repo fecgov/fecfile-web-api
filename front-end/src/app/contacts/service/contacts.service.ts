@@ -240,7 +240,7 @@ export class ContactsService {
 
 
   /**
-   * Map server fields from the response to the model.
+   * Map server fields from the response to the model Array.
    *
    * TODO The API should be changed to pass the property names expected by the front end.
    */
@@ -250,6 +250,18 @@ export class ContactsService {
     }
     const modelArray = [];
     for (const row of serverData) {
+      const model = this.convertRowToModel(row);
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+  /**
+   * Map server fields from the response to the model.
+   *
+   *
+   */
+  public convertRowToModel(row: any) {
+
       const model = new ContactModel({});
       model.entity_type = row.entity_type;
       model.id = row.id;
@@ -269,16 +281,12 @@ export class ContactsService {
       model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
-
       model.candOffice = row.candoffice;
       model.candOfficeState = row.candofficestate;
       model.candCmteId = row.candcmteid;
 
-      modelArray.push(model);
-    }
-    return modelArray;
+    return model;
   }
-
 
   /**
    * Map a single field name to its server field name equivalent.
@@ -800,6 +808,19 @@ export class ContactsService {
      .map(res => {
           return false;
         });
+  }
+
+  public getContactDetails(entityId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url =  `${environment.apiUrl}/core/contactReportDetails`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    let params = new HttpParams();
+    params = params.append('entity_id', entityId);
+    return this._http.get(
+        url, {params, headers: httpOptions});
   }
 
 }

@@ -26,6 +26,7 @@ export class ContactModel {
     activeTransactionsCnt: number;
     toggleLog: boolean;
     contactLog: any;
+    transactions: any;
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -55,6 +56,7 @@ export class ContactModel {
         this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
         this.contactLog = null;
         this.toggleLog = false;
+        this.transactions = null;
     }
 
     setContactLog(contactLog: any) {
@@ -62,5 +64,11 @@ export class ContactModel {
     }
     getContactLog(): any {
         return this.contactLog;
+    }
+    setTransactions(transactions: any){
+        this.transactions = transactions;
+    }
+    getTransactions(): any {
+        return this.transactions;
     }
 }
