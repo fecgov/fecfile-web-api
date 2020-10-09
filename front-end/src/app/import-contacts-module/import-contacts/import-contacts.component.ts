@@ -136,8 +136,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
       this.validationErrorsExist = true;
     }
     if (this.validationErrorsExist || this.duplicatesExist) {
-      const message =
-        `${userContactsMessage.contactsSaved} contact(s) were imported. ${userContactsMessage.duplicateCount} contact(s) were identified as duplicates and ${userContactsMessage.validationErrorCount} contained errors - these were not imported."`;
+      const message = `${userContactsMessage.contactsSaved} contact(s) were imported. ${userContactsMessage.duplicateCount} contact(s) were identified as duplicates and ${userContactsMessage.validationErrorCount} contained errors - these were not imported."`;
       // "1 contact(s) were imported. XXX contact(s) were identified as duplicates and XXX contained errors - these were not imported."
 
       // if (this.validationErrorsExist && this.duplicatesExist) {
