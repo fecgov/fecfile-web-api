@@ -488,7 +488,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   private emitUploadResults(response: any): void {
     let duplicateCount = 0;
     let validationErrorCount = 0;
+    let contactsSaved = 0;
     // let duplicateContacts = [];
+    //{"Response": {"contacts_saved": 2, "contacts_failed_validation": 8, "duplicate": 97}}
     if (response) {
 
       if (response.Response) {
@@ -497,6 +499,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         }
         if (this.utilService.isNumber(response.Response.duplicate)) {
           duplicateCount = response.Response.duplicate;
+        }
+        if (this.utilService.isNumber(response.Response.contacts_saved)) {
+          contactsSaved = response.Response.contacts_saved;
         }
 
         //   if (response.Response.contacts_failed_validation) {
@@ -514,6 +519,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     this.uploadResultEmitter.emit({
       // userContactFields: this.userContactFields,
       // duplicateContacts: duplicateContacts,
+      contactsSaved: contactsSaved,
       duplicateCount: duplicateCount,
       validationErrorCount: validationErrorCount,
       // duplicateFile: this.duplicateFile

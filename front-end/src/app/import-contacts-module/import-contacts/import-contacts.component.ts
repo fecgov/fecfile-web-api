@@ -168,7 +168,8 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
             `It has been excluded from the import.`;
         }
       }
-      this.confirmProceedWithrrors(message);
+      const savedMessage = `${userContactsMessage.contactsSaved} contacts were saved. `;
+      this.confirmProceedWithrrors(savedMessage + message);
     } else {
       this.unsavedData = false;
       this.showNextStep();
