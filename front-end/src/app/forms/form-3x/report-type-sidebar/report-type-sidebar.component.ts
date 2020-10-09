@@ -28,6 +28,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
 
   public editMode: boolean;
   public dueDate: string = null;
+  public electionDate: string = null;
   public electionStates: any = null;
   public electionDates: any = null;
   public frmReportSidebar: FormGroup;
@@ -109,9 +110,9 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
       this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
       this.frmReportSidebar.controls['dueDate'].patchValue(message.currentReportData.currentDueDate);
-      if(this.formType.endsWith('3X')){
+/*       if(this.formType.endsWith('3X')){
         this.populateDatesByState(message.currentReportData.currentElectionState);
-      }
+      } */
       if(this.formType.endsWith('3L')){
         this.frmReportSidebar.controls['semiAnnualDatesOption'].patchValue(this.getSemiAnnualDateOptionByStartAndEndDates(null,message.currentReportData.currentSemiAnnualStartDate,message.currentReportData.currentSemiAnnualEndDate));
       }
@@ -179,7 +180,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
 
 
   private changeDataBasedOnSelectedReport() {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this.changeDataBasedOnSelectedReportFor3L();
     }
     else{
@@ -339,6 +340,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
             this.fromDate = this.selectedReport.cvg_start_date;
             this.toDate = this.selectedReport.cvg_end_date;
             this.dueDate = this.selectedReport.due_date;
+            this.electionDate = this.selectedReport.election_date;
             this.disableCoverageDatesIfApplicable();
             this.populateSemiAnnualDates();
 
@@ -346,7 +348,8 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
             this.patchForDisabledField('fromDate',this.fromDate);
             this.patchForDisabledField('toDate',this.toDate);
             this.patchForDisabledField('state',null);
-            this.patchForDisabledField('election_date',null);
+            this.patchForDisabledField('election_date',this.electionDate);
+            this.patchForDisabledField('dueDate',this.dueDate);
             if(this.frmReportSidebar.controls['semiAnnualDatesOption'] && this.frmReportSidebar.controls['semiAnnualDatesOption'].value){
               let selectedSemiAnnualOption = this.selectedReport['semi-annual_dates'].filter(obj => obj.selected);
               if(selectedSemiAnnualOption && selectedSemiAnnualOption.length > 0){
@@ -499,7 +502,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
    * @param      {Object}  e       The event object.
    */
   public selectStateChange(e): void {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this.handleSelectStateChangeFor3L(e);
     }
     else{
@@ -571,7 +574,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
    * @param      {Object}  e       The event object.
    */
   public selectElectionDateChange(e): void {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this._messageService.sendMessage({action:'reportTypeSideBarUpdate', currentData:this.frmReportSidebar.value});
     }
     else{
@@ -629,7 +632,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
    * @param      {string}  date    The date
    */
   public fromDateChange(date: string) {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this._messageService.sendMessage({action:'reportTypeSideBarUpdate', currentData:this.frmReportSidebar.value});
     }
     else{
@@ -657,7 +660,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
    * @param      {string}  date    The date
    */
   public toDateChange(date: string) {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this._messageService.sendMessage({action:'reportTypeSideBarUpdate', currentData:this.frmReportSidebar.value});
     }
     else{

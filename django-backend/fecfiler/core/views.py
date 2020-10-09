@@ -453,28 +453,30 @@ def get_report_types(request):
                 parameter = "Monthly-Non-Election-Year"
             else:
                 parameter = "Monthly-Election-Year"
-        if form_type == 'F3X':
-            forms_obj = data['F3X'].get(parameter)
-            for report_type in forms_obj['report_type']:
-                for election_state in report_type['election_state']:
-                    for dates in election_state['dates']:
-                        if dates.get('cvg_start_date'):
-                            dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
-                        if dates.get('cvg_end_date'):
-                            dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
-                        if dates.get('due_date'):
-                            if "YYYY-01" in dates.get('due_date'):
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
-                            else:
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
-        elif form_type == 'F3L':
-            forms_obj = data['F3L'].get(parameter)
+        # if form_type == 'F3X':
+        #     forms_obj = data['F3X'].get(parameter)
+        #     for report_type in forms_obj['report_type']:
+        #         for election_state in report_type['election_state']:
+        #             for dates in election_state['dates']:
+        #                 if dates.get('cvg_start_date'):
+        #                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+        #                 if dates.get('cvg_end_date'):
+        #                     dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+        #                 if dates.get('due_date'):
+        #                     if "YYYY-01" in dates.get('due_date'):
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+        #                     else:
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+        if form_type == 'F3L' or  form_type == 'F3X':
+            forms_obj = data[form_type].get(parameter)
             for dates in forms_obj['report_type']:
                 # Temporary fix till we get EFO dates
                 if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
                 if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
                 if dates.get('due_date') == 'EFO': dates['due_date'] = None
 
+                if dates.get('election_date'):
+                    dates['election_date'] = dates.get('election_date').replace("YYYY", str(_year))
                 if dates.get('cvg_start_date'):
                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
                 if dates.get('cvg_end_date'):
