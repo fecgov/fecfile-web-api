@@ -68,10 +68,11 @@
         <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" draggable="false" [routerLink]="['/help']">
-          <i class="notifications-icon icon"></i>
-          Notifications
-        </a>
+          <a class="nav-link" draggable="false" [routerLink]="['/notifications']">
+            <!-- <i *ngIf="!(notificationsCount > 0)" class="notifications-icon icon"></i> -->
+            <i *ngIf="(notificationsCount > 0)" class="fas fa-bell" [attr.data-count]="notificationsCount"></i>
+            Notifications
+          </a>
       </li>
       <li class="nav-item dropdown">
         <div class="d-inline-block" ngbDropdown placement="bottom-left">

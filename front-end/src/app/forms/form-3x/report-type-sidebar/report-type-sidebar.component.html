@@ -26,7 +26,7 @@
               </option>
             </select>
           </div>
-          <div class="sidebar-item" *ngIf="formType !== '3L'">
+          <!-- <div class="sidebar-item" *ngIf="formType !== '3L'">
             <label for="electionDate">
               Election Date
               <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
@@ -56,8 +56,8 @@
                 {{ dateSelected.election_date | date: 'MM/dd/yyyy' }}
               </option>
             </select>
-          </div>
-          <div class="sidebar-item" *ngIf="formType === '3L'">
+          </div> -->
+          <div class="sidebar-item" *ngIf="formType === '3L' || formType === '3X'">
               <label for="electionDate">
                 Election Date*
                 <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">

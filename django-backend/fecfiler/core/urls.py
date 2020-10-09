@@ -222,4 +222,40 @@ urlpatterns = [
         views.get_f24_reports,
         name="get_f24_reports",
     ),
+    url(
+        r"^core/get_notifications_count$",
+        views.get_notifications_count,
+        name="get_notifications_count",
+    ),
+    url(
+        r"^core/get_notifications_counts$",
+        views.get_notifications_counts,
+        name="get_notifications_counts",
+    ),
+    url(
+        r"^core/get_notifications$",
+        views.get_notifications,
+        name="get_notifications",
+    ),
+    url(
+        r"^core/cashOnHand$",
+        views.cashOnHand,
+        name="cashOnHand",
+    ),
+    url(
+        r"^core/cashOnHandInfoStatus$",
+        views.cashOnHandInfoStatus,
+        name="cashOnHandInfoStatus",
+    ),
+    url(
+        r"^core/contactLogs$",
+        views.contact_logs,
+        name="contact_logs",
+    ),
+    url(
+        r"^core/contactReportDetails$",
+        views.contact_report_details,
+        name="contact_report_details",
+    ),
+
 ]

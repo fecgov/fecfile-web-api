@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { ImportContactsService } from '../../service/import-contacts.service';
 import { PaginationInstance } from 'ngx-pagination';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,6 +15,12 @@ import { FieldEntryModel } from './model/field-entry.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DuplicateContactsComponent implements OnInit, OnDestroy {
+
+  @Input()
+  public duplicates: Array<string>;
+
+  @Output()
+  public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   // public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
@@ -98,8 +104,10 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
+    // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
+    this._importContactsService.checkDuplicates(page).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
+      // this.contactsSubject.next(this.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
       this.numberOfPages = res.totalPages;
@@ -148,23 +156,43 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   /////////////////////////
-  // import modal methods
+  // import all modal methods
   /////////////////////////
 
-  public confirmFinalizeImport(modal: any) {
+  public confirmFinalizeImportAll(modal: any) {
     // const contact0 = this.contacts[0];
     // this.contacts[0] = { ...contact0, entity_name: new Date().toString() };
     this._modalService.open(modal, { centered: true, backdrop: 'static' });
   }
 
-  public cancelFinalizeImport(modal: any) {
+  public cancelFinalizeImportAll(modal: any) {
     modal.close('cancel it');
-    // this.cancelMerge();
   }
 
-  public import(modal: any) {
+  public importAll(modal: any) {
     modal.close('close it');
     // TODO call API to save imported data for the file ID.
+  }
+
+  /////////////////////////
+  // merge modal methods
+  /////////////////////////
+
+  public confirmFinalizeMergeAll(modal: any) {
+    this._modalService.open(modal, { centered: true, backdrop: 'static' });
+  }
+
+  public cancelFinalizeMergeAll(modal: any) {
+    modal.close('cancel it');
+  }
+
+  public mergeAll(modal: any) {
+    modal.close('close it');
+    // TODO call API to save merged data for the file ID.
+  }
+
+  public cancelImportAll() {
+    this.dupeCancelEmitter.emit();
   }
 
   // TODO consider putting merge modal methods in another plain old class (not a component)
