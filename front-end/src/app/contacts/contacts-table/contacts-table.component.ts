@@ -17,6 +17,9 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ContactFilterModel } from '../model/contacts-filter.model';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { AuthService} from '../../shared/services/AuthService/auth.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ContactDetailsModalComponent} from '../contact-details-modal/contact-details-modal.component';
+import {InputDialogService} from '../../shared/service/InputDialogService/input-dialog.service';
 
 @Component({
   selector: 'app-contacts-table',
@@ -156,7 +159,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     private _dialogService: DialogService,
     private _authService: AuthService,
     private _router: Router,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private contactModal: InputDialogService,
   ) {
     this.showPinColumnsSubscription = this._contactsMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -312,9 +316,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.contactsModel = contactsModelL;
 
         this.contactsModel.forEach((e) => {
-          console.log(this.dummyData.contactLog);
           e.setContactLog(this.dummyData.contactLog);
-          console.log(e.getContactLog());
         });
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
@@ -1243,5 +1245,23 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
   toggleContactLog(cnt: ContactModel) {
     cnt.toggleLog = !cnt.toggleLog;
+  }
+
+  showContactDetails(contact: ContactModel) {
+    console.log('Showing Modal for contact details fe');
+
+    const data = {
+      contact: contact
+    };
+    const modalRef = this.contactModal.openContactDetails(data);
+    modalRef.then((res) => {
+      if (res === 'agree') {
+
+      } else if (res === 'decline') {
+      }
+
+    }).catch(e => {
+      // do nothing stay on the same page
+    });
   }
 }

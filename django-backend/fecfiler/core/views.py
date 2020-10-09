@@ -5948,7 +5948,6 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
-
 def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5956,27 +5955,52 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
             cvg_start_date = datetime.date(cvg_end_date.year,1,1)
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
+                """SELECT COALESCE(t1.coh_cop, 0), rp.cvg_end_date FROM public.form_3x t1, public.reports rp 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
                 AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
-                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
+                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'
+                AND t1.report_id = rp.report_id""",
                 [cmte_id, cmte_id, cvg_start_date],
             )
             # print("prev_cash_on_hand_cop_3rd_nav")
             # print(cursor.query)
             if cursor.rowcount == 0:
-                coh_cop = 0
+                input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, False)
+                coh_cop = 0 if input_coh == None else input_coh
             else:
                 result = cursor.fetchone()
+                # print(result)
                 coh_cop = result[0]
+                if result[1].year < cvg_start_date.year:
+                    input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, True)
+                    if input_coh != None: coh_cop = input_coh
         return coh_cop
     except Exception as e:
         raise Exception(
             "The prev_cash_on_hand_cop_3rd_nav function is throwing an error: " + str(e)
         )
 
+def get_coh_f3x_table(cov_year, cmte_id, exact_match=True):
+    try:
+        check_filter = "=" if exact_match else "<="
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT coh FROM cash_on_hand_f3x WHERE cmte_id = %s AND coh_year {} %s
+                    ORDER BY coh_year DESC""".format(check_filter),
+                [cmte_id, cov_year],
+            )
+            if cursor.rowcount == 0:
+                coh = None
+            else:
+                result = cursor.fetchone()
+                coh = result[0]
+        return coh
+    except Exception as e:
+        raise Exception(
+            "The get_coh_f3x_table function is throwing an error: " + str(e)
+        )
 
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
@@ -11324,33 +11348,16 @@ class NotificationsSwitch:
         return getattr(self, 'case_' + viewtype, lambda: default)()
 
     def case_PriorNotices(self):
-        c = 12
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "date_sent":"2020-8-{0}", 
-                "subject":"subject-{1}"  
-            """.format(i, i)
-            q = q + "}"
-        q = q + "]'"
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                date_sent text,
-                subject text
-            )
-            where %s is not null
+            select null as date_sent, null as subject
+            where 1=2 and %(cmte_id)s is not null
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11364,35 +11371,19 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)      
  
     def case_ReminderEmails(self):
-        c = 15
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "form_name":"Form {0}", 
-                "report_type":"Report Type {1}",
-                "due_date":"07-7-{2}"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                form_name text,
-                report_type text,
-                due_date text
-            )
-            where %s is not null
+            select form_tp as form_name, rpt_tp as report_type, due_date
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11407,35 +11398,20 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)
  
     def case_LateNotificationEmails(self):
-        c = 17
-
+        
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "form_name":"Form {0}", 
-                "report_type":"Report Type {1}",
-                "past_due_days":"{2} Days"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                form_name text,
-                report_type text,
-                past_due_days text
-            )
-            where %s is not null
+            select form_tp as form_name, rpt_tp as report_type,
+                ( current_date - due_date ) as past_due_days
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11450,41 +11426,24 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)
 
     def case_FilingConfirmations(self):
-        c = 19
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "filing_id":"C00000{0}",
-                "form_name":"Form {1}", 
-                "report_type":"Report Type {2}",
-                "coverage_dates":"6/{3}/2020 - 6/{4}/2020", 
-                "filed_by":"Filer {5}",
-                "date_time":"08/{6}/2020 | 10:02 AM EST"
-            """.format(i, i, i, i, i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            select count(1) as count
+            from public.notifications_filing_confirmation
+            where cmte_id = %(cmte_id)s
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                filing_id text,
-                form_name text,
-                report_type text,
-                coverage_dates text,
-                filed_by text,
-                date_time text
-            )
-            where %s is not null
+            select filing_id as filing_id,
+                form_tp as form_name,
+                rpt_tp as report_type,
+                null as coverage_dates,
+                null as filed_by,
+                null as date_time
+            from public.notifications_filing_confirmation
+            where cmte_id = %(cmte_id)s
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11502,35 +11461,16 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys) 
 
     def case_Rfais(self):
-        c = 1
-
+        
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "date_sent":"2020-8-{0}", 
-                "ref_report_type":"Report Type {1}",
-                "due_date":"08/{2}/2020"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                date_sent text,
-                ref_report_type text,
-                due_date text
-            )
-            where %s is not null
+            select null as date_sent, null as ref_report_type, null as due_date
+            where 1=2 and %(cmte_id)s is not null
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11548,7 +11488,7 @@ class NotificationsSwitch:
         c = 3
 
         sql_count = """
-            SELECT {0} as count WHERE %s is not null
+            SELECT {0} as count WHERE %(cmte_id)s is not null
         """.format(c)
 
         q = "'["
@@ -11574,7 +11514,7 @@ class NotificationsSwitch:
                 date_time text,
                 check_sum text
             )
-            where %s is not null
+            where %(cmte_id)s is not null
         """
         if self._orderby != None:
             sql_items = sql_items + self._orderby
@@ -11600,12 +11540,28 @@ def get_notifications_count(request):
         cmte_id = get_comittee_id(request.user.username)
 
         sql_count = """
-            SELECT 67 as count WHERE %s is not null
+            select sum(V.records_count) as count
+            from
+            (
+                select count(1) as records_count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+                union 
+                select count(1) as records_count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+                union 
+                select count(1) as records_count
+                from public.notifications_filing_confirmation
+                where cmte_id = %(cmte_id)s
+            ) as V
         """     
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
 
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             row1=cursor.fetchone()[0]
             totalcount =  row1[0]['count']
 
@@ -11625,29 +11581,40 @@ def get_notifications_counts(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
 
-        q = """'[
-            { "group_name": "Prior Notices", "count": 12 },
-            { "group_name": "Reminder Emails", "count": 15 },
-            { "group_name": "Late Notification Emails", "count": 17 },
-            { "group_name": "Filing Confirmations", "count": 19 },
-            { "group_name": "RFAIs", "count": 1 },
-            { "group_name": "Imported Transactions", "count": 3 }
-        ]'"""
-
         sql_groups = """
-            select group_name as "groupName", count 
-            from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                group_name text,
-                count int
-            )
-            where %s is not null
+            select 'Prior Notices' as "groupName", 0 as count
+            union
+            select 'Reminder Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Late Notification Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Filing Confirmations' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_filing_confirmation
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'RFAIs' as "groupName", 0 as count
+            union
+            select 'Imported Transactions' as "groupName", 12 as count
         """
 
         sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             result = cursor.fetchall()
             items = [] if not result[0][0] else result[0][0]
         itemsCount = len(items)
@@ -11659,6 +11626,8 @@ def get_notifications_counts(request):
 
         return Response(output, status=status.HTTP_200_OK)
     except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
         return Response(
           "The get_notifications_counts API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
@@ -11674,13 +11643,17 @@ def get_notifications(request):
 
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             row1=cursor.fetchone()[0]
             totalCount =  row1[0]['count']
 
         sql = """SELECT json_agg(t) FROM (""" + sql_items + """) t"""
         with connection.cursor() as cursor:
-            cursor.execute(sql, [cmte_id])
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
             result = cursor.fetchall()
             items = [] if not result[0][0] else result[0][0]
         #itemsCount = len(items)
@@ -11701,4 +11674,139 @@ def get_notifications(request):
         return Response(
           "The get_notifications API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
-          )          
+          )
+
+@api_view(['GET', 'PUT'])
+def cashOnHand(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        cmte_id = get_comittee_id(request.user.username)
+        if not request.data.get('year'): raise Exception('year field is mandatory')
+        coh_year = request.data.get('year')
+        if request.method == "GET":
+            _sql = """SELECT json_agg(t) FROM (
+                      SELECT coh as amount, coh_year as year FROM
+                      public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s) t"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+            result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+        if request.method == "PUT":
+            coh_amount = request.data.get('amount')
+            sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+            with connection.cursor() as cursor:
+                cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                if cursor.rowcount == 0:
+                    raise Exception('Failed to insert data into table')
+                _sql = """SELECT json_agg(t) FROM (
+                          SELECT coh as amount, coh_year as year FROM
+                          public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                          coh_year = %s) t"""
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+                result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+          "The cashOnHand API - {} is throwing an error: ".format(request.method) + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def cashOnHandInfoStatus(request):
+    try:
+        status_flag = False
+        user_name = request.user.username
+        _sql = """SELECT * FROM cash_on_hand_info_status WHERE username = %s"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [user_name])
+            if cursor.rowcount == 0: 
+                status_flag = True
+                _sql1 = """INSERT INTO cash_on_hand_info_status VALUES(%s)"""
+                cursor.execute(_sql1, [user_name])
+        return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
+    except Exception as e:
+        return Response(
+          "The cashOnHandInfoStatus API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_logs(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+              c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              concat_ws(', ', e.last_name, e.first_name) AS user, c.logged_date AS modifieddate
+              FROM contacts_log_view c, authentication_account e
+              WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
+              ORDER BY c.logged_date DESC"""
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id')])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_log API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_report_details(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT concat_ws(' ', CASE WHEN r.form_type='F3X' THEN 'Form 3X:' 
+                                            WHEN r.form_type='F3L' THEN 'Form 3L:' 
+                                            WHEN r.form_type='F1M' THEN 'Form 1M:' 
+                                            WHEN r.form_type='F24' THEN 'Form 24:' 
+                                            ELSE 'Form' END,
+                                      concat(rrt.rpt_type_desc,','), 
+                                      concat_ws('-', to_char(r.cvg_start_date, 'MM/DD/YY'), 
+                                                      to_char(r.cvg_end_date, 'MM/DD/YY'))) 
+            AS formdetails, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+            c.city, c.state, c.zip, c.occupation, c.employer,c.phone_number, 
+            al.report_id, al.entity_id
+            FROM all_transactions_view al, reports r, ref_rpt_types rrt, contacts_log_view c
+            WHERE r.report_type = rrt.rpt_type 
+            AND c.id = al.entity_id 
+            AND al.entity_id = %s
+            AND c.logged_date = (
+                SELECT clv.logged_date 
+                FROM contacts_log_view clv 
+                WHERE clv.id = %s
+                AND al.last_update_date <= clv.logged_date 
+                ORDER BY clv.logged_date ASC LIMIT 1)
+            AND al.report_id = r.report_id 
+            AND al.delete_ind IS DISTINCT FROM 'Y' 
+            AND al.cmte_id = %s
+            ORDER BY r.cvg_start_date DESC
+            """
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id'),
+                request.query_params.get('entity_id'), cmte_id])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_report_details API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

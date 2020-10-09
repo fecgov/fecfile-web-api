@@ -100,7 +100,7 @@
            <i *ngIf="cnt.toggleLog" class="fas fa-angle-up"></i>
          </a>
         </td>
-        <td *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
+        <td *ngIf="isColumnVisible('name')" class="contact_link"><a (click)="showContactDetails(cnt)">{{cnt.name}}</a></td>
         <td *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
         <td *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
         <td *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>

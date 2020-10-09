@@ -34,6 +34,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   public frmReportSidebar: FormGroup;
   public fromDate: string = null;
   public toDate: string = null;
+  public electionDate: string = null;
   public selectedElectionState: string = null;
   public selectedElecetionDate: string = null;
   
@@ -82,6 +83,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
           this.dueDate = null;
           this.fromDate = null;
           this.toDate = null;
+          this.electionDate = null;
           this._selectedState = null;
           this._selectedElectionDate = null;
           this.selectedElectionState = null;
@@ -119,6 +121,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
       this.fromDate = message.currentReportData.currentStartDate;
       this.toDate = message.currentReportData.currentEndDate;
+      this.electionDate = message.currentReportData.currentElectionDate;
       this.dueDate = message.currentReportData.currentDueDate;
       this.fromDateChange(message.currentReportData.currentStartDate);
     }
@@ -316,6 +319,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         if (this._newReportSelected) {
           this.fromDate = '';
           this.toDate = '';
+          this.electionDate = '';
         }
         this._selectedElectionDates = null;
 
@@ -324,6 +328,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
 
           this.fromDate = this.messageDataForEdit.currentReportData.currentStartDate;
           this.toDate = this.messageDataForEdit.currentReportData.currentEndDate;
+          this.electionDate = this.messageDataForEdit.currentReportData.currentElectionDate;
           this.dueDate = this.messageDataForEdit.currentReportData.currentDueDate;
           this.disableCoverageDatesIfApplicable();
           this.populateSemiAnnualDates();
@@ -331,6 +336,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
           if(this.frmReportSidebar){
             this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
             this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+            this.frmReportSidebar.controls['election_date'].patchValue(this.electionDate);
             this.fromDateChange(this.fromDate);
           }
         }
@@ -339,6 +345,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         else {
             this.fromDate = this.selectedReport.cvg_start_date;
             this.toDate = this.selectedReport.cvg_end_date;
+            this.electionDate = this.selectedReport.election_date;
             this.dueDate = this.selectedReport.due_date;
             this.electionDate = this.selectedReport.election_date;
             this.disableCoverageDatesIfApplicable();

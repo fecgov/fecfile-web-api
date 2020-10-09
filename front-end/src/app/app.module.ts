@@ -109,6 +109,7 @@ import * as AWS from 'aws-sdk/global';
 import * as S3 from 'aws-sdk/clients/s3';
 
 import {PasswordModule} from './password/password.module';
+import { ContactDetailsModalComponent } from './contacts/contact-details-modal/contact-details-modal.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -201,9 +202,10 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     F24Component,
     ExportDirective,
     F24LinkModalComponent,
-    FormEntryComponent
+    FormEntryComponent,
+    ContactDetailsModalComponent
   ],
-  entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
+  entryComponents: [ConfirmModalComponent, F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3, ContactDetailsModalComponent],
   imports: [
     PasswordModule,
     SharedModule,

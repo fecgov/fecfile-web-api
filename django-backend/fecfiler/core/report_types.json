@@ -38,6 +38,7 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
+
             "election_date": "YYYY-11-03",
             "cvg_start_date": null,
             "cvg_end_date": "YYYY-10-14",
@@ -49,6 +50,7 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
+
             "cvg_start_date": null,
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-12-03",
@@ -328,19 +330,20 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
+            "election_date": "YYYY-11-03",
             "cvg_start_date": null,
-            "cvg_end_date": null,
-            "due_date": null
-          },
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22"
           {
             "report_type": "30G",
             "report_type_desciption": "30 Day Post-General - 30G",
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
+            "election_date": "YYYY-11-03",
             "cvg_start_date": null,
-            "cvg_end_date": null,
-            "due_date": null
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03"
           },
           {
             "report_type": "YE",
@@ -577,8 +580,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -673,8 +677,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -883,8 +888,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -979,8 +985,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1374,8 +1381,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO"
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "30G",
@@ -1384,8 +1392,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO"
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "MYS",
