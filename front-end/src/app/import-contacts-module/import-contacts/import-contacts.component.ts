@@ -140,32 +140,32 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
       if (this.validationErrorsExist && this.duplicatesExist) {
         if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount > 1) {
           message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
-            `and ${userContactsMessage.validationErrorCount} were found in error.  They will be excluded from the ` +
-            `import if you coose to proceed.`;
+            `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
+            `import.`;
         } else if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount === 1) {
           message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
-            `and ${userContactsMessage.validationErrorCount} was found in error.  They will be excluded from the ` +
-            `import if you coose to proceed.`;
+            `and ${userContactsMessage.validationErrorCount} was found in error.  They have been excluded from the ` +
+            `import.`;
         } else if (userContactsMessage.duplicateCount === 1 && userContactsMessage.validationErrorCount > 1) {
           message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate ` +
-            `and ${userContactsMessage.validationErrorCount} were found in error.  They will be excluded from the ` +
-            `import if you coose to proceed.`;
+            `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
+            `import.`;
         }
       } else if (this.duplicatesExist) {
         if (userContactsMessage.duplicateCount > 1) {
           message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates. ` +
-            `They will be excluded from the import if you coose to proceed.`;
+            `They have been excluded from the import.`;
         } else {
           message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate. ` +
-            `It will be excluded from the import if you coose to proceed.`;
+            `It has been excluded from the import.`;
         }
       } else if (this.validationErrorsExist) {
         if (userContactsMessage.validationErrorCount > 1) {
           message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
-            ` They will be excluded from the import if you coose to proceed.`;
+            `They have been excluded from the import.`;
         } else {
           message = `${userContactsMessage.validationErrorCount} contact was found in error.  ` +
-            ` It will be excluded from the import if you coose to proceed.`;
+            `It has been excluded from the import.`;
         }
       }
       this.confirmProceedWithrrors(message);
@@ -186,15 +186,16 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
   private confirmProceedWithrrors(message: string) {
     this._dialogService
-      .confirm(message, ConfirmModalComponent, 'Caution!')
+      .confirm(message, ConfirmModalComponent, 'Caution!', false)
       .then(res => {
         if (res === 'okay') {
           this.unsavedData = false;
           this.showNextStep();
-        } else if (res === 'cancel') {
-          this.currentStep = this.step1Upload;
-          this.forceChangeDetectionUpload = new Date();
         }
+        // else if (res === 'cancel') {
+        //   this.currentStep = this.step1Upload;
+        //   this.forceChangeDetectionUpload = new Date();
+        // }
       });
   }
 

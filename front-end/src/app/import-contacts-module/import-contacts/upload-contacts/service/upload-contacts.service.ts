@@ -83,7 +83,7 @@ export class UploadContactsService {
         _setPercentage(progressPercent);
       }).send(function (err: AWSError, data: ManagedUpload.SendData) {
         if (err) {
-          // console.log('There was an error uploading your file: ', err);
+          console.log('There was an error uploading your file: ', err);
           _setPercentage(0);
           // return false;
           // return Observable.of(false);
