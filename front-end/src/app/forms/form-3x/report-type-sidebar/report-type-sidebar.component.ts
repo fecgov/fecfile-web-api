@@ -34,7 +34,6 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   public frmReportSidebar: FormGroup;
   public fromDate: string = null;
   public toDate: string = null;
-  public electionDate: string = null;
   public selectedElectionState: string = null;
   public selectedElecetionDate: string = null;
   
