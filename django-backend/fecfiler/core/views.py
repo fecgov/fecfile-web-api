@@ -11679,9 +11679,9 @@ def cashOnHand(request):
     try:
         is_read_only_or_filer_reports(request)
         cmte_id = get_comittee_id(request.user.username)
-        if not request.data.get('year'): raise Exception('year field is mandatory')
-        coh_year = request.data.get('year')
         if request.method == "GET":
+            if not request.query_params.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.query_params.get('year')
             _sql = """SELECT json_agg(t) FROM (
                       SELECT coh as amount, coh_year as year FROM
                       public.cash_on_hand_f3x WHERE cmte_id = %s AND
@@ -11693,16 +11693,34 @@ def cashOnHand(request):
             return Response(result, status=status.HTTP_200_OK)
 
         if request.method == "PUT":
+            if not request.data.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.data.get('year')
             coh_amount = request.data.get('amount')
-            sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+
+            # first check if an entry exists
+            get_sql = """SELECT * FROM cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s """
             with connection.cursor() as cursor:
-                cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                cursor.execute(get_sql, [cmte_id, coh_year])
                 if cursor.rowcount == 0:
-                    raise Exception('Failed to insert data into table')
-                _sql = """SELECT json_agg(t) FROM (
-                          SELECT coh as amount, coh_year as year FROM
-                          public.cash_on_hand_f3x WHERE cmte_id = %s AND
-                          coh_year = %s) t"""
+                    sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to insert data into table')
+                else:
+                    sql = """UPDATE cash_on_hand_f3x set coh = %s WHERE cmte_id = %s AND
+                        coh_year = %s"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [coh_amount, cmte_id, coh_year])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to update data in the table')
+            
+            _sql = """SELECT json_agg(t) FROM (
+                    SELECT coh as amount, coh_year as year FROM
+                    public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                    coh_year = %s) t"""
+            with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, coh_year])
                 output=cursor.fetchone()[0]
                 result = output[0] if output else {}
@@ -11718,14 +11736,14 @@ def cashOnHand(request):
 def cashOnHandInfoStatus(request):
     try:
         status_flag = False
-        user_name = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         _sql = """SELECT * FROM cash_on_hand_info_status WHERE username = %s"""
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [user_name])
+            cursor.execute(_sql, [cmte_id])
             if cursor.rowcount == 0: 
                 status_flag = True
                 _sql1 = """INSERT INTO cash_on_hand_info_status VALUES(%s)"""
-                cursor.execute(_sql1, [user_name])
+                cursor.execute(_sql1, [cmte_id])
         return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
     except Exception as e:
         return Response(

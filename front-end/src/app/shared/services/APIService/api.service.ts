@@ -143,4 +143,21 @@ export class ApiService {
         )
   }
 
+  public getCashOnHandInfoStatus(): Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/cashOnHandInfoStatus`;
+    let httpOptions =  new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+      .get(url,
+        {
+          headers: httpOptions
+        }
+      )
+}
+
+
 }
