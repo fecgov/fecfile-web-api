@@ -1,0 +1,23 @@
+@import 'src/app/shared/scss/global';
+
+
+.container{
+    margin-left: 10%;
+    .form__container{
+
+        .headerLabel{
+            margin-bottom: 1%;
+        }
+        .inputField{
+            // padding-left:3%;
+            width:70%;
+        }
+    }
+}
+.modal-header{
+    color: black;
+}
+
+.form-control.ng-touched.ng-invalid{
+    border-color: $red;
+  }
