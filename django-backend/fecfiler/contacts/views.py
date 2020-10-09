@@ -176,7 +176,6 @@ def reorder_user_data(contacts_added, contact_list):
                 lambda x: x['_merge'] == 'left_only']
 
             contact_duplicate_dict = contacts_added_dict1.merge(contact_list_dict1, how='inner', indicator=False)
-            print(type(contact_duplicate_dict))
             del contact_final_dict['_merge']
             data = {"final_contact_df": contact_final_dict, "duplicate_contact_df": contact_duplicate_dict}
         else:
@@ -197,8 +196,7 @@ def reorder_user_data(contacts_added, contact_list):
 def create_db_model(contacts_final_dict):
     try:
         contacts_final_dict = contacts_final_dict.to_dict(orient='records')
-        for contact in contacts_final_dict:
-            print(contact)
+
         with connection.cursor() as cursor:
             all_contact = [{
                 **contact,
@@ -257,8 +255,6 @@ def upload_contact(request):
                 csv_string = body.read().decode('latin')
 
                 df = pd.read_csv(StringIO(csv_string), dtype=object)
-
-                print(df.head())
 
                 data = custom_validate_df(df, cmte_id)
 
