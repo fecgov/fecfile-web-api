@@ -35,7 +35,7 @@
             <div class="text-error text-center" *ngIf="(frmReportType.dirty || frmReportType.touched) && optionFailed">
               You must select a report type for filing.
             </div>
-            <div
+            <!-- <div
               class="text-error text-center"
               *ngIf=" formType === '3X' &&
                 (frmReportType.dirty || frmReportType.touched) &&
@@ -43,10 +43,10 @@
               "
             >
               You must select coverage dates.
-            </div>
+            </div> -->
             <div
               class="text-error text-center"
-              *ngIf=" formType === '3L' &&
+              *ngIf="(formType === '3L' || formType === '3X') &&
                 showErrors &&
                 coverageDatesMissing
               "
@@ -55,7 +55,7 @@
             </div>
             <div
               class="text-error text-center"
-              *ngIf=" formType === '3L' &&
+              *ngIf="(formType === '3L' || formType === '3X') &&
                 showErrors &&
                 electionDateMissing
               "
@@ -64,7 +64,7 @@
             </div>
             <div
               class="text-error text-center"
-              *ngIf=" formType === '3L' &&
+              *ngIf="(formType === '3L' || formType === '3X') &&
                 showErrors &&
                 stateMissing
               "

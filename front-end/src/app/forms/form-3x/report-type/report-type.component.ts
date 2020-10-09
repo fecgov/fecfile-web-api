@@ -122,7 +122,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
     this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
           if (res && res.action === 'coverageDatesUpdated') {
-              this.setData(res);
+              this.setDataFor3L(res);
           }
           else if(res && res.action === 'reportTypeSideBarUpdate'){
             //missing dates
@@ -290,6 +290,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
         }
         this.fromDateSelected = null;
         this.toDateSelected = null;
+        this._dueDate = null;
         this.invalidDatesServerValidation = false;
 
         // for some reason selected radio button value is coming as 'on'
@@ -346,7 +347,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   private setReportParams(dataReportType: string) {
-    if(this.formType === '3L'){
+    if(this.formType === '3L' || this.formType === '3X'){
       this.setReportParamsFor3L(dataReportType);
     }
     else{
@@ -439,6 +440,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.toDateSelected = null;
       this.semiAnnualStartDate = null;
       this.semiAnnualEndDate = null;
+      this._dueDate = null;
     }
     if (currentReport) {
       this._formReportTypeDetails = JSON.parse(JSON.stringify(currentReport))
@@ -503,11 +505,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.showErrors = true;
       return false;
     }
-    if (this.formType === '3X' && (!this.fromDateSelected || !this.toDateSelected)){
+    /* if (this.formType === '3X' && (!this.fromDateSelected || !this.toDateSelected)){
       this.showErrors = true;
       return false;
-    }
-    if (this.formType === '3L' && (this.coverageDatesMissing || this.electionDateMissing || this.stateMissing)){
+    } */
+    if (this.coverageDatesMissing || this.electionDateMissing || this.stateMissing){
       this.showErrors = true;
       return false;
     }

@@ -201,6 +201,12 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         formType = this.formType;
       }
     }
+    else if(this.currentReportData && this.currentReportData.formtype){
+      formType = this.currentReportData.formtype;
+      if (formType.length === 3) {
+        formType = formType.substr(1, 3);
+      }
+    }
     return formType;
   }
 
