@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AuthService } from './../shared/services/AuthService/auth.service';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { ApiService } from '../shared/services/APIService/api.service';
@@ -7,6 +8,7 @@ import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
 import { FormsService } from '../shared/services/FormsService/forms.service';
+import { of } from 'rxjs';
 
 
 
@@ -18,26 +20,57 @@ import { FormsService } from '../shared/services/FormsService/forms.service';
 })
 export class DashboardComponent implements OnInit {
 
+  @ViewChild('content') content: any;
+  
   public showSideBar: boolean = true;
   public showLegalDisclaimer: boolean = false;
+  public closeResult: string;
+  modalRef: any;
 
   constructor(
     private _sessionService: SessionService,
     private _apiService: ApiService,
     private _modalService: NgbModal,
     private _messageService: MessageService,
-    private _formService: FormsService
+    private _formService: FormsService,
+    private modalService: NgbModal, 
+    private _authService: AuthService
+
   ) { }
 
   ngOnInit(): void {
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
        this._formService.removeFormDashBoard("3X");
     }
+
+    this._showFirstTimeCOHIfAppliable();
   }
   
+  
+  
+  private _showFirstTimeCOHIfAppliable() {
+    if(this._authService.isCommitteeAdmin() || this._authService.isBackupCommitteeAdmin() || this._authService.isAdmin()){
+      this._apiService.getCashOnHandInfoStatus().subscribe(res => {
+        if(res && res.showMessage){
+          this.openModal();
+        }
+      });
+    }
+  }
+
+  public openCOHInfoModal(content) {
+    this.modalRef = this.modalService.open(content, { size: 'lg', centered: true, windowClass: 'custom-class' });
+  }
+
+  public openModal() {
+    // if (this.loggedInUserRole === Roles.Editor || this.loggedInUserRole === Roles.Reviewer) {
+      // this._authService.showPermissionDeniedMessage();
+    // } else {
+      this.openCOHInfoModal(this.content);
+    // }
+  }
 
 
-  public closeResult: string;
 
   /**
    * Show's or hides the sidebar navigation.

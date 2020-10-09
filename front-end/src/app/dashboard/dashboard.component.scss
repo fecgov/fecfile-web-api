@@ -4,6 +4,7 @@
   background-color: $mercury;
   min-height: $mainContentHeight;
   position: relative;
+  
   .row {
     margin-bottom: 5px;
     margin-left: 0;
@@ -69,3 +70,6 @@
 } // .dashboard
 
 
+.modal-header{
+  color:$blueZodiac;
+}

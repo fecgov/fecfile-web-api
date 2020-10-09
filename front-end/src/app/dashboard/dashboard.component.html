@@ -84,3 +84,27 @@
   </section>
 </div> <!-- ./dashboard -->
 
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="signee-container" style="padding-left: 0px;padding-right:0px;">
+      <div class="modal-header">
+        <h2 style="color: #112E51">Initial Setup</h2>
+        <button vertical-align="top" style="color: #112E51" pull-right class="close-icon" (click)="d('Cross click')"></button>
+      </div>
+      <div class="modal-body">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="row pb-3" style="margin: auto; width:70%">
+              If you need to set up your cash on hand you can do so by doing the following:
+            </div>
+            <div class="row" style="font-size: larger; margin: auto; width:70%">
+              Select: <strong>Tools </strong>  >  <strong> First Time COH</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="d('Cross click')">Close</button>
+      </div>
+  </div>
+</ng-template>
+
