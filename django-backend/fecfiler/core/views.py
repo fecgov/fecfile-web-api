@@ -3631,7 +3631,7 @@ def create_json_file(request):
                 """
                     # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
                     # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
-                    printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+                    printresp = requests.post(settings. + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
                     if not printresp.ok:
                         return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
                     else:
@@ -11427,19 +11427,21 @@ class NotificationsSwitch:
 
         sql_count = """
             select count(1) as count
-            from public.notifications_filing_confirmation
+            from public.reports
             where cmte_id = %(cmte_id)s
+            and status = 'Submitted'
         """
 
         sql_items = """
-            select filing_id as filing_id,
-                form_tp as form_name,
-                rpt_tp as report_type,
-                null as coverage_dates,
+            select fec_id as filing_id,
+                form_type as form_name,
+                report_type as report_type,
+                to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
                 null as filed_by,
-                null as date_time
-            from public.notifications_filing_confirmation
+                filed_date as date_time
+            from public.reports
             where cmte_id = %(cmte_id)s
+            and status = 'Submitted'
         """
 
         if self._orderby != None:
@@ -11483,37 +11485,16 @@ class NotificationsSwitch:
         return (sql_count, sql_items, keys)
 
     def case_ImportedTransactions(self):
-        c = 3
 
         sql_count = """
-            SELECT {0} as count WHERE %(cmte_id)s is not null
-        """.format(c)
-
-        q = "'["
-        for i in range(1, c+1):
-            if i > 1:
-                q = q + ","
-            q = q + "{"
-            q = q + """ 
-                "name":"2020-8-{0}", 
-                "uploader":"Report Type {1}",
-                "date_time":"08/{2}/2020 | 10:02 AM EST",
-                "check_sum":"N/A"
-            """.format(i, i, i)
-            q = q + "}"
-        q = q + "]'"
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
 
         sql_items = """
-            select * from json_populate_recordset(null::record,
-        """ + q + """
-            ) AS (
-                name text,
-                uploader text,
-                date_time text,
-                check_sum text
-            )
-            where %(cmte_id)s is not null
+            select null as name, null as uploader, null as date_time, null as check_sum
+            where 1=2 and %(cmte_id)s is not null
         """
+
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         if self._pagination != None:
@@ -11548,10 +11529,11 @@ def get_notifications_count(request):
                 select count(1) as records_count
                 from public.notifications_late_notification
                 where cmte_id = %(cmte_id)s
-                union 
+                union
                 select count(1) as records_count
-                from public.notifications_filing_confirmation
+                from public.reports
                 where cmte_id = %(cmte_id)s
+                and status = 'Submitted'
             ) as V
         """     
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
@@ -11599,13 +11581,14 @@ def get_notifications_counts(request):
             select 'Filing Confirmations' as "groupName", count
             from ( 
                 select count(1) as count
-                from public.notifications_filing_confirmation
+                from public.reports
                 where cmte_id = %(cmte_id)s
+                and status = 'Submitted'
             ) A
             union
             select 'RFAIs' as "groupName", 0 as count
             union
-            select 'Imported Transactions' as "groupName", 12 as count
+            select 'Imported Transactions' as "groupName", 0 as count
         """
 
         sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
@@ -11635,7 +11618,6 @@ def get_notifications_counts(request):
 def get_notifications(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        #viewtype = request.query_params.get('view')
 
         (sql_count, sql_items, keys) = construct_notifications_response(request)
 
@@ -11654,10 +11636,6 @@ def get_notifications(request):
             })
             result = cursor.fetchall()
             items = [] if not result[0][0] else result[0][0]
-        #itemsCount = len(items)
-
-        if cursor != None and cursor.query != None:
-            print(cursor.query.decode('utf8'))
 
         output = { 
             'keys': keys,
@@ -11671,6 +11649,71 @@ def get_notifications(request):
             print(cursor.query.decode('utf8'))
         return Response(
           "The get_notifications API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(["GET"])
+def get_notification(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        viewtype = request.GET.get('view', 'Prior Notice')
+        notification_id = int(request.query_params.get('id'))
+
+        sql_item = None
+        if viewtype == 'Prior Notice':
+            pass
+
+        if viewtype == 'Reminder Emails':
+            sql_item = """
+                select email_subject, email_html_body, email_text_body
+                from public.notifications_reminder_email
+                where notification_id = %(notification_id)s
+            """
+
+        if viewtype == 'Late Notification Emails':
+            sql_item = """
+                select email_subject, email_html_body, email_text_body
+                from public.notifications_late_notification
+                where notification_id = %(notification_id)s
+            """
+
+        if viewtype == 'Filing Confirmations':
+            pass
+
+        if viewtype == 'RFAIs':
+            pass
+
+        if viewtype == 'Imported Transactions':
+            pass
+
+        if sql_item is None:
+            raise Exception('Unsupported viewtype='  + viewtype)
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_item + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "notification_id": notification_id
+            })
+            row1=cursor.fetchone()[0]
+            email_subject =  row1[0]['email_subject']
+            email_html_body =  row1[0]['email_html_body']
+            email_text_body =  row1[0]['email_text_body']
+
+        email = email_html_body
+        #blob = ''.join(format(ord(i), 'b') for i in email) 
+        blob = email
+
+        output = { 
+            'contentType': 'html',
+            'blob': blob
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notification API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
 

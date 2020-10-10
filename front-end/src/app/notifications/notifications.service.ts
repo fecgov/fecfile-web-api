@@ -1,20 +1,16 @@
-import { Injectable, ChangeDetectionStrategy } from '@angular/core';
-import { INotification } from './notification';
+import { Injectable} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 import 'rxjs/add/operator/map';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 import { SortableColumnModel } from '../shared/services/TableService/sortable-column.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationsService {
-  private notificationData: INotification[];
-
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
@@ -104,5 +100,26 @@ export class NotificationsService {
         }
       })
       );
+  }
+
+  getNotification(viewtype: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let httpParams = new HttpParams();
+    let url: string = '/core/get_notification';
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    httpParams = httpParams.append('view', viewtype);
+    httpParams = httpParams.append('id', '1');
+
+    return this._http
+    .get<{contentType: string, blob: Blob}>(`${environment.apiUrl}${url}`,
+      {
+        headers: httpOptions,  params: httpParams
+      }
+    ).pipe(map(res => {
+      return res;
+    }));
   }
 }

@@ -188,9 +188,9 @@
       width: 6em;
     }
 
-    .row{
-      height: 3em;
-    }
+    // .row{
+    //   height: 3em;
+    // }
 
     input[type="checkbox" i]:disabled, .disabled-column-option{
       color: #cccccc;
@@ -198,6 +198,17 @@
 
     input[type=checkbox] {
       transform: scale(1.5);
+    }
+
+    .notifications_modal-body {
+      overflow-y: auto;
+      max-height: calc(100vh - 200px);
+    }
+
+    .notifications_modal-body-content {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 }
