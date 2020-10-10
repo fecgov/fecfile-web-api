@@ -102,7 +102,7 @@ export class NotificationsService {
       );
   }
 
-  getNotification(viewtype: string): Observable<any> {
+  getNotification(viewtype: string, notificationId: number): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let httpParams = new HttpParams();
@@ -111,7 +111,7 @@ export class NotificationsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     httpParams = httpParams.append('view', viewtype);
-    httpParams = httpParams.append('id', '1');
+    httpParams = httpParams.append('id', notificationId.toString());
 
     return this._http
     .get<{contentType: string, blob: Blob}>(`${environment.apiUrl}${url}`,
