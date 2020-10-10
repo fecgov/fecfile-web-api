@@ -109,15 +109,20 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
     if(message && message.currentReportData){
       this.frmReportSidebar.controls['fromDate'].patchValue(message.currentReportData.currentStartDate);
       this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
-      this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
       this.frmReportSidebar.controls['dueDate'].patchValue(message.currentReportData.currentDueDate);
+      this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
+      this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
+      if(this.frmReportSidebar.controls['state'].value){
+        this.frmReportSidebar.controls['fromDate'].enable();
+        this.frmReportSidebar.controls['toDate'].enable();
+        this.frmReportSidebar.controls['election_date'].enable();
+      }
 /*       if(this.formType.endsWith('3X')){
         this.populateDatesByState(message.currentReportData.currentElectionState);
       } */
       if(this.formType.endsWith('3L')){
         this.frmReportSidebar.controls['semiAnnualDatesOption'].patchValue(this.getSemiAnnualDateOptionByStartAndEndDates(null,message.currentReportData.currentSemiAnnualStartDate,message.currentReportData.currentSemiAnnualEndDate));
       }
-      this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
       this.fromDate = message.currentReportData.currentStartDate;
       this.toDate = message.currentReportData.currentEndDate;
       this.electionDate = message.currentReportData.currentElectionDate;
@@ -151,9 +156,9 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   public initForm() {
     this.frmReportSidebar = this._fb.group({
       state: new FormControl({value:null,disabled: false}),
-      election_date: new FormControl({value:null,disabled: false}),
-      fromDate: new FormControl({value:null,disabled: false},[Validators.required]),
-      toDate: new FormControl({value:null,disabled: false},[Validators.required]),
+      election_date: new FormControl({value:null,disabled: true}),
+      fromDate: new FormControl({value:null,disabled: true},[Validators.required]),
+      toDate: new FormControl({value:null,disabled: true},[Validators.required]),
       dueDate: new FormControl({value:null,disabled: false}),
       semiAnnualDatesOption: new FormControl(''),
       semiAnnualFromDate: new FormControl(),
@@ -329,7 +334,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
           this.toDate = this.messageDataForEdit.currentReportData.currentEndDate;
           this.electionDate = this.messageDataForEdit.currentReportData.currentElectionDate;
           this.dueDate = this.messageDataForEdit.currentReportData.currentDueDate;
-          this.disableCoverageDatesIfApplicable();
+          this.disableCoverageDatesIfApplicable(true);
           this.populateSemiAnnualDates();
 
           if(this.frmReportSidebar){
@@ -347,7 +352,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
             this.electionDate = this.selectedReport.election_date;
             this.dueDate = this.selectedReport.due_date;
             this.electionDate = this.selectedReport.election_date;
-            this.disableCoverageDatesIfApplicable();
+            this.disableCoverageDatesIfApplicable(false);
             this.populateSemiAnnualDates();
 
           if(this.frmReportSidebar){
@@ -424,10 +429,13 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  disableCoverageDatesIfApplicable() {
-    if(this.selectedReport && this.selectedReport.disableCoverageDates){
+  disableCoverageDatesIfApplicable(editFlag: boolean) {
+    if(this.selectedReport && this.selectedReport.disableCoverageDates || (this.selectedReport.regular_special_report_ind === 'S' && !editFlag)){
       this.frmReportSidebar.controls['fromDate'].disable();
       this.frmReportSidebar.controls['toDate'].disable();
+      if(this.selectedReport.regular_special_report_ind === 'S'){
+        this.frmReportSidebar.controls['election_date'].disable();
+      }
     }
     else{
       this.frmReportSidebar.controls['fromDate'].enable();
@@ -541,6 +549,16 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   }
 
   handleSelectStateChangeFor3L(e: any) {
+    if(e && e.target.value){
+      this.frmReportSidebar.controls['election_date'].enable();
+      this.frmReportSidebar.controls['fromDate'].enable();
+      this.frmReportSidebar.controls['toDate'].enable();
+    }
+    else{
+      this.frmReportSidebar.controls['election_date'].disable();
+      this.frmReportSidebar.controls['fromDate'].disable();
+      this.frmReportSidebar.controls['toDate'].disable();
+    }
     if (this.editMode) {
         this._messageService.sendMessage({action:'reportTypeSideBarUpdate', currentData:this.frmReportSidebar.value});
       } else {

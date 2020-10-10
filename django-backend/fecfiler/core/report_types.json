@@ -334,6 +334,7 @@
             "cvg_start_date": null,
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-10-22"
+          },
           {
             "report_type": "30G",
             "report_type_desciption": "30 Day Post-General - 30G",
