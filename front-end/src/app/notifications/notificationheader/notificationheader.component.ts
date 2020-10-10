@@ -3,6 +3,7 @@ import { FormsService } from '../../shared/services/FormsService/forms.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { NotificationsService } from '../notifications.service';
+import { TabConfiguration } from '../notification';
 
 @Component({
   selector: 'app-notificationheader',
@@ -13,29 +14,29 @@ import { NotificationsService } from '../notifications.service';
 
 export class NotificationheaderComponent implements OnInit {
   public viewMode = '';
-  public viewTabs = [
+  public viewTabs: TabConfiguration[] = [
     {
-      id: 1, name: "Prior Notices", count: 0,
+      id: 1, name: "Prior Notices", count: 0, showOptionView: false,
       toolTip: "Prior Notices - Sent by the FEC to remind a filer of upcoming reports that may need to be filed based upon the committee type and filing frequency."
     },
     {
-      id: 2, name: "Reminder Emails", count: 0,
+      id: 2, name: "Reminder Emails", count: 0, showOptionView: true,
       toolTip: "Reminder Emails - Sent by the FEC to remind a filer of their next report that is due.  The reminder email is typically sent 2 to 3 business days prior to the official filing deadline."
     },
     {
-      id: 3, name: "Late Notification Emails", count: 0,
+      id: 3, name: "Late Notification Emails", count: 0, showOptionView: true,
       toolTip: "Late Notification Emails - Sent by the FEC to remind the filer the day after a filing deadline if the FEC has not yet received the report that was due."
     },
     {
-      id: 4, name: "Filing Confirmations", count: 0,
+      id: 4, name: "Filing Confirmations", count: 0, showOptionView: false,
       toolTip: "Filing Confirmations - Emails sent by the FEC within a few minutes of a filer successfully submitting an electronic filing.  This email will include a confirmation number for the successful submission."
     },
     {
-      id: 5, name: "RFAIs", count: 0,
+      id: 5, name: "RFAIs", count: 0, showOptionView: false,
       toolTip: "RFAIs - There are letters sent by the Reports Analysis Division when a report or document filed with the FEC needs additional clarification or identifies an error, omission or possible prohibited activity."
     },
     {
-      id: 6, name: "Imported Transactions", count: 0,
+      id: 6, name: "Imported Transactions", count: 0, showOptionView: false,
       toolTip: "Import Transactions - Here you will find transaction documents that have been imported into the system."
     }
   ];
