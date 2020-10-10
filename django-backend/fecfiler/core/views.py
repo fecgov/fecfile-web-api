@@ -453,28 +453,30 @@ def get_report_types(request):
                 parameter = "Monthly-Non-Election-Year"
             else:
                 parameter = "Monthly-Election-Year"
-        if form_type == 'F3X':
-            forms_obj = data['F3X'].get(parameter)
-            for report_type in forms_obj['report_type']:
-                for election_state in report_type['election_state']:
-                    for dates in election_state['dates']:
-                        if dates.get('cvg_start_date'):
-                            dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
-                        if dates.get('cvg_end_date'):
-                            dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
-                        if dates.get('due_date'):
-                            if "YYYY-01" in dates.get('due_date'):
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
-                            else:
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
-        elif form_type == 'F3L':
-            forms_obj = data['F3L'].get(parameter)
+        # if form_type == 'F3X':
+        #     forms_obj = data['F3X'].get(parameter)
+        #     for report_type in forms_obj['report_type']:
+        #         for election_state in report_type['election_state']:
+        #             for dates in election_state['dates']:
+        #                 if dates.get('cvg_start_date'):
+        #                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+        #                 if dates.get('cvg_end_date'):
+        #                     dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+        #                 if dates.get('due_date'):
+        #                     if "YYYY-01" in dates.get('due_date'):
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+        #                     else:
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+        if form_type == 'F3L' or  form_type == 'F3X':
+            forms_obj = data[form_type].get(parameter)
             for dates in forms_obj['report_type']:
                 # Temporary fix till we get EFO dates
                 if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
                 if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
                 if dates.get('due_date') == 'EFO': dates['due_date'] = None
 
+                if dates.get('election_date'):
+                    dates['election_date'] = dates.get('election_date').replace("YYYY", str(_year))
                 if dates.get('cvg_start_date'):
                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
                 if dates.get('cvg_end_date'):
@@ -11723,9 +11725,9 @@ def cashOnHand(request):
     try:
         is_read_only_or_filer_reports(request)
         cmte_id = get_comittee_id(request.user.username)
-        if not request.data.get('year'): raise Exception('year field is mandatory')
-        coh_year = request.data.get('year')
         if request.method == "GET":
+            if not request.query_params.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.query_params.get('year')
             _sql = """SELECT json_agg(t) FROM (
                       SELECT coh as amount, coh_year as year FROM
                       public.cash_on_hand_f3x WHERE cmte_id = %s AND
@@ -11737,16 +11739,34 @@ def cashOnHand(request):
             return Response(result, status=status.HTTP_200_OK)
 
         if request.method == "PUT":
+            if not request.data.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.data.get('year')
             coh_amount = request.data.get('amount')
-            sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+
+            # first check if an entry exists
+            get_sql = """SELECT * FROM cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s """
             with connection.cursor() as cursor:
-                cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                cursor.execute(get_sql, [cmte_id, coh_year])
                 if cursor.rowcount == 0:
-                    raise Exception('Failed to insert data into table')
-                _sql = """SELECT json_agg(t) FROM (
-                          SELECT coh as amount, coh_year as year FROM
-                          public.cash_on_hand_f3x WHERE cmte_id = %s AND
-                          coh_year = %s) t"""
+                    sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to insert data into table')
+                else:
+                    sql = """UPDATE cash_on_hand_f3x set coh = %s WHERE cmte_id = %s AND
+                        coh_year = %s"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [coh_amount, cmte_id, coh_year])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to update data in the table')
+            
+            _sql = """SELECT json_agg(t) FROM (
+                    SELECT coh as amount, coh_year as year FROM
+                    public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                    coh_year = %s) t"""
+            with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, coh_year])
                 output=cursor.fetchone()[0]
                 result = output[0] if output else {}
@@ -11762,17 +11782,93 @@ def cashOnHand(request):
 def cashOnHandInfoStatus(request):
     try:
         status_flag = False
-        user_name = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         _sql = """SELECT * FROM cash_on_hand_info_status WHERE username = %s"""
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [user_name])
+            cursor.execute(_sql, [cmte_id])
             if cursor.rowcount == 0: 
                 status_flag = True
                 _sql1 = """INSERT INTO cash_on_hand_info_status VALUES(%s)"""
-                cursor.execute(_sql1, [user_name])
+                cursor.execute(_sql1, [cmte_id])
         return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
     except Exception as e:
         return Response(
-          "The cashOnHandInfoStatus API is throwing an error: ".format(request.method) + str(e),
+          "The cashOnHandInfoStatus API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_logs(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+              c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              concat_ws(', ', e.last_name, e.first_name) AS user, c.logged_date AS modifieddate
+              FROM contacts_log_view c, authentication_account e
+              WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
+              ORDER BY c.logged_date DESC"""
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id')])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_log API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_report_details(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT concat_ws(' ', CASE WHEN r.form_type='F3X' THEN 'Form 3X:' 
+                                            WHEN r.form_type='F3L' THEN 'Form 3L:' 
+                                            WHEN r.form_type='F1M' THEN 'Form 1M:' 
+                                            WHEN r.form_type='F24' THEN 'Form 24:' 
+                                            ELSE 'Form' END,
+                                      concat(rrt.rpt_type_desc,','), 
+                                      concat_ws('-', to_char(r.cvg_start_date, 'MM/DD/YY'), 
+                                                      to_char(r.cvg_end_date, 'MM/DD/YY'))) 
+            AS formdetails, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+            c.city, c.state, c.zip, c.occupation, c.employer,c.phone_number, 
+            al.report_id, al.entity_id
+            FROM all_transactions_view al, reports r, ref_rpt_types rrt, contacts_log_view c
+            WHERE r.report_type = rrt.rpt_type 
+            AND c.id = al.entity_id 
+            AND al.entity_id = %s
+            AND c.logged_date = (
+                SELECT clv.logged_date 
+                FROM contacts_log_view clv 
+                WHERE clv.id = %s
+                AND al.last_update_date <= clv.logged_date 
+                ORDER BY clv.logged_date ASC LIMIT 1)
+            AND al.report_id = r.report_id 
+            AND al.delete_ind IS DISTINCT FROM 'Y' 
+            AND al.cmte_id = %s
+            ORDER BY r.cvg_start_date DESC
+            """
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id'),
+                request.query_params.get('entity_id'), cmte_id])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_report_details API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )

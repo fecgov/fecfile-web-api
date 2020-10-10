@@ -252,4 +252,15 @@ urlpatterns = [
         views.cashOnHandInfoStatus,
         name="cashOnHandInfoStatus",
     ),
+    url(
+        r"^core/contactLogs$",
+        views.contact_logs,
+        name="contact_logs",
+    ),
+    url(
+        r"^core/contactReportDetails$",
+        views.contact_report_details,
+        name="contact_report_details",
+    ),
+
 ]
