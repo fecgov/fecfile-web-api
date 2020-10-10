@@ -41,7 +41,7 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
   private lastItemOnPage = 0;
 
   // View detail
-  private notificationContent: string;
+  public notificationContent: string;
 
   constructor(
     private _notificationsService: NotificationsService,
