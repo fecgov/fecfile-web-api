@@ -11354,7 +11354,7 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as date_sent, null as subject
+            select null as id, null as date_sent, null as subject
             where 1=2 and %(cmte_id)s is not null
         """
 
@@ -11379,7 +11379,7 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select form_tp as form_name, rpt_tp as report_type, due_date
+            select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date
             from public.notifications_reminder_email
             where cmte_id = %(cmte_id)s
         """
@@ -11406,7 +11406,7 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select form_tp as form_name, rpt_tp as report_type,
+            select notification_id as id, form_tp as form_name, rpt_tp as report_type,
                 ( current_date - due_date ) as past_due_days
             from public.notifications_late_notification
             where cmte_id = %(cmte_id)s
@@ -11435,7 +11435,8 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select fec_id as filing_id,
+            select report_id as id,
+                fec_id as filing_id,
                 form_type as form_name,
                 report_type as report_type,
                 to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
@@ -11469,7 +11470,7 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as date_sent, null as ref_report_type, null as due_date
+            select null as id, null as date_sent, null as ref_report_type, null as due_date
             where 1=2 and %(cmte_id)s is not null
         """
 
@@ -11493,7 +11494,7 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as name, null as uploader, null as date_time, null as check_sum
+            select null as id, null as name, null as uploader, null as date_time, null as check_sum
             where 1=2 and %(cmte_id)s is not null
         """
 
