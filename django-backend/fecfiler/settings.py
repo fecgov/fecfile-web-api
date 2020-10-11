@@ -358,7 +358,7 @@ AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
 AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
 AWS_HOST_NAME = 'us-east-1'
 AWS_REGION = 'us-east-1'
-
+AWS_DEFAULT_ACL = None
 AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
 
 USPS_USERNAME = os.environ.get('USPS_USERNAME', None)
