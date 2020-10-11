@@ -41,7 +41,7 @@ OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
 OTP_TIMEOUT_TIME = 30
-OTP_DISABLE = os.environ.get('OTP_DISABLE',  True )
+OTP_DISABLE = False
 OTP_DEFAULT_PASSCODE = "111111"
 JWT_PASSWORD_EXPIRY = 1800
 API_LOGIN = os.environ.get('API_LOGIN', None)
@@ -358,7 +358,7 @@ AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
 AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
 AWS_HOST_NAME = 'us-east-1'
 AWS_REGION = 'us-east-1'
-
+AWS_DEFAULT_ACL = None
 AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
 
 USPS_USERNAME = os.environ.get('USPS_USERNAME', None)
