@@ -1,9 +1,11 @@
-import { Component, Input, OnInit, ViewEncapsulation, OnDestroy} from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, OnDestroy, ViewChild} from '@angular/core';
 import { PaginationInstance } from 'ngx-pagination';
+import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from '../../shared/utils/util.service';
 import { NotificationsService } from '../notifications.service';
+import { TabConfiguration } from '../notification';
 
 @Component({
   selector: 'app-notificationdetails',
@@ -12,8 +14,11 @@ import { NotificationsService } from '../notifications.service';
   encapsulation: ViewEncapsulation.None
 })
 export class NotificationdetailsComponent implements OnInit, OnDestroy {
+  @ViewChild('notificationModal')
+  public notificationModal: ModalDirective;
+  
   @Input()
-  public view: string;
+  public tabConfig: TabConfiguration;
 
   // data model
   public notifications: Map<string, string>[] = [];
@@ -35,6 +40,9 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
+  // View detail
+  public notificationContent: string;
+
   constructor(
     private _notificationsService: NotificationsService,
     private _tableService: TableService,
@@ -53,8 +61,8 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
     };
     this.config = paginateConfig;
 
-    if (this.view !== localStorage.getItem('Notifications.view')) {
-      localStorage.setItem('Notifications.view', this.view);
+    if (this.tabConfig.name !== localStorage.getItem('Notifications.view')) {
+      localStorage.setItem('Notifications.view', this.tabConfig.name);
       this.config.currentPage = 1;
     }
 
@@ -152,7 +160,7 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
 
     this._notificationsService
       .getNotifications(
-        this.view,
+        this.tabConfig.name,
         sortedCol,
         page, 
         this.config.itemsPerPage
@@ -233,5 +241,31 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  public showNotificationModal() {
+    this._notificationsService
+    .getNotification(
+      this.tabConfig.name
+    )
+    .subscribe((response: any) => {
+      let blob = response.blob;
+      let contentType = response.contentType;
+      if (contentType == 'html') {
+        // const text = new Response(blob).text();
+        // text.then((val) => {
+        //   this.notificationContent = val;
+        // });
+        this.notificationContent = blob;
+      } else {
+        var content = "Unsupported";
+      }
+
+      this.notificationModal.show();
+    });
+  }
+
+  public closeNotificationModal() {
+    this.notificationModal.hide();
   }
 }
