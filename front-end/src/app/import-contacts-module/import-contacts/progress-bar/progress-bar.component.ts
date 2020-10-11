@@ -29,7 +29,7 @@ export class ProgressBarComponent implements OnInit, OnChanges {
       }
     }
     this.percent = percent;
-    console.log('percent=' + this.progressArray);
+    // console.log('percent=' + this.progressArray);
   }
 
 }

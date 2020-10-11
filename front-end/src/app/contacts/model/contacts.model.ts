@@ -24,6 +24,8 @@ export class ContactModel {
     deletedDate: string;
     selected: boolean;
     activeTransactionsCnt: number;
+    toggleLog: boolean;
+    contactLog: any;
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -51,7 +53,14 @@ export class ContactModel {
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
         this.selected = contact.selected;
         this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
-       
+        this.contactLog = null;
+        this.toggleLog = false;
+    }
 
+    setContactLog(contactLog: any) {
+        this.contactLog = contactLog;
+    }
+    getContactLog(): any {
+        return this.contactLog;
     }
 }

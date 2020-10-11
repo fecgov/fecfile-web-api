@@ -24,13 +24,16 @@
           <div class="container">
             <label>Enter Your Security Code</label>
             <div class="input-group">
-              <input type="number" class="form-control"
+              <input type="text" class="form-control"
                      aria-label="Text input security code"
                      formControlName="securityCode"
                     >
             </div>
             <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo.touched">
               <span>Please enter the security code received</span>
+            </div>
+            <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo?.controls['securityCode']?.errors?.pattern">
+              <span>Security code must be numeric</span>
             </div>
             <div class="text-error" *ngIf="!isValid && twoFactInfo.touched">
               <span>Invalid Security Code</span>
@@ -43,7 +46,12 @@
           </div>
           <div class="container">
             <label>Didn't receive a code?</label>
-            <a (click)="resend()"> Resend Security Code</a>
+            <div>
+              <a (click)="resend()"> Resend Security Code</a>
+            </div>
+            <div>
+              <a (click)="selectAnotherType()"> Select another method to resend code</a>
+            </div>
           </div>
         </div>
 

@@ -136,10 +136,11 @@ def verify_login(request):
 
             username = user_list["username"]
             key = user_list["secret_key"]
+            unix_time = user_list["code_time"]
             otp_class = TOTPVerification(username)
-            token_val = otp_class.verify_token(key)
+            token_val = otp_class.verify_token(key, unix_time)
 
-            if code == int(token_val):
+            if code == token_val:
                 is_allowed = True
                 if not OTP_DISABLE:
                     reset_code_counter(key)

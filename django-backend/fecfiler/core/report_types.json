@@ -8,20 +8,9 @@
             "report_type_info": "In an election year covers activity from January 1 thru March 31 and due on the 15th of April.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-01-01",
-                    "cvg_end_date": "YYYY-03-31",
-                    "due_date": "YYYY-04-15"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-01-01",
+            "cvg_end_date": "YYYY-03-31",
+            "due_date": "YYYY-04-15"
           },
           {
             "report_type": "Q2",
@@ -29,20 +18,9 @@
             "report_type_info": "In an election year covers overs activity from April 1 thru June 30 and due on the 15th of July.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-04-01",
-                    "cvg_end_date": "YYYY-06-30",
-                    "due_date": "YYYY-07-15"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-04-01",
+            "cvg_end_date": "YYYY-06-30",
+            "due_date": "YYYY-07-15"
           },
           {
             "report_type": "Q3",
@@ -50,20 +28,9 @@
             "report_type_info": "In an election year covers activity from July 1 thru September 30 and due on the 15th of October.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-07-01",
-                    "cvg_end_date": "YYYY-09-30",
-                    "due_date": "YYYY-10-15"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-07-01",
+            "cvg_end_date": "YYYY-09-30",
+            "due_date": "YYYY-10-15"
           },
           {
             "report_type": "12G",
@@ -71,20 +38,11 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+
+            "election_date": "YYYY-11-03",
+            "cvg_start_date": null,
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22"
           },
           {
             "report_type": "30G",
@@ -92,20 +50,11 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+
+            "cvg_start_date": null,
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "YYYY-11-03"
           },
           {
             "report_type": "YE",
@@ -113,20 +62,9 @@
             "report_type_info": "In an election year covers activity from October 1 thru December 31 and due on the 15th of January of the following year.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-10-01",
-                    "cvg_end_date": "YYYY-12-31",
-                    "due_date": "YYYY-01-31"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-10-01",
+            "cvg_end_date": "YYYY-12-31",
+            "due_date": "YYYY-01-31"
           },
           {
             "report_type": "12P",
@@ -134,20 +72,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12R",
@@ -155,20 +82,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12S",
@@ -176,20 +92,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12C",
@@ -197,20 +102,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "30R",
@@ -218,20 +112,9 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "30S",
@@ -239,20 +122,9 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "TER",
@@ -260,20 +132,9 @@
             "report_type_info": "Need language from RAD",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           }
         ]
       },
@@ -285,20 +146,9 @@
             "report_type_info": "In a non-election year covers activity from January 1 thru June 30 and due on the 31st of July.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-01-01",
-                    "cvg_end_date": "YYYY-06-30",
-                    "due_date": "YYYY-07-31"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-01-01",
+            "cvg_end_date": "YYYY-06-30",
+            "due_date": "YYYY-07-31"
           },
           {
             "report_type": "YE",
@@ -306,20 +156,9 @@
             "report_type_info": "In a non-election year covers activity from July 1 thru December 31 and due on the 31st of January of the following year.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-07-01",
-                    "cvg_end_date": "YYYY-12-31",
-                    "due_date": "YYYY-01-31"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-07-01",
+            "cvg_end_date": "YYYY-12-31",
+            "due_date": "YYYY-01-31"
           },
           {
             "report_type": "12P",
@@ -327,20 +166,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12R",
@@ -348,20 +176,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12S",
@@ -369,20 +186,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "12C",
@@ -390,20 +196,9 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "30R",
@@ -411,20 +206,9 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "30S",
@@ -432,20 +216,9 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           },
           {
             "report_type": "TER",
@@ -453,20 +226,9 @@
             "report_type_info": "Need language from RAD",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           }
         ]
       },
@@ -478,20 +240,9 @@
             "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-01-01",
-                    "cvg_end_date": "YYYY-01-31",
-                    "due_date": "YYYY-02-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-01-01",
+            "cvg_end_date": "YYYY-01-31",
+            "due_date": "YYYY-02-20"
           },
           {
             "report_type": "M3",
@@ -499,20 +250,9 @@
             "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-02-01",
-                    "cvg_end_date": "YYYY-02-29",
-                    "due_date": "YYYY-03-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-02-01",
+            "cvg_end_date": "YYYY-02-29",
+            "due_date": "YYYY-03-20"
           },
           {
             "report_type": "M4",
@@ -520,20 +260,9 @@
             "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-03-01",
-                    "cvg_end_date": "YYYY-03-31",
-                    "due_date": "YYYY-04-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-03-01",
+            "cvg_end_date": "YYYY-03-31",
+            "due_date": "YYYY-04-20"
           },
           {
             "report_type": "M5",
@@ -541,20 +270,9 @@
             "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-04-01",
-                    "cvg_end_date": "YYYY-04-30",
-                    "due_date": "YYYY-05-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-04-01",
+            "cvg_end_date": "YYYY-04-30",
+            "due_date": "YYYY-05-20"
           },
           {
             "report_type": "M6",
@@ -562,20 +280,9 @@
             "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-05-01",
-                    "cvg_end_date": "YYYY-05-31",
-                    "due_date": "YYYY-06-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-05-01",
+            "cvg_end_date": "YYYY-05-31",
+            "due_date": "YYYY-06-20"
           },
           {
             "report_type": "M7",
@@ -583,20 +290,9 @@
             "report_type_info": "In an election year/non-election year covers activity from June 1 thru June 30 and due on the 20th of July.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-06-01",
-                    "cvg_end_date": "YYYY-06-30",
-                    "due_date": "YYYY-07-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-06-01",
+            "cvg_end_date": "YYYY-06-30",
+            "due_date": "YYYY-07-20"
           },
           {
             "report_type": "M8",
@@ -604,20 +300,9 @@
             "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "Y",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-07-01",
-                    "cvg_end_date": "YYYY-07-31",
-                    "due_date": "YYYY-08-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-07-01",
+            "cvg_end_date": "YYYY-07-31",
+            "due_date": "YYYY-08-20"
           },
           {
             "report_type": "M9",
@@ -625,20 +310,9 @@
             "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-08-01",
-                    "cvg_end_date": "YYYY-08-31",
-                    "due_date": "YYYY-09-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-08-01",
+            "cvg_end_date": "YYYY-08-31",
+            "due_date": "YYYY-09-20"
           },
           {
             "report_type": "M10",
@@ -646,20 +320,9 @@
             "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-09-01",
-                    "cvg_end_date": "YYYY-09-30",
-                    "due_date": "YYYY-10-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-09-01",
+            "cvg_end_date": "YYYY-09-30",
+            "due_date": "YYYY-10-20"
           },
           {
             "report_type": "12G",
@@ -667,20 +330,10 @@
             "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "election_date": "YYYY-11-03",
+            "cvg_start_date": null,
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22"
           },
           {
             "report_type": "30G",
@@ -688,20 +341,10 @@
             "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "election_date": "YYYY-11-03",
+            "cvg_start_date": null,
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03"
           },
           {
             "report_type": "YE",
@@ -709,20 +352,9 @@
             "report_type_info": "In an election year/non-election year covers activity from December 1 thru December 31 and due on the 20th of January of the following year.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-12-01",
-                    "cvg_end_date": "YYYY-12-31",
-                    "due_date": "YYYY-01-31"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-12-01",
+            "cvg_end_date": "YYYY-12-31",
+            "due_date": "YYYY-01-31"
           },
           {
             "report_type": "TER",
@@ -730,20 +362,9 @@
             "report_type_info": "Need language from RAD",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           }
         ]
       },
@@ -755,20 +376,9 @@
             "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-01-01",
-                    "cvg_end_date": "YYYY-01-31",
-                    "due_date": "YYYY-02-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-01-01",
+            "cvg_end_date": "YYYY-01-31",
+            "due_date": "YYYY-02-20"
           },
           {
             "report_type": "M3",
@@ -776,20 +386,9 @@
             "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-02-01",
-                    "cvg_end_date": "YYYY-02-29",
-                    "due_date": "YYYY-03-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-02-01",
+            "cvg_end_date": "YYYY-02-29",
+            "due_date": "YYYY-03-20"
           },
           {
             "report_type": "M4",
@@ -797,20 +396,9 @@
             "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-03-01",
-                    "cvg_end_date": "YYYY-03-31",
-                    "due_date": "YYYY-04-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-03-01",
+            "cvg_end_date": "YYYY-03-31",
+            "due_date": "YYYY-04-20"
           },
           {
             "report_type": "M5",
@@ -818,20 +406,9 @@
             "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-04-01",
-                    "cvg_end_date": "YYYY-04-30",
-                    "due_date": "YYYY-05-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-04-01",
+            "cvg_end_date": "YYYY-04-30",
+            "due_date": "YYYY-05-20"
           },
           {
             "report_type": "M6",
@@ -839,20 +416,9 @@
             "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-05-01",
-                    "cvg_end_date": "YYYY-05-31",
-                    "due_date": "YYYY-06-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-05-01",
+            "cvg_end_date": "YYYY-05-31",
+            "due_date": "YYYY-06-20"
           },
           {
             "report_type": "M7",
@@ -860,20 +426,9 @@
             "report_type_info": "In an election year/non-election year covers activity from June 1 thru June 30 and due on the 20th of July.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-06-01",
-                    "cvg_end_date": "YYYY-06-30",
-                    "due_date": "YYYY-07-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-06-01",
+            "cvg_end_date": "YYYY-06-30",
+            "due_date": "YYYY-07-20"
           },
           {
             "report_type": "M8",
@@ -881,20 +436,9 @@
             "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "Y",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-07-01",
-                    "cvg_end_date": "YYYY-07-31",
-                    "due_date": "YYYY-08-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-07-01",
+            "cvg_end_date": "YYYY-07-31",
+            "due_date": "YYYY-08-20"
           },
           {
             "report_type": "M9",
@@ -902,20 +446,9 @@
             "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-08-01",
-                    "cvg_end_date": "YYYY-08-31",
-                    "due_date": "YYYY-09-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-08-01",
+            "cvg_end_date": "YYYY-08-31",
+            "due_date": "YYYY-09-20"
           },
           {
             "report_type": "M10",
@@ -923,20 +456,9 @@
             "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-09-01",
-                    "cvg_end_date": "YYYY-09-30",
-                    "due_date": "YYYY-10-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-09-01",
+            "cvg_end_date": "YYYY-09-30",
+            "due_date": "YYYY-10-20"
           },
           {
             "report_type": "M11",
@@ -944,20 +466,9 @@
             "report_type_info": "In an election year covers activity from October 1 thru October 31 and due on the 20th of November.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-10-01",
-                    "cvg_end_date": "YYYY-10-31",
-                    "due_date": "YYYY-11-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-10-01",
+            "cvg_end_date": "YYYY-10-31",
+            "due_date": "YYYY-11-20"
           },
           {
             "report_type": "M12",
@@ -965,20 +476,9 @@
             "report_type_info": "In an election year covers activity from November 1 thru November 31 and due on the 20th of December.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-11-01",
-                    "cvg_end_date": "YYYY-11-30",
-                    "due_date": "YYYY-12-20"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-11-01",
+            "cvg_end_date": "YYYY-11-30",
+            "due_date": "YYYY-12-20"
           },
           {
             "report_type": "YE",
@@ -986,20 +486,9 @@
             "report_type_info": "In an election year/non-election year covers activity from December 1 thru December 31 and due on the 20th of January of the following year.",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": "YYYY-12-01",
-                    "cvg_end_date": "YYYY-12-31",
-                    "due_date": "YYYY-01-31"
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": "YYYY-12-01",
+            "cvg_end_date": "YYYY-12-31",
+            "due_date": "YYYY-01-31"
           },
           {
             "report_type": "TER",
@@ -1007,20 +496,9 @@
             "report_type_info": "Need language from RAD",
             "regular_special_report_ind": "R",
             "default_disp_ind": "N",
-            "election_state": [
-              {
-                "state": null,
-                "state_description": null,
-                "dates": [
-                  {
-                    "election_date": null,
-                    "cvg_start_date": null,
-                    "cvg_end_date": null,
-                    "due_date": null
-                  }
-                ]
-              }
-            ]
+            "cvg_start_date": null,
+            "cvg_end_date": null,
+            "due_date": null
           }
         ]
       }
@@ -1103,8 +581,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1199,8 +678,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1409,8 +889,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1505,8 +986,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO",
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1900,8 +1382,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO"
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "30G",
@@ -1910,8 +1393,9 @@
             "regular_special_report_ind": "S",
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
-            "cvg_end_date": "EFO",
-            "due_date": "EFO"
+            "cvg_end_date": "YYYY-10-14",
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "MYS",

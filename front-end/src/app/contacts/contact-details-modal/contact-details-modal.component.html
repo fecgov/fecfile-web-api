@@ -1,0 +1,73 @@
+<div class="modal-header">
+  <div class="modal-user-info">
+   <b>{{contact.name}}</b>
+  </div>
+  <button class="btn btn-sm btn-primary btn-right"  (click)="editContact()">
+    <i class="ellipsis-icon"></i>
+  </button>
+</div>
+<div class="modal-body">
+  <addnew_contacts [transactionToEdit]="contact" [scheduleAction]="'view'" [isContactDetailsView] = "true"></addnew_contacts>
+  <br>
+  <br>
+  <hr>
+  <div class="reports"><h2>
+    Associated Reports
+  </h2>
+    <div class="reports-table">
+      <table>
+        <tbody class="single-column-table">
+        <tr>
+        <td class="wider-row">
+         <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
+         <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
+         <p>Employer: Springfield Finance Occupation: Filer</p>
+        </td>
+          </tr>
+        <tr>
+          <td class="wider-row">
+            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
+            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
+            <p>Employer: Springfield Finance Occupation: Filer</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="wider-row">
+            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
+            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
+            <p>Employer: Springfield Finance Occupation: Filer</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="wider-row">
+            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
+            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
+            <p>Employer: Springfield Finance Occupation: Filer</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="wider-row">
+            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
+            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
+            <p>Employer: Springfield Finance Occupation: Filer</p>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="notes">
+    <br>
+    <label><h4>Notes</h4></label>
+    <br>
+    <input type="text" placeholder="">
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary-gray btn-right"
+          (click)="decline()">
+   Close
+  </button>
+
+</div>
+

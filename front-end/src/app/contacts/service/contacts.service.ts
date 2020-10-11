@@ -239,6 +239,38 @@ export class ContactsService {
   }
 
 
+  public getExportContactsData(selectedContactArray: Array<string>,
+      sendAll: boolean): Observable<any> {
+
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/contact/details';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    if (sendAll === true) {
+      selectedContactArray = [];
+    }
+
+    const request: any = {};
+    request.entity = selectedContactArray;
+    request.sendAll = sendAll;
+    return this._http
+    .post(`${environment.apiUrl}${url}`, request, {
+      headers: httpOptions
+    })
+    .pipe(
+      map(res => {
+        if (res) {
+          return res;
+        }
+        return false;
+      })
+    );
+  }
+
+
   /**
    * Map server fields from the response to the model.
    *

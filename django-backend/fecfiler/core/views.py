@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from fecfiler.forms.models import CommitteeInfo
 from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
+import string
 import datetime
 import os
 import psycopg2
@@ -452,28 +453,30 @@ def get_report_types(request):
                 parameter = "Monthly-Non-Election-Year"
             else:
                 parameter = "Monthly-Election-Year"
-        if form_type == 'F3X':
-            forms_obj = data['F3X'].get(parameter)
-            for report_type in forms_obj['report_type']:
-                for election_state in report_type['election_state']:
-                    for dates in election_state['dates']:
-                        if dates.get('cvg_start_date'):
-                            dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
-                        if dates.get('cvg_end_date'):
-                            dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
-                        if dates.get('due_date'):
-                            if "YYYY-01" in dates.get('due_date'):
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
-                            else:
-                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
-        elif form_type == 'F3L':
-            forms_obj = data['F3L'].get(parameter)
+        # if form_type == 'F3X':
+        #     forms_obj = data['F3X'].get(parameter)
+        #     for report_type in forms_obj['report_type']:
+        #         for election_state in report_type['election_state']:
+        #             for dates in election_state['dates']:
+        #                 if dates.get('cvg_start_date'):
+        #                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+        #                 if dates.get('cvg_end_date'):
+        #                     dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+        #                 if dates.get('due_date'):
+        #                     if "YYYY-01" in dates.get('due_date'):
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+        #                     else:
+        #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+        if form_type == 'F3L' or  form_type == 'F3X':
+            forms_obj = data[form_type].get(parameter)
             for dates in forms_obj['report_type']:
                 # Temporary fix till we get EFO dates
                 if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
                 if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
                 if dates.get('due_date') == 'EFO': dates['due_date'] = None
 
+                if dates.get('election_date'):
+                    dates['election_date'] = dates.get('election_date').replace("YYYY", str(_year))
                 if dates.get('cvg_start_date'):
                     dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
                 if dates.get('cvg_end_date'):
@@ -753,6 +756,55 @@ def check_list_cvg_dates(args):
     except Exception:
         raise
 
+def check_list_semi_cvg_dates(args):
+    try:
+        cmte_id = args[0]
+        form_type = args[1]
+        cvg_start_dt = args[2]
+        cvg_end_dt = args[3]
+
+        forms_obj = []
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT report_id, cvg_start_date, cvg_end_date, report_type, semi_annual_start_date, semi_annual_end_date FROM public.reports 
+                WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC""",
+                [cmte_id, form_type],
+            )
+            if len(args) == 4:
+                for row in cursor.fetchall():
+                    if not (row[4] is None or row[5] is None):
+                        if cvg_start_dt <= row[5] and row[4] <= cvg_end_dt:
+                            forms_obj.append(
+                                {
+                                    "report_id": row[0],
+                                    "cvg_start_date": row[1],
+                                    "cvg_end_date": row[2],
+                                    "report_type": row[3],
+                                    "semi_annual_start_date": row[4],
+                                    "semi_annual_end_date": row[5]
+                                }
+                            )
+
+            if len(args) == 5:
+                report_id = args[4]
+                for row in cursor.fetchall():
+                    if not (row[4] is None or row[5] is None):
+                        if (cvg_start_dt <= row[5] and row[4] <= cvg_end_dt) and row[
+                            0
+                        ] != int(report_id):
+                            forms_obj.append(
+                                {
+                                    "report_id": row[0],
+                                    "cvg_start_date": row[1],
+                                    "cvg_end_date": row[2],
+                                    "report_type": row[3],
+                                    "semi_annual_start_date": row[4],
+                                    "semi_annual_end_date": row[5]
+                                }
+                            )
+        return forms_obj
+    except Exception:
+        raise
 
 def date_format(cvg_date):
     try:
@@ -1319,6 +1371,12 @@ def post_reports(data, reportid=None):
             forms_obj = check_list_cvg_dates(args)
         # print(forms_obj)
         # print('just in post_reports')
+        if form_type == 'F3L' and data.get('semi_annual_start_date') and data.get('semi_annual_end_date'):
+            semi_args = [cmte_id, form_type, data.get('semi_annual_start_date'), data.get('semi_annual_end_date')]
+            if reportid:
+                semi_args.append(reportid)
+            semi_forms_obj = check_list_semi_cvg_dates(semi_args)
+            forms_obj.extend(semi_forms_obj)
         if len(forms_obj) == 0:
             report_id = get_next_report_id()
             data["report_id"] = str(report_id)
@@ -1440,6 +1498,15 @@ def put_reports(data):
                 raise Exception("The cvg_end_dt is null.")
         if not (data.get("cvg_start_dt") is None or data.get("cvg_end_dt") is None):
             forms_obj = check_list_cvg_dates(args)
+        if data.get("form_type") == 'F3L' and data.get('semi_annual_start_date') and data.get('semi_annual_end_date'):
+            semi_args = [
+                cmte_id, 
+                data.get("form_type"), 
+                data.get('semi_annual_start_date'), 
+                data.get('semi_annual_end_date'), 
+                data.get("report_id")]
+            semi_forms_obj = check_list_semi_cvg_dates(semi_args)
+            forms_obj.extend(semi_forms_obj)
         if len(forms_obj) == 0:
             old_list_report = get_list_report(report_id, cmte_id)
             # print(old_list_report)
@@ -2050,8 +2117,8 @@ def reports(request):
                       "additional_email_2": additional_email_2,
                   }
 
-                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
-                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['semi_annual_start_date'] = date_format(request.data.get('semi_annual_start_date')) if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = date_format(request.data.get('semi_annual_end_date')) if request.data.get('semi_annual_end_date') else None
                 datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
                 datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
@@ -2176,8 +2243,8 @@ def reports(request):
                 if "election_code" in request.data:
                     datum["election_code"] = request.data.get("election_code")
                 
-                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
-                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['semi_annual_start_date'] = date_format(request.data.get('semi_annual_start_date')) if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = date_format(request.data.get('semi_annual_end_date')) if request.data.get('semi_annual_end_date') else None
                 datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
                 datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
@@ -3566,7 +3633,7 @@ def create_json_file(request):
                 """
                     # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
                     # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
-                    printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+                    printresp = requests.post(settings. + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
                     if not printresp.ok:
                         return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
                     else:
@@ -5823,6 +5890,29 @@ def get_cvg_dates(report_id, cmte_id, include_deleted=False):
     except Exception as e:
         raise Exception("The get_cvg_dates function is throwing an error: " + str(e))
 
+def get_cvg_dates_with_semi(report_id, cmte_id, include_deleted=False):
+    try:
+        with connection.cursor() as cursor:
+            if include_deleted:
+                param_string = ""
+            else:
+                param_string = "AND delete_ind is distinct from 'Y'"
+            cursor.execute(
+                "SELECT cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date from public.reports where cmte_id = %s AND report_id = %s {}".format(param_string),
+                [cmte_id, report_id],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Report ID: {} is either deleted or does not exist in Reports table".format(
+                        report_id
+                    )
+                )
+            result = cursor.fetchone()
+            cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = result
+        return cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date
+    except Exception as e:
+        raise Exception("The get_cvg_dates_with_semi function is throwing an error: " + str(e))
+
 
 def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
     """
@@ -5858,7 +5948,6 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
-
 def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5866,27 +5955,52 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
             cvg_start_date = datetime.date(cvg_end_date.year,1,1)
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
+                """SELECT COALESCE(t1.coh_cop, 0), rp.cvg_end_date FROM public.form_3x t1, public.reports rp 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
                 AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
-                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
+                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'
+                AND t1.report_id = rp.report_id""",
                 [cmte_id, cmte_id, cvg_start_date],
             )
             # print("prev_cash_on_hand_cop_3rd_nav")
             # print(cursor.query)
             if cursor.rowcount == 0:
-                coh_cop = 0
+                input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, False)
+                coh_cop = 0 if input_coh == None else input_coh
             else:
                 result = cursor.fetchone()
+                # print(result)
                 coh_cop = result[0]
+                if result[1].year < cvg_start_date.year:
+                    input_coh = get_coh_f3x_table(cvg_start_date.year, cmte_id, True)
+                    if input_coh != None: coh_cop = input_coh
         return coh_cop
     except Exception as e:
         raise Exception(
             "The prev_cash_on_hand_cop_3rd_nav function is throwing an error: " + str(e)
         )
 
+def get_coh_f3x_table(cov_year, cmte_id, exact_match=True):
+    try:
+        check_filter = "=" if exact_match else "<="
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT coh FROM cash_on_hand_f3x WHERE cmte_id = %s AND coh_year {} %s
+                    ORDER BY coh_year DESC""".format(check_filter),
+                [cmte_id, cov_year],
+            )
+            if cursor.rowcount == 0:
+                coh = None
+            else:
+                result = cursor.fetchone()
+                coh = result[0]
+        return coh
+    except Exception as e:
+        raise Exception(
+            "The get_coh_f3x_table function is throwing an error: " + str(e)
+        )
 
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
@@ -9203,7 +9317,9 @@ def get_reports_data(report_id):
 
 def create_amended(reportid):
     try:
+        print(reportid)
         data_dict = get_reports_data(reportid)
+        print(data_dict)
         if data_dict:
             # data = data[0]
             # report_id = get_next_report_id()
@@ -9237,6 +9353,7 @@ def create_amended(reportid):
                 # print('just before post_reports')
                 created_data = post_reports(data, reportid)
                 if type(created_data) is list:
+                    print(created_data)
                     raise Exception("coverage dates already cover a existing report id")
                 elif type(created_data) is dict:
                     print(created_data)
@@ -9261,24 +9378,48 @@ def create_amended(reportid):
         return False
 
 
-def get_report_ids(cmte_id, from_date, submit_flag=True, including=True, form_type='F3X'):
+def get_report_ids(cmte_id, from_date, submit_flag=True, including=True, form_type='F3X', semi_date=None):
     data_ids = []
     try:
         with connection.cursor() as cursor:
-            if submit_flag:
-                param_string = "AND status = 'Submitted'"
-            else:
-                param_string = ""
-            if including:
-                check_string = ">="
-            else:
-                check_string = ">"
+            # if submit_flag:
+            #     param_string = "AND status = 'Submitted'"
+            # else:
+            #     param_string = ""
+            param_string = "AND status = 'Submitted'" if submit_flag else ""
+            check_string = "cvg_start_date {} %s".format(">=" if including else ">")
+            values_list = [cmte_id, from_date, form_type]
+            # if including:
+            #     check_string = "AND cvg_start_date >= %s"
+            #     values_list = [cmte_id, from_date, form_type]
+            # else:
+            #     check_string = "cvg_start_date > %s"
+            #     values_list = [cmte_id, from_date, form_type]
+            if form_type == 'F3L':
+                if from_date:
+                    check_string = """(({} AND date_part('month',cvg_start_date) {} 6) 
+                            OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(
+                                check_string, "<=" if from_date.month <= 6 else ">")
+                    values_list = [cmte_id, from_date, from_date, from_date, form_type]
+                    # if from_date.month <= 6:
+                    #     check_string = """(({} AND date_part('month',cvg_start_date) <= 6) 
+                    #         OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(check_string)
+                    #     values_list = [cmte_id, from_date, from_date, from_date, form_type]
+                    # else:
+                    #     check_string = """(({} AND date_part('month',cvg_start_date) > 6) 
+                    #         OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(check_string)
+                elif semi_date:
+                    check_string = "%s >= semi_annual_start_date AND %s <= semi_annual_end_date"
+                    values_list = [cmte_id, semi_date, semi_date, form_type]
+                else:
+                    return []
             cursor.execute(
-                """SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date {} %s 
-                {} AND form_type = '{}' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""".format(check_string, param_string, form_type),
-                [cmte_id, from_date],
+                """SELECT report_id FROM public.reports WHERE cmte_id= %s AND {}
+                {} AND form_type = %s AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
+                ORDER BY cvg_start_date ASC NULLS LAST""".format(check_string, param_string),
+                values_list
             )
+            print(cursor.query)
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
@@ -9307,13 +9448,13 @@ def create_amended_reports(request):
                     )
                 data = val_data[0]
                 if data.get('form_type') in ['F3X','F3L']:
-                            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+                            cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = get_cvg_dates_with_semi(reportid, cmte_id)
 
                             # cdate = date.today()
                             from_date = cvg_start_date
                             data_obj = None
-
-                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'))
+                            print(cvg_start_date, semi_annual_start_date)
+                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'), semi_date=semi_annual_start_date)
 
                             print(report_id_list, from_date)
 
@@ -11171,5 +11312,563 @@ def get_f24_reports(request):
     except Exception as e:
         return Response(
           "The get_f24_reports API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+class NotificationsSwitch:
+
+    def switch(self, request):
+        viewtype = request.data.get("view", "Prior Notices")
+
+        pageNumber = int(request.data.get("page", 1))
+        sortColumn = request.data.get("sortColumnName", "") 
+        descending = request.data.get("descending", False)
+        itemsperpage = request.data.get("itemsPerPage", 10)
+
+        if str(sortColumn) == '':
+            self._orderby = None
+        else:
+            strbld = ' ORDER BY ' + sortColumn
+            if descending:
+                strbld = strbld + ' DESC '
+            else:
+                strbld = strbld + ' ASC '
+            self._orderby = strbld
+
+        strbld = " OFFSET "
+        if pageNumber > 0:
+            strbld = strbld + str((pageNumber - 1) * itemsperpage)
+        else:
+            strbld = strbld + str(0)
+        strbld = strbld + " ROWS FETCH FIRST " + str(itemsperpage) + " ROW ONLY "
+        self._pagination = strbld
+
+        default = "Incorrect view type"
+        viewtype = string.capwords(viewtype).replace(" ", "")
+        return getattr(self, 'case_' + viewtype, lambda: default)()
+
+    def case_PriorNotices(self):
+
+        sql_count = """
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
+
+        sql_items = """
+            select null as id, null as date_sent, null as subject
+            where 1=2 and %(cmte_id)s is not null
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "date_sent", "header": "Date Sent" },
+            { "name": "subject", "header": "Subject (Email Subject)" }
+        ]""")
+
+        return (sql_count, sql_items, keys)      
+ 
+    def case_ReminderEmails(self):
+
+        sql_count = """
+            select count(1) as count
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
+        """
+
+        sql_items = """
+            select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date
+            from public.notifications_reminder_email
+            where cmte_id = %(cmte_id)s
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "due_date", "header": "Due Date" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+ 
+    def case_LateNotificationEmails(self):
+        
+        sql_count = """
+            select count(1) as count
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
+        """
+
+        sql_items = """
+            select notification_id as id, form_tp as form_name, rpt_tp as report_type,
+                ( current_date - due_date ) as past_due_days
+            from public.notifications_late_notification
+            where cmte_id = %(cmte_id)s
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "past_due_days", "header": "Past Due" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+
+    def case_FilingConfirmations(self):
+
+        sql_count = """
+            select count(1) as count
+            from public.reports
+            where cmte_id = %(cmte_id)s
+            and status = 'Submitted'
+        """
+
+        sql_items = """
+            select report_id as id,
+                fec_id as filing_id,
+                form_type as form_name,
+                report_type as report_type,
+                to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
+                null as filed_by,
+                filed_date as date_time
+            from public.reports
+            where cmte_id = %(cmte_id)s
+            and status = 'Submitted'
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "filing_id", "header": "Filing ID" },
+            { "name": "form_name", "header": "Name of Form" },
+            { "name": "report_type", "header": "Report Type" },
+            { "name": "coverage_dates", "header": "Coverage Dates" },
+            { "name": "filed_by", "header": "Filed By" },
+            { "name": "date_time", "header": "Date/Time" }
+        ]""")
+
+        return (sql_count, sql_items, keys) 
+
+    def case_Rfais(self):
+        
+        sql_count = """
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
+
+        sql_items = """
+            select null as id, null as date_sent, null as ref_report_type, null as due_date
+            where 1=2 and %(cmte_id)s is not null
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "date_sent", "header": "Date Sent" },
+            { "name": "ref_report_type", "header": "Report Referenced" },
+            { "name": "due_date", "header": "Due Date (if Applicable)" }
+        ]""")
+
+        return (sql_count, sql_items, keys)
+
+    def case_ImportedTransactions(self):
+
+        sql_count = """
+            SELECT 0 as count WHERE %(cmte_id)s is not null
+        """
+
+        sql_items = """
+            select null as id, null as name, null as uploader, null as date_time, null as check_sum
+            where 1=2 and %(cmte_id)s is not null
+        """
+
+        if self._orderby != None:
+            sql_items = sql_items + self._orderby
+        if self._pagination != None:
+            sql_items = sql_items + self._pagination
+
+        keys = json.loads("""[
+            { "name": "name", "header": "Name" },
+            { "name": "uploader", "header": "Uploader" },
+            { "name": "date_time", "header": "Date/Time" },
+            { "name": "check_sum", "header": "Checksum" }
+        ]""")
+
+        return (sql_count, sql_items, keys) 
+
+def construct_notifications_response(request):
+    s = NotificationsSwitch()
+    return s.switch(request)
+
+@api_view(['GET'])
+def get_notifications_count(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+
+        sql_count = """
+            select sum(V.records_count) as count
+            from
+            (
+                select count(1) as records_count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+                union 
+                select count(1) as records_count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+                union
+                select count(1) as records_count
+                from public.reports
+                where cmte_id = %(cmte_id)s
+                and status = 'Submitted'
+            ) as V
+        """     
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count']
+
+        output = {'notification_count': totalcount}
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notifications_count API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def get_notifications_counts(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+
+        sql_groups = """
+            select 'Prior Notices' as "groupName", 0 as count
+            union
+            select 'Reminder Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Late Notification Emails' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+            ) A
+            union
+            select 'Filing Confirmations' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.reports
+                where cmte_id = %(cmte_id)s
+                and status = 'Submitted'
+            ) A
+            union
+            select 'RFAIs' as "groupName", 0 as count
+            union
+            select 'Imported Transactions' as "groupName", 0 as count
+        """
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
+            result = cursor.fetchall()
+            items = [] if not result[0][0] else result[0][0]
+        itemsCount = len(items)
+
+        output = { 
+            'items': items,
+            'totalItems': itemsCount
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notifications_counts API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(["POST"])
+def get_notifications(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+
+        (sql_count, sql_items, keys) = construct_notifications_response(request)
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
+            row1=cursor.fetchone()[0]
+            totalCount =  row1[0]['count']
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_items + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id
+            })
+            result = cursor.fetchall()
+            items = [] if not result[0][0] else result[0][0]
+
+        output = { 
+            'keys': keys,
+            'items': items,
+            'totalItems': totalCount
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notifications API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(["GET"])
+def get_notification(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        viewtype = request.GET.get('view', 'Prior Notice')
+        notification_id = int(request.query_params.get('id'))
+
+        sql_item = None
+        if viewtype == 'Prior Notice':
+            pass
+
+        if viewtype == 'Reminder Emails':
+            sql_item = """
+                select email_subject, email_html_body, email_text_body
+                from public.notifications_reminder_email
+                where notification_id = %(notification_id)s
+            """
+
+        if viewtype == 'Late Notification Emails':
+            sql_item = """
+                select email_subject, email_html_body, email_text_body
+                from public.notifications_late_notification
+                where notification_id = %(notification_id)s
+            """
+
+        if viewtype == 'Filing Confirmations':
+            pass
+
+        if viewtype == 'RFAIs':
+            pass
+
+        if viewtype == 'Imported Transactions':
+            pass
+
+        if sql_item is None:
+            raise Exception('Unsupported viewtype='  + viewtype)
+
+        sql = """SELECT json_agg(t) FROM (""" + sql_item + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "notification_id": notification_id
+            })
+            row1=cursor.fetchone()[0]
+            email_subject =  row1[0]['email_subject']
+            email_html_body =  row1[0]['email_html_body']
+            email_text_body =  row1[0]['email_text_body']
+
+        email = email_html_body
+        #blob = ''.join(format(ord(i), 'b') for i in email) 
+        blob = email
+
+        output = { 
+            'contentType': 'html',
+            'blob': blob
+        }
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        if cursor != None and cursor.query != None:
+            print(cursor.query.decode('utf8'))
+        return Response(
+          "The get_notification API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET', 'PUT'])
+def cashOnHand(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        cmte_id = get_comittee_id(request.user.username)
+        if request.method == "GET":
+            if not request.query_params.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.query_params.get('year')
+            _sql = """SELECT json_agg(t) FROM (
+                      SELECT coh as amount, coh_year as year FROM
+                      public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s) t"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+            result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+        if request.method == "PUT":
+            if not request.data.get('year'): raise Exception('year field is mandatory')
+            coh_year = request.data.get('year')
+            coh_amount = request.data.get('amount')
+
+            # first check if an entry exists
+            get_sql = """SELECT * FROM cash_on_hand_f3x WHERE cmte_id = %s AND
+                      coh_year = %s """
+            with connection.cursor() as cursor:
+                cursor.execute(get_sql, [cmte_id, coh_year])
+                if cursor.rowcount == 0:
+                    sql = """INSERT INTO cash_on_hand_f3x VAlUES (%s, %s, %s)"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [cmte_id, coh_year, coh_amount])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to insert data into table')
+                else:
+                    sql = """UPDATE cash_on_hand_f3x set coh = %s WHERE cmte_id = %s AND
+                        coh_year = %s"""
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql, [coh_amount, cmte_id, coh_year])
+                        if cursor.rowcount == 0:
+                            raise Exception('Failed to update data in the table')
+            
+            _sql = """SELECT json_agg(t) FROM (
+                    SELECT coh as amount, coh_year as year FROM
+                    public.cash_on_hand_f3x WHERE cmte_id = %s AND
+                    coh_year = %s) t"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, coh_year])
+                output=cursor.fetchone()[0]
+                result = output[0] if output else {}
+            return Response(result, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+          "The cashOnHand API - {} is throwing an error: ".format(request.method) + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def cashOnHandInfoStatus(request):
+    try:
+        status_flag = False
+        cmte_id = get_comittee_id(request.user.username)
+        _sql = """SELECT * FROM cash_on_hand_info_status WHERE username = %s"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id])
+            if cursor.rowcount == 0: 
+                status_flag = True
+                _sql1 = """INSERT INTO cash_on_hand_info_status VALUES(%s)"""
+                cursor.execute(_sql1, [cmte_id])
+        return Response({'showMessage': status_flag}, status=status.HTTP_200_OK) 
+    except Exception as e:
+        return Response(
+          "The cashOnHandInfoStatus API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_logs(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+              c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              concat_ws(', ', e.last_name, e.first_name) AS user, c.logged_date AS modifieddate
+              FROM contacts_log_view c, authentication_account e
+              WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
+              ORDER BY c.logged_date DESC"""
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id')])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_log API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def contact_report_details(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        if 'entity_id' not in request.query_params:
+            raise Exception('entity_id is mandatory')
+        sql = """SELECT concat_ws(' ', CASE WHEN r.form_type='F3X' THEN 'Form 3X:' 
+                                            WHEN r.form_type='F3L' THEN 'Form 3L:' 
+                                            WHEN r.form_type='F1M' THEN 'Form 1M:' 
+                                            WHEN r.form_type='F24' THEN 'Form 24:' 
+                                            ELSE 'Form' END,
+                                      concat(rrt.rpt_type_desc,','), 
+                                      concat_ws('-', to_char(r.cvg_start_date, 'MM/DD/YY'), 
+                                                      to_char(r.cvg_end_date, 'MM/DD/YY'))) 
+            AS formdetails, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
+            c.city, c.state, c.zip, c.occupation, c.employer,c.phone_number, 
+            al.report_id, al.entity_id
+            FROM all_transactions_view al, reports r, ref_rpt_types rrt, contacts_log_view c
+            WHERE r.report_type = rrt.rpt_type 
+            AND c.id = al.entity_id 
+            AND al.entity_id = %s
+            AND c.logged_date = (
+                SELECT clv.logged_date 
+                FROM contacts_log_view clv 
+                WHERE clv.id = %s
+                AND al.last_update_date <= clv.logged_date 
+                ORDER BY clv.logged_date ASC LIMIT 1)
+            AND al.report_id = r.report_id 
+            AND al.delete_ind IS DISTINCT FROM 'Y' 
+            AND al.cmte_id = %s
+            ORDER BY r.cvg_start_date DESC
+            """
+        with connection.cursor() as cursor:
+            _sql = """SELECT json_agg(t) FROM ( {} ) t""".format(sql)
+            cursor.execute(_sql, [request.query_params.get('entity_id'),
+                request.query_params.get('entity_id'), cmte_id])
+            if cursor.rowcount == 0:
+                result = []
+            else:
+                output=cursor.fetchone()[0]
+                result = output if output else []
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_report_details API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )

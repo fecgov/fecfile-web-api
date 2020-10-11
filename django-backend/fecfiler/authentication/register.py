@@ -2,6 +2,7 @@ import logging
 import uuid
 
 import boto3
+from rest_framework.response import Response
 from botocore.exceptions import ClientError
 from django.contrib.auth.hashers import make_password
 from django.db import connection
@@ -10,10 +11,10 @@ from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
-from fecfiler.core.views import check_null_value
+from fecfiler.core.views import check_null_value, NoOPError
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import check_madatory_field, check_account_exist, create_jwt_token, send_email, \
-    send_text, send_call, token_verification, reset_account_password, reset_code_counter
+    send_text, send_call, token_verification, reset_account_password, reset_code_counter, create_password_jwt_token
 from fecfiler.settings import REGISTER_USER_URL, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,21 @@ def create_account_password(cmte_id, password, email, personal_key):
         raise e
 
 
+def update_personal_key(cmte_id, email, personal_key):
+    try:
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.authentication_account SET personal_key = %s WHERE cmtee_id = %s AND 
+            email = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [personal_key, cmte_id, email])
+            if cursor.rowcount != 1:
+                raise Exception("Personal Key was not updated.")
+            else:
+                return True
+    except Exception as e:
+        logger.debug("Exception occurred while updating personal key.", str(e))
+        raise e
+
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
@@ -153,6 +169,7 @@ def code_verify_register(request):
 
         try:
             is_allowed = False
+            token = ''
             code = request.data.get('code', None)
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
@@ -170,15 +187,17 @@ def code_verify_register(request):
 
             username = user_list["username"]
             key = user_list["secret_key"]
+            unix_time = user_list["code_time"]
             otp_class = TOTPVerification(username)
-            token_val = otp_class.verify_token(key)
+            token_val = otp_class.verify_token(key, unix_time)
 
-            if code == int(token_val):
+            if code == token_val:
                 is_allowed = True
                 reset_code_counter(key)
+                token = create_password_jwt_token(email, cmte_id)
 
             response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                        'email': email}
+                        'email': email, 'token': token}
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while verifying code", str(e))
@@ -197,11 +216,21 @@ def create_password(request):
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
             email = payload.get('email', None)
+            two_factor = payload.get('2fVerified', None)
             data = {"committee_id": cmte_id, "email": email, "password": password}
 
             list_mandatory_fields = ["committee_id", "password", "email"]
             check_madatory_field(data, list_mandatory_fields)
             account_exist = check_password_account_exist(cmte_id, email)
+
+            if not two_factor:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+            if account_exist is None:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist:
                 personal_key = uuid.uuid4()
                 password_created = create_account_password(cmte_id, password, email, personal_key)
@@ -212,6 +241,62 @@ def create_password(request):
             logger.debug("exception occurred while getting account information", str(e))
             json_result = {'message': "Password Reset was not successful."}
             return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+def get_another_personal_key(request):
+    if request.method == "GET":
+        try:
+            personal_key_updated = False
+            payload = token_verification(request)
+            cmte_id = payload.get('committee_id', None)
+            email = payload.get('email', None)
+            data = {"committee_id": cmte_id, "email": email}
+
+            list_mandatory_fields = ["committee_id", "email"]
+            check_madatory_field(data, list_mandatory_fields)
+            personal_key = uuid.uuid4()
+            update_personal_key(cmte_id, email, personal_key)
+            personal_key_updated = True
+
+            response = {'personal_key_updated': personal_key_updated, 'personal_key': personal_key}
+            return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug("exception occurred while getting account information", str(e))
+            json_result = {'message': "Personal Key was not updated."}
+            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
+def get_committee_details(request):
+    try:
+        payload = token_verification(request)
+        cmte_id = payload.get('committee_id', None)
+        with connection.cursor() as cursor:
+            query_string = """SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2", 
+                cm.city, cm.state, cm.zip_code AS "zipcode", 
+                cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn, 
+                cm.cmte_filing_freq, cm.cmte_filed_type, 
+                cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename", 
+                cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax, 
+                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
+                FROM public.committee_master cm
+                LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
+                WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
+            modified_output = cursor.fetchone()[0]
+        if modified_output is None:
+            raise NoOPError('The Committee ID: {} does not match records in Committee table'.format(cmte_id))
+        # levin_accounts = get_levin_accounts(cmte_id)
+        # modified_output[0]['levin_accounts'] = levin_accounts
+        return Response(modified_output[0], status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_committee_details API is throwing  an error: " + str(e),
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
@@ -265,7 +350,7 @@ def authenticate(request):
 
             elif id == 'TEXT' or id == 'CALL':
                 try:
-                    email = data.get('email', None)
+                    email = user_list['email']
                     contact = data.get("contact")
                     if not check_null_value(contact):
                         raise Exception("contact is required")

@@ -37,7 +37,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   @Input() transactionType = '';
   @Input() scheduleAction: ContactActions = ContactActions.add;
   @Input() transactionToEdit: ContactModel;
-
+  @Input() isContactDetailsView: boolean = false;
 
   public checkBoxVal: boolean = false;
   public frmContact: FormGroup;
@@ -97,14 +97,19 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._contactsMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$)
     .subscribe(message => {
     });
+    this._messageService.getMessage().subscribe( res => {
+        if (res && res.cdEnableForm === true) {
+        this.enableFrom();
+      }
+    });
   }
 
   ngOnInit(): void {
     this._selectedEntity = null;
     this._contactToEdit = null;
-    
+
     localStorage.removeItem('contactsaved');
-    
+
     this._messageService.clearMessage();
 
 
@@ -116,6 +121,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
       }
+    }
+
+    if (this.isContactDetailsView) {
+      this.disableForm();
     }
   }
 
@@ -1221,6 +1230,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
         //this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
         //this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+        if(this.isContactDetailsView) {
+          this.disableForm();
+        }
       }
     }
   }
@@ -1426,4 +1438,16 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       return true;
   }
  }
+
+ disableForm() {
+    this.frmContact.disable();
+ }
+
+  private enableFrom() {
+   this.frmContact.enable();
+  }
+
+  saveContactDetails() {
+
+  }
 }

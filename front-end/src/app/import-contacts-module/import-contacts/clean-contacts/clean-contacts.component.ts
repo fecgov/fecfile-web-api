@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { ImportContactsService } from '../service/import-contacts.service';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 
@@ -9,6 +9,12 @@ import { Subject, BehaviorSubject, Observable } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CleanContactsComponent implements OnInit, OnDestroy {
+
+  @Input()
+  public duplicates: Array<string>;
+
+  @Output()
+  public cancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   public showErrors$: Observable<boolean>;
   public showDuplicates$: Observable<boolean>;
@@ -66,6 +72,10 @@ export class CleanContactsComponent implements OnInit, OnDestroy {
       }
 
     });
+  }
+
+  public receiveDupeCancel() {
+    this.cancelEmitter.emit();
   }
 
 }
