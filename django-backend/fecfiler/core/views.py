@@ -9676,27 +9676,7 @@ def create_amended_reports(request):
                     )
                 data = val_data[0]
                 if data.get('form_type') in ['F3X','F3L']:
-                            cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = get_cvg_dates_with_semi(reportid, cmte_id)
-
-                            # cdate = date.today()
-                            from_date = cvg_start_date
-                            data_obj = None
-                            print(cvg_start_date, semi_annual_start_date)
-                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'), semi_date=semi_annual_start_date)
-
-                            print(report_id_list, from_date)
-
-                            if report_id_list:
-                                for i in report_id_list:
-                                    amended_obj =  create_amended(i)
-                                    if str(i) == str(reportid):
-                                        data_obj = amended_obj
-
-                                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
-                            else:
-                                return Response(
-                                    "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
-                                )
+                    data_obj = amend_form3x_3l(reportid, cmte_id, data.get('form_type'))
 
                 elif data.get('form_type') == 'F1M':
                     output_dict = amend_form1m(data)
@@ -9715,13 +9695,31 @@ def create_amended_reports(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
 
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
+def amend_form3x_3l(reportid, cmte_id, form_type, error_flag=True):
+    try:
+        cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = get_cvg_dates_with_semi(reportid, cmte_id)
+        # cdate = date.today()
+        from_date = cvg_start_date
+        data_obj = None
+        print(cvg_start_date, semi_annual_start_date)
+        report_id_list = get_report_ids(cmte_id, from_date, form_type=form_type, semi_date=semi_annual_start_date)
+        print(report_id_list, from_date)
+        if report_id_list:
+            for i in report_id_list:
+                amended_obj =  create_amended(i)
+                if str(i) == str(reportid):
+                    data_obj = amended_obj
+        elif error_flag:
+            raise Exception("Given Report_id Not found")
+        return data_obj
+    except Exception as e:
+        raise Exception("""The amend_form3x_3l function is throwing an error: """ + str(e))
 
 def amend_form1m(request_dict):
     try:
@@ -12021,7 +12019,12 @@ def cashOnHand(request):
                         cursor.execute(sql, [coh_amount, cmte_id, coh_year])
                         if cursor.rowcount == 0:
                             raise Exception('Failed to update data in the table')
-            
+            from_date = date(int(coh_year), 1, 1)
+            report_id_list = get_report_ids(cmte_id, from_date, submit_flag=False, including=True, form_type='F3X')
+            if report_id_list:
+                reportid = report_id_list[0]
+                data_obj = amend_form3x_3l(reportid, cmte_id, 'F3X', False)
+                function_to_call_wrapper_update_F3X(cmte_id, reportid)
             _sql = """SELECT json_agg(t) FROM (
                     SELECT coh as amount, coh_year as year FROM
                     public.cash_on_hand_f3x WHERE cmte_id = %s AND
