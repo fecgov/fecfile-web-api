@@ -643,8 +643,17 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   public exportAllSelected(): void {
     this._contactsService.getExportContactsData(this.selectedContactArray,
       this.allContactsSelected).subscribe((res: any) => {
+        for (const contact of res.contacts) {
+          // TODO have the API omit these fields.
+          delete contact.cand_election_year;
+          delete contact.cand_office;
+          delete contact.cand_office_district;
+          delete contact.cand_office_state;
+          delete contact.ref_cand_cmte_id;
+          delete contact.last_update_date;
+        }
         this.exportContactData = res.contacts;
-        this._exportService.exportExcel(this.exportContactData, 'export_contacts');
+        this._exportService.exportCsv(this.exportContactData, 'export_contacts');
       });
   }
 
