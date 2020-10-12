@@ -1122,6 +1122,8 @@ def get_recently_submitted_reports(data):
             )
 
             forms_obj = cursor.fetchone()[0]
+            if forms_obj is None:
+                forms_obj = []
         return forms_obj
     except Exception:
         raise
@@ -1140,6 +1142,8 @@ def get_recently_saved_reports(data):
             )
 
             forms_obj = cursor.fetchone()[0]
+            if forms_obj is None:
+                forms_obj = []
         return forms_obj
     except Exception:
         raise
@@ -1161,6 +1165,8 @@ def get_upcoming_reports(data):
             )
 
             forms_obj = cursor.fetchone()[0]
+            if forms_obj is None:
+                forms_obj = []
         return forms_obj
     except Exception:
         raise
@@ -2125,6 +2131,7 @@ def recent_submitted_reports(request):
         if request.method == "GET":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = []
                 forms_obj = get_recently_submitted_reports(data)
                 return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
@@ -2156,6 +2163,7 @@ def recent_saved_reports(request):
         if request.method == "GET":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = []
                 forms_obj = get_recently_saved_reports(data)
                 return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
@@ -2187,6 +2195,7 @@ def upcoming_reports(request):
         if request.method == "GET":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = []
                 forms_obj = get_upcoming_reports(data)
                 return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:

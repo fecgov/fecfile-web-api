@@ -37,6 +37,7 @@ export class DashboardComponent implements OnInit {
   recentlySubmittedReports: any;
   recentlySubmittedReportsError = false;
   recentlySubmittedReportsEmpty = false;
+  cmte_id: string;
 
   constructor(
     private _sessionService: SessionService,
@@ -53,6 +54,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
        this._formService.removeFormDashBoard("3X");
+    }
+    if (localStorage.getItem('committee_details')){
+      this.cmte_id = JSON.parse(localStorage.getItem('committee_details')).committeeid;
     }
     this._showFirstTimeCOHIfAppliable();
     this._populateUpcomingReportsList();

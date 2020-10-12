@@ -63,7 +63,7 @@ export class CashOnHandComponent implements OnInit {
     // if(reportId){
     //   this._router.navigate(['./'],{relativeTo: this._activatedRoute, queryParamsHandling:'preserve'});
     // }
-    this._router.navigate(['/reports']);
+    this._router.navigate(['/dashboard']);
   }
 
   populateForm() {
