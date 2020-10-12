@@ -7849,9 +7849,32 @@ def contact_entity_dict(data):
         raise
 
 
-def put_contact_data(data):
+def put_contact_data(data, username):
     try:
         with connection.cursor() as cursor:
+            # creating a log of the entity modified
+            cursor.execute(
+              """
+              INSERT INTO public.entity_log(
+              entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
+              middle_name, preffix, suffix, street_1, street_2, city, state, 
+              zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
+              create_date, last_update_date, cand_office, cand_office_state, 
+              cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
+              ref_entity_id, logged_date, username)
+              SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
+              middle_name, preffix, suffix, street_1, street_2, city, state, 
+              zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
+              create_date, last_update_date, cand_office, cand_office_state, 
+              cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
+              ref_entity_id, now(), %s
+              FROM public.entity WHERE entity_id=%s
+              """,
+              [
+              username,
+              data.get("entity_id")
+              ]
+            )
             cursor.execute(
                 """
                 UPDATE public.entity SET 
@@ -8002,13 +8025,20 @@ def contacts(request):
                 datum = contact_entity_dict(request.data)
                 datum["cmte_id"] = get_comittee_id(request.user.username)
                 # datum['cmte_id'] = cmte_id
-                put_contact_data(datum)
+                put_contact_data(datum, request.user.username)
                 print("datum", datum)
                 output = get_entities(datum)
                 dict_data = output[0]
                 dict_data["phone_number"] = (
                     str(dict_data["phone_number"]) if dict_data.get("phone_number") else ""
                 )
+                if 'entity_type' in dict_data and dict_data['entity_type'] in ['IND', 'CAN']:
+                    dict_data['name'] = ', '.join([dict_data['last_name'],dict_data['first_name'],dict_data['middle_name'],
+                                          dict_data['prefix'],dict_data['suffix']])
+                else:
+                    dict_data['name'] = dict_data['entity_name']
+                dict_data['address'] = ', '.join([dict_data.get('street1'), dict_data.get('street2', "")])
+
                 return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 return Response(
