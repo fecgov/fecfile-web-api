@@ -1104,6 +1104,64 @@ def get_list_report(report_id, cmte_id):
         raise
 
 
+def get_recently_submitted_reports(data):
+    try:
+        with connection.cursor() as cursor:
+
+            query_string = """select form_type, report_type,fec_id, to_char(filed_date,'YYYY-MM-DD')::date as filed_date
+                                 from public.reports where cmte_id = %s and status = 'Submitted' 
+                                  and delete_ind is distinct from 'Y' order by last_update_date desc limit 10"""
+
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                [data['cmte_id']],
+            )
+
+            forms_obj = cursor.fetchone()[0]
+        return forms_obj
+    except Exception:
+        raise
+
+def get_recently_saved_reports(data):
+    try:
+        with connection.cursor() as cursor:
+
+            query_string = """select form_type, report_type,status, to_char(last_update_date,'YYYY-MM-DD')::date as last_saved
+                                from public.reports where cmte_id = %s and status = 'Saved' 
+                                 order by last_update_date desc limit 10"""
+
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                [data['cmte_id']],
+            )
+
+            forms_obj = cursor.fetchone()[0]
+        return forms_obj
+    except Exception:
+        raise
+
+
+def get_upcoming_reports(data):
+    try:
+        with connection.cursor() as cursor:
+
+            query_string = """select due_date,form_type,rpt_type_desc,cvg_start_date,cvg_end_date,
+                                to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date as days_until_due 
+                                from cmte_report_types_view where cmte_id = %s
+                                and to_char(due_date, 'YYYY-MM-DD')::date > to_char(now(), 'YYYY-MM-DD')::date 
+                                order by due_date limit 5"""
+
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                [data['cmte_id']],
+            )
+
+            forms_obj = cursor.fetchone()[0]
+        return forms_obj
+    except Exception:
+        raise
+
+
 def put_sql_report(
         report_type,
         cvg_start_dt,
@@ -2046,6 +2104,99 @@ def submit_report(request):
             rep_json = cursor.fetchone()[0]
 
         return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["GET"])
+def recent_submitted_reports(request):
+    try:
+        # is_read_only_or_filer_reports(request)
+        """
+        *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
+        """
+        # Get first 10 records for recently submitted reports
+
+        if request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = get_recently_submitted_reports(data)
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["GET"])
+def recent_saved_reports(request):
+    try:
+        # is_read_only_or_filer_reports(request)
+        """
+        *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
+        """
+        # Get first 10 records for recently saved reports
+
+        if request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = get_recently_saved_reports(data)
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["GET"])
+def upcoming_reports(request):
+    try:
+        # is_read_only_or_filer_reports(request)
+        """
+        *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
+        """
+        # Get first five records for upcoming reports
+
+        if request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                forms_obj = get_upcoming_reports(data)
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

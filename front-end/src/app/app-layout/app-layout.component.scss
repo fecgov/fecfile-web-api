@@ -1,7 +1,7 @@
  @import '../shared/scss/global';
 
 .app-container {
-  background-color: $mercury;
+  background-color: white;
   color: $mineShaft;
   font-family: $mainFontFamily;
   min-height: 100vh;
@@ -96,7 +96,7 @@
     width: 100%;
     z-index: 1001;
     .navbar {
-      background-color: $dustyGray;
+      background-color: $navBarGray;
       height: $topNavHeight;
       font-family: 'Lato', 'sans-serif';
     font-size: 1rem;
@@ -121,7 +121,8 @@
         margin-bottom: -28px;
         padding: 0 !important;
         img {
-          width: 260px;
+          width: 350px;
+          padding-bottom:5%;
         }
       } // .app__top-logo
       .app__top-nav {
@@ -181,7 +182,7 @@
   main {
     height: 80%;
     .app__content-wrapper {
-      background-color: $mercury;
+      background-color: white;
       font-family: $mainFontFamily;
       margin: 0 auto;
       min-height: $mainContentHeight;
@@ -190,13 +191,15 @@
       transition: all 0.4s ease 0s;
       z-index: 0;
       .app__committee-info {
-        background-color: $mercury;
+        background-color: white;
+        margin-bottom:1%;
         height: 150px;
         padding-left: 60px;
         padding-right: 60px;
         padding-top: 35px;
         position: relative;
         vertical-align: bottom;
+        border-bottom: 1px solid black;
         @include media(tablet) {
           height: 60px;
           padding-top: 10px;
@@ -244,10 +247,11 @@
     }
   } // main
   .app__footer {
-    background-color: $mercury;
+    background-color:$alto;
     color: $black;
     height: $footerMobileHeight;
     margin-top: 5px;
+    padding-top:1%;
     // overflow-y: hidden;
     padding-left: 80px;
     @include media(tablet) {
@@ -282,7 +286,20 @@
         &:last-child {
           padding-right: 0;
         }
-        a {
+        address{
+          font-style: normal;
+          font-weight:normal;
+          a{
+            border-bottom: 1px dotted black;
+            color: black
+          }
+          a:hover{
+            border-bottom: 1px dotted $pelorous;
+            text-decoration: none;
+            color: $pictonBlue;
+          }
+        }
+        /* a {
           color: $pictonBlue;
           text-decoration: none;
           &:hover,
@@ -294,7 +311,7 @@
           &:active {
             text-decoration: underline;
           }
-        }
+        } */
       }
     }
     .legal-disclaimer {
@@ -302,12 +319,20 @@
       text-align: right;
       padding-right: 20px;
       width: $footerLegalDisclaimerWidth;
-      .btn-link {
-        color: $pictonBlue;
-        &:hover,
-        &:active,
-        &:visited {
-          color: $pictonBlue;
+      font-style: normal;
+      font-weight:normal;
+          .btn-link {
+            padding:0;
+            margin:0;
+            border-bottom: 1px dotted black;
+            // color: $pictonBlue;
+            &:hover,
+            &:active,
+            &:visited {
+              //color: $pictonBlue;
+              text-decoration: none;
+              border-bottom: 1px dotted $pictonBlue;
+              color: $pictonBlue;
         }
       }
     }

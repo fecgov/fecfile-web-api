@@ -28,7 +28,7 @@
       'show-alerts': showValidateBar === true,
       'hide-alerts': step === 'step_6'
     }">
-    <div class="form__steps" *ngIf="!allTransactions">
+    <div class="form__steps mt-4" *ngIf="!allTransactions">
       <app-steps [steps]="[
           { text: 'Report', step: 'step_1', edit: editMode },
           { text: 'Type', step: 'step_2', edit: editMode },

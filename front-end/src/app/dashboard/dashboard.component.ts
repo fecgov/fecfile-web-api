@@ -1,3 +1,4 @@
+import { ReportsService } from './../reports/service/report.service';
 import { AuthService } from './../shared/services/AuthService/auth.service';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -27,6 +28,16 @@ export class DashboardComponent implements OnInit {
   public closeResult: string;
   modalRef: any;
 
+  upcomingReportsList: any = null;
+  upcomingReportsListError = false;
+  upcomingReportsListEmpty = false;
+  recentlySavedReports: any;
+  recentlySavedReportsError = false;
+  recentlySavedReportsEmpty = false;
+  recentlySubmittedReports: any;
+  recentlySubmittedReportsError = false;
+  recentlySubmittedReportsEmpty = false;
+
   constructor(
     private _sessionService: SessionService,
     private _apiService: ApiService,
@@ -34,7 +45,8 @@ export class DashboardComponent implements OnInit {
     private _messageService: MessageService,
     private _formService: FormsService,
     private modalService: NgbModal, 
-    private _authService: AuthService
+    private _authService: AuthService, 
+    private _reportService: ReportsService
 
   ) { }
 
@@ -42,8 +54,72 @@ export class DashboardComponent implements OnInit {
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
        this._formService.removeFormDashBoard("3X");
     }
-
     this._showFirstTimeCOHIfAppliable();
+    this._populateUpcomingReportsList();
+    this._populateRecentlySavedReportsList();
+    this._populateRecentlySubmittedReportsList();
+  }
+  
+  private _populateRecentlySubmittedReportsList() {
+    //reset flags first
+    this.recentlySubmittedReportsEmpty = false;
+    this.recentlySubmittedReportsError = false;
+
+    this._reportService.getRecentlySubmittedReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.recentlySubmittedReports = res;
+        }else{
+          this.recentlySubmittedReportsEmpty = true;
+        }
+      }
+    }, error => {
+      if(error){
+        this.recentlySubmittedReportsError = true;
+      }
+    });
+  }
+
+  
+  private _populateRecentlySavedReportsList() {
+    //reset flags first
+    this.recentlySavedReportsEmpty = false;
+    this.recentlySavedReportsError = false;
+
+    this._reportService.getRecentlySavedReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.recentlySavedReports = res;
+        }else{
+          this.recentlySavedReportsEmpty = true;
+        }
+      }
+    } , error => {
+        if(error){
+          this.recentlySavedReportsError = true;
+        }
+    });
+  }
+  
+  
+  private _populateUpcomingReportsList() {
+    //reset flags first
+    this.upcomingReportsListEmpty = false;
+    this.upcomingReportsListError = false;
+
+    this._reportService.getUpcomingReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.upcomingReportsList = res;
+        }else{
+          this.upcomingReportsListEmpty = true;
+        }
+      }
+    }, error => {
+      if(error){
+        this.upcomingReportsListError = true;
+      }
+    });
   }
   
   
