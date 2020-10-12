@@ -101,7 +101,7 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    this.currentSortedColumnName = 'default';
+    this.currentSortedColumnName = '';
   }
 
   /**

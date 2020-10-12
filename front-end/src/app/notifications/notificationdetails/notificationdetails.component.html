@@ -49,11 +49,12 @@
         </div>
     </div>
     <div *ngIf="!showPageSizes()" class="d-flex justify-content-center notifications__table-pagination-container">
-        <div class="text-muted">No records found</div>
+        <div *ngIf="!tabConfig.placeholder" class="text-muted">No records found</div>
+        <div *ngIf="tabConfig.placeholder" class="text-muted">Not Implemented yet</div>
     </div>
     <div bsModal #notificationModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"
         aria-labelledby="dialog-sizes-name1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered notifications_modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title pull-left">&nbsp;</h4>

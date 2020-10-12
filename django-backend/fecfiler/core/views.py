@@ -11354,12 +11354,17 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as id, null as date_sent, null as subject
-            where 1=2 and %(cmte_id)s is not null
+            select * from (
+                select null as id, null as date_sent, null as subject, 
+                       null as updated_date
+                where 1=2 and %(cmte_id)s is not null
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by updated_date DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11379,13 +11384,19 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date
-            from public.notifications_reminder_email
-            where cmte_id = %(cmte_id)s
+            select * from (
+                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
+                       updated_date
+                from public.notifications_reminder_email
+                where cmte_id = %(cmte_id)s
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by due_date DESC "
+        sql_items = sql_items + ", id DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11406,14 +11417,20 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select notification_id as id, form_tp as form_name, rpt_tp as report_type,
-                ( current_date - due_date ) as past_due_days
-            from public.notifications_late_notification
-            where cmte_id = %(cmte_id)s
+            select * from (
+                select notification_id as id, form_tp as form_name, rpt_tp as report_type,
+                    ( current_date - due_date ) as past_due_days,
+                    updated_date
+                from public.notifications_late_notification
+                where cmte_id = %(cmte_id)s
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by due_date DESC "
+        sql_items = sql_items + ", id DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11435,20 +11452,25 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select report_id as id,
-                fec_id as filing_id,
-                form_type as form_name,
-                report_type as report_type,
-                to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
-                null as filed_by,
-                filed_date as date_time
-            from public.reports
-            where cmte_id = %(cmte_id)s
-            and status = 'Submitted'
+            select * from (
+                select report_id as id,
+                    fec_id as filing_id,
+                    form_type as form_name,
+                    report_type as report_type,
+                    to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
+                    null as filed_by,
+                    to_char(filed_date, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
+                    filed_date updated_date
+                from public.reports
+                where cmte_id = %(cmte_id)s
+                and status = 'Submitted'
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by updated_date DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11470,12 +11492,17 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as id, null as date_sent, null as ref_report_type, null as due_date
-            where 1=2 and %(cmte_id)s is not null
+            select * from (
+                select null as id, null as date_sent, null as ref_report_type, null as due_date,
+                       null as updated_date
+                where 1=2 and %(cmte_id)s is not null
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by updated_date DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11494,12 +11521,17 @@ class NotificationsSwitch:
         """
 
         sql_items = """
-            select null as id, null as name, null as uploader, null as date_time, null as check_sum
-            where 1=2 and %(cmte_id)s is not null
+            select * from (
+                select null as id, null as name, null as uploader, null as date_time, null as check_sum,
+                       null as updated_date
+                where 1=2 and %(cmte_id)s is not null
+            ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
+        else:
+            sql_items = sql_items + " order by updated_date DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
