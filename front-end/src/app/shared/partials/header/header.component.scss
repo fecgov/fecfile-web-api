@@ -21,8 +21,9 @@ a.dropdown-item,.btn-link {
   text-decoration: none;
   
   &:hover {
-    color: $white;
-    text-decoration: none;
+    color: $black;
+    font-weight: bold;
+    text-decoration: underline;
   }
 }
 .btn-height {
