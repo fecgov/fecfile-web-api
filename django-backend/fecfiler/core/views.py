@@ -2764,12 +2764,40 @@ def put_sql_entity(
         cand_election_year,
         phone_number,
         cmte_id,
+        username,
+        log_flag
 ):
     try:
         with connection.cursor() as cursor:
             # Put data into Entity table
             # cursor.execute("""UPDATE public.entity SET entity_type = %s, entity_name = %s, first_name = %s, last_name = %s, middle_name = %s, preffix = %s, suffix = %s, street_1 = %s, street_2 = %s, city = %s, state = %s, zip_code = %s, occupation = %s, employer = %s, ref_cand_cmte_id = %s, last_update_date = %s WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct FROM 'Y'""",
             #             (entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, last_update_date, entity_id, cmte_id))
+            # creating a log of the entity modified
+            if not log_flag:
+                if not username:
+                    raise Exception('username is missing in contact log')
+                cursor.execute(
+                    """
+                    INSERT INTO public.entity_log(
+                    entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
+                    middle_name, preffix, suffix, street_1, street_2, city, state, 
+                    zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
+                    create_date, last_update_date, cand_office, cand_office_state, 
+                    cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
+                    ref_entity_id, logged_date, username)
+                    SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
+                    middle_name, preffix, suffix, street_1, street_2, city, state, 
+                    zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
+                    create_date, last_update_date, cand_office, cand_office_state, 
+                    cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
+                    ref_entity_id, now(), %s
+                    FROM public.entity WHERE entity_id=%s
+                    """,
+                    [
+                    username,
+                    entity_id
+                    ]
+                )
             cursor.execute(
                 """
                 UPDATE public.entity SET 
@@ -3016,7 +3044,7 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
 
 
 # TODO: need to dsicuss if we need to handle clone-and-update scenario
-def put_entities(data):
+def put_entities(data, log_flag=True):
     try:
         check_mandatory_fields_entity(data)
         if data.get("prefix"):
@@ -3094,6 +3122,8 @@ def put_entities(data):
             data.get("phone_number"),
             # data.get('last_update_date'),
             cmte_id,
+            data.get("username"),
+            log_flag
         )
         output = get_entities(data)
         return output[0]
@@ -3212,6 +3242,7 @@ def entities(request):
                     "entity_id": request.data.get("entity_id"),
                     "entity_type": request.data.get("entity_type"),
                     "cmte_id": get_comittee_id(request.user.username),
+                    "username": request.user.username,
                     "entity_name": request.data.get("entity_name"),
                     "first_name": request.data.get("first_name"),
                     "last_name": request.data.get("last_name"),
@@ -8184,11 +8215,14 @@ def contacts(request):
                     str(dict_data["phone_number"]) if dict_data.get("phone_number") else ""
                 )
                 if 'entity_type' in dict_data and dict_data['entity_type'] in ['IND', 'CAN']:
-                    dict_data['name'] = ', '.join([dict_data['last_name'],dict_data['first_name'],dict_data['middle_name'],
-                                          dict_data['prefix'],dict_data['suffix']])
+                    dict_data['name'] = ', '.join([dict_data['last_name'],dict_data['first_name']])
+                    if dict_data.get('middle_name'): dict_data['name'] += ', ' + dict_data.get('middle_name')
+                    if dict_data.get('prefix'): dict_data['name'] += ', ' + dict_data.get('prefix')
+                    if dict_data.get('suffix'): dict_data['name'] += ', ' + dict_data.get('suffix')
                 else:
                     dict_data['name'] = dict_data['entity_name']
-                dict_data['address'] = ', '.join([dict_data.get('street1'), dict_data.get('street2', "")])
+                dict_data['address'] = dict_data.get('street1')
+                if dict_data.get('street2'): dict_data['address'] += ', ' + dict_data.get('street2')
 
                 return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
             except Exception as e:

@@ -367,7 +367,7 @@ def put_schedC(data):
             # rollback entity data
             # remove entiteis if saving sched_a fails
             if rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -765,7 +765,7 @@ def post_schedC(data):
         except Exception as e:
             # remove entiteis if saving sched_a fails
             if rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -1125,6 +1125,7 @@ def schedC(request):
                 datum = schedC_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
                 logger.debug("data before saving to db:{}".format(datum))
@@ -1230,6 +1231,7 @@ def schedC(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
 
@@ -2154,7 +2156,7 @@ def post_schedC1(data):
         except Exception as e:
             # rollback lender entity
             if lender_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2164,7 +2166,7 @@ def post_schedC1(data):
 
             # rollback treasurer entity
             if treasurer_rollback_flag:
-                entity_data = put_entities(old_treasurer_entity)
+                entity_data = put_entities(old_treasurer_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2174,7 +2176,7 @@ def post_schedC1(data):
 
             # rollback authorized entity
             if authorized_rollback_flag:
-                entity_data = put_entities(old_authorized_entity)
+                entity_data = put_entities(old_authorized_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2519,6 +2521,7 @@ def schedC1(request):
                 datum = request.data.copy()
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 datum["transaction_type_identifier"] = "SC1"
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
@@ -2623,6 +2626,7 @@ def schedC1(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
 
@@ -2710,7 +2714,7 @@ def put_schedC2(data):
             put_sql_schedC2(data)
         except Exception as e:
             if entity_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2792,7 +2796,7 @@ def post_schedC2(data):
             post_sql_schedC2(data)
         except Exception as e:
             if entity_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -3025,6 +3029,7 @@ def schedC2(request):
                 datum = request.data.copy()
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
 
@@ -3130,6 +3135,7 @@ def schedC2(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
 
