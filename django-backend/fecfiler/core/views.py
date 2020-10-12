@@ -11418,7 +11418,7 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select notification_id as id, form_tp as form_name, rpt_tp as report_type,
+                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
                     ( current_date - due_date ) as past_due_days,
                     updated_date
                 from public.notifications_late_notification
@@ -11460,7 +11460,7 @@ class NotificationsSwitch:
                     to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
                     null as filed_by,
                     to_char(filed_date, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
-                    filed_date updated_date
+                    filed_date
                 from public.reports
                 where cmte_id = %(cmte_id)s
                 and status = 'Submitted'
@@ -11470,7 +11470,7 @@ class NotificationsSwitch:
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         else:
-            sql_items = sql_items + " order by updated_date DESC "
+            sql_items = sql_items + " order by filed_date DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
