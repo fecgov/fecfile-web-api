@@ -16,6 +16,9 @@
   .contacts__table-checkbox {
     width: 3%;
   }
+  .contacts__table-angleDown {
+    width: 3%;
+  }
 
   .contacts__table-pagination-container {
     padding: 1em;
@@ -139,4 +142,43 @@
       transform: scale(1.5);
     }
   }
+  .inner_table {
+    background: #D7D7D7;
+    table.log_table{
+      border-spacing: 0px;
+      background-color: white !important;
+      color: black !important;
+      tbody, thead {
+        display: block;
+      }
+      tbody{
+        height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: inherit;
+        tr td.text-red{
+          color: red !important;
+        }
+      };
+      .tr,.th, .td{
+        border-collapse: collapse;
+        background-color: white;
+      }
+      table, th,td {
+        border-collapse: collapse;
+        border: 1px solid black;
+
+      }
+    }
+  }
+.contact_link{
+  a{
+    color: #0062cc;
+
+  a:hover{
+    color: #0000FF;
+  }
+    cursor: pointer;
+  }
+}
 }

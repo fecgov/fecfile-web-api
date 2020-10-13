@@ -1,0 +1,23 @@
+@import '../../../shared/scss/global';
+
+.review_upload__container {
+    .review_upload__container-inner {
+      padding: 0 25%;
+    }
+    .review_upload__table-title {
+        padding: 2em 0;
+    }
+    .review_upload__button {
+      width: 15em;
+      margin: 1.2em .25em;
+      height: 3em;
+    }
+    .review_upload__cancel-button {
+      background-color: $fecRed;
+      color: white;
+    }
+  }
+  
+  
+  
+  

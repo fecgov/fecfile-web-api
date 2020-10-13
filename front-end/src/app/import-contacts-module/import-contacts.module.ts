@@ -11,6 +11,7 @@ import { ProgressBarComponent } from './import-contacts/progress-bar/progress-ba
 import { DuplicateContactsComponent } from './import-contacts/clean-contacts/duplicate-contacts/duplicate-contacts.component';
 import { ErrorContactsComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts.component';
 import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts-field/error-contacts-field.component';
+import { ReviewUploadComponent } from './import-contacts/review-upload/review-upload.component';
 
 @NgModule({
   imports: [
@@ -26,7 +27,8 @@ import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/er
     ProgressBarComponent,
     DuplicateContactsComponent,
     ErrorContactsComponent,
-    ErrorContactsFieldComponent
+    ErrorContactsFieldComponent,
+    ReviewUploadComponent
   ]
 })
 export class ImportContactsModule { }

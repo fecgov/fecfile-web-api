@@ -81,11 +81,12 @@ def custom_validate_df(uploaded_df_orig, cmte_id):
         test_data_ind = test_data_temp.ENTITY_TYPE.str.contains('IND', case=False)
         test_data_ind1 = test_data_temp[test_data_ind]
 
-        test_data_ind_temp = test_data_ind_diff = test_data_org_temp = test_data_org_diff = pd.DataFrame(columns=['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
-                                                                        'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
-                                                                        'OCCUPATION',
-                                                                        'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
-                                                                        'MIDDLENAME', 'PREFIX', 'SUFFIX'])
+        test_data_ind_temp = test_data_ind_diff = test_data_org_temp = test_data_org_diff = pd.DataFrame(
+            columns=['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
+                     'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
+                     'OCCUPATION',
+                     'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
+                     'MIDDLENAME', 'PREFIX', 'SUFFIX'])
 
         if not test_data_ind1.empty:
             test_data_ind_temp = test_data_ind1.dropna(how='any',
@@ -144,6 +145,9 @@ def reorder_user_data(contacts_added, contact_list):
         if contact_list is not None:
             contacts_list_dict = pd.DataFrame.from_records(contact_list)
             contacts_list_dict['street_1'] = contacts_list_dict['street_1'].str.strip()
+            contacts_list_dict['street_2'] = contacts_list_dict['street_2'].str.strip()
+            contacts_list_dict['entity_name'] = contacts_list_dict['entity_name'].str.strip()
+            contacts_list_dict['city'] = contacts_list_dict['city'].str.strip()
             contacts_list_dict.zip_code = contacts_list_dict.zip_code.astype(str)
             contacts_added.reset_index(drop=True, inplace=True)
 
@@ -153,6 +157,10 @@ def reorder_user_data(contacts_added, contact_list):
             contact_list_dict = pd.read_json(json_contact)
             contact_list_dict.fillna(value=pd.np.nan, inplace=True)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
+            contacts_added_dict['street_1'] = contacts_added_dict['street_1'].str.strip()
+            contacts_added_dict['street_2'] = contacts_added_dict['street_2'].str.strip()
+            contacts_added_dict['entity_name'] = contacts_added_dict['entity_name'].str.strip()
+            contacts_added_dict['city'] = contacts_added_dict['city'].str.strip()
             contact_list_dict1 = contact_list_dict.replace(np.nan, '', regex=True)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
             contacts_added_dict1 = contacts_added_dict1[contacts_added_dict1.zip_code.notnull()]
@@ -168,14 +176,13 @@ def reorder_user_data(contacts_added, contact_list):
                 lambda x: x['_merge'] == 'left_only']
 
             contact_duplicate_dict = contacts_added_dict1.merge(contact_list_dict1, how='inner', indicator=False)
-            print(type(contact_duplicate_dict))
             del contact_final_dict['_merge']
             data = {"final_contact_df": contact_final_dict, "duplicate_contact_df": contact_duplicate_dict}
         else:
             contacts_added.reset_index(drop=True, inplace=True)
             json_added = contacts_added.to_json(orient='records')
             contacts_added_dict = pd.read_json(json_added)
-            contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
+            contacts_added_dict = contacts_added_dict[pd.notnull(contacts_added_dict['zip_code'])]
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(int)
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
@@ -183,14 +190,13 @@ def reorder_user_data(contacts_added, contact_list):
         return data
     except Exception as e:
         logger.debug(e)
-        raise NoOPError("Exception occurred while reformatting the data.")
+        raise NoOPError("Exception occurred while reformatting the data.", str(e))
 
 
 def create_db_model(contacts_final_dict):
     try:
         contacts_final_dict = contacts_final_dict.to_dict(orient='records')
-        for contact in contacts_final_dict:
-            print(contact)
+
         with connection.cursor() as cursor:
             all_contact = [{
                 **contact,
@@ -244,43 +250,74 @@ def upload_contact(request):
                                       )
                 bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
                 file_name = request.data.get("fileName")
-                csv_obj = client.get_object(Bucket=bucket, Key=file_name)
+                csv_obj = client.get_object(Bucket=bucket, Key='contacts/' + cmte_id + '/' + file_name)
                 body = csv_obj['Body']
                 csv_string = body.read().decode('latin')
 
                 df = pd.read_csv(StringIO(csv_string), dtype=object)
-
-                print(df.head())
 
                 data = custom_validate_df(df, cmte_id)
 
                 contacts_added = data.get("final_list")
 
                 contacts_null_value = data.get("required_field_missing_list").replace(np.nan, '', regex=True)
+                failed_validation_size = len(contacts_null_value)
                 contacts_null_dict = contacts_null_value.to_dict(orient='records')
 
                 save_data = save_contact_db(contacts_added, cmte_id)
                 final_contact_list = save_data.get("final_contact_df")
+                total_records_size = len(final_contact_list)
                 final_contact_list_dict = final_contact_list.to_dict(orient='records')
 
                 duplicate_file = data.get("duplicates_files")
                 save_duplicate = save_data.get("duplicate_contact_df")
 
                 if isinstance(duplicate_file, str) and not check_null_value(data.get("duplicates_files")):
-                    duplicates = save_data.get("duplicate_contact_df")
+                    duplicates = save_data.get("duplicate_contact_df").reset_index(
+                        drop=True).replace(np.nan, '', regex=True)
                 elif isinstance(save_duplicate, str) and not check_null_value(save_duplicate):
-                    duplicates = data.get("duplicates_files")
+                    duplicates = data.get("duplicates_files").reset_index(
+                        drop=True).replace(np.nan, '', regex=True)
                 else:
                     duplicates = pd.concat(
                         [data.get("duplicates_files"), save_data.get("duplicate_contact_df")]).reset_index(
                         drop=True).replace(np.nan, '', regex=True)
 
+                duplicate_record_size = len(duplicates)
                 duplicate_dict = duplicates.to_dict(orient='records')
-                contacts_temp = {"contacts": final_contact_list_dict, "contacts_failed_validation": contacts_null_dict,
-                                 "duplicate": duplicate_dict}
+                contacts_temp = {"contacts_saved": int(total_records_size),
+                                 "contacts_failed_validation": int(failed_validation_size),
+                                 "duplicate": int(duplicate_record_size)}
                 contacts = {"Response": contacts_temp}
 
                 return JsonResponse(contacts, status=status.HTTP_201_CREATED, safe=False)
+
+        except Exception as e:
+            json_result = {'message': str(e)}
+            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["DELETE"])
+def delete_contact(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        try:
+            if request.method == 'DELETE':
+                cmte_id = get_comittee_id(request.user.username)
+
+                with connection.cursor() as cursor:
+                    query_string = """delete from public.entity where cmte_id = %s"""
+                    cursor.execute(query_string, [cmte_id])
+                    if cursor.rowcount > 0:
+                        msg = "{} Contacts successfully deleted"
+                    else:
+                        msg = "Contacts were not deleted."
+
+                return JsonResponse(msg.format(cursor.rowcount), status=status.HTTP_201_CREATED, safe=False)
 
         except Exception as e:
             json_result = {'message': str(e)}

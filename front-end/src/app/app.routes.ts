@@ -18,6 +18,8 @@ import { HelpComponent } from './help/help.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { NotificationdetailsComponent } from './notifications/notificationdetails/notificationdetails.component';
+import { NotificationheaderComponent } from './notifications/notificationheader/notificationheader.component';
 import { SettingsComponent } from './settings/settings.component';
 import { Roles } from './shared/enums/Roles';
 import { SignAndSubmitComponent } from './shared/partials/sign-and-submit/sign-and-submit.component';
@@ -176,6 +178,21 @@ export const AppRoutes: Routes = [
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'notifications',
+        component: NotificationheaderComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        children: [
+          {
+            path: 'notifications/notificationdetails',
+            component: NotificationdetailsComponent,
+            pathMatch: 'full',
+            canActivate: [CanActivateGuard],
+            canDeactivate: [CanDeactivateGuardService]
+          }
+        ]
+      },
       {
         path: 'manage_users',
         component: ManageUserComponent,
