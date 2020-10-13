@@ -1,9 +1,9 @@
-import {ContactLogModel} from './contactLog.model';
 
-export class ContactModel {
+export class ContactLogModel {
     entity_type: string;
     id: string;
     name: string;
+    address: string;
     entity_name: string;
     lastName: string;
     firstName: string;
@@ -23,12 +23,9 @@ export class ContactModel {
     candOfficeState: string;
     candOfficeDistrict: string;
     candCmteId: string;
-    deletedDate: string;
-    selected: boolean;
-    activeTransactionsCnt: number;
-    toggleLog: boolean;
-    contactLog: Array<ContactLogModel>;
-    transactions: any;
+    modifieddate: string;
+    user: string;
+
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -53,27 +50,27 @@ export class ContactModel {
         this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
-        this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
-        this.selected = contact.selected;
-        this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
-        this.contactLog = [];
-        this.toggleLog = false;
-        this.transactions = null;
+        this.modifieddate = contact.modifieddate ? contact.modifieddate : '';
+        this.user = contact.user ? contact.user : '';
+        this.address = contact.address ? contact.address : '';
     }
 
-    setContactLog(contactLog: any) {
-        if (contactLog === undefined || contactLog.length === 0) {
-            this.contactLog = []
-;        }
-        this.contactLog = contactLog;
+    getModifedDate() {
+        return this.modifieddate;
     }
-    getContactLog(): any {
-        return this.contactLog;
+
+    getUser() {
+        return this.user;
     }
-    setTransactions(transactions: any) {
-        this.transactions = transactions;
-    }
-    getTransactions(): any {
-        return this.transactions;
+
+    getInfo() {
+        if (this.entity_type === 'ORG' || this.entity_type === 'IND') {
+            let result = '';
+            result += this.address ? this.address : ' ';
+            result += ' ,' + this.name ? this.name : '';
+            return  result;
+        }  else {
+            return 'NA';
+        }
     }
 }
