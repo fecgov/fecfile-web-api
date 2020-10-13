@@ -884,11 +884,15 @@ public printReport(report: reportModel): void{
     window.open(url, '_blank');
 
   }
+  public viewFiledReport(report: reportModel): void {
+    // TODO: replace with details from report
+    const fecId = '1437593' ; // = report.fec_id
+    const comteId = 'C00447565'; // = report.cmte_id
+    const url = 'https://docquery.fec.gov/cgi-bin/forms/' + comteId + '/' + fecId + '/';
+    window.open(url, '_blank');
 
+  }
 
-  
-
-  
   /**
    * Trash all reports selected by the user.
    */
