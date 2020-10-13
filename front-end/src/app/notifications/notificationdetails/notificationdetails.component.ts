@@ -101,7 +101,7 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    this.currentSortedColumnName = 'default';
+    this.currentSortedColumnName = '';
   }
 
   /**
@@ -243,19 +243,15 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  public showNotificationModal() {
+  public showNotificationModal(id: number) {
     this._notificationsService
     .getNotification(
-      this.tabConfig.name
+      this.tabConfig.name, id
     )
     .subscribe((response: any) => {
       let blob = response.blob;
       let contentType = response.contentType;
       if (contentType == 'html') {
-        // const text = new Response(blob).text();
-        // text.then((val) => {
-        //   this.notificationContent = val;
-        // });
         this.notificationContent = blob;
       } else {
         var content = "Unsupported";

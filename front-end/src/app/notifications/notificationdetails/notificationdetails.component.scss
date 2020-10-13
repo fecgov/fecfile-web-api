@@ -200,6 +200,10 @@
       transform: scale(1.5);
     }
 
+    .notifications_modal-dialog {
+      max-width: 640px;
+    }
+
     .notifications_modal-body {
       overflow-y: auto;
       max-height: calc(100vh - 200px);

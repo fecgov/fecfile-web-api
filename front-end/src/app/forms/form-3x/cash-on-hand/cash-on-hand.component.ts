@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -5,6 +6,8 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { validateAmount } from '../../../shared/utils/forms/validation/amount.validator';
 import { mustMatch } from '../../../shared/utils/forms/validation/must-match.validator';
+import { DialogService } from '../../../shared/services/DialogService/dialog.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-cash-on-hand',
@@ -14,11 +17,18 @@ import { mustMatch } from '../../../shared/utils/forms/validation/must-match.val
 export class CashOnHandComponent implements OnInit {
 
   form: FormGroup;
+  editMode :boolean = false;
+  editWarningAlreadyShown: boolean = false;
+  transactionalForms: string[] = ["3X", "24", '3L'];
+  
 
   constructor(public activeModal: NgbActiveModal,
     private _fb: FormBuilder,
     private _decimalPipe: DecimalPipe, 
-    private _reportService: ReportsService) { }
+    private _activatedRoute: ActivatedRoute,
+    private _router: Router,
+    private _reportService: ReportsService, 
+    private _dialogService: DialogService) { }
 
   ngOnInit() {
     this.initForm();
@@ -41,8 +51,19 @@ export class CashOnHandComponent implements OnInit {
     this._reportService.updateCashOnHand(this.form.value).subscribe(res=>{
       if(res){
         this.activeModal.close();
+        this.navigateToTargetScreen();
       }
     })
+  }
+
+
+  private navigateToTargetScreen() {
+    // const formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    const reportId = this._activatedRoute.snapshot.queryParams.reportId;
+    // if(reportId){
+    //   this._router.navigate(['./'],{relativeTo: this._activatedRoute, queryParamsHandling:'preserve'});
+    // }
+    this._router.navigate(['/dashboard']);
   }
 
   populateForm() {
@@ -54,6 +75,10 @@ export class CashOnHandComponent implements OnInit {
         if(res.year){
           this.form.controls['year'].patchValue(res.year);
         }
+
+        if(res.amount || res.year){
+          this.editMode = true;
+        }
       }
     });
   }
@@ -63,6 +88,16 @@ export class CashOnHandComponent implements OnInit {
       let amount = event.target.value;
       amount = amount.replace(/,/g, ``);
       this.form.controls['amount'].patchValue(this._decimalPipe.transform(amount, '.2-2'));
+    }
+  }
+
+  showWarning(){
+    const warningMessage = 'Editing the First Time Cash on Hand may impact reports that have already been filed or saved. If you edit the Cash on Hand it will automatically amend any filed reports.';
+    if(this.editMode && !this.editWarningAlreadyShown){
+      this._dialogService.confirm(warningMessage,ConfirmModalComponent,'Warning!', false,ModalHeaderClassEnum.warningHeader).then(res=>{
+        //do nothing.
+      });
+      this.editWarningAlreadyShown = true;
     }
   }
 

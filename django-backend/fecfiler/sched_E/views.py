@@ -295,7 +295,7 @@ def put_schedE(data):
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -791,6 +791,7 @@ def put_completing_entities(data):
         if k.startswith("completing_")
     }
     comp_data["cmte_id"] = data.get("cmte_id")
+    comp_data["username"] = data.get("username")
     if "prefix" in comp_data:
         comp_data["preffix"] = comp_data.get("prefix")
     comp_data["entity_type"] = "IND"
@@ -898,7 +899,7 @@ def post_schedE(data):
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
 
                 get_data = {
@@ -913,7 +914,7 @@ def post_schedE(data):
                 remove_entities(get_data)
 
             if completing_rollback_flag:
-                entity_data = put_entities(old_completing_entity)
+                entity_data = put_entities(old_completing_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -1391,6 +1392,7 @@ def schedE(request):
                 datum['mirror_transaction_id'] = None
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            datum["username"] = request.user.username
             datum["associatedbydissemination"] = associatedbydissemination
             if datum["transaction_type_identifier"] == "IE_MULTI":
                 if "memo_text" in datum:
@@ -1532,6 +1534,7 @@ def schedE(request):
                 associatedbydissemination = True
             datum["report_id"] = report_id
             datum["cmte_id"] = get_comittee_id(request.user.username)
+            datum["username"] = request.user.username
             datum["associatedbydissemination"] = associatedbydissemination
 
             data = put_schedE(datum)

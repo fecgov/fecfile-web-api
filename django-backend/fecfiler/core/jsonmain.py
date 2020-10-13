@@ -734,9 +734,35 @@ def create_json_builders(request):
             # print("file_obj = ", file_obj)
             resp = requests.post(settings.NXG_FEC_PRINT_API_URL +
                                  settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
-
         elif call_from == "Submit":
-            # data_obj = request
+            committeeId = request.data.get("committeeid")
+            password = "test"  # request.data.get('password')
+            formType = request.data.get("form_type")
+            newAmendIndicator = request.data.get("amend_ind")
+            report_id = request.data.get("report_id")
+            reportSequence = "0"  # request.data.get('reportSequence')
+            emailAddress1 = "spanyala.ctr@fec.gov"  # request.data.get('emailAddress1')
+            reportType = request.data.get("report_type")
+            coverageStartDate = request.data.get("cvg_start_dt")
+            coverageEndDate = request.data.get("cvg_end_dt")
+            originalFECId = ""  # request.data.get('originalFECId')
+            backDoorCode = ""  # request.data.get('backDoorCode')
+            emailAddress2 = ""  # request.data.get('emailAddress2')
+            wait = "True"  # request.data.get('wait')
+            print("committeeId :" + committeeId)
+            print("password: " + password)
+            print("formType: " + formType)
+            print("newAmendIndicator: " + newAmendIndicator)
+            print("report_id: " + report_id)
+            print("reportSequence: " + reportSequence)
+            print("emailAddress1: " + emailAddress1)
+            print("reportType: " + reportType)
+            print("coverageStartDate: " + coverageStartDate)
+            print("coverageEndDate: " + coverageEndDate)
+            print("originalFECId: " + originalFECId)
+            print("backDoorCode: " + backDoorCode)
+            print("emailAddress2: " + emailAddress2)
+            print("wait: " + wait)
             data_obj = {'committeeId': committeeId,
                         'password': password,
                         'formType': formType,
@@ -754,9 +780,6 @@ def create_json_builders(request):
                         }
             file_obj = {'fecDataFile': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
-            # print("data_obj = ", data_obj)
-            # print("file_obj = ", file_obj)
-
             add_log(report_id,
                     cmte_id,
                     4,
@@ -766,10 +789,11 @@ def create_json_builders(request):
                     '',
                     ''
                     )
-
-            resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL +
-                                 "/v1/upload_filing", data=data_obj, files=file_obj)
-
+            resp = requests.post(settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION +
+                                 "upload_filing", data=data_obj, files=file_obj)
+            print(resp)
+            print(resp.ok)
+            print(resp.json())
         if not resp.ok:
             return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:

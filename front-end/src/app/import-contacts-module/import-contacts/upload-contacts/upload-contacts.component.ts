@@ -104,6 +104,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   private scanFiles(entry: any) {
     if (entry.isFile) {
       const promise = this.parseFileEntry(entry).then(file => {
+        this.progressPercent = 0;
+        this.showUpload = false;
+        this.uploadingText = 'Uploading...';
         this._startFileImport(file);
       });
     }

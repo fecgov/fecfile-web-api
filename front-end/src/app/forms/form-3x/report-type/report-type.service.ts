@@ -493,9 +493,11 @@ export class ReportTypeService {
     } else if (access_type === 'Submitted') {
       //console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
       //console.log('submit Report form 3X submitted...');
-      url = '/core/submit_report';
+      formData.append('call_from', 'Submit');
+      //url = '/core/submit_report';
+      url = '/core/create_json_builders';
       return this._http
-        .put(`${environment.apiUrl}${url}`, formData, {
+        .post(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
         })
         .pipe(
