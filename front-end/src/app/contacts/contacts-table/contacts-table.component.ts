@@ -187,11 +187,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         if (data.messageFrom === 'contactDetails' && data.message === 'updateContact' && data.contact ) {
           this.contactsModel.forEach((e) => {
           if (e.id === data.contact.entity_id) {
-            // TODO: Request backend to send contact JSON similar to get contacts but only the updated entity on PUT
-            console.warn('Contact will be out of sync when editing from modal');
-             // const index = this.contactsModel.indexOf(e);
-             // const updatedContact = this._contactsService.convertRowToModel(data.contact);
-             // this.contactsModel[index] = updatedContact;
+             const index = this.contactsModel.indexOf(e);
+             const updatedContact = this._contactsService.convertRowToModelPut(data.contact);
+             this.contactsModel[index] = updatedContact;
             }
           });
         }

@@ -1383,8 +1383,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
           if (callFrom === 'contactDetails') {
-            // TODO: JSON format must match
-            // this.transactionToEdit = res;
+            this.transactionToEdit = res;
             this._messageService.sendMessage({messageFrom: 'contactDetails', message: 'updateContact' , contact: res });
             this.disableForm();
           } else {

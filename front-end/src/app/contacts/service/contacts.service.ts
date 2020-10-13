@@ -255,6 +255,7 @@ export class ContactsService {
     }
     return modelArray;
   }
+
   /**
    * Map server fields from the response to the model.
    *
@@ -284,6 +285,36 @@ export class ContactsService {
       model.candOffice = row.candoffice;
       model.candOfficeState = row.candofficestate;
       model.candCmteId = row.candcmteid;
+
+    return model;
+  }
+  /**
+   * Map server fields from the response to the model. PUT call
+   * The response for put is not consistent with get call so re-mapping fields
+   *
+   */
+  public convertRowToModelPut(row: any) {
+
+    const model = new ContactModel({});
+    model.entity_type = row.entity_type;
+    model.id = row.entity_id;
+    model.name = row.name;
+    model.street1 = row.street_1;
+    model.street2 = row.street_2;
+    model.city = row.city;
+    model.state = row.state;
+    model.zip = row.zip_code;
+    model.employer = row.employer;
+    model.occupation = row.occupation;
+    model.phoneNumber = row.phone_number;
+    model.entity_name = row.entity_name;
+    model.candOffice = row.cand_office;
+    model.candOfficeState = row.cand_office_state;
+    model.candOfficeDistrict = row.cand_office_district;
+    model.activeTransactionsCnt = row.active_transactions_cnt;
+    model.candCmteId = row.cmte_id;
+    model.deletedDate = row.deleteddate;
+    model.candOfficeState = row.cand_office_state;
 
     return model;
   }
@@ -822,6 +853,5 @@ export class ContactsService {
     return this._http.get(
         url, {params, headers: httpOptions});
   }
-
 }
 
