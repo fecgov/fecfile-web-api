@@ -885,5 +885,18 @@ export class ContactsService {
     return this._http.get(
         url, {params, headers: httpOptions});
   }
+
+  public getContactLog(entityId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url =  `${environment.apiUrl}/core/contactLogs`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    let params = new HttpParams();
+    params = params.append('entity_id', entityId);
+    return this._http.get(
+        url, {params, headers: httpOptions});
+  }
 }
 
