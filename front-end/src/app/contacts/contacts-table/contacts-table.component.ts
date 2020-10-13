@@ -191,6 +191,20 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
           this.getPage(this.config.currentPage);
         }
       );
+
+    this._messageService.getMessage().subscribe(data => {
+      if (data) {
+        if (data.messageFrom === 'contactDetails' && data.message === 'updateContact' && data.contact ) {
+          this.contactsModel.forEach((e) => {
+          if (e.id === data.contact.entity_id) {
+             const index = this.contactsModel.indexOf(e);
+             const updatedContact = this._contactsService.convertRowToModelPut(data.contact);
+             this.contactsModel[index] = updatedContact;
+            }
+          });
+        }
+      }
+    });
   }
 
 

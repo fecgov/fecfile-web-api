@@ -272,7 +272,7 @@ export class ContactsService {
 
 
   /**
-   * Map server fields from the response to the model.
+   * Map server fields from the response to the model Array.
    *
    * TODO The API should be changed to pass the property names expected by the front end.
    */
@@ -282,6 +282,19 @@ export class ContactsService {
     }
     const modelArray = [];
     for (const row of serverData) {
+      const model = this.convertRowToModel(row);
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+
+  /**
+   * Map server fields from the response to the model.
+   *
+   *
+   */
+  public convertRowToModel(row: any) {
+
       const model = new ContactModel({});
       model.entity_type = row.entity_type;
       model.id = row.id;
@@ -301,16 +314,42 @@ export class ContactsService {
       model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
-
       model.candOffice = row.candoffice;
       model.candOfficeState = row.candofficestate;
       model.candCmteId = row.candcmteid;
 
-      modelArray.push(model);
-    }
-    return modelArray;
+    return model;
   }
+  /**
+   * Map server fields from the response to the model. PUT call
+   * The response for put is not consistent with get call so re-mapping fields
+   *
+   */
+  public convertRowToModelPut(row: any) {
 
+    const model = new ContactModel({});
+    model.entity_type = row.entity_type;
+    model.id = row.entity_id;
+    model.name = row.name;
+    model.street1 = row.street_1;
+    model.street2 = row.street_2;
+    model.city = row.city;
+    model.state = row.state;
+    model.zip = row.zip_code;
+    model.employer = row.employer;
+    model.occupation = row.occupation;
+    model.phoneNumber = row.phone_number;
+    model.entity_name = row.entity_name;
+    model.candOffice = row.cand_office;
+    model.candOfficeState = row.cand_office_state;
+    model.candOfficeDistrict = row.cand_office_district;
+    model.activeTransactionsCnt = row.active_transactions_cnt;
+    model.candCmteId = row.cmte_id;
+    model.deletedDate = row.deleteddate;
+    model.candOfficeState = row.cand_office_state;
+
+    return model;
+  }
 
   /**
    * Map a single field name to its server field name equivalent.
@@ -834,5 +873,17 @@ export class ContactsService {
         });
   }
 
+  public getContactDetails(entityId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url =  `${environment.apiUrl}/core/contactReportDetails`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    let params = new HttpParams();
+    params = params.append('entity_id', entityId);
+    return this._http.get(
+        url, {params, headers: httpOptions});
+  }
 }
 
