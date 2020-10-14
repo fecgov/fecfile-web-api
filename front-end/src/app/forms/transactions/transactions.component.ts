@@ -1039,19 +1039,24 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   handleMirrorTransactionIfApplicable(transactionToEdit: TransactionModel, emitObj: any) {
     let dialogMsg = '';
+    let mirrorFormType = '';
     if(transactionToEdit.formType === 'F3X'){
       dialogMsg = `Please note that this change will not automatcally reflect in the F24 report. You will have to make this change separately in F24.`;
+      mirrorFormType = 'F24';
     }
     else if(transactionToEdit.formType === 'F24'){
       dialogMsg = `Please note that if you update this transaction it will be updated in Form F3X. Please acknowledge this change by clicking the OK button.`;
+      mirrorFormType = 'F3X';
     }
+
     this._dialogService
         .confirm(dialogMsg,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
         .then(res => {
           if (res === 'okay') {
             //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
-            this._reportsService
-              .getReportInfo('F3X', transactionToEdit.mirrorReportId)
+            if(mirrorFormType === 'F3X'){
+              this._reportsService
+              .getReportInfo(mirrorFormType, transactionToEdit.mirrorReportId)
               .subscribe((res: any) => {
                 if(res && res[0] && res[0].reportstatus === 'Submitted'){
                   this._dialogService
@@ -1066,6 +1071,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
                   this.showCategories();
                 }
               });
+            }
+            else{
+              this.showTransaction.emit(emitObj);
+              this.showCategories();
+            }
+            
           } else if (res === 'cancel') {
           }
         });
