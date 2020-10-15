@@ -109,6 +109,10 @@
               background-color:$tertiaryBlue;
               color:white;
             }
+            .bottom-row{
+              height: 100px;
+              overflow-y: auto;
+            }
           }
         }
       }
