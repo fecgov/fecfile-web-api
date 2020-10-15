@@ -1,35 +1,30 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
-import { style, animate, transition, trigger } from '@angular/animations';
-import { PaginationInstance } from 'ngx-pagination';
+import { Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { SortableColumnModel } from '../../shared/services/TableService/sortable-column.model';
-import { TableService } from '../../shared/services/TableService/table.service';
-import { UtilService } from '../../shared/utils/util.service';
-import { ActiveView } from '../reportheader/reportheader.component';
-import { ReportsMessageService } from '../service/reports-message.service';
+import { PaginationInstance } from 'ngx-pagination';
 import { Subscription } from 'rxjs/Subscription';
 import {
   ConfirmModalComponent,
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { GetReportsResponse } from '../../reports/service/report.service';
-import { reportModel } from '../model/report.model';
-import { ReportsService } from '../service/report.service';
-import { ReportFilterModel } from '../model/report-filter.model';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { AuthService} from '../../shared/services/AuthService/auth.service';
-import {
-  form99,
-  form3XReport,
-  form99PrintPreviewResponse,
-  form3xReportTypeDetails
-} from '../../shared/interfaces/FormsService/FormsService';
-import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { GetReportsResponse } from '../../reports/service/report.service';
+import {
+  form3xReportTypeDetails, form99
+} from '../../shared/interfaces/FormsService/FormsService';
+import { SaveDialogAction } from '../../shared/partials/input-modal/input-modal.component';
+import { InputDialogService } from '../../shared/service/InputDialogService/input-dialog.service';
+import { AuthService } from '../../shared/services/AuthService/auth.service';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
-import {SaveDialogAction} from '../../shared/partials/input-modal/input-modal.component';
-import {InputDialogService} from '../../shared/service/InputDialogService/input-dialog.service';
+import { SortableColumnModel } from '../../shared/services/TableService/sortable-column.model';
+import { TableService } from '../../shared/services/TableService/table.service';
+import { UtilService } from '../../shared/utils/util.service';
+import { ReportFilterModel } from '../model/report-filter.model';
+import { reportModel } from '../model/report.model';
+import { ActiveView } from '../reportheader/reportheader.component';
+import { ReportsService } from '../service/report.service';
+import { ReportsMessageService } from '../service/reports-message.service';
 @Component({
   selector: 'app-reportdetails',
   templateUrl: './reportdetails.component.html',
@@ -1630,39 +1625,43 @@ public printReport(report: reportModel): void{
   }
 
   public amendReport(report: reportModel): void {
-
-    this._reportsService.amendReport(report).subscribe(res =>
-      {        
-        report = res;
-      
-        if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
-        this._reportsService
-          .getReportInfo(report.form_type, report.report_id)
-          .subscribe((res: form3xReportTypeDetails) => {
-            localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
-            localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
-
-          });
-        setTimeout(() => {
-          let transCategory = 'receipts';
-          if(report.form_type === 'F24'){
-            transCategory = 'disbursements';
+    const msg = 'Amending this report will automatically amend any subsequent reports that have already been filed with the FEC.  Please note that you may need to file the subsequent amendments if the financial activity has changed.';
+    this._dialogService.confirm(msg,ConfirmModalComponent, 'Warning!', true, ModalHeaderClassEnum.warningHeader).then(res=> {
+      if(res === 'okay'){
+        this._reportsService.amendReport(report).subscribe(res =>
+          {        
+            report = res;
+          
+            if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
+            this._reportsService
+              .getReportInfo(report.form_type, report.report_id)
+              .subscribe((res: form3xReportTypeDetails) => {
+                localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
+                localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
+    
+              });
+            setTimeout(() => {
+              let transCategory = 'receipts';
+              if(report.form_type === 'F24'){
+                transCategory = 'disbursements';
+              }
+              const formType =
+                report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+              this._router.navigate([`/forms/form/${formType}`], {
+                queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: transCategory, amendmentReportId: report.report_id }
+              });
+              }, 1500);
+            }    
+            else if (report.form_type === 'F1M') {
+              const formType = '1M';
+              this._router.navigate([`/forms/form/${formType}`], {
+                queryParams: { step: 'step_2', reportId: report.report_id, edit:true}
+              });
+            }      
           }
-          const formType =
-            report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._router.navigate([`/forms/form/${formType}`], {
-            queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: transCategory, amendmentReportId: report.report_id }
-          });
-          }, 1500);
-        }    
-        else if (report.form_type === 'F1M') {
-          const formType = '1M';
-          this._router.navigate([`/forms/form/${formType}`], {
-            queryParams: { step: 'step_2', reportId: report.report_id, edit:true}
-          });
-        }      
+        )    
       }
-    )    
+    })
   }
   public isUpload() {
     if (this.authService.isAdmin() ||
