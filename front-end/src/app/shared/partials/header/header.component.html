@@ -61,22 +61,17 @@
             <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
               Import Transactions
             </a>
-            <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin() || _authService.isAdmin()" class="dropdown-item" draggable="false" (click)="openCOHModal()">
-              First Time COH
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
+              Export Transactions
             </a>
             <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
-              Import Names
+              Import Contacts
             </a>
-
             <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
-              Export Names
+              Export Contacts
             </a>
-
-            <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
-              Merge Names
-            </a>
-            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
-              Create Backup
+            <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin() || _authService.isAdmin()" class="dropdown-item" draggable="false" (click)="openCOHModal()">
+              First Time COH
             </a>
           </div>
         </div>
@@ -118,10 +113,6 @@
             >
               <i class="fas fa-user-plus"></i>
               Add User
-            </a>
-            <a class="dropdown-item" draggable="false" [routerLink]="['/settings']">
-              <i class="fas fa-user-cog"></i>
-              Settings
             </a>
             <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
               <i class="fas fa-power-off"></i>
