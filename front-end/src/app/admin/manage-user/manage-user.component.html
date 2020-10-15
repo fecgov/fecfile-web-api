@@ -131,9 +131,14 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label>Contact Number</label></td>
+                                    <td><label>Contact Number
+                                        <button type="button" class="btn btn-info" ngbTooltip="Enter 10 digit phone number without any dashes" tabindex="-1"  tooltipClass="form-tooltip">
+                                            <i class="info-icon" aria-hidden="true"></i>
+                                            <span class="sr-only">Click here for more information</span>
+                                        </button>
+                                    </label></td>
                                     <td class="user-text"><input formControlName="contact"
-                                               placeholder="Enter Phone Number"
+                                               placeholder="Enter Phone Number (e.g. 4239999999)"
                                                type="text"
                                                [ngClass]=" frmAddUser.get('contact')?.invalid &&
                                                 (frmAddUser.touched || frmAddUser.dirty)
