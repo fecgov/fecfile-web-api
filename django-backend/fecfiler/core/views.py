@@ -2786,7 +2786,7 @@ def put_sql_entity(
             # cursor.execute("""UPDATE public.entity SET entity_type = %s, entity_name = %s, first_name = %s, last_name = %s, middle_name = %s, preffix = %s, suffix = %s, street_1 = %s, street_2 = %s, city = %s, state = %s, zip_code = %s, occupation = %s, employer = %s, ref_cand_cmte_id = %s, last_update_date = %s WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct FROM 'Y'""",
             #             (entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, last_update_date, entity_id, cmte_id))
             # creating a log of the entity modified
-            if not log_flag:
+            if log_flag:
                 if not username:
                     raise Exception('username is missing in contact log')
                 cursor.execute(
@@ -8071,6 +8071,7 @@ def put_contact_data(data, username):
               data.get("entity_id")
               ]
             )
+            print(cursor.query)
             cursor.execute(
                 """
                 UPDATE public.entity SET 
@@ -12070,7 +12071,7 @@ def contact_logs(request):
         sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
               c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
               c.candOfficeDistrict, c.candCmteId, c.phone_number, 
-              concat_ws(', ', e.last_name, e.first_name) AS user, c.logged_date AS modifieddate
+              concat_ws(', ', e.last_name, e.first_name) AS user, ((c.logged_date) AT TIME ZONE 'UTC') AT TIME ZONE 'EDT' AS modifieddate
               FROM contacts_log_view c, authentication_account e
               WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
               ORDER BY c.logged_date DESC"""
