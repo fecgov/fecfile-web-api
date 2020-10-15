@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ContactModel} from '../model/contacts.model';
 import {MessageService} from '../../shared/services/MessageService/message.service';
+import {ContactsService} from '../service/contacts.service';
 
 @Component({
   selector: 'app-contact-details-modal',
@@ -12,9 +13,18 @@ export class ContactDetailsModalComponent implements OnInit {
 
   contact: ContactModel;
   constructor(private activeModal: NgbActiveModal,
-              private _messageService: MessageService, ) { }
+              private _messageService: MessageService,
+              private _contactService: ContactsService,
+              ) { }
   ngOnInit() {
     this._messageService.sendMessage({cdDisableForm: true});
+    this._contactService.getContactDetails(this.contact.id).subscribe( res => {
+      if (res && res.length >= 1 && res !== undefined) {
+        this.contact.setTransactions(res);
+      } else {
+        this.contact.setTransactions(null);
+      }
+    });
   }
 
   decline() {

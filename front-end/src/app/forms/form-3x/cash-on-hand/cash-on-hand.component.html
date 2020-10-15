@@ -26,7 +26,7 @@
                   </span>
                 </div>
                 <input type="text" class="form-control" formControlName="amount" id="amount" (blur)="onAmountBlur($event)"
-                  style="width:60%">
+                  style="width:60%" (focus)="showWarning()">
               </div>
         
               <div class="form-group headerLabel pt-3">
@@ -40,11 +40,11 @@
               <div class="input-group inputField">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="expenditure_amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    <i class="calendar-icon" aria-hidden="true"></i>
                   </span>
                 </div>
                 <input type="text" class="form-control" formControlName="year" id="year"
-                  style="width:60%">
+                  style="width:60%" (focus)="showWarning()">
               </div>
             </div>
           </div>
