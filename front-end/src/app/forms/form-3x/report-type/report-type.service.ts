@@ -286,7 +286,7 @@ export class ReportTypeService {
     }
   }
 
-  public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
+  public signandSaveSubmitReport(formType: string, access_type: string, submitterName :string = ''): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url = '/core/reports';
@@ -359,10 +359,10 @@ export class ReportTypeService {
 
       //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
 
-      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-        if (typeof form3xReportType.amend_Indicator === 'string') {
-          if (form3xReportType.amend_Indicator.length >= 1) {
-            formData.append('amend_ind', form3xReportType.amend_Indicator);
+      if (form3xReportType.hasOwnProperty('amend_indicator')) {
+        if (typeof form3xReportType.amend_indicator === 'string') {
+          if (form3xReportType.amend_indicator.length >= 1) {
+            formData.append('amend_ind', form3xReportType.amend_indicator);
           } else {
             formData.append('amend_ind', 'N');
           }
@@ -482,8 +482,7 @@ export class ReportTypeService {
 
     if(form3xReportType.hasOwnProperty('amend_indicator')){
       if(form3xReportType.amend_indicator === 'A' && form3xReportType.reportsequence){
-        let newSeq = form3xReportType.reportsequence + 1;
-        formData.append('reportSequence', newSeq.toString());
+        formData.append('reportSequence', form3xReportType.reportsequence.toString());
       }
       else if(form3xReportType.amend_indicator === 'N'){
         formData.append('reportSequence', "0");
@@ -494,6 +493,10 @@ export class ReportTypeService {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
+    }
+
+    if(submitterName){
+      formData.append('filed_by', submitterName);
     }
 
     //console.log('signandSaveSubmitReport formData = ', formData);
