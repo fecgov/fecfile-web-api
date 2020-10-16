@@ -286,7 +286,7 @@ export class ReportTypeService {
     }
   }
 
-  public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
+  public signandSaveSubmitReport(formType: string, access_type: string, submitterName :string = ''): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url = '/core/reports';
@@ -359,10 +359,10 @@ export class ReportTypeService {
 
       //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
 
-      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-        if (typeof form3xReportType.amend_Indicator === 'string') {
-          if (form3xReportType.amend_Indicator.length >= 1) {
-            formData.append('amend_ind', form3xReportType.amend_Indicator);
+      if (form3xReportType.hasOwnProperty('amend_indicator')) {
+        if (typeof form3xReportType.amend_indicator === 'string') {
+          if (form3xReportType.amend_indicator.length >= 1) {
+            formData.append('amend_ind', form3xReportType.amend_indicator);
           } else {
             formData.append('amend_ind', 'N');
           }
@@ -419,6 +419,7 @@ export class ReportTypeService {
         if (typeof form3xReportType.email1 === 'string') {
           if (form3xReportType.email1.length >= 1) {
             formData.append('email_1', form3xReportType.email1);
+            formData.append('emailAddress1', form3xReportType.email1);
           }
         }
       }
@@ -427,7 +428,22 @@ export class ReportTypeService {
         if (typeof form3xReportType.email2 === 'string') {
           if (form3xReportType.email2.length >= 1) {
             formData.append('email_2', form3xReportType.email2);
+            formData.append('emailAddress2', form3xReportType.email2);
+
           }
+        }
+      }
+
+
+      //fallback to treasurers first email if no email addresses present
+      if(!form3xReportType.email1 && !form3xReportType.email2){
+        if(committeeDetails.treasureremail){
+          let treasurerEmails :string[] = committeeDetails.treasureremail.split(';');
+          if(treasurerEmails && treasurerEmails.length>0){
+            formData.append('email_1', treasurerEmails[0]);
+            formData.append('emailAddress1', treasurerEmails[0]);
+          }
+
         }
       }
 
@@ -460,10 +476,27 @@ export class ReportTypeService {
       }
     }
 
+    if(form3xReportType.hasOwnProperty('originalfecid') && form3xReportType.originalfecid){
+        formData.append('originalFECId', "FEC-" + form3xReportType.originalfecid.toString());
+    }
+
+    if(form3xReportType.hasOwnProperty('amend_indicator')){
+      if(form3xReportType.amend_indicator === 'A' && form3xReportType.reportsequence){
+        formData.append('reportSequence', form3xReportType.reportsequence.toString());
+      }
+      else if(form3xReportType.amend_indicator === 'N'){
+        formData.append('reportSequence', "0");
+      }
+    }
+
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
+    }
+
+    if(submitterName){
+      formData.append('filed_by', submitterName);
     }
 
     //console.log('signandSaveSubmitReport formData = ', formData);

@@ -31,7 +31,7 @@
         <!-- <button type="button" class="btn btn-dark">Dark</button>
         <button type="button" class="btn btn-outline-secondary">Primary</button> -->
 
-        <app-header class="container" style="margin-left:20%;"
+        <app-header style="display: block;width: 100%;"
           [formType]="formType"
         ></app-header>
       </div>
@@ -55,7 +55,11 @@
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
               <div>
-                Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
+                Form {{ formType }}
+                <ng-container *ngIf="currentReportData && currentReportData.amend_indicator === 'A' && currentReportData.reportsequence">
+                  - A{{currentReportData.reportsequence}}
+                </ng-container> 
+                | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
                 {{ formEndDate | date: 'MM/dd/yyyy' }}
               </div>              
               <ng-container *ngIf="reportOverDue && dueDate">
