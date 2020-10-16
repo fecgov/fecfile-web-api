@@ -409,6 +409,10 @@ NXG_FEC_API_VERSION = "/api/v1/"
 NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.efdev.fec.gov/printpdf')
 NXG_FEC_PRINT_API_VERSION = "/v1/print"
 
+# SUBMISSION REPORT SETTINGS
+NXG_COMMITTEE_DEFAULT_PASSWORD = "test"
+SUBMIT_REPORT_WAIT_FLAG = "False"
+
 try:
   from .local_settings import *
 except:

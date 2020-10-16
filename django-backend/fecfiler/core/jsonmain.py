@@ -738,19 +738,21 @@ def create_json_builders(request):
                                  settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
         elif call_from == "Submit":
             committeeId = request.data.get("committeeid")
-            password = "test"  # request.data.get('password')
+            password = request.data.get('password')
+            if not password:
+                password = settings.NXG_COMMITTEE_DEFAULT_PASSWORD
             formType = request.data.get("form_type")
             newAmendIndicator = request.data.get("amend_ind")
             report_id = request.data.get("report_id")
-            reportSequence = "0"  # request.data.get('reportSequence')
-            emailAddress1 = "spanyala.ctr@fec.gov"  # request.data.get('emailAddress1')
+            reportSequence = request.data.get('reportSequence')
+            emailAddress1 = request.data.get('emailAddress1')
+            emailAddress2 = request.data.get('emailAddress2')
             reportType = request.data.get("report_type")
             coverageStartDate = request.data.get("cvg_start_dt")
             coverageEndDate = request.data.get("cvg_end_dt")
-            originalFECId = ""  # request.data.get('originalFECId')
+            originalFECId = request.data.get('originalFECId')
             backDoorCode = ""  # request.data.get('backDoorCode')
-            emailAddress2 = ""  # request.data.get('emailAddress2')
-            wait = "False"  # request.data.get('wait')
+            wait = settings.SUBMIT_REPORT_WAIT_FLAG
             # print("committeeId :" + committeeId)
             # print("password: " + password)
             # print("formType: " + formType)
