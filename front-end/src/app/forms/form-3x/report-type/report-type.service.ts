@@ -419,6 +419,7 @@ export class ReportTypeService {
         if (typeof form3xReportType.email1 === 'string') {
           if (form3xReportType.email1.length >= 1) {
             formData.append('email_1', form3xReportType.email1);
+            formData.append('emailAddress1', form3xReportType.email1);
           }
         }
       }
@@ -427,7 +428,22 @@ export class ReportTypeService {
         if (typeof form3xReportType.email2 === 'string') {
           if (form3xReportType.email2.length >= 1) {
             formData.append('email_2', form3xReportType.email2);
+            formData.append('emailAddress2', form3xReportType.email2);
+
           }
+        }
+      }
+
+
+      //fallback to treasurers first email if no email addresses present
+      if(!form3xReportType.email1 && !form3xReportType.email2){
+        if(committeeDetails.treasureremail){
+          let treasurerEmails :string[] = committeeDetails.treasureremail.split(';');
+          if(treasurerEmails && treasurerEmails.length>0){
+            formData.append('email_1', treasurerEmails[0]);
+            formData.append('emailAddress1', treasurerEmails[0]);
+          }
+
         }
       }
 
@@ -457,6 +473,20 @@ export class ReportTypeService {
             formData.append('additional_email_2', form3xReportType.additionalemail2);
           }
         }
+      }
+    }
+
+    if(form3xReportType.hasOwnProperty('originalfecid') && form3xReportType.originalfecid){
+        formData.append('originalFECId', "FEC-" + form3xReportType.originalfecid.toString());
+    }
+
+    if(form3xReportType.hasOwnProperty('amend_indicator')){
+      if(form3xReportType.amend_indicator === 'A' && form3xReportType.reportsequence){
+        let newSeq = form3xReportType.reportsequence + 1;
+        formData.append('reportSequence', newSeq.toString());
+      }
+      else if(form3xReportType.amend_indicator === 'N'){
+        formData.append('reportSequence', "0");
       }
     }
 

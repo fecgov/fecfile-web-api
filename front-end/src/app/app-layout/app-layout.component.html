@@ -55,7 +55,11 @@
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
               <div>
-                Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
+                Form {{ formType }}
+                <ng-container *ngIf="currentReportData && currentReportData.amend_indicator === 'A' && currentReportData.reportsequence">
+                  - A{{currentReportData.reportsequence}}
+                </ng-container> 
+                | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
                 {{ formEndDate | date: 'MM/dd/yyyy' }}
               </div>              
               <ng-container *ngIf="reportOverDue && dueDate">
