@@ -434,6 +434,7 @@ export class ReportTypeService {
         }
       }
 
+
       //fallback to treasurers first email if no email addresses present
       if(!form3xReportType.email1 && !form3xReportType.email2){
         if(committeeDetails.treasureremail){
