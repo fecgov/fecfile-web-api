@@ -1967,18 +1967,14 @@ def reposit_f99_data(cmte_id, report_id):
     backend_connection.close()
 
 
-@api_view(["PUT"])
-def submit_report(request):
+# @api_view(["PUT"])
+def submit_report(request, submission_id, beginning_image_number, fec_id):
     """
-    an update api used for submitting a report
-
+    an update api used internally for updating filed report
     1) We need to change report status from Saved to Submitted.
     2) Update report_seq value into fec_id column.
     3) Append "FEC-" to fec_id in return value.
     3) Return JSON response: "fec_id", "status","message"
-    4) use email template from "https://github.com/SalientCRGT-FEC/nxg_fec/tree/develop/django-backend/templates/email_ack.html" and replace @parameters with report values.
-    5) Send confirmation email, please refer to email function in below file.
-    https://github.com/SalientCRGT-FEC/nxg_fec/blob/develop/django-backend/fecfiler/forms/views.py
     """
     # print(request.data)
     # print(request.query_params)
@@ -1986,15 +1982,17 @@ def submit_report(request):
         is_read_only_or_filer_submit(request)
         SUBMIT_STATUS = "Submitted"
         cmte_id = get_comittee_id(request.user.username)
-        if "report_id" in request.query_params:
-            report_id = request.query_params.get("report_id")
-            form_tp = request.query_params.get("form_type")
-        else:
-            report_id = request.data.get("report_id")
-            form_tp = request.data.get("form_type")
+        print(cmte_id)
+        # if "report_id" in request.query_params:
+        #     report_id = request.query_params.get("report_id")
+        #     form_tp = request.query_params.get("form_type")
+        # else:
+        report_id = request.data.get("report_id")
+        print(report_id)
+        form_tp = request.data.get("form_type")
         if not report_id:
             raise Exception()
-        fec_id = report_id
+        print(fec_id)
         if form_tp in ["F3X", "F24", "F3L"]:
             update_tbl = "public.reports"
             f_id = "report_id"
@@ -2011,7 +2009,7 @@ def submit_report(request):
                         update_tbl
                     )
                     + """
-                SET filed_date = %s, status = %s, fec_id = %s"""
+                SET filed_date = %s, status = %s, fec_id = %s, submission_id= %s, begining_image_number = %s"""
                     + """
                 WHERE {} = %s
                 """.format(
@@ -2025,7 +2023,7 @@ def submit_report(request):
                         update_tbl
                     )
                     + """
-                SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
+                SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s, submission_id= %s, begining_image_number = %s"""
                     + """
                 WHERE {} = %s
                 """.format(
@@ -2037,7 +2035,7 @@ def submit_report(request):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, report_id]
+                _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, submission_id, beginning_image_number, report_id]
             )
             if cursor.rowcount == 0:
                 raise Exception("report {} update failed".format(report_id))
@@ -2059,30 +2057,30 @@ def submit_report(request):
                 cursor.execute(_sql_F24, [datetime.datetime.now(), report_id])
                 if cursor.rowcount == 0:
                     raise Exception("F24 table {} update failed".format(report_id))
-        if form_tp in ["F3X", "F24","F3L"]:
-            reposit_f3x_data(cmte_id, report_id, form_tp)
-        elif form_tp == "F99":
-            reposit_f99_data(cmte_id, report_id)
-        else:
-            raise Exception("Error: invalid form type.")
+        # if form_tp in ["F3X", "F24","F3L"]:
+        #     reposit_f3x_data(cmte_id, report_id, form_tp)
+        # elif form_tp == "F99":
+        #     reposit_f99_data(cmte_id, report_id)
+        # else:
+        #     raise Exception("Error: invalid form type.")
 
-        logger.debug("sending email with data")
-        email_data = request.data.copy()
-        email_data.update(request.query_params.copy())
-        email_data["id"] = "FEC-" + email_data["report_id"]
-        email_data["committeeid"] = cmte_id
-        if "report_type" in email_data:
-            email_data["report_desc"] = email_data.get("report_type")
-        if "cvg_start_dt" in email_data:
-            email_data["coverage_start_date"] = email_data.get("cvg_start_dt")
-        if "cvg_end_dt" in email_data:
-            email_data["coverage_end_date"] = email_data.get("cvg_end_dt")
-        if "cmte_name" in email_data:
-            email_data["committeename"] = email.get("cmte_name")
-
-        logger.debug("sending email with data {}".format(email_data))
-        email(True, email_data)
-        logger.debug("email success.")
+        # logger.debug("sending email with data")
+        # email_data = request.data.copy()
+        # email_data.update(request.query_params.copy())
+        # email_data["id"] = "FEC-" + email_data["report_id"]
+        # email_data["committeeid"] = cmte_id
+        # if "report_type" in email_data:
+        #     email_data["report_desc"] = email_data.get("report_type")
+        # if "cvg_start_dt" in email_data:
+        #     email_data["coverage_start_date"] = email_data.get("cvg_start_dt")
+        # if "cvg_end_dt" in email_data:
+        #     email_data["coverage_end_date"] = email_data.get("cvg_end_dt")
+        # if "cmte_name" in email_data:
+        #     email_data["committeename"] = email.get("cmte_name")
+        #
+        # logger.debug("sending email with data {}".format(email_data))
+        # email(True, email_data)
+        # logger.debug("email success.")
 
         if form_tp in ["F3X", "F24", "F3L"]:
             _sql_response = """
