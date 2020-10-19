@@ -6,6 +6,7 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { FieldToCleanModel } from './model/field-to-clean.model';
 import { FieldEntryModel } from './model/field-entry.model';
+import { ImportContactModel } from '../../model/import-contact.model';
 
 @Component({
   selector: 'app-duplicate-contacts',
@@ -112,6 +113,17 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
       this.numberOfPages = res.totalPages;
     });
+  }
+
+  public formatName(contact: ImportContactModel): string {
+    let name = '';
+    if (contact.type === 'IND') {
+      // TODO handle suffix and prefix
+      name = `${contact.lastName}, ${contact.firstName}`;
+    } else if (contact.type === 'ORG') {
+      name = contact.name;
+    }
+    return name;
   }
 
   public cleanContact(contact: any, modal: any) {

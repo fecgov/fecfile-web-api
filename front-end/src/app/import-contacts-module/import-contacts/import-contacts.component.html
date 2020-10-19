@@ -43,9 +43,9 @@
         <!-- <app-review-upload *ngIf="currentStep === step2Review" [duplicateFile]="duplicateFile"
           (reviewEmitter)="receiveReviewAction($event)">
         </app-review-upload> -->
-        <!-- <app-clean-contacts *ngIf="currentStep === step3Clean" [duplicates]="userContacts"
+        <app-clean-contacts *ngIf="currentStep === step3Clean" [duplicates]="duplicateContacts"
           (cancelEmitter)="receiveCleanCancel()">
-        </app-clean-contacts> -->
+        </app-clean-contacts>
         <app-import-done-contacts *ngIf="currentStep === step4ImportDone"></app-import-done-contacts>
       </div>
     </section>

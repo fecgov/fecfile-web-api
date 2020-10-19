@@ -486,13 +486,13 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   // }
 
   /**
- * Emit a message with the user contacts to the parent.
- */
+   * Emit a message with the user contacts to the parent.
+   */
   private emitUploadResults(response: any): void {
     let duplicateCount = 0;
     let validationErrorCount = 0;
     let contactsSaved = 0;
-    // let duplicateContacts = [];
+    let duplicateContacts = [];
     //{"Response": {"contacts_saved": 2, "contacts_failed_validation": 8, "duplicate": 97}}
     if (response) {
 
@@ -505,6 +505,10 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         }
         if (this.utilService.isNumber(response.Response.contacts_saved)) {
           contactsSaved = response.Response.contacts_saved;
+        }
+
+        if (Array.isArray(response.Response.duplicate_contacts)) {
+          duplicateContacts = response.Response.duplicate_contacts;
         }
 
         //   if (response.Response.contacts_failed_validation) {
@@ -521,7 +525,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.uploadResultEmitter.emit({
       // userContactFields: this.userContactFields,
-      // duplicateContacts: duplicateContacts,
+      duplicateContacts: duplicateContacts,
       contactsSaved: contactsSaved,
       duplicateCount: duplicateCount,
       validationErrorCount: validationErrorCount,

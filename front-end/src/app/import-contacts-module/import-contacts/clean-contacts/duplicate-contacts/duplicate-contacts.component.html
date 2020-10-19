@@ -18,14 +18,16 @@
         <thead>
           <tr>
             <th class="hard_left"></th>
-            <th>Committee ID</th>
+            <!-- <th>Committee ID</th>
             <th>Type</th>
             <th>Committee Name/Organization</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Middle Name</th>
             <th>Prefix</th>
-            <th>Suffix</th>
+            <th>Suffix</th> -->
+            <th>Name</th>
+            <th>Location</th>
             <th>Address 1</th>
             <th>Address 2</th>
             <th>City</th>
@@ -33,42 +35,62 @@
             <th>Zip Code</th>
             <th>Employer</th>
             <th>Occupation</th>
-            <th>Candidate ID</th>
+            <!-- <th>Candidate ID</th>
             <th>Candidate Office</th>
             <th>Candidate State</th>
             <th>Candidate District</th>
-            <th>Multi-Candidate Committee Status</th>
+            <th>Multi-Candidate Committee Status</th> -->
           </tr>
         </thead>
         <tbody>
           <ng-container *ngIf="contacts$">
-            <tr *ngFor="let contact of contacts$ | async | paginate: config; let i = index;">
-              <td class="hard_left">
-                <button class="btn btn-sm btn-primary" (click)="cleanContact(contact, mergeContactsModal)">
-                  <i class="edit-broom"></i>
-                </button>
-              </td>
-              <td>{{contact.committeeId}}</td>
-              <td>{{contact.type}}</td>
-              <td>{{contact.name}}</td>
-              <td>{{contact.firstName}}</td>
-              <td>{{contact.lastName}}</td>
-              <td>{{contact.middleName}}</td>
-              <td>{{contact.prefix}}</td>
-              <td>{{contact.suffix}}</td>
-              <td>{{contact.street}}</td>
-              <td>{{contact.street2}}</td>
-              <td>{{contact.city}}</td>
-              <td>{{contact.state}}</td>
-              <td>{{contact.zip}}</td>
-              <td>{{contact.employer}}</td>
-              <td>{{contact.occupation}}</td>
-              <td>{{contact.candidateId}}</td>
-              <td>{{contact.officeSought}}</td>
-              <td>{{contact.officeState}}</td>
-              <td>{{contact.district}}</td>
-              <td>{{contact.multiCandidateCmteStatus}}</td>
-            </tr>
+            <ng-container *ngFor="let contact of contacts$ | async | paginate: config; let i = index;">
+              <tr>
+                <td class="hard_left">
+                  <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                      <i class="ellipsis-icon"></i>
+                    </button>
+                    <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                      <button class="dropdown-item">
+                        Add New
+                      </button>
+                      <button class="dropdown-item">
+                        Merge & Update
+                      </button>
+                      <button class="dropdown-item">
+                        Merge with Existing
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ formatName(contact) }}</td>
+                <td>Import File</td>
+                <td>{{contact.street}}</td>
+                <td>{{contact.street2}}</td>
+                <td>{{contact.city}}</td>
+                <td>{{contact.state}}</td>
+                <td>{{contact.zip}}</td>
+                <td>{{contact.employer}}</td>
+                <td>{{contact.occupation}}</td>
+              </tr>
+              <tr *ngFor="let dupe of contact.potentialDupes;">
+                <td class="indent_right">
+                  <div class="radio">
+                    <input type="radio" name="dupes_of_contact_{{i}}" />
+                  </div>
+                </td>
+                <td>{{ formatName(dupe) }}</td>
+                <td>Database</td>
+                <td>{{dupe.street}}</td>
+                <td>{{dupe.street2}}</td>
+                <td>{{dupe.city}}</td>
+                <td>{{dupe.state}}</td>
+                <td>{{dupe.zip}}</td>
+                <td>{{dupe.employer}}</td>
+                <td>{{dupe.occupation}}</td>
+              </tr>
+            </ng-container>
           </ng-container>
         </tbody>
       </table>

@@ -22,7 +22,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   public readonly step3Clean = ImportContactsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportContactsStepsEnum.step4ImportDone;
   public userContactFields: Array<string>;
-  public userContacts: Array<any>;
+  public duplicateContacts: Array<any>;
   public forceChangeDetectionUpload: Date;
   public duplicateFile: any;
 
@@ -45,7 +45,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     this.steps = [
       { text: 'Upload', step: this.step1Upload },
       // { text: 'Review', step: this.step2Review },
-      // { text: 'Clean', step: this.step3Clean },
+      { text: 'Clean', step: this.step3Clean },
       { text: 'Import', step: this.step4ImportDone }
     ];
     this.currentStep = this.start;
@@ -80,16 +80,16 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   public showNextStep() {
     switch (this.currentStep) {
       case this.step1Upload:
-        // this.currentStep = this.step3Clean;
+        this.currentStep = this.step3Clean;
         // this.currentStep = this.step2Review;
-        this.currentStep = this.step4ImportDone;
+        // this.currentStep = this.step4ImportDone;
         break;
       // case this.step2Configure:
       //   this.currentStep = this.step3Clean;
       //   break;
-      // case this.step3Clean:
-      //   this.currentStep = this.step4ImportDone;
-      //   break;
+      case this.step3Clean:
+        this.currentStep = this.step4ImportDone;
+        break;
       default:
         this.currentStep = this.step1Upload;
     }
@@ -112,8 +112,12 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
   public receiveUploadResult(userContactsMessage: any) {
 
+    this.unsavedData = false;
+    this.showNextStep();
+
+
     // if (userContactsMessage.duplicateContacts) {
-    //   this.userContacts = this._importContactsService.mapAllDupesFromServerFields(userContactsMessage.duplicateContacts);
+    //   this.duplicateContacts = this._importContactsService.mapAllDupesFromServerFields(userContactsMessage.duplicateContacts);
     // }
 
     // if (userContactsMessage.duplicateFile) {
@@ -129,53 +133,53 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     //   // console.log('false no duplicates');
     // }
 
-    if (userContactsMessage.duplicateCount > 0) {
-      this.duplicatesExist = true;
-    }
-    if (userContactsMessage.validationErrorCount > 0) {
-      this.validationErrorsExist = true;
-    }
-    if (this.validationErrorsExist || this.duplicatesExist) {
-      const message = `${userContactsMessage.contactsSaved} contact(s) were imported. ${userContactsMessage.duplicateCount} contact(s) were identified as duplicates and ${userContactsMessage.validationErrorCount} contained errors - these were not imported."`;
-      // "1 contact(s) were imported. XXX contact(s) were identified as duplicates and XXX contained errors - these were not imported."
+    // if (userContactsMessage.duplicateCount > 0) {
+    //   this.duplicatesExist = true;
+    // }
+    // if (userContactsMessage.validationErrorCount > 0) {
+    //   this.validationErrorsExist = true;
+    // }
+    // if (this.validationErrorsExist || this.duplicatesExist) {
+    //   const message = `${userContactsMessage.contactsSaved} contact(s) were imported. ${userContactsMessage.duplicateCount} contact(s) were identified as duplicates and ${userContactsMessage.validationErrorCount} contained errors - these were not imported."`;
+    // "1 contact(s) were imported. XXX contact(s) were identified as duplicates and XXX contained errors - these were not imported."
 
-      // if (this.validationErrorsExist && this.duplicatesExist) {
-      //   if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount > 1) {
-      //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
-      //       `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
-      //       `import.`;
-      //   } else if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount === 1) {
-      //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
-      //       `and ${userContactsMessage.validationErrorCount} was found in error.  They have been excluded from the ` +
-      //       `import.`;
-      //   } else if (userContactsMessage.duplicateCount === 1 && userContactsMessage.validationErrorCount > 1) {
-      //     message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate ` +
-      //       `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
-      //       `import.`;
-      //   }
-      // } else if (this.duplicatesExist) {
-      //   if (userContactsMessage.duplicateCount > 1) {
-      //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates. ` +
-      //       `They have been excluded from the import.`;
-      //   } else {
-      //     message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate. ` +
-      //       `It has been excluded from the import.`;
-      //   }
-      // } else if (this.validationErrorsExist) {
-      //   if (userContactsMessage.validationErrorCount > 1) {
-      //     message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
-      //       `They have been excluded from the import.`;
-      //   } else {
-      //     message = `${userContactsMessage.validationErrorCount} contact was found in error.  ` +
-      //       `It has been excluded from the import.`;
-      //   }
-      // }
-      // const savedMessage = `${userContactsMessage.contactsSaved} contacts were saved. `;
-      this.confirmProceedWithrrors(message);
-    } else {
-      this.unsavedData = false;
-      this.showNextStep();
-    }
+    // if (this.validationErrorsExist && this.duplicatesExist) {
+    //   if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount > 1) {
+    //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
+    //       `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
+    //       `import.`;
+    //   } else if (userContactsMessage.duplicateCount > 1 && userContactsMessage.validationErrorCount === 1) {
+    //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
+    //       `and ${userContactsMessage.validationErrorCount} was found in error.  They have been excluded from the ` +
+    //       `import.`;
+    //   } else if (userContactsMessage.duplicateCount === 1 && userContactsMessage.validationErrorCount > 1) {
+    //     message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate ` +
+    //       `and ${userContactsMessage.validationErrorCount} were found in error.  They have been excluded from the ` +
+    //       `import.`;
+    //   }
+    // } else if (this.duplicatesExist) {
+    //   if (userContactsMessage.duplicateCount > 1) {
+    //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates. ` +
+    //       `They have been excluded from the import.`;
+    //   } else {
+    //     message = `${userContactsMessage.duplicateCount} contact was identified as a duplicate. ` +
+    //       `It has been excluded from the import.`;
+    //   }
+    // } else if (this.validationErrorsExist) {
+    //   if (userContactsMessage.validationErrorCount > 1) {
+    //     message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
+    //       `They have been excluded from the import.`;
+    //   } else {
+    //     message = `${userContactsMessage.validationErrorCount} contact was found in error.  ` +
+    //       `It has been excluded from the import.`;
+    //   }
+    // }
+    // const savedMessage = `${userContactsMessage.contactsSaved} contacts were saved. `;
+    // this.confirmProceedWithrrors(message);
+    // } else {
+    //   this.unsavedData = false;
+    //   this.showNextStep();
+    // }
 
     // if (this.validationErrorsExist) {
     //   const message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +

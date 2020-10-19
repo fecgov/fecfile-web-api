@@ -125,20 +125,20 @@ export class UploadContactsService {
     const request: any = {};
     request.fileName = fileName;
 
-    // if (fileName === 'test_new.csv') {
-    //   return this._http
-    //     .get('assets/mock-data/import-contacts/upload_response2.json', {
-    //       headers: httpOptions
-    //     })
-    //     .pipe(
-    //       map(res => {
-    //         if (res) {
-    //           return res;
-    //         }
-    //         return false;
-    //       })
-    //     );
-    // } else {
+    if (fileName === 'test_new.csv') {
+      return this._http
+        .get('assets/mock-data/import-contacts/upload_response_2.json', {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    } else {
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
@@ -151,7 +151,7 @@ export class UploadContactsService {
           return false;
         })
       );
-    // }
+    }
   }
 
   /**
