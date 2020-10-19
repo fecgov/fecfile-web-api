@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from . import views, duplicate, merge
+from . import views, duplicate, merge, export
 
 urlpatterns = [
     url(r"^contact/upload$", views.upload_contact, name="importContactFile"),
