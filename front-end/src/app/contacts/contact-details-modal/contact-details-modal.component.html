@@ -7,7 +7,7 @@
   </button>
 </div>
 <div class="modal-body">
-  <addnew_contacts [transactionToEdit]="contact" [scheduleAction]="'view'" [isContactDetailsView] = "true"></addnew_contacts>
+  <addnew_contacts [transactionToEdit]="contact" [scheduleAction]="'edit'" [isContactDetailsView] = "true"></addnew_contacts>
   <br>
   <br>
   <hr>
@@ -17,41 +17,18 @@
     <div class="reports-table">
       <table>
         <tbody class="single-column-table">
-        <tr>
+        <tr  *ngIf="contact.getTransactions() === null">
+         <td  class="wider-row"> <p class="text-center">Data Not Available<p></td>
+        </tr>
+        <tr *ngFor="let transaction of contact.getTransactions()">
         <td class="wider-row">
-         <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
-         <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
-         <p>Employer: Springfield Finance Occupation: Filer</p>
+         <b>{{transaction.formdetails }}</b>
+         <p> {{transaction.address? transaction.address : ''}}, {{transaction.city ? transaction.city: ''}} Phone: 
+           {{transaction.phone_number ? transaction.phone_number : 'NA'}}</p>
+         <p>Employer: {{transaction.employer ? transaction.employer: 'NA'}} &nbsp;
+           Occupation: {{transaction.occupation ? transaction.occupation: 'NA'}}</p>
         </td>
           </tr>
-        <tr>
-          <td class="wider-row">
-            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
-            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
-            <p>Employer: Springfield Finance Occupation: Filer</p>
-          </td>
-        </tr>
-        <tr>
-          <td class="wider-row">
-            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
-            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
-            <p>Employer: Springfield Finance Occupation: Filer</p>
-          </td>
-        </tr>
-        <tr>
-          <td class="wider-row">
-            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
-            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
-            <p>Employer: Springfield Finance Occupation: Filer</p>
-          </td>
-        </tr>
-        <tr>
-          <td class="wider-row">
-            <b>Form 3X: October 15 Quarterly, 1/1/18 - 4/1/18 </b>
-            <p> Doe, Jane - 1234 Sycamore Street, Springfield, FL, 33034. Phone: 1 (555) 555-5555 </p>
-            <p>Employer: Springfield Finance Occupation: Filer</p>
-          </td>
-        </tr>
         </tbody>
       </table>
     </div>

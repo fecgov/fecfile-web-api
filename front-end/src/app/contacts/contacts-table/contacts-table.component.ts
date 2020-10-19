@@ -23,6 +23,8 @@ import { InputDialogService } from '../../shared/service/InputDialogService/inpu
 import { ExportService } from 'src/app/shared/services/ExportService/export.service';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
+import {forEach} from '@angular/router/src/utils/collection';
+import {ContactLogModel} from '../model/contactLog.model';
 
 @Component({
   selector: 'app-contacts-table',
@@ -44,31 +46,6 @@ import * as XLSX from 'xlsx';
   ] */
 })
 export class ContactsTableComponent implements OnInit, OnDestroy {
-
-  dummyData = {
-    'contactLog': [
-      {
-        'dateTime': '03/05/2020, 4:35pm',
-        'info': '156 Jupiter Lan',
-        'user': 'Smith, John'
-      },
-      {
-        'dateTime': '03/05/2020, 4:30pm',
-        'info': '156 Jupit',
-        'user': 'Smith, John'
-      },
-      {
-        'dateTime': '03/05/2020, 4:15pm',
-        'info': '156 Jupit',
-        'user': 'Smith, John'
-      },
-      {
-        'dateTime': '03/05/2020, 4:35pm',
-        'info': '15',
-        'user': 'Smith, John'
-      },
-    ]
-  };
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
@@ -191,6 +168,20 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
           this.getPage(this.config.currentPage);
         }
       );
+
+    this._messageService.getMessage().subscribe(data => {
+      if (data) {
+        if (data.messageFrom === 'contactDetails' && data.message === 'updateContact' && data.contact ) {
+          this.contactsModel.forEach((e) => {
+          if (e.id === data.contact.entity_id) {
+             const index = this.contactsModel.indexOf(e);
+             const updatedContact = this._contactsService.convertRowToModelPut(data.contact);
+             this.contactsModel[index] = updatedContact;
+            }
+          });
+        }
+      }
+    });
   }
 
 
@@ -328,7 +319,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.contactsModel = contactsModelL;
 
         this.contactsModel.forEach((e) => {
-          e.setContactLog(this.dummyData.contactLog);
           if (this.allContactsSelected) {
             e.selected = true;
           } else {
@@ -1288,6 +1278,12 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
 
   toggleContactLog(cnt: ContactModel) {
+    if (cnt.toggleLog !== true && cnt.getContactLog().length === 0) {
+      const test = this.fetchContactLog(cnt);
+     if ( test === undefined || test.length === 0 ) {
+       cnt.setContactLog([]);
+     }
+    }
     cnt.toggleLog = !cnt.toggleLog;
   }
 
@@ -1307,5 +1303,32 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     }).catch(e => {
       // do nothing stay on the same page
     });
+  }
+
+  fetchContactLog(cnt: ContactModel) {
+    if (cnt.getContactLog().length !== 0) {
+      return cnt.getContactLog();
+    } else {
+      this._contactsService.getContactLog(cnt.id).subscribe(  res => {
+        if (res && res !== undefined || res.length !== 0 ) {
+          cnt.setContactLog(this.convertJSONToContactLog(res));
+          return cnt.getContactLog();
+        } else {
+          return [];
+        }
+      });
+    }
+  }
+
+  private convertJSONToContactLog(res: any) {
+   const contactLogs = [];
+    for (const contactLog of res) {
+      contactLogs.push(new ContactLogModel(contactLog));
+    }
+    return contactLogs;
+}
+
+  getContactLog(cnt: ContactModel): Array<ContactLogModel> {
+   return  cnt.getContactLog();
   }
 }

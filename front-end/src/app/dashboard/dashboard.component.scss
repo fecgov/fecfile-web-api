@@ -1,11 +1,11 @@
 @import '../shared/scss/global';
 
 .dashboard {
-  background-color: $mercury;
+  background-color: white;
   min-height: $mainContentHeight;
   position: relative;
   
-  .row {
+   .row {
     margin-bottom: 5px;
     margin-left: 0;
     margin-right: 0;
@@ -13,21 +13,18 @@
     .col {
       background-color: $white;
       display: block;
-      &:first-child {
-        margin-right: 5px;
-      }
       @include media(tablet) {
         display: block;
       }
       @include media(mediumDesktop) {
-        flex: 0 0 46%;
-        max-width: 46%;
+        // flex: 0 0 46%;
+        // max-width: 46%;
         padding-left: 10px;
         padding-right: 10px;
       }
       @include media(largeDesktop) {
-        flex: 0 0 46%;
-        max-width: 46%;
+        // flex: 0 0 46%;
+        // max-width: 46%;
         padding-left: 10px;
         padding-right: 10px;
       }
@@ -45,11 +42,78 @@
       min-height: 70vh;
       position: relative;
       .row {
-        min-height: 350px;
+        // min-height: 350px;
         position: relative;
         .col {
           background-color: $white;
-          margin: 0 auto;
+          padding-left: 0;
+          padding-right: 0;
+          margin-bottom: 1%;
+          .card{
+            // css for fixed header table start
+            table {
+              width: 100%;
+              border-spacing: 0;
+            }
+
+            thead, tbody, tr, th, td { display: block; }
+
+            thead tr {
+              /* fallback */
+              width: 97%;
+              /* minus scroll bar width */
+              width: -webkit-calc(100% - 16px);
+              width:    -moz-calc(100% - 16px);
+              width:         calc(100% - 16px);
+              text-align: left;
+            }
+
+            tr:after {  /* clearing float */
+              content: ' ';
+              display: block;
+              visibility: hidden;
+              clear: both;
+            }
+
+            tbody {
+              height: 250px;
+              overflow-y: auto;
+              overflow-x: hidden;
+            }
+
+            tbody td, thead th {
+              width: 19%;  /* 19% is less than (100% / 5 cols) = 20% */
+              float: left;
+            }
+            // css for fixed header table end
+
+            // margin:2%;
+            ul{
+              list-style-type: none;
+              li{
+                a{
+                  border-bottom: 1px dotted black;
+                }
+                a:hover{
+                  border-bottom: 1px dotted $pelorous;
+                  text-decoration: none;
+                  color: $pictonBlue;
+                }
+              }
+            }
+            a{
+              color:black;
+              cursor: pointer;
+            }
+            .card-header{
+              background-color:$tertiaryBlue;
+              color:white;
+            }
+            .bottom-row{
+              height: 100px;
+              overflow-y: auto;
+            }
+          }
         }
       }
     }

@@ -1,13 +1,15 @@
+import { DialogService } from './../../../shared/services/DialogService/dialog.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService//FormsService';
 import { DatePipe } from '@angular/common';
 import {TransactionModel} from '../../transactions/model/transaction.model';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
 
 
 @Injectable({
@@ -15,7 +17,7 @@ import {TransactionModel} from '../../transactions/model/transaction.model';
 })
 export class ReportTypeService {
 
-  constructor(private _http: HttpClient, private _cookieService: CookieService) {
+  constructor(private _http: HttpClient, private _cookieService: CookieService, private _dialogService: DialogService) {
     this._datePipe = new DatePipe('en-US');
   }
   private _datePipe: DatePipe;
@@ -75,13 +77,13 @@ export class ReportTypeService {
       } else if (formReportType.hasOwnProperty('reporttype')) {
         formData.append('report_type', formReportType.reporttype);
       }
-  
+
       if (formReportType.hasOwnProperty('cvgStartDate')) {
         formData.append('cvg_start_dt', formReportType.cvgStartDate);
       } else if (formReportType.hasOwnProperty('cvgstartdate')) {
         formData.append('cvg_start_dt', formReportType.cvgstartdate);
       }
-  
+
       if (formReportType.hasOwnProperty('cvgEndDate')) {
         formData.append('cvg_end_dt', formReportType.cvgEndDate);
       } else if (formReportType.hasOwnProperty('cvgenddate')) {
@@ -90,24 +92,24 @@ export class ReportTypeService {
 
       if (formReportType.hasOwnProperty('semi_annual_start_date')) {
         formData.append('semi_annual_start_date', formReportType.semi_annual_start_date);
-      } 
+      }
 
       if (formReportType.hasOwnProperty('semi_annual_end_date')) {
         formData.append('semi_annual_end_date', formReportType.semi_annual_end_date);
       }
-  
+
       if (formReportType.hasOwnProperty('cvgEndDate')) {
         formData.append('cvg_end_dt', formReportType.cvgEndDate);
       } else if (formReportType.hasOwnProperty('cvgenddate')) {
         formData.append('cvg_end_dt', formReportType.cvgenddate);
       }
-  
+
       if (formReportType.hasOwnProperty('dueDate')) {
         formData.append('due_dt', formReportType.dueDate);
       } else if (formReportType.hasOwnProperty('duedate')) {
         formData.append('due_dt', formReportType.duedate);
       }
-  
+
       if (formReportType.hasOwnProperty('amend_Indicator')) {
         if (typeof formReportType.amend_Indicator === 'string') {
           if (formReportType.amend_Indicator.length >= 1) {
@@ -119,7 +121,7 @@ export class ReportTypeService {
       } else {
         formData.append('amend_ind', 'N');
       }
-  
+
       if (formReportType.hasOwnProperty('coh_bop')) {
         if (typeof formReportType.coh_bop === 'string') {
           if (formReportType.coh_bop.length >= 1) {
@@ -131,13 +133,13 @@ export class ReportTypeService {
       } else {
         formData.append('coh_bop', '0');
       }
-  
+
       if (typeof formReportType.electionCode === 'string') {
         if (formReportType.electionCode.length >= 1) {
           formData.append('election_code', formReportType.electionCode);
         }
       }
-  
+
       if (formReportType.election_date !== null) {
         if (typeof formReportType.election_date === 'string') {
           if (formReportType.election_date.length >= 1) {
@@ -145,7 +147,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (formReportType.election_state !== null) {
         if (typeof formReportType.election_state === 'string') {
           if (formReportType.election_state.length >= 1) {
@@ -153,7 +155,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (formReportType.email1 !== null) {
         if (typeof formReportType.email1 === 'string') {
           if (formReportType.email1.length >= 1) {
@@ -161,7 +163,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (formReportType.email2 !== null) {
         if (typeof formReportType.email2 === 'string') {
           if (formReportType.email2.length >= 1) {
@@ -169,7 +171,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (formReportType.additionalEmail1 !== null) {
         if (typeof formReportType.additionalEmail1 === 'string') {
           if (formReportType.additionalEmail1.length >= 1) {
@@ -177,7 +179,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (formReportType.additionalEmail2 !== null) {
         if (typeof formReportType.additionalEmail2 === 'string') {
           if (formReportType.additionalEmail2.length >= 1) {
@@ -186,7 +188,7 @@ export class ReportTypeService {
         }
       }
     }
-    
+
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
@@ -251,7 +253,7 @@ export class ReportTypeService {
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
-    
+
     formData.append('reportId', saveObj.reportId);
     formData.append('formType', `F${saveObj.formType}`);
     formData.append('additionalEmail1', saveObj.additionalEmail1);
@@ -284,7 +286,7 @@ export class ReportTypeService {
     }
   }
 
-  public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
+  public signandSaveSubmitReport(formType: string, access_type: string, submitterName :string = ''): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url = '/core/reports';
@@ -322,25 +324,25 @@ export class ReportTypeService {
       } else if (form3xReportType.hasOwnProperty('reportId')) {
         formData.append('report_id', form3xReportType.reportId);
       }
-  
+
       if (form3xReportType.hasOwnProperty('reportType')) {
         formData.append('report_type', form3xReportType.reportType);
       } else if (form3xReportType.hasOwnProperty('reporttype')) {
         formData.append('report_type', form3xReportType.reporttype);
       }
-  
+
       if (form3xReportType.hasOwnProperty('cvgStartDate')) {
         formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
       } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
         formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
       }
-  
+
       if (form3xReportType.hasOwnProperty('cvgEndDate')) {
         formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
       } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
         formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
       }
-  
+
       if (form3xReportType.hasOwnProperty('dueDate')) {
         if (form3xReportType.dueDate !== null) {
           formData.append('due_dt', this._datePipe.transform(form3xReportType.dueDate, 'MM/dd/yyyy'));
@@ -354,13 +356,13 @@ export class ReportTypeService {
           formData.append('due_dt', null);
         }
       }
-  
+
       //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
-  
-      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-        if (typeof form3xReportType.amend_Indicator === 'string') {
-          if (form3xReportType.amend_Indicator.length >= 1) {
-            formData.append('amend_ind', form3xReportType.amend_Indicator);
+
+      if (form3xReportType.hasOwnProperty('amend_indicator')) {
+        if (typeof form3xReportType.amend_indicator === 'string') {
+          if (form3xReportType.amend_indicator.length >= 1) {
+            formData.append('amend_ind', form3xReportType.amend_indicator);
           } else {
             formData.append('amend_ind', 'N');
           }
@@ -368,7 +370,7 @@ export class ReportTypeService {
       } else {
         formData.append('amend_ind', 'N');
       }
-  
+
       if (form3xReportType.hasOwnProperty('coh_bop')) {
         if (typeof form3xReportType.coh_bop === 'string') {
           if (form3xReportType.coh_bop.length >= 1) {
@@ -380,7 +382,7 @@ export class ReportTypeService {
       } else {
         formData.append('coh_bop', '0');
       }
-  
+
       if (form3xReportType.hasOwnProperty('electionCode')) {
         if (typeof form3xReportType.electionCode === 'string') {
           if (form3xReportType.electionCode.length >= 1) {
@@ -394,7 +396,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (form3xReportType.election_date !== null) {
         if (typeof form3xReportType.election_date === 'string') {
           if (form3xReportType.election_date.length >= 1) {
@@ -402,7 +404,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (form3xReportType.election_state !== null) {
         if (typeof form3xReportType.election_state === 'string') {
           if (form3xReportType.election_state.length >= 1) {
@@ -410,25 +412,41 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       //console.log(' access_type =', access_type);
-  
+
       if (form3xReportType.email1 !== null) {
         if (typeof form3xReportType.email1 === 'string') {
           if (form3xReportType.email1.length >= 1) {
             formData.append('email_1', form3xReportType.email1);
+            formData.append('emailAddress1', form3xReportType.email1);
           }
         }
       }
-  
+
       if (form3xReportType.email2 !== null) {
         if (typeof form3xReportType.email2 === 'string') {
           if (form3xReportType.email2.length >= 1) {
             formData.append('email_2', form3xReportType.email2);
+            formData.append('emailAddress2', form3xReportType.email2);
+
           }
         }
       }
-  
+
+
+      //fallback to treasurers first email if no email addresses present
+      if(!form3xReportType.email1 && !form3xReportType.email2){
+        if(committeeDetails.treasureremail){
+          let treasurerEmails :string[] = committeeDetails.treasureremail.split(';');
+          if(treasurerEmails && treasurerEmails.length>0){
+            formData.append('email_1', treasurerEmails[0]);
+            formData.append('emailAddress1', treasurerEmails[0]);
+          }
+
+        }
+      }
+
       if (form3xReportType.hasOwnProperty('additionalEmail1')) {
         if (typeof form3xReportType.additionalEmail1 === 'string') {
           if (form3xReportType.additionalEmail1.length >= 1) {
@@ -442,7 +460,7 @@ export class ReportTypeService {
           }
         }
       }
-  
+
       if (form3xReportType.hasOwnProperty('additionalEmail2')) {
         if (typeof form3xReportType.additionalEmail2 === 'string') {
           if (form3xReportType.additionalEmail2.length >= 1) {
@@ -458,10 +476,27 @@ export class ReportTypeService {
       }
     }
 
+    if(form3xReportType.hasOwnProperty('originalfecid') && form3xReportType.originalfecid){
+        formData.append('originalFECId', "FEC-" + form3xReportType.originalfecid.toString());
+    }
+
+    if(form3xReportType.hasOwnProperty('amend_indicator')){
+      if(form3xReportType.amend_indicator === 'A' && form3xReportType.reportsequence){
+        formData.append('reportSequence', form3xReportType.reportsequence.toString());
+      }
+      else if(form3xReportType.amend_indicator === 'N'){
+        formData.append('reportSequence', "0");
+      }
+    }
+
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
+    }
+
+    if(submitterName){
+      formData.append('filed_by', submitterName);
     }
 
     //console.log('signandSaveSubmitReport formData = ', formData);
@@ -493,9 +528,11 @@ export class ReportTypeService {
     } else if (access_type === 'Submitted') {
       //console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
       //console.log('submit Report form 3X submitted...');
-      url = '/core/submit_report';
+      formData.append('call_from', 'Submit');
+      // url = '/core/submit_report';
+      url = '/core/create_json_builders';
       return this._http
-        .put(`${environment.apiUrl}${url}`, formData, {
+        .post(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
         })
         .pipe(
@@ -507,9 +544,35 @@ export class ReportTypeService {
               return res;
             }
             return false;
-          })
-        );
+          }),
+          catchError(error => this.handleError(error))
+          );
+        // );
     }
+  }
+
+  private handleError(error: any){
+      let content = '';
+      let errorsList : string = '';
+
+      if(error){
+        error = error.error;
+        if(error.result){
+          content = `${error.result.message}`;
+        }
+        if(error.errors && error.errors.length > 0){
+          error.errors.forEach(element => {
+            errorsList = `${errorsList}${element.errorMessage}\n`;
+          });
+        }
+        content = content +":\n\n" +errorsList;
+      }
+      this._dialogService.confirm(content, ConfirmModalComponent, 'Error', false,
+      ModalHeaderClassEnum.errorHeader, null, 'OK')
+      .then(res => {
+        console.log(res);
+      });
+      return null;
   }
 
   public submitForm(formType: string, callFrom: string): Observable<any> {
@@ -668,12 +731,12 @@ export class ReportTypeService {
     {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
-    
+
     if(reportId){
       formData.append('report_id', reportId);
     } else if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
-    } else if (form3xReportType.hasOwnProperty('reportid')) {   
+    } else if (form3xReportType.hasOwnProperty('reportid')) {
       formData.append('report_id', form3xReportType.reportid);
     }
 
@@ -713,13 +776,13 @@ export class ReportTypeService {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       //console.log("prepare_json_builders_data backup object form3xReportType = ", form3xReportType);
     }
-  
+
     if(reportId){
       formData.append('report_id', reportId);
     } else if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
       //console.log(" prepare_json_builders_data reportId found");
-    } else if (form3xReportType.hasOwnProperty('reportid')) {   
+    } else if (form3xReportType.hasOwnProperty('reportid')) {
       formData.append('report_id', form3xReportType.reportid);
       //console.log(" printPreprepare_json_builders_dataviewPdf reportid found");
     }
@@ -738,7 +801,7 @@ export class ReportTypeService {
    }
 
    public printPreview(accessFrom: string, formType: string, transactions?: string, reportId?: string ): void {
-    
+
     if (accessFrom !=='transaction_table_screen') {
       this.signandSaveSubmitReport(formType,'Saved');
     }
@@ -761,13 +824,13 @@ export class ReportTypeService {
               (error) => {
                 console.error('error: ', error);
               });
-            }       
+            }
         }
       },
         (error) => {
           console.error('error: ', error);
         });
-    } else if (transactions !== 'undefined' && (transactions.length>0)) { 
+    } else if (transactions !== 'undefined' && (transactions.length>0)) {
       this.prepare_json_builders_data(formType, transactions, reportId)
       .subscribe( res => {
         if (res) {
@@ -785,14 +848,14 @@ export class ReportTypeService {
                   (error) => {
                     console.error('error: ', error);
                   });
-                }       
+                }
         }
       },
         (error) => {
           console.log('error: ', error);
         });
     }
-   
+
   }
 
   public getReportIdFromStorage(formType: string) {

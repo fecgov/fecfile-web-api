@@ -21,7 +21,6 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 export class ReportsService {
-
   // only for mock data
   // only for mock data
   // only for mock data
@@ -829,4 +828,50 @@ export class ReportsService {
           headers: httpOptions
         });
   }
+
+  getUpcomingReports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/upcoming_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+
+  getRecentlySavedReports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/recent_saved_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+
+  getRecentlySubmittedReports() {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/recent_submitted_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+  
 }

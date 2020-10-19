@@ -879,6 +879,7 @@ def post_schedA(datum):
                     # update some filds and ensure the parent-child relationaship
                     child_datum["cmte_id"] = datum.get("cmte_id")
                     child_datum["report_id"] = datum.get("report_id")
+                    child_datum["username"] = datum.get("username")
                     child_datum[
                         "transaction_type_identifier"
                     ] = TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT.get(
@@ -899,7 +900,7 @@ def post_schedA(datum):
         except Exception as e:
             # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -1219,6 +1220,7 @@ def put_schedA(datum):
                     # update some filds and ensure the parent-child relationaship
                     child_datum["cmte_id"] = datum.get("cmte_id")
                     child_datum["report_id"] = datum.get("report_id")
+                    child_datum["username"] = datum.get("username")
                     child_datum[
                         "transaction_type_identifier"
                     ] = TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT.get(
@@ -1319,7 +1321,7 @@ def put_schedA(datum):
                 raise
         except Exception as e:
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -1622,6 +1624,7 @@ def child_SA_to_parent_schedA_dict(data):
             "line_number": data.get("child_line_number"),
             "transaction_type": data.get("child_transaction_type"),
             "back_ref_transaction_id": data.get("transaction_id"),
+            "username": data.get("username"),
         }
         if "child_entity_id" in data and check_null_value(data.get("child_entity_id")):
             datum["entity_id"] = data.get("child_entity_id")
@@ -1676,6 +1679,7 @@ def AUTO_parent_SA_to_child_SB_dict(data):
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("transaction_id"),
             "entity_id": data.get("entity_id"),
+            "username": data.get("username"),
         }
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
             datum.get("transaction_type_identifier")
@@ -1961,6 +1965,7 @@ def schedA(request):
                 datum = schedA_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum['username'] = request.user.username
                 # Adding memo_code and memo_text values for reattribution flags
                 if reattribution_flag:
                     datum["memo_code"] = "X"
@@ -2064,6 +2069,7 @@ def schedA(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum['username'] = request.user.username
                 # To check if the report id exists in reports table
                 form_type = find_form_type(report_id, datum.get("cmte_id"))
                 # updating data for reattribution fields

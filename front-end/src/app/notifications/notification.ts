@@ -3,5 +3,6 @@ export class TabConfiguration {
     name: string;
     count: number;
     showOptionView: boolean;
+    placeholder: boolean;
     toolTip: string;
 }

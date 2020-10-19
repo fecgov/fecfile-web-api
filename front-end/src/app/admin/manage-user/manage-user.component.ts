@@ -7,6 +7,7 @@ import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials
 import {SortService} from './service/sort-service/sort.service';
 import {IAccount} from '../../account/account';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 
 export const roleDesc = {
   reviewer: 'This role can only view data in all forms and schedules',
@@ -22,7 +23,7 @@ export const roleDesc = {
   selector: 'app-manage-user',
   templateUrl: './manage-user.component.html',
   styleUrls: ['./manage-user.component.scss'],
-  providers: [SortService]
+  providers: [SortService, NgbTooltipConfig]
 })
 
 export class ManageUserComponent implements OnInit {
@@ -35,10 +36,14 @@ export class ManageUserComponent implements OnInit {
 
   constructor(
       private _fb: FormBuilder,
+      private _config: NgbTooltipConfig,
       private _userService: ManageUserService,
       private _dialogService: DialogService,
       public _authService: AuthService,
   ) {
+
+    this._config.placement = 'right';
+    this._config.triggers = 'click';
     this.frmAddUser = _fb.group({
       role: ['', Validators.required],
       first_name: ['', Validators.required],
