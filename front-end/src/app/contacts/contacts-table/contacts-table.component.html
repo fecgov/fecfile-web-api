@@ -65,9 +65,6 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="printAllSelected()">
-                <i class="print-icon"></i> Print
-              </button>
               <button class="dropdown-item" (click)="viewActivityAllSelected()">
                 <i class="table-icon"></i> View Activity
               </button>
@@ -165,17 +162,30 @@
           </th>
           </thead>
     <tbody>
-      <tr *ngFor="let i of cnt.getContactLog()">
+    <ng-container *ngIf="cnt.getContactLog() !== undefined && cnt.getContactLog().length > 0">
+      <tr *ngFor="let log of getContactLog(cnt)">
         <td class="" style="width: 180px">
-          {{i.dateTime}}
+          {{log.getModifedDate()| date: 'MM/dd/yyyy @ hh:mm:ss a'}}
         </td>
         <td class="text-red" style="width: 1100px">
-          {{i.info}}
+          {{log? log.getInfo() : ''}}
         </td>
         <td class="" style="width: 180px">
-          {{i.user}}
+          {{log.getUser()}}
         </td>
       </tr>
+   </ng-container>
+    <ng-container *ngIf="getContactLog(cnt).length === undefined || getContactLog(cnt).length === 0 ">
+      <tr>
+        <td class="" style="width: 180px">
+        </td>
+        <td class="text-red text-center" style="width: 1100px">
+          Data Not Available
+        </td>
+        <td class="" style="width: 180px">
+        </td>
+      </tr>
+    </ng-container>
     </tbody>
   </table>
   </td>

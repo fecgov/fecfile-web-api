@@ -147,4 +147,30 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
   public open(content) {
     this.modalRef = this.modalService.open(content, { size: 'lg', centered: true, windowClass: 'custom-class' });
   }
+
+  goToContacts(){
+    this._router.navigate(['/contacts']).then(success => {
+      this._messageService.sendMessage({'screen':'contacts', 'action':'highlight-searchbar'});
+    });
+  }
+
+  goToTransactions(){
+    this._router.navigate([`/forms/form/global`], {
+      queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true, searchTransactions:true }
+    }).then(success => {
+      if(success){
+        this._messageService.sendMessage({'screen':'transactions', 'action':'highlight-searchbar'});
+      }
+    });
+    // this.canDeactivate().then(result => {
+    //   if (result === true) {
+    //     localStorage.removeItem(`form_${this.formType}_saved`);
+    //     this._router.navigate([`/forms/form/global`], {
+    //       queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true }
+    //     }).then(success => {
+    //       this._messageService.sendMessage({'screen':'transactions', 'action':'highlight-searchbar'});
+    //     });
+    //   }
+    // });
+  }
 }

@@ -27,8 +27,8 @@ TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', '0.0.0.0:8090')
-DATA_RECEIVE_API_VERSION = "/api/v1/"
+DATA_RECEIVE_API_URL = os.environ.get('DATA_RECEIVER_URL', '0.0.0.0:8090')
+DATA_RECEIVE_API_VERSION = "/v1/"
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
@@ -408,6 +408,10 @@ NXG_FEC_API_URL = "127.0.0.1:8080"
 NXG_FEC_API_VERSION = "/api/v1/"
 NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.efdev.fec.gov/printpdf')
 NXG_FEC_PRINT_API_VERSION = "/v1/print"
+
+# SUBMISSION REPORT SETTINGS
+NXG_COMMITTEE_DEFAULT_PASSWORD = "test"
+SUBMIT_REPORT_WAIT_FLAG = "False"
 
 try:
   from .local_settings import *

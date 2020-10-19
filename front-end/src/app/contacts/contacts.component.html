@@ -65,7 +65,7 @@
                   </span>
                 </div>
                 <input class="form-control py-1" type="text" placeholder="Search All" [(ngModel)]="searchText"
-                  aria-label="Search">
+                  aria-label="Search" [ngClass]="searchInputClass">
                 <div class="input-group-append" (click)="search()" ngbTooltip="Search All" tooltipClass="form-tooltip">
                   <span class="input-group-text" id="">
                     <!-- <i class="search-icon text-grey" aria-hidden="true"></i> no longer working?-->

@@ -3,7 +3,7 @@
     <nav class="navbar py-0 navbar-expand-lg">
       <div class="navbar-brand app__top-logo">
         <a href="http://www.fec.gov/" draggable="false" target="_blank">
-          <img src="assets/img/logo-transparent.png" draggable="false"/>
+          <img src="assets/img/logo-transparent.png" draggable="false" style=""/>
         </a>
       </div>
       <button
@@ -24,11 +24,14 @@
         id="navbarSupportedContent"
         [ngClass]="{ toggleMenuStyle: toggleMenu === true }"
       >
-        <div class="form-group ml-1 mt-2">
+        <!-- <div class="form-group ml-1 mt-2">
           <input type="text" name="search" class="form-control-sm" placeholder="Search for..." />
           <i class="search-icon" aria-hidden="true"></i>
-        </div>
-        <app-header class="container"
+        </div> -->
+        <!-- <button type="button" class="btn btn-dark">Dark</button>
+        <button type="button" class="btn btn-outline-secondary">Primary</button> -->
+
+        <app-header style="display: block;width: 100%;"
           [formType]="formType"
         ></app-header>
       </div>
@@ -52,7 +55,11 @@
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
               <div>
-                Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
+                Form {{ formType }}
+                <ng-container *ngIf="currentReportData && currentReportData.amend_indicator === 'A' && currentReportData.reportsequence">
+                  - A{{currentReportData.reportsequence}}
+                </ng-container> 
+                | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
                 {{ formEndDate | date: 'MM/dd/yyyy' }}
               </div>              
               <ng-container *ngIf="reportOverDue && dueDate">
@@ -109,7 +116,7 @@
             <address>
               Toll free: 1-800-424-9530
               <br />
-              Local: (202) 694-1000
+              Local: (202)-694-1000
             </address>
           </h6>
         </div>
@@ -122,7 +129,7 @@
             </label>
             <br />
             <address>
-              <ng-container *ngIf="radAnalystInfo"> (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }} </ng-container>
+              <ng-container *ngIf="radAnalystInfo"> (202)-694-1000 x{{ radAnalystInfo?.telephone_ext }} </ng-container>
               <br />
               <ng-container>
                 <a href="https://www.fec.gov/help-candidates-and-committees/question-rad/" draggable="false" target="_blank">
@@ -137,11 +144,11 @@
             <label>Tech Support</label>
             <br />
             <address>
-              (202) 694-1307
+              (202) 694-1307<br />
+              <a href="mailto:eFiletechsupport@fec.gov">
+                eFiletechsupport@fec.gov
+              </a>
             </address>
-            <a href="mailto:eFiletechsupport@fec.gov">
-              eFiletechsupport@fec.gov
-            </a>
           </h6>
         </div>
       </div>

@@ -245,7 +245,7 @@ def put_schedF(data):
         except Exception as e:
             # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -394,7 +394,7 @@ def post_schedF(data):
         except Exception as e:
             # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -722,6 +722,7 @@ def schedF(request):
                 datum = schedF_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
                 ):
@@ -835,6 +836,7 @@ def schedF(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
 
                 # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 #     datum['entity_id'] = request.data.get('entity_id')

@@ -1,12 +1,29 @@
 @import '../../scss/global';
 
-a, .nav-link, .btn-link {
+ .searchBar, .nav-item {
+  a, .searchBtn, #dropdownTools, #dropdownProfile{
+    color: $white;
+    text-decoration: none;
+    font-size: large;
+    
+    &:hover {
+      color: $white;
+      font-size: larger;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+}
+
+a.dropdown-item,.btn-link {
   color: $black;
   text-decoration: none;
   
   &:hover {
-    color: $white;
-    text-decoration: none;
+    color: $black;
+    font-weight: bold;
+    text-decoration: underline;
   }
 }
 .btn-height {
@@ -17,10 +34,10 @@ a, .nav-link, .btn-link {
   position: relative;
 }
 .search-icon {
-  top: 18px;
-  position: absolute;
-  left: 420px;
-  color: $shuttleGray;
+  // top: 18px;
+  // position: absolute;
+  // left: 420px;
+  color: $white;
   @include media(tablet) {
     left: 200px;
   }

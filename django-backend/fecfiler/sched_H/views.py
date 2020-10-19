@@ -3256,7 +3256,7 @@ def put_schedH4(data):
                     )
         except Exception as e:
             if roll_back:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -3609,7 +3609,7 @@ def post_schedH4(data):
                 )
         except Exception as e:
             if roll_back:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -3881,6 +3881,7 @@ def schedH4(request):
                 datum = schedH4_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
                 ):
@@ -3987,6 +3988,7 @@ def schedH4(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
 
                 # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 #     datum['entity_id'] = request.data.get('entity_id')
@@ -4923,7 +4925,7 @@ def put_schedH6(data):
 
         except Exception as e:
             if roll_back:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -5208,7 +5210,7 @@ def post_schedH6(data):
                 )
         except Exception as e:
             if roll_back:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -5400,6 +5402,7 @@ def schedH6(request):
                 datum = schedH6_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
+                datum["username"] = request.user.username
                 if "transaction_id" in request.data and check_null_value(
                         request.data.get("transaction_id")
                 ):
@@ -5540,6 +5543,7 @@ def schedH6(request):
                 # end of handling
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
+                datum["username"] = request.user.username
 
                 # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 #     datum['entity_id'] = request.data.get('entity_id')

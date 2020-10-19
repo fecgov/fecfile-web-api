@@ -202,7 +202,7 @@
                       <div class="error-text">
                         
                       </div>
-                      <ng-container *ngIf="((col.name === 'expenditure_amount' || col.name === 'contribution_amount')  && displayMonthlyQuarterlyThresholdWarning) || (col.name === 'semi_annual_refund_bundled_amount' && displaySemiAnnualThresholdWarning)">
+                      <ng-container *ngIf="scheduleType.endsWith('schedA') && (((col.name === 'expenditure_amount' || col.name === 'contribution_amount')  && displayMonthlyQuarterlyThresholdWarning) || (col.name === 'semi_annual_refund_bundled_amount' && displaySemiAnnualThresholdWarning))">
                         <div class="text-info text-left">
                           Reportable Bundled Contributions Forwarded By or Credited to Lobbyists/Registrants and 
                           Lobbyist/Registrant PACs are not required to be disclosed unless the amount is greater 
