@@ -17,7 +17,8 @@
           <!-- *ngIf="isContactViewActive()" -->
           <input [(ngModel)]="allContactsSelected" type="checkbox" (change)="changeAllContactsSelected()">
         </th>
-
+        <th class="contacts__table-angleDown">
+        </th>
         <th *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
         <th *ngIf="isColumnVisible('entity_type')" [class]="getSortClass('entity_type')"
@@ -64,13 +65,13 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="printAllSelected()">
-                <i class="print-icon"></i> Print
-              </button>
               <button class="dropdown-item" (click)="viewActivityAllSelected()">
                 <i class="table-icon"></i> View Activity
               </button>
-              <button [appExport]="contactsModel" fileName="contacts" class="dropdown-item">
+              <!-- <button [appExport]="contactsModel" fileName="contacts" class="dropdown-item">
+                <i class="file-export-icon"></i> Export (Dev)
+              </button> -->
+              <button class="dropdown-item" (click)="exportAllSelected()">
                 <i class="file-export-icon"></i> Export
               </button>
               <!-- <button class="dropdown-item" (click)="trashAllSelected()">
@@ -88,54 +89,109 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let cnt of contactsModel | paginate: config; let i = index">
-        <td>
-          <input [(ngModel)]="cnt.selected" type="checkbox" (click)="checkForMultiChecked($event)">
-        </td>
-        <td *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
-        <td *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
-        <td *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
-        <td *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>
-        <td *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
-        <td *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
-        <td *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
-        <td *ngIf="isColumnVisible('zip')">{{cnt.zip | zipCode}}</td>
-        <td *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
-        <td *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
-        <td *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
-        <td *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
-        <td *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
-        <td *ngIf="isRecycleBinViewActive()">
-          {{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
-        </td>
-        <!--<td  *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
+      <ng-container *ngFor="let cnt of contactsModel | paginate: config; let i = index">
+        <tr>
+          <td>
+            <input [(ngModel)]="cnt.selected" type="checkbox" (click)="checkForMultiChecked($event, cnt)">
+          </td>
+          <td>
+            <a (click)="toggleContactLog(cnt)">
+              <i *ngIf="!cnt.toggleLog" class="fas fa-angle-down"></i>
+              <i *ngIf="cnt.toggleLog" class="fas fa-angle-up"></i>
+            </a>
+          </td>
+          <td *ngIf="isColumnVisible('name')" class="contact_link"><a (click)="showContactDetails(cnt)">{{cnt.name}}</a>
+          </td>
+          <td *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
+          <td *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
+          <td *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>
+          <td *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
+          <td *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
+          <td *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
+          <td *ngIf="isColumnVisible('zip')">{{cnt.zip | zipCode}}</td>
+          <td *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
+          <td *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
+          <td *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
+          <td *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
+          <td *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
+          <td *ngIf="isRecycleBinViewActive()">
+            {{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+          </td>
+          <!--<td  *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
         </td>-->
-        <td>
-          <div *ngIf="isRecycleBinViewActive()">
-            <button *ngIf="!_authService.isReadOnly()" class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
-              <i class="undo-icon"></i>
-            </button>
-          </div>
-          <div *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
-              <i class="ellipsis-icon"></i>
-            </button>
-            <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" (click)="editContact(cnt)">
-                <i class="edit-icon"></i> Edit
-              </button>
-              <button class="dropdown-item" (click)="viewActivity(cnt)">
-                <i class="view-icon"></i> View Activity
-              </button>
-              <button *ngIf="cnt.activeTransactionsCnt == 0 && !_authService.isReadOnly()" class="dropdown-item"
-                (click)="trashContact(cnt)">
-                <i class="trash-icon"></i> Trash
+          <td>
+            <div *ngIf="isRecycleBinViewActive()">
+              <button *ngIf="!_authService.isReadOnly()" class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
+                <i class="undo-icon"></i>
               </button>
             </div>
-          </div>
+            <div *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+              <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                <i class="ellipsis-icon"></i>
+              </button>
+              <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" (click)="editContact(cnt)">
+                  <i class="edit-icon"></i> Edit
+                </button>
+                <button class="dropdown-item" (click)="viewActivity(cnt)">
+                  <i class="view-icon"></i> View Activity
+                </button>
+                <button *ngIf="cnt.activeTransactionsCnt == 0 && !_authService.isReadOnly()" class="dropdown-item"
+                  (click)="trashContact(cnt)">
+                  <i class="trash-icon"></i> Trash
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <!--  Nested table that shows the contact Log -->
+        <tr *ngIf="cnt.toggleLog === true" class="inner_table">
+          <td colspan="90%">
+            <b>Contact History Log</b>
+            <br>
+            <table class="log_table" style="width: 100%">
+              <thead>
+          <th class="col_date_time" style="width: 180px">
+            Date/Time
+          </th>
+          <th class="col_contact_info" style="width: 1100px">
+            Contact Information
+          </th>
+          <th class="col_user" style="width: 180px">
+            User
+          </th>
+          </thead>
+    <tbody>
+    <ng-container *ngIf="cnt.getContactLog() !== undefined && cnt.getContactLog().length > 0">
+      <tr *ngFor="let log of getContactLog(cnt)">
+        <td class="" style="width: 180px">
+          {{log.getModifedDate()| date: 'MM/dd/yyyy @ hh:mm:ss a'}}
+        </td>
+        <td class="text-red" style="width: 1100px">
+          {{log? log.getInfo() : ''}}
+        </td>
+        <td class="" style="width: 180px">
+          {{log.getUser()}}
         </td>
       </tr>
-      <!--<tr *ngIf="isContactViewActive()">
+   </ng-container>
+    <ng-container *ngIf="getContactLog(cnt).length === undefined || getContactLog(cnt).length === 0 ">
+      <tr>
+        <td class="" style="width: 180px">
+        </td>
+        <td class="text-red text-center" style="width: 1100px">
+          Data Not Available
+        </td>
+        <td class="" style="width: 180px">
+        </td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </table>
+  </td>
+  </tr>
+  </ng-container>
+  <!--<tr *ngIf="isContactViewActive()">
         <td></td>
         <td *ngIf="isColumnVisible('name')"></td>
         <td *ngIf="isColumnVisible('type')"></td>
@@ -152,7 +208,7 @@
         <td *ngIf="isColumnVisible('candOfficeDistrict')"></td>
         <td></td>
       </tr>-->
-    </tbody>
+  </tbody>
 
   </table>
   <hr />

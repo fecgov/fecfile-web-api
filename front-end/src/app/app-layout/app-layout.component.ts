@@ -145,6 +145,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     let formType = this.extractFormType();
     // to refresh/clear Dash Board Filter options
     localStorage.removeItem('reports.filters');
+    localStorage.removeItem('notifications.filters');
     localStorage.removeItem('Reports.view');
 
     this._step = this._activatedRoute.snapshot.queryParams.step;
@@ -198,6 +199,12 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       }
       else if (this.formType.length === 2) {
         formType = this.formType;
+      }
+    }
+    else if(this.currentReportData && this.currentReportData.formtype){
+      formType = this.currentReportData.formtype;
+      if (formType.length === 3) {
+        formType = formType.substr(1, 3);
       }
     }
     return formType;

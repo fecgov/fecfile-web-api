@@ -1,3 +1,5 @@
+import {ContactLogModel} from './contactLog.model';
+
 export class ContactModel {
     entity_type: string;
     id: string;
@@ -24,6 +26,9 @@ export class ContactModel {
     deletedDate: string;
     selected: boolean;
     activeTransactionsCnt: number;
+    toggleLog: boolean;
+    contactLog: Array<ContactLogModel>;
+    transactions: any;
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -51,7 +56,24 @@ export class ContactModel {
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
         this.selected = contact.selected;
         this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
-       
+        this.contactLog = [];
+        this.toggleLog = false;
+        this.transactions = null;
+    }
 
+    setContactLog(contactLog: any) {
+        if (contactLog === undefined || contactLog.length === 0) {
+            this.contactLog = []
+;        }
+        this.contactLog = contactLog;
+    }
+    getContactLog(): any {
+        return this.contactLog;
+    }
+    setTransactions(transactions: any) {
+        this.transactions = transactions;
+    }
+    getTransactions(): any {
+        return this.transactions;
     }
 }

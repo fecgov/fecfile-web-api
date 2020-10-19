@@ -295,7 +295,7 @@ def put_schedE(data):
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -602,7 +602,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), cand_office, form_type)
-    elif cand_office == "S":
+    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK','DE','MT','ND','SD','VT','WY']):
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -632,7 +632,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             data.get("so_cand_state"),
             form_type
         )
-    elif cand_office == "H":
+    elif cand_office == "H" and data.get("so_cand_state") not in ['AK','DE','MT','ND','SD','VT','WY']:
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -791,6 +791,7 @@ def put_completing_entities(data):
         if k.startswith("completing_")
     }
     comp_data["cmte_id"] = data.get("cmte_id")
+    comp_data["username"] = data.get("username")
     if "prefix" in comp_data:
         comp_data["preffix"] = comp_data.get("prefix")
     comp_data["entity_type"] = "IND"
@@ -847,6 +848,7 @@ def post_schedE(data):
             new_completing_entity = put_completing_entities(data)
             completing_rollback_flag = True
             data["completing_entity_id"] = new_completing_entity.get("entity_id")
+            # data["completing_entity_id"] = old_completing_entity.get("entity_id")
         else:
             logger.debug("saving new completing entity:{}".format(data))
             # adding this condition to avoid empty individual entity when we create SE transaction
@@ -897,7 +899,7 @@ def post_schedE(data):
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
-                entity_data = put_entities(old_entity)
+                entity_data = put_entities(old_entity, False)
             else:
 
                 get_data = {
@@ -912,7 +914,7 @@ def post_schedE(data):
                 remove_entities(get_data)
 
             if completing_rollback_flag:
-                entity_data = put_entities(old_completing_entity)
+                entity_data = put_entities(old_completing_entity, False)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -1390,6 +1392,7 @@ def schedE(request):
                 datum['mirror_transaction_id'] = None
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            datum["username"] = request.user.username
             datum["associatedbydissemination"] = associatedbydissemination
             if datum["transaction_type_identifier"] == "IE_MULTI":
                 if "memo_text" in datum:
@@ -1531,6 +1534,7 @@ def schedE(request):
                 associatedbydissemination = True
             datum["report_id"] = report_id
             datum["cmte_id"] = get_comittee_id(request.user.username)
+            datum["username"] = request.user.username
             datum["associatedbydissemination"] = associatedbydissemination
 
             data = put_schedE(datum)

@@ -75,6 +75,8 @@ import { ReportheaderComponent } from './reports/reportheader/reportheader.compo
 import { ReportsComponent } from './reports/reports.component';
 import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { NotificationdetailsComponent } from './notifications/notificationdetails/notificationdetails.component';
+import { NotificationheaderComponent } from './notifications/notificationheader/notificationheader.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ExportDirective } from './shared/directives/export.directive';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
@@ -107,6 +109,8 @@ import * as AWS from 'aws-sdk/global';
 import * as S3 from 'aws-sdk/clients/s3';
 
 import {PasswordModule} from './password/password.module';
+import { ContactDetailsModalComponent } from './contacts/contact-details-modal/contact-details-modal.component';
+import { CashOnHandComponent } from './forms/form-3x/cash-on-hand/cash-on-hand.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -163,6 +167,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportsidebarComponent,
     ReportheaderComponent,
     ReportdetailsComponent,
+    NotificationheaderComponent,
+    NotificationdetailsComponent,
     SafeHTMLPipe,
     OrderByPipe,
     // PhonePipe,
@@ -198,8 +204,10 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ExportDirective,
     F24LinkModalComponent,
     FormEntryComponent,
+    ContactDetailsModalComponent,
+    CashOnHandComponent
   ],
-  entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
+  entryComponents: [ConfirmModalComponent, F24LinkModalComponent, CashOnHandComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3, ContactDetailsModalComponent],
   imports: [
     PasswordModule,
     SharedModule,

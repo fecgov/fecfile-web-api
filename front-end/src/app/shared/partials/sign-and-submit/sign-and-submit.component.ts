@@ -566,7 +566,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy {
           }
         );
       } else if (this.formType === '3X' || this.formType === '24' || this.formType === '3L') {
-        this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
+        this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted', `${this.submitterInfo.last_name}, ${this.submitterInfo.first_name}`).subscribe(res => {
         // throwError({
         //   error: {
         //     error: {

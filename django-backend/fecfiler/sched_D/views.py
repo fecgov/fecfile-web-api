@@ -368,6 +368,7 @@ def schedD(request):
             logger.debug("valid data set:{}".format(datum))
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            datum["username"] = request.user.username
 
             # if 'creditor_entity_id' in request.data and check_null_value(
             #         request.data.get('creditor_entity_id')):
@@ -505,6 +506,7 @@ def schedD(request):
             # end of handling
             datum["report_id"] = report_id
             datum["cmte_id"] = get_comittee_id(request.user.username)
+            datum["username"] = request.user.username
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -707,7 +709,7 @@ def put_schedD(datum):
                 transaction_id, current_close_balance, datum)
         except Exception as e:
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": datum.get(
                     "cmte_id"), "entity_id": entity_id}
@@ -910,7 +912,7 @@ def post_schedD(datum):
             post_sql_schedD(datum)
         except Exception as e:
             if entity_flag:
-                entity_data = put_entities(prev_entity_list[0])
+                entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": datum.get(
                     "cmte_id"), "entity_id": entity_id}

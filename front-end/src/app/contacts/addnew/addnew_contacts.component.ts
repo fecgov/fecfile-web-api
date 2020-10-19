@@ -37,7 +37,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   @Input() transactionType = '';
   @Input() scheduleAction: ContactActions = ContactActions.add;
   @Input() transactionToEdit: ContactModel;
-
+  @Input() isContactDetailsView: boolean = false;
 
   public checkBoxVal: boolean = false;
   public frmContact: FormGroup;
@@ -97,14 +97,19 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._contactsMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$)
     .subscribe(message => {
     });
+    this._messageService.getMessage().subscribe( res => {
+        if (res && res.cdEnableForm === true) {
+        this.enableFrom();
+      }
+    });
   }
 
   ngOnInit(): void {
     this._selectedEntity = null;
     this._contactToEdit = null;
-    
+
     localStorage.removeItem('contactsaved');
-    
+
     this._messageService.clearMessage();
 
 
@@ -116,6 +121,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
       }
+    }
+
+    if (this.isContactDetailsView) {
+      this.disableForm();
     }
   }
 
@@ -1221,6 +1230,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
         //this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
         //this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+        if(this.isContactDetailsView) {
+          this.disableForm();
+        }
       }
     }
   }
@@ -1370,6 +1382,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
+          if (callFrom === 'contactDetails') {
+            this.transactionToEdit = res;
+            this._messageService.sendMessage({messageFrom: 'contactDetails', message: 'updateContact' , contact: res });
+            this.disableForm();
+          } else {
           //console.log('_contactsService.saveContact res', res);
           this._contactToEdit = null;
           this.frmContact.reset();
@@ -1386,6 +1403,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           if (callFrom === 'viewContacts') {
             this._router.navigate([`/contacts`]);
           }}
+        }
       });
     } else {
       this.frmContact.markAsDirty();
@@ -1426,4 +1444,19 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       return true;
   }
  }
+
+ disableForm() {
+   this.frmContact.disable();
+ }
+ cancelEdit() {
+   this.populateFormForEditOrView(this.transactionToEdit);
+ }
+  private enableFrom() {
+   this.frmContact.enable();
+  }
+
+  saveContactDetails() {
+  this.doValidateContact('contactDetails');
+  }
+
 }

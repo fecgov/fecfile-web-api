@@ -256,7 +256,7 @@
                             <button class="dropdown-item" (click)="addMemo(report,true)">
                                 <i class="fas fa-sticky-note"></i> View Memo
                             </button>
-                            <button *ngIf="(report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
+                            <button *ngIf="(report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down')" class="dropdown-item"  (click)="viewFiledReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
                             <button  *ngIf="(report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
@@ -265,9 +265,9 @@
                             <button class="dropdown-item" (click)="downloadReport(report)">
                                 <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="dropdown-item" (click)="printReport(report)">
-                                <i class="fas fa-print"></i> Print
-                            </button>
+<!--                            <button class="dropdown-item" (click)="printReport(report)">-->
+<!--                                <i class="fas fa-print"></i> Print-->
+<!--                            </button>-->
                         </div>
                     </div>
 
@@ -279,7 +279,7 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action3" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" *ngIf="report.status === 'Filed'" (click)="viewReport(report)">
+                            <button class="dropdown-item" *ngIf="report.status === 'Filed'" (click)="viewFiledReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
                             <button class="dropdown-item" (click)="downloadReport(report)">
@@ -420,7 +420,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
-                                <button *ngIf="true" class="dropdown-item"  (click)="viewReport(report)">
+                                <button *ngIf="true" class="dropdown-item"  (click)="viewFiledReport(report)">
                                     <i class="fas fa-eye"></i> View
                                 </button>
                                 <button class="dropdown-item" (click)="addMemo(report,true)">
@@ -446,7 +446,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <div id="forms__trx-dropdown-action3" class="dropdown-menu" ngbDropdownMenu>
-                                <button class="dropdown-item" *ngIf="child.status === 'Filed'" (click)="viewReport(report)">
+                                <button class="dropdown-item" *ngIf="child.status === 'Filed'" (click)="viewFiledReport(report)">
                                     <i class="fas fa-eye"></i> View
                                 </button>
                                 <button class="dropdown-item" (click)="downloadReport(report)">

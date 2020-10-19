@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { map } from 'rxjs/operators';
 import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
@@ -21,7 +21,6 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 export class ReportsService {
-
   // only for mock data
   // only for mock data
   // only for mock data
@@ -786,4 +785,93 @@ export class ReportsService {
             })
         );
   }
+
+
+  public getCurrentCashOnHand(): Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/cashOnHand';
+    let params = new HttpParams();
+
+    params = params.append('year', (new Date()).getFullYear().toString());
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+          params
+        });
+
+    // return of({amount:'40000', year:'2020'});
+  }
+  
+  public updateCashOnHand(data: any): Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/cashOnHand';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    if(data && data.amount){
+      data.amount = data.amount.replace(/,/g, ``);
+    }
+
+    // return of({data});
+
+    return this._http
+        .put(`${environment.apiUrl}${url}`, data, {
+          headers: httpOptions
+        });
+  }
+
+  getUpcomingReports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/upcoming_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+
+  getRecentlySavedReports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/recent_saved_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+
+  getRecentlySubmittedReports() {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/recent_submitted_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+        });
+  }
+  
 }

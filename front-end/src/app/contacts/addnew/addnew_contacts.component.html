@@ -20,16 +20,17 @@
 <div class="add_new_contact-container">
   <form [formGroup]="frmContact">
     <header>
+      <ng-container *ngIf="!isContactDetailsView">
       <div class="header-content">
         <!--<div class="float-left">-->
-          <h1>
+          <h1 >
             <ng-container *ngIf="scheduleAction !== editScheduleAction"> Add New Contact </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction"> Edit Contact</ng-container>
-          </h1>
+          </h1 >
+
           <br />
         <!--</div>-->
        </div>
-
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
@@ -38,6 +39,7 @@
           </div>
         </div>
       </div>
+      </ng-container>
     </header>
     <section>
        <ng-container *ngFor="let hiddenField of hiddenFields">
@@ -414,7 +416,7 @@
       </ng-container>  
     </section>
 
-    <footer>
+    <footer *ngIf="!isContactDetailsView">
       <footer>
 
         <div class="grid-row">
@@ -455,7 +457,20 @@
         </div>
       </footer>
     </footer>
+    <footer *ngIf="isContactDetailsView && frmContact.disabled === false">
+      <div class="grid-row" >
+        <div class="grid-row__col grid-row__col--12">
+          <div class="forms__btn-container">
+            <button class="btn btn-previous btn-left" type="button"  (click)= "cancelEdit()">
+              Cancel
+            </button>
 
-
+            <button class="btn btn-primary btn-right" type="button" (click)="saveContactDetails()">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </footer>
   </form>
 </div>

@@ -65,6 +65,8 @@ export class ContactsComponent implements OnInit, OnDestroy {
   public searchTextArray = [];
   public tagArray: any = [];
   public showSideBar: boolean = false;
+
+  public searchInputClass :string = '';
   /**
    * Subscription for applying filters to the contacts obtained from
    * the server.
@@ -87,6 +89,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   private readonly filtersLSK = 'contacts.filters';
   private onDestroy$ = new Subject();
   private keywordGroup: any = [];
+  messageServiceSubscription: Subscription;
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _contactsMessageService: ContactsMessageService,
@@ -122,6 +125,13 @@ export class ContactsComponent implements OnInit, OnDestroy {
           this.showContacts();
         }
       );
+
+
+    this.messageServiceSubscription = this._messageService.getMessage().subscribe(message => {
+      if(message && message.screen === 'contacts' && message.action === 'highlight-searchbar'){
+        this.searchInputClass = 'searchHighlight';
+      }
+    });
   }
 
 
@@ -159,6 +169,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
     this.applyFiltersSubscription.unsubscribe();
     this.editContactSubscription.unsubscribe();
     this.showContactSubscription.unsubscribe();
+    this.messageServiceSubscription.unsubscribe();
     this.onDestroy$.next(true);
   }
 
@@ -269,6 +280,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
    */
   public search() {
 
+    this.searchInputClass = '';
     // Don't allow more than 12 filters
     if (this.searchTextArray.length > 12) {
       return;

@@ -1,12 +1,29 @@
 @import '../../scss/global';
 
-a, .nav-link, .btn-link {
+ .searchBar, .nav-item {
+  a, .searchBtn, #dropdownTools, #dropdownProfile{
+    color: $white;
+    text-decoration: none;
+    font-size: large;
+    
+    &:hover {
+      color: $white;
+      font-size: larger;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+}
+
+a.dropdown-item,.btn-link {
   color: $black;
   text-decoration: none;
   
   &:hover {
-    color: $white;
-    text-decoration: none;
+    color: $black;
+    font-weight: bold;
+    text-decoration: underline;
   }
 }
 .btn-height {
@@ -17,10 +34,10 @@ a, .nav-link, .btn-link {
   position: relative;
 }
 .search-icon {
-  top: 18px;
-  position: absolute;
-  left: 420px;
-  color: $shuttleGray;
+  // top: 18px;
+  // position: absolute;
+  // left: 420px;
+  color: $white;
   @include media(tablet) {
     left: 200px;
   }
@@ -40,4 +57,22 @@ a, .nav-link, .btn-link {
 }
 .secondary-dropdown-menu {
   background-color: $mercury;
+}
+
+.fas[data-count]{
+  position:relative;
+}
+.fas[data-count]:after{
+  position: absolute;
+  left: 1em;
+  top: -2em;
+  content: attr(data-count);
+  padding: .5em;
+  border-radius: 10em;
+  line-height: .9em;
+  color: white;
+  background: rgba(255,0,0,.75);
+  text-align: center;
+  min-width: 2em;
+  font: bold .6em sans-serif;
 }

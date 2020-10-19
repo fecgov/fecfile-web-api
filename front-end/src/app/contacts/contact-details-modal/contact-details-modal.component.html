@@ -1,0 +1,50 @@
+<div class="modal-header">
+  <div class="modal-user-info">
+   <b>{{contact.name}}</b>
+  </div>
+  <button class="btn btn-sm btn-primary btn-right"  (click)="editContact()">
+    <i class="ellipsis-icon"></i>
+  </button>
+</div>
+<div class="modal-body">
+  <addnew_contacts [transactionToEdit]="contact" [scheduleAction]="'edit'" [isContactDetailsView] = "true"></addnew_contacts>
+  <br>
+  <br>
+  <hr>
+  <div class="reports"><h2>
+    Associated Reports
+  </h2>
+    <div class="reports-table">
+      <table>
+        <tbody class="single-column-table">
+        <tr  *ngIf="contact.getTransactions() === null">
+         <td  class="wider-row"> <p class="text-center">Data Not Available<p></td>
+        </tr>
+        <tr *ngFor="let transaction of contact.getTransactions()">
+        <td class="wider-row">
+         <b>{{transaction.formdetails }}</b>
+         <p> {{transaction.address? transaction.address : ''}}, {{transaction.city ? transaction.city: ''}} Phone: 
+           {{transaction.phone_number ? transaction.phone_number : 'NA'}}</p>
+         <p>Employer: {{transaction.employer ? transaction.employer: 'NA'}} &nbsp;
+           Occupation: {{transaction.occupation ? transaction.occupation: 'NA'}}</p>
+        </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="notes">
+    <br>
+    <label><h4>Notes</h4></label>
+    <br>
+    <input type="text" placeholder="">
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary-gray btn-right"
+          (click)="decline()">
+   Close
+  </button>
+
+</div>
+

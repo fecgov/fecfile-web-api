@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ReportsService } from './../reports/service/report.service';
+import { AuthService } from './../shared/services/AuthService/auth.service';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { ApiService } from '../shared/services/APIService/api.service';
@@ -7,6 +9,7 @@ import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
 import { FormsService } from '../shared/services/FormsService/forms.service';
+import { of } from 'rxjs';
 
 
 
@@ -18,26 +21,136 @@ import { FormsService } from '../shared/services/FormsService/forms.service';
 })
 export class DashboardComponent implements OnInit {
 
+  @ViewChild('content') content: any;
+  
   public showSideBar: boolean = true;
   public showLegalDisclaimer: boolean = false;
+  public closeResult: string;
+  modalRef: any;
+
+  upcomingReportsList: any = null;
+  upcomingReportsListError = false;
+  upcomingReportsListEmpty = false;
+  recentlySavedReports: any;
+  recentlySavedReportsError = false;
+  recentlySavedReportsEmpty = false;
+  recentlySubmittedReports: any;
+  recentlySubmittedReportsError = false;
+  recentlySubmittedReportsEmpty = false;
+  cmte_id: string;
 
   constructor(
     private _sessionService: SessionService,
     private _apiService: ApiService,
     private _modalService: NgbModal,
     private _messageService: MessageService,
-    private _formService: FormsService
+    private _formService: FormsService,
+    private modalService: NgbModal, 
+    private _authService: AuthService, 
+    private _reportService: ReportsService
+
   ) { }
 
   ngOnInit(): void {
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
        this._formService.removeFormDashBoard("3X");
     }
+    if (localStorage.getItem('committee_details')){
+      this.cmte_id = JSON.parse(localStorage.getItem('committee_details')).committeeid;
+    }
+    this._showFirstTimeCOHIfAppliable();
+    this._populateUpcomingReportsList();
+    this._populateRecentlySavedReportsList();
+    this._populateRecentlySubmittedReportsList();
   }
   
+  private _populateRecentlySubmittedReportsList() {
+    //reset flags first
+    this.recentlySubmittedReportsEmpty = false;
+    this.recentlySubmittedReportsError = false;
+
+    this._reportService.getRecentlySubmittedReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.recentlySubmittedReports = res;
+        }else{
+          this.recentlySubmittedReportsEmpty = true;
+        }
+      }
+    }, error => {
+      if(error){
+        this.recentlySubmittedReportsError = true;
+      }
+    });
+  }
+
+  
+  private _populateRecentlySavedReportsList() {
+    //reset flags first
+    this.recentlySavedReportsEmpty = false;
+    this.recentlySavedReportsError = false;
+
+    this._reportService.getRecentlySavedReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.recentlySavedReports = res;
+        }else{
+          this.recentlySavedReportsEmpty = true;
+        }
+      }
+    } , error => {
+        if(error){
+          this.recentlySavedReportsError = true;
+        }
+    });
+  }
+  
+  
+  private _populateUpcomingReportsList() {
+    //reset flags first
+    this.upcomingReportsListEmpty = false;
+    this.upcomingReportsListError = false;
+
+    this._reportService.getUpcomingReports().subscribe((res:any)=>{
+      if(res){
+        if(res.length > 0){
+          this.upcomingReportsList = res;
+        }else{
+          this.upcomingReportsListEmpty = true;
+        }
+      }
+    }, error => {
+      if(error){
+        this.upcomingReportsListError = true;
+      }
+    });
+  }
+  
+  
+  
+  private _showFirstTimeCOHIfAppliable() {
+    if(this._authService.isCommitteeAdmin() || this._authService.isBackupCommitteeAdmin() || this._authService.isAdmin()){
+      this._apiService.getCashOnHandInfoStatus().subscribe(res => {
+        if(res && res.showMessage){
+          this.openModal();
+        }
+      });
+    }
+  }
+
+  public openCOHInfoModal(content) {
+    this.modalRef = this.modalService.open(content, { size: 'lg', centered: true, windowClass: 'custom-class' });
+  }
+
+  public openModal() {
+    // if (this.loggedInUserRole === Roles.Editor || this.loggedInUserRole === Roles.Reviewer) {
+      // this._authService.showPermissionDeniedMessage();
+    // } else {
+      this.openCOHInfoModal(this.content);
+    // }
+  }
 
 
-  public closeResult: string;
 
   /**
    * Show's or hides the sidebar navigation.

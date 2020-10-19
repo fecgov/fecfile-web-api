@@ -1,11 +1,16 @@
 <div class="clean_contacts__container">
   <p>
-    The list below is where we found possible duplicates. Reduce issues with your data’s integrity by cleaning up the
-    duplicates to ensure your data is clean and free of redundant entries. This can be done by selecting the edit icon
-    on the end of each row.
+    Listed below is where we found possible duplicates with your contacts on file, and a contact within the document you
+    have just uploaded. Listed below are New Entries from the document you just uploaded.
   </p>
+  <p><b>Duplicates can be defined by the First Name, Last Name, Committee Name, and Address of a contact from your
+      database that matches exaclty with another contact within the document you just uploaded.</b></p>
+  <p>Reduce issues with your data’s integrity by cleaning up duplicates to ensure your data is clean and free of
+    redundant entries. This can be done by selecting the <b>Edit Icon</b> on the end of each entry's row. Then you will
+    be able
+    to merge by info field, or by selecting <b>"Merge All"</b> located towards the bottom of page.</p>
   <h2 class="clean_contacts__heading">
-    Duplicate Entries
+    Duplicate Contact Entries
   </h2>
   <div class="clean_contacts__table-container">
     <div class="clean_contacts__table-inner">
@@ -76,9 +81,16 @@
   </div>
   <div class="row">
     <div class="col col-md-5">
-      <button class="btn btn-secondary btn-left clean_contacts__begin-import"
-        (click)="confirmFinalizeImport(finalizeImportModal)">
-        Begin Import
+      <button class="btn btn-secondary btn-left clean_contacts__button"
+        (click)="confirmFinalizeImportAll(finalizeImportAllModal)">
+        Ignore All & Import
+      </button>
+      <button class="btn btn-primary btn-left clean_contacts__button"
+        (click)="confirmFinalizeMergeAll(finalizeMergeAllModal)">
+        Merge All & Import
+      </button>
+      <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+        Cancel Import
       </button>
     </div>
     <div class="col col-md-5">
@@ -211,10 +223,10 @@
   </div>
 </ng-template>
 
-<ng-template #finalizeImportModal let-modal>
+<ng-template #finalizeImportAllModal let-modal>
   <div class="modal-header" id="clean_contacts__pin-modal-header">
-    <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge</h2>
-    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeImport(modal)">
+    <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Ignore All & Import Contacts</h2>
+    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeImportAll(modal)">
       <span aria-hidden="true">×</span>
     </button>
   </div>
@@ -225,11 +237,35 @@
     </p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="import(modal)">
+    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="importAll(modal)">
       Import
     </button>
     <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
-      (click)="cancelFinalizeImport(modal)">
+      (click)="cancelFinalizeImportAll(modal)">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #finalizeMergeAllModal let-modal>
+  <div class="modal-header" id="clean_contacts__pin-modal-header">
+    <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge All & Import Contacts</h2>
+    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeMergeAll(modal)">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      By continuing without merging duplicate entries, you will be overwriting existing entries with the
+      contacts in the list presented. Would you like to continue?
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="mergeAll(modal)">
+      Import
+    </button>
+    <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
+      (click)="cancelFinalizeImportAll(modal)">
       Cancel
     </button>
   </div>

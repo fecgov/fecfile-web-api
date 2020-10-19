@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs/Subscription';
-import { Component, ViewEncapsulation, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, OnDestroy, Input, OnChanges, ViewChild } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -8,6 +8,8 @@ import { AuthService } from '../../services/AuthService/auth.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
+import { NotificationsService } from 'src/app/notifications/notifications.service';
+import { CashOnHandComponent } from '../../../forms/form-3x/cash-on-hand/cash-on-hand.component';
 
 @Component({
   selector: 'app-header',
@@ -16,18 +18,22 @@ import { DialogService } from '../../services/DialogService/dialog.service';
   encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
-  
+  @ViewChild('content') content: any;
   @Input() formType: string;
 
   public menuActive: boolean = false;
   routerSubscription: Subscription;
+  notificationsCount: number;
+  modalRef: any;
 
   constructor(
     private _messageService: MessageService,
     private _formService: FormsService,
     private _dialogService: DialogService,
     private _router: Router,
-    public _authService: AuthService
+    public _authService: AuthService,
+    public _notificationsService: NotificationsService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -52,6 +58,11 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
           this._authService.doSignOut();
         }
       }
+    });
+
+    // Get notification count
+    this._notificationsService.getTotalCount().subscribe(response => {
+      this.notificationsCount = response.notification_count;
     });
   }
 
@@ -115,5 +126,51 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
         });
       }
     });
+  }
+
+  openCOHModal(){
+    const modalRef = this.modalService.open(CashOnHandComponent);
+    modalRef.result.then(result => {
+      console.log('saved');
+      console.log(result);
+      // this._transactionsService.mirrorIEtoF24({reportId: result, transactionId: trx.transactionId}).subscribe(res => {
+      //   if(res){
+      //     this.getTransactionsPage(this.config.currentPage);
+      //     this._dialogService.confirm('Transaction has been successfully added to selected F24 report. ', ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+      //   }
+      });
+    // console.log("reportID; " + result);
+    // console.log("transactionId : " + trx.transactionId);
+    // this.open(this.content);
+  }
+
+  public open(content) {
+    this.modalRef = this.modalService.open(content, { size: 'lg', centered: true, windowClass: 'custom-class' });
+  }
+
+  goToContacts(){
+    this._router.navigate(['/contacts']).then(success => {
+      this._messageService.sendMessage({'screen':'contacts', 'action':'highlight-searchbar'});
+    });
+  }
+
+  goToTransactions(){
+    this._router.navigate([`/forms/form/global`], {
+      queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true, searchTransactions:true }
+    }).then(success => {
+      if(success){
+        this._messageService.sendMessage({'screen':'transactions', 'action':'highlight-searchbar'});
+      }
+    });
+    // this.canDeactivate().then(result => {
+    //   if (result === true) {
+    //     localStorage.removeItem(`form_${this.formType}_saved`);
+    //     this._router.navigate([`/forms/form/global`], {
+    //       queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true }
+    //     }).then(success => {
+    //       this._messageService.sendMessage({'screen':'transactions', 'action':'highlight-searchbar'});
+    //     });
+    //   }
+    // });
   }
 }

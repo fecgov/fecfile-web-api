@@ -1,0 +1,63 @@
+<div class="modal-content">
+  <div class="modal-header" id="transactions__pin-modal-header">
+    <h4 class="modal-title pull-left" style="color:black">Cash On Hand as of January 1st</h4>
+    <button aria-label="Close" class="close btn btn-link" type="button" style="color:black" (click)="closeModal()">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="container" >
+      <form [formGroup]="form">
+        <div class="row">
+          <div class="col-md-10">
+            <div class="form__container">
+              <div class="form-group headerLabel">
+                <label class="user-info" for="email">Amount
+                  <button type="button" class="btn btn-info" ngbTooltip="placeholder" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+              </div>
+              <div class="input-group inputField">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="expenditure_amount">
+                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" formControlName="amount" id="amount" (blur)="onAmountBlur($event)"
+                  style="width:60%" (focus)="showWarning()">
+              </div>
+        
+              <div class="form-group headerLabel pt-3">
+                <label class="user-info" for="email">Year
+                  <button type="button" class="btn btn-info" ngbTooltip="placeholder" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+              </div>
+              <div class="input-group inputField">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="expenditure_amount">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" formControlName="year" id="year"
+                  style="width:60%" (focus)="showWarning()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+  </div>
+  <div class="modal-footer mt-4 pb-0">
+    <button type="button" class="btn btn-right btn-secondary-gray" (click)="closeModal()">
+      Cancel
+    </button>
+    <button type="button" class="btn btn-primary btn-right" (click)="save()">
+      Save
+    </button>
+  </div>
+</div>
+</div>
