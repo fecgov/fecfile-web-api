@@ -169,8 +169,12 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
         # contacts_list_dict = pd.DataFrame.from_records(get_contact_list(cmte_id))
         contact_list = get_contact_list(cmte_id)
 
+        if contact_list is None:
+            contact_list = []
+
         compare_total_address_list = []
         compare_entity_id_list = []
+        potential_duplicate = []
 
         for contact in contact_list:
             compare_entity_id_list.append(contact.get("entity_id"))
@@ -197,67 +201,8 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                 )
             )
 
-        # traverse row by row bases
-        file_record = []
-        exact_match = []
-        potential_duplicate = []
-        moderation_score = 92
-        for index, row in test_data_final1.iterrows():
-            input_list = [
-                row["ORGANIZATION_NAME"],
-                row["PREFIX"],
-                row["FIRSTNAME"],
-                row["MIDDLENAME"],
-                row["LASTNAME"],
-                row["SUFFIX"],
-            ]
-            input_name = " ".join(filter(None, input_list))
-            input_address = " ".join(
-                filter(
-                    None,
-                    [
-                        row["STREET_1"],
-                        row["STREET_2"],
-                        row["CITY"],
-                        row["STATE"],
-                        row["ZIP"],
-                    ],
-                )
-            )
-            input_total_address_list = [" ".join(
-                [
-                    input_name,
-                    input_address,
-                    row["OCCUPATION"],
-                    row["EMPLOYER"],
-                ]
-
-            )
-            ]
-
-            inputcolumn = pandas.DataFrame(input_total_address_list)
-            inputcolumn.columns = ["Match"]
-            compare_dict = {
-                "EntityId": compare_entity_id_list,
-                "Compare": compare_total_address_list,
-            }
-            comparecolumn = pandas.DataFrame(compare_dict)
-
-            inputcolumn["Key"] = 1
-            comparecolumn["Key"] = 1
-            combined_dataframe = comparecolumn.merge(inputcolumn, on="Key", how="left")
-
-            partial_match_vector = numpy.vectorize(partial_match)
-            combined_dataframe["Score"] = partial_match_vector(
-                combined_dataframe["Match"], combined_dataframe["Compare"]
-            )
-            combined_dataframe = combined_dataframe[
-                combined_dataframe.Score >= moderation_score
-                ]
-
-            score_val = combined_dataframe["Score"].values.tolist()
-            if combined_dataframe.empty:
-
+        if len(compare_total_address_list) == 0:
+            for index, row in test_data_final1.iterrows():
                 temp_data = {
                     "entity_type": row["ENTITY_TYPE"],
                     "cmte_id": row["COMMITTEE_ID"],
@@ -283,41 +228,128 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                     temp_data["transaction_id"] = row["TRANSACTION_ID"]
                 potential_duplicate.append(temp_data)
 
-            elif 100 in score_val:
-                print("Got 100% match in DB. Removing record index.", index)
-                exact_match.append(index)
-                continue
 
-            else:
-                duplicate_list = get_list_contact(
-                    cmte_id, combined_dataframe["EntityId"].values.tolist()
+        # traverse row by row bases
+        file_record = []
+        exact_match = []
+        moderation_score = 92
+        if len(contact_list) > 0:
+            for index, row in test_data_final1.iterrows():
+                input_list = [
+                    row["ORGANIZATION_NAME"],
+                    row["PREFIX"],
+                    row["FIRSTNAME"],
+                    row["MIDDLENAME"],
+                    row["LASTNAME"],
+                    row["SUFFIX"],
+                ]
+                input_name = " ".join(filter(None, input_list))
+                input_address = " ".join(
+                    filter(
+                        None,
+                        [
+                            row["STREET_1"],
+                            row["STREET_2"],
+                            row["CITY"],
+                            row["STATE"],
+                            row["ZIP"],
+                        ],
+                    )
                 )
-                joined_string = ",".join(combined_dataframe["EntityId"].values.tolist())
+                input_total_address_list = [" ".join(
+                    [
+                        input_name,
+                        input_address,
+                        row["OCCUPATION"],
+                        row["EMPLOYER"],
+                    ]
 
-                temp_data = {
-                    "entity_type": row["ENTITY_TYPE"],
-                    "cmte_id": row["COMMITTEE_ID"],
-                    "entity_name": row["ORGANIZATION_NAME"],
-                    "first_name": row["FIRSTNAME"],
-                    "last_name": row["LASTNAME"],
-                    "middle_name": row["MIDDLENAME"],
-                    "preffix": row["PREFIX"],
-                    "suffix": row["SUFFIX"],
-                    "street_1": row["STREET_1"],
-                    "street_2": row["STREET_2"],
-                    "city": row["CITY"],
-                    "state": row["STATE"],
-                    "zip_code": row["ZIP"],
-                    "occupation": row["OCCUPATION"],
-                    "employer": row["EMPLOYER"],
-                    "duplicate_entity": joined_string,
-                    "file_selected": "",
-                    "file_name": file_name,
-                    "transaction_id": ""
+                )
+                ]
+
+                inputcolumn = pandas.DataFrame(input_total_address_list)
+                inputcolumn.columns = ["Match"]
+                compare_dict = {
+                    "EntityId": compare_entity_id_list,
+                    "Compare": compare_total_address_list,
                 }
-                if transaction_included:
-                    temp_data["transaction_id"] = row["TRANSACTION_ID"]
-                potential_duplicate.append(temp_data)
+                comparecolumn = pandas.DataFrame(compare_dict)
+
+                inputcolumn["Key"] = 1
+                comparecolumn["Key"] = 1
+                combined_dataframe = comparecolumn.merge(inputcolumn, on="Key", how="left")
+
+                partial_match_vector = numpy.vectorize(partial_match)
+                combined_dataframe["Score"] = partial_match_vector(
+                    combined_dataframe["Match"], combined_dataframe["Compare"]
+                )
+                combined_dataframe = combined_dataframe[
+                    combined_dataframe.Score >= moderation_score
+                    ]
+
+                score_val = combined_dataframe["Score"].values.tolist()
+                if combined_dataframe.empty:
+
+                    temp_data = {
+                        "entity_type": row["ENTITY_TYPE"],
+                        "cmte_id": row["COMMITTEE_ID"],
+                        "entity_name": row["ORGANIZATION_NAME"],
+                        "first_name": row["FIRSTNAME"],
+                        "last_name": row["LASTNAME"],
+                        "middle_name": row["MIDDLENAME"],
+                        "preffix": row["PREFIX"],
+                        "suffix": row["SUFFIX"],
+                        "street_1": row["STREET_1"],
+                        "street_2": row["STREET_2"],
+                        "city": row["CITY"],
+                        "state": row["STATE"],
+                        "zip_code": row["ZIP"],
+                        "occupation": row["OCCUPATION"],
+                        "employer": row["EMPLOYER"],
+                        "duplicate_entity": "",
+                        "file_selected": "true",
+                        "file_name": file_name,
+                        "transaction_id": ""
+                    }
+                    if transaction_included:
+                        temp_data["transaction_id"] = row["TRANSACTION_ID"]
+                    potential_duplicate.append(temp_data)
+
+                elif 100 in score_val:
+                    print("Got 100% match in DB. Removing record index.", index)
+                    exact_match.append(index)
+                    continue
+
+                else:
+                    duplicate_list = get_list_contact(
+                        cmte_id, combined_dataframe["EntityId"].values.tolist()
+                    )
+                    joined_string = ",".join(combined_dataframe["EntityId"].values.tolist())
+
+                    temp_data = {
+                        "entity_type": row["ENTITY_TYPE"],
+                        "cmte_id": row["COMMITTEE_ID"],
+                        "entity_name": row["ORGANIZATION_NAME"],
+                        "first_name": row["FIRSTNAME"],
+                        "last_name": row["LASTNAME"],
+                        "middle_name": row["MIDDLENAME"],
+                        "preffix": row["PREFIX"],
+                        "suffix": row["SUFFIX"],
+                        "street_1": row["STREET_1"],
+                        "street_2": row["STREET_2"],
+                        "city": row["CITY"],
+                        "state": row["STATE"],
+                        "zip_code": row["ZIP"],
+                        "occupation": row["OCCUPATION"],
+                        "employer": row["EMPLOYER"],
+                        "duplicate_entity": joined_string,
+                        "file_selected": "",
+                        "file_name": file_name,
+                        "transaction_id": ""
+                    }
+                    if transaction_included:
+                        temp_data["transaction_id"] = row["TRANSACTION_ID"]
+                    potential_duplicate.append(temp_data)
 
         create_temp_db_model(potential_duplicate, file_name, cmte_id)
 
@@ -390,7 +422,7 @@ def get_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT entity_id,street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
-                                                FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
+                                                FROM public.entity WHERE cmte_id = %s AND entity_type in ('IND', 'ORG') AND delete_ind is distinct from 'Y'"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
             contact_list = cursor.fetchall()
