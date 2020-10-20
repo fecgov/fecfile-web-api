@@ -111,34 +111,64 @@ export class UploadContactsService {
     });
   }
 
+  // /**
+  //  * Inform the backend the upload is complete.
+  //  */
+  // public uploadComplete(fileName: string): Observable<any> {
+  //   const token: string = JSON.parse(this._cookieService.get('user'));
+  //   let httpOptions = new HttpHeaders();
+  //   const url = '/contact/upload';
+
+  //   httpOptions = httpOptions.append('Content-Type', 'application/json');
+  //   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  //   const request: any = {};
+  //   request.fileName = fileName;
+
+  //   if (fileName === 'test_new.csv') {
+  //     return this._http
+  //       .get('assets/mock-data/import-contacts/upload_response_2.json', {
+  //         headers: httpOptions
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res) {
+  //             return res;
+  //           }
+  //           return false;
+  //         })
+  //       );
+  //   } else {
+  //     return this._http
+  //       .post(`${environment.apiUrl}${url}`, request, {
+  //         headers: httpOptions
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res) {
+  //             return res;
+  //           }
+  //           return false;
+  //         })
+  //       );
+  //   }
+  // }
+
   /**
-   * Inform the backend the upload is complete.
+   * Validate the contacts and check for duplicates in an uploaded file.
    */
-  public uploadComplete(fileName: string): Observable<any> {
+  public validateContacts(fileName: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/contact/upload';
+    const url = '/contact/validation';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const request: any = {};
     request.fileName = fileName;
+    request.transaction_included = false;
 
-    if (fileName === 'test_new.csv') {
-      return this._http
-        .get('assets/mock-data/import-contacts/upload_response_2.json', {
-          headers: httpOptions
-        })
-        .pipe(
-          map(res => {
-            if (res) {
-              return res;
-            }
-            return false;
-          })
-        );
-    } else {
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
@@ -151,7 +181,6 @@ export class UploadContactsService {
           return false;
         })
       );
-    }
   }
 
   /**

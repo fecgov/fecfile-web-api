@@ -7,6 +7,7 @@ import { UploadContactsService } from './service/upload-contacts.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
 import CryptoJS from 'crypto-js';
 import { S3 } from 'aws-sdk/clients/all';
+import { ModalDirective } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
 
 @Component({
   selector: 'app-upload-contacts',
@@ -33,6 +34,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public hideProcessingProgress: boolean;
   public showSpinner: boolean;
   public uploadingText: string;
+  public processingText: string;
   public duplicateFile: any;
 
   private onDestroy$: Subject<any>;
@@ -334,7 +336,12 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
           return;
         }
         this.checkForProcessingProgress();
-        this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+        // this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+        //   this.showSpinner = false;
+        //   this.emitUploadResults(res);
+        // });
+
+        this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
           this.showSpinner = false;
           this.emitUploadResults(res);
         });
@@ -351,11 +358,18 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         //   this.emitUserContacts();
         // }, 1000);
         // });
-        this.checkForProcessingProgress();
-        this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+
+        // this.checkForProcessingProgress();
+        // this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+        //   this.showSpinner = false;
+        //   this.emitUploadResults(res);
+        // });
+
+        this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
           this.showSpinner = false;
           this.emitUploadResults(res);
         });
+
       });
   }
 
@@ -489,48 +503,39 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
    * Emit a message with the user contacts to the parent.
    */
   private emitUploadResults(response: any): void {
-    let duplicateCount = 0;
-    let validationErrorCount = 0;
-    let contactsSaved = 0;
-    let duplicateContacts = [];
-    //{"Response": {"contacts_saved": 2, "contacts_failed_validation": 8, "duplicate": 97}}
-    if (response) {
 
-      if (response.Response) {
-        if (this.utilService.isNumber(response.Response.contacts_failed_validation)) {
-          validationErrorCount = response.Response.contacts_failed_validation;
-        }
-        if (this.utilService.isNumber(response.Response.duplicate)) {
-          duplicateCount = response.Response.duplicate;
-        }
-        if (this.utilService.isNumber(response.Response.contacts_saved)) {
-          contactsSaved = response.Response.contacts_saved;
-        }
+    this.uploadResultEmitter.emit(response);
 
-        if (Array.isArray(response.Response.duplicate_contacts)) {
-          duplicateContacts = response.Response.duplicate_contacts;
-        }
+    // let duplicateCount = 0;
+    // let validationErrorCount = 0;
+    // let contactsSaved = 0;
+    // let duplicateContacts = [];
 
-        //   if (response.Response.contacts_failed_validation) {
-        //     if (Array.isArray(response.Response.contacts_failed_validation)) {
-        //       validationErrorCount = response.Response.contacts_failed_validation.length;
-        //     }
-        //     if (Array.isArray(response.Response.duplicate)) {
-        //       duplicateCount = response.Response.duplicate.length;
-        //       duplicateContacts = response.Response.duplicate;
-        //     }
-        //   }
+    // if (response) {
+    //   if (response.Response) {
+    //     if (this.utilService.isNumber(response.Response.contacts_failed_validation)) {
+    //       validationErrorCount = response.Response.contacts_failed_validation;
+    //     }
+    //     if (this.utilService.isNumber(response.Response.duplicate)) {
+    //       duplicateCount = response.Response.duplicate;
+    //     }
+    //     if (this.utilService.isNumber(response.Response.contacts_saved)) {
+    //       contactsSaved = response.Response.contacts_saved;
+    //     }
 
-      }
-    }
-    this.uploadResultEmitter.emit({
-      // userContactFields: this.userContactFields,
-      duplicateContacts: duplicateContacts,
-      contactsSaved: contactsSaved,
-      duplicateCount: duplicateCount,
-      validationErrorCount: validationErrorCount,
-      // duplicateFile: this.duplicateFile
-    });
+    //     if (Array.isArray(response.Response.duplicate_contacts)) {
+    //       duplicateContacts = response.Response.duplicate_contacts;
+    //     }
+    //   }
+    // }
+    // this.uploadResultEmitter.emit({
+    //   // userContactFields: this.userContactFields,
+    //   duplicateContacts: duplicateContacts,
+    //   contactsSaved: contactsSaved,
+    //   duplicateCount: duplicateCount,
+    //   validationErrorCount: validationErrorCount,
+    //   // duplicateFile: this.duplicateFile
+    // });
   }
 
 }

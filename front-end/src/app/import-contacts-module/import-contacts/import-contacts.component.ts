@@ -1,10 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ViewChild } from '@angular/core';
 import { ImportContactsStepsEnum } from './import-contacts-setps.enum';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TimeoutMessageService } from 'src/app/shared/services/TimeoutMessageService/timeout-message-service.service';
 import { Subject } from 'rxjs';
 import { ImportContactsService } from './service/import-contacts.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ErrorContactsComponent } from './clean-contacts/error-contacts/error-contacts.component';
+import { ModalDirective } from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-import-contacts',
@@ -14,6 +17,14 @@ import { ImportContactsService } from './service/import-contacts.service';
 })
 export class ImportContactsComponent implements OnInit, OnDestroy {
 
+  @ViewChild('errorsModal')
+  public errorsModal: ModalDirective;
+
+  @ViewChild('noErrorslModal')
+  public noErrorslModal: ModalDirective;
+
+  public contactErrors: Array<any>;
+  public fileName: string;
   public steps: Array<any>;
   public currentStep: ImportContactsStepsEnum;
   public readonly start = ImportContactsStepsEnum.start;
@@ -34,6 +45,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   constructor(
     private _importContactsService: ImportContactsService,
     private _dialogService: DialogService,
+    // private _modalService: NgbModal,
     private _timeoutMessageService: TimeoutMessageService
   ) {
     _timeoutMessageService.getTimeoutMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -110,10 +122,44 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public receiveUploadResult(userContactsMessage: any) {
 
-    this.unsavedData = false;
+  public errorsAcknowleged() {
+    this.errorsModal.hide();
+    this.currentStep = this.start;
+  }
+
+  public noErrorsAcknowleged() {
+    this.noErrorslModal.hide();
     this.showNextStep();
+  }
+
+  public receiveDupeCancel() {
+    // this.cancelEmitter.emit();
+  }
+
+  public receiveUploadResult(userContactsMessage: any) {
+    this.fileName = userContactsMessage.fileName;
+    this.unsavedData = false;
+    let errorCount = 0;
+    if (Array.isArray(userContactsMessage.error_list)) {
+      errorCount = userContactsMessage.error_list.length;
+    }
+
+    if (errorCount > 0) {
+      // const modalRef = this._modalService.open(ErrorContactsComponent);
+      // modalRef.componentInstance.errorContacts = userContactsMessage.error_list;
+      // modalRef.result.then(result => {
+      //   this.unsavedData = false;
+      //   this.currentStep = this.step1Upload;
+      // });
+
+      this.contactErrors = userContactsMessage.error_list;
+      this.errorsModal.show();
+    } else {
+      this.noErrorslModal.show();
+    }
+
+
 
 
     // if (userContactsMessage.duplicateContacts) {

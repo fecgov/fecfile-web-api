@@ -31,6 +31,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
     ErrorContactsComponent,
     ErrorContactsFieldComponent,
     ReviewUploadComponent
-  ]
+  ],
+  // entryComponents: [ErrorContactsComponent]
 })
 export class ImportContactsModule { }

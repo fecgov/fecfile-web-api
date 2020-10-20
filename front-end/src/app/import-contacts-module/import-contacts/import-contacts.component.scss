@@ -74,6 +74,25 @@
  
   }
 }
+.error__contacts-modal {
+  .error-contacts__description {
+    padding: 0.5em 0;
+  }
+  #error-contacts__modal-header {
+    color: black;
+  }
+  .error-contacts__body-title {
+    padding: .75em 0 
+  }
+  .error-contacts__list {
+    max-height: 500px;
+    overflow: auto;
+  }
+  .error-contacts__error {
+    list-style-type: none; 
+    padding-top: 8px;
+  }
+}
 
 
 
