@@ -6,23 +6,25 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { FieldToCleanModel } from './model/field-to-clean.model';
 import { FieldEntryModel } from './model/field-entry.model';
+import { ImportContactModel } from '../../model/import-contact.model';
+import { DuplicateContactsService } from './service/duplicate-contacts.service';
 
 @Component({
   selector: 'app-duplicate-contacts',
   templateUrl: './duplicate-contacts.component.html',
   styleUrls: ['./duplicate-contacts.component.scss',],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   @Input()
-  public duplicates: Array<string>;
+  public fileName: string;
 
   @Output()
   public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  // public contacts: Array<any>;
+  public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
 
   // ngx-pagination config for the duplicates table of contacts
@@ -79,12 +81,13 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   constructor(
     private _importContactsService: ImportContactsService,
+    private _duplicateContactsService: DuplicateContactsService,
     private _modalService: NgbModal,
     private _utilService: UtilService
   ) { }
 
   ngOnInit() {
-    // this.contacts = [];
+    this.contacts = [];
     this.contactsSubject = new BehaviorSubject<any>([]);
     this.contacts$ = this.contactsSubject.asObservable();
     const config: PaginationInstance = {
@@ -105,13 +108,28 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
     // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
-    this._importContactsService.checkDuplicates(page).subscribe((res: any) => {
+    this._duplicateContactsService.getDuplicates_mock(page).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
       // this.contactsSubject.next(this.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
       this.numberOfPages = res.totalPages;
     });
+
+    this._duplicateContactsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
+      console.log(res);
+    });
+  }
+
+  public formatName(contact: ImportContactModel): string {
+    let name = '';
+    if (contact.type === 'IND') {
+      // TODO handle suffix and prefix
+      name = `${contact.lastName}, ${contact.firstName}`;
+    } else if (contact.type === 'ORG') {
+      name = contact.name;
+    }
+    return name;
   }
 
   public cleanContact(contact: any, modal: any) {

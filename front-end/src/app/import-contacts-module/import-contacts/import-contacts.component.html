@@ -43,9 +43,12 @@
         <!-- <app-review-upload *ngIf="currentStep === step2Review" [duplicateFile]="duplicateFile"
           (reviewEmitter)="receiveReviewAction($event)">
         </app-review-upload> -->
-        <!-- <app-clean-contacts *ngIf="currentStep === step3Clean" [duplicates]="userContacts"
+        <!-- <app-clean-contacts *ngIf="currentStep === step3Clean" [duplicates]="duplicateContacts"
           (cancelEmitter)="receiveCleanCancel()">
         </app-clean-contacts> -->
+        <app-duplicate-contacts *ngIf="currentStep === step3Clean" [fileName]="fileName"
+          (dupeCancelEmitter)="receiveDupeCancel()">
+        </app-duplicate-contacts>
         <app-import-done-contacts *ngIf="currentStep === step4ImportDone"></app-import-done-contacts>
       </div>
     </section>
@@ -60,5 +63,59 @@
         </button>
       </div> -->
     </footer>
+  </div>
+</div>
+
+<div bsModal #errorsModal="bs-modal" class="modal fade error__contacts-modal" tabindex="-1" role="dialog"
+  aria-labelledby="dialog-sizes-name1" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title pull-left" id="error-contacts__modal-header">Import Failed</h2>
+      </div>
+      <div class="modal-body">
+        <p class="error-contacts__description">The system found errors within the import file, and will not be able to
+          complete the import.
+          Please check your file and ensure formatting is correct.
+        </p>
+        <h3 class="error-contacts__body-title">Import Errors</h3>
+        <ul class="error-contacts__list">
+          <li *ngFor="let error of contactErrors; let i = index" class="error-contacts__error">
+            Error {{i + 1}}: {{error.field_name}} {{error.msg}}
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="errorsAcknowleged()">
+          Ok
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #noErrorslModal="bs-modal" class="modal fade error__contacts-modal" tabindex="-1" role="dialog"
+  aria-labelledby="dialog-sizes-name1" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title pull-left" id="error-contacts__no-errors-modal-header">Upload Complete</h2>
+      </div>
+      <div class="modal-body">
+        <p>
+          No errors were detected. Please proceed to see if your data was previously imported or
+          has any duplicate contacts.
+        </p>
+        <p><i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
+          Caution: As you proceed your data has the potential of being duplicated upon import.
+          Ensure your data integrity by opting to check the individual line items before importing.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="noErrorsAcknowleged()">
+          Ok
+        </button>
+      </div>
+    </div>
   </div>
 </div>

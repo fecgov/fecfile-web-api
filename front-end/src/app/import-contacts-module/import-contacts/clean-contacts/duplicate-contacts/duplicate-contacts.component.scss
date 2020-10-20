@@ -21,7 +21,12 @@
       .hard_left {
         position: absolute;
         left: 0; 
-        width: 2%; /* 35px */;
+        width: 2%;
+      }
+      .indent_right {
+        position: absolute;
+        left: 13px; 
+        width: 2%;
       }
       td {
         vertical-align: middle;
