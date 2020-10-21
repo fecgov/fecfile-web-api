@@ -243,7 +243,8 @@ export class F3xComponent implements OnInit, OnDestroy {
     if(this.routerEventsSubscription){
       this.routerEventsSubscription.unsubscribe();
     }
-    this._messageService.clearUpdateReportTypeMessage();
+    this._messageService.clearUpdateReportTypeMessageToReportType();
+    this._messageService.clearUpdateReportTypeMessageToReportTypeSidebar();
     this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: null}});
   }
 

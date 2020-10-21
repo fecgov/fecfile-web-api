@@ -92,7 +92,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._messageService.getUpdateReportTypeMessage().takeUntil(this.onDestroy$).subscribe((message: any) => {
+    this._messageService.getUpdateReportTypeMessageToReportTypeSidebar().takeUntil(this.onDestroy$).subscribe((message: any) => {
       if(message && message.currentReportData){
         this.reportEditMode = true;
         if(this.frmReportSidebar){
@@ -102,7 +102,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
       message = null;
     });
-    
+
   }
 
   private populateDataForEdit(message: any) {
