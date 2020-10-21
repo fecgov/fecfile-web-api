@@ -15,26 +15,17 @@ logger = logging.getLogger(__name__)
 
 def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id):
     if option_selected == "add":
-        selected_field_val = "file_selected"
-        other_option_1 = "update_db"
-        other_option_2 = "exsisting_db"
+        field_val = "file_selected"
     elif option_selected == "update":
-        selected_field_val = "update_db"
-        other_option_1 = "file_selected"
-        other_option_2 = "exsisting_db"
+        field_val = "update_db"
     elif option_selected == "exsisting":
-        selected_field_val = "exsisting_db"
-        other_option_1 = "update_db"
-        other_option_2 = "file_selected"
+        field_val = "exsisting_db"
 
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.entity_import_temp SET """ + selected_field_val + """= %s, """ + other_option_1 + """ = %s, """ + \
-                   other_option_2 + """ = %s WHERE entity_id = %s AND cmte_id = %s"""
+            _sql = """UPDATE public.entity_import_temp SET """ + field_val + """= %s WHERE entity_id = %s AND cmte_id = %s"""
             _v = (
                 user_selected_val,
-                "",
-                "",
                 entity_id,
                 cmte_id
             )
@@ -45,26 +36,6 @@ def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id
         return cursor.rowcount
     except Exception as e:
         logger.debug("Exception occurred while updating user", str(e))
-        raise e
-
-
-def check_if_all_options_selected(cmte_id, file_name):
-    try:
-        all_selected = False
-        with connection.cursor() as cursor:
-            query_string = """SELECT count(*) FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') and
-             file_selected in ('', ' ') and (update_db <> '') is not true and (exsisting_db <> '') is not true"""
-
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name])
-            row1 = cursor.fetchone()[0]
-            list(row1)
-            totalcount = row1[0]['count']
-            if totalcount == 0:
-                all_selected = True
-
-        return all_selected
-    except Exception as e:
         raise e
 
 
@@ -106,10 +77,7 @@ def merge_option(request):
                         )
                         update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
 
-                all_selected = check_if_all_options_selected(cmte_id, file_name)
-
-                return JsonResponse({'msg': 'Success', 'all_selected': all_selected}, status=status.HTTP_200_OK,
-                                    safe=False)
+                return JsonResponse({'msg': 'Success'}, status=status.HTTP_200_OK, safe=False)
 
         except Exception as e:
             json_result = {'message': str(e)}
@@ -184,7 +152,6 @@ def create_entity_update_db_model(contacts_final_dict):
     except Exception as e:
         logger.debug(e)
         raise NoOPError("Error occurred while updating bulk contacts to database.", e)
-
 
 def create_entity_db_model(contacts_final_dict):
     try:
@@ -277,7 +244,7 @@ def create_temp_contact_table(file_name):
 
     try:
         with connection.cursor() as cursor:
-            query_string = """CREATE TABLE IF NOT EXISTS public.""" + table_name + """(cmte_id character varying(9) NOT NULL,file_name character varying(200) NOT NULL,entity_id varchar(30) NOT NULL,transaction_id character varying(200) NOT NULL)"""
+            query_string = """CREATE TABLE IF NOT EXISTS public.""" +table_name+"""(cmte_id character varying(9) NOT NULL,file_name character varying(200) NOT NULL,entity_id varchar(30) NOT NULL,transaction_id character varying(200) NOT NULL)"""
             cursor.execute(query_string)
 
         return table_name
@@ -332,6 +299,7 @@ def merge_contact(request):
                 contact_added_list = []
                 contact_updated_list = []
 
+
                 add_list = get_add_contact(cmte_id, file_name)
                 update_list = get_update_contact(cmte_id, file_name, "update")
                 exsist_list = get_update_contact(cmte_id, file_name, "exsisting")
@@ -351,17 +319,15 @@ def merge_contact(request):
 
                     for exsist_contact in exsist_list:
                         old_exsist_entity_list.append({"entity_id": exsist_contact["exsisting_db"],
-                                                       "transaction_id": exsist_contact["transaction_id"],
-                                                       "file_name": exsist_contact["file_name"],
+                                                       "transaction_id": exsist_contact["transaction_id"], "file_name": exsist_contact["file_name"],
                                                        "cmte_id": cmte_id})
 
                 if transaction_included:
                     contact_new_update_list = []
                     for contact in contact_updated_list:
                         contact_new_update_list.append({"entity_id": contact["update_db"],
-                                                        "transaction_id": contact["transaction_id"],
-                                                        "file_name": contact["file_name"],
-                                                        "cmte_id": cmte_id})
+                                                       "transaction_id": contact["transaction_id"], "file_name": contact["file_name"],
+                                                       "cmte_id": cmte_id})
                     total_list.extend(contact_added_list)
                     total_list.extend(contact_new_update_list)
                     total_list.extend(old_exsist_entity_list)
@@ -384,7 +350,6 @@ def merge_contact(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
 
 def delete_import(cmte_id, file_name):
     try:
