@@ -15,17 +15,26 @@ logger = logging.getLogger(__name__)
 
 def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id):
     if option_selected == "add":
-        field_val = "file_selected"
+        selected_field_val = "file_selected"
+        other_option_1 = "update_db"
+        other_option_2 = "exsisting_db"
     elif option_selected == "update":
-        field_val = "update_db"
+        selected_field_val = "update_db"
+        other_option_1 = "file_selected"
+        other_option_2 = "exsisting_db"
     elif option_selected == "exsisting":
-        field_val = "exsisting_db"
+        selected_field_val = "exsisting_db"
+        other_option_1 = "update_db"
+        other_option_2 = "file_selected"
 
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.entity_import_temp SET """ + field_val + """= %s WHERE entity_id = %s AND cmte_id = %s"""
+            _sql = """UPDATE public.entity_import_temp SET """ + selected_field_val + """= %s, """ + other_option_1 + """ = %s, """ + \
+                   other_option_2 + """ = %s WHERE entity_id = %s AND cmte_id = %s"""
             _v = (
                 user_selected_val,
+                "",
+                "",
                 entity_id,
                 cmte_id
             )
@@ -36,6 +45,26 @@ def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id
         return cursor.rowcount
     except Exception as e:
         logger.debug("Exception occurred while updating user", str(e))
+        raise e
+
+
+def check_if_all_options_selected(cmte_id, file_name):
+    try:
+        all_selected = False
+        with connection.cursor() as cursor:
+            query_string = """SELECT count(*) FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') and
+             file_selected in ('', ' ') and (update_db <> '') is not true and (exsisting_db <> '') is not true"""
+
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name])
+            row1 = cursor.fetchone()[0]
+            list(row1)
+            totalcount = row1[0]['count']
+            if totalcount == 0:
+                all_selected = True
+
+        return all_selected
+    except Exception as e:
         raise e
 
 
@@ -77,7 +106,10 @@ def merge_option(request):
                         )
                         update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
 
-                return JsonResponse({'msg': 'Success'}, status=status.HTTP_200_OK, safe=False)
+                all_selected = check_if_all_options_selected(cmte_id, file_name)
+
+                return JsonResponse({'msg': 'Success', 'all_selected': all_selected}, status=status.HTTP_200_OK,
+                                    safe=False)
 
         except Exception as e:
             json_result = {'message': str(e)}
@@ -299,7 +331,6 @@ def merge_contact(request):
                 contact_added_list = []
                 contact_updated_list = []
 
-
                 add_list = get_add_contact(cmte_id, file_name)
                 update_list = get_update_contact(cmte_id, file_name, "update")
                 exsist_list = get_update_contact(cmte_id, file_name, "exsisting")
@@ -350,6 +381,7 @@ def merge_contact(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 def delete_import(cmte_id, file_name):
     try:

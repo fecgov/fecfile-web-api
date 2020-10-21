@@ -459,7 +459,7 @@ def get_temp_contact_list(cmte_id, file_name):
 def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
+            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') ORDER BY entity_id ASC"""
 
             trans_query_string = set_offset_n_fetch(query_string, page_num, itemsperpage)
@@ -720,6 +720,30 @@ def cancel_import(request):
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
+def get_user_selected_option(contact):
+    user_selection = ""
+    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+        user_selection = "add"
+    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+        user_selection = "update"
+    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+        user_selection = "exsisting"
+
+    return user_selection
+
+
+def get_user_selected_val(contact):
+    user_selected_val = ""
+    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+        user_selected_val = contact["file_selected"]
+    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+        user_selected_val = contact["update_db"]
+    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+        user_selected_val = contact["exsisting_db"]
+
+    return user_selected_val
+
+
 @api_view(["POST"])
 def get_duplicate_contact(request):
     try:
@@ -740,7 +764,9 @@ def get_duplicate_contact(request):
                 all_contact = [{
                     **contact,
                     'contact_from': 'file',
-                    'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(",")))
+                    'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(","))),
+                    'user_selected_option': get_user_selected_option(contact),
+                    'user_selected_value': get_user_selected_val(contact)
                 } for contact in temp_list]
 
                 total_count = get_total_count(cmte_id, file_name)
