@@ -736,6 +736,11 @@ def create_json_builders(request):
             # print("file_obj = ", file_obj)
             resp = requests.post(settings.NXG_FEC_PRINT_API_URL +
                                  settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+            if not resp.ok:
+                return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                dictprint = resp.json()
+                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
         elif call_from == "Submit":
             committeeId = request.data.get("committeeid")
             password = request.data.get('password')
@@ -798,18 +803,18 @@ def create_json_builders(request):
             # print(resp)
             # print(resp.ok)
             # print(resp.json())
-        if not resp.ok:
-            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
-        else:
-            submissionId = resp.json()['result']['submissionId']
-            submission_response = checkForReportSubmission(submissionId)
-            if (submission_response.json()['result'][0]['status'] == 'ACCEPTED'):
-                # update frontend database with Filing_id, Filed_by user
-                submission_id = submission_response.json()['result'][0]['submissionId']
-                beginning_image_number = submission_response.json()['result'][0]['beginningImageNumber']
-                fec_id = submission_response.json()['result'][0]['reportId']
-                return submit_report(request, submission_id, beginning_image_number, fec_id)
-            return JsonResponse(submission_response.json(), status=status.HTTP_201_CREATED)
+            if not resp.ok:
+                return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                submissionId = resp.json()['result']['submissionId']
+                submission_response = checkForReportSubmission(submissionId)
+                if (submission_response.json()['result'][0]['status'] == 'ACCEPTED'):
+                    # update frontend database with Filing_id, Filed_by user
+                    submission_id = submission_response.json()['result'][0]['submissionId']
+                    beginning_image_number = submission_response.json()['result'][0]['beginningImageNumber']
+                    fec_id = submission_response.json()['result'][0]['reportId']
+                    return submit_report(request, submission_id, beginning_image_number, fec_id)
+                return JsonResponse(submission_response.json(), status=status.HTTP_201_CREATED)
             # if submission_response.ok:
             #     dictprint = submission_response.json()
             #     print(dictprint)
