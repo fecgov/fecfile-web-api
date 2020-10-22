@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -34,14 +34,12 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   public reportEditMode: boolean = false;
   public currentReportDescription: string = '';
   public frmReportType: FormGroup;
-  // public fromDateSelected: boolean = false;
   public reportTypeSelected: string = null;
   public isValidType: boolean = false;
   public optionFailed: boolean = false;
   public invalidDates: boolean = false;
   public screenWidth: number = 0;
   public reportType: string = null;
-  // public toDateSelected = false;
   public tooltipPosition = 'right';
   public tooltipLeft = 'auto';
   public customFormValidation: any;
@@ -49,7 +47,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
   private _committeeDetails: any = null;
   private _dueDate: string = null;
-  private _daysUntilReportDue: number = null;
   private _formType: string = null;
   private _formReportTypeDetails: any = null;
   public fromDateSelected: string = null;
@@ -59,9 +56,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   private _selectedElectionDate: string = null;
   private _fromDateUserModified: string = null;
   private _toDateUserModified: string = null;
-  private _dateChangeSubscription: Subscription;
   private onDestroy$ = new Subject();
-  private  updateRptSubscription: Subscription  = null;
   invalidDatesServerValidation: boolean;
 
   public selectedState: string = null;
@@ -75,12 +70,12 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   public showErrors: boolean = false;
   public semiAnnualStartDate: string;
   public semiAnnualEndDate: string;
+  savedMessage: any;
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
@@ -91,33 +86,17 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _utilService:UtilService
   ) {
     
-    this._messageService.getUpdateReportTypeMessage().takeUntil(this.onDestroy$).subscribe(message => {
+    this._messageService.getUpdateReportTypeMessageToReportType().takeUntil(this.onDestroy$).subscribe(message => {
       if(message && message.currentReportData){
         this.reportEditMode = true;
         this.currentReportDescription = message.currentReportData.currentReportDescription;
         if(this.frmReportType){
-          this.frmReportType.patchValue({'reportTypeRadio': message.currentReportData.currentReportType},{onlySelf:true});
-          
-          
-          //populate coverage dates on the left 
-
-
-          let currentReport: any = this.committeeReportTypes.filter((el: { report_type: any; }) => {
-            return el.report_type === message.currentReportData.currentReportType;
-          });
-
-          //creating a deep copy
-          let currentReportDeepCopy = JSON.parse(JSON.stringify(currentReport));
-
-
-          if(currentReportDeepCopy && currentReportDeepCopy.length > 0){
-            //this will simulate a click event and set dates and other params
-            currentReportDeepCopy = currentReportDeepCopy[0];
-            this.updateTypeSelectedForEdit(currentReportDeepCopy.report_type,currentReportDeepCopy.regular_special_report_ind);
-          }
+          this.updateReportTypeFromMessage(message);
+        }
+        else{
+          this.savedMessage = message;
         }
       }
-      // message = null;
     });
 
     this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
@@ -153,6 +132,26 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
             this.setDataFor3L(res.currentData);
           }
     });
+  }
+
+  private updateReportTypeFromMessage(message: any) {
+    this.frmReportType.patchValue({ 'reportTypeRadio': message.currentReportData.currentReportType }, { onlySelf: true });
+
+
+    //populate coverage dates on the left 
+    let currentReport: any = this.committeeReportTypes.filter((el: { report_type: any; }) => {
+      return el.report_type === message.currentReportData.currentReportType;
+    });
+
+    //creating a deep copy
+    let currentReportDeepCopy = JSON.parse(JSON.stringify(currentReport));
+
+
+    if (currentReportDeepCopy && currentReportDeepCopy.length > 0) {
+      //this will simulate a click event and set dates and other params
+      currentReportDeepCopy = currentReportDeepCopy[0];
+      this.updateTypeSelectedForEdit(currentReportDeepCopy.report_type, currentReportDeepCopy.regular_special_report_ind);
+    }
   }
 
   private setData(res: any) {
@@ -233,13 +232,13 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       additionalEmail2: '',
       overDue: false
     };
+
+    if(this.savedMessage){
+      this.updateReportTypeFromMessage(this.savedMessage);
+    }
  }
 
   ngDoCheck(): void {
-    if (window.localStorage.getItem(`form_${this._formType}_reset_form`) !== null) {
-      const resetForm: boolean = JSON.parse(window.localStorage.getItem(`form_${this._formType}_reset_form`));
-    }
-
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
         if (!this.reportTypeSelected) {
@@ -320,9 +319,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   updateTypeSelectedForEdit(reportType: string, reportTypeRegularSpecialIndicator: string): void{
     if (this.editMode) {
        //also send a message to sidebar to reset form first
-       this._messageService.sendMessage({action:'clearCoverageForm', component:'coverage-sidebar'});
-       this.fromDateSelected = null;
-       this.toDateSelected = null;
+      //  this._messageService.sendMessage({action:'clearCoverageForm', component:'coverage-sidebar'});
+      //  this.fromDateSelected = null;
+      //  this.toDateSelected = null;
        this.invalidDatesServerValidation = false;
 
       this.reportTypeSelected = this.reportType = reportType;
@@ -964,7 +963,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._messageService.clearUpdateReportTypeMessage();
+    this._messageService.clearUpdateReportTypeMessageToReportType();
+    this._messageService.clearUpdateReportTypeMessageToReportTypeSidebar();
     this.onDestroy$.next(true);
   }
 }
