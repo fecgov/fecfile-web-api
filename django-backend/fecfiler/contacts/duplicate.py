@@ -556,8 +556,8 @@ def validate_contact(request):
 
                 df = df[['COMMITTEE ID', 'ENTITY TYPE', 'STREET 1', 'STREET 2',
                          'CITY', 'STATE', 'ZIP', 'EMPLOYER', 'OCCUPATION',
-                         'COMMITTEE/ORGANIZATION NAME', 'LASTNAME', 'FIRSTNAME',
-                         'MIDDLENAME', 'PREFIX', 'SUFFIX']]
+                         'ORGANIZATION NAME', 'LAST NAME', 'FIRST NAME',
+                         'MIDDLE NAME', 'PREFIX', 'SUFFIX']]
 
                 df.columns = ['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
                               'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
