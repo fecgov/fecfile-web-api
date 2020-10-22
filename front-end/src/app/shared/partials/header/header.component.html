@@ -79,9 +79,40 @@
             </div>
           </div>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
+        <li class="nav-item dropdown">
+          <div class="d-inline-block" ngbDropdown placement="bottom-left">
+            <button
+              type="button"
+              class="btn btn-link btn-height dropdown-toggle"
+              id="dropdownHelp"
+              [ngClass]="{ toggleMenuLink: menuActive === true }"
+              (click)="toggleMenu()"
+              ngbDropdownToggle
+            >
+              Help
+            </button>
+            <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
+              <a class="dropdown-item" draggable="false" target="_blank" href="http://www.fec.gov/efiling">
+                Help - Link to EFO
+              </a>
+              <a class="dropdown-item" draggable="false" (click)="openUsersnap()">
+                Feedback
+              </a>
+              <a class="dropdown-item" draggable="false">
+                User Guide
+              </a>
+              <a class="dropdown-item" draggable="false" >
+                Glossary
+              </a>
+              <a class="dropdown-item" draggable="false">
+                NextGen System Help
+              </a>
+            </div>
+          </div>
         </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
+        </li> -->
         <li class="nav-item">
             <a class="nav-link" draggable="false" [routerLink]="['/notifications']">
               <!-- <i *ngIf="!(notificationsCount > 0)" class="notifications-icon icon"></i> -->
@@ -128,59 +159,3 @@
     </div>
   </nav>
 </div>
-
-
-<!-- <ng-template #content let-c="close" let-d="dismiss">
-  <div class="signee-container" style="padding-left: 0px;padding-right:0px;">
-      <div class="modal-header">
-          <h2>Cash On Hand as of January 1st</h2>
-        </div>
-        <div class="modal-body">
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="forms__agreement-text">
-                <div class="row pb-4">
-                  <form [formGroup]="form">
-<div>
-        <div class="form__container">
-          <div class="form-group optionHeader">
-            <label class="user-info" for="email">Password</label>
-          </div>
-          <div class="form-group row form-inline">
-            <input [type]="show ? 'text' : 'password'" class="form-control" formControlName="password" id="email"
-              style="width:60%">
-            <div *ngIf="!show" class="grid-row__col grid-row__col--1 text-left">
-              <img class="eye-logo" src="assets/img/eye-icon.svg" draggable="false" (click)="showPassword()" />
-            </div>
-            <div *ngIf="show" class="grid-row__col grid-row__col--1 text-left">
-              <img class="eye-logo" src="assets/img/eye-icon-red.svg" draggable="false" (click)="showPassword()" />
-            </div>
-          </div>
-    
-          <div class="form-group optionHeader">
-            <label class="user-info" for="email">Confirm Password</label>
-          </div>
-          <div class="form-group row form-inline">
-            <input [type]="show ? 'text' : 'password'" class="form-control" formControlName="confirmPassword" id="email"
-              style="width:60%">
-            <div *ngIf="!show" class="grid-row__col grid-row__col--1 text-left">
-              <img class="eye-logo" src="assets/img/eye-icon.svg" draggable="false" (click)="showPassword()" />
-            </div>
-            <div *ngIf="show" class="grid-row__col grid-row__col--1 text-left">
-              <img class="eye-logo" src="assets/img/eye-icon-red.svg" draggable="false" (click)="showPassword()" />
-            </div>
-          </div>
-        </div>
-      </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-dark" (click)="d('Cross click')">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="!checked">Submit</button>
-        </div>
-  </div>
-</ng-template> -->

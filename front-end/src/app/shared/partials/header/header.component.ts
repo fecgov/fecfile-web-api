@@ -11,6 +11,12 @@ import { DialogService } from '../../services/DialogService/dialog.service';
 import { NotificationsService } from 'src/app/notifications/notifications.service';
 import { CashOnHandComponent } from '../../../forms/form-3x/cash-on-hand/cash-on-hand.component';
 
+declare global {
+  interface Window { Usersnap: any; }
+}
+
+window.Usersnap = window.Usersnap || {};
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -172,5 +178,9 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
     //     });
     //   }
     // });
+  }
+
+  openUsersnap(){
+    window.Usersnap.open();
   }
 }
