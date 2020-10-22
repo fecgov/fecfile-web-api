@@ -27,7 +27,7 @@ import re
 import csv
 from django.core.paginator import Paginator
 import time
-from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id)
+from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id, superceded_report_id_list)
 
 # conn = boto.connect_s3()
 
@@ -374,7 +374,8 @@ def get_f3x_summary_details(report_id, cmte_id):
                                        COALESCE(ttl_contb_ref_per_ii, 0.0) AS "34_totalContributionRefunds", COALESCE(net_contb_per, 0.0) AS "35_netContributions",
                                        COALESCE(ttl_fed_op_exp_per, 0.0) AS "36_totalFederalOperatingExpenditures", COALESCE(offsets_to_op_exp_per_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
                                        COALESCE(net_op_exp_per, 0.0) AS "38_netOperatingExpenditures"
-                                FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
+                                FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
+                                        and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'"""
 
         colB_query = """SELECT COALESCE(coh_begin_calendar_yr, 0.0) AS "6a_cashOnHandJan_1",
                                    COALESCE(ttl_receipts_sum_page_ytd, 0.0) AS "6c_totalReceipts",
@@ -402,9 +403,11 @@ def get_f3x_summary_details(report_id, cmte_id):
                                        COALESCE(ttl_contb_ref_ytd_ii, 0.0) AS "34_totalContributionRefunds", COALESCE(net_contb_ytd, 0.0) AS "35_netContributions",
                                        COALESCE(ttl_fed_op_exp_ytd, 0.0) AS "36_totalFederalOperatingExpenditures", COALESCE(offsets_to_op_exp_ytd_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
                                        COALESCE(net_op_exp_ytd, 0.0) AS "38_netOperatingExpenditures"
-                                        FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
+                                FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
+                                        and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'"""
 
-        values = [report_id, cmte_id]
+
+        values = [cvg_start_date, cmte_id]
 
         return {
             "cashOnHandYear": cashOnHandYear,
@@ -418,7 +421,7 @@ def get_f3x_summary_details(report_id, cmte_id):
         raise
 
 
-def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, transaction_id_list):
+def get_transactions(identifier, report_list, cmte_id, back_ref_transaction_id, transaction_id_list):
     try:
         query_1 = """SELECT query_string FROM public.tran_query_string WHERE tran_type_identifier = %s"""
         query_values_list_1 = [identifier]
@@ -427,14 +430,16 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
         output = json_query(query_1, query_values_list_1,
                             "tran_query_string", False)[0]
         query = output.get('query_string')
+        report_string = "t1.report_id in ('{}')".format("', '".join(report_list))
+        query = query.replace("t1.report_id = %s", report_string)
         if transaction_id_list:
             query = query + " AND transaction_id in ('{}')".format(
                 "', '".join(transaction_id_list))
         # Addressing no back_ref_transaction_id column in sched_D
         if identifier in list_of_transaction_types_with_no_back_ref:
-            query_values_list = [report_id, cmte_id]
+            query_values_list = [cmte_id]
         else:
-            query_values_list = [report_id, cmte_id,
+            query_values_list = [cmte_id,
                                  back_ref_transaction_id, back_ref_transaction_id]
         error_string = identifier + ". Get all transactions"
         # print(query)
@@ -444,14 +449,14 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
         raise
 
 
-def get_back_ref_transaction_ids(DB_table, identifier, report_id, cmte_id, transaction_id_list):
+def get_back_ref_transaction_ids(DB_table, identifier, report_list, cmte_id, transaction_id_list):
     try:
         output = []
         query = """SELECT DISTINCT(back_ref_transaction_id) FROM {} 
-            WHERE transaction_type_identifier = %s AND report_id = %s AND cmte_id = %s
-            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table,
+            WHERE transaction_type_identifier = %s AND report_id in ('{}') AND cmte_id = %s
+            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table,"', '".join(report_list),
                                                                                        "', '".join(transaction_id_list))
-        query_values_list = [identifier, report_id, cmte_id]
+        query_values_list = [identifier, cmte_id]
         results = json_query(query, query_values_list, DB_table, True)
         for result in results:
             output.append(result['back_ref_transaction_id'])
@@ -460,13 +465,14 @@ def get_back_ref_transaction_ids(DB_table, identifier, report_id, cmte_id, trans
         raise
 
 
-def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id_list):
+def get_transaction_type_identifier(DB_table, report_list, cmte_id, transaction_id_list):
     try:
         if transaction_id_list:
             # Addressing no back_ref_transaction_id column in sched_D
             # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
-            query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                DB_table, "', '".join(transaction_id_list))
+            query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}') 
+                AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
+                DB_table, "', '".join(report_list),"', '".join(transaction_id_list))
             # else:
             #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
             #         DB_table, "', '".join(transaction_id_list))
@@ -474,12 +480,14 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
             # Addressing no back_ref_transaction_id column in sched_D
             if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3",
                             "public.sched_h5", "public.sched_l"]:
-                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
-                    DB_table)
+                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}') 
+                    AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
+                    DB_table, "', '".join(report_list))
             else:
-                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
-                    DB_table)
-        query_values_list = [report_id, cmte_id]
+                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}') 
+                    AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
+                    DB_table, "', '".join(report_list))
+        query_values_list = [cmte_id]
         result = json_query(query, query_values_list, DB_table, True)
         # print(result)
         return result
@@ -650,8 +658,10 @@ def create_json_builders(request):
                     if schedule not in output['data']['schedules']:
                         output['data']['schedules'][schedule] = []
                     DB_table = "public." + schedule_name.get('sched_type')
+                    report_list = superceded_report_id_list(report_id)
+                    print(report_list)
                     list_identifier = get_transaction_type_identifier(
-                        DB_table, report_id, cmte_id, transaction_id_list)
+                        DB_table, report_list, cmte_id, transaction_id_list)
                     # print('****')
                     # print(list_identifier)
                     for identifier in list_identifier:
@@ -672,7 +682,7 @@ def create_json_builders(request):
                             # print('*****')
                             # print('parent')
                             parent_transactions = get_transactions(
-                                identifier, report_id, cmte_id, None, transaction_id_list)
+                                identifier, report_list, cmte_id, None, transaction_id_list)
                             # print(parent_transactions)
                         else:
                             # print('here')
@@ -680,10 +690,10 @@ def create_json_builders(request):
                             if transaction_id_list:
                                 parent_transactions = []
                                 back_ref_tran_id_list = get_back_ref_transaction_ids(
-                                    DB_table, identifier, report_id, cmte_id, transaction_id_list)
+                                    DB_table, identifier, report_list, cmte_id, transaction_id_list)
                                 for back_ref_tran_id in back_ref_tran_id_list:
                                     parent_transactions.extend(get_transactions(
-                                        identifier, report_id, cmte_id, back_ref_tran_id, transaction_id_list))
+                                        identifier, report_list, cmte_id, back_ref_tran_id, transaction_id_list))
                         for transaction in parent_transactions:
                             if child_identifier_list:
                                 for child_identifier in child_identifier_list:
@@ -691,7 +701,7 @@ def create_json_builders(request):
                                         'tran_identifier')
                                     if child_identifier:
                                         child_transactions = get_transactions(
-                                            child_identifier, report_id, cmte_id, transaction.get('transactionId'), [])
+                                            child_identifier, report_list, cmte_id, transaction.get('transactionId'), [])
                                         # print(child_transactions)
                                         if child_transactions:
                                             if 'child' in transaction:

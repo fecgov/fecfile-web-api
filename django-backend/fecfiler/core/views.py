@@ -2541,6 +2541,7 @@ def save_cand_entity(data, new=False):
     else:
         cand_data["entity_id"] = get_next_entity_id("CAN")
     cand_data["cmte_id"] = data.get("cmte_id")
+    cand_data["username"] = data.get("username")
     cand_data["entity_type"] = "CAN"
     logger.debug("cand_data to be saved:{}".format(cand_data))
     return put_entities(cand_data)

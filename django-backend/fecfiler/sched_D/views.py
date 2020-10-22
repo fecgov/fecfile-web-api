@@ -699,7 +699,7 @@ def put_schedD(datum):
         report_id = datum.get("report_id")
         current_close_balance = float(datum.get("balance_at_close"))
         existing_close_balance = float(
-            get_existing_close_balance(cmte_id, report_id, transaction_id)
+            get_existing_close_balance(cmte_id, transaction_id)
         )
         try:
             put_sql_schedD(datum)
@@ -722,7 +722,7 @@ def put_schedD(datum):
         raise
 
 
-def get_existing_close_balance(cmte_id, report_id, transaction_id):
+def get_existing_close_balance(cmte_id, transaction_id):
     """
     fetch existing close balance in the db for current transaction
     """
@@ -730,14 +730,17 @@ def get_existing_close_balance(cmte_id, report_id, transaction_id):
     select balance_at_close
     from public.sched_d
     where cmte_id = %s
-    and report_id = %s
     and transaction_id = %s
     """
-    _v = (cmte_id, report_id, transaction_id)
+    _v = (cmte_id, transaction_id)
     try:
         with connection.cursor() as cursor:
             cursor.execute(_sql, _v)
-            return cursor.fetchone()[0]
+            output = cursor.fetchone()
+            if output:
+                return output[0]
+            else:
+                raise Exception('the transaction id cannot be found in schedD table: ' + transaction_id)
     except:
         raise
 
@@ -990,7 +993,6 @@ def put_sql_schedD(data):
                 memo_text = %s,
                 last_update_date = %s
             WHERE transaction_id = %s 
-            AND report_id = %s 
             AND cmte_id = %s 
             AND delete_ind is distinct from 'Y';
         """
@@ -1009,7 +1011,6 @@ def put_sql_schedD(data):
         data.get("memo_text"),
         datetime.datetime.now(),
         data.get("transaction_id"),
-        data.get("report_id"),
         data.get("cmte_id"),
     )
     do_transaction(_sql, _v)
@@ -1367,13 +1368,13 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     memo_text,
                     purpose,
                     last_update_date
-            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
+            FROM public.sched_d WHERE cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'
             """
 
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                (report_id, cmte_id, transaction_id),
+                (cmte_id, transaction_id),
             )
 
             schedD_list = cursor.fetchone()[0]
