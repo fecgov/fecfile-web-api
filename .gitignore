@@ -67,3 +67,5 @@ testem.log
 Thumbs.db
 .vscode/settings.json
 front-end/.vscode/launch.json
+django-backend/fecfiler/settings.py
+.gitignore

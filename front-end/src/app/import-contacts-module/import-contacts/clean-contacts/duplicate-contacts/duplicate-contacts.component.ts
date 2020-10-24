@@ -22,6 +22,9 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public fileName: string;
 
   @Output()
+  public dupeProceedEmitter: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output()
   public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   public contacts: Array<any>;
@@ -107,27 +110,48 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
-    // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
-    this._duplicateContactsService.getDuplicates_mock(page).subscribe((res: any) => {
-      this.contactsSubject.next(res.duplicates);
-      // this.contactsSubject.next(this.duplicates);
-      this.config.totalItems = res.totalCount ? res.totalCount : 0;
-      this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
-      this.numberOfPages = res.totalPages;
-    });
+
+
+    // // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
+    // this._duplicateContactsService.getDuplicates_mock(page).subscribe((res: any) => {
+    //   this.contactsSubject.next(res.duplicates);
+    //   // this.contactsSubject.next(this.duplicates);
+    //   this.config.totalItems = res.totalCount ? res.totalCount : 0;
+    //   this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
+    //   this.numberOfPages = res.totalPages;
+    // });
 
     this._duplicateContactsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
-      console.log(res);
+
+      // temp to set selected to false until api does
+      for (const contact of res.contacts) {
+        for (const dupe of contact.contacts_from_db) {
+          // response contacts the contact from DB the user may have identified as one to merge.
+          // If user has done this, the user_selected_value on th CONTACT not the DUPE CONTACT
+          // will contain the entity id of the selected contact.
+          // Set a field on the DUPLICATE CONTACT for the UI
+          // TODO change API to set select on the dupe. For now just set the first one for devl.
+          dupe.selected = false;
+          if (contact.user_selected_value && contact.user_selected_option !== 'add') {
+            contact.contacts_from_db[0].selected = true;
+          }
+        }
+      }
+
+      this.contacts = res.contacts;
+      this.config.totalItems = res.totalcontactsCount;
+      this.config.itemsPerPage = res.itemsPerPage;
+      this.numberOfPages = res.totalPages;
     });
   }
 
-  public formatName(contact: ImportContactModel): string {
+  public formatName(contact: any): string {
     let name = '';
-    if (contact.type === 'IND') {
+    if (contact.entity_type === 'IND') {
       // TODO handle suffix and prefix
-      name = `${contact.lastName}, ${contact.firstName}`;
-    } else if (contact.type === 'ORG') {
-      name = contact.name;
+      name = `${contact.last_name}, ${contact.first_name}`;
+    } else if (contact.entity_type === 'ORG') {
+      name = contact.entity_name;
     }
     return name;
   }
@@ -146,6 +170,10 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     }
     // otherwise, no show.
     return false;
+  }
+
+  public proceed(): void {
+    this.dupeProceedEmitter.emit('ignore_dupe_save');
   }
 
 
@@ -189,7 +217,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public importAll(modal: any) {
     modal.close('close it');
-    // TODO call API to save imported data for the file ID.
+    this.dupeProceedEmitter.emit('ignore_dupe_save');
   }
 
   /////////////////////////
@@ -206,15 +234,46 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public mergeAll(modal: any) {
     modal.close('close it');
-    // TODO call API to save merged data for the file ID.
+    this.dupeProceedEmitter.emit('merge_dupe_save');
   }
 
   public cancelImportAll() {
     this.dupeCancelEmitter.emit();
+    this._duplicateContactsService.cancelImport(this.fileName).subscribe((res: any) => {
+    });
   }
 
   // TODO consider putting merge modal methods in another plain old class (not a component)
   // for code separation.
+
+
+  /**
+   * For possible duplicates with the incoming contact and the existing contacts in the system,
+   * apply the users decision on how to handle.
+   *
+   * @param contact the contact to merge
+   * @param userAction the merge action selected by the user
+   */
+  public applyMergeSelection(contact: any, userAction: string) {
+    contact.user_selected_option = userAction;
+    this._duplicateContactsService.saveUserMergeSelection(this.fileName, [contact]).subscribe((res: any) => {
+      // TODO will repsponse have the user selected data for the merge.
+      // Ask for requirement detail.
+      console.log('');
+    });
+  }
+
+
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
+  // No longer used 
 
   // Clean single contact methods start here
   // Clean single contact methods start here

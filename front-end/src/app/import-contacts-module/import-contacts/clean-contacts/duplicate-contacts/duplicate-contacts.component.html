@@ -17,15 +17,8 @@
       <table class="table table-striped table-hover clean_contacts__table">
         <thead>
           <tr>
-            <th class="hard_left"></th>
-            <!-- <th>Committee ID</th>
-            <th>Type</th>
-            <th>Committee Name/Organization</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Middle Name</th>
-            <th>Prefix</th>
-            <th>Suffix</th> -->
+            <!-- <th class="hard_left"></th> -->
+            <th></th>
             <th>Name</th>
             <th>Location</th>
             <th>Address 1</th>
@@ -43,6 +36,65 @@
           </tr>
         </thead>
         <tbody>
+          <ng-container *ngFor="let contact of contacts | paginate: config; let i = index;">
+            <tr>
+              <!-- <td class="hard_left"> -->
+              <td>
+                <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i *ngIf="!contact.user_selected_option" class="ellipsis-icon"></i>
+                    <span *ngIf="contact.user_selected_option === 'add'">Add New</span>
+                    <span *ngIf="contact.user_selected_option === 'update'">Merge & Update</span>
+                    <span *ngIf="contact.user_selected_option === 'exsisting'">Merge with Existing</span>
+                  </button>
+                  <!-- placement not working so use CSS margin-left -->
+                  <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'add')">
+                      Add New
+                    </button>
+                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'update')">
+                      Merge & Update
+                    </button>
+                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'exsisting')">
+                      Merge with Existing
+                    </button>
+                  </div>
+                </div>
+              </td>
+              <td>{{ formatName(contact) }}</td>
+              <td>Import File</td>
+              <td>{{contact.street_1}}</td>
+              <td>{{contact.street_2}}</td>
+              <td>{{contact.city}}</td>
+              <td>{{contact.state}}</td>
+              <td>{{contact.zip_code}}</td>
+              <td>{{contact.employer}}</td>
+              <td>{{contact.occupation}}</td>
+            </tr>
+            <!-- <tr>
+              <span *ngIf="contact.user_selected_option === 'add'">Add New</span>
+              <span *ngIf="contact.user_selected_option === 'update'">Merge & Update</span>
+              <span *ngIf="contact.user_selected_option === 'exsisting'">Merge with Existing</span>
+            </tr> -->
+            <tr *ngFor="let dupe of contact.contacts_from_db;">
+              <td class="indent_right">
+                <div class="radio">
+                  <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.selected"
+                    [checked]="dupe.selected === true" />
+                </div>
+              </td>
+              <td>{{ formatName(dupe) }}</td>
+              <td>Database</td>
+              <td>{{dupe.street_1}}</td>
+              <td>{{dupe.street_2}}</td>
+              <td>{{dupe.city}}</td>
+              <td>{{dupe.state}}</td>
+              <td>{{dupe.zip_code}}</td>
+              <td>{{dupe.employer}}</td>
+              <td>{{dupe.occupation}}</td>
+            </tr>
+          </ng-container>
+
           <!-- <ng-container *ngIf="contacts$">
             <ng-container *ngFor="let contact of contacts$ | async | paginate: config; let i = index;">
               <tr>
@@ -97,35 +149,54 @@
     </div>
   </div>
   <hr />
-  <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
-    <pagination-controls [id]="config.id" (pageChange)="checkDuplicates($event)">
-    </pagination-controls>
-  </div>
-  <div class="row">
-    <div class="col col-md-5">
-      <button class="btn btn-secondary btn-left clean_contacts__button"
-        (click)="confirmFinalizeImportAll(finalizeImportAllModal)">
-        Ignore All & Import
-      </button>
-      <button class="btn btn-primary btn-left clean_contacts__button"
-        (click)="confirmFinalizeMergeAll(finalizeMergeAllModal)">
-        Merge All & Import
-      </button>
-      <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
-        Cancel Import
-      </button>
+  <ng-container *ngIf="contacts.length > 0">
+    <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
+      <pagination-controls [id]="config.id" (pageChange)="checkDuplicates($event)">
+      </pagination-controls>
     </div>
-    <div class="col col-md-5">
-      <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
-      <p class="clean_contacts__ignore-text">Caution: If you Merge or Ignore all, your data may be corrupted upon
-        Import. Ensure your data integrity by
-        opting to check the individual line items for Merge or Ignore.</p>
+    <div class="row">
+      <div class="col col-md-5">
+        <button class="btn btn-secondary btn-left clean_contacts__button"
+          (click)="confirmFinalizeImportAll(finalizeImportAllModal)">
+          Ignore All & Import
+        </button>
+        <button class="btn btn-primary btn-left clean_contacts__button"
+          (click)="confirmFinalizeMergeAll(finalizeMergeAllModal)">
+          Merge All & Import
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+          Cancel Import
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="checkDuplicates(1)">
+          Reload Dupes for DEV
+        </button>
+      </div>
+      <div class="col col-md-5">
+        <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
+        <p class="clean_contacts__ignore-text">Caution: If you Merge or Ignore all, your data may be corrupted upon
+          Import. Ensure your data integrity by
+          opting to check the individual line items for Merge or Ignore.</p>
+      </div>
     </div>
-  </div>
+  </ng-container>
+  <ng-container *ngIf="contacts.length === 0">
+    <div class="clean_contacts__no-dupes text-center">No Duplicates Found</div>
+    <hr />
+    <div class="row">
+      <div class="col col-md-5">
+        <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
+          Proceed
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+          Cancel Import
+        </button>
+      </div>
+    </div>
+  </ng-container>
 </div>
 
 <ng-template #mergeContactsModal let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
+  <div class="modal-header" id="clean_contacts__pin-modal-header_1">
     <h1 class="modal-title pull-left clean_contacts__merge-title">Merge Contacts</h1>
     <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelMerge(modal)">
       <span aria-hidden="true">×</span>
@@ -222,7 +293,7 @@
 </ng-template>
 
 <ng-template #finalizeMergeModal let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
+  <div class="modal-header" id="clean_contacts__pin-modal-header_2">
     <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge</h2>
     <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeMerge(modal)">
       <span aria-hidden="true">×</span>
@@ -246,7 +317,7 @@
 </ng-template>
 
 <ng-template #finalizeImportAllModal let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
+  <div class="modal-header" id="clean_contacts__pin-modal-header_3">
     <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Ignore All & Import Contacts</h2>
     <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeImportAll(modal)">
       <span aria-hidden="true">×</span>
@@ -270,7 +341,7 @@
 </ng-template>
 
 <ng-template #finalizeMergeAllModal let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
+  <div class="modal-header" id="clean_contacts__pin-modal-header_4">
     <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge All & Import Contacts</h2>
     <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeMergeAll(modal)">
       <span aria-hidden="true">×</span>

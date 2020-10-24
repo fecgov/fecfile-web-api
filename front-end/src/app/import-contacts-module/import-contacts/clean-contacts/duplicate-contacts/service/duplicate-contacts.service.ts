@@ -48,6 +48,134 @@ export class DuplicateContactsService {
       );
   }
 
+  /**
+   * Save contacts in the file and ignore dupes if any.
+   */
+  public saveContactIgnoreDupes(fileName: string, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/ignore/merge';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.transaction_included = transactionIncluded;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  /**
+   * Merge the user selections on all contacts in the import.
+   */
+  public mergeAll(fileName: string, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/merge/save';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.transaction_included = transactionIncluded;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+
+  /**
+   * Save user selected merge option.
+   * @param fileName
+   * @param contacts 
+   */
+  public saveUserMergeSelection(fileName: string, contacts: Array<any>) {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/merge/options';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const contactsToMerge = [];
+    for (const contact of contacts) {
+      // val set to true for a new contact else use entity ID.
+      const val = contact.user_selected_option !== 'add' ? contact.entity_id : 'true';
+      contactsToMerge.push({
+        entity_id: contact.entity_id,
+        selected: contact.user_selected_option,
+        val: val
+      });
+    }
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.merge_option = contactsToMerge;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  /**
+   * Cancel the import.
+   */
+  public cancelImport(fileName: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/cancel/import';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
 
   public getDuplicates_mock(page: number): Observable<any> {
     let httpOptions = new HttpHeaders();
@@ -91,10 +219,10 @@ export class DuplicateContactsService {
 
 
   /**
- * Map server fields from the response to the model.
- *
- * TODO The API should be changed to pass the property names expected by the front end.
- */
+   * Map server fields from the response to the model.
+   *
+   * TODO The API should be changed to pass the property names expected by the front end.
+   */
   public mapAllDupesFromServerFields(serverData: any): Array<DuplicateContactModel> {
     const modelArray: Array<DuplicateContactModel> = [];
     if (!serverData || !Array.isArray(serverData)) {

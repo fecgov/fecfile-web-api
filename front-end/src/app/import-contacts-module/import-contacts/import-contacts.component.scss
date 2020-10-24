@@ -81,6 +81,13 @@
   #error-contacts__modal-header {
     color: black;
   }
+  #error-contacts__modal-header_1, #error-contacts__modal-header_2 {
+    background-color: $primaryBlue;
+    color: $white;
+    span {
+      color: $white;
+    }
+  }
   .error-contacts__body-title {
     padding: .75em 0 
   }

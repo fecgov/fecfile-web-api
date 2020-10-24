@@ -47,9 +47,11 @@
           (cancelEmitter)="receiveCleanCancel()">
         </app-clean-contacts> -->
         <app-duplicate-contacts *ngIf="currentStep === step3Clean" [fileName]="fileName"
-          (dupeCancelEmitter)="receiveDupeCancel()">
+          (dupeProceedEmitter)="receiveDupeProceed($event)" (dupeCancelEmitter)="receiveDupeCancel()">
         </app-duplicate-contacts>
-        <app-import-done-contacts *ngIf="currentStep === step4ImportDone"></app-import-done-contacts>
+        <app-import-done-contacts *ngIf="currentStep === step4ImportDone" [fileName]="fileName"
+          [action]="importDoneAction">
+        </app-import-done-contacts>
       </div>
     </section>
     <footer>
@@ -70,8 +72,8 @@
   aria-labelledby="dialog-sizes-name1" [config]="{backdrop: 'static'}">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title pull-left" id="error-contacts__modal-header">Import Failed</h2>
+      <div class="modal-header" id="error-contacts__modal-header_1">
+        <h2 class="modal-title pull-left">Import Failed</h2>
       </div>
       <div class="modal-body">
         <p class="error-contacts__description">The system found errors within the import file, and will not be able to
@@ -96,10 +98,10 @@
 
 <div bsModal #noErrorslModal="bs-modal" class="modal fade error__contacts-modal" tabindex="-1" role="dialog"
   aria-labelledby="dialog-sizes-name1" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title pull-left" id="error-contacts__no-errors-modal-header">Upload Complete</h2>
+      <div class="modal-header" id="error-contacts__modal-header_2">
+        <h2 class="modal-title pull-left">Upload Complete</h2>
       </div>
       <div class="modal-body">
         <p>
