@@ -1,21 +1,42 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Router } from '@angular/router';
+import { DuplicateContactsService } from '../clean-contacts/duplicate-contacts/service/duplicate-contacts.service';
 
 @Component({
   selector: 'app-import-done-contacts',
   templateUrl: './import-done-contacts.component.html',
   styleUrls: ['./import-done-contacts.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImportDoneContactsComponent implements OnInit {
 
-  constructor(private _router: Router) { }
+  @Input()
+  public fileName: string;
+
+  @Input()
+  public action: string;
+
+  public done: boolean;
+
+  constructor(private _router: Router,
+    private _duplicateContactsService: DuplicateContactsService) { }
 
   ngOnInit() {
-    setTimeout(() => {
-      this._router.navigate([`/contacts`]);
-    }, 2000);
+    this.done = false;
+    if (this.action === 'ignore_dupe_save') {
+      this._duplicateContactsService.saveContactIgnoreDupes(this.fileName, false).subscribe((res: any) => {
+        this.done = true;
+      });
+    } else if (this.action === 'merge_dupe_save') {
+      this._duplicateContactsService.mergeAll(this.fileName, false).subscribe((res: any) => {
+      });
+    }
+
+  }
+
+  public viewContacts() {
+    this._router.navigate([`/notifications`]);
   }
 
 }

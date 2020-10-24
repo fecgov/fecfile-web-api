@@ -1,8 +1,18 @@
 <div class="import_done_contacts__container">
-  <div class="import_done_contacts__complete">
-    Your Import is now Complete!
-    <br>
-    You will now be automatically taken to your Contact Database on FECfile.
+
+  <div *ngIf="!done" class="import_done_contacts__spinner_container_outer">
+    <p>
+      The system is now importing your import file.
+      Depending upon the size of your import file the process may run for
+      a few minutes. Once the import is complete you will also receive a
+      notice in the Notifications section.
+    </p>
+    <div class="import_done_contacts__spinner_container">
+      <app-spinner></app-spinner>
+    </div>
+  </div>
+  <div *ngIf="done" class="import_done_contacts__complete" (click)="viewContacts()">
+    Your Import is now Complete. Click here to View.
   </div>
   <p>
 </div>

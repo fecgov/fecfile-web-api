@@ -8,6 +8,7 @@ import { ImportContactsService } from './service/import-contacts.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ErrorContactsComponent } from './clean-contacts/error-contacts/error-contacts.component';
 import { ModalDirective } from 'ngx-bootstrap';
+import { DuplicateContactsService } from './clean-contacts/duplicate-contacts/service/duplicate-contacts.service';
 
 @Component({
   selector: 'app-import-contacts',
@@ -36,6 +37,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   public duplicateContacts: Array<any>;
   public forceChangeDetectionUpload: Date;
   public duplicateFile: any;
+  public importDoneAction: string;
 
   private unsavedData: boolean;
   private onDestroy$ = new Subject();
@@ -43,7 +45,6 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   private duplicatesExist: boolean;
 
   constructor(
-    private _importContactsService: ImportContactsService,
     private _dialogService: DialogService,
     // private _modalService: NgbModal,
     private _timeoutMessageService: TimeoutMessageService
@@ -133,8 +134,15 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     this.showNextStep();
   }
 
+  public receiveDupeProceed(importDoneAction: string) {
+    this.importDoneAction = importDoneAction;
+    this.showNextStep();
+  }
+
   public receiveDupeCancel() {
+    // TODO call cancel API
     // this.cancelEmitter.emit();
+    this.currentStep = this.start;
   }
 
   public receiveUploadResult(userContactsMessage: any) {

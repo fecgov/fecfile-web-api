@@ -4,4 +4,13 @@
     text-align: center;
     font-size: 26px;
   }
+  .import_done_contacts__spinner_container_outer {
+    padding-top: 2em;
+    .import_done_contacts__spinner_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // height: 200px;
+    }
+  }
 }

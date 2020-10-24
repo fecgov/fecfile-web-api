@@ -9,8 +9,8 @@
   .clean_contacts__table-inner {
     overflow-x: auto;
     overflow-y: visible;
-    max-width: 96%; /* 1420px; */
-    margin-left: 4% /* 67px; */;
+    /* max-width: 96%;
+    margin-left: 4%; */
 
     table {
       table-layout: fixed;
@@ -24,12 +24,18 @@
         width: 2%;
       }
       .indent_right {
+        /*
         position: absolute;
         left: 13px; 
         width: 2%;
+        */
+        padding-left: 32px;
       }
       td {
         vertical-align: middle;
+      }
+      #contacts__dropdown-action {
+        margin-left: 3.5em
       }
     }
   }
@@ -79,13 +85,21 @@
     color: $fecRed;
     float: left;
   }
+
+  .clean_contacts__no-dupes {
+    text-align: center;
+    padding: 3em 0;
+    font-size: 25px;
+    font-weight: bold;
+  }
 }
 
 .modal {
   .modal-lg, .modal-xl {
     max-width: 95%;
   }
-  #clean_contacts__pin-modal-header {
+  #clean_contacts__pin-modal-header_1, #clean_contacts__pin-modal-header_2,
+  #clean_contacts__pin-modal-header_3, #clean_contacts__pin-modal-header_4 {
     background-color: $primaryBlue;
     color: $white;
     span {
