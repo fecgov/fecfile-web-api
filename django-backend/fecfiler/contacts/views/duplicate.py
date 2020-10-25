@@ -461,7 +461,7 @@ def get_temp_contact_list(cmte_id, file_name):
 def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
+            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db as user_selected_value, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') ORDER BY entity_id ASC"""
 
             trans_query_string = set_offset_n_fetch(query_string, page_num, itemsperpage)
@@ -477,6 +477,29 @@ def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage)
     except Exception as e:
         raise e
 
+def check_temp_contact_list_done(cmte_id, file_name):
+    try:
+        sql_count = """
+            select count(1) as count_not_done
+            from public.entity_import_temp 
+            where cmte_id = %(cmte_id)s and file_name = %(file_name)s
+            and length(file_selected) = 0
+        """
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id,
+                "file_name": file_name   
+            })
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count_not_done']
+
+        if totalcount > 0:
+            return False
+
+        return True
+    except Exception as e:
+        raise e
 
 def get_total_count(cmte_id, file_name):
     try:
@@ -723,28 +746,38 @@ def cancel_import(request):
 
 
 def get_user_selected_option(contact):
-    user_selection = ""
-    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
-        user_selection = "add"
-    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
-        user_selection = "update"
-    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
-        user_selection = "exsisting"
+    # user_selection = ""
+    # if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+    #     user_selection = "add"
+    # elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+    #     user_selection = "update"
+    # elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+    #     user_selection = "exsisting"
+    user_selection = contact["file_selected"]
 
     return user_selection
 
 
 def get_user_selected_val(contact):
     user_selected_val = ""
-    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
-        user_selected_val = contact["file_selected"]
-    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
-        user_selected_val = contact["update_db"]
-    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
-        user_selected_val = contact["exsisting_db"]
+    # if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+    #     user_selected_val = contact["file_selected"]
+    # elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+    #     user_selected_val = contact["update_db"]
+    # elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+    #     user_selected_val = contact["exsisting_db"]
+    if contact["file_selected"] is not None and contact["file_selected"] != 'add':
+        user_selected_val = contact["user_selected_value"]
 
     return user_selected_val
 
+def get_contacts_from_db(cmte_id, file_contact):
+    db_contacts = get_list_contact(cmte_id, list(file_contact['duplicate_entity'].split(",")))
+    for db_contact in db_contacts:
+        if (db_contact["entity_id"] == file_contact["user_selected_value"]):
+            db_contact["user_selected_value"] = True
+        else:
+            db_contact["user_selected_value"] = False
 
 @api_view(["POST"])
 def get_duplicate_contact(request):
@@ -766,18 +799,19 @@ def get_duplicate_contact(request):
                 all_contact = [{
                     **contact,
                     'contact_from': 'file',
-                    'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(","))),
-                    'user_selected_option': get_user_selected_option(contact),
+                    # 'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(","))),
+                    'contacts_from_db': get_contacts_from_db(cmte_id, contact),
+                    'user_selected_option': contact["file_selected"]
                     # 'user_selected_value': get_user_selected_val(contact)
-                    'user_selected_value': contact['duplicate_entity']
                 } for contact in temp_list]
+                all_done = check_temp_contact_list_done(cmte_id, file_name)
 
                 total_count = get_total_count(cmte_id, file_name)
                 numofpages = get_num_of_pages(int(total_count), int(itemsperpage))
 
                 response = {
                     "contacts": list(all_contact),
-                    "allSelected": true, 
+                    "allDone": all_done, 
                     "totalcontactsCount": total_count,
                     "itemsPerPage": itemsperpage,
                     "pageNumber": page_num,
