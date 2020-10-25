@@ -26,6 +26,10 @@
             text-decoration: none;
           }
         }
+        .import_contacts__header-2 {
+          font-size: 2em;
+          padding-left: .5em;
+        }
       }
       .header-content-sep {
         margin: 2px auto;
@@ -43,7 +47,20 @@
       .import_contacts__body {
         margin: 2px auto;
         width: 98%;
-        padding: .75em 0 .25em 0;
+        padding: .75em 0 4em 0;
+        .import_contacts__heading {
+          padding: 40px 0 20px 0;
+        }
+        .import_contacts__begin-import-msg {
+          padding: 5px 0;
+        }
+        .import_contacts__begin-import-links li {
+          padding: 5px 0 5px 25px;
+          list-style-type: none;
+        }
+        .import_contacts__import-directions {
+          padding-left: 25px;
+        }
       }
     }
     footer {
