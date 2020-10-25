@@ -53,7 +53,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public readonly duplicatePlaceHolder = 'dupe placeholder';
 
-  public mergePage: number;
+  public mergePage: number = 1;
   public mergePaginateConfig: PaginationInstance = {
     id: 'merge_dupes',
     itemsPerPage: 2,
