@@ -7,6 +7,9 @@
             <div class="float-left">
               <h1>Import Contacts</h1>
             </div>
+            <div class="float-left">
+              <div class="import_contacts__header-2">(Importing Contact data into FECfile)</div>
+            </div>
             <div class="float-left import_contacts__info" (click)="showInfo()">For more
               information click here
               <i class="info-icon" aria-hidden="true"></i>
@@ -25,15 +28,64 @@
       </div>
       <div class="import_contacts__body">
         <div *ngIf="currentStep === start">
-          <h4 style="color:brown">"FOLLOWING INFORMATION BELOW IS PLACEHOLDER AND WILL BE UPDATED."</h4>
-          <br><br>
-          <h4>To Begin Importing</h4>
-          <p>You can start your Import by taking 1 of the 3 actions provided below:</p>
-          <ul style="list-style-type:none">
-            <li (click)="beginUpload()">Begin Upload</li>
-            <li (click)="viewFormatSpecs()">View Format Specs</li>
-            <li (click)="viewCsvTemplate()">View CSV Template</li>
+          <h3 class="import_contacts__heading">To Begin Importing</h3>
+          <div class="import_contacts__begin-import-msg">
+            You can start your Import by taking clicking "Begin Upload" below, 
+            or by taking any of the additional actions  provided below:
+          </div>
+          <ul class="import_contacts__begin-import-links">
+            <li><a (click)="beginUpload()">Begin Upload</a></li>
+            <li (click)="viewFormatSpecs()">Template & Contact Specs containing all the fields</li>
           </ul>
+          <h3 class="import_contacts__heading"> Importing Files</h3>
+          <div class="import_contacts__import-directions">
+              1.  At the top right of the screen, select "Tools" and then "Import Contacts," or from the Contacts Screen (Top Menu/Contacts) you can select the "Import" Tab. You will then be taken to
+              the Import Tranactions Landing Page (this page).
+              <br><br>
+              2.  Click "Begin Upload" to navigate to the Upload Page.
+              <br><br>
+              3.  Locate your import file using your computer's file explorer, and drag and drop that file into the grey-shaded area, or use the "Upload" button to open the file explorer to locate the
+                    file you would like to upload.  The import file should have a .CSV extension, or it wil not be accepted.
+              <br><br>        
+              4.  Once the upload begins the file will be scanned for formatting errors. If there are any errors the upload will be cancelled and an error message will be displayed listing all of the          
+                    errors found. If no errors are found you will proceed to the "Clean" page.
+              <br><br>
+              5.  Next the the system will scan for duplicate contact entries within the file against your contacts database. If there are possible duplicate contact entries, you will be taken to the Clean
+          
+                    Screen to select which contact entries you would like to keep or merge. You wil also have the option to ignore the process allowing for duplicate entries from the uploaded file and
+          
+                    your current contact database to exist. If no duplicates exist, the screen will display the text: "No Duplicates found."  
+              <br><br>          
+              6.  The Import will begin after the previous step is completed.  A loader with the a completion percentage will be displayed to allow the user to visually assess the progress of the import.          
+                    Once the import is complete the user can navigate to the Notifications Modal (Top Menu/Notifications)  to view the Import and others via the link provided.
+          </div>
+          <h3 class="import_contacts__heading">How to enter data into the CSV templates</h3>
+          <div>
+            When entering data into a CSV template, ensure the fields within the template match with what you are 
+            planning to import. CSV files will not always save information within the CSV format, so you may need to 
+            save the file as an excel document first, and then when complete save in a CSV format. Further Import 
+            Instructions and Information is provided below.
+          </div>
+          <h3 class="import_contacts__heading">Additional Import Information and Instructions</h3>
+          <div class="import_contacts__import-directions">
+              a. Always clean the Contacts Database for possible duplicates.
+              <br><br>
+              b. You can only attach only 1 CSV file at a time.
+              <br><br>
+              c. You can only import Individual & Organization entities.
+              <br><br>
+              d. Zip codes: If the user wants to do the 5+4 zip code they should be instructed to not include a hyphen (-).
+              <br><br>
+              e. Always refer to the Contacts Specs for required fields.
+              <br><br>
+              f.  Once a contact has been imported and saved to the Committee’s Contacts Database, a filer will be able to pull that contact’s information while entering transactions.
+              <br><br>
+              g. Filer must always include their Committee ID for each contact row.
+              <br><br>
+              <ul style="padding-left: 60px;">
+                <li>Committee ID column must have the same ID for this file.</li>
+              </ul>
+          </div>
         </div>
         <app-upload-contacts *ngIf="currentStep === step1Upload" [forceChangeDetection]="forceChangeDetectionUpload"
           (uploadResultEmitter)="receiveUploadResult($event)">
