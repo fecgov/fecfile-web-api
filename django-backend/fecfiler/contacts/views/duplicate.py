@@ -20,7 +20,7 @@ from rest_framework.decorators import api_view
 from s3transfer import S3Transfer
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
-from fecfiler.contacts.merge import create_temp_transaction_association_model, create_temp_contact_table
+from fecfiler.contacts.views.merge import create_temp_transaction_association_model, create_temp_contact_table
 from fecfiler.core.views import get_comittee_id, NoOPError, get_next_entity_id, check_null_value, partial_match, \
     get_list_contact, set_offset_n_fetch, get_num_of_pages
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -352,6 +352,7 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                     potential_duplicate.append(temp_data)
 
         create_temp_db_model(potential_duplicate, file_name, cmte_id)
+        # create_temp_db_model(contact_list, file_name, cmte_id)
 
         data = {"errors": error_list, "data_clean": data_clean, "duplicate_db_count": len(exact_match)}
         return data
@@ -444,12 +445,13 @@ def get_temp_contact_list(cmte_id, file_name):
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name])
-            contact_list = cursor.fetchall()
-            if not contact_list:
-                raise NoOPError("No entity found for cmte_id {} ".format(cmte_id))
-            merged_list = []
-            for dictL in contact_list:
-                merged_list = dictL[0]
+            result = cursor.fetchall()
+            # if not contact_list:
+            #     raise NoOPError("No entity found for cmte_id {} ".format(cmte_id))
+            # merged_list = []
+            merged_list = [] if not result[0][0] else result[0][0]
+            # for dictL in contact_list:
+            #     merged_list = dictL[0]
 
         return merged_list
     except Exception as e:
@@ -766,7 +768,8 @@ def get_duplicate_contact(request):
                     'contact_from': 'file',
                     'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(","))),
                     'user_selected_option': get_user_selected_option(contact),
-                    'user_selected_value': get_user_selected_val(contact)
+                    # 'user_selected_value': get_user_selected_val(contact)
+                    'user_selected_value': contact['duplicate_entity']
                 } for contact in temp_list]
 
                 total_count = get_total_count(cmte_id, file_name)
@@ -774,6 +777,7 @@ def get_duplicate_contact(request):
 
                 response = {
                     "contacts": list(all_contact),
+                    "allSelected": true, 
                     "totalcontactsCount": total_count,
                     "itemsPerPage": itemsperpage,
                     "pageNumber": page_num,
