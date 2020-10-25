@@ -28,11 +28,15 @@
         position: absolute;
         left: 13px; 
         width: 2%;
-        */
         padding-left: 32px;
+        */
+        text-align: center;
       }
       td {
         vertical-align: middle;
+      }
+      .contacts__action-button {
+        width: 11em;
       }
       #contacts__dropdown-action {
         margin-left: 3.5em
@@ -76,6 +80,11 @@
   .clean_contacts__canel-button {
     background-color: $fecRed;
     color: white;
+  }
+
+  #clean_contacts__merge-all-button[disabled] {
+    background:#6c757d;
+    border-color: #6c757d;
   }
 
   .clean_contacts__ignore-warn {
