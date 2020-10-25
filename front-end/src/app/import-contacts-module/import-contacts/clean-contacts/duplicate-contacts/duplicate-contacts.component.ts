@@ -264,11 +264,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
    */
   public applyMergeSelection(contact: any, userAction: string) {
     contact.user_selected_option = userAction;
-    this._duplicateContactsService.saveUserMergeSelection(this.fileName, [contact]).subscribe((res: any) => {
-      // TODO will repsponse have the user selected data for the merge.
-      // Ask for requirement detail.
-      console.log('');
-    });
+    this._duplicateContactsService.saveUserMergeSelection(this.fileName, contact).subscribe((res: any) => {});
   }
 
   // No longer used
