@@ -778,6 +778,7 @@ def get_contacts_from_db(cmte_id, file_contact):
             db_contact["user_selected_value"] = True
         else:
             db_contact["user_selected_value"] = False
+    return db_contacts
 
 @api_view(["POST"])
 def get_duplicate_contact(request):
