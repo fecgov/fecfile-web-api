@@ -12,11 +12,7 @@ import { ImportContactModel } from '../../../model/import-contact.model';
   providedIn: 'root'
 })
 export class DuplicateContactsService {
-
-  constructor(
-    private _http: HttpClient,
-    private _cookieService: CookieService
-  ) { }
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
   /**
    * Get duplicates for the file and page.
@@ -106,13 +102,12 @@ export class DuplicateContactsService {
       );
   }
 
-
   /**
    * Save user selected merge option.
    * @param fileName
-   * @param contacts 
+   * @param contacts
    */
-  public saveUserMergeSelection(fileName: string, contacts: Array<any>) {
+  public saveUserMergeSelection(fileName: string, contact: any) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/contact/merge/options';
@@ -120,20 +115,23 @@ export class DuplicateContactsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const contactsToMerge = [];
-    for (const contact of contacts) {
-      // val set to true for a new contact else use entity ID.
-      const val = contact.user_selected_option !== 'add' ? contact.entity_id : 'true';
-      contactsToMerge.push({
-        entity_id: contact.entity_id,
-        selected: contact.user_selected_option,
-        val: val
-      });
+    let dupeEntityId = null;
+    if (contact.user_selected_option !== 'add') {
+      for (const dupe of contact.contacts_from_db) {
+        if (dupe.user_selected_value) {
+          dupeEntityId = dupe.entity_id;
+        }
+      }
     }
+
+    const mergeOption: any = {};
+    mergeOption.user_selected_option = contact.user_selected_option;
+    mergeOption.file_record_id = contact.entity_id;
+    mergeOption.db_entity_id = dupeEntityId;
 
     const request: any = {};
     request.fileName = fileName;
-    request.merge_option = contactsToMerge;
+    request.merge_option = mergeOption;
 
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
@@ -217,7 +215,6 @@ export class DuplicateContactsService {
     }
   }
 
-
   /**
    * Map server fields from the response to the model.
    *
@@ -273,5 +270,4 @@ export class DuplicateContactsService {
 
     return model;
   }
-
 }
