@@ -41,7 +41,7 @@
               <!-- <td class="hard_left"> -->
               <td>
                 <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                  <button class="btn btn-sm btn-primary contacts__action-button" ngbDropdownToggle>
                     <i *ngIf="!contact.user_selected_option" class="ellipsis-icon"></i>
                     <span *ngIf="contact.user_selected_option === 'add'">Add New</span>
                     <span *ngIf="contact.user_selected_option === 'update'">Merge & Update</span>
@@ -79,8 +79,8 @@
             <tr *ngFor="let dupe of contact.contacts_from_db;">
               <td class="indent_right">
                 <div class="radio">
-                  <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.selected"
-                    [checked]="dupe.selected === true" />
+                  <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.user_selected_value"
+                    [checked]="dupe.user_selected_value === true" />
                 </div>
               </td>
               <td>{{ formatName(dupe) }}</td>
@@ -160,7 +160,8 @@
           (click)="confirmFinalizeImportAll(finalizeImportAllModal)">
           Ignore All & Import
         </button>
-        <button class="btn btn-primary btn-left clean_contacts__button"
+        <button [disabled]="!allDupesSelected" class="btn btn-primary btn-left clean_contacts__button"
+          id="clean_contacts__merge-all-button"
           (click)="confirmFinalizeMergeAll(finalizeMergeAllModal)">
           Merge All & Import
         </button>
