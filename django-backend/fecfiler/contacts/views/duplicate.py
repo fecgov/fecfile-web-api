@@ -20,7 +20,8 @@ from rest_framework.decorators import api_view
 from s3transfer import S3Transfer
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
-from fecfiler.contacts.views.merge import create_temp_transaction_association_model, create_temp_contact_table
+from fecfiler.contacts.views.merge import create_temp_transaction_association_model, create_temp_contact_table, \
+    check_temp_contact_list_done
 from fecfiler.core.views import get_comittee_id, NoOPError, get_next_entity_id, check_null_value, partial_match, \
     get_list_contact, set_offset_n_fetch, get_num_of_pages
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -474,30 +475,6 @@ def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage)
                 forms_obj = []
 
         return forms_obj
-    except Exception as e:
-        raise e
-
-def check_temp_contact_list_done(cmte_id, file_name):
-    try:
-        sql_count = """
-            select count(1) as count_not_done
-            from public.entity_import_temp 
-            where cmte_id = %(cmte_id)s and file_name = %(file_name)s
-            and length(file_selected) = 0
-        """
-        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
-        with connection.cursor() as cursor:
-            cursor.execute(sql, {
-                "cmte_id": cmte_id,
-                "file_name": file_name   
-            })
-            row1=cursor.fetchone()[0]
-            totalcount =  row1[0]['count_not_done']
-
-        if totalcount > 0:
-            return False
-
-        return True
     except Exception as e:
         raise e
 

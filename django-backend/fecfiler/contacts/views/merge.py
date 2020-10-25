@@ -67,6 +67,29 @@ def check_if_all_options_selected(cmte_id, file_name):
     except Exception as e:
         raise e
 
+def check_temp_contact_list_done(cmte_id, file_name):
+    try:
+        sql_count = """
+            select count(1) as count_not_done
+            from public.entity_import_temp 
+            where cmte_id = %(cmte_id)s and file_name = %(file_name)s
+            and length(file_selected) = 0
+        """
+        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql, {
+                "cmte_id": cmte_id,
+                "file_name": file_name   
+            })
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count_not_done']
+
+        if totalcount > 0:
+            return False
+
+        return True
+    except Exception as e:
+        raise e
 
 @api_view(["POST"])
 def merge_option(request):
@@ -128,8 +151,9 @@ def merge_option(request):
                 #         update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
 
                 # all_selected = check_if_all_options_selected(cmte_id, file_name)
+                all_done = check_temp_contact_list_done(cmte_id, file_name)
 
-                return JsonResponse({'msg': 'Success', 'all_selected': True}, status=status.HTTP_200_OK,
+                return JsonResponse({'msg': 'Success', 'all_selected': True, 'allDone': all_done }, status=status.HTTP_200_OK,
                                     safe=False)
 
         except Exception as e:
