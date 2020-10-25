@@ -6,11 +6,10 @@ import { DuplicateContactsService } from '../clean-contacts/duplicate-contacts/s
 @Component({
   selector: 'app-import-done-contacts',
   templateUrl: './import-done-contacts.component.html',
-  styleUrls: ['./import-done-contacts.component.scss'],
+  styleUrls: ['./import-done-contacts.component.scss']
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImportDoneContactsComponent implements OnInit {
-
   @Input()
   public fileName: string;
 
@@ -19,8 +18,7 @@ export class ImportDoneContactsComponent implements OnInit {
 
   public done: boolean;
 
-  constructor(private _router: Router,
-    private _duplicateContactsService: DuplicateContactsService) { }
+  constructor(private _router: Router, private _duplicateContactsService: DuplicateContactsService) {}
 
   ngOnInit() {
     this.done = false;
@@ -30,13 +28,12 @@ export class ImportDoneContactsComponent implements OnInit {
       });
     } else if (this.action === 'merge_dupe_save') {
       this._duplicateContactsService.mergeAll(this.fileName, false).subscribe((res: any) => {
+        this.done = true;
       });
     }
-
   }
 
   public viewContacts() {
     this._router.navigate([`/notifications`]);
   }
-
 }

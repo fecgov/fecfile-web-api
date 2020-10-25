@@ -39,11 +39,12 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public contacts$: Observable<Array<any>>;
 
   // ngx-pagination config for the duplicates table of contacts
-  public maxItemsPerPage = 10;
+  public maxItemsPerPage = 4;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
+  public showAdditionalInfo: boolean;
 
   /**
    * All fields and their values from the user's contact from the file and
@@ -111,6 +112,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     this.checkDuplicates(1);
     this.mergePage = 1;
     this.allDupesSelected = false;
+    this.showAdditionalInfo = true;
   }
 
   ngOnDestroy(): void {
@@ -264,7 +266,14 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
    */
   public applyMergeSelection(contact: any, userAction: string) {
     contact.user_selected_option = userAction;
-    this._duplicateContactsService.saveUserMergeSelection(this.fileName, contact).subscribe((res: any) => {});
+    this._duplicateContactsService.saveUserMergeSelection(this.fileName, contact).subscribe((res: any) => {
+      this.checkDuplicates(this.config.currentPage);
+      this.allDupesSelected = res.allDone;
+    });
+  }
+
+  public toggleAdditionalInfo() {
+    this.showAdditionalInfo = !this.showAdditionalInfo;
   }
 
   // No longer used
