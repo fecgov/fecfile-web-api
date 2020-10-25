@@ -55,6 +55,11 @@
   @extend .fa-caret-down;
 }
 
+.caret-up-icon {
+  @extend .fas;
+  @extend .fa-caret-up;
+}
+
 .info-icon {
   @extend .fas;
   @extend .fa-info-circle;
