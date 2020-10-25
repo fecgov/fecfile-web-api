@@ -38,7 +38,7 @@ export class UploadContactsService {
     this.bucket = new S3({});
   }
 
-  public progressPercent: number;
+  public progressPercent: number = 0;
   public progressPercentSubject = new BehaviorSubject<number>(this.progressPercent);
 
   private bucket: S3;

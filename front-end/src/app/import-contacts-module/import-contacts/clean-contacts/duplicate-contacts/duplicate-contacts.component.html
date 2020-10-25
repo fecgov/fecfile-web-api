@@ -80,7 +80,7 @@
               <td class="indent_right">
                 <div class="radio">
                   <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.user_selected_value"
-                    [checked]="dupe.user_selected_value === true" />
+                    [checked]="dupe.user_selected_value === true" (change)="dupe.user_selected_value = $event.target.value" />
                 </div>
               </td>
               <td>{{ formatName(dupe) }}</td>
