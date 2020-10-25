@@ -76,39 +76,60 @@ def merge_option(request):
             if request.method == 'POST':
                 cmte_id = get_comittee_id(request.user.username)
                 file_name = request.data.get("fileName")
-                options_list = request.data.get("merge_option")
-                add_list = []
-                update_list = []
-                exsist_list = []
-                if not check_null_value(file_name) and len(options_list) == 0:
-                    msg = "FileName or option list cannot be null. Please pass file Name and option list."
-                    json_result = {'message': msg}
-                    return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                merge_parameters = request.data.get("merge_option")
+                user_option = merge_parameters['user_selected_option']
+                file_entity_id = int(merge_parameters['file_record_id'])
+                db_entity_id = merge_parameters['db_entity_id']
 
-                for option in options_list:
-                    if option["selected"].lower() == "add":
-                        add_list.append(option["entity_id"])
-                        update_user_selection(option["entity_id"], "true", "add", cmte_id)
-                    elif option["selected"].lower() == "update":
-                        update_list.append(
-                            {
-                                "entity_id": option["entity_id"],
-                                "update_id": option["val"]
-                            }
-                        )
-                        update_user_selection(option["entity_id"], option["val"], "update", cmte_id)
-                    elif option["selected"].lower() == "exsisting":
-                        exsist_list.append(
-                            {
-                                "entity_id": option["entity_id"],
-                                "ignore_id": option["val"]
-                            }
-                        )
-                        update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
+                sql = """
+                    UPDATE public.entity_import_temp 
+                    SET file_selected = %(user_option)s
+                        ,update_db = %(db_entity_id)s
+                    WHERE entity_id = %(file_entity_id)s AND cmte_id = %(cmte_id)s 
+                """
+                with connection.cursor() as cursor:
+                    cursor.execute(sql, {
+                        "cmte_id": cmte_id,
+                        "file_entity_id": file_entity_id,
+                        "user_option": user_option,
+                        "db_entity_id": db_entity_id   
+                    })
+                    if cursor.rowcount != 1:
+                        logger.debug("Updating user info for {} failed."
+                                    " No record was found")
 
-                all_selected = check_if_all_options_selected(cmte_id, file_name)
+                # add_list = []
+                # update_list = []
+                # exsist_list = []
+                # if not check_null_value(file_name) and len(options_list) == 0:
+                #     msg = "FileName or option list cannot be null. Please pass file Name and option list."
+                #     json_result = {'message': msg}
+                #     return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-                return JsonResponse({'msg': 'Success', 'all_selected': all_selected}, status=status.HTTP_200_OK,
+                # for option in options_list:
+                #     if option["selected"].lower() == "add":
+                #         add_list.append(option["entity_id"])
+                #         update_user_selection(option["entity_id"], "true", "add", cmte_id)
+                #     elif option["selected"].lower() == "update":
+                #         update_list.append(
+                #             {
+                #                 "entity_id": option["entity_id"],
+                #                 "update_id": option["val"]
+                #             }
+                #         )
+                #         update_user_selection(option["entity_id"], option["val"], "update", cmte_id)
+                #     elif option["selected"].lower() == "exsisting":
+                #         exsist_list.append(
+                #             {
+                #                 "entity_id": option["entity_id"],
+                #                 "ignore_id": option["val"]
+                #             }
+                #         )
+                #         update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
+
+                # all_selected = check_if_all_options_selected(cmte_id, file_name)
+
+                return JsonResponse({'msg': 'Success', 'all_selected': True}, status=status.HTTP_200_OK,
                                     safe=False)
 
         except Exception as e:
