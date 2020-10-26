@@ -82,6 +82,85 @@
         displayed for the user to chose which contact entry they would like to keep. The user will be able to chose one
         out of all entries listed.
       </p>
+      <div class="how_to__table">
+        <h2 class="how_to__table-heading">
+          Duplicate Contact Entries
+        </h2>
+        <div class="clean_contacts__table-container">
+          <div class="clean_contacts__table-inner">
+            <table class="table table-striped table-hover clean_contacts__table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th>Address 1</th>
+                  <th>Address 2</th>
+                  <th>City</th>
+                  <th>State</th>
+                  <th>Zip Code</th>
+                  <th>Employer</th>
+                  <th>Occupation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let contact of contacts | paginate: config; let i = index;">
+                  <tr>
+                    <td>
+                      <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-primary contacts__action-button" ngbDropdownToggle>
+                          <i *ngIf="!contact.user_selected_option" class="ellipsis-icon"></i>
+                          <span *ngIf="contact.user_selected_option === 'add'">Add New</span>
+                          <span *ngIf="contact.user_selected_option === 'update'">Merge & Update</span>
+                          <span *ngIf="contact.user_selected_option === 'exsisting'">Merge with Existing</span>
+                        </button>
+                        <!-- placement not working so use CSS margin-left -->
+                        <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                          <button class="dropdown-item">
+                            Add New
+                          </button>
+                          <button class="dropdown-item">
+                            Merge & Update
+                          </button>
+                          <button class="dropdown-item">
+                            Merge with Existing
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ formatName(contact) }}</td>
+                    <td>Import File</td>
+                    <td>{{contact.street_1}}</td>
+                    <td>{{contact.street_2}}</td>
+                    <td>{{contact.city}}</td>
+                    <td>{{contact.state}}</td>
+                    <td>{{contact.zip_code}}</td>
+                    <td>{{contact.employer}}</td>
+                    <td>{{contact.occupation}}</td>
+                  </tr>
+                  <tr *ngFor="let dupe of contact.contacts_from_db;">
+                    <td class="indent_right">
+                      <div class="radio">
+                        <input type="radio" name="dupe_id_{{contact.entity_id}}"
+                          [checked]="dupe.user_selected_value === true" />
+                      </div>
+                    </td>
+                    <td>{{ formatName(dupe) }}</td>
+                    <td>Database</td>
+                    <td>{{dupe.street_1}}</td>
+                    <td>{{dupe.street_2}}</td>
+                    <td>{{dupe.city}}</td>
+                    <td>{{dupe.state}}</td>
+                    <td>{{dupe.zip_code}}</td>
+                    <td>{{dupe.employer}}</td>
+                    <td>{{dupe.occupation}}</td>
+                  </tr>
+                </ng-container>             
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </div>
