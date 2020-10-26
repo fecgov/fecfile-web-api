@@ -35,6 +35,9 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   @Output()
   public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
+  @Output()
+  public saveStatusEmitter:  EventEmitter<any> = new EventEmitter<any>();
+
   public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
 
@@ -187,6 +190,10 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public proceed(): void {
     this.dupeProceedEmitter.emit('ignore_dupe_save');
+    // At this point user has requested a file save.
+    // Even if API has error on save we don't want unsaved changes to persit
+    this.saveStatusEmitter.emit(true);
+
   }
 
   ////////////////////////
@@ -230,6 +237,10 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public importAll(modal: any) {
     modal.close('close it');
     this.dupeProceedEmitter.emit('ignore_dupe_save');
+
+    // At this point user has requested a file save.
+    // Even if API has error on save we don't want unsaved changes to persit
+    this.saveStatusEmitter.emit(true);
   }
 
   /////////////////////////
@@ -247,11 +258,19 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public mergeAll(modal: any) {
     modal.close('close it');
     this.dupeProceedEmitter.emit('merge_dupe_save');
+
+    // At this point user has requested a file save.
+    // Even if API has error on save we don't want unsaved changes to persit
+    this.saveStatusEmitter.emit(true);
   }
 
   public cancelImportAll() {
     this.dupeCancelEmitter.emit();
     this._duplicateContactsService.cancelImport(this.fileName).subscribe((res: any) => {});
+
+    // On User cancel, unsaved changes are no longer retained.
+    this.saveStatusEmitter.emit(true);
+
   }
 
   // TODO consider putting merge modal methods in another plain old class (not a component)
