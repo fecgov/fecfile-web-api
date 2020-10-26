@@ -26,6 +26,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   @Output()
   public uploadResultEmitter: EventEmitter<any> = new EventEmitter<any>();
 
+  @Output()
+  public saveStatusEmitter:  EventEmitter<any> = new EventEmitter<any>();
+
   public userContacts: Array<any>;
   // public userContactFields: Array<string>;
   public showUpload: boolean;
@@ -177,6 +180,10 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     // we are certain it is not needed.  Any duplicate file with the same name
     // will be replaced on the bucket.  Any exact match duplicates will be handled by
     // API.
+
+    // At this point user has either selected or drag/dropped file.
+    // Inform parent of unsaved changes until file is import has been saved.
+    this.saveStatusEmitter.emit(false);
 
     const fileExtention = this.getFileExtention(file.name);
     switch (fileExtention) {
