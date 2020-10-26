@@ -64,10 +64,12 @@
                     <button class="dropdown-item" (click)="applyMergeSelection(contact, 'add')">
                       Add New
                     </button>
-                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'update')">
+                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'update')"
+                      [disabled]="!contact.enableAllActions">
                       Merge & Update
                     </button>
-                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'exsisting')">
+                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'exsisting')"
+                      [disabled]="!contact.enableAllActions">
                       Merge with Existing
                     </button>
                   </div>
@@ -87,7 +89,8 @@
               <td class="indent_right">
                 <div class="radio">
                   <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.user_selected_value"
-                    [checked]="dupe.user_selected_value === true" (change)="dupe.user_selected_value = $event.target.value" />
+                    [checked]="dupe.user_selected_value === true" 
+                    (change)="handleCheckedDupe($event, dupe, contact)" />
                 </div>
               </td>
               <td>{{ formatName(dupe) }}</td>
