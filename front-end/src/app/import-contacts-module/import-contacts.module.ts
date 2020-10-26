@@ -13,13 +13,10 @@ import { ErrorContactsComponent } from './import-contacts/clean-contacts/error-c
 import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts-field/error-contacts-field.component';
 import { ReviewUploadComponent } from './import-contacts/review-upload/review-upload.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { ImportHowToComponent } from './import-contacts/import-how-to/import-how-to.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    ImportContactsRoutingModule,
-    NgbDropdownModule
-  ],
+  imports: [SharedModule, ImportContactsRoutingModule, NgbDropdownModule],
   declarations: [
     ImportContactsComponent,
     UploadContactsComponent,
@@ -30,8 +27,9 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
     DuplicateContactsComponent,
     ErrorContactsComponent,
     ErrorContactsFieldComponent,
-    ReviewUploadComponent
-  ],
+    ReviewUploadComponent,
+    ImportHowToComponent
+  ]
   // entryComponents: [ErrorContactsComponent]
 })
-export class ImportContactsModule { }
+export class ImportContactsModule {}
