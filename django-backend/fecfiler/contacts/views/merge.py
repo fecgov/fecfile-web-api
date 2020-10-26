@@ -171,7 +171,7 @@ def get_add_contact(cmte_id, file_name):
             query_string = """SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND file_selected = %s"""
             cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name, "true"])
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name, "add"])
             contact_list = cursor.fetchall()
             if not contact_list:
                 return None
@@ -414,8 +414,8 @@ def merge_contact(request):
                 # Delete records from temp table - uncomment after test
                 contacts_deleted_size = delete_import(cmte_id, file_name)
                 if contacts_deleted_size > 0:
-                    logger.debug("Successfully clean contact temp table for committee {} and file {}", cmte_id,
-                                 file_name)
+                    logger.debug("Successfully clean contact temp table for committee {} and file {}".format(cmte_id,
+                                 file_name))
 
                 return JsonResponse({'msg': 'Successfully Merged Contacts'}, status=status.HTTP_201_CREATED, safe=False)
 
