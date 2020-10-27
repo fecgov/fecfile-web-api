@@ -9,6 +9,10 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ErrorContactsComponent } from './clean-contacts/error-contacts/error-contacts.component';
 import { ModalDirective } from 'ngx-bootstrap';
 import { DuplicateContactsService } from './clean-contacts/duplicate-contacts/service/duplicate-contacts.service';
+import { ExportService } from 'src/app/shared/services/ExportService/export.service';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+import { importContactsSpec, importContactsTemplate } from './spec-template-data';
 
 @Component({
   selector: 'app-import-contacts',
@@ -47,7 +51,9 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   constructor(
     private _dialogService: DialogService,
     // private _modalService: NgbModal,
-    private _timeoutMessageService: TimeoutMessageService
+    private _timeoutMessageService: TimeoutMessageService,
+    private _exportService: ExportService,
+    private _importContactsService: ImportContactsService
   ) {
     _timeoutMessageService
       .getTimeoutMessage()
@@ -96,7 +102,43 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   public viewFormatSpecs(): void {
-    alert('Not yet supported');
+
+    this._importContactsService.getSpecAndTemplate().subscribe((res: any) => {
+      const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      // const type = 'application/vnd.ms.excel';
+      const blob: Blob = new Blob([res], { type: type });
+      FileSaver.saveAs(blob, 'Import Contacts Specs and Template.xlsx');
+    });
+
+    // // this._exportService.exportExcel(sheet1, 'Import Contacts Specs and Template');
+    // const ws1: XLSX.WorkSheet = XLSX.utils.json_to_sheet(importContactsSpec);
+    // const ws2: XLSX.WorkSheet = XLSX.utils.json_to_sheet(importContactsTemplate);
+    // ws1['!cols'] = [{ width: 10 }, { width: 25 }, { width: 20 }, { width: 20 }, { width: 15 }, { width: 30 }];
+    // ws1['!rows'] = [
+    //   { hpx: 50 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 }
+    // ];
+
+    // const wb: XLSX.WorkBook = {
+    //   Sheets: { 'Contact Fields Specs': ws1, Template: ws2 },
+    //   SheetNames: ['Contact Fields Specs', 'Template']
+    // };
+    // const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    // // this._exportServsice.saveExcelFile(excelBuffer, 'Import Contacts Specs and Template');
   }
 
   public viewCsvTemplate(): void {
