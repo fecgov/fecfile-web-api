@@ -15,5 +15,6 @@ urlpatterns = [
     url(r"^contact/duplicate$", duplicate.get_duplicate_contact, name="duplicateContact"),
     url(r"^contact/merge/options$", merge.merge_option, name="mergeOption"),
     url(r"^contact/merge/save$", merge.merge_contact, name="mergeContact"),
+    url(r"^contact/template$", views.download_template, name="downloadTemplate"),
 ]
 
