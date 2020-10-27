@@ -35,8 +35,18 @@
             actions provided below:
           </div>
           <ul class="import_contacts__begin-import-links">
-            <li><a (click)="beginUpload()">Begin Upload</a></li>
-            <li (click)="viewFormatSpecs()">Template & Contact Specs containing all the fields</li>
+            <li>
+              <button (click)="beginUpload()" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="file-upload-icon"></i>
+                Begin Upload
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs()" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                Template & Contact Specs containing all the fields
+              </button>
+            </li>
           </ul>
           <h3 class="import_contacts__heading">Importing Files</h3>
           <div class="import_contacts__import-directions">
@@ -99,7 +109,8 @@
           *ngIf="currentStep === step1Upload"
           [forceChangeDetection]="forceChangeDetectionUpload"
           (uploadResultEmitter)="receiveUploadResult($event)"
-          (saveStatusEmitter)="receiveSavedStatus($event)">
+          (saveStatusEmitter)="receiveSavedStatus($event)"
+        >
         </app-upload-contacts>
         <!-- <app-configure-contacts *ngIf="currentStep === step2Configure" [userContactFields]="userContactFields">
         </app-configure-contacts> -->
@@ -114,7 +125,8 @@
           [fileName]="fileName"
           (dupeProceedEmitter)="receiveDupeProceed($event)"
           (dupeCancelEmitter)="receiveDupeCancel()"
-          (saveStatusEmitter)="receiveSavedStatus($event)">
+          (saveStatusEmitter)="receiveSavedStatus($event)"
+        >
         </app-duplicate-contacts>
         <app-import-done-contacts
           *ngIf="currentStep === step4ImportDone"

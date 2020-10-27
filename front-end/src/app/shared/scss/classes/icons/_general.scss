@@ -190,6 +190,11 @@
   @extend .fa-file-export;
 }
 
+.download-icon {
+  @extend .fas;
+  @extend .fa-download;
+}
+
 .print-icon {
   @extend .fas;
   @extend .fa-print;

@@ -13,7 +13,9 @@
         <br />
         or
         <br />
-        <span><a (click)="triggerSelectFileInputClick()">Select a file</a></span>
+        <button (click)="triggerSelectFileInputClick()" class="btn btn-link upload_contacts__select-file" type="button">
+          Select a file
+        </button>
         <input
           style="display:none"
           #selectFileInput
