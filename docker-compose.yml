@@ -20,7 +20,6 @@ services:
       - "8080:8080"
     depends_on:
       - db
-      - flyway
   web:
     build:
       context: './front-end'
@@ -30,8 +29,4 @@ services:
       - "80:80"
     depends_on:
       - api
-  flyway:
-    env_file: ../local.env
-    build: './data'
-    depends_on:
-      - db
+
