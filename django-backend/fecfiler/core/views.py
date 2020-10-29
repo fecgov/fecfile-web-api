@@ -2796,13 +2796,13 @@ def put_sql_entity(
                     zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
                     create_date, last_update_date, cand_office, cand_office_state, 
                     cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-                    ref_entity_id, logged_date, username)
+                    ref_entity_id, logged_date, username, notes)
                     SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
                     middle_name, preffix, suffix, street_1, street_2, city, state, 
                     zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
                     create_date, last_update_date, cand_office, cand_office_state, 
                     cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-                    ref_entity_id, now(), %s
+                    ref_entity_id, now(), %s, notes
                     FROM public.entity WHERE entity_id=%s
                     """,
                     [
@@ -8056,13 +8056,13 @@ def put_contact_data(data, username):
               zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
               create_date, last_update_date, cand_office, cand_office_state, 
               cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-              ref_entity_id, logged_date, username)
+              ref_entity_id, logged_date, username, notes)
               SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
               middle_name, preffix, suffix, street_1, street_2, city, state, 
               zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
               create_date, last_update_date, cand_office, cand_office_state, 
               cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-              ref_entity_id, now(), %s
+              ref_entity_id, now(), %s, notes
               FROM public.entity WHERE entity_id=%s
               """,
               [
@@ -8325,7 +8325,7 @@ def get_list_contact(
             # This Flag seperates whether I need only entity name or first_name, last_name
             if not name_select_flag:
                 if isinstance(entity_id, list):
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(entity_id)
                     )
@@ -8336,7 +8336,7 @@ def get_list_contact(
                     )
                 # GET single row from entity table
                 elif entity_id:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
 
                     cursor.execute(
@@ -8344,7 +8344,7 @@ def get_list_contact(
                         [cmte_id, entity_id],
                     )
                 else:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
 
                     cursor.execute(
@@ -8353,10 +8353,10 @@ def get_list_contact(
                     )
             else:
                 if entity_name_flag:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 else:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
@@ -12069,7 +12069,7 @@ def contact_logs(request):
             raise Exception('entity_id is mandatory')
         sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
               c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
-              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, c.notes,
               concat_ws(', ', e.last_name, e.first_name) AS user, ((c.logged_date) AT TIME ZONE 'UTC') AT TIME ZONE 'EDT' AS modifieddate
               FROM contacts_log_view c, authentication_account e
               WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
@@ -12085,7 +12085,7 @@ def contact_logs(request):
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
-          "The contact_log API is throwing an error: " + str(e),
+          "The contact_logs API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
 
@@ -12163,3 +12163,21 @@ def save_csv_md5_to_db(request):
           status=status.HTTP_400_BAD_REQUEST
           )        
 
+@api_view(["POST"])
+def contact_notes(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        entity_id = request.data.get('entity_id')
+        notes = request.data.get('notes') #request.md5hash
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.entity SET notes=%s WHERE entity_id=%s and cmte_id=%s"""
+            cursor.execute(_sql, [notes, entity_id, cmte_id])
+            if cursor.rowcount == 0:
+                return Response("Unable to find the entity id: {} for the committee {}".format(entity_id, cmte_id), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response("Sucessfully updated the notes for entity_id: {}".format(entity_id), status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_notes API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

@@ -620,7 +620,7 @@
                         "text": "District",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "suffix",
+                        "name": "Office_District",
                         "type": "text",
                         "value": null,
                         "scroll": false,
