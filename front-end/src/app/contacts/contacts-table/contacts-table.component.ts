@@ -1278,18 +1278,13 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
 
   toggleContactLog(cnt: ContactModel) {
-    if (cnt.toggleLog !== true && cnt.getContactLog().length === 0) {
-      const test = this.fetchContactLog(cnt);
-      if (test === undefined || test.length === 0) {
-        cnt.setContactLog([]);
-      }
+    if (cnt.toggleLog !== true) {
+     this.fetchContactLog(cnt);
     }
     cnt.toggleLog = !cnt.toggleLog;
   }
 
   showContactDetails(contact: ContactModel) {
-    console.log('Showing Modal for contact details fe');
-
     const data = {
       contact: contact
     };
@@ -1306,18 +1301,14 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   }
 
   fetchContactLog(cnt: ContactModel) {
-    if (cnt.getContactLog().length !== 0) {
-      return cnt.getContactLog();
-    } else {
       this._contactsService.getContactLog(cnt.id).subscribe(res => {
         if (res && res !== undefined || res.length !== 0) {
           cnt.setContactLog(this.convertJSONToContactLog(res));
           return cnt.getContactLog();
         } else {
-          return [];
+          cnt.setContactLog([]);
         }
       });
-    }
   }
 
   private convertJSONToContactLog(res: any) {

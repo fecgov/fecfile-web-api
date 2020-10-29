@@ -1,5 +1,6 @@
 from django.conf.urls import url
 #from . import views, duplicate, merge, export
+from . import contacts_committee
 from .views import views
 from .views import duplicate
 from .views import merge
@@ -15,5 +16,7 @@ urlpatterns = [
     url(r"^contact/duplicate$", duplicate.get_duplicate_contact, name="duplicateContact"),
     url(r"^contact/merge/options$", merge.merge_option, name="mergeOption"),
     url(r"^contact/merge/save$", merge.merge_contact, name="mergeContact"),
+    url(r"^contact/template$", views.download_template, name="downloadTemplate"),
+    url(r"^contact/transaction/upload$", contacts_committee.upload_cand_contact, name="OtherContact")
 ]
 

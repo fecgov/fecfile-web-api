@@ -9,15 +9,18 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ErrorContactsComponent } from './clean-contacts/error-contacts/error-contacts.component';
 import { ModalDirective } from 'ngx-bootstrap';
 import { DuplicateContactsService } from './clean-contacts/duplicate-contacts/service/duplicate-contacts.service';
+import { ExportService } from 'src/app/shared/services/ExportService/export.service';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+import { importContactsSpec, importContactsTemplate } from './spec-template-data';
 
 @Component({
   selector: 'app-import-contacts',
   templateUrl: './import-contacts.component.html',
-  styleUrls: ['./import-contacts.component.scss'],
+  styleUrls: ['./import-contacts.component.scss']
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImportContactsComponent implements OnInit, OnDestroy {
-
   @ViewChild('errorsModal')
   public errorsModal: ModalDirective;
 
@@ -38,6 +41,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   public forceChangeDetectionUpload: Date;
   public duplicateFile: any;
   public importDoneAction: string;
+  public isShowInfo: boolean;
 
   private unsavedData: boolean;
   private onDestroy$ = new Subject();
@@ -47,11 +51,19 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   constructor(
     private _dialogService: DialogService,
     // private _modalService: NgbModal,
-    private _timeoutMessageService: TimeoutMessageService
+    private _timeoutMessageService: TimeoutMessageService,
+    private _exportService: ExportService,
+    private _importContactsService: ImportContactsService
   ) {
-    _timeoutMessageService.getTimeoutMessage().takeUntil(this.onDestroy$).subscribe(message => {
-      this.unsavedData = false;
-    });
+    _timeoutMessageService
+      .getTimeoutMessage()
+      .takeUntil(this.onDestroy$)
+      .subscribe(message => {
+        // There may be a race condition between the receipt of this message
+        // and the timeout navigatingto login.  Id true, the canDeacivate method here
+        // may need to check browser cache for timeout property.
+        this.unsavedData = false;
+      });
   }
 
   ngOnInit() {
@@ -68,6 +80,8 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     this.onDestroy$ = new Subject();
     this.validationErrorsExist = false;
     this.duplicatesExist = false;
+    this.isShowInfo = false;
+    this.unsavedData = false;
   }
 
   ngOnDestroy() {
@@ -75,7 +89,12 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   public showInfo(): void {
-    alert('Not yet supported');
+    // alert('Not yet supported');
+    this.isShowInfo = true;
+  }
+
+  public receiveReturnFromHowTo() {
+    this.isShowInfo = false;
   }
 
   public beginUpload() {
@@ -83,7 +102,43 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   public viewFormatSpecs(): void {
-    alert('Not yet supported');
+
+    this._importContactsService.getSpecAndTemplate().subscribe((res: any) => {
+      const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      // const type = 'application/vnd.ms.excel';
+      const blob: Blob = new Blob([res], { type: type });
+      FileSaver.saveAs(blob, 'Import Contacts Specs and Template.xlsx');
+    });
+
+    // // this._exportService.exportExcel(sheet1, 'Import Contacts Specs and Template');
+    // const ws1: XLSX.WorkSheet = XLSX.utils.json_to_sheet(importContactsSpec);
+    // const ws2: XLSX.WorkSheet = XLSX.utils.json_to_sheet(importContactsTemplate);
+    // ws1['!cols'] = [{ width: 10 }, { width: 25 }, { width: 20 }, { width: 20 }, { width: 15 }, { width: 30 }];
+    // ws1['!rows'] = [
+    //   { hpx: 50 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 },
+    //   { hpx: 20 }
+    // ];
+
+    // const wb: XLSX.WorkBook = {
+    //   Sheets: { 'Contact Fields Specs': ws1, Template: ws2 },
+    //   SheetNames: ['Contact Fields Specs', 'Template']
+    // };
+    // const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    // // this._exportServsice.saveExcelFile(excelBuffer, 'Import Contacts Specs and Template');
   }
 
   public viewCsvTemplate(): void {
@@ -123,7 +178,6 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public errorsAcknowleged() {
     this.errorsModal.hide();
     this.currentStep = this.start;
@@ -147,7 +201,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
   public receiveUploadResult(userContactsMessage: any) {
     this.fileName = userContactsMessage.fileName;
-    this.unsavedData = false;
+    // this.unsavedData = false;
     let errorCount = 0;
     if (Array.isArray(userContactsMessage.error_list)) {
       errorCount = userContactsMessage.error_list.length;
@@ -166,9 +220,6 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     } else {
       this.noErrorslModal.show();
     }
-
-
-
 
     // if (userContactsMessage.duplicateContacts) {
     //   this.duplicateContacts = this._importContactsService.mapAllDupesFromServerFields(userContactsMessage.duplicateContacts);
@@ -246,18 +297,16 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   private confirmProceedWithrrors(message: string) {
-    this._dialogService
-      .confirm(message, ConfirmModalComponent, 'Caution!', false)
-      .then(res => {
-        if (res === 'okay') {
-          this.unsavedData = false;
-          this.showNextStep();
-        }
-        // else if (res === 'cancel') {
-        //   this.currentStep = this.step1Upload;
-        //   this.forceChangeDetectionUpload = new Date();
-        // }
-      });
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {
+      if (res === 'okay') {
+        // this.unsavedData = false;
+        this.showNextStep();
+      }
+      // else if (res === 'cancel') {
+      //   this.currentStep = this.step1Upload;
+      //   this.forceChangeDetectionUpload = new Date();
+      // }
+    });
   }
 
   public receiveReviewAction(action: string) {
@@ -274,33 +323,39 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Receive save status of the file from child components.
+   *
+   * @param saveStatus save status of the file
+   */
+  public receiveSavedStatus(saveStatus: boolean): void {
+    this.unsavedData = !saveStatus;
+  }
+
+  /**
    * Determines ability for a person to leave a page with a form on it.
    *
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
+    // return true;
 
-    return true;
+    if (this.unsavedData) {
+      let result: boolean = null;
+      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+        let val: boolean = null;
 
-    // if (this.unsavedData) {
-    //   let result: boolean = null;
-    //   result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
-    //     let val: boolean = null;
+        if (res === 'okay') {
+          val = true;
+        } else if (res === 'cancel') {
+          val = false;
+        }
 
-    //     if (res === 'okay') {
-    //       val = true;
-    //     } else if (res === 'cancel') {
-    //       val = false;
-    //     }
+        return val;
+      });
 
-    //     return val;
-    //   });
-
-    //   return result;
-    // } else {
-    //   return true;
-    // }
-
+      return result;
+    } else {
+      return true;
+    }
   }
-
 }
