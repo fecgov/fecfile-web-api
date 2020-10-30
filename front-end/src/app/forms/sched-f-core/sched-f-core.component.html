@@ -55,7 +55,7 @@
     </header>
 
     <section *ngIf="loaded">
-      <div [hidden]="showPart2" class="paragraph">
+      <div [hidden]="getShowPart2()" class="paragraph">
         <div class="col coord_expenditure_text">
           <h3>Has filer been designated to make a Coordinated Expenditure?</h3>
         </div>
@@ -298,7 +298,7 @@
         </div>                     
       </div>
     </section>
-    <section [hidden]="!showPart2" class="paragraph">
+    <section [hidden]="!getShowPart2()" class="paragraph">
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
@@ -726,7 +726,7 @@
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
-            <ng-container *ngIf="!showPart2">
+            <ng-container *ngIf="!getShowPart2()">
               <button *ngIf="scheduleAction === addScheduleAction"
                 class="btn btn-previous btn-left" type="button" 
                 (click)="previousStep()">
@@ -740,7 +740,7 @@
                 Next
               </button>                                        
             </ng-container>
-            <ng-container *ngIf="showPart2">
+            <ng-container *ngIf="getShowPart2()">
               <button class="btn btn-previous btn-left" (click)="back()">
                 Previous
               </button>

@@ -1134,6 +1134,7 @@ def get_recently_saved_reports(data):
 
             query_string = """select form_type, report_type,status, to_char(last_update_date,'YYYY-MM-DD')::date as last_saved
                                 from public.reports where cmte_id = %s and status = 'Saved' 
+                                and delete_ind is distinct from 'Y' 
                                  order by last_update_date desc limit 10"""
 
             cursor.execute(

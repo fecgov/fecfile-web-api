@@ -121,8 +121,18 @@
         margin-bottom: -28px;
         padding: 0 !important;
         img {
-          width: 350px;
-          padding-bottom:5%;
+          @include media(tablet) {
+            width: 225px;
+          }
+          @include media(mediumDesktop) {
+            width: 225px;
+          }
+          @include media(largeDesktop) {
+            width: 250px;
+            padding-bottom:2%;
+          }
+          
+          // padding-bottom:2%;
         }
       } // .app__top-logo
       .app__top-nav {
@@ -201,15 +211,15 @@
         vertical-align: bottom;
         border-bottom: 1px solid black;
         @include media(tablet) {
-          height: 60px;
+          height: 100%;
           padding-top: 10px;
         }
         @include media(mediumDesktop) {
-          height: 60px;
+          height: 100%;
           padding-top: 10px;
         }
         @include media(largeDesktop) {
-          height: 60px;
+          height: 100%;
           padding-top: 10px;
         }
         .committee-name,
@@ -274,14 +284,17 @@
         display: block;
         @include media(tablet) {
           display: block;
+          padding-right: 0px;
         }
         @include media(mediumDesktop) {
           display: inline-block;
+          padding-right: 0px;
         }
         @include media(largeDesktop) {
           display: inline-block;
+          padding-right: 100px;
         }
-        padding-right: 100px;
+        
         padding-left: 10px;
         &:last-child {
           padding-right: 0;
