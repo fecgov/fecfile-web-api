@@ -16,14 +16,8 @@
         <button (click)="triggerSelectFileInputClick()" class="btn btn-link upload_contacts__select-file" type="button">
           Select a file
         </button>
-        <input
-          style="display:none"
-          #selectFileInput
-          type="file"
-          accept=".json, .xls, .csv"
-          (change)="fileSelected()"
-          (click)="onClick($event)"
-        />
+        <!-- accept=".json, .xls, .csv" -->
+        <input style="display:none" #selectFileInput type="file" (change)="fileSelected()" (click)="onClick($event)" />
       </div>
     </div>
     <div id="upload_contacts__info-area">

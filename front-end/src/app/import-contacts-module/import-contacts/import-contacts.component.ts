@@ -341,7 +341,10 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
     if (this.unsavedData) {
       let result: boolean = null;
-      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+      result = await this._dialogService.confirm('If you leave this page the importing process ' +
+        'will be cancelled and no data will be added. ' +
+        'Click Cancel to cancel the import or Continue if you want the import process to finish.',
+        ConfirmModalComponent).then(res => {
         let val: boolean = null;
 
         if (res === 'okay') {
