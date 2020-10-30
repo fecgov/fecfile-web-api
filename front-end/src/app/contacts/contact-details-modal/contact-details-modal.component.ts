@@ -12,6 +12,9 @@ import {ContactsService} from '../service/contacts.service';
 export class ContactDetailsModalComponent implements OnInit {
 
   contact: ContactModel;
+  showResponse: boolean = false;
+  responseMessage: string = '';
+  notesValue: string = '';
   constructor(private activeModal: NgbActiveModal,
               private _messageService: MessageService,
               private _contactService: ContactsService,
@@ -41,4 +44,17 @@ export class ContactDetailsModalComponent implements OnInit {
   setContact(value: ContactModel) {
     this.contact = value;
   }
+
+    saveNotes() {
+      this._contactService.updateNotes(this.contact.id, this.notesValue).subscribe( res => {
+        if (res) {
+          this.showResponse = true;
+          this.responseMessage = 'Successfully Updated Notes';
+          setTimeout(() => {
+            this.showResponse = false;
+            this.responseMessage = '';
+          }, 3000);
+        }
+      });
+    }
 }

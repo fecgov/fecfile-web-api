@@ -1215,7 +1215,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ phone_number: formData.phoneNumber }, { onlySelf: true });
         this.frmContact.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
         this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
-        this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+        this.frmContact.patchValue({ Office_District: formData.candOfficeDistrict }, { onlySelf: true });
       
         this.frmContact.patchValue({ entity_name: formData.name }, { onlySelf: true });
         
@@ -1379,11 +1379,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         contactObj.candCmteId = this.frmContact.get('commitee_id').value;
       }
 
+      if (this.frmContact.get('Office_District')) {
+        contactObj.candOfficeDistrict = this.frmContact.get('Office_District').value;
+      }
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
           if (callFrom === 'contactDetails') {
-            this.transactionToEdit = res;
+            this.transactionToEdit = this._contactsService.convertRowToModelPut(res);
             this._messageService.sendMessage({messageFrom: 'contactDetails', message: 'updateContact' , contact: res });
             this.disableForm();
           } else {
