@@ -13,7 +13,7 @@ from fecfiler.core.views import get_comittee_id, check_null_value, get_list_cont
 logger = logging.getLogger(__name__)
 
 
-def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id):
+def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id, file_name):
     if option_selected == "add":
         selected_field_val = "file_selected"
         other_option_1 = "update_db"
@@ -30,13 +30,14 @@ def update_user_selection(entity_id, user_selected_val, option_selected, cmte_id
     try:
         with connection.cursor() as cursor:
             _sql = """UPDATE public.entity_import_temp SET """ + selected_field_val + """= %s, """ + other_option_1 + """ = %s, """ + \
-                   other_option_2 + """ = %s WHERE entity_id = %s AND cmte_id = %s"""
+                   other_option_2 + """ = %s WHERE entity_id = %s AND cmte_id = %s AND file_name = %s"""
             _v = (
                 user_selected_val,
                 "",
                 "",
                 entity_id,
-                cmte_id
+                cmte_id,
+                file_name
             )
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
@@ -67,29 +68,6 @@ def check_if_all_options_selected(cmte_id, file_name):
     except Exception as e:
         raise e
 
-def check_temp_contact_list_done(cmte_id, file_name):
-    try:
-        sql_count = """
-            select count(1) as count_not_done
-            from public.entity_import_temp 
-            where cmte_id = %(cmte_id)s and file_name = %(file_name)s
-            and length(file_selected) = 0
-        """
-        sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
-        with connection.cursor() as cursor:
-            cursor.execute(sql, {
-                "cmte_id": cmte_id,
-                "file_name": file_name   
-            })
-            row1=cursor.fetchone()[0]
-            totalcount =  row1[0]['count_not_done']
-
-        if totalcount > 0:
-            return False
-
-        return True
-    except Exception as e:
-        raise e
 
 @api_view(["POST"])
 def merge_option(request):
@@ -103,57 +81,25 @@ def merge_option(request):
                 user_option = merge_parameters['user_selected_option']
                 file_entity_id = int(merge_parameters['file_record_id'])
                 db_entity_id = merge_parameters['db_entity_id']
+                add_list = []
+                update_list = []
+                exsist_list = []
+                if not check_null_value(file_name) and len(merge_parameters) == 0:
+                    msg = "FileName or option list cannot be null. Please pass file Name and option list."
+                    json_result = {'message': msg}
+                    return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-                sql = """
-                    UPDATE public.entity_import_temp 
-                    SET file_selected = %(user_option)s
-                        ,update_db = %(db_entity_id)s
-                    WHERE entity_id = %(file_entity_id)s AND cmte_id = %(cmte_id)s 
-                """
-                with connection.cursor() as cursor:
-                    cursor.execute(sql, {
-                        "cmte_id": cmte_id,
-                        "file_entity_id": file_entity_id,
-                        "user_option": user_option,
-                        "db_entity_id": db_entity_id   
-                    })
-                    if cursor.rowcount != 1:
-                        logger.debug("Updating user info for {} failed."
-                                    " No record was found")
+                if user_option.lower() == "add":
+                    add_list.append(file_entity_id)
+                    update_user_selection(file_entity_id, "true", "add", cmte_id, file_name)
+                elif user_option.lower() == "update":
+                    update_user_selection(file_entity_id, db_entity_id, "update", cmte_id, file_name)
+                elif user_option.lower() == "exsisting":
+                    update_user_selection(file_entity_id, db_entity_id, "exsisting", cmte_id, file_name)
 
-                # add_list = []
-                # update_list = []
-                # exsist_list = []
-                # if not check_null_value(file_name) and len(options_list) == 0:
-                #     msg = "FileName or option list cannot be null. Please pass file Name and option list."
-                #     json_result = {'message': msg}
-                #     return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                all_selected = check_if_all_options_selected(cmte_id, file_name)
 
-                # for option in options_list:
-                #     if option["selected"].lower() == "add":
-                #         add_list.append(option["entity_id"])
-                #         update_user_selection(option["entity_id"], "true", "add", cmte_id)
-                #     elif option["selected"].lower() == "update":
-                #         update_list.append(
-                #             {
-                #                 "entity_id": option["entity_id"],
-                #                 "update_id": option["val"]
-                #             }
-                #         )
-                #         update_user_selection(option["entity_id"], option["val"], "update", cmte_id)
-                #     elif option["selected"].lower() == "exsisting":
-                #         exsist_list.append(
-                #             {
-                #                 "entity_id": option["entity_id"],
-                #                 "ignore_id": option["val"]
-                #             }
-                #         )
-                #         update_user_selection(option["entity_id"], option["val"], "exsisting", cmte_id)
-
-                # all_selected = check_if_all_options_selected(cmte_id, file_name)
-                all_done = check_temp_contact_list_done(cmte_id, file_name)
-
-                return JsonResponse({'msg': 'Success', 'all_selected': True, 'allDone': all_done }, status=status.HTTP_200_OK,
+                return JsonResponse({'msg': 'Success', 'allDone': all_selected}, status=status.HTTP_200_OK,
                                     safe=False)
 
         except Exception as e:
@@ -171,7 +117,7 @@ def get_add_contact(cmte_id, file_name):
             query_string = """SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND file_selected = %s"""
             cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name, "add"])
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name, "true"])
             contact_list = cursor.fetchall()
             if not contact_list:
                 return None
@@ -229,6 +175,7 @@ def create_entity_update_db_model(contacts_final_dict):
     except Exception as e:
         logger.debug(e)
         raise NoOPError("Error occurred while updating bulk contacts to database.", e)
+
 
 def create_entity_db_model(contacts_final_dict):
     try:
@@ -321,7 +268,7 @@ def create_temp_contact_table(file_name):
 
     try:
         with connection.cursor() as cursor:
-            query_string = """CREATE TABLE IF NOT EXISTS public.""" +table_name+"""(cmte_id character varying(9) NOT NULL,file_name character varying(200) NOT NULL,entity_id varchar(30) NOT NULL,transaction_id character varying(200) NOT NULL)"""
+            query_string = """CREATE TABLE IF NOT EXISTS public.""" + table_name + """(cmte_id character varying(9) NOT NULL,file_name character varying(200) NOT NULL,entity_id varchar(30) NOT NULL,transaction_id character varying(200) NOT NULL)"""
             cursor.execute(query_string)
 
         return table_name
@@ -395,15 +342,17 @@ def merge_contact(request):
 
                     for exsist_contact in exsist_list:
                         old_exsist_entity_list.append({"entity_id": exsist_contact["exsisting_db"],
-                                                       "transaction_id": exsist_contact["transaction_id"], "file_name": exsist_contact["file_name"],
+                                                       "transaction_id": exsist_contact["transaction_id"],
+                                                       "file_name": exsist_contact["file_name"],
                                                        "cmte_id": cmte_id})
 
                 if transaction_included:
                     contact_new_update_list = []
                     for contact in contact_updated_list:
                         contact_new_update_list.append({"entity_id": contact["update_db"],
-                                                       "transaction_id": contact["transaction_id"], "file_name": contact["file_name"],
-                                                       "cmte_id": cmte_id})
+                                                        "transaction_id": contact["transaction_id"],
+                                                        "file_name": contact["file_name"],
+                                                        "cmte_id": cmte_id})
                     total_list.extend(contact_added_list)
                     total_list.extend(contact_new_update_list)
                     total_list.extend(old_exsist_entity_list)

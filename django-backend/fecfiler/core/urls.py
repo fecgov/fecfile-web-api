@@ -275,5 +275,9 @@ urlpatterns = [
         views.contact_report_details,
         name="contact_report_details",
     ),
-
+    url(
+        r"^core/contact_notes$",
+        views.contact_notes,
+        name="contact_notes",
+    ),
 ]

@@ -20,11 +20,14 @@ from rest_framework.decorators import api_view
 from s3transfer import S3Transfer
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
-from fecfiler.contacts.views.merge import create_temp_transaction_association_model, create_temp_contact_table, \
-    check_temp_contact_list_done
+
+
+from fecfiler.contacts.views.merge import check_if_all_options_selected, create_temp_contact_table, \
+    create_temp_transaction_association_model
 from fecfiler.core.views import get_comittee_id, NoOPError, get_next_entity_id, check_null_value, partial_match, \
     get_list_contact, set_offset_n_fetch, get_num_of_pages
-from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, \
+    CONTACT_MATCH_PERCENTAGE
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +85,7 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                 Column('EMPLOYER', int_emp_check),
                 Column('OCCUPATION', int_emp_check),
                 Column('ORGANIZATION_NAME', int_org_check),
-                Column('LASTNAME', int_name_check),
+                Column('LASTNAME', int_city_range_check),
                 Column('FIRSTNAME', int_name_check),
                 Column('MIDDLENAME', int_name_check),
                 Column('PREFIX', int_prefix_name),
@@ -229,11 +232,10 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                     temp_data["transaction_id"] = row["TRANSACTION_ID"]
                 potential_duplicate.append(temp_data)
 
-
         # traverse row by row bases
         file_record = []
         exact_match = []
-        moderation_score = 92
+        moderation_score = CONTACT_MATCH_PERCENTAGE
         if len(contact_list) > 0:
             for index, row in test_data_final1.iterrows():
                 input_list = [
@@ -353,7 +355,6 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                     potential_duplicate.append(temp_data)
 
         create_temp_db_model(potential_duplicate, file_name, cmte_id)
-        # create_temp_db_model(contact_list, file_name, cmte_id)
 
         data = {"errors": error_list, "data_clean": data_clean, "duplicate_db_count": len(exact_match)}
         return data
@@ -446,13 +447,12 @@ def get_temp_contact_list(cmte_id, file_name):
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, file_name])
-            result = cursor.fetchall()
-            # if not contact_list:
-            #     raise NoOPError("No entity found for cmte_id {} ".format(cmte_id))
-            # merged_list = []
-            merged_list = [] if not result[0][0] else result[0][0]
-            # for dictL in contact_list:
-            #     merged_list = dictL[0]
+            contact_list = cursor.fetchall()
+            if not contact_list:
+                raise NoOPError("No entity found for cmte_id {} ".format(cmte_id))
+            merged_list = []
+            for dictL in contact_list:
+                merged_list = dictL[0]
 
         return merged_list
     except Exception as e:
@@ -462,7 +462,7 @@ def get_temp_contact_list(cmte_id, file_name):
 def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db as user_selected_value, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
+            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
                                                 FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') ORDER BY entity_id ASC"""
 
             trans_query_string = set_offset_n_fetch(query_string, page_num, itemsperpage)
@@ -477,6 +477,7 @@ def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage)
         return forms_obj
     except Exception as e:
         raise e
+
 
 def get_total_count(cmte_id, file_name):
     try:
@@ -723,39 +724,39 @@ def cancel_import(request):
 
 
 def get_user_selected_option(contact):
-    # user_selection = ""
-    # if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
-    #     user_selection = "add"
-    # elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
-    #     user_selection = "update"
-    # elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
-    #     user_selection = "exsisting"
-    user_selection = contact["file_selected"]
+    user_selection = ""
+    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+        user_selection = "add"
+    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+        user_selection = "update"
+    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+        user_selection = "exsisting"
 
     return user_selection
 
 
 def get_user_selected_val(contact):
     user_selected_val = ""
-    # if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
-    #     user_selected_val = contact["file_selected"]
-    # elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
-    #     user_selected_val = contact["update_db"]
-    # elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
-    #     user_selected_val = contact["exsisting_db"]
-    if contact["file_selected"] is not None and contact["file_selected"] != 'add':
-        user_selected_val = contact["user_selected_value"]
+    if contact["file_selected"] is not None and check_null_value(contact["file_selected"]):
+        user_selected_val = contact["file_selected"]
+    elif contact["update_db"] is not None and check_null_value(contact["update_db"]):
+        user_selected_val = contact["update_db"]
+    elif contact["exsisting_db"] is not None and check_null_value(contact["exsisting_db"]):
+        user_selected_val = contact["exsisting_db"]
 
     return user_selected_val
 
+
 def get_contacts_from_db(cmte_id, file_contact):
     db_contacts = get_list_contact(cmte_id, list(file_contact['duplicate_entity'].split(",")))
+
     for db_contact in db_contacts:
-        if (db_contact["entity_id"] == file_contact["user_selected_value"]):
+        if db_contact["entity_id"] == file_contact["update_db"] or db_contact["entity_id"] == file_contact["exsisting_db"]:
             db_contact["user_selected_value"] = True
         else:
             db_contact["user_selected_value"] = False
     return db_contacts
+
 
 @api_view(["POST"])
 def get_duplicate_contact(request):
@@ -777,19 +778,18 @@ def get_duplicate_contact(request):
                 all_contact = [{
                     **contact,
                     'contact_from': 'file',
-                    # 'contacts_from_db': get_list_contact(cmte_id, list(contact['duplicate_entity'].split(","))),
                     'contacts_from_db': get_contacts_from_db(cmte_id, contact),
-                    'user_selected_option': contact["file_selected"]
-                    # 'user_selected_value': get_user_selected_val(contact)
+                    'user_selected_option': get_user_selected_option(contact),
+                    'user_selected_value': get_user_selected_val(contact)
                 } for contact in temp_list]
-                all_done = check_temp_contact_list_done(cmte_id, file_name)
 
                 total_count = get_total_count(cmte_id, file_name)
                 numofpages = get_num_of_pages(int(total_count), int(itemsperpage))
+                all_done = check_if_all_options_selected(cmte_id, file_name)
 
                 response = {
                     "contacts": list(all_contact),
-                    "allDone": all_done, 
+                    "allDone": all_done,
                     "totalcontactsCount": total_count,
                     "itemsPerPage": itemsperpage,
                     "pageNumber": page_num,

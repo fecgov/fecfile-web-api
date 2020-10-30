@@ -35,9 +35,17 @@
   </div>
   <div class="notes">
     <br>
-    <label><h4>Notes</h4></label>
+    <label><h4>Notes
+      <button type="button" class="btn btn-info" ngbTooltip="Place Holder" tooltipClass="form-tooltip">
+        <i class="info-icon" aria-hidden="true"></i>
+        <span class="sr-only">Click here for more information</span>
+      </button>
+     </h4>
+    </label>
     <br>
-    <input type="text" placeholder="">
+    <input type="text"
+           [maxLength]="500"
+           placeholder="">
   </div>
 </div>
 <div class="modal-footer">

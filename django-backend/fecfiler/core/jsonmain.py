@@ -28,6 +28,7 @@ import csv
 from django.core.paginator import Paginator
 import time
 from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id, superceded_report_id_list)
+from fecfiler.password_management.views import  treasurer_encrypted_password
 
 # conn = boto.connect_s3()
 
@@ -753,13 +754,17 @@ def create_json_builders(request):
                 return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
         elif call_from == "Submit":
             committeeId = request.data.get("committeeid")
-            password = request.data.get('password')
+            # password = request.data.get('password')
+            # get treasurer encrypted password and pass it to data-receiver
+            password = treasurer_encrypted_password(committeeId)
             if not password:
                 password = settings.NXG_COMMITTEE_DEFAULT_PASSWORD
             formType = request.data.get("form_type")
             newAmendIndicator = request.data.get("amend_ind")
             report_id = request.data.get("report_id")
             reportSequence = request.data.get('reportSequence')
+            if not reportSequence:
+                reportSequence = 0
             emailAddress1 = request.data.get('emailAddress1')
             emailAddress2 = request.data.get('emailAddress2')
             reportType = request.data.get("report_type")
@@ -768,20 +773,6 @@ def create_json_builders(request):
             originalFECId = request.data.get('originalFECId')
             backDoorCode = ""  # request.data.get('backDoorCode')
             wait = settings.SUBMIT_REPORT_WAIT_FLAG
-            # print("committeeId :" + committeeId)
-            # print("password: " + password)
-            # print("formType: " + formType)
-            # print("newAmendIndicator: " + newAmendIndicator)
-            # print("report_id: " + report_id)
-            # print("reportSequence: " + reportSequence)
-            # print("emailAddress1: " + emailAddress1)
-            # print("reportType: " + reportType)
-            # print("coverageStartDate: " + coverageStartDate)
-            # print("coverageEndDate: " + coverageEndDate)
-            # print("originalFECId: " + originalFECId)
-            # print("backDoorCode: " + backDoorCode)
-            # print("emailAddress2: " + emailAddress2)
-            # print("wait: " + wait)
             data_obj = {'committeeId': committeeId,
                         'password': password,
                         'formType': formType,
@@ -810,27 +801,21 @@ def create_json_builders(request):
                     )
             resp = requests.post(settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION +
                                  "upload_filing", data=data_obj, files=file_obj)
-            # print(resp)
-            # print(resp.ok)
-            # print(resp.json())
             if not resp.ok:
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
-                submissionId = resp.json()['result']['submissionId']
-                submission_response = checkForReportSubmission(submissionId)
-                if (submission_response.json()['result'][0]['status'] == 'ACCEPTED'):
-                    # update frontend database with Filing_id, Filed_by user
-                    submission_id = submission_response.json()['result'][0]['submissionId']
-                    beginning_image_number = submission_response.json()['result'][0]['beginningImageNumber']
-                    fec_id = submission_response.json()['result'][0]['reportId']
-                    return submit_report(request, submission_id, beginning_image_number, fec_id)
-                return JsonResponse(submission_response.json(), status=status.HTTP_201_CREATED)
-            # if submission_response.ok:
-            #     dictprint = submission_response.json()
-            #     print(dictprint)
-            #     return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
-            # dictprint = resp.json()
-            # return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
+                if call_from == "Submit":
+                    submissionId = resp.json()['result']['submissionId']
+                    submission_response = checkForReportSubmission(submissionId)
+                    if (submission_response.json()['result'][0]['status'] == 'ACCEPTED'):
+                        # update frontend database with Filing_id, Filed_by user
+                        submission_id = submission_response.json()['result'][0]['submissionId']
+                        beginning_image_number = submission_response.json()['result'][0]['beginningImageNumber']
+                        fec_id = submission_response.json()['result'][0]['reportId']
+                        return submit_report(request, submission_id, beginning_image_number, fec_id)
+                    return JsonResponse(submission_response.json(), status=status.HTTP_201_CREATED)
+                else:
+                    return JsonResponse(resp.json(), status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response("The create_json_builders is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
