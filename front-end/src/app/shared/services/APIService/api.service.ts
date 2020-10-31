@@ -1,18 +1,21 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { AppConfigService } from '../../../app-config.service';
 import { Auth } from '../../interfaces/APIService/APIService';
+import { ConfirmModalComponent } from '../../partials/confirm-modal/confirm-modal.component';
 import { AuthService } from '../AuthService/auth.service';
+import { DialogService } from '../DialogService/dialog.service';
 import { SessionService } from '../SessionService/session.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ApiService {
+export class ApiService implements HttpInterceptor  {
   
 
   constructor(
@@ -20,7 +23,8 @@ export class ApiService {
     private _session: SessionService,
     private _authService: AuthService,
     private _cookieService: CookieService,
-    private _appConfigService: AppConfigService
+    private _appConfigService: AppConfigService,
+    private _dialogService: DialogService
   ) { }
 
   private states: any[];
@@ -159,5 +163,36 @@ export class ApiService {
       )
 }
 
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (request.params.has("handleResponseError")) {
+      return next.handle(request).pipe(
+        catchError((error: HttpErrorResponse) => {
+          let reason = error.statusText + '\n' +
+            (error && error.error ? error.error : '');
 
+          this._dialogService.checkIfModalOpen();
+          this._dialogService
+            .confirm(
+              reason,
+              ConfirmModalComponent,
+              'Exception',
+              false
+            )
+            .then(response => {
+              if (response === 'okay') {
+                this._dialogService.checkIfModalOpen();
+              } else if (
+                response === 'cancel' ||
+                response !== ModalDismissReasons.BACKDROP_CLICK ||
+                response !== ModalDismissReasons.ESC
+              ) {
+              }
+            });
+
+          return throwError(error);
+        }));
+    } else {
+      return next.handle(request);
+    }
+  }
 }
