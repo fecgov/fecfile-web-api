@@ -13,6 +13,8 @@ import { ExportService } from 'src/app/shared/services/ExportService/export.serv
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import { importContactsSpec, importContactsTemplate } from './spec-template-data';
+import { ConsentModalComponent } from 'src/app/app-main-login/consent-modal/consent-modal.component';
+import { CancelImportConfirmComponent } from './cancel-import-confirm/cancel-import-confirm.component';
 
 @Component({
   selector: 'app-import-contacts',
@@ -53,7 +55,9 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     // private _modalService: NgbModal,
     private _timeoutMessageService: TimeoutMessageService,
     private _exportService: ExportService,
-    private _importContactsService: ImportContactsService
+    private _importContactsService: ImportContactsService,
+    private _modalService: NgbModal,
+    private _duplicateContactsService: DuplicateContactsService
   ) {
     _timeoutMessageService
       .getTimeoutMessage()
@@ -102,7 +106,6 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   }
 
   public viewFormatSpecs(): void {
-
     this._importContactsService.getSpecAndTemplate().subscribe((res: any) => {
       const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
       // const type = 'application/vnd.ms.excel';
@@ -341,19 +344,31 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
     if (this.unsavedData) {
       let result: boolean = null;
-      result = await this._dialogService.confirm('If you leave this page the importing process ' +
-        'will be cancelled and no data will be added. ' +
-        'Click Cancel to cancel the import or Continue if you want the import process to finish.',
-        ConfirmModalComponent).then(res => {
-        let val: boolean = null;
+      // result = await this._dialogService.confirm('If you leave this page the importing process ' +
+      //   'will be cancelled and no data will be added. ' +
+      //   'Click Cancel to cancel the import or Continue if you want the import process to finish.',
+      //   ConfirmModalComponent).then(res => {
+      //   let val: boolean = null;
 
-        if (res === 'okay') {
-          val = true;
-        } else if (res === 'cancel') {
-          val = false;
+      //   if (res === 'okay') {
+      //     val = true;
+      //   } else if (res === 'cancel') {
+      //     val = false;
+      //   }
+
+      //   return val;
+      // });
+
+      const modalRef = this._modalService.open(CancelImportConfirmComponent);
+      result = await modalRef.result.then(res => {
+        if (res === 'continue') {
+          return false;
+        } else if ('cancel') {
+          this._duplicateContactsService.cancelImport(this.fileName).subscribe((res: any) => {});
+          this.unsavedData = false;
+          // canDeactivate is true to let user nav to new location
+          return true;
         }
-
-        return val;
       });
 
       return result;

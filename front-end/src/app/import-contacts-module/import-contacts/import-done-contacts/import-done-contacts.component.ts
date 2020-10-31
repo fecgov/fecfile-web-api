@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Router } from '@angular/router';
 import { DuplicateContactsService } from '../clean-contacts/duplicate-contacts/service/duplicate-contacts.service';
@@ -16,6 +16,9 @@ export class ImportDoneContactsComponent implements OnInit {
   @Input()
   public action: string;
 
+  @Output()
+  public saveStatusEmitter: EventEmitter<any> = new EventEmitter<any>();
+
   public done: boolean;
 
   constructor(private _router: Router, private _duplicateContactsService: DuplicateContactsService) {}
@@ -25,15 +28,17 @@ export class ImportDoneContactsComponent implements OnInit {
     if (this.action === 'ignore_dupe_save') {
       this._duplicateContactsService.saveContactIgnoreDupes(this.fileName, false).subscribe((res: any) => {
         this.done = true;
+        this.saveStatusEmitter.emit(true);
       });
     } else if (this.action === 'merge_dupe_save') {
       this._duplicateContactsService.mergeAll(this.fileName, false).subscribe((res: any) => {
         this.done = true;
+        this.saveStatusEmitter.emit(true);
       });
     }
   }
 
   public viewContacts() {
-    this._router.navigate([`/notifications`]);
+    this._router.navigate(['/notifications']);
   }
 }
