@@ -14,6 +14,7 @@ import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/er
 import { ReviewUploadComponent } from './import-contacts/review-upload/review-upload.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImportHowToComponent } from './import-contacts/import-how-to/import-how-to.component';
+import { CancelImportConfirmComponent } from './import-contacts/cancel-import-confirm/cancel-import-confirm.component';
 
 @NgModule({
   imports: [SharedModule, ImportContactsRoutingModule, NgbDropdownModule],
@@ -28,8 +29,9 @@ import { ImportHowToComponent } from './import-contacts/import-how-to/import-how
     ErrorContactsComponent,
     ErrorContactsFieldComponent,
     ReviewUploadComponent,
-    ImportHowToComponent
-  ]
-  // entryComponents: [ErrorContactsComponent]
+    ImportHowToComponent,
+    CancelImportConfirmComponent
+  ],
+  entryComponents: [CancelImportConfirmComponent]
 })
 export class ImportContactsModule {}

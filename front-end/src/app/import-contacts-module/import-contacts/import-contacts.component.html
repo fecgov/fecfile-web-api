@@ -132,6 +132,7 @@
           *ngIf="currentStep === step4ImportDone"
           [fileName]="fileName"
           [action]="importDoneAction"
+          (saveStatusEmitter)="receiveSavedStatus($event)"
         >
         </app-import-done-contacts>
       </div>
