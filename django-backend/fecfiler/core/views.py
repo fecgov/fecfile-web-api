@@ -7069,6 +7069,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             search_keys = [
                 "id",
@@ -7086,6 +7087,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             if search_string:
                 for key in search_keys:
@@ -7154,7 +7156,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
 
             trans_query_string = (
-                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt, notes from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
                 + cmte_id
                 + """' """
