@@ -178,8 +178,9 @@ export const AppRoutes: Routes = [
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {path: 'notifications', redirectTo: 'notifications/', pathMatch: 'full'},
       {
-        path: 'notifications',
+        path: 'notifications/:tabid',
         component: NotificationheaderComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],

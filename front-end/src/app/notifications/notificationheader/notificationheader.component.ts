@@ -50,7 +50,14 @@ export class NotificationheaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.viewMode = 'tab-1';
+    let tabId = "1";
+    if (this._activeRoute.snapshot.paramMap.get('tabid')) {
+      tabId  = this._activeRoute.snapshot.paramMap.get('tabid');
+    } 
+    if (isNaN(Number(tabId))) {
+      tabId = "1";
+    }
+    this.viewMode = 'tab-' + tabId;
 
     if (localStorage.getItem('form3XNotificationInfo.showDashBoard') === "Y") {
       this._formService.removeFormDashBoard("3X");
