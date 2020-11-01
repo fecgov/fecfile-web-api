@@ -1134,6 +1134,7 @@ def get_recently_saved_reports(data):
 
             query_string = """select form_type, report_type,status, to_char(last_update_date,'YYYY-MM-DD')::date as last_saved
                                 from public.reports where cmte_id = %s and status = 'Saved' 
+                                and delete_ind is distinct from 'Y' 
                                  order by last_update_date desc limit 10"""
 
             cursor.execute(
@@ -7068,6 +7069,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             search_keys = [
                 "id",
@@ -7085,6 +7087,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             if search_string:
                 for key in search_keys:
@@ -7153,7 +7156,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
 
             trans_query_string = (
-                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt, notes from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
                 + cmte_id
                 + """' """
@@ -11612,8 +11615,13 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
-                       updated_date
+                select notification_id as id, 
+                    form_tp as form_name, 
+                    '/reports' as form_name_redirect,
+                    rpt_tp as report_type, 
+                    '/reports' as report_type_redirect,
+                    due_date,
+                    updated_date
                 from public.notifications_reminder_email
                 where cmte_id = %(cmte_id)s
             ) v
@@ -11645,7 +11653,12 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
+                select notification_id as id, 
+                    form_tp as form_name, 
+                    '/reports' as form_name_redirect,
+                    rpt_tp as report_type, 
+                    '/reports' as report_type_redirect,
+                    due_date,
                     ( current_date - due_date ) as past_due_days,
                     updated_date
                 from public.notifications_late_notification
@@ -11673,24 +11686,25 @@ class NotificationsSwitch:
 
         sql_count = """
             select count(1) as count
-            from public.reports
+            from public.notifications_filing_confirmations
             where cmte_id = %(cmte_id)s
-            and status = 'Submitted'
         """
 
         sql_items = """
             select * from (
                 select report_id as id,
                     fec_id as filing_id,
+                    '/reports' as filing_id_redirect,
                     form_type as form_name,
+                    '/reports' as form_name_redirect,
                     report_type as report_type,
+                    '/reports' as report_type_redirect,
                     to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
-                    null as filed_by,
+                    filed_by,
                     to_char(filed_date, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
                     filed_date
-                from public.reports
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
             ) v
         """
 
@@ -11784,18 +11798,17 @@ def get_notifications_count(request):
             select sum(V.records_count) as count
             from
             (
-                select count(1) as records_count
+                select 'reminder_email' as notification_type, count(1) as records_count
                 from public.notifications_reminder_email
                 where cmte_id = %(cmte_id)s
                 union 
-                select count(1) as records_count
+                select 'late_notification' as notification_type, count(1) as records_count
                 from public.notifications_late_notification
                 where cmte_id = %(cmte_id)s
                 union
-                select count(1) as records_count
-                from public.reports
+                select 'filing_confirmations' as notification_type, count(1) as records_count
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
             ) as V
         """     
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
@@ -11843,9 +11856,8 @@ def get_notifications_counts(request):
             select 'Filing Confirmations' as "groupName", count
             from ( 
                 select count(1) as count
-                from public.reports
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
             ) A
             union
             select 'RFAIs' as "groupName", 0 as count
@@ -11939,9 +11951,6 @@ def get_notification(request):
                 where notification_id = %(notification_id)s
             """
 
-        if viewtype == 'Filing Confirmations':
-            pass
-
         if viewtype == 'RFAIs':
             pass
 
@@ -11949,7 +11958,35 @@ def get_notification(request):
             pass
 
         if sql_item is None:
-            raise Exception('Unsupported viewtype='  + viewtype)
+            if viewtype == 'Filing Confirmations':
+                sql_submission_id = """
+                    select COALESCE(max(submission_id), '0') as submission_id
+                    from public.notifications_filing_confirmations
+                    where report_id = %(notification_id)s
+                """     
+                sql = """SELECT json_agg(t) FROM (""" + sql_submission_id + """) t"""
+
+                with connection.cursor() as cursor:
+                    cursor.execute(sql, {
+                        "notification_id": notification_id
+                    })
+                    row1=cursor.fetchone()[0]
+                    submission_id =  row1[0]['submission_id']
+
+                responses = requests.get(
+                    "http://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email?submissionId={}".format(
+                        submission_id
+                    )
+                )
+                return Response(
+                    responses,
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return Response(
+                    "Unsupported viewtype = " + viewtype,
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
 
         sql = """SELECT json_agg(t) FROM (""" + sql_item + """) t"""
         with connection.cursor() as cursor:

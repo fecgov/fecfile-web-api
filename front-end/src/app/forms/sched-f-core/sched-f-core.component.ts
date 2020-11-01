@@ -1,30 +1,30 @@
-import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
-import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, OnDestroy, OnChanges , ChangeDetectionStrategy } from '@angular/core';
-import {FormBuilder, ValidationErrors, Validators} from '@angular/forms';
-import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
-import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { UtilService } from 'src/app/shared/utils/util.service';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { Observable, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { F3xMessageService } from '../form-3x/service/f3x-message.service';
-import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
-import { HttpClient } from '@angular/common/http';
+import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { UtilService } from 'src/app/shared/utils/util.service';
+import { AuthService } from '../../shared/services/AuthService/auth.service';
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
-import { ReportsService } from 'src/app/reports/service/report.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { schedFstaticFormFields } from '../sched-f/static-form-fields.json';
-import {Observable, Subscription} from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
+import { TransactionsService } from '../transactions/service/transactions.service';
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 
 @Component({
   selector: 'app-sched-f-core',
@@ -72,7 +72,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
     _schedHMessageServiceService: SchedHMessageServiceService,
-    _authService: AuthService,
+    _authService: AuthService
   ) {
     super(
       _http,
@@ -107,6 +107,13 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     this.initFormSubscription = _f3xMessageService.getInitFormMessage().subscribe(message => {
       this.resetForm();
     });
+  }
+
+  public getShowPart2(): boolean {
+    if((this.showPart2 && this.showPart2.toString() === 'false') || this.showPart2 === false){
+      return false;
+    }
+    return true;
   }
 
   public ngOnInit() {

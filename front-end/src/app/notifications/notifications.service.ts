@@ -112,6 +112,7 @@ export class NotificationsService {
 
     httpParams = httpParams.append('view', viewtype);
     httpParams = httpParams.append('id', notificationId.toString());
+    httpParams = httpParams.append('handleResponseError', 'true');
 
     return this._http
     .get<{contentType: string, blob: Blob}>(`${environment.apiUrl}${url}`,

@@ -26,8 +26,12 @@
             text-decoration: none;
           }
         }
+        .import_contacts__header-1 {
+          font-size: 1.5em;
+          font-weight: bold;
+        }
         .import_contacts__header-2 {
-          font-size: 2em;
+          font-size: 1.5em;
           padding-left: .5em;
         }
       }
@@ -36,8 +40,8 @@
         width: 98%;
       }
       .import_contacts__info {
-        padding-top: 1em;
-        padding-left: 1em;
+        padding-top: .5em;
+        padding-left: 2em;
       }
     }
     section {

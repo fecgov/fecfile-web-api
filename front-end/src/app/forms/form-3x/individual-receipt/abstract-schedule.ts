@@ -715,6 +715,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.scheduleAction === ScheduleActions.view) {
       this.frmIndividualReceipt.disable();
     }
+
+    // if(this.scheduleAction !== ScheduleActions.addSubTransaction && this._parentTransactionModel){
+    //   this._parentTransactionModel = null;
+    // }
   }
 
   private mapValidatorsForAllFields(fields: any, formGroup: any, memoCodeValue: any) {
@@ -2363,7 +2367,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 );
               }
             }
-            this.resetFormAttributes();
+            this.resetFormAttributes((saveAction === SaveActions.saveForReturnToParent || saveAction === SaveActions.saveForReturnToNewParent) ? true : false );
           }
           //if saving because of a print action, schedule action needs to be changed from add to edit for the next time.
           //also save the current POST response's metadata into the _transactionToEdit object for 'edit' flow
@@ -2618,7 +2622,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return Observable.of('invalid');
     }
   }
-  private resetFormAttributes() {
+  private resetFormAttributes(resetParentTransactionalModel:boolean = false) {
     this._transactionToEdit = null;
     this._formSubmitted = true;
     this.memoCode = false;
@@ -2640,6 +2644,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.redesignationTransactionId = null;
     this.displayMonthlyQuarterlyThresholdWarning = false;
     this.displaySemiAnnualThresholdWarning = false;
+    if(resetParentTransactionalModel){
+      this._parentTransactionModel = null;
+    }
   }
 
   _prepopulateDefaultPurposeText() {
