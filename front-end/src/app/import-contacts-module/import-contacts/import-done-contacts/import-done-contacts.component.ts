@@ -39,6 +39,6 @@ export class ImportDoneContactsComponent implements OnInit {
   }
 
   public viewContacts() {
-    this._router.navigate(['/notifications']);
+    this._router.navigate(['/notifications/6']);
   }
 }
