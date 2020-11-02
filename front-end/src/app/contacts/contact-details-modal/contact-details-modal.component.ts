@@ -43,6 +43,7 @@ export class ContactDetailsModalComponent implements OnInit {
   }
   setContact(value: ContactModel) {
     this.contact = value;
+    this.notesValue = value.notes;
   }
 
     saveNotes() {
@@ -50,6 +51,7 @@ export class ContactDetailsModalComponent implements OnInit {
         if (res) {
           this.showResponse = true;
           this.responseMessage = 'Successfully Updated Notes';
+          this.contact.notes = this.notesValue;
           setTimeout(() => {
             this.showResponse = false;
             this.responseMessage = '';

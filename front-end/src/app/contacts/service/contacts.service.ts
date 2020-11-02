@@ -317,6 +317,7 @@ export class ContactsService {
       model.candOffice = row.candoffice;
       model.candOfficeState = row.candofficestate;
       model.candCmteId = row.candcmteid;
+      model.notes = row.notes;
 
     return model;
   }

@@ -29,6 +29,7 @@ export class ContactModel {
     toggleLog: boolean;
     contactLog: Array<ContactLogModel>;
     transactions: any;
+    notes: string;
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -59,6 +60,7 @@ export class ContactModel {
         this.contactLog = [];
         this.toggleLog = false;
         this.transactions = null;
+        this.notes = contact.notes ? contact.notes : '';
     }
 
     setContactLog(contactLog: any) {
