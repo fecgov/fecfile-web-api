@@ -50,7 +50,7 @@ export class ContactModel {
         this.officeSought = contact.officeSought ? contact.officeSought : '';
         this.candOffice = contact.candOffice ? contact.candOffice : '';
         this.candOfficeState = contact.candOfficeState ? contact.candOfficeState : '';
-        this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
+        this.candOfficeDistrict = contact.candofficedistrict ? contact.candofficedistrict : '';
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
