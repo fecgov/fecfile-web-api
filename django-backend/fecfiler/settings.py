@@ -416,6 +416,9 @@ NXG_FEC_PRINT_API_VERSION = "/v1/print"
 NXG_COMMITTEE_DEFAULT_PASSWORD = "test"
 SUBMIT_REPORT_WAIT_FLAG = "False"
 
+# Service Endpoint for filing confirmation email
+NXG_FEC_FILING_CONFIRMATION_URL = os.environ.get('FILING_CONFIRMATION_URL',  'http://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email')
+
 try:
   from .local_settings import *
 except:
