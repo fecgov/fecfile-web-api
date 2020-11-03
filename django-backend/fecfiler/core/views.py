@@ -11973,15 +11973,26 @@ def get_notification(request):
                     row1=cursor.fetchone()[0]
                     submission_id =  row1[0]['submission_id']
 
+                #submission_id = "4d074079-53d3-4b3b-9d37-caf011633c55"
                 responses = requests.get(
-                    "http://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email?submissionId={}".format(
+                    settings.NXG_FEC_FILING_CONFIRMATION_URL + "?submissionId={}".format(
                         submission_id
                     )
                 )
-                return Response(
-                    responses,
-                    status=status.HTTP_400_BAD_REQUEST
-                    )
+                if responses.status_code == status.HTTP_200_OK:
+                    blob = responses.text.replace("\n", "")
+                    output = { 
+                        'contentType': 'binary',
+                        'blob': blob
+                    }
+                else:
+                    output = { 
+                        'contentType': 'html',
+                        'blob': responses.content
+                    }
+
+                return Response(output, status=status.HTTP_200_OK)
+
             else:
                 return Response(
                     "Unsupported viewtype = " + viewtype,

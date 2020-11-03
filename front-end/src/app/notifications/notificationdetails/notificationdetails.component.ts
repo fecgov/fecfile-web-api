@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, OnDestroy, ViewChild} from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, OnDestroy, ViewChild, ElementRef, Renderer2} from '@angular/core';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
@@ -16,6 +16,9 @@ import { TabConfiguration } from '../notification';
 export class NotificationdetailsComponent implements OnInit, OnDestroy {
   @ViewChild('notificationModal')
   public notificationModal: ModalDirective;
+
+  @ViewChild('notificationContentContainer')
+  public notificationContentContainer: ElementRef;
   
   @Input()
   public tabConfig: TabConfiguration;
@@ -42,11 +45,13 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
 
   // View detail
   public notificationContent: string;
+  public notificationContentType: string;
 
   constructor(
     private _notificationsService: NotificationsService,
     private _tableService: TableService,
-    private _utilService: UtilService
+    private _utilService: UtilService,
+    private renderer: Renderer2
   ) {
   }
 
@@ -249,13 +254,28 @@ export class NotificationdetailsComponent implements OnInit, OnDestroy {
       this.tabConfig.name, id
     )
     .subscribe((response: any) => {
-      let blob = response.blob;
-      let contentType = response.contentType;
-      if (contentType == 'html') {
-        this.notificationContent = blob;
-      } else {
-        var content = "Unsupported";
+      // clear container
+      const childElements = this.notificationContentContainer.nativeElement.childNodes;
+      for (let child of childElements) {
+        this.renderer.removeChild(this.notificationContentContainer.nativeElement, child);
       }
+
+      let blob = response.blob;
+      if (response.contentType == 'html') {
+        this.notificationContent = blob;
+      } else if (response.contentType == 'binary') {
+        let iframe: HTMLIFrameElement = this.renderer.createElement('iframe');
+        iframe.srcdoc = blob;
+        // iframe.onload = (event) => {
+        //   let iframe: HTMLIFrameElement = event.target as HTMLIFrameElement;
+        //   iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        // }
+        iframe.className = 'notifications_modal-body-frame';
+        this.notificationContentContainer.nativeElement.appendChild(iframe);
+      } else {
+        this.notificationContent = "Unsupported";
+      }
+      this.notificationContentType = response.contentType;
 
       this.notificationModal.show();
     });
