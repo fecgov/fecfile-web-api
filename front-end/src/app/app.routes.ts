@@ -34,12 +34,11 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 
-
 export const AppRoutes: Routes = [
   {
     path: '',
     component: LoginComponent,
-    pathMatch: 'full',
+    pathMatch: 'full'
   },
   { path: 'register', component: RegisterComponent, pathMatch: 'full' },
   { path: 'enterSecCode', component: ConfirmTwoFactorComponent, pathMatch: 'full' },
@@ -124,6 +123,13 @@ export const AppRoutes: Routes = [
         }
       },
       {
+        path: 'import-transactions',
+        loadChildren: 'src/app/import-transactions-module/import-transactions.module#ImportTransactionsModule',
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor]
+        }
+      },
+      {
         path: 'addContact',
         component: AddNewContactComponent,
         pathMatch: 'full',
@@ -162,7 +168,10 @@ export const AppRoutes: Routes = [
         }
       },
       {
-        path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
+        path: 'submitform/:form_id',
+        component: SubmitComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
         data: {
           role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin]
         }
@@ -178,7 +187,7 @@ export const AppRoutes: Routes = [
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
-      {path: 'notifications', redirectTo: 'notifications/', pathMatch: 'full'},
+      { path: 'notifications', redirectTo: 'notifications/', pathMatch: 'full' },
       {
         path: 'notifications/:tabid',
         component: NotificationheaderComponent,
@@ -203,7 +212,7 @@ export const AppRoutes: Routes = [
         data: {
           role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin]
         }
-      },
+      }
     ]
   },
   { path: '**', redirectTo: '' }
