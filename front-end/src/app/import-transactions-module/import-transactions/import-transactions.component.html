@@ -1,0 +1,358 @@
+<div class="import_contacts__main-container">
+  <app-import-trx-how-to *ngIf="isShowInfo" (returnEmitter)="receiveReturnFromHowTo()"> </app-import-trx-how-to>
+  <!-- use hidden to retain user input.  ngIf will destroy the instance -->
+  <div [hidden]="isShowInfo" class="import_contacts__container">
+    <header>
+      <div class="header-content">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="float-left">
+              <div class="import_contacts__header-1">Import Transactions</div>
+            </div>
+            <div class="float-left">
+              <div class="import_contacts__header-2">(Importing data into FECfile)</div>
+            </div>
+            <div class="float-left import_contacts__info" (click)="showInfo()">
+              For more information click here
+              <i class="info-icon" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="header-content-sep">
+        <hr />
+      </div>
+    </header>
+    <section>
+      <div *ngIf="currentStep !== start" class="import_contacts__steps">
+        <app-steps [steps]="steps" [current_step]="currentStep"> </app-steps>
+      </div>
+      <div class="import_contacts__body">
+        <div *ngIf="currentStep === start">
+          <h3 class="import_contacts__heading">To Begin Importing</h3>
+          <div class="import_contacts__begin-import-msg">
+            You can start your Import by taking clicking "Begin Upload" below, or by taking any of the 7 additional
+            actions provided below::
+          </div>
+          <ul class="import_contacts__begin-import-links">
+            <li>
+              <button (click)="beginUpload()" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="file-upload-icon"></i>
+                Begin Upload
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View Format Specs for all the transactions for F3X & F3L
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View F3X template & schedule specs
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View F3L template & schedule specs
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View Document with ALL the transactions and the unique transaction identifiers for F3X & F3L
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View Document with all the reports codes for F3X & F3L
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View CSV Template
+              </button>
+            </li>
+            <li>
+              <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+                <i aria-hidden="true" class="download-icon"></i>
+                View All Transaction Types
+              </button>
+            </li>
+          </ul>
+          <h3 class="import_contacts__heading-list">Importing Files</h3>
+          <div class="import_contacts__import-directions">
+            <ol>
+              <li class="import_contacts__first-item">
+                At the top right of the screen, select Tools and then Import Transactions. The Import Tranactions
+                Landing Page (this page) will appear.
+              </li>
+              <li>
+                Click "Begin Upload" to navigate to the Upload Page.
+              </li>
+              <li>
+                Locate your import file using your computer's file explorer, and then drag and drop that file into the
+                grey-shaded area provided, or use the "Upload" button option to open the file explorer and locate the
+                file you would like to import. The import file should have a .CSV extension, or it wil not be accepted.
+              </li>
+              <li>
+                Once the upload begins the file will be scanned for formatting errors. If there are any formatting
+                errors the upload will be cancelled and an error message will be displayed listing all of the formatting
+                errors found. If no errors are found you wil proceed to the "Review"page.
+              </li>
+              <li>
+                Once at the "Review" page the file will be scanned for matching transactions within the file that may
+                have been previously uploaded. Bascially scanning the import file to see if the file has previously been
+                imported. If there are matching transactions from a previously uploaded file the system will provide a
+                warning, and a prompt to proceed or not to prevent from possibly uploading the same file twice.
+              </li>
+              <li>
+                Next the the system will scan for duplicate contact entries within the file against your contacts
+                database. If there are possible duplicate contact entries, you will be taken to the "Clean" screen to
+                select which contact entries you would like to keep or merge. You will also have the option to ignore
+                the process allowing for duplicate entries from the uploaded file and your current contact database to
+                exist. If no duplicates exist, the screen will display the text: "No Duplicates found."
+              </li>
+              <li>
+                Next the Import will begin after the previous step. A loader with a completion percentage will be
+                displayed allowing the user to view the progress of the import. Once the import is complete the user can
+                navigate to the Notifications Modal (Top Menu/Notifications) to view the import and others via the link
+                provided.
+              </li>
+            </ol>
+          </div>
+          <h3 class="import_contacts__heading">How to enter data into the CSV templates</h3>
+          <div>
+            When entering data into a CSV template, ensure the fields within the template match with what you are
+            planning to import. CSV files will not always save information within the CSV format, so you may need to
+            save the file as an excel document first, and then when complete save in a CSV format. Further Import
+            Instructions and Information is provided below.
+          </div>
+          <h3 class="import_contacts__heading-list">Additional Import Information and Instructions</h3>
+          <div class="import_contacts__import-directions">
+            <ol class="import_contacts__alpha-list">
+              <li class="import_contacts__first-item">
+                A Filer can only import transactions to the specific reports: F3X or F3L.
+              </li>
+              <li>
+                Reports must be in a "Saved," or "Amended" status before starting the import process.
+              </li>
+              <li>
+                Always clean the Contacts Database for possible duplicates before initiating an Import:
+                <ul class="import_contacts__import-directions">
+                  <li>
+                    Filer can select one file or multiple files to drag & drop. The limit is 10 files. The Filer can
+                    only upload/import a .CSV file for one schedule. Transactions from different schedules cannot be
+                    combined into 1 CSV file.
+                  </li>
+                  <li>
+                    Each CSV file must correspond to a schedule type and include transactions ONLY for that schedule.
+                  </li>
+                  <li>
+                    The Filer can also split a schedule into separate files, but we recommend having all the
+                    corresponding transactions for each schedule in one file/schedule because of the limitation.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Once all of the transactions are imported, the language required by FEC in certain fields of the
+                transactions will be auto calculated.
+                <ul class="import_contacts__import-directions">
+                  <li>
+                    Language: Some transactions will have language that is auto-generated. Please refer to the Form 3X
+                    format specifications to determine if you should leave the description field blank or if you need to
+                    include data.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Aggregate amounts for each transaction will be auto calculated along with the existing transactions and
+                displayed.
+              </li>
+              <li>
+                Any transactions that will be auto generated based on imported transactions, will be auto generated and
+                saved to the database. In-Kind Receipt (imported) → In-Kind Out must be auto generated.
+              </li>
+              <li>
+                The Filer has to manually add the "Levin Account name" under "Profile" menu. When the filer is adding
+                LAs or LBs into the template, they will need to add the "Levin Account name" (from the application) into
+                that column.
+              </li>
+            </ol>
+          </div>
+          <h3 class="import_contacts__heading">Receipt Description & Purpose of Disbursement fields</h3>
+          <div>
+            Filers must review the "Value Reference" in the import specs for the exact language that should be included
+            for "Receipt Description," and "Purpose of Disbursement Fields."
+          </div>
+          <h3 class="import_contacts__heading">Employer & Occupation</h3>
+          <div>
+            Employer and occupation fields are required if an individual donor aggregate is greater than $200. Please
+            note that the aggregate is auto-calculated by the system once importing is complete. If you anticipate that
+            the the donor aggregate will be greater than $200 please include employer and occupation as part of the
+            import file.
+          </div>
+          <h3 class="import_contacts__heading">Auto-generate transactions</h3>
+          <div>
+            When an In-Kind transactions in imported, In-Kind Out will be auto-generated.
+          </div>
+          <h3 class="import_contacts__heading-list">Loans and Debt transactions</h3>
+          <div class="import_contacts__import-directions">
+            <ol class="import_contacts__alpha-list">
+              <li class="import_contacts__first-item">
+                Loans & debt transaction must be manually entered into the system.
+              </li>
+              <li>
+                Loan & debt payment transactions must be manually entered into the system.
+              </li>
+            </ol>
+          </div>
+          <h3 class="import_contacts__heading-list">Bundled Transactions and/or Auto-Generated Transactions</h3>
+          <div class="import_contacts__import-directions">
+            <ol class="import_contacts__alpha-list">
+              <li class="import_contacts__first-item">
+                Once all the transactions are imported, the language required by FEC in certain fields of the
+                transactions must be auto populated.
+                <ul class="import_contacts__import-directions">
+                  <li>
+                    Some transactions will have language that is auto-generated. Please refer to the Form 3X format
+                    specifications to determine if you should leave the description field blank or if you need to
+                    include data.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Aggregate amounts for each transaction must be auto calculated along with the existing transactions and
+                displayed.
+              </li>
+              <li>
+                Any transactions that need to be auto generated based on imported transactions, must be auto generated
+                and saved to te database. In-Kind Receipt (imported) → In-Kind Out must be auto generated.
+              </li>
+            </ol>
+          </div>
+          <h3 class="import_contacts__heading">Importing H3 - H6 transactions</h3>
+          <div>Make sure H1 & H2 ratios exist or are manually added before importing H3 - H6 transactions.</div>
+          <div class="import_contacts__sub-section-title">Event Types</div>
+          <div class="import_contacts__import-directions">
+            <ol>
+              <li class="import_contacts__first-item">Administrative – H3, H4 = AD</li>
+              <li>Direct Fundraising – H3, H4 = DF</li>
+              <li>Exempt Activity – H3, H4 = EA</li>
+              <li>Generic Voter Drive – H3, H5 = GV</li>
+              <li>Direct Candidate Support – H3, H5 = DC</li>
+              <li>Public Communications – H3, H5 = PC</li>
+              <li>Voter Registration – H5, H6 = VR</li>
+              <li>GOTV – H5, H6 = GOTV</li>
+              <li>Voter ID – H5, H6 = VI</li>
+              <li>Generic Campaign – H5, H6 = GC</li>
+            </ol>
+            <ol class="import_contacts__alpha-list import_contacts__import-directions">
+              <li class="import_contacts__first-item">
+                If a H2 event is selected, Activity or Event Identifier column in the template must be entered with the
+                unique H2 name that the filer has created in the application.
+              </li>
+              <li>
+                Account name for H3 & H5, LA, LB:
+                <ol class="import_contacts__import-directions">
+                  <li>H3 - filer adds a name.</li>
+                  <li>
+                    For H5, LA, LB - Filer must first manually add the Levin account to the application via Profile
+                    menu. Filer must then add that name here for any H5, LA or LB transactions.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </div>
+          <h3 class="import_contacts__heading">Importing Earmarks</h3>
+          <div>
+            All Conduit Earmark transactions for Deposited & Undeposited must be manually entered into the system.
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div *ngIf="currentStep !== start">
+        <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="showNextStep()">
+          Next
+        </button>
+        <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray" (click)="showPreviousStep()">
+          Previous
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div
+  bsModal
+  #errorsModal="bs-modal"
+  class="modal fade error__contacts-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="dialog-sizes-name1"
+  [config]="{ backdrop: 'static' }"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" id="error-contacts__modal-header_1">
+        <h2 class="modal-title pull-left">Import Failed</h2>
+      </div>
+      <div class="modal-body">
+        <p class="error-contacts__description">
+          The system found errors within the import file, and will not be able to complete the import. Please check your
+          file and ensure formatting is correct.
+        </p>
+        <h3 class="error-contacts__body-title">Import Errors</h3>
+        <ul class="error-contacts__list">
+          <li *ngFor="let error of contactErrors; let i = index" class="error-contacts__error">
+            Error {{ i + 1 }}: {{ error.field_name }} {{ error.msg }}
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="errorsAcknowleged()">
+          Ok
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div
+  bsModal
+  #noErrorslModal="bs-modal"
+  class="modal fade error__contacts-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="dialog-sizes-name1"
+  [config]="{ backdrop: 'static' }"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" id="error-contacts__modal-header_2">
+        <h2 class="modal-title pull-left">Upload Complete</h2>
+      </div>
+      <div class="modal-body">
+        <p>
+          No errors were detected. Please proceed to see if your data was previously imported or has any duplicate
+          contacts.
+        </p>
+        <p>
+          <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
+          Caution: As you proceed your data has the potential of being duplicated upon import. Ensure your data
+          integrity by opting to check the individual line items before importing.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="noErrorsAcknowleged()">
+          Ok
+        </button>
+      </div>
+    </div>
+  </div>
+</div> -->
