@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { ImportTransactionsService } from '../service/import-transactions.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-import-trx-start',
@@ -7,9 +9,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ImportTrxStartComponent implements OnInit {
 
-  constructor() { }
+  @Output()
+  public beginUploadEmitter: EventEmitter<any> = new EventEmitter<any>();
+
+  constructor(private _importTransactionsService: ImportTransactionsService) { }
 
   ngOnInit() {
+  }
+
+  public beginUpload() {
+    this.beginUploadEmitter.emit();
+  }
+
+  public viewFormatSpecs(fileName: string) {
+    this._importTransactionsService.getSpecAndTemplate(fileName).subscribe((res: any) => {
+      const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+      const blob: Blob = new Blob([res], { type: type });
+      FileSaver.saveAs(blob, 'Import Contacts Specs and Template.xlsx');
+    });
   }
 
 }

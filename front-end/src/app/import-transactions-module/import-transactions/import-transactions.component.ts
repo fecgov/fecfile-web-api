@@ -39,7 +39,7 @@ export class ImportTransactionsComponent implements OnInit {
     this.isShowInfo = false;
   }
 
-  public beginUpload() {
+  public receiveBeginUpload() {
     this.currentStep = this.step1Upload;
   }
 
@@ -74,13 +74,5 @@ export class ImportTransactionsComponent implements OnInit {
         break;
       default:
     }
-  }
-
-  public viewFormatSpecs(fileName: string) {
-    this._importTransactionsService.getSpecAndTemplate(fileName).subscribe((res: any) => {
-      const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-      const blob: Blob = new Blob([res], { type: type });
-      FileSaver.saveAs(blob, 'Import Contacts Specs and Template.xlsx');
-    });
   }
 }

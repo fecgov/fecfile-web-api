@@ -51,39 +51,6 @@
         margin: 2px auto;
         width: 98%;
         padding: 0.75em 0 4em 0;
-        .import_contacts__heading {
-          padding: 40px 0 20px 0;
-        }
-        .import_contacts__sub-section-title {
-          padding-top: 20px;
-        }
-        .import_contacts__heading-list {
-          padding: 40px 0 0 0;
-        }
-        .import_contacts__import-directions {
-          padding-left: 25px;
-          ol {
-            padding: 0;
-            margin-left: 1em;
-            margin-bottom: 0;
-            li {
-              padding-top: 20px;
-            }
-            .import_contacts__first-item {
-              padding-top: 0px;
-            }
-          }
-          .import_contacts__alpha-list {
-            list-style-type: lower-alpha;
-          }
-        }
-        .import_contacts__begin-import-msg {
-          padding: 5px 0;
-        }
-        .import_contacts__begin-import-links li {
-          padding: 5px 0 5px 25px;
-          list-style-type: none;
-        }
       }
     }
     footer {
