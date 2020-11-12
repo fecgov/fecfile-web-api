@@ -2,50 +2,63 @@
   <app-import-trx-how-to *ngIf="isShowInfo" (returnEmitter)="receiveReturnFromHowTo()"> </app-import-trx-how-to>
   <!-- use hidden to retain user input.  ngIf will destroy the instance -->
   <div [hidden]="isShowInfo" class="import_contacts__container">
-    <header>
-      <div class="header-content">
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="float-left">
-              <div class="import_contacts__header-1">Import Transactions</div>
-            </div>
-            <div class="float-left">
-              <div class="import_contacts__header-2">(Importing data into FECfile)</div>
-            </div>
-            <div class="float-left import_contacts__info" (click)="showInfo()">
-              For more information click here
-              <i class="info-icon" aria-hidden="true"></i>
+    <div *ngIf="currentStep !== start" class="import_trx__sidebar" [ngClass]="sidebarVisibleClass">
+      <app-import-trx-sidebar
+        [fileQueue_foo]="fileQueue"
+        (toggleEmitter)="receiveToggleSidebar($event)"
+      ></app-import-trx-sidebar>
+    </div>
+    <!-- <div [ngClass]="currentStep !== start ? 'right-side ' : ''"> -->
+    <!-- <div [ngClass]="sidebarVisibleClass"> -->
+    <div [ngClass]="rightSideClassArray">
+      <header>
+        <div class="header-content">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="float-left">
+                <div class="import_contacts__header-1">Import Transactions</div>
+              </div>
+              <div class="float-left">
+                <div class="import_contacts__header-2">(Importing data into FECfile)</div>
+              </div>
+              <div class="float-left import_contacts__info" (click)="showInfo()">
+                For more information click here
+                <i class="info-icon" aria-hidden="true"></i>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="header-content-sep">
-        <hr />
-      </div>
-    </header>
-    <section>
-      <div *ngIf="currentStep !== start" class="import_contacts__steps">
-        <app-steps [steps]="steps" [current_step]="currentStep"> </app-steps>
-      </div>
-      <div class="import_contacts__body">
-        <div *ngIf="currentStep === start">
-          <app-import-trx-start (beginUploadEmitter)="receiveBeginUpload()"> </app-import-trx-start>
+        <div class="header-content-sep">
+          <hr />
         </div>
-        <div *ngIf="currentStep === start">
-          <app-import-trx-upload (beginUploadEmitter)="receiveBeginUpload()"> </app-import-trx-upload>
+      </header>
+      <section>
+        <div class="import_contacts__body_container">
+          <div class="import_contacts__body">
+            <div *ngIf="currentStep !== start" class="import_contacts__steps">
+              <app-steps [steps]="steps" [current_step]="currentStep"> </app-steps>
+            </div>
+            <div *ngIf="currentStep === start">
+              <app-import-trx-start (beginUploadEmitter)="receiveBeginUpload()"> </app-import-trx-start>
+            </div>
+            <div *ngIf="currentStep === step1Upload">
+              <app-import-trx-upload (beginUploadEmitter)="receiveBeginUpload()" (queueEmitter)="receiveQueue($event)">
+              </app-import-trx-upload>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
-    <footer>
-      <div *ngIf="currentStep !== start">
-        <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="showNextStep()">
-          Next
-        </button>
-        <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray" (click)="showPreviousStep()">
-          Previous
-        </button>
-      </div>
-    </footer>
+      </section>
+      <footer>
+        <div *ngIf="currentStep !== start" style="width: 100%">
+          <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="showNextStep()">
+            Next
+          </button>
+          <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray" (click)="showPreviousStep()">
+            Previous
+          </button>
+        </div>
+      </footer>
+    </div>
   </div>
 </div>
 
