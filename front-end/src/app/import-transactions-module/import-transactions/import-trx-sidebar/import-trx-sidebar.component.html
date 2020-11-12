@@ -1,0 +1,36 @@
+<div class="import_trx_sidebar__main">
+  <div class="sidebar-toggle-btn" [ngClass]="sidebarVisibleClass">
+    <button type="button" class="btn btn-link" (click)="toggleSidebar()">
+      <i [ngClass]="iconClass">
+        <span class="sr-only">Toggle Sidebar</span>
+      </i>
+    </button>
+  </div>
+  <h3 class="text-center sidebar-header">{{ headerTitle }}</h3>
+  <hr />
+  <div class="file-queue">
+    <ul class="file-queue-list">
+      <li *ngFor="let file of fileQueue" class="file-in-queue">
+        <div class="">
+          <div class="row align-items-center queue-row">
+            <div class="col-md-4 file-name">
+              {{ file.fileName }}
+            </div>
+            <div class="col-md-4">
+              <div class="file-status">
+                {{ file.status }}
+              </div>
+            </div>
+            <div class="col-md-1">
+              <button type="button" class="btn btn-link" (click)="cancelFile(file)">
+                <i class="close-simple cancel-file">
+                  <span class="sr-only">Cancel Import Single File</span>
+                </i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

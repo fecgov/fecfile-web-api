@@ -17,6 +17,9 @@ export class ImportTransactionsComponent implements OnInit {
   public readonly step2Review = ImportTransactionsStepsEnum.step2Review;
   public readonly step3Clean = ImportTransactionsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
+  public sidebarVisibleClass: string;
+  public rightSideClassArray: Array<string>;
+  public fileQueue: Array<any>;
 
   constructor(private _importTransactionsService: ImportTransactionsService) {}
 
@@ -41,6 +44,27 @@ export class ImportTransactionsComponent implements OnInit {
 
   public receiveBeginUpload() {
     this.currentStep = this.step1Upload;
+    this.sidebarVisibleClass = 'sidebar-visible';
+    // this._initRightSideClass();
+    this.receiveToggleSidebar({ sidebarVisibleClass: this.sidebarVisibleClass });
+  }
+
+  public receiveToggleSidebar($event: any) {
+    this.sidebarVisibleClass = $event.sidebarVisibleClass;
+    this._initRightSideClass();
+    this.rightSideClassArray.push(this.sidebarVisibleClass);
+  }
+
+  public receiveQueue(queue: any) {
+    this.fileQueue = queue;
+  }
+
+  private _initRightSideClass(): void {
+    this.rightSideClassArray = [];
+    const stepClass = this.currentStep !== this.start ? 'right-side ' : '';
+    if (stepClass) {
+      this.rightSideClassArray.push(stepClass);
+    }
   }
 
   //
@@ -71,6 +95,9 @@ export class ImportTransactionsComponent implements OnInit {
         break;
       case this.step2Review:
         this.currentStep = this.step1Upload;
+        break;
+      case this.step1Upload:
+        this.currentStep = this.start;
         break;
       default:
     }

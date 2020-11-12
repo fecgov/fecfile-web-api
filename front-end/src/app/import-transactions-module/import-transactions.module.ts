@@ -6,9 +6,10 @@ import { ImportTransactionsComponent } from './import-transactions/import-transa
 import { ImportTrxHowToComponent } from './import-transactions/import-trx-how-to/import-trx-how-to.component';
 import { ImportTrxStartComponent } from './import-transactions/import-trx-start/import-trx-start.component';
 import { ImportTrxUploadComponent } from './import-transactions/import-trx-upload/import-trx-upload.component';
+import { ImportTrxSidebarComponent } from './import-transactions/import-trx-sidebar/import-trx-sidebar.component';
 
 @NgModule({
   imports: [SharedModule, ImportTransactionsRoutingModule, NgbDropdownModule],
-  declarations: [ImportTransactionsComponent, ImportTrxHowToComponent, ImportTrxStartComponent, ImportTrxUploadComponent]
+  declarations: [ImportTransactionsComponent, ImportTrxHowToComponent, ImportTrxStartComponent, ImportTrxUploadComponent, ImportTrxSidebarComponent]
 })
 export class ImportTransactionsModule {}
