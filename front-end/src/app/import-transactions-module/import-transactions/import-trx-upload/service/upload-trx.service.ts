@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
 import * as S3 from 'aws-sdk/clients/s3';
@@ -8,6 +8,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AWSError } from 'aws-sdk/global';
 import { ManagedUpload } from 'aws-sdk/clients/s3';
 import { CookieService } from 'ngx-cookie-service';
+import { map } from 'rxjs/operators';
 
 /**
  * A service for uploading a transaction files to AWS.
@@ -17,13 +18,13 @@ import { CookieService } from 'ngx-cookie-service';
   providedIn: 'root'
 })
 export class UploadTrxService {
-  private readonly CONTACTS_PATH = 'transactions/';
+  private readonly TRANSACTIONS_PATH = 'transactions/';
 
   /**
    * Constructor will obtain credentials for AWS S3 Bucket.
    * @param _http
    */
-  constructor() {
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {
     AWS.config.region = environment.awsRegion;
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
       IdentityPoolId: environment.awsIdentityPoolId
@@ -40,12 +41,12 @@ export class UploadTrxService {
   /**
    * Upload the file to AWS S3 bucket.
    */
-  public uploadFile(file: File, committeeId: string): Observable<any> {
+  public uploadFile(file: File, checkSum: string, committeeId: string): Observable<any> {
     this.progressPercent = 0;
     const params = {
       Bucket: this.bucketName,
-      Key: this.CONTACTS_PATH + committeeId + '/' + file.name,
-      Metadata: { 'committee-id': committeeId },
+      Key: this.TRANSACTIONS_PATH + committeeId + '/' + file.name,
+      Metadata: { 'committee-id': committeeId, 'check-sum': checkSum },
       Body: file,
       ACL: 'public-read',
       ContentType: file.type
@@ -94,5 +95,58 @@ export class UploadTrxService {
    */
   public getProgressPercent(): Observable<any> {
     return this.progressPercentSubject.asObservable();
+  }
+
+  /**
+   * Get objects from the S3 bucket in the transactions/committee folder.
+   */
+  public listObjects(committeeId: string) {
+    const params = {
+      Bucket: this.bucketName,
+      // MaxKeys: 20,
+      Prefix: this.TRANSACTIONS_PATH + committeeId
+    };
+
+    return Observable.create(observer => {
+      this.bucket.listObjectsV2(params, function(err, data) {
+        // this.bucket.listObjectVersions(params, function (err, data) {
+        if (err) {
+          console.log(err, err.stack);
+        } else {
+          console.log(data);
+          observer.next(data);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  /**
+   * Start processing the uploaded file of transactions.
+   */
+  public processingUploadedTransactions(fileName: string, checkSum: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/chk_csv_uploaded_in_db';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.checkSum = checkSum;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
   }
 }

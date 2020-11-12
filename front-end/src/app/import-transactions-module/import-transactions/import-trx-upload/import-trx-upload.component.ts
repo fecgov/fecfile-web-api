@@ -139,7 +139,7 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
         i++;
       }
       this.queueEmitter.emit(this.fileQueue);
-      this._uploadCsv(this.fileQueue[0]);
+      this._uploadCsv(files[0]);
     }
   }
 
@@ -236,69 +236,68 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
     return fileExtention;
   }
 
-  /**
-   * Start the file import process.  First it will check for valid file types and then upload
-   * to S3 Bucket.  If successful, it will call the API to process the file.
-   *
-   * @param file file to import
-   */
-  private _startFileImport(file: File) {
-    // No longer checking for upload file duplicates.  Comment out until
-    // we are certain it is not needed.  Any duplicate file with the same name
-    // will be replaced on the bucket.  Any exact match duplicates will be handled by
-    // API.
-    // At this point user has either selected or drag/dropped file.
-    // Inform parent of unsaved changes until file is import has been saved.
-    // this.saveStatusEmitter.emit(false);
-    // this.progressPercent = 0;
-    // this.showUpload = false;
-    // this.uploadingText = 'Uploading...';
-    // this._uploadCsv(file);
-    // const fileExtention = this.getFileExtention(file.name);
-    // switch (fileExtention) {
-    //   // case 'json':
-    //   //   break;
-    //   case 'csv':
-    //     this.progressPercent = 0;
-    //     this.showUpload = false;
-    //     this.uploadingText = 'Uploading...';
-    //     this._uploadCsv(file);
-    //     break;
-    //   default:
-    //     this._dialogService
-    //       .confirm(
-    //         'You can only import CSV files. If your file is a ' +
-    //           'different type, please convert your data file to a CSV.',
-    //         ConfirmModalComponent,
-    //         'Warning!',
-    //         false
-    //       )
-    //       .then(res => {});
-    // }
-  }
-
   private _uploadCsv(file: File) {
-    this.progressPercent = 0;
-    this.showUpload = false;
-    this.uploadingText = 'Uploading...';
-    this._uploadTrxService
-      .uploadFile(file, this.committeeId)
-      .takeUntil(this.onDestroy$)
-      .subscribe((data: any) => {
-        if (data === false) {
-          console.log('false');
-          return;
+    // const checkSum = this._createFileCheckSum(file);
+
+    // TODO convert this to a method returning observable or promise
+    // TODO this will perform better if API generates it but requires upload to do so.
+    // TODO if not done in API, check for faster front end library option
+    const fileReader = new FileReader();
+    fileReader.onload = e => {
+      const fileData = fileReader.result;
+      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+      const md5 = hash.toString(CryptoJS.enc.Hex);
+      this.checkSum = md5;
+
+      this._uploadTrxService.listObjects(this.committeeId).subscribe((data: S3.Types.ListObjectsV2Output) => {
+        console.log('');
+        for (const s3Obj of data.Contents) {
+          // remove double quotes from eTag
+          let eTagEdited = s3Obj.ETag;
+          if (s3Obj.ETag) {
+            if (s3Obj.ETag.length > 1) {
+              if (s3Obj.ETag.startsWith('"') && s3Obj.ETag.endsWith('"')) {
+                eTagEdited = s3Obj.ETag.substring(1, s3Obj.ETag.length - 1);
+              }
+            }
+          }
+
+          if (this.checkSum === eTagEdited) {
+            this._dialogService
+              .confirm(
+                'This file has been uploaded before!  TODO show Review Screen',
+                ConfirmModalComponent,
+                'Warning!',
+                false
+              )
+              .then(res => {});
+          }
         }
-        this._checkForProcessingProgress();
-        // this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
-        //   this.showSpinner = false;
-        //   this.emitUploadResults(res);
-        // });
-        // this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
-        //   this.showSpinner = false;
-        //   this.emitUploadResults(res);
-        // });
       });
+
+      this.progressPercent = 0;
+      this.showUpload = false;
+      this.uploadingText = 'Uploading...';
+      this._uploadTrxService
+        .uploadFile(file, this.checkSum, this.committeeId)
+        .takeUntil(this.onDestroy$)
+        .subscribe((data: any) => {
+          if (data === false) {
+            console.log('false');
+            return;
+          }
+          this._checkForProcessingProgress();
+          this._uploadTrxService.processingUploadedTransactions(file.name, this.checkSum).subscribe((res: any) => {
+            this.showSpinner = false;
+            // this.emitUploadResults(res);
+          });
+          // this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
+          //   this.showSpinner = false;
+          //   this.emitUploadResults(res);
+          // });
+        });
+    };
+    fileReader.readAsText(file);
   }
 
   /**
@@ -428,14 +427,20 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private _createFileCheckSum(file: File) {
-    const fileReader = new FileReader();
-    fileReader.onload = e => {
-      const fileData = fileReader.result;
-      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
-      const md5 = hash.toString(CryptoJS.enc.Hex);
-      const output = 'MD5 (' + file.name + ') = ' + md5;
-      console.log(output);
-    };
-    fileReader.readAsText(file);
+    const prom = new Promise(resolve => {
+      const fileReader = new FileReader();
+      fileReader.onload = e => {
+        const fileData = fileReader.result;
+        const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+        const md5 = hash.toString(CryptoJS.enc.Hex);
+        const output = 'MD5 (' + file.name + ') = ' + md5;
+        console.log(output);
+        resolve(md5);
+      };
+      fileReader.readAsText(file);
+    });
+    prom.then(res => {
+      return res;
+    });
   }
 }

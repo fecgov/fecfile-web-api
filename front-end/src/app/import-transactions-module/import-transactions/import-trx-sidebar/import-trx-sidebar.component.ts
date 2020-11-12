@@ -25,6 +25,7 @@ export class ImportTrxSidebarComponent implements OnInit {
     this.headerTitle = this.headerTitleValue;
   }
 
+  // for devl
   private foo_loadQueue() {
     this.fileQueue = [];
     this.fileQueue.push({
@@ -72,7 +73,7 @@ export class ImportTrxSidebarComponent implements OnInit {
       sidebarVisibleClass: this.sidebarVisibleClass
     });
 
-    this.foo_loadQueue();
+    // this.foo_loadQueue();
   }
 
   public cancelFile(file: any) {
