@@ -49,4 +49,20 @@
       }
     }
   }
+  .button-container {
+    background-color: $mineShaft;
+    padding: 2em 0;
+    .btn-row {
+      padding: 1.25em 7em;
+    }
+    .sidebar-button {
+      width: 11em;
+      height: 3em;
+      padding: 1em;
+    }
+    .cancel-button {
+      background-color: $fecRed;
+      color: white;
+    }
+  }
 }

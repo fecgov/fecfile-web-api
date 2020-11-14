@@ -1,0 +1,9 @@
+<div class="import-done-container">
+  <div class="complete-message">Your Import is now Complete!</div>
+  <button *ngIf="!allFilesDone" class="btn btn-secondary import-done-button" (click)="proceed()">
+    Proceed
+  </button>
+  <button *ngIf="allFilesDone && hasFailure" class="btn btn-secondary import-done-button" (click)="showErrorLog()">
+    View Error Logs for Failed Files
+  </button>
+</div>

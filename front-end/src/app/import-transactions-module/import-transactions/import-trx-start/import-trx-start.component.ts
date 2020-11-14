@@ -8,17 +8,15 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./import-trx-start.component.scss']
 })
 export class ImportTrxStartComponent implements OnInit {
-
   @Output()
-  public beginUploadEmitter: EventEmitter<any> = new EventEmitter<any>();
+  public beginFileSelectEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor(private _importTransactionsService: ImportTransactionsService) { }
+  constructor(private _importTransactionsService: ImportTransactionsService) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   public beginUpload() {
-    this.beginUploadEmitter.emit();
+    this.beginFileSelectEmitter.emit();
   }
 
   public viewFormatSpecs(fileName: string) {
@@ -28,5 +26,4 @@ export class ImportTrxStartComponent implements OnInit {
       FileSaver.saveAs(blob, 'Import Contacts Specs and Template.xlsx');
     });
   }
-
 }

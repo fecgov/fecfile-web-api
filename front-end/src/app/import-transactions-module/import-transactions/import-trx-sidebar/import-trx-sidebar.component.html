@@ -6,9 +6,9 @@
       </i>
     </button>
   </div>
-  <h3 class="text-center sidebar-header">{{ headerTitle }}</h3>
-  <hr />
-  <div class="file-queue">
+  <h3 *ngIf="open" class="text-center sidebar-header">{{ headerTitle }}</h3>
+  <hr *ngIf="open" />
+  <div [hidden]="!open" *ngIf="fileQueue" class="file-queue">
     <ul class="file-queue-list">
       <li *ngFor="let file of fileQueue" class="file-in-queue">
         <div class="">
@@ -32,5 +32,17 @@
         </div>
       </li>
     </ul>
+    <div class="button-container">
+      <div *ngIf="currentStep === step1Upload" class="row btn-row">
+        <button class="btn btn-secondary sidebar-button" (click)="proceed()">
+          Proceed
+        </button>
+      </div>
+      <div class="row btn-row">
+        <button class="btn sidebar-button cancel-button" (click)="cancelImportAll()">
+          Cancel All Imports
+        </button>
+      </div>
+    </div>
   </div>
 </div>

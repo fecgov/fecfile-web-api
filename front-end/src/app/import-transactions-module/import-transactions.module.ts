@@ -7,9 +7,21 @@ import { ImportTrxHowToComponent } from './import-transactions/import-trx-how-to
 import { ImportTrxStartComponent } from './import-transactions/import-trx-start/import-trx-start.component';
 import { ImportTrxUploadComponent } from './import-transactions/import-trx-upload/import-trx-upload.component';
 import { ImportTrxSidebarComponent } from './import-transactions/import-trx-sidebar/import-trx-sidebar.component';
+import { ImportTrxReviewComponent } from './import-transactions/import-trx-review/import-trx-review.component';
+import { ImportTrxDoneComponent } from './import-transactions/import-trx-done/import-trx-done.component';
+import { ImportTrxCleanComponent } from './import-transactions/import-trx-clean/import-trx-clean.component';
 
 @NgModule({
   imports: [SharedModule, ImportTransactionsRoutingModule, NgbDropdownModule],
-  declarations: [ImportTransactionsComponent, ImportTrxHowToComponent, ImportTrxStartComponent, ImportTrxUploadComponent, ImportTrxSidebarComponent]
+  declarations: [
+    ImportTransactionsComponent,
+    ImportTrxHowToComponent,
+    ImportTrxStartComponent,
+    ImportTrxUploadComponent,
+    ImportTrxSidebarComponent,
+    ImportTrxReviewComponent,
+    ImportTrxDoneComponent,
+    ImportTrxCleanComponent
+  ]
 })
 export class ImportTransactionsModule {}
