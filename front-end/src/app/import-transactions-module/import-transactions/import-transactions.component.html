@@ -4,8 +4,12 @@
   <div [hidden]="isShowInfo" class="import_contacts__container">
     <div *ngIf="currentStep !== start" class="import_trx__sidebar" [ngClass]="sidebarVisibleClass">
       <app-import-trx-sidebar
-        [fileQueue_foo]="fileQueue"
+        [fileQueue]="fileQueue"
+        [currentStep]="currentStep"
+        [forceChangeDetection]="forceSidebarChangeDetection"
+        [open]="openSidebar"
         (toggleEmitter)="receiveToggleSidebar($event)"
+        (proceedUploadEmitter)="receiveProceedUploadSidebar()"
       ></app-import-trx-sidebar>
     </div>
     <!-- <div [ngClass]="currentStep !== start ? 'right-side ' : ''"> -->
@@ -38,13 +42,26 @@
             <div *ngIf="currentStep !== start" class="import_contacts__steps">
               <app-steps [steps]="steps" [current_step]="currentStep"> </app-steps>
             </div>
-            <div *ngIf="currentStep === start">
-              <app-import-trx-start (beginUploadEmitter)="receiveBeginUpload()"> </app-import-trx-start>
-            </div>
-            <div *ngIf="currentStep === step1Upload">
-              <app-import-trx-upload (beginUploadEmitter)="receiveBeginUpload()" (queueEmitter)="receiveQueue($event)">
-              </app-import-trx-upload>
-            </div>
+            <app-import-trx-start *ngIf="currentStep === start" 
+              (beginFileSelectEmitter)="receiveBeginFileSelect()">
+            </app-import-trx-start>
+            <app-import-trx-upload *ngIf="currentStep === step1Upload"
+              (queueEmitter)="receiveSelectedFiles($event)">
+            </app-import-trx-upload>
+            <app-import-trx-review *ngIf="currentStep === step2Review"
+              [uploadFile]="currentFile"
+              (resultsEmitter)="receiveReviewResults($event)"
+            ></app-import-trx-review>
+            <app-import-trx-clean *ngIf="currentStep === step3Clean"
+              [uploadFile]="currentFile"
+              (resultsEmitter)="receiveCleanResults($event)"
+            ></app-import-trx-clean>
+            <app-import-trx-done *ngIf="currentStep === step4ImportDone"
+              [uploadFile]="currentFile"
+              [fileQueue]="fileQueue"
+              (proceedEmitter)="receiveProceedNextFile()"
+            >
+            </app-import-trx-done>
           </div>
         </div>
       </section>

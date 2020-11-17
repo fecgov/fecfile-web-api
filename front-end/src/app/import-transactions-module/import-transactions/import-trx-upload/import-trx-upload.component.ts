@@ -23,73 +23,29 @@ import { ImportTransactionsService } from '../service/import-transactions.servic
 import { UploadTrxService } from './service/upload-trx.service';
 import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { AnyLengthString } from 'aws-sdk/clients/comprehendmedical';
+import { UploadFileModel } from '../model/upload-file.model';
 
+/**
+ * This component provides UI for selecting file to upload.
+ * The actual upload will be done in the Review Component.
+ */
 @Component({
   selector: 'app-import-trx-upload',
   templateUrl: './import-trx-upload.component.html',
   styleUrls: ['./import-trx-upload.component.scss']
 })
-export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
+export class ImportTrxUploadComponent implements OnInit, OnChanges {
   @ViewChild('selectFileInput')
   public selectFileInput: ElementRef;
-
-  @Input()
-  public forceChangeDetection: Date;
-
-  @Output()
-  public uploadResultEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Output()
   public queueEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  @Output()
-  public saveStatusEmitter: EventEmitter<any> = new EventEmitter<any>();
+  private fileQueue: Array<UploadFileModel>;
 
-  public userContacts: Array<any>;
-  public showUpload: boolean;
-  public progressPercent: number;
-  public processingPercent: number;
-  public hideProcessingProgress: boolean;
-  public showSpinner: boolean;
-  public uploadingText: string;
-  public processingText: string;
-  public duplicateFile: any;
+  constructor(private _dialogService: DialogService) {}
 
-  private onDestroy$: Subject<any>;
-  private uploadProcessing$: Subject<any>;
-  private checkSum: string;
-  private committeeId: string;
-  private fileQueue: Array<any>;
-
-  constructor(
-    private _importTransactionsService: ImportTransactionsService,
-    private _uploadTrxService: UploadTrxService,
-    private _utilService: UtilService,
-    private _dialogService: DialogService
-  ) {}
-
-  public ngOnInit() {
-    this.committeeId = null;
-    if (localStorage.getItem('committee_details') !== null) {
-      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
-      this.committeeId = cmteDetails.committeeid;
-    }
-
-    this.onDestroy$ = new Subject();
-    this.showUpload = true;
-    this.hideProcessingProgress = true;
-    this.showSpinner = false;
-    this.progressPercent = 0;
-    this.processingPercent = 0;
-    this.getProgress();
-  }
-
-  public ngOnDestroy() {
-    this.onDestroy$.next();
-    if (this.uploadProcessing$) {
-      this.uploadProcessing$.next();
-    }
-  }
+  public ngOnInit() {}
 
   public ngOnChanges(changes: SimpleChanges) {
     this.ngOnInit();
@@ -125,21 +81,19 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
 
   private _startImporting(files: Array<File>) {
     if (this._validateSelctedFiles(files)) {
-      this.fileQueue = [];
+      this.fileQueue = new Array<UploadFileModel>();
       let i = 0;
       for (const file of files) {
-        const qFile: any = {};
+        const qFile: UploadFileModel = new UploadFileModel();
         qFile.fileName = file.name;
-        if (i === 0) {
-          qFile.status = 'Uploading';
-        } else {
-          qFile.status = 'Queued';
-        }
+        qFile.status = 'Queued';
+        qFile.file = file;
+        qFile.queueIndex = i;
         this.fileQueue.push(qFile);
         i++;
       }
       this.queueEmitter.emit(this.fileQueue);
-      this._uploadCsv(files[0]);
+      // this._uploadCsv(files[0]);
     }
   }
 
@@ -149,21 +103,6 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
   public fileSelected() {
     if (this.selectFileInput.nativeElement.files) {
       this._startImporting(this.selectFileInput.nativeElement.files);
-
-      // if (this.selectFileInput.nativeElement.files[0]) {
-      //   const file: File = this.selectFileInput.nativeElement.files[0];
-      //   if (!this._validateFileType(file)) {
-      //     this._showInvalidFileType();
-      //   } else {
-      //     this.saveStatusEmitter.emit(false);
-      //     const qFile: any = {};
-      //     qFile.fileName = file.name;
-      //     qFile.status = 'Uploading';
-      //     this.fileQueue = [qFile];
-      //     this.queueEmitter.emit(this.fileQueue);
-      //     this._uploadCsv(file);
-      //   }
-      // }
     }
   }
 
@@ -234,120 +173,6 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy, OnChanges {
     }
     fileExtention = fileName.split('.').pop();
     return fileExtention;
-  }
-
-  private _uploadCsv(file: File) {
-    // const checkSum = this._createFileCheckSum(file);
-
-    // TODO convert this to a method returning observable or promise
-    // TODO this will perform better if API generates it but requires upload to do so.
-    // TODO if not done in API, check for faster front end library option
-    const fileReader = new FileReader();
-    fileReader.onload = e => {
-      const fileData = fileReader.result;
-      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
-      const md5 = hash.toString(CryptoJS.enc.Hex);
-      this.checkSum = md5;
-
-      this._uploadTrxService.listObjects(this.committeeId).subscribe((data: S3.Types.ListObjectsV2Output) => {
-        console.log('');
-        for (const s3Obj of data.Contents) {
-          // remove double quotes from eTag
-          let eTagEdited = s3Obj.ETag;
-          if (s3Obj.ETag) {
-            if (s3Obj.ETag.length > 1) {
-              if (s3Obj.ETag.startsWith('"') && s3Obj.ETag.endsWith('"')) {
-                eTagEdited = s3Obj.ETag.substring(1, s3Obj.ETag.length - 1);
-              }
-            }
-          }
-
-          if (this.checkSum === eTagEdited) {
-            this._dialogService
-              .confirm(
-                'This file has been uploaded before!  TODO show Review Screen',
-                ConfirmModalComponent,
-                'Warning!',
-                false
-              )
-              .then(res => {});
-          }
-        }
-      });
-
-      this.progressPercent = 0;
-      this.showUpload = false;
-      this.uploadingText = 'Uploading...';
-      this._uploadTrxService
-        .uploadFile(file, this.checkSum, this.committeeId)
-        .takeUntil(this.onDestroy$)
-        .subscribe((data: any) => {
-          if (data === false) {
-            console.log('false');
-            return;
-          }
-          this._checkForProcessingProgress();
-          this._uploadTrxService.processingUploadedTransactions(file.name, this.checkSum).subscribe((res: any) => {
-            this.showSpinner = false;
-            // this.emitUploadResults(res);
-          });
-          // this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
-          //   this.showSpinner = false;
-          //   this.emitUploadResults(res);
-          // });
-        });
-    };
-    fileReader.readAsText(file);
-  }
-
-  /**
-   * Check for processing progress now that upload is complete.
-   */
-  private _checkForProcessingProgress() {
-    // Ensure Upload complete message and spnner appear simultaneously using delay.
-    const timer1 = timer(300);
-    const timerSubject = new Subject<any>();
-    const timerSubscription = timer1.pipe(takeUntil(timerSubject)).subscribe(() => {
-      this.uploadingText = 'Upload complete!';
-      this.showSpinner = true;
-      if (timerSubscription) {
-        timerSubscription.unsubscribe();
-      }
-      timerSubject.next();
-      timerSubject.complete();
-    });
-
-    // this.hideProcessingProgress = false;
-    // const progressPoller = interval(500);
-    // this.uploadProcessing$ = new Subject();
-    // progressPoller.takeUntil(this.uploadProcessing$);
-    // this.processingPercent = 0;
-    // progressPoller.subscribe(val => {
-    //   this.uploadContactsService.checkUploadProcessing().takeUntil(this.uploadProcessing$).subscribe(res => {
-    //     this.processingPercent += res;
-    //     if (this.processingPercent > 99) {
-    //       this.uploadProcessing$.next();
-    //       this.uploadProcessing$.complete();
-    //       // Using setTimeout to avoid another subject but should use RxJs (try delay or interval)
-    //       // The purpose here is to allow the user to see the 100% completion before switching view.
-    //       setTimeout(() => {
-    //         // this.emitUserContacts();
-    //       }, 1000);
-    //     }
-    //   });
-    // });
-  }
-
-  public getProgress() {
-    this._uploadTrxService
-      .getProgressPercent()
-      .takeUntil(this.onDestroy$)
-      .subscribe((percent: number) => {
-        this.progressPercent = percent;
-        if (this.progressPercent >= 100) {
-          // this.uploadingText = 'Upload complete!';
-        }
-      });
   }
 
   /**

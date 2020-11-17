@@ -1,5 +1,15 @@
 import { Subscription } from 'rxjs/Subscription';
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+  OnDestroy,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -17,8 +27,6 @@ import { AuthService } from '../../services/AuthService/auth.service';
   providers: [NgbTooltipConfig]
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-
-
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public formType: string = null;
@@ -46,41 +54,38 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private _formService: FormsService,
     private _config: NgbTooltipConfig,
     private _authService: AuthService,
-    private _messageService : MessageService
-  ) { }
+    private _messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     const route: string = this._router.url;
 
-    this._formService.get_filed_form_types().takeUntil(this.onDestroy$)
-      .subscribe(res => this.committee_forms = <Icommittee_forms[]>res);
+    this._formService
+      .get_filed_form_types()
+      .takeUntil(this.onDestroy$)
+      .subscribe(res => (this.committee_forms = <Icommittee_forms[]>res));
 
-    this.routerSubscription = this._router
-      .events
-      .subscribe(val => {
-        if (val) {
-          if (val instanceof NavigationEnd) {
-            if (
-              val.url.indexOf('/forms/form/') === 0 ||
-              val.url.indexOf('/forms/transactions/') === 0 ||
-              val.url.indexOf('/signandSubmit/3X') === 0 ||
-              val.url.indexOf('/contacts') === 0 ||
-              val.url.indexOf('/addContact') === 0 ||
-              val.url.indexOf('/import-contacts') === 0 ||
-              val.url.indexOf('/reports') === 0
-            ) {
-              this._closeNavBar();
-            } else if (
-              val.url.indexOf('/dashboard') === 0 ||
-              val.url.indexOf('/forms/form/') === -1
-            ) {
-              this.formType = null;
-              this._openNavBar();
-            }
+    this.routerSubscription = this._router.events.subscribe(val => {
+      if (val) {
+        if (val instanceof NavigationEnd) {
+          if (
+            val.url.indexOf('/forms/form/') === 0 ||
+            val.url.indexOf('/forms/transactions/') === 0 ||
+            val.url.indexOf('/signandSubmit/3X') === 0 ||
+            val.url.indexOf('/contacts') === 0 ||
+            val.url.indexOf('/addContact') === 0 ||
+            val.url.indexOf('/import-contacts') === 0 ||
+            val.url.indexOf('/import-transactions') === 0 ||
+            val.url.indexOf('/reports') === 0
+          ) {
+            this._closeNavBar();
+          } else if (val.url.indexOf('/dashboard') === 0 || val.url.indexOf('/forms/form/') === -1) {
+            this.formType = null;
+            this._openNavBar();
           }
         }
-      });
-
+      }
+    });
 
     this.screenWidth = window.innerWidth;
 
@@ -104,22 +109,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-
   ngDoCheck(): void {
     const route: string = this._router.url;
 
     if (!this._toggleNavClicked) {
       if (route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
-
         let formSelected: string = null;
 
-        this.childRouteSubscription = this._activatedRoute
-          .children[0]
-          .params
-          .subscribe(param => {
-            formSelected = param['form_id'];
-            this.formSelected(formSelected);
-          });
+        this.childRouteSubscription = this._activatedRoute.children[0].params.subscribe(param => {
+          formSelected = param['form_id'];
+          this.formSelected(formSelected);
+        });
 
         this._closeNavBar();
 
@@ -158,37 +158,34 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (this._authService.isReadOnly()) {
       return;
     }
-    this.routerEventsSubscription = this._router
-      .events
-      .subscribe(val => {
-        if (val instanceof NavigationEnd) {
-          if (val.url.indexOf(form) >= 1) {
-            if (form !== '3X') {
-              // Except Forn3X screens we should not show Form3X related dashboard
-              if (localStorage.getItem('form3XReportInfo.showDashBoard') === 'Y') {
-                this._formService.removeFormDashBoard('3X');
-              }
+    this.routerEventsSubscription = this._router.events.subscribe(val => {
+      if (val instanceof NavigationEnd) {
+        if (val.url.indexOf(form) >= 1) {
+          if (form !== '3X') {
+            // Except Forn3X screens we should not show Form3X related dashboard
+            if (localStorage.getItem('form3XReportInfo.showDashBoard') === 'Y') {
+              this._formService.removeFormDashBoard('3X');
             }
-            else if (form === '3X') {
-              localStorage.removeItem("form3XReportInfo.dueDate");
-              localStorage.removeItem("form3XReportInfo.electionDate");
-              localStorage.removeItem("form3XReportInfo.fromDate");
-              localStorage.removeItem("form3XReportInfo.regularSpecialReportInd");
-              localStorage.removeItem("form3XReportInfo.reportDescription");
-              localStorage.removeItem("form3XReportInfo.reportType");
-              localStorage.removeItem("form3XReportInfo.toDate");
-              localStorage.removeItem("form3xReportTypes");
-              localStorage.removeItem("form3xSelectedReportType");
-              localStorage.removeItem("form_3X_ReportInfo");
+          } else if (form === '3X') {
+            localStorage.removeItem('form3XReportInfo.dueDate');
+            localStorage.removeItem('form3XReportInfo.electionDate');
+            localStorage.removeItem('form3XReportInfo.fromDate');
+            localStorage.removeItem('form3XReportInfo.regularSpecialReportInd');
+            localStorage.removeItem('form3XReportInfo.reportDescription');
+            localStorage.removeItem('form3XReportInfo.reportType');
+            localStorage.removeItem('form3XReportInfo.toDate');
+            localStorage.removeItem('form3xReportTypes');
+            localStorage.removeItem('form3xSelectedReportType');
+            localStorage.removeItem('form_3X_ReportInfo');
 
-              //also destroy any current f3x component if present
-              this._messageService.sendMessage({formType : '3X', action: 'destroy'});
-            }
-
-            this.formType = form;
+            //also destroy any current f3x component if present
+            this._messageService.sendMessage({ formType: '3X', action: 'destroy' });
           }
+
+          this.formType = form;
         }
-      });
+      }
+    });
   }
 
   /**
