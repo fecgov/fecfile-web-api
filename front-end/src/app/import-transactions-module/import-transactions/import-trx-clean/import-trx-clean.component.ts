@@ -18,7 +18,6 @@ export class ImportTrxCleanComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.uploadFile.status = ImportFileStatusEnum.clean;
   }
 
   public proceed() {

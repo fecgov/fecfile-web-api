@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { UploadFileModel } from '../model/upload-file.model';
 import { ImportFileStatusEnum } from '../import-file-status.enum';
 import { ImportTransactionsService } from '../service/import-transactions.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-import-trx-done',
@@ -20,12 +21,24 @@ export class ImportTrxDoneComponent implements OnInit {
 
   public hasFailure: boolean;
   public allFilesDone: boolean;
+  public allFailed: boolean;
+  public readonly completeStatus = ImportFileStatusEnum.complete;
+  public readonly importingStatus = ImportFileStatusEnum.importing;
+  public progressPercent: number;
 
-  constructor(private _importTransactionsService: ImportTransactionsService) {}
+  constructor(private _router: Router, private _importTransactionsService: ImportTransactionsService) {}
 
   ngOnInit() {
-    this.uploadFile.status = ImportFileStatusEnum.importing;
-    this._finalizeImport();
+    this.progressPercent = 0;
+    this.allFilesDone = false;
+    this.hasFailure = false;
+    this.allFailed = false;
+
+    if (this.uploadFile.status === ImportFileStatusEnum.importing) {
+      this._finalizeImport();
+    } else {
+      this._determineNextStep();
+    }
   }
 
   private _finalizeImport() {
@@ -36,9 +49,6 @@ export class ImportTrxDoneComponent implements OnInit {
   }
 
   private _determineNextStep() {
-    this.allFilesDone = false;
-    this.hasFailure = false;
-
     // Any file with a status of queued means not all are done.
     let allQueuedDone = true;
     let failedCount = 0;
@@ -51,11 +61,12 @@ export class ImportTrxDoneComponent implements OnInit {
     }
 
     // If all are failed, then all are done.
-    let allFailed = false;
     if (this.fileQueue.length === failedCount) {
-      allFailed = true;
+      this.allFailed = true;
     }
-    this.allFilesDone = allQueuedDone || allFailed ? true : false;
+    // this.allFilesDone = allQueuedDone || allFailed ? true : false;
+
+    this.allFilesDone = allQueuedDone ? true : false;
     // If all are done and any one file failed, show error log.
     if (this.allFilesDone) {
       if (failedCount > 0) {
@@ -70,5 +81,9 @@ export class ImportTrxDoneComponent implements OnInit {
 
   public showErrorLog() {
     alert('Error log not yet developed');
+  }
+
+  public goToNotifications() {
+    this._router.navigate(['/notifications/6']);
   }
 }

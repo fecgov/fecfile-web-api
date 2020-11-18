@@ -1,0 +1,57 @@
+@import 'src/app/shared/scss/global';
+
+// a shared file for all modals
+
+.session-timed-out.modal-backdrop {
+  background-color: #5b616b;
+  opacity: 1 !important;
+  background-image: url('src/assets/img/fec-logo-5opac.png');
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  z-index: 1075 !important;
+}
+.modal {
+  z-index: 1080 !important;
+  .modal-dialog {
+    .modal-content {
+      margin-left: auto;
+      margin-right: auto;
+      width: 300px;
+      @include media(tablet) {
+        width: 100%;
+      }
+      @include media(mediumDesktop) {
+        width: 100%;
+      }
+      @include media(largeDesktop) {
+        width: 100%;
+      }
+      .modal-header {
+        // background-color: $crusta;
+        color: $white;
+        .btn-link {
+          color: $white;
+          &:hover,
+          &:active,
+          &:visited {
+            color: $white;
+            text-decoration: none;
+          }
+        }
+      }
+      .modal-title {
+        margin: 0 !important;
+      }
+      .warning-header {
+        background-color: $crusta;
+      }
+      .modal-body {
+        color: $black;
+        white-space: pre-wrap;
+      }
+    }
+  }
+}

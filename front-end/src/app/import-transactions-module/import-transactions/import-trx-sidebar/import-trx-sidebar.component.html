@@ -10,19 +10,27 @@
   <hr *ngIf="open" />
   <div [hidden]="!open" *ngIf="fileQueue" class="file-queue">
     <ul class="file-queue-list">
-      <li *ngFor="let file of fileQueue" class="file-in-queue">
+      <li *ngFor="let file of fileQueue; let i = index" class="container file-in-queue">
         <div class="">
           <div class="row align-items-center queue-row">
             <div class="col-md-4 file-name">
               {{ file.fileName }}
             </div>
             <div class="col-md-4">
-              <div class="file-status">
+              <div class="file-status" [ngClass]="currentFile?.queueIndex === i ? 'current-file' : 'non-current-file'">
                 {{ file.status }}
               </div>
             </div>
             <div class="col-md-1">
-              <button type="button" class="btn btn-link" (click)="cancelFile(file)">
+              <button
+                *ngIf="file.status !== completeStatus"
+                type="button"
+                class="btn btn-link"
+                ngbTooltip="Cancel this file."
+                tooltipClass="form-tooltip"
+                placement="left"
+                (click)="cancelFile(file)"
+              >
                 <i class="close-simple cancel-file">
                   <span class="sr-only">Cancel Import Single File</span>
                 </i>
@@ -32,16 +40,26 @@
         </div>
       </li>
     </ul>
-    <div class="button-container">
+    <div *ngIf="fileQueue?.length > 0 && currentStep !== step4ImportDone" class="container button-container">
       <div *ngIf="currentStep === step1Upload" class="row btn-row">
-        <button class="btn btn-secondary sidebar-button" (click)="proceed()">
-          Proceed
-        </button>
+        <div class="col text-center">
+          <button class="btn btn-secondary sidebar-button" (click)="proceed()">
+            Proceed
+          </button>
+        </div>
       </div>
       <div class="row btn-row">
-        <button class="btn sidebar-button cancel-button" (click)="cancelImportAll()">
-          Cancel All Imports
-        </button>
+        <div class="col text-center">
+          <button
+            ngbTooltip="Cancel all incompleted files."
+            tooltipClass="form-tooltip"
+            placement="right"
+            class="btn sidebar-button cancel-button"
+            (click)="cancelImportAll()"
+          >
+            Cancel Remaining Imports
+          </button>
+        </div>
       </div>
     </div>
   </div>

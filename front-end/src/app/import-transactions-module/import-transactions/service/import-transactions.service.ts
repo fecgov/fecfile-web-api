@@ -9,11 +9,9 @@ import { CookieService } from 'ngx-cookie-service';
   providedIn: 'root'
 })
 export class ImportTransactionsService {
-
-  constructor(private _http: HttpClient, private _cookieService: CookieService) { }
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
   public getSpecAndTemplate(fileName: string): Observable<any> {
-
     const url = '/contact/template';
     // add this once API is ready const url = '/transactions/template';
     let params = new HttpParams();
@@ -28,7 +26,6 @@ export class ImportTransactionsService {
       })
     );
   }
-
 
   /**
    * Start processing the uploaded file of transactions.
@@ -62,8 +59,11 @@ export class ImportTransactionsService {
       case 'validation_error.csv':
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
         break;
-      case 'duplicate_file.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/duplicate_file.json';
+      case 'validation_error_2.csv':
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
+        break;
+      case 'success.csv':
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
         break;
       case 'duplicate_file.csv':
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/duplicate_file.json';

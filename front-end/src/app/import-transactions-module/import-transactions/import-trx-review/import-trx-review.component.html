@@ -1,16 +1,40 @@
-<div class="upload_contacts__progress_container">
-  <p>{{ uploadingText }}</p>
-  <ngb-progressbar
-    type="dark"
-    textType="white"
-    animated="true"
-    [value]="progressPercent"
-    showValue="true"
-    height="2rem"
-  >
-  </ngb-progressbar>
-  <p>
-    Your file is being scanned to ensure it meets the correct import specifications. If there are any errors they will
-    be listed at the end of the scan.
-  </p>
+<div class="review-main" *ngIf="hasDupeFile">
+  <div class="duplicate-message">
+    The file you uploaded appears to be a duplicate. The transactions contained in the file already exist in your
+    FECfile database. Please click Proceed at the bottom of the page to continue with importing the file.
+    <br /><br />
+    If the file is in fact a duplicate, and you do not want to continue with the import of this file, please click
+    either the "Cancel This Import" button at the bottow of the page, or the "X" button next to the current file's name
+    in the Left Navigatin Pane, and this file import will be cancelled, and the next file upload will begin.
+  </div>
+  <div class="review-table-container">
+    <table class="table table-striped table-hover review-table text-center">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Date/Time</th>
+          <th>Checksum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of duplicateFileList">
+          <td>{{ file.fileName }}</td>
+          <td>{{ file.uploadDate | date: 'MM/dd/yyyy @ hh:mm:ss a':'GMT' }}</td>
+          <td>{{ file.checkSum }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="container">
+    <div class="row text-center">
+      <div class="col col-md-5">
+        <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
+          Proceed
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImport()">
+          Cancel This Import
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

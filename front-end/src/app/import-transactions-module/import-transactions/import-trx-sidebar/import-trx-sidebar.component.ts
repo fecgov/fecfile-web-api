@@ -1,6 +1,9 @@
 import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ImportTransactionsStepsEnum } from '../import-transactions-steps.enum';
 import { UploadFileModel } from '../model/upload-file.model';
+import { ImportFileStatusEnum } from '../import-file-status.enum';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-import-trx-sidebar',
@@ -9,8 +12,10 @@ import { UploadFileModel } from '../model/upload-file.model';
 })
 export class ImportTrxSidebarComponent implements OnInit, OnChanges {
   @Input()
-  // public fileQueue_foo: Array<any>;
   public fileQueue: Array<UploadFileModel>;
+
+  @Input()
+  public currentFile: UploadFileModel;
 
   @Input()
   public currentStep: ImportTransactionsStepsEnum;
@@ -27,27 +32,25 @@ export class ImportTrxSidebarComponent implements OnInit, OnChanges {
   @Output()
   public proceedUploadEmitter: EventEmitter<any> = new EventEmitter<any>();
 
+  @Output()
+  public proceedCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
+
   public iconClass = 'bars-icon';
   public sidebarVisibleClass = 'sidebar-hidden';
   public headerTitle: string;
-  // public open: boolean;
   public readonly step1Upload = ImportTransactionsStepsEnum.step1Upload;
-  // public readonly step1aSelect = ImportTransactionsStepsEnum.step1aSelect;
+  public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
+  public readonly completeStatus = ImportFileStatusEnum.complete;
 
   private readonly headerTitleValue = 'Import File(s) Status';
 
-  constructor() {}
+  constructor(private _dialogService: DialogService) {}
 
   ngOnInit() {
     this.headerTitle = this.headerTitleValue;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.currentStep) {
-      if (changes.currentStep.currentValue === this.step1Upload) {
-        // this._openSideBar();
-      }
-    }
     if (changes.open !== undefined) {
       if (changes.open.currentValue === true) {
         this._openSideBar();
@@ -57,27 +60,44 @@ export class ImportTrxSidebarComponent implements OnInit, OnChanges {
     }
   }
 
-  // // for devl
-  // private foo_loadQueue() {
-  //   this.fileQueue = [];
-  //   this.fileQueue.push({
-  //     fileName: 'file_1.csv',
-  //     status: 'Processing'
-  //   });
-  //   for (let i = 1; i < 14; i++) {
-  //     this.fileQueue.push({
-  //       fileName: `file_some_really_long_name_${i}.csv`,
-  //       status: 'Queued'
-  //     });
-  //   }
-  // }
-
   public toggleSidebar() {
     if (this.iconClass === 'close-icon') {
       this._closeSideBar();
     } else {
       this._openSideBar();
     }
+  }
+
+  public cancelFile(file: any) {
+    // TODO emit to parent a message to cancel import on this file.
+    // It will call API for cancel.
+    const message = 'Import for this file will be canceled. ' + 'Are you sure you would like to continue?';
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', true).then(res => {
+      if (res === 'okay') {
+        // this._closeSideBar();
+        this.proceedCancelEmitter.emit({
+          cancelType: 'cancel-file',
+          file: file
+        });
+      }
+    });
+  }
+
+  public cancelImportAll() {
+    // TODO emit to parent the cancel action
+    const message =
+      'This action will cancel all remaining Imports that have not been completed. ' +
+      'Are you sure you would like to continue?';
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', true).then(res => {
+      if (res === 'okay') {
+        this._closeSideBar();
+        this.proceedCancelEmitter.emit({ cancelType: 'cancel-all' });
+      }
+    });
+  }
+
+  public proceed() {
+    this.proceedUploadEmitter.emit();
   }
 
   /**
@@ -106,20 +126,20 @@ export class ImportTrxSidebarComponent implements OnInit, OnChanges {
       showSidebar: true,
       sidebarVisibleClass: this.sidebarVisibleClass
     });
-
-    // this.foo_loadQueue();
   }
 
-  public cancelFile(file: any) {
-    // TODO emit to parent a message to cancel import on this file.
-    // It will call API for cancel.
-  }
-
-  public cancelImportAll() {
-    // TODO emit to parent the cancel action
-  }
-
-  public proceed() {
-    this.proceedUploadEmitter.emit();
-  }
+  /**
+   * Check if there are files in the Queued status to be imported.
+   * Files in the Failed status will not apply.
+   */
+  // public checkQueuedFileExists(): boolean {
+  //   // const totalFiles = this.fileQueue.length;
+  //   // return this.currentFile.queueIndex + 1 < totalFiles ? true : false;
+  //   for (const file of this.fileQueue) {
+  //     if (file.status === ImportFileStatusEnum.queued) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 }

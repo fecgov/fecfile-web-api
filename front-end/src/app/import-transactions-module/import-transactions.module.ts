@@ -10,6 +10,8 @@ import { ImportTrxSidebarComponent } from './import-transactions/import-trx-side
 import { ImportTrxReviewComponent } from './import-transactions/import-trx-review/import-trx-review.component';
 import { ImportTrxDoneComponent } from './import-transactions/import-trx-done/import-trx-done.component';
 import { ImportTrxCleanComponent } from './import-transactions/import-trx-clean/import-trx-clean.component';
+import { UploadCompleteMessageComponent } from './import-transactions/import-trx-review/upload-complete-message/upload-complete-message.component';
+import { ImportTrxFileSelectComponent } from './import-transactions/import-trx-file-select/import-trx-file-select.component';
 
 @NgModule({
   imports: [SharedModule, ImportTransactionsRoutingModule, NgbDropdownModule],
@@ -21,7 +23,10 @@ import { ImportTrxCleanComponent } from './import-transactions/import-trx-clean/
     ImportTrxSidebarComponent,
     ImportTrxReviewComponent,
     ImportTrxDoneComponent,
-    ImportTrxCleanComponent
-  ]
+    ImportTrxCleanComponent,
+    UploadCompleteMessageComponent,
+    ImportTrxFileSelectComponent
+  ],
+  entryComponents: [UploadCompleteMessageComponent]
 })
 export class ImportTransactionsModule {}
