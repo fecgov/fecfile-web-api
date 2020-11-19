@@ -84,4 +84,48 @@ export class ImportTransactionsService {
         })
       );
   }
+
+  /**
+   * Get duplicates for the file and page.
+   */
+  public getDuplicates(fileName: string, page: number): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/duplicate';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.page = page;
+    request.itemsPerPage = 4;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+
+    const mockFile = 'assets/mock-data/import-contacts/duplicates.json';
+    return this._http
+      .get(mockFile, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
 }

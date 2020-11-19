@@ -10,7 +10,7 @@
   .import_contacts__container {
     .import_trx__sidebar {
       background-color: #aeb0b5;
-      min-height: 146vh;
+      min-height: $mainContentHeight;
       padding-left: 0;
       float: left;
       transition: all 0.4s ease 0s;
@@ -30,6 +30,9 @@
       &.sidebar-hidden {
         width: 95%;
       }
+    }
+    .lower-section {
+      width: 100%;
     }
     header {
       .header-content {

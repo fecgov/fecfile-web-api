@@ -1,5 +1,17 @@
+@import 'src/app/shared/scss/global';
+
 .review-main {
   .duplicate-message {
     margin: 0 0 2em 0;
+  }
+  .review-button {
+    width: 11em;
+    height: 3em;
+    margin: 1.2em 0.25em;
+  }
+
+  .review-cancel-button {
+    background-color: $fecRed;
+    color: white;
   }
 }

@@ -11,7 +11,6 @@ import { ImportFileStatusEnum } from '../import-file-status.enum';
 import { ImportTransactionsService } from '../service/import-transactions.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-
 @Component({
   selector: 'app-import-trx-upload',
   templateUrl: './import-trx-upload.component.html',
@@ -120,10 +119,15 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
           }
           this._checkForProcessingProgress();
         });
+
+      // alert('fake for no internet conn');
+      // this.resultsEmitter.emit({
+      //   resultType: 'success',
+      //   uploadFile: this.uploadFile
+      // });
     };
     fileReader.readAsText(file);
   }
-
 
   /**
    * Check for processing progress now that upload is complete.

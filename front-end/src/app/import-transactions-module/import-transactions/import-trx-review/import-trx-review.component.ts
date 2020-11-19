@@ -61,7 +61,7 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
   public cancelImport() {
     this.resultsEmitter.emit({
       resultType: 'cancel-file',
-      uploadFile: this.uploadFile
+      file: this.uploadFile
     });
   }
 

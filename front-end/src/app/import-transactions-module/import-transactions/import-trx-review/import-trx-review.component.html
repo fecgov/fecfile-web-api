@@ -26,14 +26,16 @@
     </table>
   </div>
   <div class="container">
-    <div class="row text-center">
-      <div class="col col-md-5">
-        <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
-          Proceed
-        </button>
-        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImport()">
-          Cancel This Import
-        </button>
+    <div class="row">
+      <div class="col text-center">
+        <div>
+          <button class="btn btn-secondary review-button" (click)="proceed()">
+            Proceed
+          </button>
+          <button class="btn review-button review-cancel-button" (click)="cancelImport()">
+            Cancel This Import
+          </button>
+        </div>
       </div>
     </div>
   </div>
