@@ -1,271 +1,184 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  Output,
-  EventEmitter,
-  OnDestroy,
-  Input,
-  SimpleChanges,
-  OnChanges
-} from '@angular/core';
-import * as XLSX from 'xlsx';
+import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { S3 } from 'aws-sdk/clients/all';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { timer, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UtilService } from 'src/app/shared/utils/util.service';
-import CryptoJS from 'crypto-js';
-import { S3 } from 'aws-sdk/clients/all';
-import { ModalDirective } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { UploadTrxService } from '../import-trx-upload/service/upload-trx.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { ImportTransactionsService } from '../service/import-transactions.service';
-import { UploadTrxService } from './service/upload-trx.service';
-import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
-import { AnyLengthString } from 'aws-sdk/clients/comprehendmedical';
+import CryptoJS from 'crypto-js';
 import { UploadFileModel } from '../model/upload-file.model';
+import { ImportFileStatusEnum } from '../import-file-status.enum';
+import { ImportTransactionsService } from '../service/import-transactions.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-/**
- * This component provides UI for selecting file to upload.
- * The actual upload will be done in the Review Component.
- */
 @Component({
   selector: 'app-import-trx-upload',
   templateUrl: './import-trx-upload.component.html',
   styleUrls: ['./import-trx-upload.component.scss']
 })
-export class ImportTrxUploadComponent implements OnInit, OnChanges {
-  @ViewChild('selectFileInput')
-  public selectFileInput: ElementRef;
+export class ImportTrxUploadComponent implements OnInit, OnDestroy {
+  @Input()
+  public uploadFile: UploadFileModel;
 
   @Output()
-  public queueEmitter: EventEmitter<any> = new EventEmitter<any>();
+  public resultsEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  private fileQueue: Array<UploadFileModel>;
+  public progressPercent: number;
+  public uploadingText: string;
 
-  constructor(private _dialogService: DialogService) {}
+  private onDestroy$: Subject<any>;
+  private uploadProcessing$: Subject<any>;
+  private checkSum: string;
+  private committeeId: string;
 
-  public ngOnInit() {}
+  constructor(
+    private _uploadTrxService: UploadTrxService,
+    private _modalService: NgbModal,
+    private _importTransactionsService: ImportTransactionsService
+  ) {}
 
-  public ngOnChanges(changes: SimpleChanges) {
-    this.ngOnInit();
+  ngOnInit() {
+    // this.uploadFile.status = ImportFileStatusEnum.uploading;
+    this.committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      this.committeeId = cmteDetails.committeeid;
+    }
+    this.progressPercent = 0;
+    this.onDestroy$ = new Subject();
+    this.getProgress();
+    this._uploadFile();
+  }
+
+  public ngOnDestroy() {
+    this.onDestroy$.next();
+    if (this.uploadProcessing$) {
+      this.uploadProcessing$.next();
+    }
+  }
+
+  // Requirements for UI have Upload as file selection and the upload occuring
+  // as part of the review.  This is why the upload to S3 is in this component.
+  // Another option is to add a new step to the train stops called "file select".
+  // The component supporting it will just handle selection files from client.
+  // The next step "upload" will handle S3 followed by "review".
+
+  private _uploadFile() {
+    const file = this.uploadFile.file;
+    // const checkSum = this._createFileCheckSum(file);
+
+    // TODO convert this to a method returning observable or promise
+    // TODO this will perform better if API generates it but requires upload to do so.
+    // TODO if not done in API, check for faster front end library option
+    const fileReader = new FileReader();
+    fileReader.onload = e => {
+      console.log('start MD5 = ' + new Date());
+      const fileData = fileReader.result;
+      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+      const md5 = hash.toString(CryptoJS.enc.Hex);
+      this.checkSum = md5;
+      console.log('end MD5 = ' + new Date());
+
+      // this is checking for duplicate files on S3.
+      // It will be replaced by API call to check for processed files
+      // as we don't know retention policy for S3 files
+
+      // this._uploadTrxService.listObjects(this.committeeId).subscribe((data: S3.Types.ListObjectsV2Output) => {
+      //   for (const s3Obj of data.Contents) {
+      //     // remove double quotes from eTag
+      //     let eTagEdited = s3Obj.ETag;
+      //     if (s3Obj.ETag) {
+      //       if (s3Obj.ETag.length > 1) {
+      //         if (s3Obj.ETag.startsWith('"') && s3Obj.ETag.endsWith('"')) {
+      //           eTagEdited = s3Obj.ETag.substring(1, s3Obj.ETag.length - 1);
+      //         }
+      //       }
+      //     }ss
+
+      //     if (this.checkSum === eTagEdited) {
+      //       this._dialogService
+      //         .confirm(
+      //           'This file has been uploaded before!  TODO show Review Screen',
+      //           ConfirmModalComponent,
+      //           'Warning!',
+      //           false
+      //         )
+      //         .then(res => {});
+      //     }
+      //   }
+      // });
+
+      this.progressPercent = 0;
+      this.uploadingText = 'Uploading...';
+      this._uploadTrxService
+        .uploadFile(file, this.checkSum, this.committeeId)
+        .takeUntil(this.onDestroy$)
+        .subscribe((data: any) => {
+          if (data === false) {
+            return;
+          }
+          this._checkForProcessingProgress();
+        });
+
+      // alert('fake for no internet conn');
+      // this.resultsEmitter.emit({
+      //   resultType: 'success',
+      //   uploadFile: this.uploadFile
+      // });
+    };
+    fileReader.readAsText(file);
   }
 
   /**
-   * An event handler when files are dropped into the file drop area for adding files to the queue.
-   *
-   * @param $event the drop event
+   * Check for processing progress now that upload is complete.
    */
-  public drop($event: any) {
-    $event.preventDefault();
-    const items = $event.dataTransfer.items;
-    const dropFiles = $event.dataTransfer.files;
-    this._startImporting(dropFiles);
+  private _checkForProcessingProgress() {
+    // Ensure Upload complete message and spnner appear simultaneously using delay.
+    const timer1 = timer(300);
+    const timerSubject = new Subject<any>();
+    const timerSubscription = timer1.pipe(takeUntil(timerSubject)).subscribe(() => {
+      this.uploadingText = 'Upload complete!';
+      if (timerSubscription) {
+        timerSubscription.unsubscribe();
+      }
+      timerSubject.next();
+      timerSubject.complete();
+      this.resultsEmitter.emit({
+        resultType: 'success',
+        uploadFile: this.uploadFile
+      });
+    });
 
-    // const promise = this._parseDataTransferItems(items).then((files: Array<File>) => {
-    //   this._startImporting(files);
-    // });
-
-    // for (const item of items) {
-    //   if (item.kind === 'file') {
-    //     const entry = item.webkitGetAsEntry();
-    //     // this.scanFiles(entry);
-    //     if (entry.isFile) {
-    //       const promise = this._parseFileEntry(entry).then(file => {
-    //         // this._v(file);
-    //       });
+    // this.hideProcessingProgress = false;
+    // const progressPoller = interval(500);
+    // this.uploadProcessing$ = new Subject();
+    // progressPoller.takeUntil(this.uploadProcessing$);
+    // this.processingPercent = 0;
+    // progressPoller.subscribe(val => {
+    //   this.uploadContactsService.checkUploadProcessing().takeUntil(this.uploadProcessing$).subscribe(res => {
+    //     this.processingPercent += res;
+    //     if (this.processingPercent > 99) {
+    //       this.uploadProcessing$.next();
+    //       this.uploadProcessing$.complete();
+    //       // Using setTimeout to avoid another subject but should use RxJs (try delay or interval)
+    //       // The purpose here is to allow the user to see the 100% completion before switching view.
+    //       setTimeout(() => {
+    //         // this.emitUserContacts();
+    //       }, 1000);
     //     }
-    //   }
-    // }
+    //   });
+    // });
   }
 
-  private _startImporting(files: Array<File>) {
-    if (this._validateSelctedFiles(files)) {
-      this.fileQueue = new Array<UploadFileModel>();
-      let i = 0;
-      for (const file of files) {
-        const qFile: UploadFileModel = new UploadFileModel();
-        qFile.fileName = file.name;
-        qFile.status = 'Queued';
-        qFile.file = file;
-        qFile.queueIndex = i;
-        this.fileQueue.push(qFile);
-        i++;
-      }
-      this.queueEmitter.emit(this.fileQueue);
-      // this._uploadCsv(files[0]);
-    }
-  }
-
-  /**
-   * Start handling a single file selected for import
-   */
-  public fileSelected() {
-    if (this.selectFileInput.nativeElement.files) {
-      this._startImporting(this.selectFileInput.nativeElement.files);
-    }
-  }
-
-  /**
-   * Programatically trigger a click event on the select file element.
-   */
-  public triggerSelectFileInputClick(): void {
-    this.selectFileInput.nativeElement.click();
-  }
-
-  public onClick(event) {
-    event.target.value = '';
-  }
-
-  /**
-   * Determine if user selected files are valid.  Show error message if not.
-   * @param files the files to be validated
-   * @returns true if valid
-   */
-  private _validateSelctedFiles(files: Array<File>): boolean {
-    if (files.length > 10) {
-      this._dialogService
-        .confirm(
-          'You can only import 10 CSV files at one time.  ' +
-            'If you have more than 10, please import the additional files at a later time.',
-          ConfirmModalComponent,
-          'Warning!',
-          false
-        )
-        .then(res => {});
-      return false;
-    }
-    for (const file of files) {
-      if (!this._validateFileType(file)) {
-        this._showInvalidFileType();
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private _validateFileType(file: File): boolean {
-    const fileExtention = this._getFileExtention(file.name);
-    if (!fileExtention) {
-      return false;
-    }
-    if (fileExtention.toLocaleLowerCase() !== 'csv') {
-      return false;
-    }
-    return true;
-  }
-
-  private _showInvalidFileType(): void {
-    this._dialogService
-      .confirm(
-        'You can only import CSV files. If your file is a ' + 'different type, please convert your data file to a CSV.',
-        ConfirmModalComponent,
-        'Warning!',
-        false
-      )
-      .then(res => {});
-  }
-
-  private _getFileExtention(fileName: string): string {
-    let fileExtention = '';
-    if (!fileName.includes('.')) {
-      return fileExtention;
-    }
-    fileExtention = fileName.split('.').pop();
-    return fileExtention;
-  }
-
-  /**
-   * Convert a DataTransferItemList into an array of Files.
-   * MDN uses file() returning a Promise.  This method will
-   * return an array of Promises and waits until each Promise in the array has
-   * been fullfilled.
-   *
-   * @param items the DataTransferItemList containing files dropped.
-   * @returns an array of Promises where each item in the array is a File.
-   */
-  private _parseDataTransferItems(items: DataTransferItemList): Promise<Array<File>> {
-    // convert DataTransferItemList to array
-    const dataTransferItemArray = [];
-    // for (const item of items.) {
-    for (let i = 0; i < items.length; i++) {
-      const item: DataTransferItem = items[i];
-      if (item.kind === 'file') {
-        // check for getAsEntry() if webkitGetAsEntry() does not exist.  See MDN web docs.
-        let entry: any = null;
-        const itemMask: any = item;
-        if (typeof item.webkitGetAsEntry === 'function') {
-          entry = item.webkitGetAsEntry();
-        } else if (typeof itemMask.getAsEntry === 'function') {
-          entry = itemMask.getAsEntry();
+  public getProgress() {
+    this._uploadTrxService
+      .getProgressPercent()
+      .takeUntil(this.onDestroy$)
+      .subscribe((percent: number) => {
+        this.progressPercent = percent;
+        if (this.progressPercent >= 100) {
+          // this.uploadingText = 'Upload complete!';
         }
-        if (entry.isFile) {
-          dataTransferItemArray.push(entry);
-        }
-      }
-    }
-    const promiseArray = dataTransferItemArray.map((item: any) => {
-      return this._parseFileEntry(item);
-    });
-    return Promise.all(promiseArray);
-  }
-
-  /**
-   * Convert FileEntry to a File object.
-   *
-   * @param fileEntry the FileSystemFileEntry object to convert.
-   */
-  private _parseFileEntry(fileEntry): Promise<File> {
-    return new Promise((resolve, reject) => {
-      fileEntry.file(
-        (file: File) => {
-          resolve(file);
-        },
-        err => {
-          reject(err);
-        }
-      );
-    });
-  }
-
-  /**
-   * An event handler when files are dragged into the file drop area for adding files to the queue.
-   *
-   * @param event the dragenter event
-   */
-  public dragEnter(event) {
-    // indicates valid drop data
-    // false allows drop
-    return Array.prototype.every.call(event.dataTransfer.items, item => item.kind !== 'file');
-  }
-
-  /**
-   * An event handler when files are dragged over the file drop area
-   * for adding files to the queue.
-   *
-   * @param event the dragover event
-   */
-  public dragOver(event) {
-    // indicates valid drop data
-    // false allows drop
-    return Array.prototype.every.call(event.dataTransfer.items, item => item.kind !== 'file');
-  }
-
-  private _createFileCheckSum(file: File) {
-    const prom = new Promise(resolve => {
-      const fileReader = new FileReader();
-      fileReader.onload = e => {
-        const fileData = fileReader.result;
-        const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
-        const md5 = hash.toString(CryptoJS.enc.Hex);
-        const output = 'MD5 (' + file.name + ') = ' + md5;
-        console.log(output);
-        resolve(md5);
-      };
-      fileReader.readAsText(file);
-    });
-    prom.then(res => {
-      return res;
-    });
+      });
   }
 }

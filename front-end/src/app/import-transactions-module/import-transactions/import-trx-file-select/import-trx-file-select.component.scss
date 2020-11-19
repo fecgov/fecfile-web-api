@@ -1,0 +1,59 @@
+@import 'src/app/shared/scss/global';
+
+.upload_contacts__container {
+  .configure_contacts__instructions {
+    font-size: 20px;
+  }
+  .form-type-container {
+    height: 5em;
+    width: 47%;
+    margin-bottom: 3em;
+    .form-type-group {
+      border-radius: 5px;
+      border: darkgrey thin solid;
+      .form-type-radio {
+        padding: 0 5em;
+      }
+    }
+  }
+  #upload_contacts__drop-area {
+    height: 20em;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: $mercury;
+    .upload_contacts__drop-area-text {
+      padding: 4% 25%;
+      text-align: center;
+      font-size: 26px;
+      .upload_contacts__upload-icon {
+        font-size: 3em;
+        padding: 10px;
+        color: $blueZodiac;
+      }
+      .upload_contacts__select-file {
+        font-size: 26px;
+      }
+    }
+  }
+  #upload_contacts__info-area {
+    height: 20em;
+    padding-left: 6%;
+    margin-bottom: 20px;
+    background-color: $mercury;
+    .upload_contacts__info-cell-container {
+      padding: 5%;
+    }
+    .upload_contacts__info-icon {
+      text-align: center;
+    }
+    i {
+      font-size: 3em;
+      padding: 10px;
+      text-align: center;
+      color: $dustyGray;
+    }
+    .upload_contacts__info-cell {
+      padding: 3%;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<div class="clean-info-container">
+  <div (click)="toggleAdditionalInfo()">
+    <i [ngClass]=" showAdditionalInfo ? 'dropdown-icon' : 'caret-up-icon' ">
+    </i>Additional Information
+  </div>
+  <hr>
+  <div *ngIf="showAdditionalInfo">
+    <p>
+        Listed below are possible duplicates with your contacts on file and within the contacts 
+        you have just uploaded.  The possible duplicates have similar names and addresses with 
+        slight deviations. The entries indented below are the current database contacts you already have. 
+        Select one of the entries you would like to keep as a final version.
+      </p>
+    <p>
+      <b>
+          Duplicates can be defined by the First Name, Last Name, Committee Name, and Address of a contact 
+          from your database that matches exaclty with another contact within the document you just uploaded.
+      </b>
+      If a contact in your import file was a 100% match with an existing contact in your database it will be automatically merged.
+    </p>
+    <p>
+        Reduce issues with your data’s integrity by cleaning up duplicates to ensure your data is clean and free 
+        of redundant entries. This can be done by selecting the <b>Edit button</b> to the left of the top entry . Then you 
+        will be able to decide how to merge the entries and lastly select <b>"Merge & Import</b>." You can also chose 
+        <b>"Ignore & Import"</b> which will keep all entries.
+    </p>
+  </div>
+</div>

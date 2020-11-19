@@ -5,16 +5,16 @@
     <div *ngIf="currentStep !== start" class="import_trx__sidebar" [ngClass]="sidebarVisibleClass">
       <app-import-trx-sidebar
         [fileQueue]="fileQueue"
+        [currentFile]="currentFile"
         [currentStep]="currentStep"
         [forceChangeDetection]="forceSidebarChangeDetection"
         [open]="openSidebar"
         (toggleEmitter)="receiveToggleSidebar($event)"
         (proceedUploadEmitter)="receiveProceedUploadSidebar()"
+        (proceedCancelEmitter)="receiveSidebarCancel($event)"
       ></app-import-trx-sidebar>
     </div>
-    <!-- <div [ngClass]="currentStep !== start ? 'right-side ' : ''"> -->
-    <!-- <div [ngClass]="sidebarVisibleClass"> -->
-    <div [ngClass]="rightSideClassArray">
+    <div [ngClass]="rightSideClassArray" class="right-side">
       <header>
         <div class="header-content">
           <div class="grid-row">
@@ -42,21 +42,33 @@
             <div *ngIf="currentStep !== start" class="import_contacts__steps">
               <app-steps [steps]="steps" [current_step]="currentStep"> </app-steps>
             </div>
-            <app-import-trx-start *ngIf="currentStep === start" 
-              (beginFileSelectEmitter)="receiveBeginFileSelect()">
+            <app-import-trx-start *ngIf="currentStep === start" (beginFileSelectEmitter)="receiveBeginFileSelect()">
             </app-import-trx-start>
-            <app-import-trx-upload *ngIf="currentStep === step1Upload"
-              (queueEmitter)="receiveSelectedFiles($event)">
+
+            <app-import-trx-file-select
+              *ngIf="currentStep === step1Upload && fileSelectStep1"
+              (queueEmitter)="receiveSelectedFiles($event)"
+            >
+            </app-import-trx-file-select>
+
+            <app-import-trx-upload
+              *ngIf="currentStep === step1Upload && !fileSelectStep1"
+              [uploadFile]="currentFile"
+              (resultsEmitter)="receiveUploadResults($event)"
+            >
             </app-import-trx-upload>
-            <app-import-trx-review *ngIf="currentStep === step2Review"
+
+            <app-import-trx-review
+              *ngIf="currentStep === step2Review"
               [uploadFile]="currentFile"
               (resultsEmitter)="receiveReviewResults($event)"
-            ></app-import-trx-review>
-            <app-import-trx-clean *ngIf="currentStep === step3Clean"
-              [uploadFile]="currentFile"
-              (resultsEmitter)="receiveCleanResults($event)"
-            ></app-import-trx-clean>
-            <app-import-trx-done *ngIf="currentStep === step4ImportDone"
+            >
+            </app-import-trx-review>
+
+            <app-import-trx-clean-info *ngIf="currentStep === step3Clean"> </app-import-trx-clean-info>
+
+            <app-import-trx-done
+              *ngIf="currentStep === step4ImportDone"
               [uploadFile]="currentFile"
               [fileQueue]="fileQueue"
               (proceedEmitter)="receiveProceedNextFile()"
@@ -65,7 +77,7 @@
           </div>
         </div>
       </section>
-      <footer>
+      <!-- <footer>
         <div *ngIf="currentStep !== start" style="width: 100%">
           <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="showNextStep()">
             Next
@@ -74,76 +86,15 @@
             Previous
           </button>
         </div>
-      </footer>
+      </footer> -->
     </div>
   </div>
 </div>
-
-<!-- <div
-  bsModal
-  #errorsModal="bs-modal"
-  class="modal fade error__contacts-modal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="dialog-sizes-name1"
-  [config]="{ backdrop: 'static' }"
->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header" id="error-contacts__modal-header_1">
-        <h2 class="modal-title pull-left">Import Failed</h2>
-      </div>
-      <div class="modal-body">
-        <p class="error-contacts__description">
-          The system found errors within the import file, and will not be able to complete the import. Please check your
-          file and ensure formatting is correct.
-        </p>
-        <h3 class="error-contacts__body-title">Import Errors</h3>
-        <ul class="error-contacts__list">
-          <li *ngFor="let error of contactErrors; let i = index" class="error-contacts__error">
-            Error {{ i + 1 }}: {{ error.field_name }} {{ error.msg }}
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="errorsAcknowleged()">
-          Ok
-        </button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-<!-- <div
-  bsModal
-  #noErrorslModal="bs-modal"
-  class="modal fade error__contacts-modal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="dialog-sizes-name1"
-  [config]="{ backdrop: 'static' }"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header" id="error-contacts__modal-header_2">
-        <h2 class="modal-title pull-left">Upload Complete</h2>
-      </div>
-      <div class="modal-body">
-        <p>
-          No errors were detected. Please proceed to see if your data was previously imported or has any duplicate
-          contacts.
-        </p>
-        <p>
-          <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
-          Caution: As you proceed your data has the potential of being duplicated upon import. Ensure your data
-          integrity by opting to check the individual line items before importing.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary btn-modal-footer btn-right" (click)="noErrorsAcknowleged()">
-          Ok
-        </button>
-      </div>
-    </div>
-  </div>
-</div> -->
+<div [hidden]="isShowInfo" class="import_trx__lower-container">
+  <app-import-trx-clean
+    *ngIf="currentStep === step3Clean"
+    [uploadFile]="currentFile"
+    (dupeProceedEmitter)="receiveCleanResults($event)"
+  >
+  </app-import-trx-clean>
+</div>

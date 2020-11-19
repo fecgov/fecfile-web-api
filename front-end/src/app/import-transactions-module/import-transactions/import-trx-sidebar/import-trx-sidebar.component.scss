@@ -28,21 +28,29 @@
     background-color: $shuttleGray;
     max-height: 450px;
     overflow-y: auto;
+    overflow-x: hidden;
     .queue-row {
       height: 4em;
       padding: 0 0.25em;
       border-bottom: $white solid thin;
       .file-name {
-        color: white;
+        color: $white;
         word-wrap: break-word;
       }
       .file-status {
-        background-color: $white;
-        color: $black;
         border-radius: 6px;
         text-align: center;
         padding: 4px 0;
         width: 80%;
+      }
+      .current-file {
+        background-color: $blueZodiac;
+        color: $white;
+        font-weight: bold;
+      }
+      .non-current-file {
+        background-color: $white;
+        color: $black;
       }
       .cancel-file {
         color: $black;
@@ -53,12 +61,11 @@
     background-color: $mineShaft;
     padding: 2em 0;
     .btn-row {
-      padding: 1.25em 7em;
+      padding: 0.25em 0;
     }
     .sidebar-button {
-      width: 11em;
+      width: 55%;
       height: 3em;
-      padding: 1em;
     }
     .cancel-button {
       background-color: $fecRed;

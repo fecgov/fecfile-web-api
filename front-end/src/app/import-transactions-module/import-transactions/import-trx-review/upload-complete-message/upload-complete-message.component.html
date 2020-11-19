@@ -1,0 +1,18 @@
+<div #content>
+  <div class="modal-header warning-header">
+    <h4 class="modal-title" id="modal-basic-title">Upload Complete</h4>
+  </div>
+  <div class="modal-body">
+    <p>
+      No errors were detected. Please proceed to see if your data was previously imported or has any duplicate contacts.
+    </p>
+    <p>
+      <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
+      <b>Caution:</b> As you proceed your data has the potential of being duplicated upon import. Ensure your data
+      integrity by opting to check the individual line items before importing.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close('continue')">Ok</button>
+  </div>
+</div>

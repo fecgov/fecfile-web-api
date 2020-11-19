@@ -1,18 +1,17 @@
 @import 'src/app/shared/scss/global';
 
 .import_contacts__main-container {
-  display: table;
-  table-layout: fixed;
-  min-height: $mainContentHeight;
+  // display: table;
+  // table-layout: fixed;
+  // min-height: $mainContentHeight;
   margin: 0;
   padding: 0;
   width: 100%;
   .import_contacts__container {
+    display: flex;
     .import_trx__sidebar {
       background-color: #aeb0b5;
-      min-height: 146vh;
       padding-left: 0;
-      float: left;
       transition: all 0.4s ease 0s;
       &.sidebar-visible {
         width: 25%;
@@ -30,6 +29,9 @@
       &.sidebar-hidden {
         width: 95%;
       }
+    }
+    .lower-section {
+      width: 100%;
     }
     header {
       .header-content {
@@ -69,9 +71,9 @@
     section {
       .import_contacts__body_container {
         .import_contacts__body {
-          margin: 2px auto;
+          // margin: 2px auto;
           width: 98%;
-          padding: 0.75em 0 4em 0;
+          // padding: 0.75em 0 4em 0;
           float: right;
           .import_contacts__steps {
             padding: 2em 0;
