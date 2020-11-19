@@ -1,5 +1,5 @@
 <div class="trx-clean-container">
-
+  <hr style="padding-top: 3px;" />
   <h2 class="clean_contacts__heading">
     Duplicate Contact Entries
   </h2>
@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let contact of contacts | paginate: config; let i = index;">
+          <ng-container *ngFor="let contact of contacts | paginate: config; let i = index">
             <tr>
               <td>
                 <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
@@ -36,12 +36,18 @@
                     <button class="dropdown-item" (click)="applyMergeSelection(contact, 'add')">
                       Add New
                     </button>
-                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'update')"
-                      [disabled]="!contact.enableAllActions">
+                    <button
+                      class="dropdown-item"
+                      (click)="applyMergeSelection(contact, 'update')"
+                      [disabled]="!contact.enableAllActions"
+                    >
                       Merge & Update
                     </button>
-                    <button class="dropdown-item" (click)="applyMergeSelection(contact, 'exsisting')"
-                      [disabled]="!contact.enableAllActions">
+                    <button
+                      class="dropdown-item"
+                      (click)="applyMergeSelection(contact, 'exsisting')"
+                      [disabled]="!contact.enableAllActions"
+                    >
                       Merge with Existing
                     </button>
                   </div>
@@ -49,31 +55,35 @@
               </td>
               <td>{{ formatName(contact) }}</td>
               <td>Import File</td>
-              <td>{{contact.street_1}}</td>
-              <td>{{contact.street_2}}</td>
-              <td>{{contact.city}}</td>
-              <td>{{contact.state}}</td>
-              <td>{{contact.zip_code}}</td>
-              <td>{{contact.employer}}</td>
-              <td>{{contact.occupation}}</td>
+              <td>{{ contact.street_1 }}</td>
+              <td>{{ contact.street_2 }}</td>
+              <td>{{ contact.city }}</td>
+              <td>{{ contact.state }}</td>
+              <td>{{ contact.zip_code }}</td>
+              <td>{{ contact.employer }}</td>
+              <td>{{ contact.occupation }}</td>
             </tr>
-            <tr *ngFor="let dupe of contact.contacts_from_db;">
+            <tr *ngFor="let dupe of contact.contacts_from_db">
               <td class="indent_right">
                 <div class="radio">
-                  <input type="radio" name="dupe_id_{{contact.entity_id}}" [value]="dupe.user_selected_value"
-                    [checked]="dupe.user_selected_value === true" 
-                    (change)="handleCheckedDupe($event, dupe, contact)" />
+                  <input
+                    type="radio"
+                    name="dupe_id_{{ contact.entity_id }}"
+                    [value]="dupe.user_selected_value"
+                    [checked]="dupe.user_selected_value === true"
+                    (change)="handleCheckedDupe($event, dupe, contact)"
+                  />
                 </div>
               </td>
               <td>{{ formatName(dupe) }}</td>
               <td>Database</td>
-              <td>{{dupe.street_1}}</td>
-              <td>{{dupe.street_2}}</td>
-              <td>{{dupe.city}}</td>
-              <td>{{dupe.state}}</td>
-              <td>{{dupe.zip_code}}</td>
-              <td>{{dupe.employer}}</td>
-              <td>{{dupe.occupation}}</td>
+              <td>{{ dupe.street_1 }}</td>
+              <td>{{ dupe.street_2 }}</td>
+              <td>{{ dupe.city }}</td>
+              <td>{{ dupe.state }}</td>
+              <td>{{ dupe.zip_code }}</td>
+              <td>{{ dupe.employer }}</td>
+              <td>{{ dupe.occupation }}</td>
             </tr>
           </ng-container>
         </tbody>
@@ -81,12 +91,54 @@
     </div>
   </div>
   <hr />
-
-  <div class="row">
-    <div class="col col-md-5">
-      <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
-        Proceed
-      </button>
+  <ng-container *ngIf="contacts.length > 0">
+    <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
+      <pagination-controls [id]="config.id" (pageChange)="checkDuplicates($event)"> </pagination-controls>
     </div>
-  </div>
+    <div class="row">
+      <div class="col col-md-5">
+        <button
+          class="btn btn-secondary btn-left clean_contacts__button"
+          (click)="confirmFinalizeImportAll(finalizeImportAllModal)"
+        >
+          Ignore All & Import
+        </button>
+        <button
+          [disabled]="!allDupesSelected"
+          class="btn btn-primary btn-left clean_contacts__button"
+          id="clean_contacts__merge-all-button"
+          (click)="confirmFinalizeMergeAll(finalizeMergeAllModal)"
+        >
+          Merge All & Import
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+          Cancel Import
+        </button>
+        <!-- <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="checkDuplicates(1)">
+          Reload Dupes for DEV
+        </button> -->
+      </div>
+      <div class="col col-md-5">
+        <i class="exclamation-triangle-icon clean_contacts__ignore-warn"></i>
+        <p class="clean_contacts__ignore-text">
+          Caution: If you Merge or Ignore all, your data may be corrupted upon Import. Ensure your data integrity by
+          opting to check the individual line items for Merge or Ignore.
+        </p>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="contacts.length === 0">
+    <div class="clean_contacts__no-dupes text-center">No Duplicates Found</div>
+    <hr />
+    <div class="row">
+      <div class="col col-md-5">
+        <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
+          Proceed
+        </button>
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+          Cancel Import
+        </button>
+      </div>
+    </div>
+  </ng-container>
 </div>
