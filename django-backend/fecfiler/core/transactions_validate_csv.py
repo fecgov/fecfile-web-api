@@ -11,6 +11,7 @@ import numpy
 from psycopg2.extensions import register_adapter, AsIs
 import logging
 import time
+import re
 from sqlalchemy import create_engine
 from sqlalchemy.types import String
 from sqlalchemy.types import NVARCHAR
@@ -83,6 +84,7 @@ def export_excel_to_db(filename, path):
         
         #filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/Unique_code_new/"
         #filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
+        # Original file name to be renamed as above F3X - Schedule A_Format Specs_Import Transactions_MAPPED
         filelocation = path
         filewithpath = filelocation + filename
         print("File name",filewithpath)
@@ -122,6 +124,21 @@ def export_excel_to_db(filename, path):
         print("In export_excel_to_db EXCEPTION BLOCK ")
         print(ex)
 
+def rename_files_folder(filelocation):
+    #filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
+    #F3X - Schedule A_Format Specs_Import Transactions_MAPPED
+    with os.scandir(filelocation) as entries:
+        for entry in entries:
+            if ' - ' in entry.name:
+                res = re.split(' |-|_|!', entry.name)
+                print(res[4])
+                filename = 'F3X_Schedule' + res[4] + '_FormatSpecs_Import_Transactions_MAPPED.xlsx'
+                # print(filelocation+entry.name)
+                # print(filelocation+filename)   
+                os.rename(filelocation+entry.name,filelocation+filename)
+
+
+
 def move_data_from_excel_to_db():
     try:
         filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"        
@@ -137,9 +154,10 @@ def move_data_from_excel_to_db():
         # value_reference text
                 
         dirname = os.path.dirname
-        filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/Unique_code/"
+        filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
         filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
         counter = 1
+        rename_files_folder(filelocation)
         with os.scandir(filelocation) as entries:
             for entry in entries:
                 print('counter',counter)
@@ -202,7 +220,7 @@ def schema_validation(dataframe, schema):
             print('[',error.row,',',error.column,',',error.value,']')
         errors_index_rows = [e.row for e in errors]
         print('errors_index_rows: ',errors_index_rows)
-        
+
         pd.DataFrame({'col':errors}).to_csv('errors.csv', mode='a', header=False)
 
         data_clean = dataframe.drop(index=errors_index_rows)
@@ -232,10 +250,14 @@ def build_schemas(formname, sched, trans_type):
                                       port='5432',
                                       database='postgres'  )
         cursor = connection.cursor()
-        cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.TYPE, rfsfs.REQUIRED	FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",(formname, sched, trans_type)) 
+        print('formname',formname) 
+        print('sched',sched) 
+        print('trans_type',trans_type)
+        cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required	FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",(formname, sched, trans_type)) 
         format_specs = cursor.fetchall()
         columns = []
         headers = []
+        #print('format_specs',format_specs)
         for counter, row in enumerate(format_specs):
             #"A/N-3" "NUM-4"
             # Column('ZIP', [MatchesPatternValidation('^[\\w\\s]{1,9}$')]),
@@ -299,36 +321,40 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
             #load_data_from_df_to_db(tablename, data)
             print('read_csv For loop')
+            print(data)
             res = validate_dataframe(data, sched)
             if "Validate_Pass" != res:
                 #print("load_dataframe_from_s3:",res)
-                return res                        
+               return res                        
             data = data.sort_values(by=["TRANSACTION IDENTIFIER"], ascending=False)
             print('...............')
             #loop through the data set to pick unique tranid's 
+            print('Unique TRANSACTION IDENTIFIERS:',data['TRANSACTION IDENTIFIER'].unique().size)
+            cntr = 1
             for tranid in data['TRANSACTION IDENTIFIER'].unique():
+                print('.....................................................................................................................')
                 print('.............tranid: ',tranid)
+                print('***********CNTR:',cntr)
+                cntr+=1
+                #if tranid == 'TRAN':
+                #    print('data',data)
                 # build schema based on tranid
                 head_schema = build_schemas('F3X', 'ScheduleA', tranid)
+                print('After build_schemas')
                 headers = head_schema[0]
-                schema  = head_schema[1] 
+                schema  = head_schema[1]
+                print('....headers....',headers)
+                print('....schema....',schema) 
                 #pick the data with tranid based schema
-                data = data[headers]
+                data_temp = data[headers]
                 #pick data with tranid 
-                data = data.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
+                data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
                 #Validate data based on Schema and data
-                schema_validation(data, schema)
-                #Remove the break once Chami provides complete list of updated Format specs/Templates
-                break
-                # validate df
-                #schema_validation(uploaded_df, schema)
+                schema_validation(data_temp, schema)
+                print('After schema_validation')
+                #break
+                print('........END..............................................................................................')
             print('...............')
-
-            #schema_validation(data, schema_conditions)
-            #1 try to identify the trans type count for each type and read the data based on count and tran type
-            #2Build Schemas for Each tran types
-            #3Apply schemas for data from step 1 dynamically
-            #   
             #time.sleep(sleeptime)  
             return 'Validate_Pass'      
     except Exception as error:
@@ -365,7 +391,10 @@ def validate_transactions(sched, bktname, key):
 try:
     sched = 'SA'
     bktname = "fecfile-filing-frontend"
-    key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
+    #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
+    key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini_11_19.csv"
     validate_transactions(sched, bktname, key)
+
+    # move_data_from_excel_to_db()    
 except Exception as ex:
     print(ex)
