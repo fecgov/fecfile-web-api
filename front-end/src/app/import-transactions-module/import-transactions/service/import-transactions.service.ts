@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, concatMap, switchMap, retry, share } from 'rxjs/operators';
+import { Observable, timer, interval } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -114,7 +114,7 @@ export class ImportTransactionsService {
     //     })
     //   );
 
-    const mockFile = 'assets/mock-data/import-contacts/duplicates.json';
+    const mockFile = 'assets/mock-data/import-contacts/duplicates.2.json';
     return this._http
       .get(mockFile, {
         headers: httpOptions
@@ -127,5 +127,186 @@ export class ImportTransactionsService {
           return false;
         })
       );
+  }
+
+  /**
+   * Save contacts in the file and ignore dupes if any.
+   */
+  public saveContactIgnoreDupes(fileName: string, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = 'import-trx-ignoredupes???'; // '/contact/ignore/merge';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.transaction_included = transactionIncluded;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+    return Observable.of(true);
+  }
+
+  /**
+   * Merge the user selections on all contacts in the import.
+   */
+  public mergeAll(fileName: string, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = 'import-trx-merge???'; // '/contact/merge/save';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.transaction_included = transactionIncluded;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+    return Observable.of(true);
+  }
+
+  /**
+   * Save user selected merge option.
+   * @param fileName
+   * @param contacts
+   */
+  public saveUserMergeSelection(fileName: string, contact: any) {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = 'import-trx-save-user-select???'; // '/contact/merge/options';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let dupeEntityId = null;
+    if (contact.user_selected_option !== 'add') {
+      for (const dupe of contact.contacts_from_db) {
+        if (dupe.user_selected_value) {
+          dupeEntityId = dupe.entity_id;
+        }
+      }
+    }
+
+    const mergeOption: any = {};
+    mergeOption.user_selected_option = contact.user_selected_option;
+    mergeOption.file_record_id = contact.entity_id;
+    mergeOption.db_entity_id = dupeEntityId;
+
+    const request: any = {};
+    request.fileName = fileName;
+    request.merge_option = mergeOption;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+    return Observable.of(true);
+  }
+
+  /**
+   * Cancel a single file from import.
+   */
+  public cancelImport(fileName: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = 'import-trx-cancel-file???'; //'/contact/cancel/import';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+    return Observable.of(true);
+  }
+
+  /**
+   * Cancel a single file from import.
+   */
+  public cancelImportAll(fileNames: Array<string>): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = 'import-trx-cancel-all???'; //'/contact/cancel/import';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileNames = fileNames;
+
+    // return this._http
+    //   .post(`${environment.apiUrl}${url}`, request, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+    return Observable.of(true);
+  }
+
+  public pollForProgress_bitcoin() {
+    return this._http.get('https://blockchain.info/ticker');
+  }
+
+  public pollForProgress(): Observable<number> {
+    // return Observable.of(10);
+    const mockUrl = 'assets/mock-data/import-transactions/progress.json';
+    return timer(0, 1000).pipe(
+      switchMap(() =>
+        this._http.get<any>(mockUrl).map(response => {
+          return response;
+        })
+      )
+    );
+    // , retry(), share();
   }
 }

@@ -34,7 +34,11 @@
         <div *ngIf="allFilesDone && allFailed" class="import-done-notifications">
           Your Import is now Complete. All files have failed.
         </div>
-        <button *ngIf="allFilesDone && hasFailure" class="btn btn-secondary import-done-button" (click)="showErrorLog()">
+        <button
+          *ngIf="allFilesDone && hasFailure"
+          class="btn btn-secondary import-done-button"
+          (click)="showErrorLog()"
+        >
           View Error Logs for Failed Files
         </button>
       </div>

@@ -63,7 +63,7 @@
               <td>{{ contact.employer }}</td>
               <td>{{ contact.occupation }}</td>
             </tr>
-            <tr *ngFor="let dupe of contact.contacts_from_db">
+            <tr *ngFor="let dupe of contact.potentialDupes">
               <td class="indent_right">
                 <div class="radio">
                   <input
@@ -111,7 +111,8 @@
         >
           Merge All & Import
         </button>
-        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" 
+          (click)="confirmCancelImport(cancelImportModal)">
           Cancel Import
         </button>
         <!-- <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="checkDuplicates(1)">
@@ -135,10 +136,105 @@
         <button class="btn btn-secondary btn-left clean_contacts__button" (click)="proceed()">
           Proceed
         </button>
-        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" (click)="cancelImportAll()">
+        <button class="btn btn-left clean_contacts__button clean_contacts__canel-button" 
+          (click)="confirmCancelImport(cancelImportModal)">
           Cancel Import
         </button>
       </div>
     </div>
   </ng-container>
 </div>
+<!-- <ng-template #finalizeMergeModal let-modal>
+    <div class="modal-header clean_contacts__pin-modal-header" id="clean_contacts__pin-modal-header_2">
+      <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge</h2>
+      <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeMerge(modal)">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>
+        By Merging this selection you are combining the entries listed into one Final Entry. Would you like to
+        continue?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="merge(modal)">
+        Merge
+      </button>
+      <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
+        (click)="cancelFinalizeMerge(modal)">
+        Cancel
+      </button>
+    </div>
+  </ng-template> -->
+  
+  <ng-template #finalizeImportAllModal let-modal>
+    <div class="modal-header clean_contacts__pin-modal-header">
+      <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Ignore All & Import Contacts</h2>
+      <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeImportAll(modal)">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>
+        By continuing without merging duplicate entries, you will be keeping multiple entries for the contacts within the
+        list presented. Would you like to continue?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="importAll(modal)">
+        Import
+      </button>
+      <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
+        (click)="cancelFinalizeImportAll(modal)">
+        Cancel
+      </button>
+    </div>
+  </ng-template>
+  
+  <ng-template #finalizeMergeAllModal let-modal>
+    <div class="modal-header" id="clean_contacts__pin-modal-header_4">
+      <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge All & Import Contacts</h2>
+      <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelFinalizeMergeAll(modal)">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>
+        By continuing without merging duplicate entries, you will be overwriting existing entries with the
+        contacts in the list presented. Would you like to continue?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="mergeAll(modal)">
+        Import
+      </button>
+      <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
+        (click)="cancelFinalizeMergeAll(modal)">
+        Cancel
+      </button>
+    </div>
+  </ng-template>
+  <ng-template #cancelImportModal let-modal>
+      <div class="modal-header clean_contacts__pin-modal-header">
+        <h2 class="modal-title pull-left clean_contacts__merge-title">Cancel Import</h2>
+        <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelImportCancel(modal)">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          You are about to <b>Cancel</b> the current file upload, and begin the next file upload. 
+          Are you sure you would like to continue?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="cancelImport(modal)">
+          Continue
+        </button>
+        <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
+          (click)="cancelImportCancel(modal)">
+          Cancel
+        </button>
+      </div>
+    </ng-template>

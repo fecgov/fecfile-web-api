@@ -14,13 +14,10 @@ import { ImportTransactionsService } from '../service/import-transactions.servic
 })
 export class ImportTrxCleanComponent implements OnInit, OnDestroy {
   @Input()
-  public fileName: string;
+  public uploadFile: UploadFileModel;
 
   @Output()
-  public dupeProceedEmitter: EventEmitter<any> = new EventEmitter<any>();
-
-  @Output()
-  public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
+  public resultsEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Output()
   public saveStatusEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -38,9 +35,6 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
 
   private contactsSubject: BehaviorSubject<Array<any>>;
   private onDestroy$ = new Subject();
-
-  @Input()
-  public uploadFile: UploadFileModel;
 
   constructor(
     private _modalService: NgbModal,
@@ -80,24 +74,8 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     //   this.numberOfPages = res.totalPages;
     // });
 
-    this._importTransactionsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
-      // // temp to set selected to false until api does
-      // for (const contact of res.contacts) {
-      //   for (const dupe of contact.contacts_from_db) {
-      //     // TEMP CODE
-      //     // response contacts the contact from DB the user may have identified as one to merge.
-      //     // If user has done this, the user_selected_value on th CONTACT not the DUPE CONTACT
-      //     // will contain the entity id of the selected contact.
-      //     // Set a field on the DUPLICATE CONTACT for the UI
-      //     // TODO change API to set select on the dupe. For now just set the first one for devl.
-      //     dupe.user_selected_value = false;
-      //     if (contact.user_selected_option !== 'add') {
-      //       contact.contacts_from_db[0].user_selected_value = true;
-      //     }
-      //     // TEMP CDE END
-      //   }
-      // }
-
+    this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page)
+        .subscribe((res: any) => {
       this.contacts = res.duplicates;
       this.config.totalItems = res.totalcontactsCount;
       this.config.itemsPerPage = res.itemsPerPage;
@@ -140,9 +118,112 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
   }
 
   public proceed() {
-    this.dupeProceedEmitter.emit({
-      resultType: 'success',
+    this.resultsEmitter.emit({
+      resultType: 'proceed',
       uploadFile: this.uploadFile
+    });
+  }
+
+  // ////////////////////////
+  // // merge modal methods
+  // ////////////////////////
+
+  // public confirmFinalizeMerge(modal: any) {
+  //   this._modalService.open(modal, { centered: true, backdrop: 'static' });
+  // }
+
+  // public cancelFinalizeMerge(modal: any) {
+  //   modal.close('cancel it');
+  // }
+
+  // public merge(modal: any) {
+  //   modal.close('close it');
+  //   // TODO call API to save merge data for the file ID. use this.contactToClean
+  //   // Either get the page data again from API removing the merged contact
+  //   // or slice the merged contact out of the array.  Former is preferred.
+  // }
+
+  /////////////////////////
+  // import all modal methods
+  /////////////////////////
+
+  public confirmFinalizeImportAll(modal: any) {
+    this._modalService.open(modal, { centered: true, backdrop: 'static' });
+  }
+
+  public cancelFinalizeImportAll(modal: any) {
+    modal.close('cancel it');
+  }
+
+  public importAll(modal: any) {
+    modal.close('close it');
+    this.resultsEmitter.emit({
+      resultType: 'ignore_dupe_save',
+      file: this.uploadFile
+    });
+    this.saveStatusEmitter.emit(true);
+  }
+
+  /////////////////////////
+  // merge modal methods
+  /////////////////////////
+
+  public confirmFinalizeMergeAll(modal: any) {
+    this._modalService.open(modal, { centered: true, backdrop: 'static' });
+  }
+
+  public cancelFinalizeMergeAll(modal: any) {
+    modal.close('cancel it');
+  }
+
+  public mergeAll(modal: any) {
+    modal.close('close it');
+    this.resultsEmitter.emit({
+      resultType: 'merge_dupe_save',
+      file: this.uploadFile
+    });
+    this.saveStatusEmitter.emit(true);
+  }
+
+  /////////////////////////
+  // cancel import modal methods
+  /////////////////////////
+
+  public confirmCancelImport(modal: any) {
+    this._modalService.open(modal, { centered: true, backdrop: 'static' });
+  }
+
+  public cancelImportCancel(modal: any) {
+    modal.close('cancel it');
+  }
+
+  public cancelImport(modal: any) {
+    modal.close('close it');
+    this.resultsEmitter.emit({
+      resultType: 'cancel-file',
+      file: this.uploadFile
+    });
+    this._importTransactionsService.cancelImport(this.uploadFile.fileName)
+      .subscribe((res: any) => {
+      });
+
+    // On User cancel, unsaved changes are no longer retained.
+    this.saveStatusEmitter.emit(true);
+  }
+
+  /**
+   * For possible duplicates with the incoming contact and the existing contacts in the system,
+   * apply the users decision on how to handle.
+   *
+   * @param contact the contact to merge
+   * @param userAction the merge action selected by the user
+   */
+  public applyMergeSelection(contact: any, userAction: string) {
+    contact.user_selected_option = userAction;
+    this._importTransactionsService.saveUserMergeSelection(this.uploadFile.fileName,
+        contact).subscribe((res: any) => {
+      this.checkDuplicates(this.config.currentPage);
+      this.allDupesSelected = res.allDone;
     });
   }
 }
