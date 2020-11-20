@@ -104,21 +104,35 @@
   }
 }
 
+// #clean_contacts__pin-modal-header_1,
+// #clean_contacts__pin-modal-header_2,
+// #clean_contacts__pin-modal-header_3,
+// #clean_contacts__pin-modal-header_4,
+// #clean_contacts__pin-modal-header_5,
+.clean_contacts__pin-modal-header {
+  background-color: $primaryBlue;
+  color: $white;
+  span {
+    color: $white;
+  }
+}
+
 .modal {
   .modal-lg,
   .modal-xl {
     max-width: 95%;
   }
-  #clean_contacts__pin-modal-header_1,
-  #clean_contacts__pin-modal-header_2,
-  #clean_contacts__pin-modal-header_3,
-  #clean_contacts__pin-modal-header_4 {
-    background-color: $primaryBlue;
-    color: $white;
-    span {
-      color: $white;
-    }
-  }
+  // #clean_contacts__pin-modal-header_1,
+  // #clean_contacts__pin-modal-header_2,
+  // #clean_contacts__pin-modal-header_3,
+  // #clean_contacts__pin-modal-header_4,
+  // .clean_contacts__pin-modal-header{
+  //   background-color: $primaryBlue;
+  //   color: $white;
+  //   span {
+  //     color: $white;
+  //   }
+  // }
   .clean_contacts__merge-table {
     .clean_contacts__name-col {
       width: 9%;

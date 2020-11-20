@@ -27,6 +27,7 @@ export class ImportTransactionsComponent implements OnInit {
   public currentFile: UploadFileModel;
   public forceSidebarChangeDetection: Date;
   public openSidebar: boolean;
+  public cleanImportAction: string;
 
   constructor() {}
 
@@ -114,13 +115,24 @@ export class ImportTransactionsComponent implements OnInit {
     }
   }
 
-  public receiveProceedNextFile() {
-    this._proceedNextFile();
+  public receiveCleanResults($event: any) {
+    if ($event.resultType === 'cancel-file') {
+      this._cancelFile($event.file);
+    // } else if ($event.resultType === 'ignore_dupe_save') {
+    //   this.currentStep = this.step4ImportDone;
+    //   this.currentFile.status = ImportFileStatusEnum.importing;
+    // } else if ($event.resultType === 'merge_dupe_save') {
+    //   this.currentStep = this.step4ImportDone;
+    //   this.currentFile.status = ImportFileStatusEnum.importing;
+    } else {
+      this.cleanImportAction = $event.resultType;
+      this.currentStep = this.step4ImportDone;
+      this.currentFile.status = ImportFileStatusEnum.importing;
+    }
   }
 
-  public receiveCleanResults($event: any) {
-    this.currentStep = this.step4ImportDone;
-    this.currentFile.status = ImportFileStatusEnum.importing;
+  public receiveProceedNextFile() {
+    this._proceedNextFile();
   }
 
   private _proceedNextFile() {

@@ -69,6 +69,7 @@
 
             <app-import-trx-done
               *ngIf="currentStep === step4ImportDone"
+              [action]="cleanImportAction"
               [uploadFile]="currentFile"
               [fileQueue]="fileQueue"
               (proceedEmitter)="receiveProceedNextFile()"
@@ -89,12 +90,12 @@
       </footer> -->
     </div>
   </div>
-</div>
-<div [hidden]="isShowInfo" class="import_trx__lower-container">
-  <app-import-trx-clean
-    *ngIf="currentStep === step3Clean"
-    [uploadFile]="currentFile"
-    (dupeProceedEmitter)="receiveCleanResults($event)"
-  >
-  </app-import-trx-clean>
+  <div [hidden]="isShowInfo" class="import_trx__lower-container">
+    <app-import-trx-clean
+      *ngIf="currentStep === step3Clean"
+      [uploadFile]="currentFile"
+      (resultsEmitter)="receiveCleanResults($event)"
+    >
+    </app-import-trx-clean>
+  </div>
 </div>
