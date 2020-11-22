@@ -36,7 +36,7 @@ export class NotificationheaderComponent implements OnInit {
       toolTip: "RFAIs - There are letters sent by the Reports Analysis Division when a report or document filed with the FEC needs additional clarification or identifies an error, omission or possible prohibited activity."
     },
     {
-      id: 6, name: "Imported Status", count: 0, showOptionView: true, placeholder: false,
+      id: 6, name: "Imported Status", count: 0, showOptionView: false, placeholder: false,
       toolTip: "Import Transactions - Here you will find transaction documents that have been imported into the system."
     }
   ];
