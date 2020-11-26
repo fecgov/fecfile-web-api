@@ -287,8 +287,17 @@ def build_schemas(formname, sched, trans_type):
                 columns.append(column)
                 headers.append(field)
                 #print(s[0],len)            
-            elif 'NUM' in type:# or 'AMT' in type:
-                pattern = '^[\\w\\s]{1,'+ len + '}$'
+            elif 'NUM' in type:
+                #pattern = '^[\\w\\s]{1,'+ len + '}$'
+                pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
+                mpv = MatchesPatternValidation(pattern)
+                column = Column(field, [mpv])
+                #print(s[0],len)            
+                columns.append(column)
+                headers.append(field)
+            elif 'AMT' in type:
+                pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
+                #pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
                 #print(s[0],len)            
@@ -321,6 +330,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
             #load_data_from_df_to_db(tablename, data)
             print('read_csv For loop')
+            data = data.dropna(axis=[1,0], how='all')
             print(data)
             res = validate_dataframe(data, sched)
             if "Validate_Pass" != res:
@@ -392,7 +402,7 @@ try:
     sched = 'SA'
     bktname = "fecfile-filing-frontend"
     #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-    key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini_11_19.csv"
+    key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_11_25_TEST_Data.csv"
     validate_transactions(sched, bktname, key)
 
     # move_data_from_excel_to_db()    
