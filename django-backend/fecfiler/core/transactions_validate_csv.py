@@ -33,6 +33,8 @@ logging.basicConfig(level=logging.ERROR)
 
 def validate_dataframe(data, sched):
     #check if the column contains only values of a particular schedule 
+    #print(sched)
+    #print(data['SCHEDULE NAME'])
     if data['SCHEDULE NAME'].str.contains(sched).any():
         print ("schedule matches")
     else: 
@@ -132,12 +134,10 @@ def rename_files_folder(filelocation):
             if ' - ' in entry.name:
                 res = re.split(' |-|_|!', entry.name)
                 print(res[4])
-                filename = 'F3X_Schedule' + res[4] + '_FormatSpecs_Import_Transactions_MAPPED.xlsx'
+                filename = 'F3L_Schedule' + res[4] + '_FormatSpecs_Import_Transactions_MAPPED.xlsx'
                 # print(filelocation+entry.name)
                 # print(filelocation+filename)   
                 os.rename(filelocation+entry.name,filelocation+filename)
-
-
 
 def move_data_from_excel_to_db():
     try:
@@ -154,7 +154,8 @@ def move_data_from_excel_to_db():
         # value_reference text
                 
         dirname = os.path.dirname
-        filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
+        #filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
+        filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3L/unique_code_final/"
         filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
         counter = 1
         rename_files_folder(filelocation)
@@ -235,8 +236,8 @@ def schema_validation(dataframe, schema):
                         #"proper format.")
 
 def build_schemas(formname, sched, trans_type):
-    formname = 'F3X' 
-    sched    = 'ScheduleA'
+    # formname = 'F3X' 
+    # sched    = 'ScheduleA'
     #trans_type = 'PARTN_MEMO'
     try:
         # query_string = """SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.TYPE, rfsfs.REQUIRED	
@@ -312,10 +313,18 @@ def build_schemas(formname, sched, trans_type):
     except Exception as e:
         raise e
 
-def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
+def load_dataframe_from_s3(bktname, key, size, sleeptime):
     print(bktname, key)
     try:
-        tablename = 'temp' 
+        str = key.split('_')
+        schedule  = str[1]
+        formname = (str[0].split('/'))[1] 
+        sched = schedule.replace('Schedule','S')
+        print('sched:',sched)
+        print(schedule) 
+        print(formname)        
+
+        tablename = 'temp'
         if "/" in key:
             tablename=key[key.find("/")+1:-4].split()[0]
         else:
@@ -330,8 +339,8 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
             #load_data_from_df_to_db(tablename, data)
             print('read_csv For loop')
-            data = data.dropna(axis=[1,0], how='all')
-            print(data)
+            data = data.dropna(axis=[0], how='all')
+            #print(data)
             res = validate_dataframe(data, sched)
             if "Validate_Pass" != res:
                 #print("load_dataframe_from_s3:",res)
@@ -349,17 +358,22 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
                 #if tranid == 'TRAN':
                 #    print('data',data)
                 # build schema based on tranid
-                head_schema = build_schemas('F3X', 'ScheduleA', tranid)
+                head_schema = build_schemas(formname, schedule, tranid)
                 print('After build_schemas')
                 headers = head_schema[0]
                 schema  = head_schema[1]
                 print('....headers....',headers)
                 print('....schema....',schema) 
                 #pick the data with tranid based schema
+                print('11111111111111111111111111')
+                #print(data)
+                #print(data['MEMO CODE'])
                 data_temp = data[headers]
                 #pick data with tranid 
+                print('11111111111111111111111111')
                 data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
                 #Validate data based on Schema and data
+                print('11111111111111111111111111')
                 schema_validation(data_temp, schema)
                 print('After schema_validation')
                 #break
@@ -372,7 +386,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, sched):
         
 
 #main method to call the process 
-def validate_transactions(sched, bktname, key):
+def validate_transactions(bktname, key):
     try:
 
         #send_message_to_queue()
@@ -386,9 +400,10 @@ def validate_transactions(sched, bktname, key):
         # bktname = "fecfile-filing-frontend"
         # key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
         #key = "transactions/C00029447_SchedA_UI_Identifier.csv"
+
         print("bktname: ",bktname, ", Key : ", key)
         if bktname:
-            res = load_dataframe_from_s3(bktname, key, 100000, 1, sched) #100,000 records and 1s timer is for testing and need to be updated.
+            res = load_dataframe_from_s3(bktname, key, 100000, 1) #100,000 records and 1s timer is for testing and need to be updated.
             if res != 'Validate_Pass':
                 print("Error with data validation:", res)
         else:
@@ -399,12 +414,11 @@ def validate_transactions(sched, bktname, key):
         logging.debug(error)
 
 try:
-    sched = 'SA'
     bktname = "fecfile-filing-frontend"
     #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-    key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_11_25_TEST_Data.csv"
-    validate_transactions(sched, bktname, key)
+    key = "transactions/F3X_ScheduleF_Import_Transactions_11_25_TEST_Data.csv"
+    validate_transactions(bktname, key)
 
-    # move_data_from_excel_to_db()    
+    #move_data_from_excel_to_db()    
 except Exception as ex:
     print(ex)
