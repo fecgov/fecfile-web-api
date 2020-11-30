@@ -11755,7 +11755,7 @@ class NotificationsSwitch:
 
         return (sql_count, sql_items, keys)
 
-    def case_ImportedTransactions(self):
+    def case_ImportedStatus(self):
 
         sql_count = """
             SELECT 0 as count WHERE %(cmte_id)s is not null
@@ -11763,16 +11763,19 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select null as id, null as name, null as uploader, null as date_time, null as check_sum,
-                       null as updated_date
-                where 1=2 and %(cmte_id)s is not null
+                select file_name as name,
+                    uploaded_by as uploader,
+                    to_char(uploaded_on, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
+                    checksum as check_sum
+                from public.notifications_import_statuses
+                where cmte_id = %(cmte_id)s
             ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         else:
-            sql_items = sql_items + " order by updated_date DESC "
+            sql_items = sql_items + " order by date_time DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11808,6 +11811,10 @@ def get_notifications_count(request):
                 union
                 select 'filing_confirmations' as notification_type, count(1) as records_count
                 from public.notifications_filing_confirmations
+                where cmte_id = %(cmte_id)s
+                union
+                select 'import_status' as notification_type, count(1) as records_count
+                from public.notifications_import_statuses
                 where cmte_id = %(cmte_id)s
             ) as V
         """     
@@ -11862,7 +11869,12 @@ def get_notifications_counts(request):
             union
             select 'RFAIs' as "groupName", 0 as count
             union
-            select 'Imported Transactions' as "groupName", 0 as count
+            select 'Imported Status' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_import_statuses
+                where cmte_id = %(cmte_id)s
+            ) A
         """
 
         sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
