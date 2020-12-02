@@ -85,6 +85,7 @@ export class ImportTrxFileSelectComponent implements OnInit {
       for (const file of files) {
         const qFile: UploadFileModel = new UploadFileModel();
         qFile.fileName = file.name;
+        qFile.formType = this.formType;
         qFile.status = ImportFileStatusEnum.queued;
         qFile.file = file;
         qFile.queueIndex = i;

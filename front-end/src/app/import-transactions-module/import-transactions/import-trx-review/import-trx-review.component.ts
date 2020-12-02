@@ -34,7 +34,7 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
 
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
-  private checkSum: string;
+  // private checkSum: string;
   private committeeId: string;
 
   constructor(
@@ -66,46 +66,60 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
   }
 
   private _startReview() {
-    // this.uploadFile.status = ImportFileStatusEnum.review;
     const file = this.uploadFile.file;
-    this._importTransactionsService.processingUploadedTransactions(file.name, this.checkSum).subscribe((res: any) => {
-      let hasValidationErrors = false;
-      if (res.error_list) {
-        if (res.error_list.length > 0) {
-          hasValidationErrors = true;
-        }
-      }
-      if (res.duplicate_file_list) {
-        if (res.duplicate_file_list.length > 0) {
-          this.hasDupeFile = true;
-          this.duplicateFileList = res.duplicate_file_list;
-        }
-      }
-      if (hasValidationErrors) {
-        this.uploadFile.status = ImportFileStatusEnum.failed;
-        const message =
-          'The system found errors within the import file, ' +
-          'and will not be able to complete the import. ' +
-          'Please check your file and ensure formatting is correct.';
-        this._dialogService
-          .confirm(message, ConfirmModalComponent, 'Import Failed!', false, ModalHeaderClassEnum.errorHeader)
-          .then(res => {
-            this.resultsEmitter.emit({
-              resultType: 'validation-error',
-              uploadFile: this.uploadFile
-            });
-          });
-      } else if (this.hasDupeFile) {
-      } else {
-        this._modalService.open(UploadCompleteMessageComponent).result.then((resp: string) => {
-          if (resp === 'continue') {
-            this.resultsEmitter.emit({
-              resultType: 'success',
-              uploadFile: this.uploadFile
+
+    const fileReader = new FileReader();
+    fileReader.onload = e => {
+      console.log('start MD5 = ' + new Date());
+      const fileData = fileReader.result;
+      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+      const md5 = hash.toString(CryptoJS.enc.Hex);
+      // this.checkSum = md5;
+      this.uploadFile.checkSum = md5;
+      console.log('end MD5 = ' + new Date());
+
+      this._importTransactionsService
+        .processingUploadedTransactions(file.name, this.uploadFile.checkSum, this.uploadFile.formType)
+        .subscribe((res: any) => {
+          let hasValidationErrors = false;
+          if (res.error_list) {
+            if (res.error_list.length > 0) {
+              hasValidationErrors = true;
+            }
+          }
+          if (res.duplicate_file_list) {
+            if (res.duplicate_file_list.length > 0) {
+              this.hasDupeFile = true;
+              this.duplicateFileList = res.duplicate_file_list;
+            }
+          }
+          if (hasValidationErrors) {
+            this.uploadFile.status = ImportFileStatusEnum.failed;
+            const message =
+              'The system found errors within the import file, ' +
+              'and will not be able to complete the import. ' +
+              'Please check your file and ensure formatting is correct.';
+            this._dialogService
+              .confirm(message, ConfirmModalComponent, 'Import Failed!', false, ModalHeaderClassEnum.errorHeader)
+              .then(res => {
+                this.resultsEmitter.emit({
+                  resultType: 'validation-error',
+                  uploadFile: this.uploadFile
+                });
+              });
+          } else if (this.hasDupeFile) {
+          } else {
+            this._modalService.open(UploadCompleteMessageComponent).result.then((resp: string) => {
+              if (resp === 'continue') {
+                this.resultsEmitter.emit({
+                  resultType: 'success',
+                  uploadFile: this.uploadFile
+                });
+              }
             });
           }
         });
-      }
-    });
+    };
+    fileReader.readAsText(file);
   }
 }
