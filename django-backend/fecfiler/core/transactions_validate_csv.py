@@ -33,8 +33,9 @@ logging.basicConfig(level=logging.ERROR)
 
 def validate_dataframe(data, sched):
     #check if the column contains only values of a particular schedule 
-    #print(sched)
-    #print(data['SCHEDULE NAME'])
+    print(sched)
+    print(data['SCHEDULE NAME'])
+        
     if data['SCHEDULE NAME'].str.contains(sched).any():
         print ("schedule matches")
     else: 
@@ -139,23 +140,15 @@ def rename_files_folder(filelocation):
                 # print(filelocation+filename)   
                 os.rename(filelocation+entry.name,filelocation+filename)
 
-def move_data_from_excel_to_db():
+def move_data_from_excel_to_db(form):
     try:
         filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"        
-        #parse the excels and load SPEC to the DB. Make sure to rename the column headers as follows: 
-        # formname text,
-        # schedname text,
-        # transaction_type text,
-        # field_description text,
-        # type text,
-        # required text,
-        # auto_generate text,
-        # sample_data text,
-        # value_reference text
                 
         dirname = os.path.dirname
-        #filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
         filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3L/unique_code_final/"
+        if form == 'F3X':
+            print('its F3X') 
+            filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
         filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
         counter = 1
         rename_files_folder(filelocation)
@@ -171,47 +164,6 @@ def move_data_from_excel_to_db():
         print(ex)
 
 
-#SELECT * FROM ref_transaction_types rtt WHERE rtt.tran_identifier = 'INDV_REC'
-
-# def getdbconnection():
-#     try:
-#         # "postgres://PG_USER:PG_PASSWORD@PG_HOST:PG_PORT/PG_DATABASE"
-#         #engine   = create_engine('postgres://postgres:postgres@localhost:5432', pool_recycle=3600)
-#         #postgreSQLConnection    = engine.connect()
-#         postgreSQLConnection = psycopg2.connect(user='postgres',
-#                                       password = 'postgres',
-#                                       host='localhost',
-#                                       port='5432',
-#                                       database='postgres'  )
-#         return postgreSQLConnection
-#     except Exception as ex:  
-#         print("In EXCEPTION BLOCK ")
-#         print(ex)
-
-
-
-        #schema = Schema([column1 , column2
-                # schema_conditions
-                # Column('ENTITY TYPE', [InListValidation(['IND', 'ORG'])]),
-                # Column('SCHEDULE NAME ', [InListValidation(['IND1', 'ORG1'])]),
-                # Column('TRANSACTION IDENTIFIER ', [InListValidation(['IND1', 'ORG1'])]),
-                # Column('CONTRIBUTOR STREET 1', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')])
-            # Column('COMMITTEE_ID', [MatchesPatternValidation('[cC][0-9]{8}')]),
-            # Column('ENTITY_TYPE', [InListValidation(['IND', 'ORG'])]),
-            # Column('STREET_1', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
-            # Column('STREET_2', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
-            # Column('CITY', [MatchesPatternValidation    ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
-            # Column('STATE', [MatchesPatternValidation   ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{2}$')]),
-            # Column('ZIP', [MatchesPatternValidation     ('^[\\w\\s]{1,9}$')]),
-            # Column('EMPLOYER', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
-            # Column('OCCUPATION', [MatchesPatternValidation       ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
-            # Column('ORGANIZATION_NAME', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,200}$')]),
-            # Column('LASTNAME', [MatchesPatternValidation         ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
-            # Column('FIRSTNAME', [MatchesPatternValidation        ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
-            # Column('MIDDLENAME', [MatchesPatternValidation       ('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
-            # Column('PREFIX', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')]),
-            # Column('SUFFIX', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')])
-        #])
 def schema_validation(dataframe, schema):
     try:
         #print(dataframe)
@@ -319,7 +271,10 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
         str = key.split('_')
         schedule  = str[1]
         formname = (str[0].split('/'))[1] 
-        sched = schedule.replace('Schedule','S')
+        if 'H' in schedule or 'h' in schedule:
+            sched = schedule.replace('Schedule','')
+        else:
+            sched = schedule.replace('Schedule','S')
         print('sched:',sched)
         print(schedule) 
         print(formname)        
@@ -414,11 +369,11 @@ def validate_transactions(bktname, key):
         logging.debug(error)
 
 try:
-    bktname = "fecfile-filing-frontend"
-    #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-    key = "transactions/F3X_ScheduleF_Import_Transactions_11_25_TEST_Data.csv"
-    validate_transactions(bktname, key)
+     bktname = "fecfile-filing-frontend"
+     #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
+     key = "transactions/F3X_ScheduleF_Import_Transactions_11_25_TEST_Data.csv"
+     validate_transactions(bktname, key)
 
-    #move_data_from_excel_to_db()    
+    #move_data_from_excel_to_db('F3X')    
 except Exception as ex:
     print(ex)

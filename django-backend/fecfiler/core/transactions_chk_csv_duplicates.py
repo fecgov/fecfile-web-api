@@ -27,17 +27,17 @@ CREATE TABLE public.transactions_file_details
 '''
 
 #check if file is new
-def check_for_file_hash_in_db(cmteid, filename, hash):
+def check_for_file_hash_in_db(cmteid, filename, hash, fecfilename):
     conn = None
     try:
         """ insert a transactions_file_details """
-        selectsql = """SELECT md5 FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s;"""
+        selectsql = """SELECT cmte_id, md5, file_name, create_date FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;"""
  
         conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
         cur = conn.cursor()
-        cur.execute(selectsql, (cmteid, filename, hash))
+        cur.execute(selectsql, (cmteid, filename, hash, fecfilename))
         dbhash = cur.fetchone()
-        print('dbhash : ', dbhash)
+        #print('dbhash : ', dbhash)
         conn.commit()
         cur.close
         return dbhash;
@@ -49,19 +49,20 @@ def check_for_file_hash_in_db(cmteid, filename, hash):
 
 
 # load the filename with hashcode to db
-def load_file_hash_to_db(cmteid, filename, hash):
+def load_file_hash_to_db(cmteid, filename, hash, fecfilename):
     conn = None
     try:
         print("cmteid :",cmteid)
         print("filename :",filename)
         print("hash :",hash)
+        print("fecfilename:",fecfilename)
         """ insert a transactions_file_details """
-        insertsql = """INSERT INTO transactions_file_details(cmte_id, file_name, md5)
-                VALUES(%s, %s, %s);"""
+        insertsql = """INSERT INTO transactions_file_details(cmte_id, file_name, md5, fec_file_name)
+                VALUES(%s, %s, %s, %s);"""
  
         conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
         cur = conn.cursor()
-        cur.execute(insertsql, (cmteid, filename, hash))
+        cur.execute(insertsql, (cmteid, filename, hash, fecfilename))
         conn.commit()
         cur.close
         return 'done'
@@ -141,33 +142,70 @@ def chk_csv_uploaded(request):
         cmte_id = get_comittee_id(request.user.username)
         file_name = request.data.get("file_name") #request.file_name
         md5 = request.data.get("md5hash") #request.md5hash
-        print(cmte_id, file_name, md5)
+        fec_file_name = request.data.get("fecfilename")
+        print(cmte_id, file_name, md5, fec_file_name)
         filename = file_name #"srini_test1.csv"#"Disbursements_1q2020.csv"
         hash_value = md5 #generate_md5_hash(filename)
-        fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value)
+        fecfilename = fec_file_name #"F3X_ScheduleLA_Import_Transactions_C0011147_part1_11_25.csv"
+        fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value, fecfilename)
         if fileexists is None: 
-            #load_file_hash_to_db(cmte_id, filename, hash_value)
-            returnstr = 'File loaded successfully!!!'
-        else:
-            returnstr = 'File exists in DB'  
+            load_file_hash_to_db(cmte_id, filename, hash_value, fecfilename)
+
+        rcmteid      = ""
+        rhash        = ""
+        rfilename    = ""
+        rcreate_date = ""
+        if fileexists is not None:
+            rcmteid =  fileexists[0]
+            rhash = fileexists[1]
+            rfilename = fileexists[2]
+            rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
+        
+        returnstr = {    "error_list": [],
+                        "fileName": filename,
+                        "duplicate_file_list": [{
+                        "fileName"  : rfilename,
+                        "uploadDate": rcreate_date,
+                        "checkSum"  : rhash
+                        }],
+                        "duplicate_db_count": 0
+                    }
         return returnstr
     except Exception as e:
-        print(e)
+        returnstr = {'message': str(e)}
+        return returnstr
 
 
 # try:
+#     cmte_id = 'C0011147'
 #     dirname = os.path.dirname 
 #     filepath = dirname(dirname(os.getcwd()))+"/csv/"
 #     filename = "srini_test1.csv" #"Disbursements_1q2020.csv"
-#     hash_value = generate_md5_hash(filename)
-#     fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value)
+#     fecfilename = "F3X_ScheduleLA_Import_Transactions_C0011147_part1_11_25.csv"
+#     hash_value = '2222222'#generate_md5_hash(filename)
+#     fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value, fecfilename)
+
+#     rcmteid =  ""
+#     rhash = ""
+#     rfilename = ""
+#     rcreate_date = ""
+#     if fileexists is not None:
+#         rcmteid =  fileexists[0]
+#         rhash = fileexists[1]
+#         rfilename = fileexists[2]
+#         rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
+    
+#     returnstr = {    "error_list": [],
+#                     "fileName": filename,
+#                     "duplicate_file_list": [{
+#                     "fileName"  : rfilename,
+#                     "uploadDate": rcreate_date,
+#                     "checkSum"  : rhash
+#                     }],
+#                     "duplicate_db_count": 0
+#                 }
 #     if fileexists is None: 
-#         load_file_hash_to_db(cmte_id, filename, hash_value)
-#         returnstr = 'File loaded successfully!!!'
-#     else:
-#         returnstr = 'File exists in DB'  
-#     print(returnstr)
+#         load_file_hash_to_db(cmte_id, filename, hash_value, fecfilename)
+#     #print(returnstr)
 # except Exception as e:
 #     print(e)
-
-

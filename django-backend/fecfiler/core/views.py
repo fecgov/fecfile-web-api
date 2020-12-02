@@ -49,6 +49,9 @@ from fecfiler.core.transactions_chk_csv_duplicates import (
     chk_csv_uploaded,
     load_file_hash_to_db
 )    
+from fecfiler.core.transactions_validate_contacts import (
+    get_contact_details_from_transactions
+)
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -12189,13 +12192,10 @@ def contact_report_details(request):
 def chk_csv_uploaded_in_db(request):
     try:
         resp = chk_csv_uploaded(request)
-        return Response(resp, status=status.HTTP_200_OK)              
+        return JsonResponse(resp, status=status.HTTP_201_CREATED, safe=False)
     except Exception as e:
-        return Response(
-          "The chk_csv_uploaded_in_db API is throwing an error: " + str(e),
-          status=status.HTTP_400_BAD_REQUEST
-          )
-
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)        
 
 @api_view(["POST"])
 def save_csv_md5_to_db(request):
@@ -12209,8 +12209,21 @@ def save_csv_md5_to_db(request):
         return Response(
           "The save_csv_md5_to_db API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
-          )        
+          )
 
+@api_view(["POST"])
+def get_contact_details_from_csv(request):
+    try:
+        cmteid = request.user.username
+        filename = request.data.get("file_name") #request.file_name
+        resp = get_contact_details_from_transactions(cmteid, filename)
+        return Response(resp, status=status.HTTP_200_OK)              
+    except Exception as e:
+        return Response(
+          "The save_csv_md5_to_db API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )        
+  
 @api_view(["POST"])
 def contact_notes(request):
     try:
