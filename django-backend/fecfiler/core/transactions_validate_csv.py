@@ -308,7 +308,7 @@ def move_error_files_to_s3(bktname, key):
         #print('move_error_files_to_s3: ',bktname, key)
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        
+        os.remove(errorfilename)
     except ClientError as e:
         print(e)
         logging.debug("error in load_dataframe_from_s3 method")
@@ -439,7 +439,7 @@ def validate_transactions(bktname, key):
 try:
      bktname = "fecfile-filing-frontend"
      #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-     key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
+     key = "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
      validate_transactions(bktname, key)
 
     #move_data_from_excel_to_db('F3X')    
