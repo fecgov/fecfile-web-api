@@ -1,10 +1,13 @@
 import hashlib
 import os
+import os.path
+from os import path
 import psycopg2
 import pandas as pd 
 from pandas_schema import Column, Schema
 from pandas_schema.validation import MatchesPatternValidation, InListValidation
 import boto3
+from botocore.exceptions import ClientError
 from io import StringIO
 from pandas.util import hash_pandas_object
 import numpy
@@ -164,25 +167,54 @@ def move_data_from_excel_to_db(form):
         print(ex)
 
 
-def schema_validation(dataframe, schema):
+def schema_validation(dataframe, schema, bktname, key):
     try:
         #print(dataframe)
+        #key = key.split('/')
+        errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
+        print('msg',errorfilename)
+        #print('Error File Name: ',key[1])
+        
         errors = schema.validate(dataframe)
+
+        errdf = []       
         for error in errors:
-            # print('Lit of errors:',error)
-            print('[',error.row,',',error.column,',',error.value,']')
+            msg = error.message 
+            error.message = re.sub("[\"@*&?].*[\"@*&?]", "", msg)
+            print('[',error.row,',',error.column,',',error.value,',',error.message,']')
+            errdf.append({  	'row_no':       error.row,
+				'field_name':   error.column,
+				'msg':          error.message
+				})                
+
+        # # initialize list of lists 
+        # data = [['tom', 10], ['nick', 15], ['juli', 14]] 
+        # # Create the pandas DataFrame 
+        # df = pd.DataFrame(data, columns = ['Name', 'Age']) 
+
         errors_index_rows = [e.row for e in errors]
         print('errors_index_rows: ',errors_index_rows)
-
-        pd.DataFrame({'col':errors}).to_csv('errors.csv', mode='a', header=False)
+        #pd.DataFrame({'col':errors}).to_csv(errorfilename, mode='a', header=True)
+        if path.exists(errorfilename):
+            pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=False, index = False)
+        else:
+            pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=True, index = False)
 
         data_clean = dataframe.drop(index=errors_index_rows)
         data_dirty = pd.concat([data_clean, dataframe]).drop_duplicates(keep=False)
         data = {"errors": data_dirty, "data_clean": data_clean}
         #print("data:",data)
         return data
+    except ClientError as e:
+        print(e)
+        logging.debug("error in schema_validation method")
+        logging.debug(e)
+        raise
     except Exception as e:
         print(e)
+        logging.debug("error in schema_validation method")
+        logging.debug(e)
+        raise
         #logger.debug(e)
         #raise NoOPError("Error occurred while validating file structure. Please ensure header and data values are in "
                         #"proper format.")
@@ -265,6 +297,28 @@ def build_schemas(formname, sched, trans_type):
     except Exception as e:
         raise e
 
+
+def move_error_files_to_s3(bktname, key):
+    try:
+        keyfolder = key.split('/')[0]
+        print(keyfolder)
+        print(bktname)
+        errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
+        errfilerelpath = keyfolder + '/error_files/' + errorfilename
+        #print('move_error_files_to_s3: ',bktname, key)
+        s3 = boto3.resource('s3')
+        s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
+        
+    except ClientError as e:
+        print(e)
+        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug(e)
+        raise
+    except Exception as e:
+        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug(e)
+        raise
+
 def load_dataframe_from_s3(bktname, key, size, sleeptime):
     print(bktname, key)
     try:
@@ -291,6 +345,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
         body = obj['Body']
         csv_string = body.read().decode('utf-8')
         res = ''
+        flag = False
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
             #load_data_from_df_to_db(tablename, data)
             print('read_csv For loop')
@@ -320,24 +375,37 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
                 print('....headers....',headers)
                 print('....schema....',schema) 
                 #pick the data with tranid based schema
-                print('11111111111111111111111111')
+                #print('11111111111111111111111111')
                 #print(data)
                 #print(data['MEMO CODE'])
                 data_temp = data[headers]
                 #pick data with tranid 
-                print('11111111111111111111111111')
+                #print('22222222222222222222222')
                 data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
                 #Validate data based on Schema and data
-                print('11111111111111111111111111')
-                schema_validation(data_temp, schema)
+                print('3333333333333333333')
+                schema_validation(data_temp, schema, bktname, key)
                 print('After schema_validation')
                 #break
                 print('........END..............................................................................................')
             print('...............')
             #time.sleep(sleeptime)  
-            return 'Validate_Pass'      
-    except Exception as error:
-        print(error)
+            #return 'Validate_Pass' 
+            flag = True       
+        move_error_files_to_s3(bktname, key)     
+        if flag is True:
+            return 'Validate_Pass' 
+        else: 
+            return 'Validate_Fail' 
+    except ClientError as e:
+        print(e)
+        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug(e)
+        raise
+    except Exception as e:
+        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug(e)
+        raise
         
 
 #main method to call the process 
@@ -371,7 +439,7 @@ def validate_transactions(bktname, key):
 try:
      bktname = "fecfile-filing-frontend"
      #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-     key = "transactions/F3X_ScheduleF_Import_Transactions_11_25_TEST_Data.csv"
+     key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
      validate_transactions(bktname, key)
 
     #move_data_from_excel_to_db('F3X')    
