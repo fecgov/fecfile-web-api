@@ -19,7 +19,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.types import String
 from sqlalchemy.types import NVARCHAR
 from sqlalchemy.types import Text
-from sqlalchemy import create_engine
 from django.db import connection
 
 # Postgres Database Settings - local
@@ -34,45 +33,50 @@ PG_PASSWORD = os.getenv('DB_PASSWORD')
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.ERROR)
 
-def validate_dataframe(data, sched):
+def validate_dataframe(data):
     #check if the column contains only values of a particular schedule 
-    print(sched)
-    print(data['SCHEDULE NAME'])
-        
+    # print(sched)
+    # print(data['SCHEDULE NAME'])
+    sched = data['SCHEDULE NAME'][0][0:2]
+    #print("data['SCHEDULE NAME']",data['SCHEDULE NAME'][0],'sched:',sched)     
     if data['SCHEDULE NAME'].str.contains(sched).any():
         print ("schedule matches")
+        return "Validate_Pass"
     else: 
         print ("Non schedule matches available")
         return "Multiple_Sched"
-    return "Validate_Pass"
 
-# to drop tables  ​
-#     sql = "DROP TABLE IF EXISTS srini_temp_trans;COMMIT;"
-#     conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
-#     cur = conn.cursor()
-#     cur.execute(sql)
-#     cur.close()
+# def save_data_from_excel_to_db(data):
+#     #print('in the get_data_from_csv')
+#     postgreSQLTable = 'ref_forms_scheds_format_specs'
+#     try:
+#         # Create an engine instance
+#         engine   = create_engine('postgres://postgres:postgres@localhost:5432', pool_recycle=3600);
+#         # Connect to PostgreSQL server
+#         postgreSQLConnection = engine.connect()
+#         data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': Text} )
+#         time.sleep(1)
+#     except ValueError as vx:
+#         print("valuerror; ")
+#         print(vx)
+#     except Exception as ex:  
+#         print("In EXCEPTION BLOCK ")
+#         print(ex)
+#     finally:
+#         postgreSQLConnection.close();
 
 
-# df.to_sql('people', con=engine, if_exists='append', index=False, dtype={'First Name': String(length=255),
-#                                                                         'Last Name': String(length=255),
-#                                                                         'Age': SmallInteger, 'Phone Number': String(length=255)})
-
-def load_data_from_csv_to_db(data):
+def save_data_from_excel_to_db(data):
     #print('in the get_data_from_csv')
     postgreSQLTable = 'ref_forms_scheds_format_specs'
     try:
-        # Create an engine instance
-        engine   = create_engine('postgres://postgres:postgres@localhost:5432', pool_recycle=3600);
-        # Connect to PostgreSQL server
+        # "postgres://PG_USER:PG_PASSWORD@PG_HOST:PG_PORT/PG_DATABASE"
+        connectionstring = "postgres://" + PG_USER + ":" + PG_PASSWORD + "@" + PG_HOST + ":" + PG_PORT + "/" + PG_DATABASE
+        print("connectionstring : ",connectionstring)
+        engine   = create_engine(connectionstring, pool_recycle=3600);
         postgreSQLConnection = engine.connect()
-        #print("1111; ")
         data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': Text} )
-        #data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': String(length=5)})
-
         time.sleep(1)
-        #temp = engine.execute("SELECT * FROM srini_temp_trans").fetchall()
-        #print("22222; ")
     except ValueError as vx:
         print("valuerror; ")
         print(vx)
@@ -80,24 +84,18 @@ def load_data_from_csv_to_db(data):
         print("In EXCEPTION BLOCK ")
         print(ex)
     finally:
-        postgreSQLConnection.close();
+        postgreSQLConnection.close()
+
 
 
 def export_excel_to_db(filename, path):
     try:
-        #dirname = os.path.dirname
-        #print(dirname(dirname(os.getcwd())))
-        
-        #filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/Unique_code_new/"
-        #filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
-        # Original file name to be renamed as above F3X - Schedule A_Format Specs_Import Transactions_MAPPED
         filelocation = path
         filewithpath = filelocation + filename
         print("File name",filewithpath)
         str = filename.split('_')
         formname  = str[0]
         schedname = str[1] 
-        #print(dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx") 
         xls = pd.ExcelFile(filewithpath)
         res = len(xls.sheet_names)
         sheet_to_start = 1
@@ -105,7 +103,7 @@ def export_excel_to_db(filename, path):
             sheet_to_start = 0
         #print(xls.sheet_names)
         for sheet_name in xls.sheet_names[sheet_to_start:]:
-            print(sheet_name)
+            #print(sheet_name)
             if sheet_name != 'All Receipts':
                 df = pd.read_excel(filewithpath, 
                                     sheet_name=sheet_name, 
@@ -124,20 +122,21 @@ def export_excel_to_db(filename, path):
                 df.insert (2, "transaction_type", sheet_name)         
 
                 #print(df)
-                load_data_from_csv_to_db(df)
+                save_data_from_excel_to_db(df)
                 #break
     except Exception as ex:  
         print("In export_excel_to_db EXCEPTION BLOCK ")
         print(ex)
 
 def rename_files_folder(filelocation):
+    #RENAME XLS FILES TO PARSE AND UPDATE
     #filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
     #F3X - Schedule A_Format Specs_Import Transactions_MAPPED
     with os.scandir(filelocation) as entries:
         for entry in entries:
             if ' - ' in entry.name:
                 res = re.split(' |-|_|!', entry.name)
-                print(res[4])
+                #print(res[4])
                 filename = 'F3L_Schedule' + res[4] + '_FormatSpecs_Import_Transactions_MAPPED.xlsx'
                 # print(filelocation+entry.name)
                 # print(filelocation+filename)   
@@ -145,65 +144,45 @@ def rename_files_folder(filelocation):
 
 def move_data_from_excel_to_db(form):
     try:
-        filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"        
-                
         dirname = os.path.dirname
         filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3L/unique_code_final/"
         if form == 'F3X':
-            print('its F3X') 
             filelocation = dirname(dirname(os.getcwd()))+"/csv/Final_SPECS/F3X/unique_code_final/"
-        filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
         counter = 1
         rename_files_folder(filelocation)
         with os.scandir(filelocation) as entries:
             for entry in entries:
-                print('counter',counter)
-                print('........................Schedule File Name:',entry.name)
-                
                 export_excel_to_db(entry.name,filelocation)
-                print('....................... End....',entry.name)
                 counter+=1
     except Exception as ex:
         print(ex)
 
 
-def schema_validation(dataframe, schema, bktname, key):
+def schema_validation(dataframe, schema, bktname, key, errorfilename):
     try:
-        #print(dataframe)
-        #key = key.split('/')
-        errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
-        print('msg',errorfilename)
-        #print('Error File Name: ',key[1])
-        
+        #print('msg',errorfilename)
         errors = schema.validate(dataframe)
-
         errdf = []       
         for error in errors:
             msg = error.message 
             error.message = re.sub("[\"@*&?].*[\"@*&?]", "", msg)
-            print('[',error.row,',',error.column,',',error.value,',',error.message,']')
+            #print('[',error.row,',',error.column,',',error.value,',',error.message,']')
             errdf.append({  	'row_no':       error.row,
 				'field_name':   error.column,
 				'msg':          error.message
 				})                
 
-        # # initialize list of lists 
-        # data = [['tom', 10], ['nick', 15], ['juli', 14]] 
-        # # Create the pandas DataFrame 
-        # df = pd.DataFrame(data, columns = ['Name', 'Age']) 
-
         errors_index_rows = [e.row for e in errors]
-        print('errors_index_rows: ',errors_index_rows)
-        #pd.DataFrame({'col':errors}).to_csv(errorfilename, mode='a', header=True)
-        if path.exists(errorfilename):
-            pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=False, index = False)
-        else:
-            pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=True, index = False)
+        print('errors_index_rows: ',len(errors_index_rows))
+        if len(errors_index_rows) > 0:
+            if path.exists(errorfilename):
+                pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=False, index = False)
+            else:
+                pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=True, index = False)
 
         data_clean = dataframe.drop(index=errors_index_rows)
         data_dirty = pd.concat([data_clean, dataframe]).drop_duplicates(keep=False)
         data = {"errors": data_dirty, "data_clean": data_clean}
-        #print("data:",data)
         return data
     except ClientError as e:
         print(e)
@@ -215,112 +194,92 @@ def schema_validation(dataframe, schema, bktname, key):
         logging.debug("error in schema_validation method")
         logging.debug(e)
         raise
-        #logger.debug(e)
-        #raise NoOPError("Error occurred while validating file structure. Please ensure header and data values are in "
-                        #"proper format.")
 
 def build_schemas(formname, sched, trans_type):
-    # formname = 'F3X' 
-    # sched    = 'ScheduleA'
-    #trans_type = 'PARTN_MEMO'
     try:
-        # query_string = """SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.TYPE, rfsfs.REQUIRED	
-        #                     FROM public.ref_forms_scheds_format_specs rfsfs 
-        #                     WHERE rfsfs.formname  = %s 
-        #                     AND rfsfs.schedname = %s
-        #                     AND rfsfs.transaction_type = %s"""
-        connection = psycopg2.connect(user='postgres',
-                                      password = 'postgres',
-                                      host='localhost',
-                                      port='5432',
-                                      database='postgres'  )
+        # connection = psycopg2.connect(user='postgres',
+        #                               password = 'postgres',
+        #                               host='localhost',
+        #                               port='5432',
+        #                               database='postgres'  )
+        connection = psycopg2.connect(user=PG_USER,
+                                      password = PG_PASSWORD,
+                                      host=PG_HOST,
+                                      port=PG_PORT,
+                                      database=PG_DATABASE)
         cursor = connection.cursor()
-        print('formname',formname) 
-        print('sched',sched) 
-        print('trans_type',trans_type)
+        # print('formname',formname) 
+        # print('sched',sched) 
+        # print('trans_type',trans_type)
         cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required	FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",(formname, sched, trans_type)) 
         format_specs = cursor.fetchall()
         columns = []
         headers = []
-        #print('format_specs',format_specs)
         for counter, row in enumerate(format_specs):
-            #"A/N-3" "NUM-4"
-            # Column('ZIP', [MatchesPatternValidation('^[\\w\\s]{1,9}$')]),
-            # Column('EMPLOYER', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
-            #print(row)
             field = row[3]
             type  = row[4]
             required = row[5]
-            #print(field, type)
             s = type.split('-')
-            #field = s[0] 
             len = s[1]
-            #print(s[0],len)
-            #print('required:',required)
             if 'A/N' in type:
                 if required is None:
-                    # print("in required is None")
-                    # print(field)
                     pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv],allow_empty=True)
                 else:
-                    #print("in ELSE required is None")
                     pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv])
                 columns.append(column)
                 headers.append(field)
-                #print(s[0],len)            
             elif 'NUM' in type:
-                #pattern = '^[\\w\\s]{1,'+ len + '}$'
                 pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
-                #print(s[0],len)            
                 columns.append(column)
                 headers.append(field)
             elif 'AMT' in type:
                 pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
-                #pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
-                #print(s[0],len)            
                 columns.append(column)
                 headers.append(field)
-            #print(field)
-        # for col in columns:
-        #     print(col.__dict__)
         schema = Schema(columns)
         head_schema = [headers,schema]
         return head_schema
-    except Exception as e:
-        raise e
+    except ValueError as vx:
+        print("valuerror; ")
+        print(vx)
+    except Exception as ex:  
+        print("In EXCEPTION BLOCK ")
+        print(ex)
+    finally:
+        connection.close();
 
 
-def move_error_files_to_s3(bktname, key):
+def move_error_files_to_s3(bktname, key, errorfilename):
     try:
         keyfolder = key.split('/')[0]
-        print(keyfolder)
-        print(bktname)
-        errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
+        #print(keyfolder)
+        #print(bktname)
         errfilerelpath = keyfolder + '/error_files/' + errorfilename
-        #print('move_error_files_to_s3: ',bktname, key)
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        os.remove(errorfilename)
+        #os.remove(errorfilename)
     except ClientError as e:
         print(e)
-        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug("error in move_error_files_to_s3 method")
         logging.debug(e)
         raise
     except Exception as e:
-        logging.debug("error in load_dataframe_from_s3 method")
+        logging.debug("error in move_error_files_to_s3 method")
         logging.debug(e)
         raise
 
 def load_dataframe_from_s3(bktname, key, size, sleeptime):
-    print(bktname, key)
+    #print(bktname, key)
+    resvalidation=""
+    errorfilename=""
     try:
         str = key.split('_')
         schedule  = str[1]
@@ -329,17 +288,16 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
             sched = schedule.replace('Schedule','')
         else:
             sched = schedule.replace('Schedule','S')
-        print('sched:',sched)
-        print(schedule) 
-        print(formname)        
-
+        # print('sched:',sched)
+        print('schedule ',schedule) 
+        print('formname ',formname)        
         tablename = 'temp'
         if "/" in key:
             tablename=key[key.find("/")+1:-4].split()[0]
         else:
             raise Exception('S3 key not having a / char')
         tablename = tablename.lower() 
-        print("tablename:", tablename)  
+        # print("tablename:", tablename)  
         s3 = boto3.client('s3')
         obj = s3.get_object(Bucket=bktname, Key=key)
         body = obj['Body']
@@ -347,53 +305,32 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
         res = ''
         flag = False
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
-            #load_data_from_df_to_db(tablename, data)
-            print('read_csv For loop')
             data = data.dropna(axis=[0], how='all')
-            #print(data)
-            res = validate_dataframe(data, sched)
+            res = validate_dataframe(data)
             if "Validate_Pass" != res:
-                #print("load_dataframe_from_s3:",res)
                return res                        
             data = data.sort_values(by=["TRANSACTION IDENTIFIER"], ascending=False)
-            print('...............')
+            # print('...............')
             #loop through the data set to pick unique tranid's 
-            print('Unique TRANSACTION IDENTIFIERS:',data['TRANSACTION IDENTIFIER'].unique().size)
             cntr = 1
             for tranid in data['TRANSACTION IDENTIFIER'].unique():
-                print('.....................................................................................................................')
-                print('.............tranid: ',tranid)
-                print('***********CNTR:',cntr)
                 cntr+=1
-                #if tranid == 'TRAN':
-                #    print('data',data)
                 # build schema based on tranid
                 head_schema = build_schemas(formname, schedule, tranid)
-                print('After build_schemas')
                 headers = head_schema[0]
                 schema  = head_schema[1]
-                print('....headers....',headers)
-                print('....schema....',schema) 
-                #pick the data with tranid based schema
-                #print('11111111111111111111111111')
-                #print(data)
-                #print(data['MEMO CODE'])
+                # print('....headers....',headers)
+                # print('....schema....',schema) 
                 data_temp = data[headers]
-                #pick data with tranid 
-                #print('22222222222222222222222')
                 data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
-                #Validate data based on Schema and data
-                print('3333333333333333333')
-                schema_validation(data_temp, schema, bktname, key)
-                print('After schema_validation')
-                #break
-                print('........END..............................................................................................')
-            print('...............')
-            #time.sleep(sleeptime)  
-            #return 'Validate_Pass' 
+                errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
+                resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
+                #print('resvalidation:',resvalidation)
             flag = True       
-        move_error_files_to_s3(bktname, key)     
-        if flag is True:
+        if path.exists(errorfilename):
+            move_error_files_to_s3(bktname, key, errorfilename)     
+            return errorfilename
+        elif flag is True:
             return 'Validate_Pass' 
         else: 
             return 'Validate_Fail' 
@@ -409,24 +346,16 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
         
 
 #main method to call the process 
-def validate_transactions(bktname, key):
+def validate_transactions(bktname, key, cmteid):
     try:
 
         #send_message_to_queue()
         #aws sqs receive-message --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions --attribute-names All --message-attribute-names All --max-number-of-messages 10
         #aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
-        #bktname: "fecfile-filing-frontend"
-        #key: "transactions/F3X_Specs_Import_Transactions_Srini.csv"
-        #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-        
-        # sched = 'SA'
-        # bktname = "fecfile-filing-frontend"
-        # key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-        #key = "transactions/C00029447_SchedA_UI_Identifier.csv"
-
         print("bktname: ",bktname, ", Key : ", key)
-        if bktname:
+        if bktname and key:
             res = load_dataframe_from_s3(bktname, key, 100000, 1) #100,000 records and 1s timer is for testing and need to be updated.
+            print(res)
             if res != 'Validate_Pass':
                 print("Error with data validation:", res)
         else:
@@ -435,13 +364,17 @@ def validate_transactions(bktname, key):
         print(ex)
         logging.debug("error in process_transactions method")
         logging.debug(error)
+        raise
 
 try:
-     bktname = "fecfile-filing-frontend"
-     #key = "transactions/F3X_Tempate_Schedule_Specs_Import_Transactions_Schedule_A_Srini.csv"
-     key = "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-     validate_transactions(bktname, key)
+    cmteid =  "C00011147"
+    bktname = "fecfile-filing-frontend"
+    key = "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
+    if bktname and key:
+       validate_transactions(bktname, key, cmteid)
+    else: 
+        print("No data")
 
-    #move_data_from_excel_to_db('F3X')    
+    #move_data_from_excel_to_db('F3X')
 except Exception as ex:
     print(ex)
