@@ -15,7 +15,7 @@ export class ImportTrxHowToComponent implements OnInit {
   public steps: Array<any>;
   public currentStep: ImportTransactionsStepsEnum;
   public readonly start = ImportTransactionsStepsEnum.start;
-  public readonly step1Upload = ImportTransactionsStepsEnum.step1Upload;
+  public readonly step1Select = ImportTransactionsStepsEnum.step1Select;
   public readonly step2Review = ImportTransactionsStepsEnum.step2Review;
   public readonly step3Clean = ImportTransactionsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
@@ -30,7 +30,7 @@ export class ImportTrxHowToComponent implements OnInit {
 
   ngOnInit() {
     this.steps = [
-      { text: 'Upload', step: this.step1Upload },
+      { text: 'Upload', step: this.step1Select },
       { text: 'Review', step: this.step2Review },
       { text: 'Clean', step: this.step3Clean },
       { text: 'Import', step: this.step4ImportDone }

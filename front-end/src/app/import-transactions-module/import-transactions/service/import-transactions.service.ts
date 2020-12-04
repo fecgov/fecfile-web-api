@@ -4,26 +4,14 @@ import { map, concatMap, switchMap, retry, share } from 'rxjs/operators';
 import { Observable, timer, interval } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CookieService } from 'ngx-cookie-service';
-import * as S3 from 'aws-sdk/clients/s3';
-import * as AWS from 'aws-sdk/global';
-import { AWSError } from 'aws-sdk/global';
-import { SelectObjectContentEventStream } from 'aws-sdk/clients/s3';
-import { StreamingEventStream } from 'aws-sdk/lib/event-stream/event-stream';
-import { ERROR_COMPONENT_TYPE } from '@angular/compiler';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImportTransactionsService {
-  private bucket: S3;
-  private readonly bucketName = 'fecfile-filing-frontend';
 
   constructor(private _http: HttpClient, private _cookieService: CookieService) {
-    AWS.config.region = environment.awsRegion;
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: environment.awsIdentityPoolId
-    });
-    this.bucket = new S3({});
   }
 
   public getSpecAndTemplate(fileName: string): Observable<any> {
@@ -42,10 +30,7 @@ export class ImportTransactionsService {
     );
   }
 
-  /**
-   * Start processing the uploaded file of transactions.
-   */
-  public processingUploadedTransactions(fileName: string, checkSum: string, formType: string): Observable<any> {
+  public checkDuplicateFile(fileName: string, checkSum: string, formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/chk_csv_uploaded_in_db';
@@ -337,66 +322,4 @@ export class ImportTransactionsService {
     // , retry(), share();
   }
 
-  /**
-   * Read a CSV file from S3 given a limited number of records.
-   *
-   * @param file
-   * @returns an Observable containing an array of the header fields names.
-   */
-  public readCsvRecords(file: File, numberOfRecords: number): Observable<any> {
-    let headerFields = [];
-
-    const params = {
-      Bucket: this.bucketName,
-      Key: file.name,
-      ExpressionType: 'SQL',
-      Expression: 'select * from s3object s limit ' + numberOfRecords,
-      InputSerialization: {
-        CSV: {
-          FileHeaderInfo: 'NONE'
-        }
-      },
-      OutputSerialization: {
-        CSV: {
-          FieldDelimiter: ',',
-          RecordDelimiter: '\n'
-        }
-      }
-    };
-
-    return Observable.create(observer => {
-      this.bucket.selectObjectContent(params, function(err, data) {
-        if (err) {
-          observer.next(ERROR_COMPONENT_TYPE);
-          observer.complete();
-        }
-        const events: SelectObjectContentEventStream = data.Payload;
-        if (Array.isArray(events)) {
-          for (const event of events) {
-            // Check the top-level field to determine which event this is.
-            if (event.Records) {
-              // console.log('Records:', event.Records.Payload.toString());
-              const headerRecord = event.Records.Payload.toString();
-              headerFields = headerRecord.split(',');
-              // handle Records event
-            } else if (event.Stats) {
-              // handle Stats event
-              // console.log(`Stats Processed ${event.Stats.Details.BytesProcessed} bytes`);
-            } else if (event.Progress) {
-              // handle Progress event
-              // console.log('Progress:');
-            } else if (event.Cont) {
-              // handle Cont event
-              // console.log('Cont:');
-            } else if (event.End) {
-              // handle End event
-              // console.log('End:');
-            }
-          }
-        }
-        observer.next(headerFields);
-        observer.complete();
-      });
-    });
-  }
 }

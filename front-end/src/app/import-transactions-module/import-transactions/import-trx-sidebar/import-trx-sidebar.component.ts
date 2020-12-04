@@ -38,7 +38,7 @@ export class ImportTrxSidebarComponent implements OnInit, OnChanges {
   public iconClass = 'bars-icon';
   public sidebarVisibleClass = 'sidebar-hidden';
   public headerTitle: string;
-  public readonly step1Upload = ImportTransactionsStepsEnum.step1Upload;
+  public readonly step1Select = ImportTransactionsStepsEnum.step1Select;
   public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
   public readonly completeStatus = ImportFileStatusEnum.complete;
 

@@ -3,6 +3,7 @@ export class UploadFileModel {
   status: string;
   file: File;
   formType: string;
+  scheduleType: string;
   checkSum: string;
 
   /**

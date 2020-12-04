@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { S3 } from 'aws-sdk/clients/all';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { timer, Subject } from 'rxjs';
+import { timer, Subject, throwError } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UploadTrxService } from '../import-trx-upload/service/upload-trx.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
@@ -57,76 +57,110 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Requirements for UI have Upload as file selection and the upload occuring
-  // as part of the review.  This is why the upload to S3 is in this component.
-  // Another option is to add a new step to the train stops called "file select".
-  // The component supporting it will just handle selection files from client.
-  // The next step "upload" will handle S3 followed by "review".
+  // private _uploadFile() {
+  //   const file = this.uploadFile.file;
+  //   // const checkSum = this._createFileCheckSum(file);
+
+  //   // TODO convert this to a method returning observable or promise
+  //   // TODO this will perform better if API generates it but requires upload to do so.
+  //   // TODO if not done in API, check for faster front end library option
+  //   const fileReader = new FileReader();
+  //   fileReader.onload = e => {
+  //     console.log('start MD5 = ' + new Date());
+  //     const fileData = fileReader.result;
+  //     const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+  //     const md5 = hash.toString(CryptoJS.enc.Hex);
+  //     this.checkSum = md5;
+  //     console.log('end MD5 = ' + new Date());
+
+  //     // this is checking for duplicate files on S3.
+  //     // It will be replaced by API call to check for processed files
+  //     // as we don't know retention policy for S3 files
+
+  //     // this._uploadTrxService.listObjects(this.committeeId).subscribe((data: S3.Types.ListObjectsV2Output) => {
+  //     //   for (const s3Obj of data.Contents) {
+  //     //     // remove double quotes from eTag
+  //     //     let eTagEdited = s3Obj.ETag;
+  //     //     if (s3Obj.ETag) {
+  //     //       if (s3Obj.ETag.length > 1) {
+  //     //         if (s3Obj.ETag.startsWith('"') && s3Obj.ETag.endsWith('"')) {
+  //     //           eTagEdited = s3Obj.ETag.substring(1, s3Obj.ETag.length - 1);
+  //     //         }
+  //     //       }
+  //     //     }ss
+
+  //     //     if (this.checkSum === eTagEdited) {
+  //     //       this._dialogService
+  //     //         .confirm(
+  //     //           'This file has been uploaded before!  TODO show Review Screen',
+  //     //           ConfirmModalComponent,
+  //     //           'Warning!',
+  //     //           false
+  //     //         )
+  //     //         .then(res => {});
+  //     //     }
+  //     //   }
+  //     // });
+
+  //     this.progressPercent = 0;
+  //     this.uploadingText = 'Uploading...';
+  //     this._uploadTrxService
+  //       .uploadFile(file, this.checkSum, this.committeeId)
+  //       .takeUntil(this.onDestroy$)
+  //       .subscribe((data: any) => {
+  //         if (data === false) {
+  //           return;
+  //         }
+  //         this._checkForProcessingProgress();
+  //       });
+
+  //     // alert('fake for no internet conn');
+  //     // this.resultsEmitter.emit({
+  //     //   resultType: 'success',
+  //     //   uploadFile: this.uploadFile
+  //     // });
+  //   };
+  //   fileReader.readAsText(file);
+  // }
 
   private _uploadFile() {
     const file = this.uploadFile.file;
-    // const checkSum = this._createFileCheckSum(file);
+    this.progressPercent = 0;
+    this.uploadingText = 'Uploading...';
 
-    // TODO convert this to a method returning observable or promise
-    // TODO this will perform better if API generates it but requires upload to do so.
-    // TODO if not done in API, check for faster front end library option
+    // read the first record to get sched type
     const fileReader = new FileReader();
     fileReader.onload = e => {
-      console.log('start MD5 = ' + new Date());
-      const fileData = fileReader.result;
-      const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
-      const md5 = hash.toString(CryptoJS.enc.Hex);
-      this.checkSum = md5;
-      console.log('end MD5 = ' + new Date());
+      const chunkData = fileReader.result;
+      const lines = chunkData.toString().split('\n', 2);
+      if (!lines) {
+        return;
+      }
+      if (!(lines.length > 1)) {
+        return;
+      }
+      const firstRec = lines[1];
+      console.log(firstRec);
+      const fields = firstRec.split(',');
+      if (!(fields.length > 2)) {
+        return;
+      }
+      const scheduleType = this._updateFileNameWithSchedule(fields[2]);
+      this.uploadFile.scheduleType = scheduleType;
 
-      // this is checking for duplicate files on S3.
-      // It will be replaced by API call to check for processed files
-      // as we don't know retention policy for S3 files
-
-      // this._uploadTrxService.listObjects(this.committeeId).subscribe((data: S3.Types.ListObjectsV2Output) => {
-      //   for (const s3Obj of data.Contents) {
-      //     // remove double quotes from eTag
-      //     let eTagEdited = s3Obj.ETag;
-      //     if (s3Obj.ETag) {
-      //       if (s3Obj.ETag.length > 1) {
-      //         if (s3Obj.ETag.startsWith('"') && s3Obj.ETag.endsWith('"')) {
-      //           eTagEdited = s3Obj.ETag.substring(1, s3Obj.ETag.length - 1);
-      //         }
-      //       }
-      //     }ss
-
-      //     if (this.checkSum === eTagEdited) {
-      //       this._dialogService
-      //         .confirm(
-      //           'This file has been uploaded before!  TODO show Review Screen',
-      //           ConfirmModalComponent,
-      //           'Warning!',
-      //           false
-      //         )
-      //         .then(res => {});
-      //     }
-      //   }
-      // });
-
-      this.progressPercent = 0;
-      this.uploadingText = 'Uploading...';
       this._uploadTrxService
-        .uploadFile(file, this.checkSum, this.committeeId)
-        .takeUntil(this.onDestroy$)
-        .subscribe((data: any) => {
-          if (data === false) {
-            return;
-          }
-          this._checkForProcessingProgress();
-        });
-
-      // alert('fake for no internet conn');
-      // this.resultsEmitter.emit({
-      //   resultType: 'success',
-      //   uploadFile: this.uploadFile
-      // });
+      .uploadFile(this.uploadFile, this.committeeId)
+      .takeUntil(this.onDestroy$)
+      .subscribe((data: any) => {
+        if (data === false) {
+          return;
+        }
+        this._checkForProcessingProgress();
+      });
     };
-    fileReader.readAsText(file);
+    // read a chunk of the file large enough to include the header and 1st transaction rec
+    const chunk: Blob = file.slice(0, 20480);
+    fileReader.readAsText(chunk);
   }
 
   /**
@@ -143,6 +177,20 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
       }
       timerSubject.next();
       timerSubject.complete();
+
+      // // TODO get Schedule Type from file on S3 and rename file to include it for API
+      // this._uploadTrxService
+      //   .readCsvRecords(this.uploadFile.file, 1, this.committeeId)
+      //   .subscribe((records: Array<any>) => {
+      //     if (records) {
+      //       if (records.length > 0) {
+      //         const rec = records[0];
+      //         const scheduleType = rec['SCHEDULE NAME'];
+      //         this._updateFileNameWithSchedule(scheduleType);
+      //       }
+      //     }
+      //   });
+
       this.resultsEmitter.emit({
         resultType: 'success',
         uploadFile: this.uploadFile
@@ -168,6 +216,49 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
     //     }
     //   });
     // });
+  }
+
+  /**
+   * API requires file renamed with schedule name.
+   * TODO do this server side.
+   * @param scheduleType code for the schedule
+   */
+  private _updateFileNameWithSchedule(scheduleType: string): string {
+    let scheduleName: string = null;
+    let schedCode: string = null;
+    if (scheduleType) {
+      if (scheduleType.length > 1) {
+        schedCode = scheduleType.substring(0, 2);
+      }
+    }
+    if (!schedCode) {
+      throwError('invalid schedule name of ' + scheduleType);
+      return;
+    }
+    // SA - ScheduleA
+    // SB - ScheduleB
+    // SE - ScheduleSE
+    // SF - ScheduleSF
+
+    const prefix = 'Schedule';
+    if (
+      schedCode === 'H3' ||
+      schedCode === 'H4' ||
+      schedCode === 'H5' ||
+      schedCode === 'H6' ||
+      schedCode === 'LA' ||
+      schedCode === 'LB'
+    ) {
+      scheduleName = prefix + schedCode;
+    } else {
+      if (schedCode.substring(0, 1) === 'A' || schedCode.substring(0, 1) === 'B') {
+        scheduleName = prefix + schedCode.substring(0, 1);
+      } else if (schedCode.substring(0, 1) === 'E' || schedCode.substring(0, 1) === 'F') {
+        scheduleName = prefix + 'S' + schedCode;
+      }
+    }
+    console.log('rename file to include ' + scheduleName);
+    return scheduleName;
   }
 
   public getProgress() {

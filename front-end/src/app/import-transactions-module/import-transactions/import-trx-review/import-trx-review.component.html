@@ -40,3 +40,9 @@
     </div>
   </div>
 </div>
+<app-import-trx-upload
+  *ngIf="startUpload"
+  [uploadFile]="uploadFile"
+  (resultsEmitter)="receiveUploadResults($event)"
+>
+</app-import-trx-upload>
