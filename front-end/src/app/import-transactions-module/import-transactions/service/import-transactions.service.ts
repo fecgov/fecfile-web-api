@@ -4,15 +4,14 @@ import { map, concatMap, switchMap, retry, share } from 'rxjs/operators';
 import { Observable, timer, interval } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CookieService } from 'ngx-cookie-service';
-
+import { UploadFileModel } from '../model/upload-file.model';
+import { UploadTrxService } from '../import-trx-upload/service/upload-trx.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImportTransactionsService {
-
-  constructor(private _http: HttpClient, private _cookieService: CookieService) {
-  }
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
   public getSpecAndTemplate(fileName: string): Observable<any> {
     const url = '/contact/template';
@@ -30,10 +29,12 @@ export class ImportTransactionsService {
     );
   }
 
-  public checkDuplicateFile(fileName: string, checkSum: string, formType: string): Observable<any> {
+  public checkForValidationErrors(uploadFile: UploadFileModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/core/chk_csv_uploaded_in_db';
+    const url = '/core/need_name_from_srini';
+
+    const fileName = uploadFile.fileName;
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -47,9 +48,7 @@ export class ImportTransactionsService {
     const request: any = {};
     request.cmte_id = committeeId;
     request.filename = fileName;
-    request.hash_value = checkSum;
-    // TODO how will fornt end know schedule.  This should be determined by backend.
-    request.fecfilename = `${formType}_ScheduleA_Import_Transactions_${committeeId}.csv`;
+    request.fecfilename = uploadFile.fecFileName;
 
     if (fileName === 'no-mock.csv') {
       return this._http
@@ -71,9 +70,70 @@ export class ImportTransactionsService {
       case 'validation_error.csv':
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
         break;
-      case 'validation_error_2.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
+      case 'validation_error.1.csv':
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.1.json';
         break;
+      case 'validation_error.2.csv':
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.2.json';
+        break;
+      case 'success.csv':
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+        break;
+      default:
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+    }
+
+    return this._http
+      .get(mockFile, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  public checkDuplicateFile(uploadFile: UploadFileModel): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/chk_csv_uploaded_in_db';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      committeeId = cmteDetails.committeeid;
+    }
+
+    const request: any = {};
+    request.cmte_id = committeeId;
+    request.filename = uploadFile.fileName;
+    request.hash_value = uploadFile.checkSum;
+    request.fecfilename = uploadFile.fecFileName;
+
+    if (uploadFile.fileName === 'no-mock.csv') {
+      return this._http
+        .post(`${environment.apiUrl}${url}`, request, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    }
+
+    let mockFile = '';
+    switch (uploadFile.fileName) {
       case 'success.csv':
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
         break;
@@ -322,4 +382,7 @@ export class ImportTransactionsService {
     // , retry(), share();
   }
 
+  public formatFecFileName(uploadFile: UploadFileModel, committeeId: string) {
+    return `${uploadFile.formType}_${uploadFile.scheduleType}_Import_Transactions_${committeeId}.csv`;
+  }
 }

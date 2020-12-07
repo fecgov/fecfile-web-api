@@ -46,3 +46,9 @@
   (resultsEmitter)="receiveUploadResults($event)"
 >
 </app-import-trx-upload>
+<div *ngIf="showSpinner" class="upload_contact__spinner_container_outer">
+  <p>Processing uploaded file...</p>
+  <div class="upload_contact__spinner_container">
+    <app-spinner></app-spinner>
+  </div>
+</div>

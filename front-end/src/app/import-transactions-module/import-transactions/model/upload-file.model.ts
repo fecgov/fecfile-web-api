@@ -1,5 +1,7 @@
 export class UploadFileModel {
   fileName: string;
+  fecFileName: string;
+  errorFileName: string;
   status: string;
   file: File;
   formType: string;

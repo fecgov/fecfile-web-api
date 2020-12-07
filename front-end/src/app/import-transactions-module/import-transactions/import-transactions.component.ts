@@ -20,12 +20,13 @@ export class ImportTransactionsComponent implements OnInit {
   public readonly step2Review = ImportTransactionsStepsEnum.step2Review;
   public readonly step3Clean = ImportTransactionsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
-  public fileSelectStep1: boolean;
+  // public fileSelectStep1: boolean;
   public sidebarVisibleClass: string;
   public rightSideClassArray: Array<string>;
   public fileQueue: Array<UploadFileModel>;
   public currentFile: UploadFileModel;
   public forceSidebarChangeDetection: Date;
+  public forceReviewChangeDetection: Date;
   public openSidebar: boolean;
   public cleanImportAction: string;
 
@@ -46,7 +47,7 @@ export class ImportTransactionsComponent implements OnInit {
     ];
     this.fileQueue = [];
     this.currentStep = this.start;
-    this.fileSelectStep1 = false;
+    // this.fileSelectStep1 = false;
     this.sidebarVisibleClass = 'sidebar-hidden';
     this.openSidebar = false;
     this.rightSideClassArray = [];
@@ -62,7 +63,7 @@ export class ImportTransactionsComponent implements OnInit {
 
   public receiveBeginFileSelect() {
     this.currentStep = this.step1Select;
-    this.fileSelectStep1 = true;
+    // this.fileSelectStep1 = true;
     this.sidebarVisibleClass = 'sidebar-hidden';
     this._handleToggleSideBarStyling();
   }
@@ -160,8 +161,13 @@ export class ImportTransactionsComponent implements OnInit {
     this.fileQueue[fileIndex].status = ImportFileStatusEnum.uploading;
     this.currentFile = this.fileQueue[fileIndex];
 
-    this.currentStep = this.step2Review;
-    this.fileSelectStep1 = false;
+    // If current step is review, force change detection to start review of next file
+    if (this.currentStep === this.step2Review) {
+      this.forceReviewChangeDetection = new Date();
+    } else {
+      this.currentStep = this.step2Review;
+      // this.fileSelectStep1 = false;
+    }
   }
 
   private _toggleSidebar(open: boolean) {

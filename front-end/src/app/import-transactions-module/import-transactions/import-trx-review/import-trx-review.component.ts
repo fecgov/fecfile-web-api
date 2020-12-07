@@ -1,10 +1,10 @@
-import { Component, OnInit, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { S3 } from 'aws-sdk/clients/all';
 import {
   ConfirmModalComponent,
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { timer, Subject } from 'rxjs';
+import { timer, Subject, throwError } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UploadTrxService } from '../import-trx-upload/service/upload-trx.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
@@ -20,9 +20,12 @@ import { UploadCompleteMessageComponent } from './upload-complete-message/upload
   templateUrl: './import-trx-review.component.html',
   styleUrls: ['./import-trx-review.component.scss']
 })
-export class ImportTrxReviewComponent implements OnInit, OnDestroy {
+export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
   @Input()
   public uploadFile: UploadFileModel;
+
+  @Input()
+  public forceChangeDetection: Date;
 
   @Output()
   public resultsEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -32,6 +35,7 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
   public hasDupeFile: boolean;
   public duplicateFileList: Array<any>;
   public startUpload: boolean;
+  public showSpinner: boolean;
 
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
@@ -45,10 +49,25 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      this.committeeId = cmteDetails.committeeid;
+    }
     this._startReview();
     this.hasDupeFile = false;
     this.startUpload = false;
+    this.showSpinner = false;
     this.duplicateFileList = [];
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes.forceChangeDetection !== undefined) {
+      if (changes.forceChangeDetection.currentValue !== changes.forceChangeDetection.previousValue
+        && changes.forceChangeDetection.firstChange === false) {
+        this.ngOnInit();
+      }
+    }
   }
 
   public ngOnDestroy() {}
@@ -67,20 +86,8 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
     });
   }
 
-  // private _readFileChunk(chunk: Blob) {
-  //   const fileReader = new FileReader();
-  //   fileReader.onload = e => {
-  //     const chunkData = fileReader.result;
-  //     // console.log(chunkData);
-  //   };
-  //   fileReader.readAsText(chunk);
-  // }
-
   private async _startReview() {
     const file: File = this.uploadFile.file;
-    // const chunk: Blob = file.slice(0, 2048);
-    // this._readFileChunk(chunk);
-
     const maxClientSideSize = 2000000000; // 2,000,000,000 = 2GB
     if (file.size > maxClientSideSize) {
       // TODO call API to gen md5 checksum and check for duplicates
@@ -95,58 +102,164 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy {
         this.uploadFile.checkSum = md5;
         console.log('end MD5 = ' + new Date());
 
-        this._importTransactionsService
-          .checkDuplicateFile(file.name, this.uploadFile.checkSum, this.uploadFile.formType)
-          .subscribe((res: any) => {
-            // let hasValidationErrors = false;
-            // if (res.error_list) {
-            //   if (res.error_list.length > 0) {
-            //     hasValidationErrors = true;
-            //   }
-            // }
-            if (res.duplicate_file_list) {
-              if (res.duplicate_file_list.length > 0) {
-                this.hasDupeFile = true;
-                this.duplicateFileList = res.duplicate_file_list;
-              }
-            }
-            // if (hasValidationErrors) {
-            //   this.uploadFile.status = ImportFileStatusEnum.failed;
-            //   const message =
-            //     'The system found errors within the import file, ' +
-            //     'and will not be able to complete the import. ' +
-            //     'Please check your file and ensure formatting is correct.';
-            //   this._dialogService
-            //     .confirm(message, ConfirmModalComponent, 'Import Failed!', false, ModalHeaderClassEnum.errorHeader)
-            //     .then(res => {
-            //       this.resultsEmitter.emit({
-            //         resultType: 'validation-error',
-            //         uploadFile: this.uploadFile
-            //       });
-            //     });
-            // } else
-            if (this.hasDupeFile) {
-              // already handled above
-            } else {
-              // this._modalService.open(UploadCompleteMessageComponent).result.then((resp: string) => {
-              //   if (resp === 'continue') {
-              //     this.resultsEmitter.emit({
-              //       resultType: 'success',
-              //       uploadFile: this.uploadFile
-              //     });
-              //   }
-              // });
-
-              // Do S3 upload
-              this.startUpload = true;
-            }
-          });
+        this._readFileForScheduleType();
       };
       fileReader.readAsText(file);
     }
   }
 
+  private _checkForDuplicateFiles() {
+    this._importTransactionsService.checkDuplicateFile(this.uploadFile).subscribe((res: any) => {
+      // let hasValidationErrors = false;
+      // if (res.error_list) {
+      //   if (res.error_list.length > 0) {
+      //     hasValidationErrors = true;
+      //   }
+      // }
+      if (res.duplicate_file_list) {
+        if (res.duplicate_file_list.length > 0) {
+          this.hasDupeFile = true;
+          this.duplicateFileList = res.duplicate_file_list;
+        }
+      }
+      // if (hasValidationErrors) {
+      //   this.uploadFile.status = ImportFileStatusEnum.failed;
+      //   const message =
+      //     'The system found errors within the import file, ' +
+      //     'and will not be able to complete the import. ' +
+      //     'Please check your file and ensure formatting is correct.';
+      //   this._dialogService
+      //     .confirm(message, ConfirmModalComponent, 'Import Failed!', false, ModalHeaderClassEnum.errorHeader)
+      //     .then(res => {
+      //       this.resultsEmitter.emit({
+      //         resultType: 'validation-error',
+      //         uploadFile: this.uploadFile
+      //       });
+      //     });
+      // } else
+      if (this.hasDupeFile) {
+        // already handled above
+      } else {
+        // this._modalService.open(UploadCompleteMessageComponent).result.then((resp: string) => {
+        //   if (resp === 'continue') {
+        //     this.resultsEmitter.emit({
+        //       resultType: 'success',
+        //       uploadFile: this.uploadFile
+        //     });
+        //   }
+        // });
+
+        // Do S3 upload
+        this.startUpload = true;
+      }
+    });
+  }
+
+  private _readFileForScheduleType() {
+    // read the first record to get sched type
+    const fileReader = new FileReader();
+    fileReader.onload = e => {
+      const chunkData = fileReader.result;
+      const lines = chunkData.toString().split('\n', 2);
+      if (!lines) {
+        return;
+      }
+      if (!(lines.length > 1)) {
+        return;
+      }
+      const firstRec = lines[1];
+      console.log(firstRec);
+      const fields = firstRec.split(',');
+      if (!(fields.length > 2)) {
+        return;
+      }
+      const scheduleType = this._formatScheduleName(fields[2]);
+      this.uploadFile.scheduleType = scheduleType;
+      this.uploadFile.fecFileName = this._importTransactionsService.formatFecFileName(
+        this.uploadFile,
+        this.committeeId
+      );
+
+      this._checkForDuplicateFiles();
+    };
+    // read a chunk of the file large enough to include the header and 1st transaction rec
+    const file = this.uploadFile.file;
+    const chunk: Blob = file.slice(0, 20480);
+    fileReader.readAsText(chunk);
+  }
+
   public receiveUploadResults($event: any) {
-    alert('check for validation errors');
+    this.showSpinner = true;
+    this._importTransactionsService.checkForValidationErrors(this.uploadFile).subscribe((res: any) => {
+      this.showSpinner = false;
+      if (res.validation_failed === true) {
+        this.uploadFile.errorFileName = res.error_file;
+        this.uploadFile.status = ImportFileStatusEnum.failed;
+        const message =
+          'The system found errors within the import file, ' +
+          'and will not be able to complete the import. ' +
+          'Please check your file and ensure formatting is correct.';
+        this._dialogService
+          .confirm(message, ConfirmModalComponent, 'Import Failed!', false, ModalHeaderClassEnum.errorHeader)
+          .then(res => {
+            this.resultsEmitter.emit({
+              resultType: 'validation-error',
+              uploadFile: this.uploadFile
+            });
+          });
+      } else {
+        this._modalService.open(UploadCompleteMessageComponent).result.then((resp: string) => {
+          if (resp === 'continue') {
+            this.resultsEmitter.emit({
+              resultType: 'success',
+              uploadFile: this.uploadFile
+            });
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * API requires file renamed with schedule name.
+   * TODO do this server side.
+   * @param scheduleType code for the schedule
+   */
+  private _formatScheduleName(scheduleType: string): string {
+    let scheduleName: string = null;
+    let schedCode: string = null;
+    if (scheduleType) {
+      if (scheduleType.length > 1) {
+        schedCode = scheduleType.substring(0, 2);
+      }
+    }
+    if (!schedCode) {
+      throwError('invalid schedule name of ' + scheduleType);
+      return;
+    }
+    // SA - ScheduleA
+    // SB - ScheduleB
+    // SE - ScheduleSE
+    // SF - ScheduleSF
+
+    const prefix = 'Schedule';
+    if (
+      schedCode === 'H3' ||
+      schedCode === 'H4' ||
+      schedCode === 'H5' ||
+      schedCode === 'H6' ||
+      schedCode === 'LA' ||
+      schedCode === 'LB'
+    ) {
+      scheduleName = prefix + schedCode;
+    } else {
+      if (schedCode.substring(0, 1) === 'A' || schedCode.substring(0, 1) === 'B') {
+        scheduleName = prefix + schedCode.substring(0, 1);
+      } else if (schedCode.substring(0, 1) === 'E' || schedCode.substring(0, 1) === 'F') {
+        scheduleName = prefix + 'S' + schedCode;
+      }
+    }
+    console.log('rename file to include ' + scheduleName);
+    return scheduleName;
   }
 }

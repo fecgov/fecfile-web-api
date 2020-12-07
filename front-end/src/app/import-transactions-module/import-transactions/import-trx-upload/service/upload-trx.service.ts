@@ -46,12 +46,15 @@ export class UploadTrxService {
    * Upload the file to AWS S3 bucket.
    */
   public uploadFile(uploadFile: UploadFileModel, committeeId: string): Observable<any> {
-    this.progressPercent = 0;
-    const fileName = `${uploadFile.formType}_${uploadFile.scheduleType}_Import_Transactions_${committeeId}.csv`;
+    this.progressPercent = 0;;
     const params = {
       Bucket: this.bucketName,
-      Key: this.TRANSACTIONS_PATH + committeeId + '/' + fileName,
-      Metadata: { 'committee-id': committeeId, 'check-sum': uploadFile.checkSum },
+      Key: this.TRANSACTIONS_PATH + committeeId + '/' + uploadFile.fecFileName,
+      Metadata: {
+        'committee-id': committeeId,
+        'check-sum': uploadFile.checkSum,
+        'user-file-name': uploadFile.fileName
+      },
       Body: uploadFile.file,
       ACL: 'public-read',
       ContentType: uploadFile.file.type

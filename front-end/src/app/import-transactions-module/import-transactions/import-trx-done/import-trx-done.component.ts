@@ -5,6 +5,8 @@ import { ImportTransactionsService } from '../service/import-transactions.servic
 import { Router } from '@angular/router';
 import { timer, Observable, Subscription } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
+import * as FileSaver from 'file-saver';
+import { UploadContactsService } from 'src/app/import-contacts-module/import-contacts/upload-contacts/service/upload-contacts.service';
 
 @Component({
   selector: 'app-import-trx-done',
@@ -32,10 +34,20 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
   public progressPercent: number;
 
   private progressSubscription: Subscription;
+  private committeeId: string;
 
-  constructor(private _router: Router, private _importTransactionsService: ImportTransactionsService) {}
+  constructor(
+    private _router: Router,
+    private _importTransactionsService: ImportTransactionsService,
+    private _uploadContactsService: UploadContactsService
+  ) {}
 
   ngOnInit() {
+    this.committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      this.committeeId = cmteDetails.committeeid;
+    }
     this.progressPercent = 0;
     this.allFilesDone = false;
     this.hasFailure = false;
@@ -129,7 +141,21 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
   }
 
   public showErrorLog() {
-    alert('Error log not yet developed');
+    for (const errorFile of this.fileQueue) {
+      if (errorFile.status === ImportFileStatusEnum.failed && errorFile.errorFileName) {
+        this._downloadErrorFile(errorFile.errorFileName);
+      }
+    }
+  }
+
+  private _downloadErrorFile(fileName: string) {
+    this._uploadContactsService.getObject(`transactions/${this.committeeId}/error_files/${fileName}`).subscribe(res => {
+      const type = 'text/csv;charset=utf-8';
+      const blob: Blob = new Blob([res.Body], { type: type });
+
+      // TODO for large files, look at https://github.com/jimmywarting/StreamSaver.js
+      FileSaver.saveAs(blob, 'errors_' + fileName);
+    });
   }
 
   public goToNotifications() {

@@ -127,40 +127,49 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
     const file = this.uploadFile.file;
     this.progressPercent = 0;
     this.uploadingText = 'Uploading...';
+    this._uploadTrxService
+    .uploadFile(this.uploadFile, this.committeeId)
+    .takeUntil(this.onDestroy$)
+    .subscribe((data: any) => {
+      if (data === false) {
+        return;
+      }
+      this._checkForProcessingProgress();
+    });
 
-    // read the first record to get sched type
-    const fileReader = new FileReader();
-    fileReader.onload = e => {
-      const chunkData = fileReader.result;
-      const lines = chunkData.toString().split('\n', 2);
-      if (!lines) {
-        return;
-      }
-      if (!(lines.length > 1)) {
-        return;
-      }
-      const firstRec = lines[1];
-      console.log(firstRec);
-      const fields = firstRec.split(',');
-      if (!(fields.length > 2)) {
-        return;
-      }
-      const scheduleType = this._updateFileNameWithSchedule(fields[2]);
-      this.uploadFile.scheduleType = scheduleType;
+    // // read the first record to get sched type
+    // const fileReader = new FileReader();
+    // fileReader.onload = e => {
+    //   const chunkData = fileReader.result;
+    //   const lines = chunkData.toString().split('\n', 2);
+    //   if (!lines) {
+    //     return;
+    //   }
+    //   if (!(lines.length > 1)) {
+    //     return;
+    //   }
+    //   const firstRec = lines[1];
+    //   console.log(firstRec);
+    //   const fields = firstRec.split(',');
+    //   if (!(fields.length > 2)) {
+    //     return;
+    //   }
+    //   const scheduleType = this._updateFileNameWithSchedule(fields[2]);
+    //   this.uploadFile.scheduleType = scheduleType;
 
-      this._uploadTrxService
-      .uploadFile(this.uploadFile, this.committeeId)
-      .takeUntil(this.onDestroy$)
-      .subscribe((data: any) => {
-        if (data === false) {
-          return;
-        }
-        this._checkForProcessingProgress();
-      });
-    };
-    // read a chunk of the file large enough to include the header and 1st transaction rec
-    const chunk: Blob = file.slice(0, 20480);
-    fileReader.readAsText(chunk);
+    //   this._uploadTrxService
+    //   .uploadFile(this.uploadFile, this.committeeId)
+    //   .takeUntil(this.onDestroy$)
+    //   .subscribe((data: any) => {
+    //     if (data === false) {
+    //       return;
+    //     }
+    //     this._checkForProcessingProgress();
+    //   });
+    // };
+    // // read a chunk of the file large enough to include the header and 1st transaction rec
+    // const chunk: Blob = file.slice(0, 20480);
+    // fileReader.readAsText(chunk);
   }
 
   /**
@@ -216,49 +225,6 @@ export class ImportTrxUploadComponent implements OnInit, OnDestroy {
     //     }
     //   });
     // });
-  }
-
-  /**
-   * API requires file renamed with schedule name.
-   * TODO do this server side.
-   * @param scheduleType code for the schedule
-   */
-  private _updateFileNameWithSchedule(scheduleType: string): string {
-    let scheduleName: string = null;
-    let schedCode: string = null;
-    if (scheduleType) {
-      if (scheduleType.length > 1) {
-        schedCode = scheduleType.substring(0, 2);
-      }
-    }
-    if (!schedCode) {
-      throwError('invalid schedule name of ' + scheduleType);
-      return;
-    }
-    // SA - ScheduleA
-    // SB - ScheduleB
-    // SE - ScheduleSE
-    // SF - ScheduleSF
-
-    const prefix = 'Schedule';
-    if (
-      schedCode === 'H3' ||
-      schedCode === 'H4' ||
-      schedCode === 'H5' ||
-      schedCode === 'H6' ||
-      schedCode === 'LA' ||
-      schedCode === 'LB'
-    ) {
-      scheduleName = prefix + schedCode;
-    } else {
-      if (schedCode.substring(0, 1) === 'A' || schedCode.substring(0, 1) === 'B') {
-        scheduleName = prefix + schedCode.substring(0, 1);
-      } else if (schedCode.substring(0, 1) === 'E' || schedCode.substring(0, 1) === 'F') {
-        scheduleName = prefix + 'S' + schedCode;
-      }
-    }
-    console.log('rename file to include ' + scheduleName);
-    return scheduleName;
   }
 
   public getProgress() {
