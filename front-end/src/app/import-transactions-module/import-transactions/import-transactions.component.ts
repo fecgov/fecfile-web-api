@@ -15,17 +15,18 @@ export class ImportTransactionsComponent implements OnInit {
   public steps: Array<any>;
   public currentStep: ImportTransactionsStepsEnum;
   public readonly start = ImportTransactionsStepsEnum.start;
-  // public readonly step1aSelect = ImportTransactionsStepsEnum.step1aSelect;
-  public readonly step1Upload = ImportTransactionsStepsEnum.step1Upload;
+  public readonly step1Select = ImportTransactionsStepsEnum.step1Select;
+  // public readonly step1Upload = ImportTransactionsStepsEnum.step1Upload;
   public readonly step2Review = ImportTransactionsStepsEnum.step2Review;
   public readonly step3Clean = ImportTransactionsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportTransactionsStepsEnum.step4ImportDone;
-  public fileSelectStep1: boolean;
+  // public fileSelectStep1: boolean;
   public sidebarVisibleClass: string;
   public rightSideClassArray: Array<string>;
   public fileQueue: Array<UploadFileModel>;
   public currentFile: UploadFileModel;
   public forceSidebarChangeDetection: Date;
+  public forceReviewChangeDetection: Date;
   public openSidebar: boolean;
   public cleanImportAction: string;
 
@@ -39,14 +40,14 @@ export class ImportTransactionsComponent implements OnInit {
     this.isShowInfo = false;
     this.steps = [
       // { text: 'Select', step: this.step1aSelect },
-      { text: 'Upload', step: this.step1Upload },
+      { text: 'Upload', step: this.step1Select },
       { text: 'Review', step: this.step2Review },
       { text: 'Clean', step: this.step3Clean },
       { text: 'Import', step: this.step4ImportDone }
     ];
     this.fileQueue = [];
     this.currentStep = this.start;
-    this.fileSelectStep1 = false;
+    // this.fileSelectStep1 = false;
     this.sidebarVisibleClass = 'sidebar-hidden';
     this.openSidebar = false;
     this.rightSideClassArray = [];
@@ -61,8 +62,8 @@ export class ImportTransactionsComponent implements OnInit {
   }
 
   public receiveBeginFileSelect() {
-    this.currentStep = this.step1Upload;
-    this.fileSelectStep1 = true;
+    this.currentStep = this.step1Select;
+    // this.fileSelectStep1 = true;
     this.sidebarVisibleClass = 'sidebar-hidden';
     this._handleToggleSideBarStyling();
   }
@@ -93,10 +94,10 @@ export class ImportTransactionsComponent implements OnInit {
     this._toggleSidebar(true);
   }
 
-  public receiveUploadResults($event: any) {
-    this.currentFile.status = ImportFileStatusEnum.review;
-    this.currentStep = this.step2Review;
-  }
+  // public receiveUploadResults($event: any) {
+  //   this.currentFile.status = ImportFileStatusEnum.review;
+  //   this.currentStep = this.step2Review;
+  // }
 
   public receiveReviewResults($event: any) {
     // If the file failed validation, set it in the queue to reflect the updated status.
@@ -118,12 +119,12 @@ export class ImportTransactionsComponent implements OnInit {
   public receiveCleanResults($event: any) {
     if ($event.resultType === 'cancel-file') {
       this._cancelFile($event.file);
-    // } else if ($event.resultType === 'ignore_dupe_save') {
-    //   this.currentStep = this.step4ImportDone;
-    //   this.currentFile.status = ImportFileStatusEnum.importing;
-    // } else if ($event.resultType === 'merge_dupe_save') {
-    //   this.currentStep = this.step4ImportDone;
-    //   this.currentFile.status = ImportFileStatusEnum.importing;
+      // } else if ($event.resultType === 'ignore_dupe_save') {
+      //   this.currentStep = this.step4ImportDone;
+      //   this.currentFile.status = ImportFileStatusEnum.importing;
+      // } else if ($event.resultType === 'merge_dupe_save') {
+      //   this.currentStep = this.step4ImportDone;
+      //   this.currentFile.status = ImportFileStatusEnum.importing;
     } else {
       this.cleanImportAction = $event.resultType;
       this.currentStep = this.step4ImportDone;
@@ -160,8 +161,13 @@ export class ImportTransactionsComponent implements OnInit {
     this.fileQueue[fileIndex].status = ImportFileStatusEnum.uploading;
     this.currentFile = this.fileQueue[fileIndex];
 
-    this.currentStep = this.step1Upload;
-    this.fileSelectStep1 = false;
+    // If current step is review, force change detection to start review of next file
+    if (this.currentStep === this.step2Review) {
+      this.forceReviewChangeDetection = new Date();
+    } else {
+      this.currentStep = this.step2Review;
+      // this.fileSelectStep1 = false;
+    }
   }
 
   private _toggleSidebar(open: boolean) {
@@ -192,44 +198,44 @@ export class ImportTransactionsComponent implements OnInit {
   }
 
   private _cancelFile(cancelledFile: UploadFileModel) {
-         // remove canceled file from the queue, resequence the queueIndex
-      // on the fileQueue and determine where to go
-      // based on the queue contents.
-      //
-      // 1) all files canceled? then go back to start.
-      // 2) still have file in queued status?  then continue.
-      // 3) none in queued status, but some failed? then go to done.
-      // See case# below.
+    // remove canceled file from the queue, resequence the queueIndex
+    // on the fileQueue and determine where to go
+    // based on the queue contents.
+    //
+    // 1) all files canceled? then go back to start.
+    // 2) still have file in queued status?  then continue.
+    // 3) none in queued status, but some failed? then go to done.
+    // See case# below.
 
-      const newQueue = new Array<UploadFileModel>();
-      let i = 0;
+    const newQueue = new Array<UploadFileModel>();
+    let i = 0;
+    for (const file of this.fileQueue) {
+      if (file.queueIndex !== cancelledFile.queueIndex) {
+        file.queueIndex = i;
+        newQueue.push(file);
+        i++;
+      }
+    }
+    this.fileQueue = newQueue;
+    if (this.fileQueue.length === 0) {
+      // case 1
+      this._initialize();
+    } else if (this._checkQueuedFileExists()) {
+      // case 2
+      // find the first queued file starting from the top.
+      // Can't simply proceed to next file following the cancelled one
+      // because the cancelled file may fall after a queued one.
       for (const file of this.fileQueue) {
-        if (file.queueIndex !== cancelledFile.queueIndex) {
-          file.queueIndex = i;
-          newQueue.push(file);
-          i++;
+        if (file.status === ImportFileStatusEnum.queued) {
+          this.currentFile = file;
+          break;
         }
       }
-      this.fileQueue = newQueue;
-      if (this.fileQueue.length === 0) {
-        // case 1
-        this._initialize();
-      } else if (this._checkQueuedFileExists()) {
-        // case 2
-        // find the first queued file starting from the top.
-        // Can't simply proceed to next file following the cancelled one
-        // because the cancelled file may fall after a queued one.
-        for (const file of this.fileQueue) {
-          if (file.status === ImportFileStatusEnum.queued) {
-            this.currentFile = file;
-            break;
-          }
-        }
-        this._startFileUpload(this.currentFile.queueIndex);
-      } else {
-        // case 3
-        this.currentStep = this.step4ImportDone;
-      }
+      this._startFileUpload(this.currentFile.queueIndex);
+    } else {
+      // case 3
+      this.currentStep = this.step4ImportDone;
+    }
   }
 
   // //

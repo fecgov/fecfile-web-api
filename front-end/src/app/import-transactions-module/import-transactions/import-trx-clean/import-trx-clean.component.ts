@@ -74,9 +74,11 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     //   this.numberOfPages = res.totalPages;
     // });
 
-    this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page)
-        .subscribe((res: any) => {
-      this.contacts = res.duplicates;
+    this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page).subscribe((res: any) => {
+      // until API supports duplicate contacts, make it empty.
+      // this.contacts = res.duplicates;
+      this.contacts = [];
+
       this.config.totalItems = res.totalcontactsCount;
       this.config.itemsPerPage = res.itemsPerPage;
       this.numberOfPages = res.totalPages;
@@ -203,9 +205,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
       resultType: 'cancel-file',
       file: this.uploadFile
     });
-    this._importTransactionsService.cancelImport(this.uploadFile.fileName)
-      .subscribe((res: any) => {
-      });
+    this._importTransactionsService.cancelImport(this.uploadFile.fileName).subscribe((res: any) => {});
 
     // On User cancel, unsaved changes are no longer retained.
     this.saveStatusEmitter.emit(true);
@@ -220,8 +220,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
    */
   public applyMergeSelection(contact: any, userAction: string) {
     contact.user_selected_option = userAction;
-    this._importTransactionsService.saveUserMergeSelection(this.uploadFile.fileName,
-        contact).subscribe((res: any) => {
+    this._importTransactionsService.saveUserMergeSelection(this.uploadFile.fileName, contact).subscribe((res: any) => {
       this.checkDuplicates(this.config.currentPage);
       this.allDupesSelected = res.allDone;
     });

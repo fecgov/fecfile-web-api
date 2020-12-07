@@ -41,7 +41,7 @@
       </li>
     </ul>
     <div *ngIf="fileQueue?.length > 0 && currentStep !== step4ImportDone" class="container button-container">
-      <div *ngIf="currentStep === step1Upload" class="row btn-row">
+      <div *ngIf="currentStep === step1Select" class="row btn-row">
         <div class="col text-center">
           <button class="btn btn-secondary sidebar-button" (click)="proceed()">
             Proceed

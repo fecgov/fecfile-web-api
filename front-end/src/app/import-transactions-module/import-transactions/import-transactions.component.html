@@ -46,21 +46,15 @@
             </app-import-trx-start>
 
             <app-import-trx-file-select
-              *ngIf="currentStep === step1Upload && fileSelectStep1"
+              *ngIf="currentStep === step1Select"
               (queueEmitter)="receiveSelectedFiles($event)"
             >
             </app-import-trx-file-select>
 
-            <app-import-trx-upload
-              *ngIf="currentStep === step1Upload && !fileSelectStep1"
-              [uploadFile]="currentFile"
-              (resultsEmitter)="receiveUploadResults($event)"
-            >
-            </app-import-trx-upload>
-
             <app-import-trx-review
               *ngIf="currentStep === step2Review"
               [uploadFile]="currentFile"
+              [forceChangeDetection]="forceReviewChangeDetection"
               (resultsEmitter)="receiveReviewResults($event)"
             >
             </app-import-trx-review>

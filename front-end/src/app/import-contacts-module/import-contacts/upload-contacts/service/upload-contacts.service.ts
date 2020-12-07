@@ -263,6 +263,30 @@ export class UploadContactsService {
     });
   }
 
+  public getObject(fileName: string): Observable<any> {
+    const params = {
+      Bucket: this.bucketName,
+      Key: fileName,
+    };
+
+    return Observable.create(observer => {
+      this.bucket.getObject(params, function (err, data) {
+        if (err) {
+          observer.next(ERROR_COMPONENT_TYPE);
+          observer.complete();
+        } else {
+          observer.next(data);
+          observer.complete();
+        }
+      });
+
+      // .createReadStream()
+      // .on('error', function(err){
+      //   res.status(500).json({error:"Error -> " + err});
+      // }).pipe(res);
+    });
+  }
+
   /**
    * Read the JSON file uploaded to AWS and get property names.
    *

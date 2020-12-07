@@ -1,19 +1,4 @@
 {
-  "error_list": [
-    {
-      "error_id": 1,
-      "row_no": 0,
-      "field_name": "STATE",
-      "msg": "length is not equal to 2"
-    },
-    {
-      "error_id": 2,
-      "row_no": 1,
-      "field_name": "ENTITY_TYPE",
-      "msg": "is not in the list of legal options (IND, ORG)"
-    }
-  ],
-  "fileName": "validation_error.csv",
-  "duplicate_file_list": [],
-  "duplicate_db_count": 0
+  "error_file": "validation_error.csv",
+  "validation_failed": true
 }
