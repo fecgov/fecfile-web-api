@@ -1,7 +1,7 @@
 <h3 class="import_trx__heading">To Begin Importing</h3>
 <div class="import_trx__begin-import-msg">
   You can start your Import by taking clicking "Begin Upload" below, or by taking any of the 7 additional actions
-  provided below::
+  provided below:
 </div>
 <ul class="import_trx__begin-import-links">
   <li>
@@ -11,48 +11,44 @@
     </button>
   </li>
   <li>
-    <button
-      (click)="viewFormatSpecs('F3X_ScheduleA_Import_Transactions_C0011147_part1_11_25.csv')"
-      class="btn btn-link"
-      type="button"
-    >
+    <button (click)="downloadFormatSpecs()" class="btn btn-link" type="button">
       <!-- <button (click)="foo_Util_get_csv_file('C00515064/success.csv')" class="btn btn-link" type="button"> -->
       <i aria-hidden="true" class="download-icon"></i>
       View Format Specs for all the transactions for F3X & F3L
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadF3xTemplate()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View F3X template & schedule specs
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadF3lTemplate()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View F3L template & schedule specs
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadUniqueTransactionIdentifiers()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View Document with ALL the transactions and the unique transaction identifiers for F3X & F3L
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadReportCodes()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View Document with all the reports codes for F3X & F3L
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadCsvTemplate()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View CSV Template
     </button>
   </li>
   <li>
-    <button (click)="viewFormatSpecs('get_file_name_from_srini.xlsx')" class="btn btn-link" type="button">
+    <button (click)="downloadTransactionTypes()" class="btn btn-link" type="button">
       <i aria-hidden="true" class="download-icon"></i>
       View All Transaction Types
     </button>
