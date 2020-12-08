@@ -237,11 +237,28 @@ def build_schemas(formname, sched, trans_type):
     finally:
         connection.close();
 
-def create_cmte_error_folder(bktname, errfilerelpath):
+def check_errkey_exists(bktname, key):
+    errkey = key.split('/')
+    print()
+    errkey = errkey[0] + '/error_files/' + errkey[1]
+    #errkey = key + '/error_files'
+
+    print('key', key)
+    print('errkey', errkey)
+    s3 = boto3.client('s3')    
+    result = s3.list_objects(Bucket=bktname, Prefix=errkey )
+    exists=False
+    #print(result)
+    if "Contents" not in result:
+        print("list objects doesn'texist:")
+        s3.put_object(Bucket=bktname, Key=(errkey+'/'))
+
+def create_cmte_error_folder(bktname, key, errfilerelpath):
     #print('create_cmte_error_folder:',bktname)
     #print('create_cmte_error_folder:',errfilerelpath)
-
+    
     s3 = boto3.client('s3')
+    #check_errkey_exists(bktname, key)
     result = s3.list_objects(Bucket=bktname, Prefix=errfilerelpath )
     #print('cmteid result',result)
     exists=False
@@ -259,8 +276,8 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         #print(bktname)
         #print('222222222222222')
         cmte_err_folder = keyfolder + '/error_files/' + cmteid
-         
-        create_cmte_error_folder(bktname, cmte_err_folder)
+
+        create_cmte_error_folder(bktname, key, cmte_err_folder)
         errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
@@ -357,6 +374,7 @@ def validate_transactions(bktname, key, cmteid):
         #aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
         #print("bktname: ",bktname, ", Key : ", key)
         returnstr = "File_not_found"
+        check_errkey_exists(bktname, key)
         if check_file_exists(bktname, key):
             if bktname and key:
                 res = load_dataframe_from_s3(bktname, key, 100000, 1, cmteid) #100,000 records and 1s timer is for testing and need to be updated.
@@ -399,16 +417,16 @@ def check_file_exists(bktname, key):
 
 
 
-# cmteid =  "C00011111"
-# bktname = "fecfile-filing-frontend"
-# key = "transactions/F3X_ScheduleH6_Import_Transactions_11_25_TEST_Data.csv"
+cmteid =  "C00011111"
+bktname = "fecfile-filing-frontend"
+key = "transactions/F3X_ScheduleH6_Import_Transactions_11_25_TEST_Data.csv"
+if bktname and key:
+    print()
+    print(validate_transactions(bktname, key, cmteid))
+else: 
+    print("No data")
 
-# if bktname and key:
-#     print(validate_transactions(bktname, key, cmteid))
-# else: 
-#     print("No data")
-
-#   #move_data_from_excel_to_db('F3X')
+  #move_data_from_excel_to_db('F3X')
 
 
 

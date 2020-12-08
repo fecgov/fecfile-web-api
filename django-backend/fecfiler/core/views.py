@@ -12251,7 +12251,6 @@ def validate_import_transactions(request):
           "The save_csv_md5_to_db API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )        
-  
 
 
 @api_view(["POST"])
