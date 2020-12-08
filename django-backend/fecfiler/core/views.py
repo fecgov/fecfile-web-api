@@ -12233,7 +12233,7 @@ def get_contact_details_from_csv(request):
 def validate_import_transactions(request):
     try:
 
-        cmteid =  request.user.username
+        cmteid =  get_comittee_id(request.user.username)
         bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
         key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
 

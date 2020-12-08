@@ -237,27 +237,46 @@ def build_schemas(formname, sched, trans_type):
     finally:
         connection.close();
 
+def create_cmte_error_folder(bktname, errfilerelpath):
+    #print('create_cmte_error_folder:',bktname)
+    #print('create_cmte_error_folder:',errfilerelpath)
 
-def move_error_files_to_s3(bktname, key, errorfilename):
+    s3 = boto3.client('s3')
+    result = s3.list_objects(Bucket=bktname, Prefix=errfilerelpath )
+    #print('cmteid result',result)
+    exists=False
+    if "Contents" not in result:
+        print("list objects doesn'texist:")
+        s3.put_object(Bucket=bktname, Key=(errfilerelpath+'/'))
+    # else:
+    #     print("list objects exist:")
+    
+
+def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
     try:
         keyfolder = key.split('/')[0]
         #print(keyfolder)
         #print(bktname)
-        errfilerelpath = keyfolder + '/error_files/' + errorfilename
+        #print('222222222222222')
+        cmte_err_folder = keyfolder + '/error_files/' + cmteid
+         
+        create_cmte_error_folder(bktname, cmte_err_folder)
+        errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
         os.remove(errorfilename)
+        return errfilerelpath
     except ClientError as e:
         print(e)
         logging.debug("error in move_error_files_to_s3 method")
         logging.debug(e)
         raise
-    except Exception as e:
+    except Exception as e: 
         logging.debug("error in move_error_files_to_s3 method")
         logging.debug(e)
         raise
 
-def load_dataframe_from_s3(bktname, key, size, sleeptime):
+def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
     #print(bktname, key)
     resvalidation=""
     errorfilename=""
@@ -308,9 +327,12 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime):
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
                 #print('resvalidation:',resvalidation)
             flag = True       
+
+        #print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
-            move_error_files_to_s3(bktname, key, errorfilename)     
-            return errorfilename
+            #print('11111111111111111')
+            errfilerelpath = move_error_files_to_s3(bktname, key, errorfilename, cmteid)     
+            return errfilerelpath
         elif flag is True:
             return 'Validate_Pass' 
         else: 
@@ -333,26 +355,32 @@ def validate_transactions(bktname, key, cmteid):
         #send_message_to_queue()
         #aws sqs receive-message --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions --attribute-names All --message-attribute-names All --max-number-of-messages 10
         #aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
-        print("bktname: ",bktname, ", Key : ", key)
-        returnstr =''
+        #print("bktname: ",bktname, ", Key : ", key)
+        returnstr = "File_not_found"
         if check_file_exists(bktname, key):
             if bktname and key:
-                res = load_dataframe_from_s3(bktname, key, 100000, 1) #100,000 records and 1s timer is for testing and need to be updated.
+                res = load_dataframe_from_s3(bktname, key, 100000, 1, cmteid) #100,000 records and 1s timer is for testing and need to be updated.
                 #print(res)
                 if res != 'Validate_Pass':
                     print("Error with data validation:", res)
                     returnstr = res 
-            else:
-                print("Queue is empty!!!")
+                else:
+                    print("Queue is empty!!!")
 
-            returnstr = {    "errorfileName": returnstr,
+            #print(returnstr)
+            if returnstr is not "File_not_found":
+                print(returnstr.split('/'))
+
+            returnstr = {    "errorfilename": returnstr,
                             "bktname" : bktname,
                             "key"     : key }
+            
+            
             return returnstr
     except Exception as ex:
         print(ex)
         logging.debug("error in process_transactions method")
-        returnstr = {    "errorfileName": "File_not_found",
+        returnstr = {    "errorfilename": "File_not_found",
                         "bktname" : bktname,
                         "key"     : key }
         print(returnstr)                
@@ -371,19 +399,26 @@ def check_file_exists(bktname, key):
 
 
 
-# def test():
-#     try:
-#         cmteid =  "C00011147"
-#         bktname = "fecfile-filing-frontend"
-#         key = "transactions/F3X_ScheduleC_Import_Transactions_11_25_TEST_Data.csv"
+# cmteid =  "C00011111"
+# bktname = "fecfile-filing-frontend"
+# key = "transactions/F3X_ScheduleH6_Import_Transactions_11_25_TEST_Data.csv"
 
-#         if bktname and key:
-#             print('RESULT : ',validate_transactions(bktname, key, cmteid))
-#         else: 
-#             print("No data")
+# if bktname and key:
+#     print(validate_transactions(bktname, key, cmteid))
+# else: 
+#     print("No data")
 
-#         #move_data_from_excel_to_db('F3X')
-#     except Exception as ex:
-#         print(ex)
+#   #move_data_from_excel_to_db('F3X')
 
-# test()
+
+
+# errfilerelpath = 'transactions/error_files/' + cmteid
+# s3 = boto3.client('s3')
+# result = s3.list_objects(Bucket=bktname, Prefix=errfilerelpath )
+# #print('cmteid result',result)
+# exists=False
+# if "Contents" not in result:
+#     print("list objects doesn'texist:")
+#     s3.put_object(Bucket=bktname, Key=(errfilerelpath+'/'))
+# else:
+#     print("list objects exist:")
