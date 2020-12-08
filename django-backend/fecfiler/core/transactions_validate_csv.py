@@ -46,25 +46,6 @@ def validate_dataframe(data):
         print ("Non schedule matches available")
         return "Multiple_Sched"
 
-# def save_data_from_excel_to_db(data):
-#     #print('in the get_data_from_csv')
-#     postgreSQLTable = 'ref_forms_scheds_format_specs'
-#     try:
-#         # Create an engine instance
-#         engine   = create_engine('postgres://postgres:postgres@localhost:5432', pool_recycle=3600);
-#         # Connect to PostgreSQL server
-#         postgreSQLConnection = engine.connect()
-#         data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': Text} )
-#         time.sleep(1)
-#     except ValueError as vx:
-#         print("valuerror; ")
-#         print(vx)
-#     except Exception as ex:  
-#         print("In EXCEPTION BLOCK ")
-#         print(ex)
-#     finally:
-#         postgreSQLConnection.close();
-
 
 def save_data_from_excel_to_db(data):
     #print('in the get_data_from_csv')
@@ -173,7 +154,7 @@ def schema_validation(dataframe, schema, bktname, key, errorfilename):
 				})                
 
         errors_index_rows = [e.row for e in errors]
-        print('errors_index_rows: ',len(errors_index_rows))
+        #print('errors_index_rows: ',len(errors_index_rows))
         if len(errors_index_rows) > 0:
             if path.exists(errorfilename):
                 pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=False, index = False)
@@ -265,7 +246,7 @@ def move_error_files_to_s3(bktname, key, errorfilename):
         errfilerelpath = keyfolder + '/error_files/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        #os.remove(errorfilename)
+        os.remove(errorfilename)
     except ClientError as e:
         print(e)
         logging.debug("error in move_error_files_to_s3 method")
@@ -353,28 +334,56 @@ def validate_transactions(bktname, key, cmteid):
         #aws sqs receive-message --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions --attribute-names All --message-attribute-names All --max-number-of-messages 10
         #aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
         print("bktname: ",bktname, ", Key : ", key)
-        if bktname and key:
-            res = load_dataframe_from_s3(bktname, key, 100000, 1) #100,000 records and 1s timer is for testing and need to be updated.
-            print(res)
-            if res != 'Validate_Pass':
-                print("Error with data validation:", res)
-        else:
-            print("Queue is empty!!!")
+        returnstr =''
+        if check_file_exists(bktname, key):
+            if bktname and key:
+                res = load_dataframe_from_s3(bktname, key, 100000, 1) #100,000 records and 1s timer is for testing and need to be updated.
+                #print(res)
+                if res != 'Validate_Pass':
+                    print("Error with data validation:", res)
+                    returnstr = res 
+            else:
+                print("Queue is empty!!!")
+
+            returnstr = {    "errorfileName": returnstr,
+                            "bktname" : bktname,
+                            "key"     : key }
+            return returnstr
     except Exception as ex:
         print(ex)
         logging.debug("error in process_transactions method")
-        logging.debug(error)
+        returnstr = {    "errorfileName": "File_not_found",
+                        "bktname" : bktname,
+                        "key"     : key }
+        print(returnstr)                
+        return returnstr
+
+
+
+def check_file_exists(bktname, key):
+    s3 = boto3.client('s3')
+    try:
+        s3.head_object(Bucket=bktname, Key=key)
+        return True
+    except ClientError:
+        # Not found
         raise
 
-try:
-    cmteid =  "C00011147"
-    bktname = "fecfile-filing-frontend"
-    key = "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-    if bktname and key:
-       validate_transactions(bktname, key, cmteid)
-    else: 
-        print("No data")
 
-    #move_data_from_excel_to_db('F3X')
-except Exception as ex:
-    print(ex)
+
+# def test():
+#     try:
+#         cmteid =  "C00011147"
+#         bktname = "fecfile-filing-frontend"
+#         key = "transactions/F3X_ScheduleC_Import_Transactions_11_25_TEST_Data.csv"
+
+#         if bktname and key:
+#             print('RESULT : ',validate_transactions(bktname, key, cmteid))
+#         else: 
+#             print("No data")
+
+#         #move_data_from_excel_to_db('F3X')
+#     except Exception as ex:
+#         print(ex)
+
+# test()

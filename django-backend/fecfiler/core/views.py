@@ -54,7 +54,7 @@ from fecfiler.core.transactions_validate_contacts import (
 )
 
 from fecfiler.core.transactions_validate_csv import (
-    validate_import_transactions
+    validate_transactions
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
@@ -12236,12 +12236,15 @@ def validate_import_transactions(request):
         cmteid =  request.user.username
         bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
         key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
+
+        #print('cmteid ', cmteid,' bkt_name ',bktname,' key: ', key )
         if bktname and key:
             resp = validate_transactions(bktname, key, cmteid)
         else: 
             resp = "No data"
 
         resp = validate_transactions(bktname, key, cmteid) #get_contact_details_from_transactions(cmteid, filename)
+        
         return Response(resp, status=status.HTTP_200_OK)              
     except Exception as e:
         return Response(
