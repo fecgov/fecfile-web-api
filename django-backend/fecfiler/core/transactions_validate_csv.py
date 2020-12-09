@@ -417,16 +417,16 @@ def check_file_exists(bktname, key):
 
 
 
-cmteid =  "C00011111"
-bktname = "fecfile-filing-frontend"
-key = "transactions/F3X_ScheduleH6_Import_Transactions_11_25_TEST_Data.csv"
-if bktname and key:
-    print()
-    print(validate_transactions(bktname, key, cmteid))
-else: 
-    print("No data")
+# cmteid =  "C00011111"
+# bktname = "fecfile-filing-frontend"
+# key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
+# if bktname and key:
+#     print()
+#     print(validate_transactions(bktname, key, cmteid))
+# else: 
+#     print("No data")
 
-  #move_data_from_excel_to_db('F3X')
+#   #move_data_from_excel_to_db('F3X')
 
 
 
