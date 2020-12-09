@@ -63,8 +63,10 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes.forceChangeDetection !== undefined) {
-      if (changes.forceChangeDetection.currentValue !== changes.forceChangeDetection.previousValue
-        && changes.forceChangeDetection.firstChange === false) {
+      if (
+        changes.forceChangeDetection.currentValue !== changes.forceChangeDetection.previousValue &&
+        changes.forceChangeDetection.firstChange === false
+      ) {
         this.ngOnInit();
       }
     }
@@ -188,12 +190,32 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
     fileReader.readAsText(chunk);
   }
 
+  // private _determineErrorFileName(errorFilePath: string): string {
+  //   let fileName = 'error_file.csv';
+  //   const nameSplit = errorFilePath.split('/');
+  //   let fecFileName = '';
+  //   if (nameSplit.length) {
+  //     if (nameSplit.length > 2) {
+  //       fecFileName = nameSplit[3];
+  //     }
+  //   }
+  //   return fileName;
+  // }
+
   public receiveUploadResults($event: any) {
     this.showSpinner = true;
     this._importTransactionsService.checkForValidationErrors(this.uploadFile).subscribe((res: any) => {
       this.showSpinner = false;
-      if (res.validation_failed === true) {
-        this.uploadFile.errorFileName = res.error_file;
+      // if (res.validation_failed === true) {
+      let validationFailed = true;
+      if (res.errorfileName) {
+        if (res.errorfileName.toLowerCase() === 'file not found') {
+          validationFailed = false;
+        }
+      }
+      if (validationFailed) {
+        // this.uploadFile.errorFileName = res.error_file;
+        this.uploadFile.errorFileName = res.errorfileName;
         this.uploadFile.status = ImportFileStatusEnum.failed;
         const message =
           'The system found errors within the import file, ' +

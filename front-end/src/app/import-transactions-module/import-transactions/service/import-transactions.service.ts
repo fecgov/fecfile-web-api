@@ -71,10 +71,10 @@ export class ImportTransactionsService {
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
         break;
       case 'validation_error.1.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.1.json';
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
         break;
       case 'validation_error.2.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.2.json';
+        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
         break;
       case 'success.csv':
         mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
