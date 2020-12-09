@@ -11,6 +11,8 @@ import { UploadTrxService } from '../import-trx-upload/service/upload-trx.servic
   providedIn: 'root'
 })
 export class ImportTransactionsService {
+  private readonly bucketName = 'fecfile-filing-frontend';
+
   constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
   public getSpecAndTemplate(fileName: string): Observable<any> {
@@ -32,59 +34,28 @@ export class ImportTransactionsService {
   public checkForValidationErrors(uploadFile: UploadFileModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/core/need_name_from_srini';
+    const url = '/core/validate_import_transactions';
 
     const fileName = uploadFile.fileName;
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    let committeeId = null;
-    if (localStorage.getItem('committee_details') !== null) {
-      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
-      committeeId = cmteDetails.committeeid;
-    }
+    // let committeeId = null;
+    // if (localStorage.getItem('committee_details') !== null) {
+    //   const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+    //   committeeId = cmteDetails.committeeid;
+    // }
 
     const request: any = {};
-    request.cmte_id = committeeId;
+    // request.cmte_id = committeeId;
     request.filename = fileName;
-    request.fecfilename = uploadFile.fecFileName;
+    request.key = uploadFile.fecFileName;
+    request.bkt_name = this.bucketName;
 
-    if (fileName === 'no-mock.csv') {
-      return this._http
-        .post(`${environment.apiUrl}${url}`, request, {
-          headers: httpOptions
-        })
-        .pipe(
-          map(res => {
-            if (res) {
-              return res;
-            }
-            return false;
-          })
-        );
-    }
-
-    let mockFile = '';
-    switch (fileName) {
-      case 'validation_error.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
-        break;
-      case 'validation_error.1.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
-        break;
-      case 'validation_error.2.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
-        break;
-      case 'success.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
-        break;
-      default:
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
-    }
-
+    // if (fileName === 'no-mock.csv') {
     return this._http
-      .get(mockFile, {
+      .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
       })
       .pipe(
@@ -95,6 +66,38 @@ export class ImportTransactionsService {
           return false;
         })
       );
+    // }
+
+    // let mockFile = '';
+    // switch (fileName) {
+    //   case 'validation_error.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
+    //     break;
+    //   case 'validation_error.1.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
+    //     break;
+    //   case 'validation_error.2.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/validation_error.json';
+    //     break;
+    //   case 'success.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+    //     break;
+    //   default:
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+    // }
+
+    // return this._http
+    //   .get(mockFile, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
   }
 
   public checkDuplicateFile(uploadFile: UploadFileModel): Observable<any> {
@@ -111,40 +114,20 @@ export class ImportTransactionsService {
       committeeId = cmteDetails.committeeid;
     }
 
+    // get_comittee_id(request.user.username)
+    //     file_name = request.data.get("file_name") #request.file_name
+    //     md5 = request.data.get("md5hash") #request.md5hash
+    //     fec_file_name = request.data.get("fecfilename")
+
     const request: any = {};
-    request.cmte_id = committeeId;
-    request.filename = uploadFile.fileName;
-    request.hash_value = uploadFile.checkSum;
+    // request.get_comittee_id = committeeId;
+    request.file_name = uploadFile.fileName;
+    request.md5hash = uploadFile.checkSum;
     request.fecfilename = uploadFile.fecFileName;
 
-    if (uploadFile.fileName === 'no-mock.csv') {
-      return this._http
-        .post(`${environment.apiUrl}${url}`, request, {
-          headers: httpOptions
-        })
-        .pipe(
-          map(res => {
-            if (res) {
-              return res;
-            }
-            return false;
-          })
-        );
-    }
-
-    let mockFile = '';
-    switch (uploadFile.fileName) {
-      case 'success.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
-        break;
-      case 'duplicate_file.csv':
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/duplicate_file.json';
-        break;
-      default:
-        mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
-    }
+    // if (uploadFile.fileName === 'no-mock.csv') {
     return this._http
-      .get(mockFile, {
+      .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
       })
       .pipe(
@@ -155,6 +138,31 @@ export class ImportTransactionsService {
           return false;
         })
       );
+    // }
+
+    // let mockFile = '';
+    // switch (uploadFile.fileName) {
+    //   case 'success.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+    //     break;
+    //   case 'duplicate_file.csv':
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/duplicate_file.json';
+    //     break;
+    //   default:
+    //     mockFile = 'assets/mock-data/import-transactions/chk_csv_uploaded_in_db/success.json';
+    // }
+    // return this._http
+    //   .get(mockFile, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
   }
 
   /**
