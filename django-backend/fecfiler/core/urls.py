@@ -4,6 +4,11 @@ from . import views, jsonmain, jsonsqlgenerate
 
 urlpatterns = [
     url(
+        r"^core/validate_import_transactions$",
+        views.validate_import_transactions,
+        name="validate_import_transactions",
+    ),
+    url(
         r"^core/chk_csv_uploaded_in_db$",
         views.chk_csv_uploaded_in_db,
         name="chk_csv_uploaded_in_db",
