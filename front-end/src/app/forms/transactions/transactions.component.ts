@@ -1094,7 +1094,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Import transactions from an external file.
    */
   public doImport() {
-    alert('Import transactions is not yet supported');
+    this._router.navigate(['/import-transactions']);
   }
 
   /**

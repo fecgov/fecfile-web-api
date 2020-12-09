@@ -545,11 +545,27 @@ def validate_contact(request):
         try:
             if request.method == 'POST':
                 cmte_id = get_comittee_id(request.user.username)
+                file_name = request.data.get("fileName")
+
+                # log the import
+                sql = """
+                    insert into public.entity_import_log (
+                        committee_id, file_name, uploaded_by, uploaded_on, checksum
+                    ) values (
+                        %(cmte_id)s, %(file_name)s, %(uploaded_by)s, now(), 'N/A'
+                    )
+                """
+                with connection.cursor() as cursor:
+                    cursor.execute(sql, {
+                        "cmte_id": cmte_id,
+                        "file_name": file_name,
+                        "uploaded_by": request.user.username[9:]
+                    })
+
                 client = boto3.client('s3',
                                       settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
                                       )
-                bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
-                file_name = request.data.get("fileName")
+                bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME        
                 transaction_included = request.data.get("transaction_included")
                 csv_obj = client.get_object(Bucket=bucket, Key='contacts/' + cmte_id + '/' + file_name)
                 body = csv_obj['Body']

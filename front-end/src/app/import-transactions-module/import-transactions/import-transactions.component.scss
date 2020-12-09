@@ -1,13 +1,39 @@
 @import 'src/app/shared/scss/global';
 
 .import_contacts__main-container {
-  display: table;
-  table-layout: fixed;
-  min-height: $mainContentHeight;
+  // display: table;
+  // table-layout: fixed;
+  // min-height: $mainContentHeight;
   margin: 0;
   padding: 0;
   width: 100%;
   .import_contacts__container {
+    display: flex;
+    margin-bottom: 20px;
+    .import_trx__sidebar {
+      background-color: #aeb0b5;
+      padding-left: 0;
+      transition: all 0.4s ease 0s;
+      &.sidebar-visible {
+        width: 25%;
+      }
+      &.sidebar-hidden {
+        width: 3%;
+      }
+    }
+    .right-side {
+      float: right;
+      transition: all 0.4s ease 0s;
+      &.sidebar-visible {
+        width: 75%;
+      }
+      &.sidebar-hidden {
+        width: 95%;
+      }
+    }
+    .lower-section {
+      width: 100%;
+    }
     header {
       .header-content {
         display: block;
@@ -44,45 +70,15 @@
       }
     }
     section {
-      .import_contacts__steps {
-        padding: 2em 0;
-      }
-      .import_contacts__body {
-        margin: 2px auto;
-        width: 98%;
-        padding: 0.75em 0 4em 0;
-        .import_contacts__heading {
-          padding: 40px 0 20px 0;
-        }
-        .import_contacts__sub-section-title {
-          padding-top: 20px;
-        }
-        .import_contacts__heading-list {
-          padding: 40px 0 0 0;
-        }
-        .import_contacts__import-directions {
-          padding-left: 25px;
-          ol {
-            padding: 0;
-            margin-left: 1em;
-            margin-bottom: 0;
-            li {
-              padding-top: 20px;
-            }
-            .import_contacts__first-item {
-              padding-top: 0px;
-            }
+      .import_contacts__body_container {
+        .import_contacts__body {
+          // margin: 2px auto;
+          width: 98%;
+          // padding: 0.75em 0 4em 0;
+          float: right;
+          .import_contacts__steps {
+            padding: 2em 0;
           }
-          .import_contacts__alpha-list {
-            list-style-type: lower-alpha;
-          }
-        }
-        .import_contacts__begin-import-msg {
-          padding: 5px 0;
-        }
-        .import_contacts__begin-import-links li {
-          padding: 5px 0 5px 25px;
-          list-style-type: none;
         }
       }
     }
