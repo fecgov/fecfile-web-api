@@ -59,12 +59,20 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
     this.startUpload = false;
     this.showSpinner = false;
     this.duplicateFileList = [];
+
+    // test code for schedule
+    // const scheds = ['SA111', 'SB111', 'SE111', 'SF111', 'H3111', 'H4111', 'H5111', 'H6111', 'SLA111', 'SLB11'];
+    // for (const s of scheds) {
+    //   console.log(`Sched code = ${s} / Sched Name = ${this._formatScheduleName(s)}`);
+    // }
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes.forceChangeDetection !== undefined) {
-      if (changes.forceChangeDetection.currentValue !== changes.forceChangeDetection.previousValue
-        && changes.forceChangeDetection.firstChange === false) {
+      if (
+        changes.forceChangeDetection.currentValue !== changes.forceChangeDetection.previousValue &&
+        changes.forceChangeDetection.firstChange === false
+      ) {
         this.ngOnInit();
       }
     }
@@ -73,10 +81,12 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
   public ngOnDestroy() {}
 
   public proceed() {
-    this.resultsEmitter.emit({
-      resultType: 'proceed',
-      uploadFile: this.uploadFile
-    });
+    // move receiveUploadResults into here.  No longer event emitted.
+    this.receiveUploadResults('');
+    // this.resultsEmitter.emit({
+    //   resultType: 'proceed',
+    //   uploadFile: this.uploadFile
+    // });
   }
 
   public cancelImport() {
@@ -188,12 +198,32 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
     fileReader.readAsText(chunk);
   }
 
+  // private _determineErrorFileName(errorFilePath: string): string {
+  //   let fileName = 'error_file.csv';
+  //   const nameSplit = errorFilePath.split('/');
+  //   let fecFileName = '';
+  //   if (nameSplit.length) {
+  //     if (nameSplit.length > 2) {
+  //       fecFileName = nameSplit[3];
+  //     }
+  //   }
+  //   return fileName;
+  // }
+
   public receiveUploadResults($event: any) {
     this.showSpinner = true;
     this._importTransactionsService.checkForValidationErrors(this.uploadFile).subscribe((res: any) => {
       this.showSpinner = false;
-      if (res.validation_failed === true) {
-        this.uploadFile.errorFileName = res.error_file;
+      // if (res.validation_failed === true) {
+      let validationFailed = true;
+      if (res.errorfilename) {
+        if (res.errorfilename.toLowerCase() === 'file_not_found') {
+          validationFailed = false;
+        }
+      }
+      if (validationFailed) {
+        // this.uploadFile.errorFileName = res.error_file;
+        this.uploadFile.errorFileName = res.errorfilename;
         this.uploadFile.status = ImportFileStatusEnum.failed;
         const message =
           'The system found errors within the import file, ' +
@@ -241,25 +271,23 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
     // SB - ScheduleB
     // SE - ScheduleSE
     // SF - ScheduleSF
+    // SLA - ScheduleLA
+    // SLB - ScheduleLB
 
     const prefix = 'Schedule';
-    if (
-      schedCode === 'H3' ||
-      schedCode === 'H4' ||
-      schedCode === 'H5' ||
-      schedCode === 'H6' ||
-      schedCode === 'LA' ||
-      schedCode === 'LB'
-    ) {
+    if (schedCode === 'H3' || schedCode === 'H4' || schedCode === 'H5' || schedCode === 'H6') {
       scheduleName = prefix + schedCode;
     } else {
-      if (schedCode.substring(0, 1) === 'A' || schedCode.substring(0, 1) === 'B') {
-        scheduleName = prefix + schedCode.substring(0, 1);
-      } else if (schedCode.substring(0, 1) === 'E' || schedCode.substring(0, 1) === 'F') {
-        scheduleName = prefix + 'S' + schedCode;
+      const schedPos2 = schedCode.substring(1);
+      if (schedPos2 === 'A' || schedPos2 === 'B') {
+        scheduleName = prefix + schedPos2;
+      } else if (schedPos2 === 'E' || schedPos2 === 'F') {
+        scheduleName = prefix + 'S' + schedPos2;
+      } else if (schedCode === 'SL') {
+        scheduleName = prefix + scheduleType.substring(1, 3);
       }
     }
-    console.log('rename file to include ' + scheduleName);
+    // console.log('rename file to include ' + scheduleName);
     return scheduleName;
   }
 }

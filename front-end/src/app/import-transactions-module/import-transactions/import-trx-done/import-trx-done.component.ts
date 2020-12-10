@@ -143,18 +143,19 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
   public showErrorLog() {
     for (const errorFile of this.fileQueue) {
       if (errorFile.status === ImportFileStatusEnum.failed && errorFile.errorFileName) {
-        this._downloadErrorFile(errorFile.errorFileName);
+        this._downloadErrorFile(errorFile);
       }
     }
   }
 
-  private _downloadErrorFile(fileName: string) {
-    this._uploadContactsService.getObject(`transactions/${this.committeeId}/error_files/${fileName}`).subscribe(res => {
+  private _downloadErrorFile(errorFile: UploadFileModel) {
+    // this._uploadContactsService.getObject(`transactions/${this.committeeId}/error_files/${fileName}`).subscribe(res => {
+    this._uploadContactsService.getObject(errorFile.errorFileName).subscribe(res => {
       const type = 'text/csv;charset=utf-8';
       const blob: Blob = new Blob([res.Body], { type: type });
 
       // TODO for large files, look at https://github.com/jimmywarting/StreamSaver.js
-      FileSaver.saveAs(blob, 'errors_' + fileName);
+      FileSaver.saveAs(blob, 'errors_' + errorFile.fileName);
     });
   }
 
