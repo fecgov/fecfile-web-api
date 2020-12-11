@@ -172,15 +172,18 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
       const chunkData = fileReader.result;
       const lines = chunkData.toString().split('\n', 2);
       if (!lines) {
+        console.error(new Error('no data in first 2 lines'));
         return;
       }
       if (!(lines.length > 1)) {
+        console.error(new Error('no data in line 2'));
         return;
       }
       const firstRec = lines[1];
       console.log(firstRec);
       const fields = firstRec.split(',');
       if (!(fields.length > 2)) {
+        console.error(new Error('1st record missing fields for schedule in pos 3'));
         return;
       }
       const scheduleType = this._formatScheduleName(fields[2]);
