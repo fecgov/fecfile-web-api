@@ -363,7 +363,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
                 data_temp = data[headers]
                 #print('tranid:',tranid)
                 print('tranid:',tranid.strip())
-                #data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
+                data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
                 #print(data_temp)
                 errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
@@ -444,7 +444,7 @@ def check_file_exists(bktname, key):
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
                     
-# key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
+# key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
 # if bktname and key:
 #     print(validate_transactions(bktname, key, cmteid))
 # else: 
