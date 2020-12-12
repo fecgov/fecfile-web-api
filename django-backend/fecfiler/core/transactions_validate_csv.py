@@ -292,7 +292,7 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        #os.remove(errorfilename)
+        os.remove(errorfilename)
         return errfilerelpath
     except ClientError as e:
         print(e)
@@ -443,14 +443,14 @@ def check_file_exists(bktname, key):
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
-                    
-# key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+# key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
 # if bktname and key:
+#     print()
 #     print(validate_transactions(bktname, key, cmteid))
 # else: 
 #     print("No data")
 
-#move_data_from_excel_to_db('F3X')
+#   #move_data_from_excel_to_db('F3X')
 
 
 
