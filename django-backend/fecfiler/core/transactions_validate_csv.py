@@ -53,11 +53,11 @@ def save_data_from_excel_to_db(data):
     try:
         # "postgres://PG_USER:PG_PASSWORD@PG_HOST:PG_PORT/PG_DATABASE"
         connectionstring = "postgres://" + PG_USER + ":" + PG_PASSWORD + "@" + PG_HOST + ":" + PG_PORT + "/" + PG_DATABASE
-        print("connectionstring : ",connectionstring)
+        #print("connectionstring : ",connectionstring)
         engine   = create_engine(connectionstring, pool_recycle=3600);
         postgreSQLConnection = engine.connect()
         data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': Text} )
-        time.sleep(1)
+        #time.sleep(1)
     except ValueError as vx:
         print("valuerror; ")
         print(vx)
@@ -84,7 +84,7 @@ def export_excel_to_db(filename, path):
             sheet_to_start = 0
         #print(xls.sheet_names)
         for sheet_name in xls.sheet_names[sheet_to_start:]:
-            #print(sheet_name)
+            print(sheet_name)
             if sheet_name != 'All Receipts':
                 df = pd.read_excel(filewithpath, 
                                     sheet_name=sheet_name, 
@@ -141,8 +141,9 @@ def move_data_from_excel_to_db(form):
 
 def schema_validation(dataframe, schema, bktname, key, errorfilename):
     try:
-        #print('msg',errorfilename)
+        #print('msg',dataframe)
         errors = schema.validate(dataframe)
+        #print(errors)
         errdf = []       
         for error in errors:
             msg = error.message 
@@ -166,12 +167,12 @@ def schema_validation(dataframe, schema, bktname, key, errorfilename):
         data = {"errors": data_dirty, "data_clean": data_clean}
         return data
     except ClientError as e:
-        print(e)
+        print('ClientError Exception in schema_validation:',e)
         logging.debug("error in schema_validation method")
         logging.debug(e)
         raise
     except Exception as e:
-        print(e)
+        print('Exception Regular in schema_validation:',e)
         logging.debug("error in schema_validation method")
         logging.debug(e)
         raise
@@ -200,6 +201,7 @@ def build_schemas(formname, sched, trans_type):
             field = row[3]
             type  = row[4]
             required = row[5]
+            #print('----------------------------------------------------------------------------')
             s = type.split('-')
             len = s[1]
             if 'A/N' in type:
@@ -208,18 +210,27 @@ def build_schemas(formname, sched, trans_type):
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv],allow_empty=True)
                 else:
+                    #print('A/N is mandatory with len: ', len,' field: ',field)
+                    if field in ['REPORT TYPE', 'REPORT YEAR', 'SCHEDULE NAME', 'TRANSACTION IDENTIFIER', 'TRANSACTION NUMBER', 'ENTITY TYPE']:
+                        pattern = '^[A-Za-z0-9_-]{1,' + len + '}$'
+                    else:
+                        #print('field:',field)
+                        pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     mpv = MatchesPatternValidation(pattern)
-                    column = Column(field, [mpv])
+                    column = Column(field, [mpv], allow_empty= False)
                 columns.append(column)
                 headers.append(field)
+                print(field)
             elif 'NUM' in type:
+                print(field)
                 pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
                 columns.append(column)
                 headers.append(field)
             elif 'AMT' in type:
+                print(field)
                 pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
@@ -230,10 +241,10 @@ def build_schemas(formname, sched, trans_type):
         return head_schema
     except ValueError as vx:
         print("valuerror; ")
-        print(vx)
+        print('Exception in build_schemas:',vx)
     except Exception as ex:  
         print("In EXCEPTION BLOCK ")
-        print(ex)
+        print('Exception in build_schemas:',vx)
     finally:
         connection.close();
 
@@ -281,7 +292,7 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        os.remove(errorfilename)
+        #os.remove(errorfilename)
         return errfilerelpath
     except ClientError as e:
         print(e)
@@ -289,6 +300,7 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         logging.debug(e)
         raise
     except Exception as e: 
+        print(e)
         logging.debug("error in move_error_files_to_s3 method")
         logging.debug(e)
         raise
@@ -321,7 +333,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         csv_string = body.read().decode('utf-8')
         res = ''
         flag = False
-        for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size): #, usecols=['ENTITY TYPE', 'CONTRIBUTOR STREET 1', 'TRANSACTION IDENTIFIER ']): 
+        for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size):
             data = data.dropna(axis=[0], how='all')
             res = validate_dataframe(data)
             if "Validate_Pass" != res:
@@ -332,22 +344,33 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
             cntr = 1
             for tranid in data['TRANSACTION IDENTIFIER'].unique():
                 cntr+=1
+                #print('cntr',cntr)
                 # build schema based on tranid
                 head_schema = build_schemas(formname, schedule, tranid)
                 headers = head_schema[0]
                 schema  = head_schema[1]
-                # print('....headers....',headers)
-                # print('....schema....',schema) 
+
+                #print('....headers....',(",".join(headers)))
+                #print('....schema....',schema) 
+                
+                # headersstr = pd.Series(headers.flatten())
+                # data_temp = data[headers]
+                #include_clique = products[products.str.contains("Product A")]
+                #print(headers)
+                # for h in headers:
+                #     print(h)    
+                        
                 data_temp = data[headers]
-                data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
+                #print('tranid:',tranid)
+                print('tranid:',tranid.strip())
+                #data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
+                #print(data_temp)
                 errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
-                #print('resvalidation:',resvalidation)
-            flag = True       
-
-        #print('AAAAAAAAA:',errorfilename)
+            flag = True
+            print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
-            #print('11111111111111111')
+            print('11111111111111111')
             errfilerelpath = move_error_files_to_s3(bktname, key, errorfilename, cmteid)     
             return errfilerelpath
         elif flag is True:
@@ -355,11 +378,12 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         else: 
             return 'Validate_Fail' 
     except ClientError as e:
-        print(e)
+        print('Exception in load_dataframe_from_s3:',e)
         logging.debug("error in load_dataframe_from_s3 method")
         logging.debug(e)
         raise
     except Exception as e:
+        print('Exception in load_dataframe_from_s3:',e)
         logging.debug("error in load_dataframe_from_s3 method")
         logging.debug(e)
         raise
@@ -419,14 +443,14 @@ def check_file_exists(bktname, key):
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
+                    
 # key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
 # if bktname and key:
-#     print()
 #     print(validate_transactions(bktname, key, cmteid))
 # else: 
 #     print("No data")
 
-#   #move_data_from_excel_to_db('F3X')
+#move_data_from_excel_to_db('F3X')
 
 
 
