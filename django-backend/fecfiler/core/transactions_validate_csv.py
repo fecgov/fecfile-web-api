@@ -165,6 +165,7 @@ def schema_validation(dataframe, schema, bktname, key, errorfilename):
         data_clean = dataframe.drop(index=errors_index_rows)
         data_dirty = pd.concat([data_clean, dataframe]).drop_duplicates(keep=False)
         data = {"errors": data_dirty, "data_clean": data_clean}
+        #print('data_dirty:',data_dirty)
         return data
     except ClientError as e:
         print('ClientError Exception in schema_validation:',e)
@@ -212,25 +213,25 @@ def build_schemas(formname, sched, trans_type):
                 else:
                     #print('A/N is mandatory with len: ', len,' field: ',field)
                     if field in ['REPORT TYPE', 'REPORT YEAR', 'SCHEDULE NAME', 'TRANSACTION IDENTIFIER', 'TRANSACTION NUMBER', 'ENTITY TYPE']:
-                        pattern = '^[A-Za-z0-9_-]{1,' + len + '}$'
+                        pattern = '^(\\S)+[A-Za-z0-9_-]{1,' + len + '}$'
                     else:
                         #print('field:',field)
                         pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
-                    pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
+                    #pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv], allow_empty= False)
                 columns.append(column)
                 headers.append(field)
-                print(field)
+                #print(field)
             elif 'NUM' in type:
-                print(field)
+                #print(field)
                 pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
                 columns.append(column)
                 headers.append(field)
             elif 'AMT' in type:
-                print(field)
+                #print(field)
                 pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
@@ -292,7 +293,7 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        os.remove(errorfilename)
+        #os.remove(errorfilename)
         return errfilerelpath
     except ClientError as e:
         print(e)
@@ -333,7 +334,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         csv_string = body.read().decode('utf-8')
         res = ''
         flag = False
-        for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size):
+        for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size, na_filter=False):
             data = data.dropna(axis=[0], how='all')
             res = validate_dataframe(data)
             if "Validate_Pass" != res:
@@ -362,11 +363,14 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
                         
                 data_temp = data[headers]
                 #print('tranid:',tranid)
-                print('tranid:',tranid.strip())
+                #print('tranid:',tranid.strip())
+                #only for testing remove later
+                #tranid='PARTN_REC'
                 data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
                 #print(data_temp)
                 errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
+
             flag = True
             print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
@@ -441,14 +445,14 @@ def check_file_exists(bktname, key):
 
 
 
-# cmteid =  "C00011111"
-# bktname = "fecfile-filing-frontend"
-# key = "transactions/F3X_ScheduleB_Import_Transactions_11_25_TEST_Data.csv"
-# if bktname and key:
-#     print()
-#     print(validate_transactions(bktname, key, cmteid))
-# else: 
-#     print("No data")
+cmteid =  "C00011111"
+bktname = "fecfile-filing-frontend"
+key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+if bktname and key:
+    print()
+    print(validate_transactions(bktname, key, cmteid))
+else: 
+    print("No data")
 
 #   #move_data_from_excel_to_db('F3X')
 
