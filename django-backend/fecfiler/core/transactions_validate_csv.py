@@ -293,7 +293,7 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
         errfilerelpath = keyfolder + '/error_files/' + cmteid + '/' + errorfilename
         s3 = boto3.resource('s3')
         s3.Bucket(bktname).upload_file(errorfilename, errfilerelpath)
-        #os.remove(errorfilename)
+        os.remove(errorfilename)
         return errfilerelpath
     except ClientError as e:
         print(e)
