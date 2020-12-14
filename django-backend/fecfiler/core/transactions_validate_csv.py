@@ -372,9 +372,9 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
 
             flag = True
-            print('AAAAAAAAA:',errorfilename)
+            #print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
-            print('11111111111111111')
+            #print('11111111111111111')
             errfilerelpath = move_error_files_to_s3(bktname, key, errorfilename, cmteid)     
             return errfilerelpath
         elif flag is True:
@@ -445,14 +445,13 @@ def check_file_exists(bktname, key):
 
 
 
-cmteid =  "C00011111"
-bktname = "fecfile-filing-frontend"
-key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
-if bktname and key:
-    print()
-    print(validate_transactions(bktname, key, cmteid))
-else: 
-    print("No data")
+# cmteid =  "C00011111"
+# bktname = "fecfile-filing-frontend"
+# key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+# if bktname and key:
+#     print(validate_transactions(bktname, key, cmteid))
+# else: 
+#     print("No data")
 
 #   #move_data_from_excel_to_db('F3X')
 
