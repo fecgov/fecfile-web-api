@@ -46,10 +46,12 @@ export class UploadTrxService {
    * Upload the file to AWS S3 bucket.
    */
   public uploadFile(uploadFile: UploadFileModel, committeeId: string): Observable<any> {
-    this.progressPercent = 0;;
+    this.progressPercent = 0;
     const params = {
       Bucket: this.bucketName,
-      Key: this.TRANSACTIONS_PATH + committeeId + '/' + uploadFile.fecFileName,
+      // Key: this.TRANSACTIONS_PATH + committeeId + '/' + uploadFile.fecFileName,
+      // TODO API not ready for committee in path.  Remove temporarily.
+      Key: this.TRANSACTIONS_PATH + uploadFile.fecFileName,
       Metadata: {
         'committee-id': committeeId,
         'check-sum': uploadFile.checkSum,
