@@ -160,29 +160,35 @@ def chk_csv_uploaded(request):
             rhash = fileexists[1]
             rfilename = fileexists[2]
             rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
-        
-        returnstr = {    "error_list": [],
+            returnstr = {    "error_list": [],
+                            "fileName": filename,
+                            "duplicate_file_list": [{
+                            "fileName"  : rfilename,
+                            "uploadDate": rcreate_date,
+                            "checkSum"  : rhash
+                            }],
+                            "duplicate_db_count": 0
+                        }
+        else:
+            returnstr = {    "error_list": [],
                         "fileName": filename,
-                        "duplicate_file_list": [{
-                        "fileName"  : rfilename,
-                        "uploadDate": rcreate_date,
-                        "checkSum"  : rhash
-                        }],
+                        "duplicate_file_list": [],
                         "duplicate_db_count": 0
-                    }
+                    }  
         return returnstr
     except Exception as e:
         returnstr = {'message': str(e)}
-        return returnstr
+        print(returnstr)
+        raise
 
 
 # try:
 #     cmte_id = 'C0011147'
 #     dirname = os.path.dirname 
 #     filepath = dirname(dirname(os.getcwd()))+"/csv/"
-#     filename = "srini_test1.csv" #"Disbursements_1q2020.csv"
+#     filename = "srini_test14.csv" #"Disbursements_1q2020.csv"
 #     fecfilename = "F3X_ScheduleLA_Import_Transactions_C0011147_part1_11_25.csv"
-#     hash_value = '2222222'#generate_md5_hash(filename)
+#     hash_value = '22222224'#generate_md5_hash(filename)
 #     fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value, fecfilename)
 
 #     rcmteid =  ""
@@ -194,18 +200,23 @@ def chk_csv_uploaded(request):
 #         rhash = fileexists[1]
 #         rfilename = fileexists[2]
 #         rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
-    
-#     returnstr = {    "error_list": [],
+#         returnstr = {    "error_list": [],
+#                         "fileName": filename,
+#                         "duplicate_file_list": [{
+#                         "fileName"  : rfilename,
+#                         "uploadDate": rcreate_date,
+#                         "checkSum"  : rhash
+#                         }],
+#                         "duplicate_db_count": 0
+#                     }
+#     else:
+#         returnstr = {    "error_list": [],
 #                     "fileName": filename,
-#                     "duplicate_file_list": [{
-#                     "fileName"  : rfilename,
-#                     "uploadDate": rcreate_date,
-#                     "checkSum"  : rhash
-#                     }],
+#                     "duplicate_file_list": [],
 #                     "duplicate_db_count": 0
-#                 }
+#                 }                    
 #     if fileexists is None: 
 #         load_file_hash_to_db(cmte_id, filename, hash_value, fecfilename)
-#     #print(returnstr)
+#     print(returnstr)
 # except Exception as e:
 #     print(e)
