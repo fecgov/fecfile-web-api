@@ -12,6 +12,7 @@ import { UploadTrxService } from '../import-trx-upload/service/upload-trx.servic
 })
 export class ImportTransactionsService {
   private readonly bucketName = 'fecfile-filing-frontend';
+  private readonly TRANSACTIONS_PATH = 'transactions/';
 
   constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
@@ -50,7 +51,7 @@ export class ImportTransactionsService {
     const request: any = {};
     // request.cmte_id = committeeId;
     request.filename = fileName;
-    request.key = uploadFile.fecFileName;
+    request.key = this.TRANSACTIONS_PATH + uploadFile.fecFileName;
     request.bkt_name = this.bucketName;
 
     // if (fileName === 'no-mock.csv') {
