@@ -28,7 +28,8 @@ export class UploadTrxService {
    * Constructor will obtain credentials for AWS S3 Bucket.
    * @param _http
    */
-  constructor() {
+  constructor(private _http: HttpClient,
+    private _cookieService: CookieService) {
     AWS.config.region = environment.awsRegion;
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
       IdentityPoolId: environment.awsIdentityPoolId
@@ -209,5 +210,33 @@ export class UploadTrxService {
         observer.complete();
       });
     });
+  }
+
+  /**
+   * Invokes the api to import DCF file from S3 and validate and import. 
+   */
+  public importDcfFile(fileName: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/import/fecfile';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
   }
 }

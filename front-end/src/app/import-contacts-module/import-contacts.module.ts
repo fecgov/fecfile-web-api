@@ -32,6 +32,7 @@ import { CancelImportConfirmComponent } from './import-contacts/cancel-import-co
     ImportHowToComponent,
     CancelImportConfirmComponent
   ],
-  entryComponents: [CancelImportConfirmComponent]
+  entryComponents: [CancelImportConfirmComponent], 
+  exports: [UploadContactsComponent]
 })
 export class ImportContactsModule {}

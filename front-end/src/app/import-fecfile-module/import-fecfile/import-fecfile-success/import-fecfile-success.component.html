@@ -1,0 +1,38 @@
+<div class="import_done_contacts__container">
+
+  <!-- <div class="import_done_contacts__spinner_container_outer">
+    <p>
+      
+    </p>
+    <div class="import_done_contacts__spinner_container">
+      <app-spinner></app-spinner>
+    </div>
+  </div> -->
+  <div  class="import_done_contacts__complete">
+    Your file has been successfully imported. Please see below
+    <table class="table table-striped table-hover clean_contacts__table">
+      <thead>
+        <tr>
+          <th>Heading 1</th>
+          <th>Heading 2</th>
+          <th>Heading 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let row of successMessage">
+          <tr>
+            <td>{{row.heading1}}</td>
+            <td>{{row.heading2}}</td>
+            <td>{{row.heading3}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="text-center">
+    <button class="btn btn-primary" type="button"
+    [routerLink]="['/dashboard']">
+              Return to Dashboard
+    </button>
+  </div>
+</div>
