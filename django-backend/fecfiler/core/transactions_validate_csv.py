@@ -27,11 +27,12 @@ PG_PORT = os.getenv('DB_PORT')
 PG_DATABASE = os.getenv('DB_NAME')
 PG_USER = os.getenv('DB_USERNAME')
 PG_PASSWORD = os.getenv('DB_PASSWORD')
+SQS_QUEUE_NAME = os.environ.get('SQS_QUEUE_NAME') #
 
 
 # Setting the logging level
-#logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.ERROR)
 
 def validate_dataframe(data):
     #check if the column contains only values of a particular schedule 
@@ -110,9 +111,6 @@ def export_excel_to_db(filename, path):
         print(ex)
 
 def rename_files_folder(filelocation):
-    #RENAME XLS FILES TO PARSE AND UPDATE
-    #filename = "F3X_ScheduleA_FormatSpecs_Import_Transactions_UNIQUE_CODE.xlsx"
-    #F3X - Schedule A_Format Specs_Import Transactions_MAPPED
     with os.scandir(filelocation) as entries:
         for entry in entries:
             if ' - ' in entry.name:
@@ -255,8 +253,8 @@ def check_errkey_exists(bktname, key):
     errkey = errkey[0] + '/error_files/' + errkey[1]
     #errkey = key + '/error_files'
 
-    print('key', key)
-    print('errkey', errkey)
+    # print('key', key)
+    # print('errkey', errkey)
     s3 = boto3.client('s3')    
     result = s3.list_objects(Bucket=bktname, Prefix=errkey )
     exists=False
@@ -275,7 +273,7 @@ def create_cmte_error_folder(bktname, key, errfilerelpath):
     #print('cmteid result',result)
     exists=False
     if "Contents" not in result:
-        print("list objects doesn'texist:")
+        # print("list objects doesn'texist:")
         s3.put_object(Bucket=bktname, Key=(errfilerelpath+'/'))
     # else:
     #     print("list objects exist:")
@@ -319,8 +317,8 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         else:
             sched = schedule.replace('Schedule','S')
         # print('sched:',sched)
-        print('schedule ',schedule) 
-        print('formname ',formname)        
+        # print('schedule ',schedule) 
+        # print('formname ',formname)        
         tablename = 'temp'
         if "/" in key:
             tablename=key[key.find("/")+1:-4].split()[0]
@@ -351,30 +349,15 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
                 headers = head_schema[0]
                 schema  = head_schema[1]
 
-                #print('....headers....',(",".join(headers)))
-                #print('....schema....',schema) 
-                
-                # headersstr = pd.Series(headers.flatten())
-                # data_temp = data[headers]
-                #include_clique = products[products.str.contains("Product A")]
-                #print(headers)
-                # for h in headers:
-                #     print(h)    
-                        
                 data_temp = data[headers]
-                #print('tranid:',tranid)
-                #print('tranid:',tranid.strip())
-                #only for testing remove later
-                #tranid='PARTN_REC'
                 data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
-                #print(data_temp)
                 errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
                 resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
 
             flag = True
-            #print('AAAAAAAAA:',errorfilename)
+            # print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
-            #print('11111111111111111')
+            # print('11111111111111111')
             errfilerelpath = move_error_files_to_s3(bktname, key, errorfilename, cmteid)     
             return errfilerelpath
         elif flag is True:
@@ -445,15 +428,67 @@ def check_file_exists(bktname, key):
 
 
 
+def send_message_to_queue(bktname, key):
+    returnstr=''
+    try:
+        # Get the service resource
+        sqs = boto3.resource('sqs')
+
+        # Get the queue. This returns an SQS.Queue instance
+        queue = sqs.get_queue_by_name(QueueName=SQS_QUEUE_NAME)
+
+        # You can now access identifiers and attributes
+        # print('URL:',queue.url)
+        # print(queue.attributes.get('DelaySeconds'))
+
+        response = queue.send_messages(Entries=[
+            {
+                'Id': '1',
+                'MessageBody': 'ImportTransactions',
+                'MessageAttributes': {
+                    "bktname": {
+                        'DataType': "String",
+                        'StringValue': bktname #"fecfile-filing-frontend"
+                    },
+                    "key": {
+                        'DataType': "String",
+                        'StringValue': key #"transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+                    }
+                }
+            }
+        ])
+
+        # Print out any failures
+        # print(response.get('Failed'))
+        # # The response is NOT a resource, but gives you a message ID and MD5
+        # print(response.get('MessageId'))
+        # print(response.get('MD5OfMessageBody'))
+        # print('RESPONSE:',response.get('Successful')[0].get('Id'))
+        if response.get('Successful'):
+            if response.get('Successful')[0].get('Id'):
+                returnstr = {   "sendmessage": 'Success',
+                                "bktname" : bktname,
+                                "key"     : key }
+        return returnstr
+    except Exception as ex:
+        print(ex)
+        returnstr = {   "sendmessage": 'Fail',
+                        "bktname" : bktname,
+                        "key"     : key,
+                        "error"   : ex }
+        return  returnstr       
+        logging.debug("error in send_message_to_queue method")
+
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
 # key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+# #key =  "transactions/F3X_ScheduleA_Import_Transactions_C00515064.csv"
 # if bktname and key:
 #     print(validate_transactions(bktname, key, cmteid))
 # else: 
 #     print("No data")
 
-#   #move_data_from_excel_to_db('F3X')
+  #move_data_from_excel_to_db('F3X')
 
 
 
@@ -467,3 +502,18 @@ def check_file_exists(bktname, key):
 #     s3.put_object(Bucket=bktname, Key=(errfilerelpath+'/'))
 # else:
 #     print("list objects exist:")
+
+#code to send and receive mesg from queues
+# try:
+#     # SQS_QUEUE_NAME = 'fecfile-importtransactions'
+#     # SQS_QUEUE_ARN  = 'arn:aws:sqs:us-east-1:813218302951:fecfile-importtransactions' 
+#     # SQS_QUEUE_URL  = 'https://queue.amazonaws.com/813218302951/fecfile-importtransactions' 
+#     bktname = "fecfile-filing-frontend"
+#     key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+#     if SQS_QUEUE_NAME is None:
+#         SQS_QUEUE_NAME = 'fecfile-importtransactions'
+#     print('SQS_QUEUE_NAME =',SQS_QUEUE_NAME) #
+#     print(send_message_to_queue(bktname, key))
+#     #get_message_from_queue()
+# except Exception as ex:
+#     print(ex)

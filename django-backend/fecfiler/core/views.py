@@ -54,7 +54,8 @@ from fecfiler.core.transactions_validate_contacts import (
 )
 
 from fecfiler.core.transactions_validate_csv import (
-    validate_transactions
+    validate_transactions,
+    send_message_to_queue
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
@@ -12236,7 +12237,7 @@ def get_contact_details_from_csv(request):
         return Response(resp, status=status.HTTP_200_OK)              
     except Exception as e:
         return Response(
-          "The save_csv_md5_to_db API is throwing an error: " + str(e),
+          "The get_contact_details_from_csv API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )        
 
@@ -12253,14 +12254,33 @@ def validate_import_transactions(request):
         if bktname and key:
             resp = validate_transactions(bktname, key, cmteid)
         else: 
-            resp = "No data"
+            resp = "No data: both bktname and key need to be sent"
 
         resp = validate_transactions(bktname, key, cmteid) #get_contact_details_from_transactions(cmteid, filename)
         
         return Response(resp, status=status.HTTP_200_OK)              
     except Exception as e:
         return Response(
-          "The save_csv_md5_to_db API is throwing an error: " + str(e),
+          "The validate_import_transactions API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )        
+@api_view(["POST"])
+def queue_transaction_message(request):
+    try:
+        cmteid =  get_comittee_id(request.user.username)
+        bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
+        key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
+
+        print('cmteid ', cmteid,' bkt_name ',bktname,' key: ', key )
+        if bktname and key:
+            resp = send_message_to_queue(bktname, key)
+        else: 
+            resp = "No data: both bktname and key need to be sent"
+
+        return Response(resp, status=status.HTTP_200_OK)              
+    except Exception as e:
+        return Response(
+          "The queue_transaction_message API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )        
 
