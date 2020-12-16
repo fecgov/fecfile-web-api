@@ -35,6 +35,7 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
 
   private progressSubscription: Subscription;
   private committeeId: string;
+  private currentFileDone: boolean;
 
   constructor(
     private _router: Router,
@@ -52,6 +53,7 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
     this.allFilesDone = false;
     this.hasFailure = false;
     this.allFailed = false;
+    this.currentFileDone = false;
 
     if (this.uploadFile.status === ImportFileStatusEnum.importing) {
       this._finalizeImport();
@@ -70,16 +72,23 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
     switch (this.action) {
       case 'ignore_dupe_save':
         this._importTransactionsService
-          .saveContactIgnoreDupes(this.uploadFile.fileName, true)
-          .subscribe((res: any) => {});
+          .saveContactIgnoreDupes(this.uploadFile, true)
+          .subscribe((res: any) => {
+            this.currentFileDone = true;
+          });
         break;
       case 'merge_dupe_save':
-        this._importTransactionsService.mergeAll(this.uploadFile.fileName, true).subscribe((res: any) => {});
+        this._importTransactionsService.mergeAll(this.uploadFile, true)
+          .subscribe((res: any) => {
+          this.currentFileDone = true;
+        });
         break;
       case 'proceed':
         this._importTransactionsService
-          .saveContactIgnoreDupes(this.uploadFile.fileName, true)
-          .subscribe((res: any) => {});
+          .saveContactIgnoreDupes(this.uploadFile, true)
+          .subscribe((res: any) => {
+            this.currentFileDone = true;
+          });
         break;
       default:
     }
@@ -96,7 +105,7 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
     let mockPercent = 0;
     this.progressSubscription = this._importTransactionsService.pollForProgress().subscribe((percent: number) => {
       mockPercent += percent;
-      if (mockPercent >= 100) {
+      if (mockPercent >= 100 && this.currentFileDone) {
         // if (percent >= 100) {
         this.progressSubscription.unsubscribe();
         this.progressPercent = 100;
