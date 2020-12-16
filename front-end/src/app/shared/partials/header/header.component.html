@@ -59,6 +59,9 @@
                 <a class="dropdown-item" draggable="false" (click)="viewAllTransactions()">
                   All Transactions
                 </a>
+                <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/import-fecfile']">
+                  Import FECFile
+                </a>
                 <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/import-transactions']">
                   Import Transactions
                 </a>

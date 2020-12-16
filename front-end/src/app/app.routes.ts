@@ -123,6 +123,13 @@ export const AppRoutes: Routes = [
         }
       },
       {
+        path: 'import-fecfile',
+        loadChildren: 'src/app/import-fecfile-module/import-fecfile.module#ImportFecFile1Module',
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor, Roles.Reviewer]
+        }
+      },
+      {
         path: 'import-transactions',
         loadChildren: 'src/app/import-transactions-module/import-transactions.module#ImportTransactionsModule',
         data: {
