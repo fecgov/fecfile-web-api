@@ -27,7 +27,7 @@ PG_PORT = os.getenv('DB_PORT')
 PG_DATABASE = os.getenv('DB_NAME')
 PG_USER = os.getenv('DB_USERNAME')
 PG_PASSWORD = os.getenv('DB_PASSWORD')
-SQS_QUEUE_NAME = os.environ.get('SQS_QUEUE_NAME') #
+SQS_QUEUE_NAME = os.getenv('FECFILE_IMPORTTRANSACTION_QUEUE') #
 
 
 # Setting the logging level
@@ -472,12 +472,12 @@ def send_message_to_queue(bktname, key):
         return returnstr
     except Exception as ex:
         print(ex)
+        logging.debug("error in send_message_to_queue method")
         returnstr = {   "sendmessage": 'Fail',
                         "bktname" : bktname,
                         "key"     : key,
                         "error"   : ex }
         return  returnstr       
-        logging.debug("error in send_message_to_queue method")
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
@@ -510,9 +510,10 @@ def send_message_to_queue(bktname, key):
 #     # SQS_QUEUE_URL  = 'https://queue.amazonaws.com/813218302951/fecfile-importtransactions' 
 #     bktname = "fecfile-filing-frontend"
 #     key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
-#     if SQS_QUEUE_NAME is None:
-#         SQS_QUEUE_NAME = 'fecfile-importtransactions'
-#     print('SQS_QUEUE_NAME =',SQS_QUEUE_NAME) #
+#     #if SQS_QUEUE_NAME is None:
+#         #SQS_QUEUE_NAME = 'fecfile-importtransactions'
+#     #print('SQS_QUEUE_NAME =',SQS_QUEUE_NAME) 
+#     print('FECFILE QUEUE :',os.environ.get('FECFILE_IMPORTTRANSACTION_QUEUE'))
 #     print(send_message_to_queue(bktname, key))
 #     #get_message_from_queue()
 # except Exception as ex:
