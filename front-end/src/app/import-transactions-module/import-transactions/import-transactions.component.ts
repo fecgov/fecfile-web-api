@@ -232,10 +232,25 @@ export class ImportTransactionsComponent implements OnInit {
         }
       }
       this._startFileUpload(this.currentFile.queueIndex);
-    } else {
-      // case 3
+    } else if (this._checkAllFailed()) {
+      // case 3 - if all files in the queue have failed, go to done.
       this.currentStep = this.step4ImportDone;
+    } else {
+      // no change to currentStep.
     }
+  }
+
+  /**
+   * If all files in the queue have a status of failed, return true.
+   */
+  private _checkAllFailed(): boolean {
+    let count = 0;
+    for (const file of this.fileQueue) {
+      if (file.status === ImportFileStatusEnum.failed) {
+        count++;
+      }
+    }
+    return count === this.fileQueue.length;
   }
 
   // //
