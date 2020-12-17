@@ -426,6 +426,39 @@ def check_file_exists(bktname, key):
         # Not found
         raise
 
+def check_data_processed(md5, fecfilename):
+    conn = None
+    try:
+        res = ''
+        selectsql= '''SELECT csv_data_processed FROM public.transactions_file_details tfd WHERE tfd.fec_file_name = %s 
+                        ORDER BY create_Date DESC   limit 1;'''
+        psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
+        #conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
+        conn = psycopg2.connect(psyconnstr)
+        cur = conn.cursor()
+        cur.execute(selectsql, (fecfilename,))
+        if cur.rowcount == 1:
+            res = cur.fetchone() 
+            #print('Row updated')
+            #logging.debug('Successfull updated check_data_processed Row ')
+        conn.commit()
+        cur.close
+        if 'True' == res[0]:
+            return 'Success'
+        else:
+            return 'Failure'
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("database error check_data_processed")
+        print(error)
+        logging.debug(error)
+    except Exception as ex:
+        print('error in check_data_processed:',ex)
+        logging.debug("error in check_data_processed method")
+        logging.debug(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
 
 
 def send_message_to_queue(bktname, key):
@@ -457,15 +490,20 @@ def send_message_to_queue(bktname, key):
                 }
             }
         ])
-
-        # Print out any failures
-        # print(response.get('Failed'))
-        # # The response is NOT a resource, but gives you a message ID and MD5
-        # print(response.get('MessageId'))
-        # print(response.get('MD5OfMessageBody'))
-        # print('RESPONSE:',response.get('Successful')[0].get('Id'))
         if response.get('Successful'):
             if response.get('Successful')[0].get('Id'):
+                start_time = time.time()
+                seconds = 60*3
+                while True:
+                    current_time = time.time()
+                    elapsed_time = current_time - start_time
+                    if 'Success' == check_data_processed('',key.split('/')[1]):
+                        break
+                    time.sleep(5)
+                    if elapsed_time > seconds:
+                        print("Finished iterating in: " + str(int(elapsed_time))  + " seconds")
+                        break
+
                 returnstr = {   "sendmessage": 'Success',
                                 "bktname" : bktname,
                                 "key"     : key }
