@@ -30,6 +30,13 @@ PG_PASSWORD = os.getenv('DB_PASSWORD')
 SQS_QUEUE_NAME = os.getenv('FECFILE_IMPORTTRANSACTION_QUEUE') #
 
 
+BACKEND_DB_HOST = os.getenv('BACKEND_DB_HOST')
+BACKEND_DB_PORT = os.getenv('BACKEND_DB_PORT')
+BACKEND_DB_NAME = os.getenv('BACKEND_DB_NAME')
+BACKEND_DB_USERNAME = os.getenv('BACKEND_DB_USERNAME')
+BACKEND_DB_PASSWORD = os.getenv('BACKEND_DB_PASSWORD')
+
+
 # Setting the logging level
 logging.basicConfig(level=logging.DEBUG)
 #logging.basicConfig(level=logging.ERROR)
@@ -460,20 +467,54 @@ def check_data_processed(md5, fecfilename):
             conn.close()
 
 
+def load_transactions_from_temp_perm_tables(fecfilename):
+    print('fecfilename:',fecfilename)
+    conn = None
+    try:
+        res = ''
+        selectsql= '''import_sched_a'''
+        psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
+        conn = psycopg2.connect(psyconnstr)
+        #conn = psycopg2.connect("host=localhost dbname=backend user=postgres")
+        cur = conn.cursor()
+        cur.callproc(selectsql, (fecfilename,))
+        if cur.rowcount == 1:
+            res = cur.fetchone() 
+            #print('Row updated')
+            #logging.debug('Successfull updated check_data_processed Row ')
+        conn.commit()
+        cur.close
+        print(res[0])
+        if 0 == res[0]:
+            return 'Success'
+        else:
+            return 'Failure'
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("database error load_transactions_from_temp_perm_tables")
+        print(error)
+        logging.debug(error)
+    except Exception as ex:
+        print('error in load_transactions_from_temp_perm_tables:',ex)
+        logging.debug("error in load_transactions_from_temp_perm_tables method")
+        logging.debug(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
 
 def send_message_to_queue(bktname, key):
     returnstr=''
     try:
         # Get the service resource
         sqs = boto3.resource('sqs')
-
         # Get the queue. This returns an SQS.Queue instance
         queue = sqs.get_queue_by_name(QueueName=SQS_QUEUE_NAME)
-
         # You can now access identifiers and attributes
         # print('URL:',queue.url)
         # print(queue.attributes.get('DelaySeconds'))
-
+        returnstr = {   "sendmessage": 'Fail',
+                        "bktname" : bktname,
+                        "key"     : key}
         response = queue.send_messages(Entries=[
             {
                 'Id': '1',
@@ -498,15 +539,19 @@ def send_message_to_queue(bktname, key):
                     current_time = time.time()
                     elapsed_time = current_time - start_time
                     if 'Success' == check_data_processed('',key.split('/')[1]):
+                        temp_to_perm = load_transactions_from_temp_perm_tables(key.split('/')[1]) 
+                        res='Fail'
+                        if 0 == temp_to_perm:
+                            res = 'Success'    
+                            returnstr = {   "sendmessage": res,
+                                            "bktname" : bktname,
+                                            "key"     : key }
                         break
                     time.sleep(5)
                     if elapsed_time > seconds:
                         print("Finished iterating in: " + str(int(elapsed_time))  + " seconds")
                         break
 
-                returnstr = {   "sendmessage": 'Success',
-                                "bktname" : bktname,
-                                "key"     : key }
         return returnstr
     except Exception as ex:
         print(ex)
@@ -516,6 +561,9 @@ def send_message_to_queue(bktname, key):
                         "key"     : key,
                         "error"   : ex }
         return  returnstr       
+
+
+
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
@@ -556,3 +604,4 @@ def send_message_to_queue(bktname, key):
 #     #get_message_from_queue()
 # except Exception as ex:
 #     print(ex)
+
