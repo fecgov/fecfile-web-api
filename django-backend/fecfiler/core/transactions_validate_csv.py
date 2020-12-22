@@ -38,15 +38,12 @@ BACKEND_DB_PASSWORD = os.getenv('BACKEND_DB_PASSWORD')
 
 
 # Setting the logging level
-logging.basicConfig(level=logging.DEBUG)
-#logging.basicConfig(level=logging.ERROR)
+#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 def validate_dataframe(data):
     #check if the column contains only values of a particular schedule 
-    # print(sched)
-    # print(data['SCHEDULE NAME'])
     sched = data['SCHEDULE NAME'][0][0:2]
-    #print("data['SCHEDULE NAME']",data['SCHEDULE NAME'][0],'sched:',sched)     
     if data['SCHEDULE NAME'].str.contains(sched).any():
         print ("schedule matches")
         return "Validate_Pass"
@@ -65,7 +62,6 @@ def save_data_from_excel_to_db(data):
         engine   = create_engine(connectionstring, pool_recycle=3600);
         postgreSQLConnection = engine.connect()
         data.to_sql(postgreSQLTable, postgreSQLConnection,  if_exists='append', index=False, dtype={'AUTO-GENERATE': Text} )
-        #time.sleep(1)
     except ValueError as vx:
         print("valuerror; ")
         print(vx)
@@ -109,8 +105,6 @@ def export_excel_to_db(filename, path):
                 df.insert (0, "formname", formname)         
                 df.insert (1, "schedname", schedname)         
                 df.insert (2, "transaction_type", sheet_name)         
-
-                #print(df)
                 save_data_from_excel_to_db(df)
                 #break
     except Exception as ex:  
@@ -122,10 +116,7 @@ def rename_files_folder(filelocation):
         for entry in entries:
             if ' - ' in entry.name:
                 res = re.split(' |-|_|!', entry.name)
-                #print(res[4])
                 filename = 'F3L_Schedule' + res[4] + '_FormatSpecs_Import_Transactions_MAPPED.xlsx'
-                # print(filelocation+entry.name)
-                # print(filelocation+filename)   
                 os.rename(filelocation+entry.name,filelocation+filename)
 
 def move_data_from_excel_to_db(form):
@@ -146,21 +137,17 @@ def move_data_from_excel_to_db(form):
 
 def schema_validation(dataframe, schema, bktname, key, errorfilename):
     try:
-        #print('msg',dataframe)
         errors = schema.validate(dataframe)
-        #print(errors)
         errdf = []       
         for error in errors:
             msg = error.message 
             error.message = re.sub("[\"@*&?].*[\"@*&?]", "", msg)
-            #print('[',error.row,',',error.column,',',error.value,',',error.message,']')
             errdf.append({  	'row_no':       error.row,
 				'field_name':   error.column,
 				'msg':          error.message
 				})                
 
         errors_index_rows = [e.row for e in errors]
-        #print('errors_index_rows: ',len(errors_index_rows))
         if len(errors_index_rows) > 0:
             if path.exists(errorfilename):
                 pd.DataFrame(errdf, columns=['row_no', 'field_name', 'msg']).to_csv(errorfilename, mode='a', header=False, index = False)
@@ -196,10 +183,7 @@ def build_schemas(formname, sched, trans_type):
                                       port=PG_PORT,
                                       database=PG_DATABASE)
         cursor = connection.cursor()
-        # print('formname',formname) 
-        # print('sched',sched) 
-        # print('trans_type',trans_type)
-        cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required	FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",(formname, sched, trans_type)) 
+        cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required	FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",(formname, sched, trans_type))
         format_specs = cursor.fetchall()
         columns = []
         headers = []
@@ -237,7 +221,8 @@ def build_schemas(formname, sched, trans_type):
                 headers.append(field)
             elif 'AMT' in type:
                 #print(field)
-                pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
+                #pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
+                pattern = '^[0-9]\d{0,'+ len + '}(\.\d{1,3})?%?$'
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
                 columns.append(column)
@@ -250,7 +235,7 @@ def build_schemas(formname, sched, trans_type):
         print('Exception in build_schemas:',vx)
     except Exception as ex:  
         print("In EXCEPTION BLOCK ")
-        print('Exception in build_schemas:',vx)
+        print('Exception in build_schemas:',ex)
     finally:
         connection.close();
 
@@ -258,40 +243,23 @@ def check_errkey_exists(bktname, key):
     errkey = key.split('/')
     print()
     errkey = errkey[0] + '/error_files/' + errkey[1]
-    #errkey = key + '/error_files'
-
-    # print('key', key)
-    # print('errkey', errkey)
     s3 = boto3.client('s3')    
     result = s3.list_objects(Bucket=bktname, Prefix=errkey )
     exists=False
-    #print(result)
     if "Contents" not in result:
-        print("list objects doesn'texist:")
         s3.put_object(Bucket=bktname, Key=(errkey+'/'))
 
 def create_cmte_error_folder(bktname, key, errfilerelpath):
-    #print('create_cmte_error_folder:',bktname)
-    #print('create_cmte_error_folder:',errfilerelpath)
-    
     s3 = boto3.client('s3')
-    #check_errkey_exists(bktname, key)
     result = s3.list_objects(Bucket=bktname, Prefix=errfilerelpath )
-    #print('cmteid result',result)
     exists=False
     if "Contents" not in result:
-        # print("list objects doesn'texist:")
         s3.put_object(Bucket=bktname, Key=(errfilerelpath+'/'))
-    # else:
-    #     print("list objects exist:")
     
 
 def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
     try:
         keyfolder = key.split('/')[0]
-        #print(keyfolder)
-        #print(bktname)
-        #print('222222222222222')
         cmte_err_folder = keyfolder + '/error_files/' + cmteid
 
         create_cmte_error_folder(bktname, key, cmte_err_folder)
@@ -340,6 +308,7 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         res = ''
         flag = False
         for data in pd.read_csv(StringIO(csv_string), dtype=object,  iterator=True, chunksize=size, na_filter=False):
+            #pd.core.strings.str_strip(data)
             data = data.dropna(axis=[0], how='all')
             res = validate_dataframe(data)
             if "Validate_Pass" != res:
@@ -348,23 +317,24 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
             # print('...............')
             #loop through the data set to pick unique tranid's 
             cntr = 1
+            # print(data['TRANSACTION IDENTIFIER'].unique())
             for tranid in data['TRANSACTION IDENTIFIER'].unique():
-                cntr+=1
-                #print('cntr',cntr)
-                # build schema based on tranid
-                head_schema = build_schemas(formname, schedule, tranid)
-                headers = head_schema[0]
-                schema  = head_schema[1]
+                if tranid:
+                    cntr+=1
+                    # print('cntr',cntr)
+                    # print('tranid:',tranid)
+                    # build schema based on tranid
+                    head_schema = build_schemas(formname, schedule, tranid)
+                    headers = head_schema[0]
+                    schema  = head_schema[1]
 
-                data_temp = data[headers]
-                data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
-                errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
-                resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
+                    data_temp = data[headers]
+                    data_temp = data_temp.loc[(data['TRANSACTION IDENTIFIER'] == tranid)]
+                    errorfilename = re.match(r"(.*)\.csv", key).group(1).split('/')[1] + '_error.csv'
+                    resvalidation = schema_validation(data_temp, schema, bktname, key, errorfilename)
 
             flag = True
-            # print('AAAAAAAAA:',errorfilename)
         if path.exists(errorfilename):
-            # print('11111111111111111')
             errfilerelpath = move_error_files_to_s3(bktname, key, errorfilename, cmteid)     
             return errfilerelpath
         elif flag is True:
@@ -381,12 +351,13 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
         logging.debug("error in load_dataframe_from_s3 method")
         logging.debug(e)
         raise
-        
+
+
+
 
 #main method to call the process 
 def validate_transactions(bktname, key, cmteid):
     try:
-
         #send_message_to_queue()
         #aws sqs receive-message --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions --attribute-names All --message-attribute-names All --max-number-of-messages 10
         #aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
@@ -401,7 +372,7 @@ def validate_transactions(bktname, key, cmteid):
                     print("Error with data validation:", res)
                     returnstr = res 
                 else:
-                    print("Queue is empty!!!")
+                    print("~~~~~~~~~~~~~~~~~~~~Parsing Success!!! Error Queue is empty!!!~~~~~~~~~~~~~~")
 
             #print(returnstr)
             if returnstr is not "File_not_found":
@@ -440,14 +411,11 @@ def check_data_processed(md5, fecfilename):
         selectsql= '''SELECT csv_data_processed FROM public.transactions_file_details tfd WHERE tfd.fec_file_name = %s 
                         ORDER BY create_Date DESC   limit 1;'''
         psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
-        #conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
         conn = psycopg2.connect(psyconnstr)
         cur = conn.cursor()
         cur.execute(selectsql, (fecfilename,))
         if cur.rowcount == 1:
             res = cur.fetchone() 
-            #print('Row updated')
-            #logging.debug('Successfull updated check_data_processed Row ')
         conn.commit()
         cur.close
         if 'True' == res[0]:
@@ -468,20 +436,16 @@ def check_data_processed(md5, fecfilename):
 
 
 def load_transactions_from_temp_perm_tables(fecfilename):
-    print('fecfilename:',fecfilename)
     conn = None
     try:
         res = ''
         selectsql= '''import_sched_a'''
         psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
         conn = psycopg2.connect(psyconnstr)
-        #conn = psycopg2.connect("host=localhost dbname=backend user=postgres")
         cur = conn.cursor()
         cur.callproc(selectsql, (fecfilename,))
         if cur.rowcount == 1:
             res = cur.fetchone() 
-            #print('Row updated')
-            #logging.debug('Successfull updated check_data_processed Row ')
         conn.commit()
         cur.close
         print(res[0])
@@ -539,7 +503,7 @@ def send_message_to_queue(bktname, key):
                     current_time = time.time()
                     elapsed_time = current_time - start_time
                     if 'Success' == check_data_processed('',key.split('/')[1]):
-                        temp_to_perm = load_transactions_from_temp_perm_tables(key.split('/')[1]) 
+                        temp_to_perm = 0#load_transactions_from_temp_perm_tables(key.split('/')[1]) 
                         res='Fail'
                         if 0 == temp_to_perm:
                             res = 'Success'    
@@ -567,14 +531,15 @@ def send_message_to_queue(bktname, key):
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
-# key = "transactions/F3X_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+# key = "transactions/F3L_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
 # #key =  "transactions/F3X_ScheduleA_Import_Transactions_C00515064.csv"
 # if bktname and key:
 #     print(validate_transactions(bktname, key, cmteid))
 # else: 
 #     print("No data")
 
-  #move_data_from_excel_to_db('F3X')
+#move_data_from_excel_to_db('F3X')
+#move_data_from_excel_to_db('F3L')
 
 
 
@@ -604,4 +569,5 @@ def send_message_to_queue(bktname, key):
 #     #get_message_from_queue()
 # except Exception as ex:
 #     print(ex)
+
 
