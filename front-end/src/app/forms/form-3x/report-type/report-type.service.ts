@@ -18,6 +18,7 @@ import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/par
 })
 export class ReportTypeService {
 
+
   constructor(private _http: HttpClient, private _cookieService: CookieService, private _dialogService: DialogService, private _authService: AuthService) {
     this._datePipe = new DatePipe('en-US');
   }
@@ -46,6 +47,15 @@ export class ReportTypeService {
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions
     });
+  }
+
+  getAllReportTypes(formType: string) {
+    const mockFile = 'assets/mock-data/report-types/report-types.json';
+    let httpOptions = new HttpHeaders();
+    return this._http
+      .get(mockFile, {
+        headers: httpOptions
+      });
   }
 
   /**

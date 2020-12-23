@@ -2,7 +2,7 @@
   <div *ngIf="step !== 'step_6'" class="form__sidebar">
     <div [hidden]="step !== 'step_1'" *ngIf="!allTransactions">
       <report-type-sidebar title="Report Coverage Dates" (status)="onNotify($event)" [selectedReport]="selectedReport"
-        [specialReports]="specialReports" [regularReports]="regularReports">
+        [specialReports]="specialReports" [regularReports]="regularReports" (electionYearTypeEmitter)="electionYearTypeChanged($event)">
       </report-type-sidebar>
     </div>
      <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary' ||
