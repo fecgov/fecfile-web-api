@@ -240,7 +240,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     else if(this.screenType === 'fecfile'){
-      switch (fileExtention) {
+      switch (fileExtention.toLowerCase()) {
       case 'dcf':
           this.progressPercent = 0;
           this.showUpload = false;
