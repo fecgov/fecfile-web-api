@@ -12249,15 +12249,49 @@ def validate_import_transactions(request):
         cmteid =  get_comittee_id(request.user.username)
         bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
         key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-
+        auth = request.auth
         #print('cmteid ', cmteid,' bkt_name ',bktname,' key: ', key )
         if bktname and key:
             resp = validate_transactions(bktname, key, cmteid)
         else: 
             resp = "No data: both bktname and key need to be sent"
 
-        resp = validate_transactions(bktname, key, cmteid) #get_contact_details_from_transactions(cmteid, filename)
-        
+        #resp = validate_transactions(bktname, key, cmteid) 
+        # filename = key.split('/')[1].split('.')[0]
+        # filename = filename + '_contacts.csv'
+        filename = key.split('/')[1]
+        transcontacts = get_contact_details_from_transactions(cmteid, filename)
+        transcontacts =  'contacts/'+transcontacts 
+        data_obj = {
+            "fileName": transcontacts,
+        }
+        '''
+        url = "https://" + settings.DATA_RECEIVE_API_URL + "/v1/contact/transaction/upload"
+        print(url)
+        res = requests.post(
+            "https://"
+            + settings.DATA_RECEIVE_API_URL
+            + "/v1/contact/transaction/upload",
+            data=data_obj,
+        )  
+        '''      
+        url='http://localhost:8080/api/v1/contact/transaction/upload'
+        token_use = request.auth.decode("utf-8")
+        token_use = "JWT" + " " + token_use
+        res = requests.post(url,
+            data=data_obj,
+            headers={'Authorization': token_use}        
+        )        
+
+        '''
+            URL : api/v1/contact/transaction/upload
+            Method: POST
+            Body: {
+                "fileName": "test_dummy.csv"
+            }
+
+        '''
+        print(res)
         return Response(resp, status=status.HTTP_200_OK)              
     except Exception as e:
         return Response(

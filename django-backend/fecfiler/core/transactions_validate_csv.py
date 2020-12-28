@@ -511,7 +511,7 @@ def send_message_to_queue(bktname, key):
                                             "bktname" : bktname,
                                             "key"     : key }
                         break
-                    time.sleep(5)
+                    #time.sleep(5)
                     if elapsed_time > seconds:
                         print("Finished iterating in: " + str(int(elapsed_time))  + " seconds")
                         break
@@ -531,7 +531,7 @@ def send_message_to_queue(bktname, key):
 
 # cmteid =  "C00011111"
 # bktname = "fecfile-filing-frontend"
-# key = "transactions/F3L_ScheduleA_Import_Transactions_11_25_TEST_Data.csv"
+# # key = "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
 # #key =  "transactions/F3X_ScheduleA_Import_Transactions_C00515064.csv"
 # if bktname and key:
 #     print(validate_transactions(bktname, key, cmteid))
