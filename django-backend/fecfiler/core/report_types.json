@@ -1,6 +1,8 @@
 {
   "F3X":{
       "Quarterly-Election-Year": {
+        "type":"election-year",
+        "selected": "ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "Q1",
@@ -139,6 +141,8 @@
         ]
       },
       "Quarterly-Non-Election-Year": {
+        "type":"non-election-year",
+        "selected": "NON_ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "MY",
@@ -233,6 +237,8 @@
         ]
       },
       "Monthly-Election-Year": {
+        "type":"election-year",
+        "selected": "ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "M2",
@@ -369,6 +375,8 @@
         ]
       },
       "Monthly-Non-Election-Year": {
+        "type":"non-election-year",
+        "selected": "NON_ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "M2",
@@ -505,6 +513,8 @@
     },
   "F3L": {
     "Quarterly-Non-Election-Year": {
+        "type":"non-election-year",
+        "selected": "NON_ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "QMS",
@@ -747,6 +757,8 @@
         ]
       },
     "Quarterly-Election-Year": {
+        "type":"election-year",
+        "selected": "ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "Q1",
@@ -1055,6 +1067,8 @@
         ]
       },
     "Monthly-Non-Election-Year": {
+        "type":"non-election-year",
+        "selected": "NON_ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "M2",
@@ -1249,6 +1263,8 @@
         ]
       },
     "Monthly-Election-Year": {
+        "type":"election-year",
+        "selected": "ELECTION_IS_SELECTED",
         "report_type": [
           {
             "report_type": "M2",
