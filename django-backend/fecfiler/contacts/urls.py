@@ -17,6 +17,11 @@ urlpatterns = [
     url(r"^contact/merge/options$", merge.merge_option, name="mergeOption"),
     url(r"^contact/merge/save$", merge.merge_contact, name="mergeContact"),
     url(r"^contact/template$", views.download_template, name="downloadTemplate"),
-    url(r"^contact/transaction/upload$", contacts_committee.upload_cand_contact, name="OtherContact")
+    url(r"^contact/transaction/upload$", contacts_committee.upload_cand_contact, name="OtherContact"),
+    url(r"^contact/transaction/ignore/merge$", duplicate.ignore_merge, name="ignoreMerge"),
+    url(r"^contact/transaction/cancel/import$", duplicate.cancel_import, name="cancelImport"),
+    url(r"^contact/transaction/duplicate$", duplicate.get_duplicate_contact, name="duplicateContact"),
+    url(r"^contact/transaction/merge/options$", merge.merge_option, name="mergeOption"),
+    url(r"^contact/transaction/merge/save$", merge.merge_contact, name="mergeContact"),
 ]
 
