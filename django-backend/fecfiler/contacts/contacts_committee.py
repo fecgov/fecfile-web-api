@@ -46,7 +46,7 @@ def reorder_user_data(contacts_added, contact_list):
             contacts_added_dict1 = contacts_added_dict1[contacts_added_dict1.zip_code.notnull()]
             # contacts_added_dict1.drop(contacts_added_dict1.loc[contacts_added_dict1['zip_code']
             # != ''].index, inplace=True)
-            contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(int)
+            #contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(int)
             contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(str)
             contacts_added_dict1.reset_index(drop=True, inplace=True)
 
@@ -78,7 +78,7 @@ def reorder_user_data(contacts_added, contact_list):
             json_added = contacts_added.to_json(orient='records')
             contacts_added_dict = pd.read_json(json_added)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
-            contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(int)
+            #contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(int)
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
             data = {"final_contact_df": contacts_added_dict1, "duplicate_contact_df": ""}
@@ -166,7 +166,7 @@ def save_contact_db(contacts_added, cmte_id, file_name):
 def custom_validate_cand_df(uploaded_df_orig, cmte_id):
     try:
 
-        uploaded_df_orig.ZIP = uploaded_df_orig.ZIP.astype(str)
+        uploaded_df_orig.ZIP_CODE = uploaded_df_orig.ZIP_CODE.astype(str)
 
         uploaded_df_orig = uploaded_df_orig.replace(np.nan, '', regex=True)
         uploaded_df = uploaded_df_orig.drop_duplicates()
@@ -207,17 +207,17 @@ def upload_cand_contact(request):
 
                 df = pd.read_csv(StringIO(csv_string), dtype=object)
 
-                df = df[['COMMITTEE ID', 'ENTITY TYPE', 'STREET 1', 'STREET 2',
+                df = df[['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1', 'STREET_2',
                          'CITY', 'STATE', 'ZIP', 'EMPLOYER', 'OCCUPATION',
-                         'ORGANIZATION NAME', 'LAST NAME', 'FIRST NAME',
-                         'MIDDLE NAME', 'PREFIX', 'SUFFIX', 'CAND_OFFICE',
+                         'ORGANIZATION_NAME', 'LAST_NAME', 'FIRST_NAME',
+                         'MIDDLE_NAME', 'PREFIX', 'SUFFIX', 'CAND_OFFICE',
                          'CAND_OFFICE_STATE', 'CAND_OFFICE_DISTRICT', 'REF_CAND_CMTE_ID', 'TRANSACTION_ID']]
 
                 df.columns = ['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
-                              'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
+                              'STREET_2', 'CITY', 'STATE', 'ZIP_CODE', 'EMPLOYER',
                               'OCCUPATION',
-                              'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
-                              'MIDDLENAME', 'PREFIX', 'SUFFIX', 'CAND_OFFICE',
+                              'ORGANIZATION_NAME', 'LAST_NAME', 'FIRST_NAME',
+                              'MIDDLE_NAME', 'PREFFIX', 'SUFFIX', 'CAND_OFFICE',
                               'CAND_OFFICE_STATE', 'CAND_OFFICE_DISTRICT', 'REF_CAND_CMTE_ID', 'TRANSACTION_ID']
 
                 df = df[~df['ENTITY_TYPE'].isin(['ORG', 'IND'])]

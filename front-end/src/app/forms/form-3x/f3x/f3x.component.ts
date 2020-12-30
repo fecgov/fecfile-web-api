@@ -171,7 +171,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       // this._reportTypeService.getAllReportTypes(this.formType).subscribe((res : any)=> {
       if (Array.isArray(res)) {
         this.reportsArray = res;
-        let currentReportType : any = res.filter(obj => obj.selected === 'true');
+        let currentReportType : any = res.filter(obj => obj.selected);
         if(currentReportType && currentReportType.length > 0){
           currentReportType = currentReportType[0];
           this.reportTypes = currentReportType.report_type;

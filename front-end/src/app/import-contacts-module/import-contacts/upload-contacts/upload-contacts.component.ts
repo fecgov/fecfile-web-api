@@ -419,8 +419,25 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
           return;
         }
         this.checkForProcessingProgress();
-        // this._uploadTrxService.importDcfFile(file.name).subscribe((res: any) => {
-          of([{heading1:"test1",heading2:"test2", heading3: "test3"},{heading1:"test1",heading2:"test2", heading3: "test3"},{heading1:"test1",heading2:"test2", heading3: "test3"}]).subscribe((res:any) => {
+        this._uploadTrxService.importDcfFile(file.name, this.committeeId).subscribe((res: any) => {
+          // of([{
+          //     "success": true,
+          //     "data" : {
+          //         "cmte_id": "C00000000",
+          //         "file_name": "satheesh.dcf",
+          //         "submission_date_time": "12/23/2020 12:25PM",
+          //         "message": ""
+          //       }}, 
+          //       {
+          //         "success": false,
+          //         "data" : {
+          //             "cmte_id": "C00000000",
+          //             "file_name": "satheesh.dcf",
+          //             "submission_date_time": "12/23/2020 12:25PM",
+          //         "message": "Error in processing transaction"
+          //         }
+          //     }])
+              // .subscribe((res:any) => {
           this.showSpinner = false;
           this.emitUploadResults(res);
         });

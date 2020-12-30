@@ -149,6 +149,7 @@ export class ImportFecFileComponent implements OnInit, OnDestroy {
     switch (this.currentStep) {
       case this.step1Upload:
         this.currentStep = this.step4ImportDone;
+        this.receiveSavedStatus(true);
         break;
       default:
         this.currentStep = this.step1Upload;

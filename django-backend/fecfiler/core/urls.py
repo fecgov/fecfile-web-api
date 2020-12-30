@@ -290,4 +290,9 @@ urlpatterns = [
         views.contact_notes,
         name="contact_notes",
     ),
+    url(
+        r"^core/import_fecfile",
+        views.import_fecfile,
+        name="import_fecfile",
+    ),
 ]

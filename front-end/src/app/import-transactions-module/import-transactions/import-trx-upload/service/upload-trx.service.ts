@@ -23,6 +23,7 @@ import { UploadFileModel } from '../../model/upload-file.model';
 })
 export class UploadTrxService {
   private readonly TRANSACTIONS_PATH = 'transactions/';
+  private readonly CONTACTS_PATH = 'contacts/';
 
   /**
    * Constructor will obtain credentials for AWS S3 Bucket.
@@ -217,16 +218,17 @@ export class UploadTrxService {
   /**
    * Invokes the api to import DCF file from S3 and validate and import. 
    */
-  public importDcfFile(fileName: string): Observable<any> {
+  public importDcfFile(fileName: string, committeeId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/import/fecfile';
+    const url = '/core/import_fecfile';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const request: any = {};
-    request.fileName = fileName;
+    request.file_name = this.CONTACTS_PATH + committeeId + '/' + fileName;
+    request.committee_id = committeeId;
 
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
