@@ -76,8 +76,8 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
 
     this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page).subscribe((res: any) => {
       // until API supports duplicate contacts, make it empty.
-      // this.contacts = res.duplicates;
-      this.contacts = [];
+      this.contacts = res.contacts;
+      // this.contacts = [];
 
       this.config.totalItems = res.totalcontactsCount;
       this.config.itemsPerPage = res.itemsPerPage;

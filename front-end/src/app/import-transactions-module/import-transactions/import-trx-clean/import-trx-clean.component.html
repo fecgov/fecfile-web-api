@@ -63,7 +63,7 @@
               <td>{{ contact.employer }}</td>
               <td>{{ contact.occupation }}</td>
             </tr>
-            <tr *ngFor="let dupe of contact.potentialDupes">
+            <tr *ngFor="let dupe of contact.contacts_from_db">
               <td class="indent_right">
                 <div class="radio">
                   <input
