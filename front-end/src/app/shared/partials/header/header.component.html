@@ -1,159 +1,162 @@
 <div class="float-left" style="padding-top:1%; padding-left:5%;">
-  <ul class="navbar-nav float-right searchBar">
-    <li class="nav-item">
-      <a class="nav-link searchBtn" draggable="false" (click)="goToContacts()">
-        Search Contacts
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link searchBtn" draggable="false" (click)="goToTransactions()">
-        Search Transactions
-      </a>
-    </li>
-  </ul>
-</div>
-<div class="float-right; ">
-  <nav class="navbar navbar-expand-lg float-right">
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNavDropdown"
-      aria-controls="navbarNavDropdown"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav float-right">
-        <li class="nav-item">
-          <a class="nav-link" draggable="false" [routerLink]="['/dashboard']">
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" draggable="false" [routerLink]="['/reports']">
-            Reports
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" draggable="false" [routerLink]="['/contacts']">
-            Contacts
-          </a>
-        </li>
-  
-        <li class="nav-item dropdown">
-          <div class="d-inline-block" ngbDropdown placement="bottom-left">
-            <button
-              type="button"
-              class="btn btn-link btn-height dropdown-toggle"
-              id="dropdownTools"
-              [ngClass]="{ toggleMenuLink: menuActive === true }"
-              (click)="toggleMenu()"
-              ngbDropdownToggle
-            >
-              Tools
-            </button>
-            <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
-              <a class="dropdown-item" draggable="false" (click)="viewAllTransactions()">
-                All Transactions
-              </a>
-              <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
-                Import Transactions
-              </a>
-              <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
-                Export Transactions
-              </a>
-              <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
-                Import Contacts
-              </a>
-              <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
-                Export Contacts
-              </a>
-              <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin() || _authService.isAdmin()" class="dropdown-item" draggable="false" (click)="openCOHModal()">
-                First Time COH
-              </a>
-            </div>
-          </div>
-        </li>
-        <li class="nav-item dropdown">
-          <div class="d-inline-block" ngbDropdown placement="bottom-left">
-            <button
-              type="button"
-              class="btn btn-link btn-height dropdown-toggle"
-              id="dropdownHelp"
-              [ngClass]="{ toggleMenuLink: menuActive === true }"
-              (click)="toggleMenu()"
-              ngbDropdownToggle
-            >
-              Help
-            </button>
-            <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
-              <a class="dropdown-item" draggable="false" target="_blank" href="http://www.fec.gov/efiling">
-                Help - Link to EFO
-              </a>
-              <a class="dropdown-item" draggable="false" (click)="openUsersnap()">
-                Feedback
-              </a>
-              <a class="dropdown-item" draggable="false">
-                User Guide
-              </a>
-              <a class="dropdown-item" draggable="false" >
-                Glossary
-              </a>
-              <a class="dropdown-item" draggable="false">
-                NextGen System Help
-              </a>
-            </div>
-          </div>
-        </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
-        </li> -->
-        <li class="nav-item">
-            <a class="nav-link" draggable="false" [routerLink]="['/notifications']">
-              <!-- <i *ngIf="!(notificationsCount > 0)" class="notifications-icon icon"></i> -->
-              <i *ngIf="(notificationsCount > 0)" class="fas fa-bell" [attr.data-count]="notificationsCount"></i>
-              Notifications
+    <ul class="navbar-nav float-right searchBar">
+      <li class="nav-item">
+        <a class="nav-link searchBtn" draggable="false" (click)="goToContacts()">
+          Search Contacts
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link searchBtn" draggable="false" (click)="goToTransactions()">
+          Search Transactions
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="float-right; ">
+    <nav class="navbar navbar-expand-lg float-right">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav float-right">
+          <li class="nav-item">
+            <a class="nav-link" draggable="false" [routerLink]="['/dashboard']">
+              Dashboard
             </a>
-        </li>
-        <li class="nav-item dropdown">
-          <div class="d-inline-block" ngbDropdown placement="bottom-left">
-            <button
-              type="button"
-              class="btn btn-link btn-height dropdown-toggle"
-              id="dropdownProfile"
-              [ngClass]="{ toggleMenuLink: menuActive === true }"
-              (click)="toggleMenu()"
-              ngbDropdownToggle
-            >
-              <i class="profile-icon icon" aria-hidden="true"></i>
-              Profile
-            </button>
-            <div class="secondary-dropdown-menu profile" aria-labelledby="dropdownProfile" ngbDropdownMenu>
-              <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
-                <i class="fas fa-user"></i>
-                Account
-              </a>
-  <!--            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">-->
-  <!--              Users-->
-  <!--            </a>-->
-              <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin()"
-                 class="dropdown-item" draggable="false"
-                 [routerLink]="['/manage_users']"
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" draggable="false" [routerLink]="['/reports']">
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" draggable="false" [routerLink]="['/contacts']">
+              Contacts
+            </a>
+          </li>
+    
+          <li class="nav-item dropdown">
+            <div class="d-inline-block" ngbDropdown placement="bottom-left">
+              <button
+                type="button"
+                class="btn btn-link btn-height dropdown-toggle"
+                id="dropdownTools"
+                [ngClass]="{ toggleMenuLink: menuActive === true }"
+                (click)="toggleMenu()"
+                ngbDropdownToggle
               >
-                <i class="fas fa-user-plus"></i>
-                Add User
-              </a>
-              <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
-                <i class="fas fa-power-off"></i>
-                Logout
-              </a>
+                Tools
+              </button>
+              <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
+                <a class="dropdown-item" draggable="false" (click)="viewAllTransactions()">
+                  All Transactions
+                </a>
+                <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/import-fecfile']">
+                  Import FECFile
+                </a>
+                <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/import-transactions']">
+                  Import Transactions
+                </a>
+                <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
+                  Export Transactions
+                </a>
+                <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/import-contacts']">
+                  Import Contacts
+                </a>
+                <a class="dropdown-item" draggable="false" (click)="exportAllContacts()">
+                  Export Contacts
+                </a>
+                <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin() || _authService.isAdmin()" class="dropdown-item" draggable="false" (click)="openCOHModal()">
+                  First Time COH
+                </a>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </nav>
-</div>
+          </li>
+          <li class="nav-item dropdown">
+            <div class="d-inline-block" ngbDropdown placement="bottom-left">
+              <button
+                type="button"
+                class="btn btn-link btn-height dropdown-toggle"
+                id="dropdownHelp"
+                [ngClass]="{ toggleMenuLink: menuActive === true }"
+                (click)="toggleMenu()"
+                ngbDropdownToggle
+              >
+                Help
+              </button>
+              <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
+                <a class="dropdown-item" draggable="false" target="_blank" href="http://www.fec.gov/efiling">
+                  Help - Link to EFO
+                </a>
+                <a class="dropdown-item" draggable="false" (click)="openUsersnap()">
+                  Feedback
+                </a>
+                <a class="dropdown-item" draggable="false">
+                  User Guide
+                </a>
+                <a class="dropdown-item" draggable="false" >
+                  Glossary
+                </a>
+                <a class="dropdown-item" draggable="false">
+                  NextGen System Help
+                </a>
+              </div>
+            </div>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
+          </li> -->
+          <li class="nav-item">
+              <a class="nav-link" draggable="false" [routerLink]="['/notifications']">
+                <!-- <i *ngIf="!(notificationsCount > 0)" class="notifications-icon icon"></i> -->
+                <i *ngIf="(notificationsCount > 0)" class="fas fa-bell" [attr.data-count]="notificationsCount"></i>
+                Notifications
+              </a>
+          </li>
+          <li class="nav-item dropdown">
+            <div class="d-inline-block" ngbDropdown placement="bottom-left">
+              <button
+                type="button"
+                class="btn btn-link btn-height dropdown-toggle"
+                id="dropdownProfile"
+                [ngClass]="{ toggleMenuLink: menuActive === true }"
+                (click)="toggleMenu()"
+                ngbDropdownToggle
+              >
+                <i class="profile-icon icon" aria-hidden="true"></i>
+                Profile
+              </button>
+              <div class="secondary-dropdown-menu profile" aria-labelledby="dropdownProfile" ngbDropdownMenu>
+                <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
+                  <i class="fas fa-user"></i>
+                  Account
+                </a>
+    <!--            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">-->
+    <!--              Users-->
+    <!--            </a>-->
+                <a *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin()"
+                   class="dropdown-item" draggable="false"
+                   [routerLink]="['/manage_users']"
+                >
+                  <i class="fas fa-user-plus"></i>
+                  Add User
+                </a>
+                <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
+                  <i class="fas fa-power-off"></i>
+                  Logout
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>

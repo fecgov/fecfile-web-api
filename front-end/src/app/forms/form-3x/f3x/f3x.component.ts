@@ -90,6 +90,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   routerEventsSubscription: Subscription;
   returnToGlobalAllTransaction: boolean;
   currentReportData: any;
+  reportsArray: any[];
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -146,6 +147,17 @@ export class F3xComponent implements OnInit, OnDestroy {
     });
   }
 
+  electionYearTypeChanged(event:any){
+    if(event && event.option && event.option.target.value && this.reportsArray){
+      let currentReportType: any = this.reportsArray.filter(obj => obj.type === event.option.target.value);
+      if(currentReportType && currentReportType.length > 0){
+        this.reportTypes = currentReportType[0].report_type;
+        this.reportsLoading = false;
+        this._setReports();
+      }
+    }
+  }
+
   ngOnInit(): void {
     this.scheduleAction = ScheduleActions.add;
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -156,9 +168,13 @@ export class F3xComponent implements OnInit, OnDestroy {
       : true;
 
     this._reportTypeService.getReportTypes(this.formType).subscribe(res => {
-      if (typeof res === 'object') {
-        if (Array.isArray(res.report_type)) {
-          this.reportTypes = res.report_type;
+      // this._reportTypeService.getAllReportTypes(this.formType).subscribe((res : any)=> {
+      if (Array.isArray(res)) {
+        this.reportsArray = res;
+        let currentReportType : any = res.filter(obj => obj.selected);
+        if(currentReportType && currentReportType.length > 0){
+          currentReportType = currentReportType[0];
+          this.reportTypes = currentReportType.report_type;
 
           this.reportsLoading = false;
 

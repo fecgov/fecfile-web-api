@@ -1,0 +1,75 @@
+@import 'src/app/shared/scss/global';
+
+.import_trx_sidebar__main {
+  /* padding: 1em; */
+  .sidebar-toggle-btn {
+    i {
+      color: $white;
+      /* font-size: 20px; */
+    }
+    .btn:focus {
+      box-shadow: none;
+    }
+    &.sidebar-visible {
+      float: right;
+    }
+    &.sidebar-hidden {
+      text-align: center;
+    }
+  }
+  .sidebar-header {
+    padding-top: 2em;
+  }
+  hr {
+    color: $white;
+  }
+  .file-queue-list {
+    list-style: none;
+    background-color: $shuttleGray;
+    max-height: 450px;
+    overflow: visible;
+    padding-right: 7px;
+    .queue-row {
+      height: 4em;
+      padding: 0 0.25em;
+      border-bottom: $white solid thin;
+      .file-name {
+        color: $white;
+        word-wrap: break-word;
+      }
+      .file-status {
+        border-radius: 6px;
+        text-align: center;
+        padding: 4px 0;
+        width: 80%;
+      }
+      .current-file {
+        background-color: $blueZodiac;
+        color: $white;
+        font-weight: bold;
+      }
+      .non-current-file {
+        background-color: $white;
+        color: $black;
+      }
+      .cancel-file {
+        color: $black;
+      }
+    }
+  }
+  .button-container {
+    background-color: $mineShaft;
+    padding: 2em 0;
+    .btn-row {
+      padding: 0.25em 0;
+    }
+    .sidebar-button {
+      width: 55%;
+      height: 3em;
+    }
+    .cancel-button {
+      background-color: $fecRed;
+      color: white;
+    }
+  }
+}

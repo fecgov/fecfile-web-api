@@ -103,6 +103,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
           if (res && res.action === 'coverageDatesUpdated') {
               this.setDataFor3L(res);
           }
+          else if(res && res.action === 'resetForm'){
+            this.resetReportScreenForms();
+          }
           else if(res && res.action === 'reportTypeSideBarUpdate'){
             //missing dates
             if(this.selectedReportInfo && !this.selectedReportInfo.disableCoverageDates && (!res.currentData.fromDate || !res.currentData.toDate)){

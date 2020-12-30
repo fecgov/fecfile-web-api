@@ -205,6 +205,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public priviousTransactionType = '';
   public currentTransactionType = '';
   public candOfficeStatesByTransactionType: any;
+  schedATransactionsWithMemoAmountRestrictions: string[] = ["PARTN_MEMO"];
+  schedBTransactionsWithMemoAmountRestrictions: string[] = ["OPEXP_CC_PAY_MEMO","OPEXP_STAF_REIM_MEMO","OPEXP_PMT_TO_PROL_MEMO","IE_CC_PAY_MEMO",
+                                                            "IE_STAF_REIM_MEMO","IE_PMT_TO_PROL_MEMO","COEXP_CC_PAY_MEMO","COEXP_STAF_REIM_MEMO" ,
+                                                            "COEXP_PMT_TO_PROL_MEMO","OTH_DISB_CC_PAY_MEMO","OTH_DISB_STAF_REIM_MEMO","OTH_DISB_PMT_TO_PROL_MEMO",
+                                                            "FEA_CC_PAY_MEMO","FEA_STAF_REIM_MEMO","FEA_PMT_TO_PROL_MEMO","OTH_DISB_NC_ACC_CC_PAY_MEMO",
+                                                            "OTH_DISB_NC_ACC_STAF_REIM_MEMO","OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO"
+                                                          ];
+  schedHTransactionsWithMemoAmountRestrictions: string[] = ["ALLOC_EXP_CC_PAY_MEMO","ALLOC_EXP_STAF_REIM_MEMO","ALLOC_EXP_PMT_TO_PROL_MEMO",
+                                                            "ALLOC_FEA_CC_PAY_MEMO","ALLOC_FEA_STAF_REIM_MEMO"];
 
   constructor(
     private _http: HttpClient,
@@ -6150,7 +6159,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   private handleMemoAmount(col: any) {
     // check if the transaction is a child and if it has to have memo amount lesser than that of parent
-    if (this.transactionType === 'PARTN_MEMO' && this.isFieldName(col.name, 'contribution_amount')) {
+    let amountFieldName : string = '';
+    if(this.schedATransactionsWithMemoAmountRestrictions.includes(this.transactionType)){
+      amountFieldName = 'contribution_amount';
+    }
+    else if(this.schedBTransactionsWithMemoAmountRestrictions.includes(this.transactionType)){
+      amountFieldName = 'expenditure_amount';
+    }else if(this.schedHTransactionsWithMemoAmountRestrictions.includes(this.transactionType)){
+      amountFieldName = 'total_amount';
+    }
+
+    if (amountFieldName !== '') {
       // TO AVOID EXCESSIVE API CALLS
       let childTransactionId = null;
       if (this.scheduleAction === ScheduleActions.edit && this._transactionToEdit) {
@@ -6160,10 +6179,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._receiptService.getChildMaxAmt(this._parentTransactionModel.transactionId, childTransactionId).subscribe(res => {
           const maxAmount = Number(res.amount);
           this._maxChildAmount = res.amount;
-          if (this.isFieldName(col.name, 'contribution_amount')) {
-            const control =  this.frmIndividualReceipt.controls['contribution_amount'];
+          if (this.isFieldName(col.name, amountFieldName)) {
+            const control =  this.frmIndividualReceipt.controls[amountFieldName];
             control.setValidators([control.validator, CustomValidator.maxAmount(maxAmount)]);
             control.updateValueAndValidity();
+
+            amountFieldName = '';
           }
         });
       }

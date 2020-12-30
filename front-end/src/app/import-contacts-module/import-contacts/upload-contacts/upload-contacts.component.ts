@@ -1,3 +1,4 @@
+import { UploadTrxService } from './../../../import-transactions-module/import-transactions/import-trx-upload/service/upload-trx.service';
 import {
   Component,
   OnInit,
@@ -12,7 +13,7 @@ import {
 } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
-import { timer, Subject } from 'rxjs';
+import { timer, Subject, of } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UploadContactsService } from './service/upload-contacts.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
@@ -35,6 +36,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   @Input()
   public forceChangeDetection: Date;
 
+  @Input()
+  public screenType :string = 'contacts';
+
   @Output()
   public uploadResultEmitter: EventEmitter<any> = new EventEmitter<any>();
 
@@ -52,6 +56,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public processingText: string;
   public duplicateFile: any;
 
+  public extensionType = 'CSV';
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
   private checkSum: string;
@@ -61,7 +66,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     private csvConverterService: CsvConverterService,
     private uploadContactsService: UploadContactsService,
     private utilService: UtilService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService, 
+    private _uploadTrxService: UploadTrxService
+
   ) {}
 
   public ngOnInit() {
@@ -77,7 +84,14 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     this.showSpinner = false;
     this.progressPercent = 0;
     this.processingPercent = 0;
+    this.getFileExtensionsInfo();
     this.getProgress();
+  }
+
+  getFileExtensionsInfo() {
+    if(this.screenType === 'fecfile'){
+      this.extensionType = 'DCF';
+    }
   }
 
   public ngOnDestroy() {
@@ -195,34 +209,54 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     this.saveStatusEmitter.emit(false);
 
     const fileExtention = this.getFileExtention(file.name);
-    switch (fileExtention) {
-      // case 'json':
-      //   // this._handleJsonImport_DEPRECATED(file);
-      //   this._uploadJson(file);
-      //   break;
-      case 'csv':
-        // this._handleCsvImport_DEPRECATED(file);
-        this.progressPercent = 0;
-        this.showUpload = false;
-        this.uploadingText = 'Uploading...';
-        this._uploadCsv(file);
-        break;
-      // case 'xls':
-      //   // this._handleXlsImport_DEPRECATED(file);
-      //   break;
-      // case 'xlsx':
-      //   // this._handleXlsImport_DEPRECATED(file);
-      //   break;
-      default:
-        this._dialogService
-          .confirm('You can only import CSV files. If your file is a ' +
-            'different type, please convert your data file to a CSV.',
-            ConfirmModalComponent, 'Warning!', false)
-          .then(res => {
-            // if (res === 'okay' || res === 'cancel') {
-            // }
-          });
+    if(this.screenType === 'contacts'){
+      switch (fileExtention) {
+        // case 'json':
+        //   // this._handleJsonImport_DEPRECATED(file);
+        //   this._uploadJson(file);
+        //   break;
+        case 'csv':
+          // this._handleCsvImport_DEPRECATED(file);
+          this.progressPercent = 0;
+          this.showUpload = false;
+          this.uploadingText = 'Uploading...';
+          this._uploadCsv(file);
+          break;
+        // case 'xls':
+        //   // this._handleXlsImport_DEPRECATED(file);
+        //   break;
+        // case 'xlsx':
+        //   // this._handleXlsImport_DEPRECATED(file);
+        //   break;
+        default:
+          this._dialogService
+            .confirm('You can only import CSV files. If your file is a ' +
+              'different type, please convert your data file to a CSV.',
+              ConfirmModalComponent, 'Warning!', false)
+            .then(res => {
+              // if (res === 'okay' || res === 'cancel') {
+              // }
+            });
+      }
     }
+    else if(this.screenType === 'fecfile'){
+      switch (fileExtention.toLowerCase()) {
+      case 'dcf':
+          this.progressPercent = 0;
+          this.showUpload = false;
+          this.uploadingText = 'Uploading...';
+          this._uploadDcf(file);
+          break;
+        default:
+          this._dialogService
+            .confirm('You can only import DCF files. If your file is a ' +
+              'different type, please convert your data file to a DCF.',
+              ConfirmModalComponent, 'Warning!', false)
+            .then(res => {
+            });
+          }
+    }
+    
 
     // const fileReader = new FileReader();
     // fileReader.onload = (e) => {
@@ -369,6 +403,41 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         // });
 
         this.uploadContactsService.validateContacts(file.name).subscribe((res: any) => {
+          this.showSpinner = false;
+          this.emitUploadResults(res);
+        });
+      });
+  }
+
+  private _uploadDcf(file: File) {
+    this.uploadContactsService
+      .uploadFile(file, this.checkSum, this.committeeId)
+      .takeUntil(this.onDestroy$)
+      .subscribe((data: any) => {
+        if (data === false) {
+          console.log('false');
+          return;
+        }
+        this.checkForProcessingProgress();
+        this._uploadTrxService.importDcfFile(file.name, this.committeeId).subscribe((res: any) => {
+          // of([{
+          //     "success": true,
+          //     "data" : {
+          //         "cmte_id": "C00000000",
+          //         "file_name": "satheesh.dcf",
+          //         "submission_date_time": "12/23/2020 12:25PM",
+          //         "message": ""
+          //       }}, 
+          //       {
+          //         "success": false,
+          //         "data" : {
+          //             "cmte_id": "C00000000",
+          //             "file_name": "satheesh.dcf",
+          //             "submission_date_time": "12/23/2020 12:25PM",
+          //         "message": "Error in processing transaction"
+          //         }
+          //     }])
+              // .subscribe((res:any) => {
           this.showSpinner = false;
           this.emitUploadResults(res);
         });

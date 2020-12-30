@@ -261,6 +261,7 @@ def create_entity_log_model(old_update_list, username):
 
 
 def create_temp_contact_table(file_name):
+    file_name = file_name[(file_name.rfind("/") + 1):]
     table_name = "contacts_" + file_name
     index = table_name.rfind(".")
     table_name = table_name[:index]

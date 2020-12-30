@@ -3,6 +3,16 @@ from . import views, jsonmain, jsonsqlgenerate
 
 
 urlpatterns = [
+    
+    url(
+        r"^core/queue_transaction_message$",
+        views.queue_transaction_message,
+        name="queue_transaction_message",
+    ),    url(
+        r"^core/validate_import_transactions$",
+        views.validate_import_transactions,
+        name="validate_import_transactions",
+    ),
     url(
         r"^core/chk_csv_uploaded_in_db$",
         views.chk_csv_uploaded_in_db,
@@ -279,5 +289,10 @@ urlpatterns = [
         r"^core/contact_notes$",
         views.contact_notes,
         name="contact_notes",
+    ),
+    url(
+        r"^core/import_fecfile",
+        views.import_fecfile,
+        name="import_fecfile",
     ),
 ]
