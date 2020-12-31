@@ -12276,7 +12276,7 @@ def save_csv_md5_to_db(request):
           )
 
 @api_view(["POST"])
-def get_contact_details_from_csv(request):
+def generate_contact_details_from_csv(request):
     try:
         cmteid = request.user.username
         filename = request.data.get("file_name") #request.file_name

@@ -210,6 +210,74 @@ export class ImportTransactionsService {
     //   );
   }
 
+
+  /**
+   * Create a CSV file on S3 for contacts in the transaction file to be processed.
+   *
+   * TODO this should be a server side task as part of validate API.
+   * Doing it as a API call here to speed up code delivery.
+   *
+   * @param uploadFile
+   */
+  public generateContactCsv(uploadFile: UploadFileModel): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/generate_contact_details_from_csv';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.file_name = uploadFile.fecFileName;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  /**
+   * Start processing of the CSV file on S3 containing contacts.  This is step 2 following
+   * generateContactCsv().
+   *
+   * TODO this should be a server side task as part of validate API.
+   * Doing it as a API call here to speed up code delivery.
+   *
+   * @param uploadFile
+   */
+  public processContactCsv(uploadFile: UploadFileModel): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/transaction/upload';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.file_name = uploadFile.fecFileName;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
   /**
    * Save contacts in the file no dupes detected.
    */

@@ -52,7 +52,12 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
       currentPage: 1
     };
     this.config = config;
-    this.checkDuplicates(1);
+
+    this._importTransactionsService.generateContactCsv(this.uploadFile).subscribe((res: any) => {
+      this._importTransactionsService.processContactCsv(this.uploadFile).subscribe((res: any) => {
+        this.checkDuplicates(1);
+      });
+    });
     // this.mergePage = 1;
     this.allDupesSelected = false;
   }
@@ -78,7 +83,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     //   this.numberOfPages = res.totalPages;
     // });
 
-    this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page).subscribe((res: any) => {
+    this._importTransactionsService.getDuplicates(this.uploadFile.fecFileName, page).subscribe((res: any) => {
       // until API supports duplicate contacts, make it empty.
       this.contacts = res.contacts;
       // this.contacts = [];
