@@ -52,7 +52,12 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
       currentPage: 1
     };
     this.config = config;
-    this.checkDuplicates(1);
+
+    this._importTransactionsService.generateContactCsv(this.uploadFile).subscribe((res: any) => {
+      this._importTransactionsService.processContactCsv(this.uploadFile).subscribe((res: any) => {
+        this.checkDuplicates(1);
+      });
+    });
     // this.mergePage = 1;
     this.allDupesSelected = false;
   }
