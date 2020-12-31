@@ -81,7 +81,7 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
         });
         break;
       case 'proceed':
-        this._importTransactionsService.saveContactIgnoreDupes(this.uploadFile, true).subscribe((res: any) => {
+        this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
           this.currentFileDone = true;
         });
         break;
