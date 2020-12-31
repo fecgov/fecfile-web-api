@@ -72,18 +72,28 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
     switch (this.action) {
       case 'ignore_dupe_save':
         this._importTransactionsService.saveContactIgnoreDupes(this.uploadFile, true).subscribe((res: any) => {
-          this.currentFileDone = true;
+          // this.currentFileDone = true;
+          this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
+            this.currentFileDone = true;
+          });
         });
         break;
       case 'merge_dupe_save':
         this._importTransactionsService.mergeAll(this.uploadFile, true).subscribe((res: any) => {
-          this.currentFileDone = true;
+          // this.currentFileDone = true;
+          this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
+            this.currentFileDone = true;
+          });
         });
         break;
       case 'proceed':
-        this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
-          this.currentFileDone = true;
-        });
+        this._importTransactionsService.saveContactIgnoreDupes(this.uploadFile, true).subscribe((res: any) => {
+          // this.currentFileDone = true;
+          this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
+            this.currentFileDone = true;
+          });
+      });
+      break;
         break;
       default:
     }

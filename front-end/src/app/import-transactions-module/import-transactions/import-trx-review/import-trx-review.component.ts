@@ -247,6 +247,10 @@ export class ImportTrxReviewComponent implements OnInit, OnDestroy, OnChanges {
               resultType: 'success',
               uploadFile: this.uploadFile
             });
+            this._importTransactionsService.generateContactCsv(this.uploadFile).subscribe((res: any) => {
+              this._importTransactionsService.processContactCsv(this.uploadFile).subscribe((res: any) => {
+              });
+            });
           }
         });
       }
