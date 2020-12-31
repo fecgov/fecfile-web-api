@@ -439,7 +439,7 @@ def load_transactions_from_temp_perm_tables(fecfilename):
     conn = None
     try:
         res = ''
-        selectsql= '''import_sched_a'''
+        selectsql= '''import_schedules'''
         psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
         conn = psycopg2.connect(psyconnstr)
         cur = conn.cursor()
@@ -503,7 +503,7 @@ def send_message_to_queue(bktname, key):
                     current_time = time.time()
                     elapsed_time = current_time - start_time
                     if 'Success' == check_data_processed('',key.split('/')[1]):
-                        temp_to_perm = 0#load_transactions_from_temp_perm_tables(key.split('/')[1]) 
+                        temp_to_perm = load_transactions_from_temp_perm_tables(key.split('/')[1]) 
                         res='Fail'
                         if 0 == temp_to_perm:
                             res = 'Success'    
