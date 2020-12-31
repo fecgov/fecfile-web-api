@@ -83,7 +83,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     //   this.numberOfPages = res.totalPages;
     // });
 
-    this._importTransactionsService.getDuplicates(this.uploadFile.fileName, page).subscribe((res: any) => {
+    this._importTransactionsService.getDuplicates(this.uploadFile.fecFileName, page).subscribe((res: any) => {
       // until API supports duplicate contacts, make it empty.
       this.contacts = res.contacts;
       // this.contacts = [];
