@@ -26,7 +26,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
   public contacts$: Observable<Array<any>>;
 
   // ngx-pagination config for the duplicates table of contacts
-  public maxItemsPerPage = 4;
+  public maxItemsPerPage = 1000000; // set to 4 once server side supports pagination.
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
@@ -47,7 +47,7 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     this.contactsSubject = new BehaviorSubject<any>([]);
     this.contacts$ = this.contactsSubject.asObservable();
     const config: PaginationInstance = {
-      id: 'clean_contacts__table-pagination',
+      id: 'trx_clean_contacts_pgn',
       itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
@@ -60,6 +60,10 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
     this.contactsSubject.unsubscribe();
+  }
+
+  public changePageClientSide(page: number) {
+    this.config.currentPage = page;
   }
 
   public checkDuplicates(page: number) {
@@ -102,11 +106,6 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
     }
     return name;
   }
-
-  // public cleanContact(contact: any, modal: any) {
-  //   this.prepareContactToClean(contact);
-  //   this._modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static' });
-  // }
 
   /**
    * Determine if pagination should be shown.
@@ -180,6 +179,13 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
 
   public mergeAll(modal: any) {
     modal.close('close it');
+
+    // temp code: passing contacts array when merge option is needed
+    // until pagination and server side saving of user selections is supported
+    // as it is with import-contact module.  Until then, pass the
+    // full array of duplicates containing user selctions for the merge.
+    this.uploadFile.contacts = this.contacts;
+
     this.resultsEmitter.emit({
       resultType: 'merge_dupe_save',
       file: this.uploadFile
@@ -220,9 +226,19 @@ export class ImportTrxCleanComponent implements OnInit, OnDestroy {
    */
   public applyMergeSelection(contact: any, userAction: string) {
     contact.user_selected_option = userAction;
+
+    let count = 0;
+    for (const dupe of this.contacts) {
+      if (dupe.user_selected_option) {
+        count++;
+      }
+    }
+    this.allDupesSelected = this.contacts.length === count;
+
     this._importTransactionsService.saveUserMergeSelection(this.uploadFile.fileName, contact).subscribe((res: any) => {
-      this.checkDuplicates(this.config.currentPage);
-      this.allDupesSelected = res.allDone;
+      // Until pagination in place and API supports saving user selection accross pages, do this.
+      // this.allDupesSelected = res.allDone;
+      // this.checkDuplicates(this.config.currentPage);
     });
   }
 }

@@ -172,7 +172,7 @@ export class ImportTransactionsService {
   public getDuplicates(fileName: string, page: number): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/contact/duplicate';
+    const url = '/contact/transaction/duplicate';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -181,6 +181,120 @@ export class ImportTransactionsService {
     request.fileName = fileName;
     request.page = page;
     request.itemsPerPage = 4;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+
+    // const mockFile = 'assets/mock-data/import-contacts/duplicates.2.json';
+    // return this._http
+    //   .get(mockFile, {
+    //     headers: httpOptions
+    //   })
+    //   .pipe(
+    //     map(res => {
+    //       if (res) {
+    //         return res;
+    //       }
+    //       return false;
+    //     })
+    //   );
+  }
+
+  /**
+   * Save contacts in the file and ignore dupes if any.
+   */
+  public saveContactIgnoreDupes(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/transaction/ignore/merge';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = uploadFile.fecFileName;
+    request.transaction_included = transactionIncluded;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  /**
+   * Merge the user selections on all contacts in the import.
+   */
+  public mergeAll(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/transaction/merge/save';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = uploadFile.fecFileName;
+    request.transaction_included = transactionIncluded;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+
+    // const token: string = JSON.parse(this._cookieService.get('user'));
+    // let httpOptions = new HttpHeaders();
+    // const url = '/contact/transaction/merge/save';
+
+    // httpOptions = httpOptions.append('Content-Type', 'application/json');
+    // httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    // const mergeOptionArray = [];
+    // for (const contact of uploadFile.contacts) {
+    //   let dupeEntityId = null;
+    //   if (contact.user_selected_option !== 'add') {
+    //     for (const dupe of contact.contacts_from_db) {
+    //       if (dupe.user_selected_value) {
+    //         dupeEntityId = dupe.entity_id;
+    //       }
+    //     }
+    //   }
+
+    //   const mergeOption: any = {};
+    //   mergeOption.user_selected_option = contact.user_selected_option;
+    //   mergeOption.file_record_id = contact.entity_id;
+    //   mergeOption.db_entity_id = dupeEntityId;
+
+    //   mergeOptionArray.push(mergeOption);
+    // }
+    // const request: any = {};
+    // request.fileName = uploadFile.fecFileName;
+    // request.merge_options = mergeOptionArray;
 
     // return this._http
     //   .post(`${environment.apiUrl}${url}`, request, {
@@ -194,82 +308,6 @@ export class ImportTransactionsService {
     //       return false;
     //     })
     //   );
-
-    const mockFile = 'assets/mock-data/import-contacts/duplicates.2.json';
-    return this._http
-      .get(mockFile, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
-        })
-      );
-  }
-
-  /**
-   * Save contacts in the file and ignore dupes if any.
-   */
-  public saveContactIgnoreDupes(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions = new HttpHeaders();
-    const url = '/core/queue_transaction_message';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const request: any = {};
-    request.key = this.TRANSACTIONS_PATH + uploadFile.fecFileName;
-    request.bkt_name = this.bucketName;
-    // request.transaction_included = transactionIncluded;
-
-    return this._http
-      .post(`${environment.apiUrl}${url}`, request, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
-        })
-      );
-    // return Observable.of(true);
-  }
-
-  /**
-   * Merge the user selections on all contacts in the import.
-   */
-  public mergeAll(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions = new HttpHeaders();
-    const url = '/core/queue_transaction_message';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const request: any = {};
-    request.key = this.TRANSACTIONS_PATH + uploadFile.fecFileName;
-    request.bkt_name = this.bucketName;
-    // request.transaction_included = transactionIncluded;
-
-    return this._http
-      .post(`${environment.apiUrl}${url}`, request, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
-        })
-      );
-    // return Observable.of(true);
   }
 
   /**
@@ -280,7 +318,7 @@ export class ImportTransactionsService {
   public saveUserMergeSelection(fileName: string, contact: any) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = 'import-trx-save-user-select???'; // '/contact/merge/options';
+    const url = '/contact/transaction/merge/options';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -303,19 +341,19 @@ export class ImportTransactionsService {
     request.fileName = fileName;
     request.merge_option = mergeOption;
 
-    // return this._http
-    //   .post(`${environment.apiUrl}${url}`, request, {
-    //     headers: httpOptions
-    //   })
-    //   .pipe(
-    //     map(res => {
-    //       if (res) {
-    //         return res;
-    //       }
-    //       return false;
-    //     })
-    //   );
-    return Observable.of(true);
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+    // return Observable.of(true);
   }
 
   /**

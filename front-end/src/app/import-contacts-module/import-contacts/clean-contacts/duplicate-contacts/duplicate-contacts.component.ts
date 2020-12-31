@@ -42,7 +42,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public contacts$: Observable<Array<any>>;
 
   // ngx-pagination config for the duplicates table of contacts
-  public maxItemsPerPage = 4;
+  public maxItemsPerPage = 2;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
@@ -126,39 +126,30 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
 
-    // // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
-    // this._duplicateContactsService.getDuplicates_mock(page).subscribe((res: any) => {
-    //   this.contactsSubject.next(res.duplicates);
-    //   // this.contactsSubject.next(this.duplicates);
-    //   this.config.totalItems = res.totalCount ? res.totalCount : 0;
-    //   this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
+    // this._duplicateContactsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
+    //   // // temp to set selected to false until api does
+    //   // for (const contact of res.contacts) {
+    //   //   for (const dupe of contact.contacts_from_db) {
+    //   //     // TEMP CODE
+    //   //     // response contacts the contact from DB the user may have identified as one to merge.
+    //   //     // If user has done this, the user_selected_value on th CONTACT not the DUPE CONTACT
+    //   //     // will contain the entity id of the selected contact.
+    //   //     // Set a field on the DUPLICATE CONTACT for the UI
+    //   //     // TODO change API to set select on the dupe. For now just set the first one for devl.
+    //   //     dupe.user_selected_value = false;
+    //   //     if (contact.user_selected_option !== 'add') {
+    //   //       contact.contacts_from_db[0].user_selected_value = true;
+    //   //     }
+    //   //     // TEMP CDE END
+    //   //   }
+    //   // }
+
+    //   this.contacts = res.contacts;
+    //   this.config.totalItems = res.totalcontactsCount;
+    //   this.config.itemsPerPage = res.itemsPerPage;
     //   this.numberOfPages = res.totalPages;
+    //   this.allDupesSelected = res.allDone;
     // });
-
-    this._duplicateContactsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
-      // // temp to set selected to false until api does
-      // for (const contact of res.contacts) {
-      //   for (const dupe of contact.contacts_from_db) {
-      //     // TEMP CODE
-      //     // response contacts the contact from DB the user may have identified as one to merge.
-      //     // If user has done this, the user_selected_value on th CONTACT not the DUPE CONTACT
-      //     // will contain the entity id of the selected contact.
-      //     // Set a field on the DUPLICATE CONTACT for the UI
-      //     // TODO change API to set select on the dupe. For now just set the first one for devl.
-      //     dupe.user_selected_value = false;
-      //     if (contact.user_selected_option !== 'add') {
-      //       contact.contacts_from_db[0].user_selected_value = true;
-      //     }
-      //     // TEMP CDE END
-      //   }
-      // }
-
-      this.contacts = res.contacts;
-      this.config.totalItems = res.totalcontactsCount;
-      this.config.itemsPerPage = res.itemsPerPage;
-      this.numberOfPages = res.totalPages;
-      this.allDupesSelected = res.allDone;
-    });
   }
 
   public handleCheckedDupe($event: any, dupe: any, contact: any) {
