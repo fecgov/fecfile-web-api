@@ -12374,3 +12374,22 @@ def contact_notes(request):
           "The contact_notes API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
+
+
+@api_view(["POST"])
+def import_fecfile(request):
+    try:
+        data_obj = json.loads(request.body)
+        print(data_obj)
+        resp = requests.post(settings.NXG_FEC_DCF_CONVERTER_API_URL +
+                             settings.NXG_FEC_DCF_CONVERTER_API_VERSION, data=json.dumps(data_obj))
+        if not resp.ok:
+            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            dictprint = resp.json()
+            return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response(
+          "The import_fecfile API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

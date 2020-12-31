@@ -221,7 +221,7 @@ export class UploadTrxService {
   public importDcfFile(fileName: string, committeeId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/import';
+    const url = '/core/import_fecfile';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -231,7 +231,7 @@ export class UploadTrxService {
     request.committee_id = committeeId;
 
     return this._http
-      .post(`${environment.dcfConverterApiUrl}${url}`, request, {
+      .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
       })
       .pipe(
