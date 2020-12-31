@@ -211,6 +211,37 @@ export class ImportTransactionsService {
   }
 
   /**
+   * Save contacts in the file no dupes detected.
+   */
+  public saveProceedNoDupes(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/queue_transaction_message';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.key = this.TRANSACTIONS_PATH + uploadFile.fecFileName;
+    request.bkt_name = this.bucketName;
+    // request.transaction_included = transactionIncluded;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+    // return Observable.of(true);
+  }
+
+  /**
    * Save contacts in the file and ignore dupes if any.
    */
   public saveContactIgnoreDupes(uploadFile: UploadFileModel, transactionIncluded: boolean): Observable<any> {
