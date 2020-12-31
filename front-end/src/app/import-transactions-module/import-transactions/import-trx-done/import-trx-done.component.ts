@@ -71,24 +71,19 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
   private _finalizeImport() {
     switch (this.action) {
       case 'ignore_dupe_save':
-        this._importTransactionsService
-          .saveContactIgnoreDupes(this.uploadFile, true)
-          .subscribe((res: any) => {
-            this.currentFileDone = true;
-          });
+        this._importTransactionsService.saveContactIgnoreDupes(this.uploadFile, true).subscribe((res: any) => {
+          this.currentFileDone = true;
+        });
         break;
       case 'merge_dupe_save':
-        this._importTransactionsService.mergeAll(this.uploadFile, true)
-          .subscribe((res: any) => {
+        this._importTransactionsService.mergeAll(this.uploadFile, true).subscribe((res: any) => {
           this.currentFileDone = true;
         });
         break;
       case 'proceed':
-        this._importTransactionsService
-          .saveContactIgnoreDupes(this.uploadFile, true)
-          .subscribe((res: any) => {
-            this.currentFileDone = true;
-          });
+        this._importTransactionsService.saveContactIgnoreDupes(this.uploadFile, true).subscribe((res: any) => {
+          this.currentFileDone = true;
+        });
         break;
       default:
     }
@@ -105,6 +100,9 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
     let mockPercent = 0;
     this.progressSubscription = this._importTransactionsService.pollForProgress().subscribe((percent: number) => {
       mockPercent += percent;
+      if (mockPercent > 130) {
+        this.currentFileDone = true;
+      }
       if (mockPercent >= 100 && this.currentFileDone) {
         // if (percent >= 100) {
         this.progressSubscription.unsubscribe();

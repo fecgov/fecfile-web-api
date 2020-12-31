@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
+from fecfiler.contacts.views.duplicate import create_temp_db_model
 from fecfiler.contacts.views.merge import create_temp_contact_table, create_temp_transaction_association_model
 from fecfiler.core.views import get_comittee_id, NoOPError, get_next_entity_id, check_null_value
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
@@ -156,9 +157,18 @@ def save_contact_db(contacts_added, cmte_id, file_name):
     all_contact = []
     contact_list = get_contact_list(cmte_id)
     data = reorder_user_data(contacts_added, contact_list)
-    all_contact = create_db_model(data.get("final_contact_df"), file_name)
-    table_name = create_temp_contact_table(file_name)
-    create_temp_transaction_association_model(all_contact, table_name)
+    #all_contact = create_db_model(data.get("final_contact_df"), file_name)
+    #table_name = create_temp_contact_table(file_name)
+    #create_temp_transaction_association_model(all_contact, table_name)
+
+    duplicate_contact_df = data.get("duplicate_contact_df")
+    duplicate_contact_df['duplicate_entity'] = ''
+    duplicate_contact_df['transaction_id'] = ''
+    duplicate_contact_df['file_selected'] = 'true'
+    duplicate_contact_df['file_name'] = file_name
+    duplicate_contact_dict = duplicate_contact_df.to_dict('records')
+
+    create_temp_db_model(duplicate_contact_dict, file_name, cmte_id)
 
     return len(all_contact), len(data.get("duplicate_contact_df"))
 
@@ -228,7 +238,8 @@ def upload_cand_contact(request):
                 # df = pd.concat([test_data_org1, test_data_ind1]).reset_index(drop=True)
 
                 print(df.head())
-
+                file_name = file_name[(file_name.rfind("/") + 1):]
+                
                 data = custom_validate_cand_df(df, cmte_id)
 
                 contacts_added = data.get("final_list")
