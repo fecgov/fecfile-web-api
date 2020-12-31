@@ -3,7 +3,11 @@ from . import views, jsonmain, jsonsqlgenerate
 
 
 urlpatterns = [
-    
+    url(
+        r"^core/generate_contact_details_from_csv$",
+        views.generate_contact_details_from_csv,
+        name="generate_contact_details_from_csv",
+    ),
     url(
         r"^core/queue_transaction_message$",
         views.queue_transaction_message,
