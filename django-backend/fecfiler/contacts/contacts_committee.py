@@ -210,15 +210,17 @@ def upload_cand_contact(request):
                                       settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
                                       )
                 bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
-                file_name = request.data.get("fileName")
-                csv_obj = client.get_object(Bucket=bucket, Key=file_name)
+                file_name = request.data.get("file_name")
+                s3_file_name = file_name.lower()
+                s3_file_name = "contacts/" + cmte_id + "_" + s3_file_name
+                csv_obj = client.get_object(Bucket=bucket, Key=s3_file_name)
                 body = csv_obj['Body']
                 csv_string = body.read().decode('latin')
 
                 df = pd.read_csv(StringIO(csv_string), dtype=object)
 
                 df = df[['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1', 'STREET_2',
-                         'CITY', 'STATE', 'ZIP', 'EMPLOYER', 'OCCUPATION',
+                         'CITY', 'STATE', 'ZIP_CODE', 'EMPLOYER', 'OCCUPATION',
                          'ORGANIZATION_NAME', 'LAST_NAME', 'FIRST_NAME',
                          'MIDDLE_NAME', 'PREFIX', 'SUFFIX', 'CAND_OFFICE',
                          'CAND_OFFICE_STATE', 'CAND_OFFICE_DISTRICT', 'REF_CAND_CMTE_ID', 'TRANSACTION_ID']]
