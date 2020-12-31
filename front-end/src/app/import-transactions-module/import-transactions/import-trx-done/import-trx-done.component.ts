@@ -92,11 +92,11 @@ export class ImportTrxDoneComponent implements OnInit, OnDestroy {
           this._importTransactionsService.saveProceedNoDupes(this.uploadFile, true).subscribe((res: any) => {
             this.currentFileDone = true;
           });
-      });
-      break;
+        });
         break;
       default:
     }
+
     this._pollForProgress();
     // setInterval(foo => {
     //   this.uploadFile.status = ImportFileStatusEnum.complete;
