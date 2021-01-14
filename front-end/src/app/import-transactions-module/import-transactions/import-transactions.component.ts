@@ -119,12 +119,6 @@ export class ImportTransactionsComponent implements OnInit {
   public receiveCleanResults($event: any) {
     if ($event.resultType === 'cancel-file') {
       this._cancelFile($event.file);
-      // } else if ($event.resultType === 'ignore_dupe_save') {
-      //   this.currentStep = this.step4ImportDone;
-      //   this.currentFile.status = ImportFileStatusEnum.importing;
-      // } else if ($event.resultType === 'merge_dupe_save') {
-      //   this.currentStep = this.step4ImportDone;
-      //   this.currentFile.status = ImportFileStatusEnum.importing;
     } else {
       this.cleanImportAction = $event.resultType;
       this.currentStep = this.step4ImportDone;

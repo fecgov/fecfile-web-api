@@ -14,6 +14,20 @@ urlpatterns = [
         name="validate_import_transactions",
     ),
     url(
+        r"^core/generate_contact_details_from_csv$",
+        views.generate_contact_details_from_csv,
+        name="generate_contact_details_from_csv",
+    ),
+    url(
+        r"^core/queue_transaction_message$",
+        views.queue_transaction_message,
+        name="queue_transaction_message",
+    ),    url(
+        r"^core/validate_import_transactions$",
+        views.validate_import_transactions,
+        name="validate_import_transactions",
+    ),
+    url(
         r"^core/chk_csv_uploaded_in_db$",
         views.chk_csv_uploaded_in_db,
         name="chk_csv_uploaded_in_db",

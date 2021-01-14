@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
+from fecfiler.contacts.views.duplicate import create_temp_db_model
 from fecfiler.contacts.views.merge import create_temp_contact_table, create_temp_transaction_association_model
 from fecfiler.core.views import get_comittee_id, NoOPError, get_next_entity_id, check_null_value
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
@@ -35,10 +36,12 @@ def reorder_user_data(contacts_added, contact_list):
             contacts_list_dict.zip_code = contacts_list_dict.zip_code.astype(str)
             contacts_added.reset_index(drop=True, inplace=True)
 
-            json_added = contacts_added.to_json(orient='records')
-            json_contact = contacts_list_dict.to_json(orient='records')
-            contacts_added_dict = pd.read_json(json_added)
-            contact_list_dict = pd.read_json(json_contact)
+            #json_added = contacts_added.to_json(orient='records')
+            #json_contact = contacts_list_dict.to_json(orient='records')
+            #contacts_added_dict = pd.read_json(json_added)
+            contacts_added_dict = contacts_added
+            #contact_list_dict = pd.read_json(json_contact)
+            contact_list_dict = contacts_list_dict
             contact_list_dict.fillna(value=pd.np.nan, inplace=True)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
             contact_list_dict1 = contact_list_dict.replace(np.nan, '', regex=True)
@@ -136,7 +139,7 @@ def create_db_model(contacts_final_dict, file_name):
 def get_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT cmte_id,entity_type,street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+            query_string = """SELECT entity_id as duplicate_entity, cmte_id,entity_type,street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND entity_type not in ('IND', 'ORG') AND delete_ind is distinct from 'Y'"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
@@ -156,9 +159,18 @@ def save_contact_db(contacts_added, cmte_id, file_name):
     all_contact = []
     contact_list = get_contact_list(cmte_id)
     data = reorder_user_data(contacts_added, contact_list)
-    all_contact = create_db_model(data.get("final_contact_df"), file_name)
-    table_name = create_temp_contact_table(file_name)
-    create_temp_transaction_association_model(all_contact, table_name)
+    #all_contact = create_db_model(data.get("final_contact_df"), file_name)
+    #table_name = create_temp_contact_table(file_name)
+    #create_temp_transaction_association_model(all_contact, table_name)
+
+    duplicate_contact_df = data.get("duplicate_contact_df")
+    #duplicate_contact_df['duplicate_entity'] = ''
+    duplicate_contact_df['transaction_id'] = ''
+    duplicate_contact_df['file_selected'] = 'true'
+    duplicate_contact_df['file_name'] = file_name
+    duplicate_contact_dict = duplicate_contact_df.to_dict('records')
+
+    create_temp_db_model(duplicate_contact_dict, file_name, cmte_id)
 
     return len(all_contact), len(data.get("duplicate_contact_df"))
 
@@ -200,15 +212,17 @@ def upload_cand_contact(request):
                                       settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
                                       )
                 bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
-                file_name = request.data.get("fileName")
-                csv_obj = client.get_object(Bucket=bucket, Key=file_name)
+                file_name = request.data.get("file_name")
+                s3_file_name = file_name.lower()
+                s3_file_name = "contacts/" + cmte_id + "_" + s3_file_name
+                csv_obj = client.get_object(Bucket=bucket, Key=s3_file_name)
                 body = csv_obj['Body']
                 csv_string = body.read().decode('latin')
 
                 df = pd.read_csv(StringIO(csv_string), dtype=object)
 
                 df = df[['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1', 'STREET_2',
-                         'CITY', 'STATE', 'ZIP', 'EMPLOYER', 'OCCUPATION',
+                         'CITY', 'STATE', 'ZIP_CODE', 'EMPLOYER', 'OCCUPATION',
                          'ORGANIZATION_NAME', 'LAST_NAME', 'FIRST_NAME',
                          'MIDDLE_NAME', 'PREFIX', 'SUFFIX', 'CAND_OFFICE',
                          'CAND_OFFICE_STATE', 'CAND_OFFICE_DISTRICT', 'REF_CAND_CMTE_ID', 'TRANSACTION_ID']]
@@ -228,7 +242,8 @@ def upload_cand_contact(request):
                 # df = pd.concat([test_data_org1, test_data_ind1]).reset_index(drop=True)
 
                 print(df.head())
-
+                file_name = file_name[(file_name.rfind("/") + 1):]
+                
                 data = custom_validate_cand_df(df, cmte_id)
 
                 contacts_added = data.get("final_list")
