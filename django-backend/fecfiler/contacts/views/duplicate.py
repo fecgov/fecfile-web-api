@@ -612,6 +612,8 @@ def validate_contact(request):
 
 
 def create_entity_db_model(contacts_final_dict):
+    if contacts_final_dict is None:
+        return []
     try:
         all_contact = []
         with connection.cursor() as cursor:
@@ -683,8 +685,8 @@ def ignore_merge(request):
 
                 contacts_deleted_size = delete_import(cmte_id, file_name)
                 if contacts_deleted_size > 0:
-                    logger.debug("Successfully clean contact temp table for committee {} and file {}", cmte_id,
-                                 file_name)
+                    logger.debug("Successfully clean contact temp table for committee {} and file {}".format(cmte_id,
+                                 file_name))
 
                 data = {"message": "{} records were successfully added to database.".format(len(contacts_added))}
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)

@@ -445,8 +445,13 @@ def load_transactions_from_temp_perm_tables(fecfilename):
     try:
         res = ''
         selectsql= '''import_schedules'''
-        psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
-        conn = psycopg2.connect(psyconnstr)
+        #psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
+        #conn = psycopg2.connect(psyconnstr)
+        conn = psycopg2.connect(user=PG_USER,
+                                password=PG_PASSWORD,
+                                host=PG_HOST,
+                                port=PG_PORT,
+                                database=PG_DATABASE) 
         cur = conn.cursor()
         cur.callproc(selectsql, (fecfilename,))
         if cur.rowcount == 1:
