@@ -410,8 +410,13 @@ def check_data_processed(md5, fecfilename):
         res = ''
         selectsql= '''SELECT csv_data_processed FROM public.transactions_file_details tfd WHERE tfd.fec_file_name = %s 
                         ORDER BY create_Date DESC   limit 1;'''
-        psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
-        conn = psycopg2.connect(psyconnstr)
+        #psyconnstr = 'host='+ PG_HOST + ' ' + ' dbname=' + ' ' + PG_DATABASE + ' ' + ' user=' + PG_USER
+        conn = psycopg2.connect(user=PG_USER,
+                                      password=PG_PASSWORD,
+                                      host=PG_HOST,
+                                      port=PG_PORT,
+                                      database=PG_DATABASE) 
+        #conn = psycopg2.connect(psyconnstr)
         cur = conn.cursor()
         cur.execute(selectsql, (fecfilename,))
         if cur.rowcount == 1:
