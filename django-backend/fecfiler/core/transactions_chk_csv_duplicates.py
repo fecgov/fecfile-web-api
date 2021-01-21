@@ -22,7 +22,7 @@ PG_PORT = os.getenv('DB_PORT')
 PG_DATABASE = os.getenv('DB_NAME')
 PG_USER = os.getenv('DB_USERNAME')
 PG_PASSWORD = os.getenv('DB_PASSWORD')
-SQS_QUEUE_NAME = os.getenv('FECFILE_IMPORTTRANSACTION_QUEUE') #
+SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME') #
 
 
 
