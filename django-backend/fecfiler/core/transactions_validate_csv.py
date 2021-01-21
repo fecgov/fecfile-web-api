@@ -27,7 +27,7 @@ PG_PORT = os.getenv('DB_PORT')
 PG_DATABASE = os.getenv('DB_NAME')
 PG_USER = os.getenv('DB_USERNAME')
 PG_PASSWORD = os.getenv('DB_PASSWORD')
-SQS_QUEUE_NAME = os.getenv('FECFILE_IMPORTTRANSACTION_QUEUE') #
+SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME') #
 
 
 BACKEND_DB_HOST = os.getenv('BACKEND_DB_HOST')
@@ -574,7 +574,7 @@ def send_message_to_queue(bktname, key):
 #     #if SQS_QUEUE_NAME is None:
 #         #SQS_QUEUE_NAME = 'fecfile-importtransactions'
 #     #print('SQS_QUEUE_NAME =',SQS_QUEUE_NAME) 
-#     print('FECFILE QUEUE :',os.environ.get('FECFILE_IMPORTTRANSACTION_QUEUE'))
+#     print('FECFILE QUEUE :',os.environ.get('SQS_QUEUE_NAME'))
 #     print(send_message_to_queue(bktname, key))
 #     #get_message_from_queue()
 # except Exception as ex:
