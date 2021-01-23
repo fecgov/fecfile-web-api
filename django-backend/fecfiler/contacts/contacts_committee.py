@@ -159,9 +159,9 @@ def save_contact_db(contacts_added, cmte_id, file_name):
     all_contact = []
     contact_list = get_contact_list(cmte_id)
     data = reorder_user_data(contacts_added, contact_list)
-    #all_contact = create_db_model(data.get("final_contact_df"), file_name)
-    #table_name = create_temp_contact_table(file_name)
-    #create_temp_transaction_association_model(all_contact, table_name)
+    all_contact = create_db_model(data.get("final_contact_df"), file_name)
+    table_name = create_temp_contact_table(file_name)
+    create_temp_transaction_association_model(all_contact, table_name)
 
     duplicate_contact_df = data.get("duplicate_contact_df")
     #duplicate_contact_df['duplicate_entity'] = ''
