@@ -1,0 +1,75 @@
+<div class="upload_contacts__container">
+  <div class="container form-type-container">
+    <div class="row h-100 form-type-group">
+      <div class="col text-center my-auto">
+        <div class="radio">
+          <div class="form-check-inline">
+            <div class="radio-options form-type-radio">
+              <label for="f3x_form_type">
+                <input type="radio" id="f3x_form_type" name="f3x_form_type" [value]="f3xForm" [(ngModel)]="formType" />
+                F3X
+              </label>
+            </div>
+            <div class="radio-options form-type-radio">
+              <label for="f3l_form_type">
+                <input type="radio" id="f3l_form_type" name="f3l_form_type" [value]="f3lForm" [(ngModel)]="formType" />
+                F3L
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    id="upload_contacts__drop-area"
+    (drop)="drop($event)"
+    (dragenter)="dragEnter($event)"
+    (dragover)="dragOver($event)"
+  >
+    <div class="upload_contacts__drop-area-text">
+      <i (click)="triggerSelectFileInputClick()" class="file-upload-icon upload_contacts__upload-icon"></i>
+      <br />
+      Drop or Drag a CSV File Here to Upload
+      <br />
+      or
+      <br />
+      <button (click)="triggerSelectFileInputClick()" class="btn btn-link upload_contacts__select-file" type="button">
+        Select a file
+      </button>
+      <input
+        accept=".csv"
+        multiple
+        style="display:none"
+        #selectFileInput
+        type="file"
+        (change)="fileSelected()"
+        (click)="onClick($event)"
+      />
+    </div>
+  </div>
+  <div id="upload_contacts__info-area">
+    <div class="row">
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="users-icon"></i>
+        </div>
+        Importing your contacts saves you time. It helps you build your contacts database quicker so you can move
+        through your forms effortlessly and seamlessly.
+      </div>
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="database-server-icon"></i>
+        </div>
+        To keep your database clean we will give you a chance to merge or ignore possible duplicate contacts during the
+        import process
+      </div>
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="cloud-icon"></i>
+        </div>
+        Because your contact database is located in cloud.gov (or AWS), you never have to worry about losing your data.
+      </div>
+    </div>
+  </div>
+</div>

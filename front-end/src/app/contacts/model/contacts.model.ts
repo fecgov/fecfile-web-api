@@ -29,6 +29,7 @@ export class ContactModel {
     toggleLog: boolean;
     contactLog: Array<ContactLogModel>;
     transactions: any;
+    notes: string;
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -50,7 +51,7 @@ export class ContactModel {
         this.officeSought = contact.officeSought ? contact.officeSought : '';
         this.candOffice = contact.candOffice ? contact.candOffice : '';
         this.candOfficeState = contact.candOfficeState ? contact.candOfficeState : '';
-        this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
+        this.candOfficeDistrict = contact.candofficedistrict ? contact.candofficedistrict : '';
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
@@ -59,6 +60,7 @@ export class ContactModel {
         this.contactLog = [];
         this.toggleLog = false;
         this.transactions = null;
+        this.notes = contact.notes ? contact.notes : '';
     }
 
     setContactLog(contactLog: any) {

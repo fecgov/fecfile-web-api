@@ -24,7 +24,12 @@
             <ng-container *ngFor="let notification of notifications | paginate: config; let i = index">
                 <tr>
                     <td *ngFor="let key of keys">
-                        {{ notification.get(key.name) }}
+                        <div *ngIf="!notification.get(key.name + '_redirect')">{{ notification.get(key.name) }}</div>
+                        <div *ngIf="notification.get(key.name + '_redirect')">
+                            <a routerLink="{{ notification.get(key.name + '_redirect') }}">
+                                {{ notification.get(key.name) }}
+                            </a>
+                        </div>
                     </td>
                     <td *ngIf="tabConfig.showOptionView">
                         <button type="button" class="btn btn-sm btn-light" (click)="showNotificationModal(notification.get('id'))">
@@ -63,7 +68,7 @@
                     </button>
                 </div>
                 <div class="modal-body notifications_modal-body">
-                    <div class="notifications_modal-body-content" [innerHTML]="notificationContent">
+                    <div class="notifications_modal-body-content" [innerHTML]="notificationContent" #notificationContentContainer>
                     </div>
                 </div>
                 <div class="modal-footer">

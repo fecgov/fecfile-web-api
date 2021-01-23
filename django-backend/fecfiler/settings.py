@@ -34,6 +34,9 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 TIME_ZONE = "America/New_York"
 
+CONTACT_MATCH_PERCENTAGE = 92
+
+
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
 REGISTER_USER_URL = os.environ.get('REGISTER_USER_URL', "http://dev-fecfile.efdev.fec.gov/#/register?register_token=")
@@ -41,7 +44,7 @@ OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
 OTP_TIMEOUT_TIME = 30
-OTP_DISABLE = False
+OTP_DISABLE = True
 OTP_DEFAULT_PASSCODE = "111111"
 JWT_PASSWORD_EXPIRY = 1800
 API_LOGIN = os.environ.get('API_LOGIN', None)
@@ -412,6 +415,14 @@ NXG_FEC_PRINT_API_VERSION = "/v1/print"
 # SUBMISSION REPORT SETTINGS
 NXG_COMMITTEE_DEFAULT_PASSWORD = "test"
 SUBMIT_REPORT_WAIT_FLAG = "False"
+
+# Service Endpoint for filing confirmation email
+NXG_FEC_FILING_CONFIRMATION_URL = os.environ.get('FILING_CONFIRMATION_URL',  'http://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email')
+
+# dcf_converter end point details
+NXG_FEC_DCF_CONVERTER_API_URL = os.environ.get('DCF_CONVERTER_URL', 'https://dev-efile-api.efdev.fec.gov/dcf_converter')
+# NXG_FEC_DCF_CONVERTER_API_URL = os.environ.get('DCF_CONVERTER_URL', 'http://127.0.0.1:5000')
+NXG_FEC_DCF_CONVERTER_API_VERSION = "/v1/import"
 
 try:
   from .local_settings import *

@@ -23,19 +23,11 @@ pipeline {
             stage("front-end") {
               steps { imageBuild("${VERSION}", "awsdev") }
             } 
-            stage("Flyway") {
-              steps { build_flyway("${VERSION}") }
-            }
-            //stage("Functions") {
-            //  steps { build_functions("${VERSION}")}
-            //}
-          }
+                      }
         }
        
         stage("Deploy App") {
           steps {
-            //Deploy flyway
-            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
             //Deploy backend
             deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
@@ -61,19 +53,12 @@ pipeline {
             stage("front-end") {
               steps { imageBuild("${VERSION}qa", "awsqa") }
             } 
-            stage("Flyway") {
-              steps { build_flyway("${VERSION}") }
-            }
-            //stage("Functions") {
-            //  steps { build_functions("${VERSION}")}
-            // }
+
           }
         }
        
         stage("Deploy App"){
           steps{
-            //Deploy flyway
-            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
             //Deploy backend
             deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
@@ -84,7 +69,7 @@ pipeline {
     }
     //End of qa stage 
     stage('UAT'){
-      when { branch 'master'}
+      when { branch 'main'}
       stages {
         stage("Build Images"){
           parallel {
@@ -94,19 +79,11 @@ pipeline {
             stage("front-end") {
               steps { imageBuild("${VERSION}uat", "awsuat") }
             } 
-            stage("Flyway") {
-              steps { build_flyway("${VERSION}") }
-            }
-            //stage("Functions") {
-            //  steps { build_functions("${VERSION}")}
-            // }
           }
         }
        
         stage("Deploy App"){
           steps{
-            //Deploy flyway
-            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
             //Deploy backend
             deployToK8s("${VERSION}", "uat","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend

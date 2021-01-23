@@ -310,13 +310,14 @@ export class ContactsService {
       model.entity_name = row.entity_name;
       model.candOffice = row.candOffice;
       model.candOfficeState = row.candOfficeState;
-      model.candOfficeDistrict = row.candOfficeDistrict;
+      model.candOfficeDistrict = row.candofficedistrict;
       model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
       model.candOffice = row.candoffice;
       model.candOfficeState = row.candofficestate;
       model.candCmteId = row.candcmteid;
+      model.notes = row.notes;
 
     return model;
   }
@@ -898,5 +899,31 @@ export class ContactsService {
     return this._http.get(
         url, {params, headers: httpOptions});
   }
+
+  public updateNotes(entityId: string, notes: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url =  `${environment.apiUrl}/core/contact_notes`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    const request = {
+      'entity_id' : entityId,
+      'notes': notes,
+    };
+    return this._http
+        .post(url, request, {
+          headers: httpOptions
+        })
+        .pipe(
+            map(res => {
+              if (res) {
+                return res;
+              }
+              return false;
+            })
+        );
+  }
+
 }
 

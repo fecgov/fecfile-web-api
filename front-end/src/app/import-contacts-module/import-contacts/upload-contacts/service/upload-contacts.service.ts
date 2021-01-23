@@ -38,7 +38,7 @@ export class UploadContactsService {
     this.bucket = new S3({});
   }
 
-  public progressPercent: number;
+  public progressPercent: number = 0;
   public progressPercentSubject = new BehaviorSubject<number>(this.progressPercent);
 
   private bucket: S3;
@@ -111,34 +111,64 @@ export class UploadContactsService {
     });
   }
 
+  // /**
+  //  * Inform the backend the upload is complete.
+  //  */
+  // public uploadComplete(fileName: string): Observable<any> {
+  //   const token: string = JSON.parse(this._cookieService.get('user'));
+  //   let httpOptions = new HttpHeaders();
+  //   const url = '/contact/upload';
+
+  //   httpOptions = httpOptions.append('Content-Type', 'application/json');
+  //   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  //   const request: any = {};
+  //   request.fileName = fileName;
+
+  //   if (fileName === 'test_new.csv') {
+  //     return this._http
+  //       .get('assets/mock-data/import-contacts/upload_response_2.json', {
+  //         headers: httpOptions
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res) {
+  //             return res;
+  //           }
+  //           return false;
+  //         })
+  //       );
+  //   } else {
+  //     return this._http
+  //       .post(`${environment.apiUrl}${url}`, request, {
+  //         headers: httpOptions
+  //       })
+  //       .pipe(
+  //         map(res => {
+  //           if (res) {
+  //             return res;
+  //           }
+  //           return false;
+  //         })
+  //       );
+  //   }
+  // }
+
   /**
-   * Inform the backend the upload is complete.
+   * Validate the contacts and check for duplicates in an uploaded file.
    */
-  public uploadComplete(fileName: string): Observable<any> {
+  public validateContacts(fileName: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/contact/upload';
+    const url = '/contact/validation';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const request: any = {};
     request.fileName = fileName;
+    request.transaction_included = false;
 
-    // if (fileName === 'test_new.csv') {
-    //   return this._http
-    //     .get('assets/mock-data/import-contacts/upload_response2.json', {
-    //       headers: httpOptions
-    //     })
-    //     .pipe(
-    //       map(res => {
-    //         if (res) {
-    //           return res;
-    //         }
-    //         return false;
-    //       })
-    //     );
-    // } else {
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
@@ -151,7 +181,6 @@ export class UploadContactsService {
           return false;
         })
       );
-    // }
   }
 
   /**
@@ -231,6 +260,30 @@ export class UploadContactsService {
         observer.next(headerFields);
         observer.complete();
       });
+    });
+  }
+
+  public getObject(fileName: string): Observable<any> {
+    const params = {
+      Bucket: this.bucketName,
+      Key: fileName,
+    };
+
+    return Observable.create(observer => {
+      this.bucket.getObject(params, function (err, data) {
+        if (err) {
+          observer.next(ERROR_COMPONENT_TYPE);
+          observer.complete();
+        } else {
+          observer.next(data);
+          observer.complete();
+        }
+      });
+
+      // .createReadStream()
+      // .on('error', function(err){
+      //   res.status(500).json({error:"Error -> " + err});
+      // }).pipe(res);
     });
   }
 

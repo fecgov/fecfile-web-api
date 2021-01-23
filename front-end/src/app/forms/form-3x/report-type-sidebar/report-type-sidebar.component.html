@@ -1,8 +1,37 @@
+<div class="">
+  <header>
+    <h3 class="text-center">Select Election Year Type</h3>
+    <hr />
+    
+  </header>
+  <div class="sidebar-body pb-1" style="padding: 0 1.25em;">
+    <div class="sidebar-item">
+      <label for="electionYearType">
+        Election Year Type
+        <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
+          <i class="info-icon" aria-hidden="true"></i>
+          <span class="sr-only">
+            Click for more information
+          </span>
+        </button>
+      </label>
+      <select class="form-control" (change)="selectElectionYearTypeChange($event)">
+        <option [value]="'election-year'">Election Year</option>
+        <option [value]="'non-election-year'">Non-Election Year</option>
+      </select>
+    </div>
+  </div>
+  <hr>
+</div>
+
 <div class="report-type-sidebar">
   <header>
     <h3 class="text-center">Report Coverage Dates</h3>
     <hr />
   </header>
+
+
+
   <section>
     <form class="sidebar-form-content" [formGroup]="frmReportSidebar">
       <div class="sidebar-body" style="padding: 0 1.25em;">

@@ -55,6 +55,11 @@
   @extend .fa-caret-down;
 }
 
+.caret-up-icon {
+  @extend .fas;
+  @extend .fa-caret-up;
+}
+
 .info-icon {
   @extend .fas;
   @extend .fa-info-circle;
@@ -183,6 +188,11 @@
 .file-export-icon {
   @extend .fas;
   @extend .fa-file-export;
+}
+
+.download-icon {
+  @extend .fas;
+  @extend .fa-download;
 }
 
 .print-icon {

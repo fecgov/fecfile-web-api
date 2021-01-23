@@ -1,9 +1,9 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
   <div *ngIf="step !== 'step_6'" class="form__sidebar">
-    <div [hidden]="step !== 'step_1'" *ngIf="!allTransactions">
+    <div *ngIf="step === 'step_1' && !allTransactions">
       <report-type-sidebar title="Report Coverage Dates" (status)="onNotify($event)" [selectedReport]="selectedReport"
-        [specialReports]="specialReports" [regularReports]="regularReports">
+        [specialReports]="specialReports" [regularReports]="regularReports" (electionYearTypeEmitter)="electionYearTypeChanged($event)">
       </report-type-sidebar>
     </div>
     <div *ngIf="
@@ -42,10 +42,15 @@
       </app-steps>
     </div>
     <div class="form__content">
+      <div class="form__step"  *ngIf="step === 'step_2'" >
+        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
+          [transactionCategories]="transactionCategories">
+        </f3x-transaction-type>
+      </div>
       <div *ngIf="step === 'financial_summary'">
         <f3x-financial-summary> </f3x-financial-summary>
       </div>
-      <div class="form__step" [hidden]="step !== 'step_1'">
+      <div class="form__step" *ngIf="step === 'step_1'">
         <form-report-type [formRadioOptionsVisible]="formRadioOptionsVisible" (status)="onNotify($event)"
           [reportType]="reportType" [reportsLoading]="reportsLoading"
           [coverageDateNotSelected]="coverageDateNotSelected" [committeeReportTypes]="reportTypes"
@@ -203,12 +208,7 @@
         <app-loanreceipt> </app-loanreceipt>
       </div>
 
-      <!-- Do not reorder this div and move it up, its causing user snap issues because of "ngbheader" directive -->
-      <div class="form__step" [hidden]="step !== 'step_2'">
-        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
-          [transactionCategories]="transactionCategories">
-        </f3x-transaction-type>
-      </div>
+      
     </div>
   </div>
   <!-- ./form__container -->

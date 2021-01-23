@@ -1,0 +1,42 @@
+<div class="import_done_contacts__container">
+
+  <!-- <div class="import_done_contacts__spinner_container_outer">
+    <p>
+      
+    </p>
+    <div class="import_done_contacts__spinner_container">
+      <app-spinner></app-spinner>
+    </div>
+  </div> -->
+  <div  class="import_done_contacts__complete">
+    Your file has been successfully imported. Please see below
+    <table class="table table-striped table-hover clean_contacts__table">
+      <thead>
+        <tr>
+          <th>Success/Failure</th>
+          <th>Committee Id</th>
+          <th>File Name</th>
+          <th>Submission Timestamp</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container>
+          <tr [ngClass]="successMessage.success ? 'table-success':'table-danger'" >
+            <td>{{successMessage.success ? 'Success': 'Failure'}}</td>
+            <td>{{successMessage?.data?.committee_id}}</td>
+            <td>{{successMessage?.data?.file_name}}</td>
+            <td>{{successMessage?.data?.submission_date_time}}</td>
+            <td>{{successMessage?.data?.message}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="text-center">
+    <button class="btn btn-primary" type="button"
+    [routerLink]="['/dashboard']">
+              Return to Dashboard
+    </button>
+  </div>
+</div>

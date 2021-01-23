@@ -49,6 +49,14 @@ from fecfiler.core.transactions_chk_csv_duplicates import (
     chk_csv_uploaded,
     load_file_hash_to_db
 )    
+from fecfiler.core.transactions_validate_contacts import (
+    get_contact_details_from_transactions
+)
+
+from fecfiler.core.transactions_validate_csv import (
+    validate_transactions,
+    send_message_to_queue
+)
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -417,6 +425,7 @@ def get_report_types(request):
         #         ),
         #         status=status.HTTP_400_BAD_REQUEST,
         #     )
+        reps = []
         form_type = request.query_params.get("form_type")
         cmte_id = get_comittee_id(request.user.username)
         with open('./fecfiler/core/report_types.json') as f:
@@ -435,8 +444,13 @@ def get_report_types(request):
 
         if _year%2 == 1:
             odd = True
+            even = False
+            _nyear = _year
+            _year = _year - 1
         else:
             odd = False
+            even = True
+            _nyear = _year - 1
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -448,15 +462,21 @@ def get_report_types(request):
                 cmte_filing_freq = cmte_filing_freq[0]
 
         if cmte_filing_freq == "Q":
-            if odd:
-                parameter = "Quarterly-Non-Election-Year"
-            else:
-                parameter = "Quarterly-Election-Year"
+            # Below code committed by mahi on 12/23/2020
+            # if odd:
+            #     parameter = "Quarterly-Non-Election-Year"
+            # else:
+            #     parameter = "Quarterly-Election-Year"
+            # Below code added by mahi on 12/23/2020
+            parameter = "Quarterly"
         else:
-            if odd:
-                parameter = "Monthly-Non-Election-Year"
-            else:
-                parameter = "Monthly-Election-Year"
+            # Below code committed by mahi on 12/23/2020
+            # if odd:
+            #     parameter = "Monthly-Non-Election-Year"
+            # else:
+            #     parameter = "Monthly-Election-Year"
+            # Below code added by mahi on 12/23/2020
+            parameter = "Monthly"
         # if form_type == 'F3X':
         #     forms_obj = data['F3X'].get(parameter)
         #     for report_type in forms_obj['report_type']:
@@ -471,13 +491,19 @@ def get_report_types(request):
         #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
         #                     else:
         #                         dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
-        if form_type == 'F3L' or  form_type == 'F3X':
-            forms_obj = data[form_type].get(parameter)
+        if form_type == 'F3L' or form_type == 'F3X':
+            # 12/23/2020 changes made by mahi
+            # this is not the right way to do it but due to the time constraint I am utilizing the existing code
+            forms_obj = data[form_type].get(parameter+"-Election-Year")
+            forms_obj['selected'] = even
             for dates in forms_obj['report_type']:
                 # Temporary fix till we get EFO dates
-                if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
-                if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
-                if dates.get('due_date') == 'EFO': dates['due_date'] = None
+                if dates.get('cvg_start_date') == 'EFO':
+                    dates['cvg_start_date'] = None
+                if dates.get('cvg_end_date') == 'EFO':
+                    dates['cvg_end_date'] = None
+                if dates.get('due_date') == 'EFO':
+                    dates['due_date'] = None
 
                 if dates.get('election_date'):
                     dates['election_date'] = dates.get('election_date').replace("YYYY", str(_year))
@@ -496,10 +522,39 @@ def get_report_types(request):
                             item['start_date'] = item.get('start_date').replace("YYYY", str(_year))
                         if item.get('end_date'):
                             item['end_date'] = item.get('end_date').replace("YYYY", str(_year))
+
+            reps.append(forms_obj)
+
+            forms_obj = data[form_type].get(parameter+"-Non-Election-Year")
+            forms_obj['selected'] = odd
+            for dates in forms_obj['report_type']:
+                # Temporary fix till we get EFO dates
+                if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
+                if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
+                if dates.get('due_date') == 'EFO': dates['due_date'] = None
+
+                if dates.get('election_date'):
+                    dates['election_date'] = dates.get('election_date').replace("YYYY", str(_nyear))
+                if dates.get('cvg_start_date'):
+                    dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_nyear))
+                if dates.get('cvg_end_date'):
+                    dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_nyear))
+                if dates.get('due_date'):
+                    if "YYYY-01" in dates.get('due_date'):
+                        dates['due_date'] = dates.get('due_date').replace("YYYY", str(_nyear + 1))
+                    else:
+                        dates['due_date'] = dates.get('due_date').replace("YYYY", str(_nyear))
+                if dates.get('semi-annual_dates'):
+                    for item in dates.get('semi-annual_dates'):
+                        if item.get('start_date'):
+                            item['start_date'] = item.get('start_date').replace("YYYY", str(_nyear))
+                        if item.get('end_date'):
+                            item['end_date'] = item.get('end_date').replace("YYYY", str(_nyear))
+            reps.append(forms_obj)
         else:
             raise Exception('The form type passed is not yet implemented. Input received: {}'.format(form_type))
 
-        return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(reps, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response(
             "The get_report_types API is throwing an error: " + str(e),
@@ -1134,6 +1189,7 @@ def get_recently_saved_reports(data):
 
             query_string = """select form_type, report_type,status, to_char(last_update_date,'YYYY-MM-DD')::date as last_saved
                                 from public.reports where cmte_id = %s and status = 'Saved' 
+                                and delete_ind is distinct from 'Y' 
                                  order by last_update_date desc limit 10"""
 
             cursor.execute(
@@ -2541,6 +2597,7 @@ def save_cand_entity(data, new=False):
     else:
         cand_data["entity_id"] = get_next_entity_id("CAN")
     cand_data["cmte_id"] = data.get("cmte_id")
+    cand_data["username"] = data.get("username")
     cand_data["entity_type"] = "CAN"
     logger.debug("cand_data to be saved:{}".format(cand_data))
     return put_entities(cand_data)
@@ -2795,13 +2852,13 @@ def put_sql_entity(
                     zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
                     create_date, last_update_date, cand_office, cand_office_state, 
                     cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-                    ref_entity_id, logged_date, username)
+                    ref_entity_id, logged_date, username, notes)
                     SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
                     middle_name, preffix, suffix, street_1, street_2, city, state, 
                     zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
                     create_date, last_update_date, cand_office, cand_office_state, 
                     cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-                    ref_entity_id, now(), %s
+                    ref_entity_id, now(), %s, notes
                     FROM public.entity WHERE entity_id=%s
                     """,
                     [
@@ -7067,6 +7124,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             search_keys = [
                 "id",
@@ -7084,6 +7142,7 @@ def contactsTable(request):
                 "candCmteId",
                 "phone_number",
                 "deleteddate",
+                "notes",
             ]
             if search_string:
                 for key in search_keys:
@@ -7152,7 +7211,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
 
             trans_query_string = (
-                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt, notes from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
                 + cmte_id
                 + """' """
@@ -8055,13 +8114,13 @@ def put_contact_data(data, username):
               zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
               create_date, last_update_date, cand_office, cand_office_state, 
               cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-              ref_entity_id, logged_date, username)
+              ref_entity_id, logged_date, username, notes)
               SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, 
               middle_name, preffix, suffix, street_1, street_2, city, state, 
               zip_code, occupation, employer, ref_cand_cmte_id, delete_ind, 
               create_date, last_update_date, cand_office, cand_office_state, 
               cand_office_district, cand_election_year, phone_number, principal_campaign_committee, 
-              ref_entity_id, now(), %s
+              ref_entity_id, now(), %s, notes
               FROM public.entity WHERE entity_id=%s
               """,
               [
@@ -8324,7 +8383,7 @@ def get_list_contact(
             # This Flag seperates whether I need only entity name or first_name, last_name
             if not name_select_flag:
                 if isinstance(entity_id, list):
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(entity_id)
                     )
@@ -8335,7 +8394,7 @@ def get_list_contact(
                     )
                 # GET single row from entity table
                 elif entity_id:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
 
                     cursor.execute(
@@ -8343,7 +8402,7 @@ def get_list_contact(
                         [cmte_id, entity_id],
                     )
                 else:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
 
                     cursor.execute(
@@ -8352,10 +8411,10 @@ def get_list_contact(
                     )
             else:
                 if entity_name_flag:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 else:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, notes
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
@@ -11611,8 +11670,13 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
-                       updated_date
+                select notification_id as id, 
+                    form_tp as form_name, 
+                    '/reports' as form_name_redirect,
+                    rpt_tp as report_type, 
+                    '/reports' as report_type_redirect,
+                    due_date,
+                    updated_date
                 from public.notifications_reminder_email
                 where cmte_id = %(cmte_id)s
             ) v
@@ -11644,7 +11708,12 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select notification_id as id, form_tp as form_name, rpt_tp as report_type, due_date,
+                select notification_id as id, 
+                    form_tp as form_name, 
+                    '/reports' as form_name_redirect,
+                    rpt_tp as report_type, 
+                    '/reports' as report_type_redirect,
+                    due_date,
                     ( current_date - due_date ) as past_due_days,
                     updated_date
                 from public.notifications_late_notification
@@ -11672,24 +11741,25 @@ class NotificationsSwitch:
 
         sql_count = """
             select count(1) as count
-            from public.reports
+            from public.notifications_filing_confirmations
             where cmte_id = %(cmte_id)s
-            and status = 'Submitted'
         """
 
         sql_items = """
             select * from (
                 select report_id as id,
                     fec_id as filing_id,
+                    '/reports' as filing_id_redirect,
                     form_type as form_name,
+                    '/reports' as form_name_redirect,
                     report_type as report_type,
+                    '/reports' as report_type_redirect,
                     to_char(cvg_start_date, 'MM/DD/YYYY') || ' - ' || to_char(cvg_end_date, 'MM/DD/YYYY') as coverage_dates,
-                    null as filed_by,
+                    filed_by,
                     to_char(filed_date, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
                     filed_date
-                from public.reports
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
             ) v
         """
 
@@ -11740,7 +11810,7 @@ class NotificationsSwitch:
 
         return (sql_count, sql_items, keys)
 
-    def case_ImportedTransactions(self):
+    def case_ImportedStatus(self):
 
         sql_count = """
             SELECT 0 as count WHERE %(cmte_id)s is not null
@@ -11748,16 +11818,19 @@ class NotificationsSwitch:
 
         sql_items = """
             select * from (
-                select null as id, null as name, null as uploader, null as date_time, null as check_sum,
-                       null as updated_date
-                where 1=2 and %(cmte_id)s is not null
+                select file_name as name,
+                    uploaded_by as uploader,
+                    to_char(uploaded_on, 'MM/DD/YYYY | HH:MI AM TZ') as date_time,
+                    checksum as check_sum
+                from public.notifications_import_statuses
+                where cmte_id = %(cmte_id)s
             ) v
         """
 
         if self._orderby != None:
             sql_items = sql_items + self._orderby
         else:
-            sql_items = sql_items + " order by updated_date DESC "
+            sql_items = sql_items + " order by date_time DESC "
         if self._pagination != None:
             sql_items = sql_items + self._pagination
 
@@ -11783,18 +11856,21 @@ def get_notifications_count(request):
             select sum(V.records_count) as count
             from
             (
-                select count(1) as records_count
+                select 'reminder_email' as notification_type, count(1) as records_count
                 from public.notifications_reminder_email
                 where cmte_id = %(cmte_id)s
                 union 
-                select count(1) as records_count
+                select 'late_notification' as notification_type, count(1) as records_count
                 from public.notifications_late_notification
                 where cmte_id = %(cmte_id)s
                 union
-                select count(1) as records_count
-                from public.reports
+                select 'filing_confirmations' as notification_type, count(1) as records_count
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
+                union
+                select 'import_status' as notification_type, count(1) as records_count
+                from public.notifications_import_statuses
+                where cmte_id = %(cmte_id)s
             ) as V
         """     
         sql = """SELECT json_agg(t) FROM (""" + sql_count + """) t"""
@@ -11842,14 +11918,18 @@ def get_notifications_counts(request):
             select 'Filing Confirmations' as "groupName", count
             from ( 
                 select count(1) as count
-                from public.reports
+                from public.notifications_filing_confirmations
                 where cmte_id = %(cmte_id)s
-                and status = 'Submitted'
             ) A
             union
             select 'RFAIs' as "groupName", 0 as count
             union
-            select 'Imported Transactions' as "groupName", 0 as count
+            select 'Imported Status' as "groupName", count
+            from ( 
+                select count(1) as count
+                from public.notifications_import_statuses
+                where cmte_id = %(cmte_id)s
+            ) A
         """
 
         sql = """SELECT json_agg(t) FROM (""" + sql_groups + """) t"""
@@ -11938,9 +12018,6 @@ def get_notification(request):
                 where notification_id = %(notification_id)s
             """
 
-        if viewtype == 'Filing Confirmations':
-            pass
-
         if viewtype == 'RFAIs':
             pass
 
@@ -11948,7 +12025,46 @@ def get_notification(request):
             pass
 
         if sql_item is None:
-            raise Exception('Unsupported viewtype='  + viewtype)
+            if viewtype == 'Filing Confirmations':
+                sql_submission_id = """
+                    select COALESCE(max(submission_id), '0') as submission_id
+                    from public.notifications_filing_confirmations
+                    where report_id = %(notification_id)s
+                """     
+                sql = """SELECT json_agg(t) FROM (""" + sql_submission_id + """) t"""
+
+                with connection.cursor() as cursor:
+                    cursor.execute(sql, {
+                        "notification_id": notification_id
+                    })
+                    row1=cursor.fetchone()[0]
+                    submission_id =  row1[0]['submission_id']
+
+                #submission_id = "4d074079-53d3-4b3b-9d37-caf011633c55"
+                responses = requests.get(
+                    settings.NXG_FEC_FILING_CONFIRMATION_URL + "?submissionId={}".format(
+                        submission_id
+                    )
+                )
+                if responses.status_code == status.HTTP_200_OK:
+                    blob = responses.text.replace("\n", "")
+                    output = { 
+                        'contentType': 'binary',
+                        'blob': blob
+                    }
+                else:
+                    output = { 
+                        'contentType': 'html',
+                        'blob': responses.content
+                    }
+
+                return Response(output, status=status.HTTP_200_OK)
+
+            else:
+                return Response(
+                    "Unsupported viewtype = " + viewtype,
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
 
         sql = """SELECT json_agg(t) FROM (""" + sql_item + """) t"""
         with connection.cursor() as cursor:
@@ -12068,7 +12184,7 @@ def contact_logs(request):
             raise Exception('entity_id is mandatory')
         sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address, 
               c.city, c.state, c.zip, c.occupation, c.employer, c.candOffice, c.candOfficeState, 
-              c.candOfficeDistrict, c.candCmteId, c.phone_number, 
+              c.candOfficeDistrict, c.candCmteId, c.phone_number, c.notes,
               concat_ws(', ', e.last_name, e.first_name) AS user, ((c.logged_date) AT TIME ZONE 'UTC') AT TIME ZONE 'EDT' AS modifieddate
               FROM contacts_log_view c, authentication_account e
               WHERE c.id=%s AND c.username IS NOT NULL AND e.username=c.username
@@ -12084,7 +12200,7 @@ def contact_logs(request):
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
-          "The contact_log API is throwing an error: " + str(e),
+          "The contact_logs API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
 
@@ -12140,13 +12256,10 @@ def contact_report_details(request):
 def chk_csv_uploaded_in_db(request):
     try:
         resp = chk_csv_uploaded(request)
-        return Response(resp, status=status.HTTP_200_OK)              
+        return JsonResponse(resp, status=status.HTTP_201_CREATED, safe=False)
     except Exception as e:
-        return Response(
-          "The chk_csv_uploaded_in_db API is throwing an error: " + str(e),
-          status=status.HTTP_400_BAD_REQUEST
-          )
-
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)        
 
 @api_view(["POST"])
 def save_csv_md5_to_db(request):
@@ -12160,5 +12273,123 @@ def save_csv_md5_to_db(request):
         return Response(
           "The save_csv_md5_to_db API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(["POST"])
+def generate_contact_details_from_csv(request):
+    try:
+        cmteid = request.user.username
+        filename = request.data.get("file_name") #request.file_name
+        resp = get_contact_details_from_transactions(cmteid, filename)
+        return Response(resp, status=status.HTTP_200_OK)              
+    except Exception as e:
+        return Response(
+          "The get_contact_details_from_csv API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
           )        
 
+
+@api_view(["POST"])
+def validate_import_transactions(request):
+    try:
+
+        cmteid =  get_comittee_id(request.user.username)
+        bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
+        key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
+        auth = request.auth
+        #print('cmteid ', cmteid,' bkt_name ',bktname,' key: ', key )
+        if bktname and key:
+            resp = validate_transactions(bktname, key, cmteid)
+        else: 
+            resp = "No data: both bktname and key need to be sent"
+
+        '''
+        # Start Contacts code commented out
+        filename = key.split('/')[1]
+        transcontacts = get_contact_details_from_transactions(cmteid, filename)
+        transcontacts =  'contacts/'+transcontacts 
+        data_obj = {
+            "fileName": transcontacts,
+        }
+        # url = "https://" + settings.DATA_RECEIVE_API_URL + "/v1/contact/transaction/upload"
+        # print(url)
+        # res = requests.post(
+        #     "https://"
+        #     + settings.DATA_RECEIVE_API_URL
+        #     + "/v1/contact/transaction/upload",
+        #     data=data_obj,
+        # )  
+        url='http://localhost:8080/api/v1/contact/transaction/upload'
+        token_use = request.auth.decode("utf-8")
+        token_use = "JWT" + " " + token_use
+        res = requests.post(url,
+            data=data_obj,
+            headers={'Authorization': token_use}        
+        )     
+        # End Contacts code commented out   
+        print(res)
+        '''
+        return Response(resp, status=status.HTTP_200_OK)              
+    except Exception as e:
+        return Response(
+          "The validate_import_transactions API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )        
+@api_view(["POST"])
+def queue_transaction_message(request):
+    try:
+        cmteid =  get_comittee_id(request.user.username)
+        bktname = request.data.get("bkt_name") #"fecfile-filing-frontend"
+        key = request.data.get("key") #"transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
+
+        print('cmteid ', cmteid,' bkt_name ',bktname,' key: ', key )
+        if bktname and key:
+            resp = send_message_to_queue(bktname, key)
+        else: 
+            resp = "No data: both bktname and key need to be sent"
+
+        return Response(resp, status=status.HTTP_200_OK)              
+    except Exception as e:
+        return Response(
+          "The queue_transaction_message API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )        
+
+
+@api_view(["POST"])
+def contact_notes(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        entity_id = request.data.get('entity_id')
+        notes = request.data.get('notes') #request.md5hash
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.entity SET notes=%s WHERE entity_id=%s and cmte_id=%s"""
+            cursor.execute(_sql, [notes, entity_id, cmte_id])
+            if cursor.rowcount == 0:
+                return Response("Unable to find the entity id: {} for the committee {}".format(entity_id, cmte_id), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response("Sucessfully updated the notes for entity_id: {}".format(entity_id), status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The contact_notes API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+
+@api_view(["POST"])
+def import_fecfile(request):
+    try:
+        data_obj = json.loads(request.body)
+        print(data_obj)
+        resp = requests.post(settings.NXG_FEC_DCF_CONVERTER_API_URL +
+                             settings.NXG_FEC_DCF_CONVERTER_API_VERSION, data=json.dumps(data_obj))
+        if not resp.ok:
+            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            dictprint = resp.json()
+            return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response(
+          "The import_fecfile API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

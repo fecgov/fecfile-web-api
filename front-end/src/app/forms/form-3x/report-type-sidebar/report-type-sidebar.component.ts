@@ -21,6 +21,7 @@ import { ApiService } from './../../../shared/services/APIService/api.service';
 export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Output() electionYearTypeEmitter: EventEmitter<any> = new EventEmitter<any>();
   @Input() specialReports: boolean = false;
   @Input() regularReports: boolean = false;
   @Input() selectedReport: any = null;
@@ -92,7 +93,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._messageService.getUpdateReportTypeMessage().takeUntil(this.onDestroy$).subscribe((message: any) => {
+    this._messageService.getUpdateReportTypeMessageToReportTypeSidebar().takeUntil(this.onDestroy$).subscribe((message: any) => {
       if(message && message.currentReportData){
         this.reportEditMode = true;
         if(this.frmReportSidebar){
@@ -102,7 +103,14 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
       message = null;
     });
-    
+
+  }
+
+  selectElectionYearTypeChange(option:any){
+    if(option){
+      this._messageService.sendMessage({action:'resetForm'});
+      this.electionYearTypeEmitter.emit({option:option});
+    }
   }
 
   private populateDataForEdit(message: any) {

@@ -201,18 +201,26 @@
     }
 
     .notifications_modal-dialog {
-      max-width: 640px;
+      max-width: 650px;
     }
 
     .notifications_modal-body {
       overflow-y: auto;
-      max-height: calc(100vh - 200px);
+      height: calc(100vh - 200px);
     }
 
     .notifications_modal-body-content {
       display: block;
       margin-left: auto;
       margin-right: auto;
+      width: 100%;
+      height: 100%;
+    }
+
+    .notifications_modal-body-frame {
+       border: 0;
+       width: 100%;
+       height: 100%;
     }
   }
 }

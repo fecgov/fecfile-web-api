@@ -9,7 +9,9 @@ export class MessageService {
     private _subject: BehaviorSubject<any> = new BehaviorSubject<any>('');
     private _populateChildComponentsubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
     private _rollbackChangesSubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
-    private _updateReportType: BehaviorSubject<any> = new BehaviorSubject<any>('');
+    private _updateReportTypeToReportType: BehaviorSubject<any> = new BehaviorSubject<any>('');
+    private _updateReportTypeToReportTypeSidebar: BehaviorSubject<any> = new BehaviorSubject<any>('');
+    
 
     constructor() { }
 
@@ -96,16 +98,42 @@ export class MessageService {
      *
      * @param      {Any}  message  The message
      */
-    public sendUpdateReportTypeMessage(message: any) {
-        this._updateReportType.next(message);
+    public sendUpdateReportTypeMessageToReportType(message: any) {
+        this._updateReportTypeToReportType.next(message);
+    }
+
+        /**
+     * Sends the message to a component.
+     *
+     * @param      {Any}  message  The message
+     */
+    public sendUpdateReportTypeMessageToReportTypeSidebar(message: any) {
+        this._updateReportTypeToReportTypeSidebar.next(message);
     }
 
     /**
      * Clears the message if needed.
      *
      */
-    public clearUpdateReportTypeMessage() {
-        this._updateReportType.next('');
+    public clearUpdateReportTypeMessageToReportType() {
+        this._updateReportTypeToReportType.next('');
+    }
+    
+    /**
+     * Clears the message if needed.
+     *
+     */
+    public clearUpdateReportTypeMessageToReportTypeSidebar() {
+        this._updateReportTypeToReportTypeSidebar.next('');
+    }    
+
+    /**
+     * Gets the message.
+     *
+     * @return     {Observable}  The message.
+     */
+    public getUpdateReportTypeMessageToReportType(): Observable<any> {
+        return this._updateReportTypeToReportType.asObservable();
     }
 
     /**
@@ -113,8 +141,8 @@ export class MessageService {
      *
      * @return     {Observable}  The message.
      */
-    public getUpdateReportTypeMessage(): Observable<any> {
-        return this._updateReportType.asObservable();
+    public getUpdateReportTypeMessageToReportTypeSidebar(): Observable<any> {
+        return this._updateReportTypeToReportTypeSidebar.asObservable();
     }
 
 }

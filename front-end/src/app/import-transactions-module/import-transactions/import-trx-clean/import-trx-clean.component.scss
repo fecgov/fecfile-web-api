@@ -1,0 +1,175 @@
+@import 'src/app/shared/scss/global';
+
+.trx-clean-container {
+  position: relative;
+  p {
+    font-size: 18px;
+  }
+
+  .clean_contacts__table-inner {
+    overflow-x: auto;
+    overflow-y: visible;
+    /* max-width: 96%;
+    margin-left: 4%; */
+
+    table {
+      table-layout: fixed;
+      th {
+        width: 10em; /* 150px; */
+        height: 2.5em;
+      }
+      .hard_left {
+        position: absolute;
+        left: 0;
+        width: 2%;
+      }
+      .indent_right {
+        /*
+        position: absolute;
+        left: 13px; 
+        width: 2%;
+        padding-left: 32px;
+        */
+        text-align: center;
+      }
+      td {
+        vertical-align: middle;
+      }
+      .contacts__action-button {
+        width: 11em;
+      }
+      #contacts__dropdown-action {
+        margin-left: 3.5em;
+      }
+    }
+  }
+
+  .clean_contacts__heading {
+    padding: 0.5em 0;
+  }
+
+  .clean_contacts__table-pagination-container {
+    padding: 1em;
+  }
+
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
+
+  .ngx-pagination .current {
+    padding: 0.1875rem 0.625rem;
+    background: #9b9b9b !important;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a,
+  .ngx-pagination button {
+    color: #9b9b9b !important;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }
+
+  /* style ngx-pagination - end */
+
+  .clean_contacts__button {
+    width: 11em;
+    height: 3em;
+    margin: 1.2em 0.25em;
+  }
+
+  .clean_contacts__canel-button {
+    background-color: $fecRed;
+    color: white;
+  }
+
+  #clean_contacts__merge-all-button[disabled] {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .clean_contacts__ignore-warn {
+    font-size: 3em;
+    padding: 20px;
+    text-align: center;
+    color: $fecRed;
+    float: left;
+  }
+
+  .clean_contacts__no-dupes {
+    text-align: center;
+    padding: 3em 0;
+    font-size: 25px;
+    font-weight: bold;
+  }
+}
+
+// #clean_contacts__pin-modal-header_1,
+// #clean_contacts__pin-modal-header_2,
+// #clean_contacts__pin-modal-header_3,
+// #clean_contacts__pin-modal-header_4,
+// #clean_contacts__pin-modal-header_5,
+.clean_contacts__pin-modal-header {
+  background-color: $primaryBlue;
+  color: $white;
+  span {
+    color: $white;
+  }
+}
+
+.modal {
+  .modal-lg,
+  .modal-xl {
+    max-width: 95%;
+  }
+  // #clean_contacts__pin-modal-header_1,
+  // #clean_contacts__pin-modal-header_2,
+  // #clean_contacts__pin-modal-header_3,
+  // #clean_contacts__pin-modal-header_4,
+  // .clean_contacts__pin-modal-header{
+  //   background-color: $primaryBlue;
+  //   color: $white;
+  //   span {
+  //     color: $white;
+  //   }
+  // }
+  .clean_contacts__merge-table {
+    .clean_contacts__name-col {
+      width: 9%;
+    }
+    .clean_contacts__merge-label {
+      font-size: larger;
+      width: 22%;
+      a {
+        &:hover,
+        &:visited,
+        &:active {
+          color: black;
+          text-decoration: none;
+        }
+      }
+    }
+    td {
+      vertical-align: middle;
+    }
+    .clean_contacts__display-name {
+      font-weight: bold;
+    }
+    .clean_contacts__checkbox {
+      float: left;
+      height: 20px;
+      width: 20px;
+    }
+    .clean_contacts__checkbox-missing-val {
+      float: left;
+      height: 20px;
+      width: 20px;
+      margin-top: 7px;
+      margin-right: 9%;
+    }
+    .clean_contacts__missing-field {
+      width: 70%;
+      height: 19px;
+    }
+  }
+}

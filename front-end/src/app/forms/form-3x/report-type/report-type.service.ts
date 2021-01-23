@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/shared/services/AuthService/auth.service';
 import { DialogService } from './../../../shared/services/DialogService/dialog.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
@@ -17,7 +18,8 @@ import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/par
 })
 export class ReportTypeService {
 
-  constructor(private _http: HttpClient, private _cookieService: CookieService, private _dialogService: DialogService) {
+
+  constructor(private _http: HttpClient, private _cookieService: CookieService, private _dialogService: DialogService, private _authService: AuthService) {
     this._datePipe = new DatePipe('en-US');
   }
   private _datePipe: DatePipe;
@@ -45,6 +47,15 @@ export class ReportTypeService {
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions
     });
+  }
+
+  getAllReportTypes(formType: string) {
+    const mockFile = 'assets/mock-data/report-types/report-types.json';
+    let httpOptions = new HttpHeaders();
+    return this._http
+      .get(mockFile, {
+        headers: httpOptions
+      });
   }
 
   /**
@@ -286,7 +297,7 @@ export class ReportTypeService {
     }
   }
 
-  public signandSaveSubmitReport(formType: string, access_type: string, submitterName :string = ''): Observable<any> {
+  public signandSaveSubmitReport(formType: string, access_type: string, submitterName :string = '', form:any = null, emailsOnFileArray :string[]= null): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url = '/core/reports';
@@ -414,12 +425,15 @@ export class ReportTypeService {
       }
 
       //console.log(' access_type =', access_type);
+      let emailsList : string = '';
+      let notificationsList : string = '';
 
       if (form3xReportType.email1 !== null) {
         if (typeof form3xReportType.email1 === 'string') {
           if (form3xReportType.email1.length >= 1) {
             formData.append('email_1', form3xReportType.email1);
             formData.append('emailAddress1', form3xReportType.email1);
+            emailsList=`${emailsList}${form3xReportType.email1};`;
           }
         }
       }
@@ -429,34 +443,42 @@ export class ReportTypeService {
           if (form3xReportType.email2.length >= 1) {
             formData.append('email_2', form3xReportType.email2);
             formData.append('emailAddress2', form3xReportType.email2);
-
+            emailsList=`${emailsList}${form3xReportType.email2};`;
           }
         }
       }
 
+      if(emailsOnFileArray && emailsOnFileArray.length > 0)
+      {
+        const emailsOnFile = emailsOnFileArray.reduce((acc,element)=>{
+          return acc + ";" + element;
+        });
 
-      //fallback to treasurers first email if no email addresses present
-      if(!form3xReportType.email1 && !form3xReportType.email2){
-        if(committeeDetails.treasureremail){
-          let treasurerEmails :string[] = committeeDetails.treasureremail.split(';');
-          if(treasurerEmails && treasurerEmails.length>0){
-            formData.append('email_1', treasurerEmails[0]);
-            formData.append('emailAddress1', treasurerEmails[0]);
-          }
+        emailsList=`${emailsList}${emailsOnFile};`;
+      }
 
-        }
+      if(committeeDetails.treasureremail){
+        emailsList=`${emailsList}${committeeDetails.treasureremail};`;
+      }
+
+      // let submitterEmail : string = '';
+      const currentUser = this._authService.getCurrentUser();
+      if(currentUser && currentUser.email){
+        emailsList=`${emailsList}${currentUser.email};`;
       }
 
       if (form3xReportType.hasOwnProperty('additionalEmail1')) {
         if (typeof form3xReportType.additionalEmail1 === 'string') {
           if (form3xReportType.additionalEmail1.length >= 1) {
             formData.append('additional_email_1', form3xReportType.additionalEmail1);
+            notificationsList=`${notificationsList}${form3xReportType.additionalEmail1};`;
           }
         }
       } else if (form3xReportType.hasOwnProperty('additionalemail1')) {
         if (typeof form3xReportType.additionalemail1 === 'string') {
           if (form3xReportType.additionalemail1.length >= 1) {
             formData.append('additional_email_1', form3xReportType.additionalemail1);
+            notificationsList=`${notificationsList}${form3xReportType.additionalemail1};`;
           }
         }
       }
@@ -465,16 +487,38 @@ export class ReportTypeService {
         if (typeof form3xReportType.additionalEmail2 === 'string') {
           if (form3xReportType.additionalEmail2.length >= 1) {
             formData.append('additional_email_2', form3xReportType.additionalEmail2);
+            notificationsList=`${notificationsList}${form3xReportType.additionalEmail2};`;
           }
         }
       } else if (form3xReportType.hasOwnProperty('additionalemail2')) {
         if (typeof form3xReportType.additionalemail2 === 'string') {
           if (form3xReportType.additionalemail2.length >= 1) {
             formData.append('additional_email_2', form3xReportType.additionalemail2);
+            notificationsList=`${notificationsList}${form3xReportType.additionalemail2};`;
           }
         }
       }
+
+      if(form && form.additionalEmail1){
+        notificationsList=`${notificationsList}${form.additionalEmail1};`;
+      }
+
+      if(form && form.additionalEmail2){
+        notificationsList=`${notificationsList}${form.additionalEmail2};`;
+      }
+
+      //append all non-notification emails to emailAddress1 for api handling
+      if(emailsList && emailsList.length > 0){
+        formData.append('emailAddress1', emailsList);
+      }
+    
+      //also append all notification emails to emailAddress2 for api handling
+      if(notificationsList && notificationsList.length > 0){
+        formData.append('emailAddress2', notificationsList);
+      }
     }
+
+    
 
     if(form3xReportType.hasOwnProperty('originalfecid') && form3xReportType.originalfecid){
         formData.append('originalFECId', "FEC-" + form3xReportType.originalfecid.toString());

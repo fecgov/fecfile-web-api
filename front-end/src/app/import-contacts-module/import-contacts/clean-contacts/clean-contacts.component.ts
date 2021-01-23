@@ -54,24 +54,24 @@ export class CleanContactsComponent implements OnInit, OnDestroy {
   public determineComponentsToShow() {
     const page = 1;
     let showErrs = false;
-    this._importContactsService.validateContacts(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
-      if (res.validation_errors) {
-        if (res.validation_errors.length > 0) {
-          showErrs = true;
-          this.showErrorsSubject.next(true);
-        }
-      }
-      if (showErrs === false) {
-        this._importContactsService.checkDuplicates(page).takeUntil(this.onDestroy$).subscribe((res2: any) => {
-          if (res2.duplicates) {
-            if (res2.duplicates.length > 0) {
-              this.showDuplicatesSubject.next(true);
-            }
-          }
-        });
-      }
-
-    });
+    this.showDuplicatesSubject.next(true);
+    // this._importContactsService.validateContacts(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
+    //   if (res.validation_errors) {
+    //     if (res.validation_errors.length > 0) {
+    //       showErrs = true;
+    //       this.showErrorsSubject.next(true);
+    //     }
+    //   }
+    //   if (showErrs === false) {
+    //     this._importContactsService.checkDuplicates(page).takeUntil(this.onDestroy$).subscribe((res2: any) => {
+    //       if (res2.duplicates) {
+    //         if (res2.duplicates.length > 0) {
+    //           this.showDuplicatesSubject.next(true);
+    //         }
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   public receiveDupeCancel() {
