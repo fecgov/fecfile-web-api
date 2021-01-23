@@ -360,23 +360,39 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   
       this._router.navigate([`/forms/form/${formType}`], {
         queryParams: queryParamsMap
-      });
-  
-      res = res[0];
-      this._messageService.sendUpdateReportTypeMessage({
-        currentReportData: {
+      }).then(success=>{
+        if(success){
+          res = res[0];
+          const currentReportData =  {
+            'currentReportDescription': res.reporttypedescription,
+            'currentStartDate': res.cvgStartDate ? this._datePipe.transform(res.cvgStartDate, 'yyyy-MM-dd') : null, 
+            'currentEndDate': res.cvgEndDate ? this._datePipe.transform(res.cvgEndDate, 'yyyy-MM-dd') : null,
+            'currentDueDate' : res.duedate,
+            'currentReportType': res.reporttype,
+            'currentElectionDate':res.election_date ? res.election_date : res.electiondate,
+            'currentElectionState':res.election_state ? res.election_state : res.electionstate,
+            'currentSemiAnnualStartDate': res.semi_annual_start_date,
+            'currentSemiAnnualEndDate': res.semi_annual_end_date
+          }
           
-          'currentReportDescription': res.reporttypedescription,
-          'currentStartDate': res.cvgStartDate ? this._datePipe.transform(res.cvgStartDate, 'yyyy-MM-dd') : null, 
-          'currentEndDate': res.cvgEndDate ? this._datePipe.transform(res.cvgEndDate, 'yyyy-MM-dd') : null,
-          'currentDueDate' : res.duedate,
-          'currentReportType': res.reporttype,
-          'currentElectionDate':res.election_date ? res.election_date : res.electiondate,
-          'currentElectionState':res.election_state ? res.election_state : res.electionstate,
-          'currentSemiAnnualStartDate': res.semi_annual_start_date,
-          'currentSemiAnnualEndDate': res.semi_annual_end_date
+          //messages are wrapped in the setTimeout method to allow the ReportTypeComponent, and
+          //ReportTypeSidebarComponent to be initialized (in the order). 
+          setTimeout(()=>{
+            // first send message to right component
+            this._messageService.sendUpdateReportTypeMessageToReportType({
+              currentReportData
+            });
+            //then send msg to left component
+            this._messageService.sendUpdateReportTypeMessageToReportTypeSidebar({
+              currentReportData
+            });
+          }, 0);
+
+          
+
         }
       });
+  
     })
     
   }

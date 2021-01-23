@@ -566,42 +566,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy {
           }
         );
       } else if (this.formType === '3X' || this.formType === '24' || this.formType === '3L') {
-        this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted', `${this.submitterInfo.last_name}, ${this.submitterInfo.first_name}`).subscribe(res => {
-        // throwError({
-        //   error: {
-        //     error: {
-        //       errors: 
-        //         [
-        //           {
-        //             coverageEndDate: '03/31/2020',
-        //             errorMessage: 'Incorrect Coverage Ending Date for Report Type',
-        //             errorNumber: 'USER_ERROR-DR000018',
-        //             fieldName: 'coverageEndDate',
-        //             reportType: 'M4',
-        //           },
-        //           {
-        //             coverageEndDate: '03/31/2020',
-        //             errorMessage: 'Another error with different message',
-        //             errorNumber: 'USER_ERROR-DR000018',
-        //             fieldName: 'coverageEndDate',
-        //             reportType: 'M4',
-        //           }
-        //         ],
-              
-        //       result: [
-        //         {
-        //           committeeId: 'C00000935',
-        //           message: 'Upload rejected, please fix the errors and re-submit the report',
-        //           reportId: '',
-        //           status: 'Failed Sanity Check',
-        //           submissionId: '83b64910-a915-47db-b6dd-4451bdbe5320',
-        //           uploadTimeStamp: '09/18/2020 17:02:19',
-        //         },
-        //       ],
-        //     },
-        //   },
-        // }).subscribe(
-        //   (res) => {
+        this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted', `${this.submitterInfo.last_name}, ${this.submitterInfo.first_name}`, this.form.value, this.emailsOnFile).subscribe(res => {
             if (res) {
               const frmSaved: any = {
                 saved: true,

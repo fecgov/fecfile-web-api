@@ -12,12 +12,12 @@ import { DuplicateContactsComponent } from './import-contacts/clean-contacts/dup
 import { ErrorContactsComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts.component';
 import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts-field/error-contacts-field.component';
 import { ReviewUploadComponent } from './import-contacts/review-upload/review-upload.component';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { ImportHowToComponent } from './import-contacts/import-how-to/import-how-to.component';
+import { CancelImportConfirmComponent } from './import-contacts/cancel-import-confirm/cancel-import-confirm.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    ImportContactsRoutingModule
-  ],
+  imports: [SharedModule, ImportContactsRoutingModule, NgbDropdownModule],
   declarations: [
     ImportContactsComponent,
     UploadContactsComponent,
@@ -28,7 +28,11 @@ import { ReviewUploadComponent } from './import-contacts/review-upload/review-up
     DuplicateContactsComponent,
     ErrorContactsComponent,
     ErrorContactsFieldComponent,
-    ReviewUploadComponent
-  ]
+    ReviewUploadComponent,
+    ImportHowToComponent,
+    CancelImportConfirmComponent
+  ],
+  entryComponents: [CancelImportConfirmComponent], 
+  exports: [UploadContactsComponent]
 })
-export class ImportContactsModule { }
+export class ImportContactsModule {}

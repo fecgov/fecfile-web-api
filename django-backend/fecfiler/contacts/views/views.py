@@ -5,9 +5,10 @@ import boto3
 import numpy as np
 import pandas as pd
 import psycopg2
+import os
 from django.conf import settings
 from django.db import connection
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from pandas_schema import Column, Schema
 from pandas_schema.validation import MatchesPatternValidation, InListValidation
 from rest_framework import status
@@ -326,3 +327,14 @@ def delete_contact(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+@api_view(["GET"])
+def download_template(request):
+
+    filename = r'Import Contacts Specs & Template.xlsx'
+    dirname = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
+    xls_file_path = dirname +  '/../resources/' + filename
+    response = FileResponse(open(xls_file_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'inline; filename = {}'.format(filename)
+
+    return response

@@ -327,7 +327,7 @@
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
                                *ngIf="frmIndividualReceipt.get(col?.name).errors?.max">
-                            Exceeds maximum amount {{this._maxChildAmount}}$
+                               Entered amount exceeds maximum allowable amount of {{this._maxChildAmount| currency:'USD':'symbol-narrow':'1.2-2'}}$
                           </div>
                         </ng-container>
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">

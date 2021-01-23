@@ -12,5 +12,15 @@
 </head>
 <body>
   <app-root></app-root>
+  <script>
+    window.onUsersnapLoad = function(api) {
+      api.init();
+      window.Usersnap = api;
+    }
+    var script = document.createElement('script');
+    script.async = 1;
+    script.src = 'https://api.usersnap.com/load/15b42c30-fbf3-436f-833d-2f4acf2b23f6.js?onload=onUsersnapLoad';
+    document.getElementsByTagName('head')[0].appendChild(script);
+  </script>
 </body>
 </html>

@@ -35,12 +35,34 @@
   </div>
   <div class="notes">
     <br>
-    <label><h4>Notes</h4></label>
+    <label><h4>Notes
+      <button type="button" class="btn btn-info" ngbTooltip="Place Holder" tooltipClass="form-tooltip">
+        <i class="info-icon" aria-hidden="true"></i>
+        <span class="sr-only">Click here for more information</span>
+      </button>
+     </h4>
+    </label>
     <br>
-    <input type="text" placeholder="">
+    <form>
+
+
+    <input type="text"
+           name="notes"
+           [maxLength]="500"
+           placeholder=""
+           [(ngModel)]="notesValue">
+    </form>
   </div>
+  <span *ngIf="showResponse" class="text-success">
+    {{responseMessage}}
+  </span>
 </div>
 <div class="modal-footer">
+  <button class="btn btn-secondary btn-left"
+          (click)="saveNotes()">
+    Save Notes
+  </button>
+
   <button class="btn btn-secondary-gray btn-right"
           (click)="decline()">
    Close

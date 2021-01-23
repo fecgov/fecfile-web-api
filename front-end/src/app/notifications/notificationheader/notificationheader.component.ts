@@ -16,7 +16,7 @@ export class NotificationheaderComponent implements OnInit {
   public viewMode = '';
   public viewTabs: TabConfiguration[] = [
     {
-      id: 1, name: "Prior Notices", count: 0, showOptionView: false, placeholder: true,
+      id: 1, name: "Prior Notices", count: 0, showOptionView: true, placeholder: true,
       toolTip: "Prior Notices - Sent by the FEC to remind a filer of upcoming reports that may need to be filed based upon the committee type and filing frequency."
     },
     {
@@ -28,15 +28,15 @@ export class NotificationheaderComponent implements OnInit {
       toolTip: "Late Notification Emails - Sent by the FEC to remind the filer the day after a filing deadline if the FEC has not yet received the report that was due."
     },
     {
-      id: 4, name: "Filing Confirmations", count: 0, showOptionView: false, placeholder: false,
+      id: 4, name: "Filing Confirmations", count: 0, showOptionView: true, placeholder: false,
       toolTip: "Filing Confirmations - Emails sent by the FEC within a few minutes of a filer successfully submitting an electronic filing.  This email will include a confirmation number for the successful submission."
     },
     {
-      id: 5, name: "RFAIs", count: 0, showOptionView: false, placeholder: true,
+      id: 5, name: "RFAIs", count: 0, showOptionView: true, placeholder: true,
       toolTip: "RFAIs - There are letters sent by the Reports Analysis Division when a report or document filed with the FEC needs additional clarification or identifies an error, omission or possible prohibited activity."
     },
     {
-      id: 6, name: "Imported Transactions", count: 0, showOptionView: false, placeholder: false,
+      id: 6, name: "Imported Status", count: 0, showOptionView: false, placeholder: false,
       toolTip: "Import Transactions - Here you will find transaction documents that have been imported into the system."
     }
   ];
@@ -50,7 +50,14 @@ export class NotificationheaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.viewMode = 'tab-1';
+    let tabId = "1";
+    if (this._activeRoute.snapshot.paramMap.get('tabid')) {
+      tabId  = this._activeRoute.snapshot.paramMap.get('tabid');
+    } 
+    if (isNaN(Number(tabId))) {
+      tabId = "1";
+    }
+    this.viewMode = 'tab-' + tabId;
 
     if (localStorage.getItem('form3XNotificationInfo.showDashBoard') === "Y") {
       this._formService.removeFormDashBoard("3X");

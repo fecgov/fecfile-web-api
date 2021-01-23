@@ -1,4 +1,13 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  Output,
+  EventEmitter,
+  Input
+} from '@angular/core';
 import { ImportContactsService } from '../../service/import-contacts.service';
 import { PaginationInstance } from 'ngx-pagination';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,31 +15,39 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { FieldToCleanModel } from './model/field-to-clean.model';
 import { FieldEntryModel } from './model/field-entry.model';
+import { ImportContactModel } from '../../model/import-contact.model';
+import { DuplicateContactsService } from './service/duplicate-contacts.service';
 
 @Component({
   selector: 'app-duplicate-contacts',
   templateUrl: './duplicate-contacts.component.html',
-  styleUrls: ['./duplicate-contacts.component.scss',],
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./duplicate-contacts.component.scss'],
+  encapsulation: ViewEncapsulation.None
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DuplicateContactsComponent implements OnInit, OnDestroy {
-
   @Input()
-  public duplicates: Array<string>;
+  public fileName: string;
+
+  @Output()
+  public dupeProceedEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Output()
   public dupeCancelEmitter: EventEmitter<any> = new EventEmitter<any>();
 
-  // public contacts: Array<any>;
+  @Output()
+  public saveStatusEmitter: EventEmitter<any> = new EventEmitter<any>();
+
+  public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
 
   // ngx-pagination config for the duplicates table of contacts
-  public maxItemsPerPage = 10;
+  public maxItemsPerPage = 2;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
+  public showAdditionalInfo: boolean;
 
   /**
    * All fields and their values from the user's contact from the file and
@@ -40,7 +57,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public readonly duplicatePlaceHolder = 'dupe placeholder';
 
-  public mergePage: number;
+  public mergePage: number = 1;
   public mergePaginateConfig: PaginationInstance = {
     id: 'merge_dupes',
     itemsPerPage: 2,
@@ -50,6 +67,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   public userContactHeader: any;
   public dupeContactHeader: Array<any>;
   public totalDuplicates = 0;
+  public allDupesSelected: boolean;
 
   private contactsSubject: BehaviorSubject<Array<any>>;
   private onDestroy$ = new Subject();
@@ -79,12 +97,13 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   constructor(
     private _importContactsService: ImportContactsService,
+    private _duplicateContactsService: DuplicateContactsService,
     private _modalService: NgbModal,
     private _utilService: UtilService
-  ) { }
+  ) {}
 
   ngOnInit() {
-    // this.contacts = [];
+    this.contacts = [];
     this.contactsSubject = new BehaviorSubject<any>([]);
     this.contacts$ = this.contactsSubject.asObservable();
     const config: PaginationInstance = {
@@ -95,6 +114,8 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     this.config = config;
     this.checkDuplicates(1);
     this.mergePage = 1;
+    this.allDupesSelected = false;
+    this.showAdditionalInfo = true;
   }
 
   ngOnDestroy(): void {
@@ -104,14 +125,48 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
-    // this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
-    this._importContactsService.checkDuplicates(page).subscribe((res: any) => {
-      this.contactsSubject.next(res.duplicates);
-      // this.contactsSubject.next(this.duplicates);
-      this.config.totalItems = res.totalCount ? res.totalCount : 0;
-      this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
-      this.numberOfPages = res.totalPages;
-    });
+
+    // this._duplicateContactsService.getDuplicates(this.fileName, page).subscribe((res: any) => {
+    //   // // temp to set selected to false until api does
+    //   // for (const contact of res.contacts) {
+    //   //   for (const dupe of contact.contacts_from_db) {
+    //   //     // TEMP CODE
+    //   //     // response contacts the contact from DB the user may have identified as one to merge.
+    //   //     // If user has done this, the user_selected_value on th CONTACT not the DUPE CONTACT
+    //   //     // will contain the entity id of the selected contact.
+    //   //     // Set a field on the DUPLICATE CONTACT for the UI
+    //   //     // TODO change API to set select on the dupe. For now just set the first one for devl.
+    //   //     dupe.user_selected_value = false;
+    //   //     if (contact.user_selected_option !== 'add') {
+    //   //       contact.contacts_from_db[0].user_selected_value = true;
+    //   //     }
+    //   //     // TEMP CDE END
+    //   //   }
+    //   // }
+
+    //   this.contacts = res.contacts;
+    //   this.config.totalItems = res.totalcontactsCount;
+    //   this.config.itemsPerPage = res.itemsPerPage;
+    //   this.numberOfPages = res.totalPages;
+    //   this.allDupesSelected = res.allDone;
+    // });
+  }
+
+  public handleCheckedDupe($event: any, dupe: any, contact: any) {
+    dupe.user_selected_value = $event.target.checked;
+    // Existing contact must be selected for action "existing" and "update".
+    contact.enableAllActions = true;
+  }
+
+  public formatName(contact: any): string {
+    let name = '';
+    if (contact.entity_type === 'IND') {
+      // TODO handle suffix and prefix
+      name = `${contact.last_name}, ${contact.first_name}`;
+    } else if (contact.entity_type === 'ORG') {
+      name = contact.entity_name;
+    }
+    return name;
   }
 
   public cleanContact(contact: any, modal: any) {
@@ -130,6 +185,10 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  public proceed(): void {
+    this.dupeProceedEmitter.emit('ignore_dupe_save');
+    // this.saveStatusEmitter.emit(true);
+  }
 
   ////////////////////////
   // merge modal methods
@@ -171,7 +230,8 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public importAll(modal: any) {
     modal.close('close it');
-    // TODO call API to save imported data for the file ID.
+    this.dupeProceedEmitter.emit('ignore_dupe_save');
+    // this.saveStatusEmitter.emit(true);
   }
 
   /////////////////////////
@@ -188,23 +248,56 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public mergeAll(modal: any) {
     modal.close('close it');
-    // TODO call API to save merged data for the file ID.
+    this.dupeProceedEmitter.emit('merge_dupe_save');
+    // this.saveStatusEmitter.emit(true);
   }
 
   public cancelImportAll() {
     this.dupeCancelEmitter.emit();
+    this._duplicateContactsService.cancelImport(this.fileName).subscribe((res: any) => {});
+
+    // On User cancel, unsaved changes are no longer retained.
+    this.saveStatusEmitter.emit(true);
   }
 
   // TODO consider putting merge modal methods in another plain old class (not a component)
   // for code separation.
 
-  // Clean single contact methods start here
-  // Clean single contact methods start here
-  // Clean single contact methods start here
+  /**
+   * For possible duplicates with the incoming contact and the existing contacts in the system,
+   * apply the users decision on how to handle.
+   *
+   * @param contact the contact to merge
+   * @param userAction the merge action selected by the user
+   */
+  public applyMergeSelection(contact: any, userAction: string) {
+    contact.user_selected_option = userAction;
+    this._duplicateContactsService.saveUserMergeSelection(this.fileName, contact).subscribe((res: any) => {
+      this.checkDuplicates(this.config.currentPage);
+      this.allDupesSelected = res.allDone;
+    });
+  }
 
+  public toggleAdditionalInfo() {
+    this.showAdditionalInfo = !this.showAdditionalInfo;
+  }
+
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+  // No longer used
+
+  // Clean single contact methods start here
+  // Clean single contact methods start here
+  // Clean single contact methods start here
 
   private prepareContactToClean(contact: any) {
-
     // fill in placeholders for duplicates allowing for equal slots
     // for duplicate paginate.
 
@@ -221,7 +314,6 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     this.fieldsToClean = [];
     this.initMergeHeaders(contact);
     for (const field of this.contactFields) {
-
       const model = new FieldToCleanModel();
       model.displayName = field.displayName;
       model.name = field.name;
@@ -286,8 +378,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
             dupeFieldSelected = true;
           }
         }
-        if (field.userField.selected === false &&
-          dupeFieldSelected === false) {
+        if (field.userField.selected === false && dupeFieldSelected === false) {
           return false;
         }
       }
@@ -298,7 +389,6 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   public useAllDuplicate($event: any, i: number) {
-
     // clear out any previously checked fields
     i--;
     for (const field of this.fieldsToClean) {
@@ -330,7 +420,6 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   public useAllUserContact($event: any) {
-
     // clear out any previously checked fields
     for (const field of this.fieldsToClean) {
       for (const dupe of field.dupeFields) {
@@ -351,7 +440,6 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
           dupeHeader.selected = false;
         }
       }
-
     } else {
       for (const field of this.fieldsToClean) {
         field.userField.selected = false;
@@ -360,7 +448,6 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   public fieldSelectedChange(field: FieldToCleanModel) {
-
     let final = '';
     if (field.userField.selected) {
       final = field.userField.value;
@@ -390,7 +477,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   public checkLastDupeHeaderOnPage(i: number, header: any): boolean {
-    if ((i + 1) === this.mergePaginateConfig.itemsPerPage) {
+    if (i + 1 === this.mergePaginateConfig.itemsPerPage) {
       return true;
     } else {
       return false;
@@ -404,5 +491,4 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
       return false;
     }
   }
-
 }

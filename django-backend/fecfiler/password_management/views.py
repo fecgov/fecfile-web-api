@@ -495,3 +495,17 @@ def reset_password(request):
             logger.debug("exception occurred while getting account information", str(e))
             json_result = {'message': "Password Reset was not successful."}
             return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+def treasurer_encrypted_password(cmte_id):
+    try:
+        with connection.cursor() as cursor:
+            # get treasurer password and use it in submission process
+            _sql = """Select password from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) 
+                        AND delete_ind !='Y' """
+            cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
+            treasurer_password = cursor.fetchone()[0]
+            return treasurer_password
+    except Exception as e:
+        logger.debug("Exception occurred while retrieving treasurer password", str(e))
+        return ""

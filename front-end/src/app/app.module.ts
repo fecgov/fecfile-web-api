@@ -111,6 +111,7 @@ import * as S3 from 'aws-sdk/clients/s3';
 import {PasswordModule} from './password/password.module';
 import { ContactDetailsModalComponent } from './contacts/contact-details-modal/contact-details-modal.component';
 import { CashOnHandComponent } from './forms/form-3x/cash-on-hand/cash-on-hand.component';
+import { ApiService } from './shared/services/APIService/api.service';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -251,7 +252,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     UtilService,
     OrderByPipe,
     PhonePipe,
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ApiService, multi: true },
   ],
   exports:[
     SubTransactionsTableComponent

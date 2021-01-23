@@ -10,6 +10,14 @@ import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { NotificationsService } from 'src/app/notifications/notifications.service';
 import { CashOnHandComponent } from '../../../forms/form-3x/cash-on-hand/cash-on-hand.component';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ExportService } from '../../services/ExportService/export.service';
+
+declare global {
+  interface Window { Usersnap: any; }
+}
+
+window.Usersnap = window.Usersnap || {};
 
 @Component({
   selector: 'app-header',
@@ -33,7 +41,9 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
     private _router: Router,
     public _authService: AuthService,
     public _notificationsService: NotificationsService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private _contactsService: ContactsService,
+    private _exportService: ExportService
   ) {}
 
   ngOnInit(): void {
@@ -172,5 +182,29 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
     //     });
     //   }
     // });
+  }
+
+  openUsersnap(){
+    window.Usersnap.open();
+  }
+
+  /**
+   * Export all contacts for the committee.
+   */
+  public exportAllContacts(): void {
+    const allContacts = true;
+    this._contactsService.getExportContactsData([],
+      allContacts).subscribe((res: any) => {
+        for (const contact of res.contacts) {
+          // TODO have the API omit these fields.
+          delete contact.cand_election_year;
+          // delete contact.cand_office;
+          // delete contact.cand_office_district;
+          // delete contact.cand_office_state;
+          delete contact.ref_cand_cmte_id;
+          delete contact.last_update_date;
+        }
+        this._exportService.exportCsv(res.contacts, 'export_contacts');
+      });
   }
 }
