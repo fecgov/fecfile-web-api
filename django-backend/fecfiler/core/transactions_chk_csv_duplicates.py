@@ -16,7 +16,19 @@ def addapt_numpy_int64(numpy_int64):
 register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
+
+PG_HOST = os.getenv('DB_HOST')
+PG_PORT = os.getenv('DB_PORT')
+PG_DATABASE = os.getenv('DB_NAME')
+PG_USER = os.getenv('DB_USERNAME')
+PG_PASSWORD = os.getenv('DB_PASSWORD')
+SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME') #
+
+
+
 '''
+
+
 CREATE TABLE public.transactions_file_details
 (
   cmte_id 	character varying(9) NOT NULL,
@@ -33,7 +45,12 @@ def check_for_file_hash_in_db(cmteid, filename, hash, fecfilename):
         """ insert a transactions_file_details """
         selectsql = """SELECT cmte_id, md5, file_name, create_date FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;"""
  
-        conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
+        #conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
+        conn = psycopg2.connect(user=PG_USER,
+                                      password=PG_PASSWORD,
+                                      host=PG_HOST,
+                                      port=PG_PORT,
+                                      database=PG_DATABASE)        
         cur = conn.cursor()
         cur.execute(selectsql, (cmteid, filename, hash, fecfilename))
         dbhash = cur.fetchone()
@@ -60,7 +77,12 @@ def load_file_hash_to_db(cmteid, filename, hash, fecfilename):
         insertsql = """INSERT INTO transactions_file_details(cmte_id, file_name, md5, fec_file_name)
                 VALUES(%s, %s, %s, %s);"""
  
-        conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
+        # conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
+        conn = psycopg2.connect(user=PG_USER,
+                                      password = PG_PASSWORD,
+                                      host=PG_HOST,
+                                      port=PG_PORT,
+                                      database=PG_DATABASE)        
         cur = conn.cursor()
         cur.execute(insertsql, (cmteid, filename, hash, fecfilename))
         conn.commit()
