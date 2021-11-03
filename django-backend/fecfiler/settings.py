@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.environ.get('DEBUG', True)
 
 TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
@@ -39,7 +39,7 @@ CONTACT_MATCH_PERCENTAGE = 92
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
-REGISTER_USER_URL = os.environ.get('REGISTER_USER_URL', "http://dev-fecfile.efdev.fec.gov/#/register?register_token=")
+REGISTER_USER_URL = os.environ.get('REGISTER_USER_URL', "http://localhost/#/register?register_token=")
 OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
@@ -141,27 +141,13 @@ CORS_ALLOW_HEADERS = default_headers + (
 
 DATABASES = {
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-
-     #'default': {
-     #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-     #    'NAME': 'postgres',
-     #    'USER': 'postgres',
-     #    'PASSWORD': 'postgres',
-     #    'HOST': 'localhost',
-     #    'PORT': '5432',
-     #}
-
      'default': {
-         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-         'NAME': os.environ.get('DB_NAME', 'postgres'),
-         'USER': os.environ.get('DB_USERNAME', 'postgres'),
-         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
-         'PORT': os.environ.get('DB_PORT', '5432')
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres'),
+        'USER': os.environ.get('FECFILE_DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('FECFILE_DB_PASSWORD', 'postgres'),
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
      }
 
 }

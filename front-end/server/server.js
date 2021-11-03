@@ -10,7 +10,7 @@ const db = jsonServer.router('./server/db.json');
 server.use(bodyParser.urlencoded({extended: true}));
 server.use(bodyParser.json());
 
-server.use(cors());
+// server.use(cors());
 
 /**
  * Use this function for a route if you need to do some server side processing.

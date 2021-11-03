@@ -2,31 +2,42 @@ version: '3'
 
 services:
   db:
-    image: postgres:10
+    build:
+      context: './db'
+      dockerfile: Dockerfile
+    image: fecfile-db
+    container_name: fecfile-db
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_NAME: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
   api:
-    env_file: ../local.env
-    build: './django-backend'
-    image: fecnxg
+    # env_file: ../local.env
+    build:
+      context: './django-backend'
+      dockerfile: Dockerfile
+    # command: python manage.py runserver 0.0.0.0:8080
+    image: fecfile-api
+    container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
     ports:
-      - "8080:8080"
+      - 8080:8080
     depends_on:
       - db
   web:
     build:
       context: './front-end'
       dockerfile: Dockerfile
+    image: fecfile-web
+    container_name: fecfile-web
     restart: always
+    volumes:
+      - ./django-frontend:/opt/nxg_fec
     ports:
-      - "80:80"
+      - 80:80
     depends_on:
       - api
-

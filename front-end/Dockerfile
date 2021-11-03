@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 # add `/usr/src/app/node_modules/.bin` to $PATH
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
-RUN npm install -g npm to update
+# RUN npm install -g npm to update
 
 # install and cache app dependencies
 COPY package.json /usr/src/app/package.json
