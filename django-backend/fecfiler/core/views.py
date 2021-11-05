@@ -1960,7 +1960,7 @@ def reposit_f99_data(cmte_id, report_id):
             os.environ.get("BACKEND_DB_NAME"),
             os.environ.get("BACKEND_DB_USER"),
             os.environ.get("BACKEND_DB_HOST"),
-            os.environ.get("BACKEND_DB_PASSWORD"),
+            os.environ.get("BACKEND_FECFILE_DB_PASSWORD"),
         )
     )
     # conn.close()

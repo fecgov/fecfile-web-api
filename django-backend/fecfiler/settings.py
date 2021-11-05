@@ -15,6 +15,12 @@ import datetime
 from corsheaders.defaults import default_headers
 import logging
 
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+    "http://localhost",
+]
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -146,7 +152,7 @@ DATABASES = {
         'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres'),
         'USER': os.environ.get('FECFILE_DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('FECFILE_DB_PASSWORD', 'postgres'),
-        'HOST': '127.0.0.1',
+        'HOST': os.environ.get('FECFILE_DB_HOST', 'localhost'),
         'PORT': '5432',
      }
 
@@ -331,7 +337,6 @@ LOGGING = {
         },
     }
 }
-
 #if DEBUG:
     # make all loggers use the console.
 for logger in LOGGING['loggers']:

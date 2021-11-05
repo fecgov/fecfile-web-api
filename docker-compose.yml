@@ -14,11 +14,12 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+
   api:
     # env_file: ../local.env
     build:
       context: './django-backend'
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-live
     # command: python manage.py runserver 0.0.0.0:8080
     image: fecfile-api
     container_name: fecfile-api
@@ -28,16 +29,35 @@ services:
       - 8080:8080
     depends_on:
       - db
+    environment:
+      - FECFILE_DB_HOST
+      - FECFILE_DB_USERNAME
+      - FECFILE_DB_PASSWORD
+      - FECFILE_DB_NAME
+
   web:
     build:
       context: './front-end'
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-live
     image: fecfile-web
     container_name: fecfile-web
     restart: always
     volumes:
-      - ./django-frontend:/opt/nxg_fec
+#      - ./django-frontend:/opt/nxg_fec
+      - ./front-end:/usr/src/app
     ports:
-      - 80:80
+      - 8081:80
     depends_on:
       - api
+
+  proxy:
+    build:
+      context: './proxy'
+      dockerfile: Dockerfile
+    image: fecfile-proxy
+    container_name: fecfile-proxy
+    restart: always
+    volumes:
+      - ./proxy/log:/var/log/nginx
+    ports:
+      - 80:80

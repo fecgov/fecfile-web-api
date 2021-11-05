@@ -6,13 +6,21 @@ from retrying import retry
 @retry
 def postgres_test():
     try:
+
+        print("testing connection with dbname={} user={} host={} password={} connect_timeout=3000".
+            format(
+            os.environ.get('FECFILE_DB_NAME'),
+            os.environ.get('FECFILE_DB_USERNAME'),
+            os.environ.get('FECFILE_DB_HOST'),
+            os.environ.get('FECFILE_DB_PASSWORD')))
+
         conn = psycopg2.connect(
             'dbname={} user={} host={} password={} connect_timeout=3000'.
             format(
-                os.environ.get('DB_NAME'),
-                os.environ.get('DB_USERNAME'),
-                os.environ.get('DB_HOST'),
-                os.environ.get('DB_PASSWORD')))
+                os.environ.get('FECFILE_DB_NAME'),
+                os.environ.get('FECFILE_DB_USERNAME'),
+                os.environ.get('FECFILE_DB_HOST'),
+                os.environ.get('FECFILE_DB_PASSWORD')))
         conn.close()
         return True
     except ImportError:

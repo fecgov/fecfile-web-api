@@ -58,9 +58,17 @@ when running docker-compose you will need to be in the root directory of the pro
 # Build the application
 ` docker-compose build `
 # Run the containers after being built
-`docker-compose up -d`
-Alternatively if you have made changes to the application and need to push the changes to a container
-` docker-compose up --build -d` will build the containers then start them.
+`docker-compose up --build`
+
+You should set the following environment variables in the shell where you are running 'docker-compose up'.
+Proper values for the development variables are shown here as an example
+```
+export FECFILE_DB_HOST=db
+export FECFILE_DB_USERNAME=postgres
+export FECFILE_DB_PASSWORD=postgres
+export FECFILE_DB_NAME=postgres
+```
+
 # Shut down the containers
 ` docker-compose down `
 # see all running containers
