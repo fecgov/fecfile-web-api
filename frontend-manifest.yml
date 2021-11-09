@@ -1,0 +1,5 @@
+name: fecfile-online-frontend
+instances: 1
+memory: 256M
+buildpack: staticfile_buildpack
+path: ./front-end/dist/fec-eFilling

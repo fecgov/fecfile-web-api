@@ -1,0 +1,9 @@
+# base image
+FROM node:10 as builder
+
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+
