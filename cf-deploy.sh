@@ -15,6 +15,6 @@ docker build -t fecfile-web-cf-build -f Dockerfile-cf-build .
 docker run -v ${SCRIPT_DIR}/front-end/:/usr/src/app fecfile-web-cf-build sh -c 'cd /usr/src/app/ && npm install && node --max_old_space_size=4000 ./node_modules/\@angular/cli/bin/ng build'
 
 #copy all the nginx and cloud foundry files into the Angualr dist dir
-cp ${SCRIPT_DIR}/deploy-config/front-end-nginx-config/* ${SCRIPT_DIR}/front-end/dist/fec-eFilling
-cd ${SCRIPT_DIR}/front-end/dist/fec-eFilling
+cp ${SCRIPT_DIR}/deploy-config/front-end-nginx-config/* ${SCRIPT_DIR}/front-end/dist
+cd ${SCRIPT_DIR}/front-end/dist
 cf push 
