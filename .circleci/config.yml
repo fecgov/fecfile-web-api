@@ -31,8 +31,8 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
-            app-dir: ~/project/django-backend/
-            pip-dependency-file: requirements.txt
+          app-dir: ~/project/django-backend/
+          pip-dependency-file: requirements.txt
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
