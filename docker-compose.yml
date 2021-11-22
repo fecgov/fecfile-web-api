@@ -5,6 +5,8 @@ services:
     build:
       context: './db'
       dockerfile: Dockerfile
+      args:
+        ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
     image: fecfile-db
     container_name: fecfile-db
     restart: always
@@ -12,6 +14,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_NAME: postgres
       POSTGRES_PASSWORD: postgres
+      
     ports:
       - 5432:5432
 
@@ -19,7 +22,7 @@ services:
     # env_file: ../local.env
     build:
       context: './django-backend'
-      dockerfile: './build-scripts/Dockerfile-live'
+      dockerfile: './Dockerfile-live'
     # command: python manage.py runserver 0.0.0.0:8080
     image: fecfile-api
     container_name: fecfile-api
@@ -38,7 +41,7 @@ services:
   web:
     build:
       context: './front-end'
-      dockerfile: Dockerfile-live
+      dockerfile: './build-scripts/Dockerfile-live'
     image: fecfile-web
     container_name: fecfile-web
     restart: always

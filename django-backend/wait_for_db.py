@@ -3,7 +3,7 @@ import os
 from retrying import retry
 
 
-@retry
+@retry(wait_fixed=2000)
 def postgres_test():
     try:
 
