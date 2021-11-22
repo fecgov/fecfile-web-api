@@ -70,7 +70,7 @@ jobs:
 
       - run:
           name: run linter
-          command: eslint "src/**"
+          command: ./node_modules/.bin/eslint "src/**"
           working_directory: ~/project/front-end/
 
 # Invoke jobs via workflows
