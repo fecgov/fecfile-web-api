@@ -12,9 +12,9 @@
     "build": "ng build",
     "build-local": "ng build --configuration=local",
     "test": "ng test",
-    "lint": "ng lint",
     "e2e": "ng e2e",
-    "json-server": "nodemon ./server/server.js"
+    "json-server": "nodemon ./server/server.js",
+    "lint": "sh ./build-scripts/lint.sh"
   },
   "private": true,
   "dependencies": {
@@ -69,8 +69,12 @@
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "12.12.6",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "angular-password-strength-meter": "~2.0.0",
     "codelyzer": "~4.2.1",
+    "eslint": "^8.3.0",
+    "eslint-config-google": "^0.14.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "jwt-decode": "^2.2.0",
