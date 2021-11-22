@@ -62,7 +62,7 @@ jobs:
 
       - run:
           name: intall eslint@6 eslint-config-google
-          command: npm install eslint@6
+          command: npm install eslint@6  @typescript-eslint/parser
           working_directory: ~/project/front-end/
 
       - run:
