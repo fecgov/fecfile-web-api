@@ -62,7 +62,7 @@ jobs:
 
       - run:
           name: intall eslint@6
-          command: npm install eslint
+          command: npm install eslint@6
           working_directory: ~/project/front-end/
 
       - run:
