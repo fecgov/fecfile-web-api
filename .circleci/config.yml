@@ -29,6 +29,9 @@ jobs:
     # CircleCI will report the results back to your VCS provider.
     steps:
       - checkout
+      - run
+          name: check python version
+          command: python -v
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/django-backend/
