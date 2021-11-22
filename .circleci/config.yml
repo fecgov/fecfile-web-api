@@ -62,7 +62,15 @@ jobs:
 
       - run:
           name: intall eslint
-          command: npm install -g eslint
+          command: npm install -eslint
+          working_directory: ~/project/front-end/
+
+      - run:
+          command: ls ~/project/node_modules/
+
+      - run:
+          name: run linter
+          command: eslint "src/**"
           working_directory: ~/project/front-end/
 
 # Invoke jobs via workflows
