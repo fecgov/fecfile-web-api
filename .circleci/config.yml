@@ -69,6 +69,11 @@ jobs:
           command: ls ~/project/front-end/node_modules/ || echo not found
 
       - run:
+          name: run linter version
+          command: ./node_modules/.bin/eslint --version
+          working_directory: ~/project/front-end/
+
+      - run:
           name: run linter
           command: ./node_modules/.bin/eslint "src/**"
           working_directory: ~/project/front-end/
