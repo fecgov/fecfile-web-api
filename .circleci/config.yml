@@ -66,7 +66,7 @@ jobs:
           working_directory: ~/project/front-end/
 
       - run:
-          command: ls ~/project/node_modules/
+          command: ls ~/project/front-end/node_modules/ || echo not found
 
       - run:
           name: run linter
