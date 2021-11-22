@@ -61,7 +61,7 @@ jobs:
 #          working_directory: ~/project/front-end/
 
       - run:
-          name: intall eslint@6
+          name: intall eslint@6 eslint-config-google
           command: npm install eslint@6
           working_directory: ~/project/front-end/
 
