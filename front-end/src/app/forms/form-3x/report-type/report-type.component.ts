@@ -762,7 +762,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    *
    * @param      {Element}  tooltip  The tooltip
    */
-  public toggleToolTip(tooltip: { isOpen: () => void; close: () => void; open: () => void; }): void {
+  public toggleToolTip(tooltip: { isOpen: () => boolean; close: () => void; open: () => boolean; }): void {
     if (tooltip.isOpen()) {
       tooltip.close();
     } else {

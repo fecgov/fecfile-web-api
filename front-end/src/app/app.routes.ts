@@ -113,25 +113,25 @@ export const AppRoutes: Routes = [
       { path: 'contacts', component: ContactsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       {
         path: 'forms/form/1M',
-        loadChildren: 'src/app/f1m-module/f1m/f1m.module#F1mModule'
+        loadChildren: () => import('src/app/f1m-module/f1m/f1m.module').then(m => m.F1mModule)
       },
       {
         path: 'import-contacts',
-        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule',
+        loadChildren: () => import('src/app/import-contacts-module/import-contacts.module').then(m => m.ImportContactsModule),
         data: {
           role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
         path: 'import-fecfile',
-        loadChildren: 'src/app/import-fecfile-module/import-fecfile.module#ImportFecFile1Module',
+        loadChildren: () => import('src/app/import-fecfile-module/import-fecfile.module').then(m => m.ImportFecFile1Module),
         data: {
           role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor, Roles.Reviewer]
         }
       },
       {
         path: 'import-transactions',
-        loadChildren: 'src/app/import-transactions-module/import-transactions.module#ImportTransactionsModule',
+        loadChildren: () => import('src/app/import-transactions-module/import-transactions.module').then(m => m.ImportTransactionsModule),
         data: {
           role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor]
         }
@@ -226,7 +226,8 @@ export const AppRoutes: Routes = [
 ];
 
 export const routing = RouterModule.forRoot(AppRoutes, {
-  useHash: true,
-  enableTracing: false,
-  onSameUrlNavigation: 'reload'
+    useHash: true,
+    enableTracing: false,
+    onSameUrlNavigation: 'reload',
+    relativeLinkResolution: 'legacy'
 });

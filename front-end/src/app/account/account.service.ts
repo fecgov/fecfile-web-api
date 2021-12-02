@@ -1,5 +1,4 @@
 import {Injectable, ChangeDetectionStrategy } from '@angular/core';
-import {Http, Response} from '@angular/http';
 import {IAccount} from './account';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';

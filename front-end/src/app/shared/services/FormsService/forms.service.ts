@@ -11,7 +11,7 @@ import { ReportFilterModel } from 'src/app/reports/model/report-filter.model';
 import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
-import { RequestOptions } from '@angular/http';
+// import { RequestOptions } from '@angular/http';
 
 /*export interface GetReportsResponse {
   reports: reportModel[];

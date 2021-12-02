@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ImportTrxSidebarComponent } from './import-trx-sidebar.component';
 
@@ -6,7 +6,7 @@ describe('ImportTrxSidebarComponent', () => {
   let component: ImportTrxSidebarComponent;
   let fixture: ComponentFixture<ImportTrxSidebarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ImportTrxSidebarComponent ]
     })
