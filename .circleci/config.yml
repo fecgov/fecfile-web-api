@@ -14,11 +14,7 @@ jobs:
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
       - image: cimg/python:3.7
-    # Checkout the code as the first step. This is a dedicated CircleCI step.
-    # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
-    # Here we're making sure we use just use the system-wide pip. By default it uses the project root's requirements.txt.
-    # Then run your tests!
-    # CircleCI will report the results back to your VCS provider.
+
     steps:
       - checkout
 
@@ -39,11 +35,8 @@ jobs:
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
       - image: cimg/python:3.7
-    # Checkout the code as the first step. This is a dedicated CircleCI step.
-    # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
-    # Here we're making sure we use just use the system-wide pip. By default it uses the project root's requirements.txt.
-    # Then run your tests!
-    # CircleCI will report the results back to your VCS provider.
+      - image: cimg/postgres:14.0
+
     steps:
       - checkout
 
@@ -51,6 +44,12 @@ jobs:
           pkg-manager: pip
           app-dir: ~/project/django-backend/
           pip-dependency-file: requirements.txt
+
+      - run:
+          name: Wait for the database to be active
+          command: python wait_for_db.py
+          working_directory: ~/project/django-backend/
+
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
@@ -126,7 +125,7 @@ jobs:
 workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-#      - unit-test-django
+      - unit-test-django
       - lint-python
       - lint-angular
 #      - unit-test-angular

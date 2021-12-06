@@ -1,3 +1,15 @@
+# CircleCI Configuration
+## Environment Variables
+When configuring CircleCI, you will need to set environment varaialbes the database
+configuration as follows:
+```
+FECFILE_DB_HOST=localhost 
+FECFILE_DB_USERNAME=postgres 
+FECFILE_DB_PASSWORD=postgres 
+FECFILE_DB_NAME=postgres 
+```
+NOTE that the FECFILE_DB_HOST is different here than what you need for your docker-compose configuration.
+
 # Using CircleCI local CLI 
 
 ## Install circleci local
@@ -20,6 +32,18 @@ do if you want to actually run the changes on Circle.
 This can save a lot of time when trying to debug an issue in CI.
 ```
 circleci local execute --job JOB_NAME
+```
+
+## Necessary Environment Variables
+The Django backend expects to find the database login info in the environment.  
+To run in the local CircleCI for the django unit tests (for example), use the following:
+
+```
+circleci local execute -e FECFILE_DB_HOST=localhost \
+         -e FECFILE_DB_USERNAME=postgres \
+         -e FECFILE_DB_PASSWORD=postgres \
+         -e FECFILE_DB_NAME=postgres \
+         --job unit-test-django
 ```
 
 ## CircleCI configuration
