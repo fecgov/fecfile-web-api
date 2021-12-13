@@ -7,7 +7,7 @@ exports.config = {
   framework: 'jasmine2',
   directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
-  baseUrl: 'http://dev-fecfile.efdev.fec.gov/',
+  baseUrl: 'http://localhost/',
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: false,

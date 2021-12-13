@@ -1,7 +1,7 @@
 import { entityTypes } from './entity-types-json';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, Output } from '@angular/core';
+import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, Output, Directive } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -53,6 +53,7 @@ export enum SaveActions {
   saveForReturnToSummary = 'saveForReturnToSUmmary'
 }
 
+@Directive()
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   @Output() parentDataEmitter : EventEmitter<any> = new EventEmitter<any>();

@@ -1,0 +1,11 @@
+# base image
+FROM node:16 as builder
+
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+
+RUN npm install -g eslint
+
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+

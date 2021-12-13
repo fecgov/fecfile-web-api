@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { F24LinkModalComponent } from './f24-link-modal.component';
 
@@ -6,7 +6,7 @@ describe('F24LinkModalComponent', () => {
   let component: F24LinkModalComponent;
   let fixture: ComponentFixture<F24LinkModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ F24LinkModalComponent ]
     })

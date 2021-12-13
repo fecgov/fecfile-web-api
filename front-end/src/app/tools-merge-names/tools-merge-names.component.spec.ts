@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ToolsMergeNamesComponent } from './tools-merge-names.component';
 
@@ -6,7 +6,7 @@ describe('ToolsMergeNamesComponent', () => {
   let component: ToolsMergeNamesComponent;
   let fixture: ComponentFixture<ToolsMergeNamesComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ToolsMergeNamesComponent ]
     })

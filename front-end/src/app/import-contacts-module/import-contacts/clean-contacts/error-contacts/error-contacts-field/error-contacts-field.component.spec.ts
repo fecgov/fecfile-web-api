@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ErrorContactsFieldComponent } from './error-contacts-field.component';
 
@@ -6,7 +6,7 @@ describe('ErrorContactsFieldComponent', () => {
   let component: ErrorContactsFieldComponent;
   let fixture: ComponentFixture<ErrorContactsFieldComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ErrorContactsFieldComponent ]
     })

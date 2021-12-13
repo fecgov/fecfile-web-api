@@ -136,7 +136,8 @@ def verify_login(request):
 
             username = user_list["username"]
             key = user_list["secret_key"]
-            unix_time = user_list["code_time"]
+            # unix_time = user_list["code_time"]
+            unix_time = "code_time" in user_list and user_list["code_time"]
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key, unix_time)
 

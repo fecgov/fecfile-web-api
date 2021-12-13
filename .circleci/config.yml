@@ -1,0 +1,133 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+# See: https://circleci.com/docs/2.0/orb-intro/
+orbs:
+  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
+  python: circleci/python@1.2
+
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+jobs:
+  lint-python:
+    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
+    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+    docker:
+      - image: cimg/python:3.7
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install flake8
+          # This assumes pytest is installed via the install-package step above
+          command: pip install flake8
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Run lint
+          # This assumes pytest is installed via the install-package step above
+          command: flake8 fecfiler
+          working_directory: ~/project/django-backend/
+
+  unit-test-django:
+    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
+    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+    docker:
+      - image: cimg/python:3.7
+      - image: cimg/postgres:12.8
+
+    steps:
+      - checkout
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/django-backend/
+          pip-dependency-file: requirements.txt
+
+      - run:
+          name: Wait for the database to be active
+          command: python wait_for_db.py
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Run tests
+          # This assumes pytest is installed via the install-package step above
+          command: python manage.py test
+          working_directory: ~/project/django-backend/
+
+  lint-angular:
+    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
+    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+    docker:
+      - image: cimg/node:14.18-browsers
+    steps:
+      - checkout
+
+      - run:
+          command: ls ~/project/front-end
+
+      # TODO: Decide if we should also incorporate package-lock.json in the cache
+      - restore_cache:
+          keys:
+            - front-end-modules-v1-{{ checksum "~/project/front-end/package.json" }}
+
+      - run:
+          name: Ensure packages are installed
+          command: npm install
+          working_directory: ~/project/front-end/
+
+      - save_cache:
+          key: front-end-modules-v1-{{ checksum "~/project/front-end/package.json" }}
+          paths:
+            - ~/project/front-end/node_modules
+
+
+      - run:
+          name: print the linter version
+          command: ./node_modules/.bin/eslint --version
+          working_directory: ~/project/front-end/
+
+      - run:
+          name: run linter
+          command: ./node_modules/.bin/eslint "src/**/*.ts"
+          working_directory: ~/project/front-end/
+
+  unit-test-angular:
+    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
+    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+    docker:
+      - image: cimg/node:14.18-browsers
+    steps:
+      - checkout
+
+      - run:
+          name: Ensure packages are installed
+          command: npm install
+          working_directory: ~/project/front-end/
+
+      - run:
+          command: ls ~/project/front-end/node_modules/ || echo not found
+
+      - run:
+          name: run linter version
+          command: ./node_modules/.bin/eslint --version
+          working_directory: ~/project/front-end/
+
+      - run:
+          name: run linter
+          command: ./node_modules/.bin/eslint "src/**/*.ts"
+          working_directory: ~/project/front-end/
+
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  test: # This is the name of the workflow, feel free to change it to better match your workflow.
+    jobs:
+      - unit-test-django
+      - lint-python
+      - lint-angular
+#      - unit-test-angular
+
+
