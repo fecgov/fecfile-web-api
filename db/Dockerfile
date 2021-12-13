@@ -1,4 +1,4 @@
-FROM postgres:10
+FROM postgres:12
 
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_NAME=postgres
