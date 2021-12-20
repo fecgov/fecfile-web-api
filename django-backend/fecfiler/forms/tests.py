@@ -5,11 +5,11 @@ from django.test import TestCase
 from django.test import Client
 from .models import CommitteeInfo, Committee
 
-
 class CommitteeInfoTest(TestCase):
     """ Test module for CommitteeInfo model """
 
     def setUp(self):
+        CommitteeInfo.objects.filter(committeeid='C01234567').delete()
         CommitteeInfo.objects.create(
             committeeid='C01234567', committeename = 'Test Committee 1', street1='Street1 ',
             street2 = 'Street 2', city='Washington DC', state='DC', zipcode='912853', text="-",
@@ -30,21 +30,23 @@ class CommitteeInfoTest(TestCase):
                 "treasurerlastname": "Smith",
                 "treasurersuffix": "IV"
             }
+        CommitteeInfo.objects.filter(committeeid=save_data.get("committeeid")).delete()
         CommitteeInfo.objects.create(**save_data)
-        
+
     def test_committee_create_partial_info(self):
         comm = CommitteeInfo.objects.get(committeeid='C01234567')
         
         self.assertEqual(comm.committeename, "Test Committee 1")
 
     def test_committee_create_full_info(self):
-        comm = CommitteeInfo.objects.get(committeeid='C11234567')            
-        self.assertEqual(comm.committeename, "Test Committee 2")
+       comm = CommitteeInfo.objects.get(committeeid='C11234567')
+       self.assertEqual(comm.committeename, "Test Committee 2")
 
 class CommitteeTest(TestCase):
     """ Test module for Committee model """
 
     def setUp(self):
+        Committee.objects.filter(committeeid='C01234567').delete()
         Committee.objects.create(
             committeeid='C01234567', committeename = 'Test Committee 1', street1='Street1 ',
             street2 = 'Street 2', city='Washington DC', state='DC', zipcode='912853', 
@@ -64,11 +66,11 @@ class CommitteeTest(TestCase):
                 "treasurerlastname": "Smith",
                 "treasurersuffix": "IV"
             }
+        Committee.objects.filter(committeeid=save_data.get("committeeid")).delete()
         Committee.objects.create(**save_data)
         
     def test_committee_create(self):
         comm = Committee.objects.get(committeeid='C01234567')
-        
         self.assertEqual(comm.committeename, "Test Committee 1")
 
 class Validate_F99(TestCase):
