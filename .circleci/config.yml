@@ -52,9 +52,21 @@ jobs:
           working_directory: ~/project/django-backend/
 
       - run:
+          name: Create migrations
+          # This assumes pytest is installed via the install-package step above
+          command: python manage.py makemigrations
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: run migrations
+          # This assumes pytest is installed via the install-package step above
+          command: python manage.py migrate
+          working_directory: ~/project/django-backend/
+
+      - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
-          command: python manage.py test
+          command: python manage.py test --keep
           working_directory: ~/project/django-backend/
 
   lint-angular:

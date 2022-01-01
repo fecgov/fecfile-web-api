@@ -12,11 +12,11 @@ from fecfiler.authentication.models import Account
 class SimpleTest(TestCase):
     def setUp(self):
         self.credentials = {
-            'username': 'C01234567',
+            'username': 'C00601211',
             'password': 'test',
-            'email':'test1@test.com'
+            'email':'test@fec.gov'
         }
-        self.user = Account.objects.create_user(**self.credentials)
+        # self.user = Account.objects.create_user(**self.credentials)
         
 
     def test_login_success(self):
