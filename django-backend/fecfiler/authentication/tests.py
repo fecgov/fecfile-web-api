@@ -31,6 +31,6 @@ class SimpleTest(TestCase):
         # should be logged in now
         self.assertTrue(content.get('is_allowed'), 'Expected the login result to set is_allowed to true')
 
-        #verify we got a valid token
+        # verify we got a valid token
         self.assertGreater(len(content.get('token')), 50, 'JWT Token returned by login too short')
         self.assertEqual(decoded.get('email'), self.credentials.get('email'), 'JWT email does not match expected email')

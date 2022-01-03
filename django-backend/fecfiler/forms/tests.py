@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test import Client
 from .models import CommitteeInfo, Committee
 
+
 class CommitteeInfoTest(TestCase):
     """ Test module for CommitteeInfo model """
 
@@ -39,8 +40,8 @@ class CommitteeInfoTest(TestCase):
         self.assertEqual(comm.committeename, "Test Committee 1")
 
     def test_committee_create_full_info(self):
-       comm = CommitteeInfo.objects.get(committeeid='C11234567')
-       self.assertEqual(comm.committeename, "Test Committee 2")
+        comm = CommitteeInfo.objects.get(committeeid='C11234567')
+        self.assertEqual(comm.committeename, "Test Committee 2")
 
 
 class CommitteeTest(TestCase):
