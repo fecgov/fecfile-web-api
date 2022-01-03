@@ -157,7 +157,8 @@ DATABASES = {
         'TEST': {
             'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres')
         }
-    }
+     }
+
 }
 
 

@@ -5,6 +5,7 @@ from .validators import validate_is_pdf
 from django.utils.translation import ugettext_lazy as _
 from db_file_storage.model_utils import delete_file, delete_file_if_needed
 from fecfiler.custom_storages import MediaStorage
+from datetime import datetime
 
 # Table to store F99 attachment data (Refer this documentation: https://django-db-file-storage.readthedocs.io/en/master/)
 
@@ -34,7 +35,7 @@ class CommitteeInfo(models.Model):
     treasurermiddlename = models.CharField(max_length=20, null=True, blank=True)
     treasurerprefix = models.CharField(max_length=10, null=True, blank=True)
     treasurersuffix = models.CharField(max_length=10, null=True, blank=True)
-    created_at = models.DateTimeField(null=False)
+    created_at = models.DateTimeField(null=True, default=datetime.now)
     updated_at = models.DateTimeField(null=True, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
     isdeleted = models.BooleanField(default=False)
