@@ -7587,6 +7587,9 @@ UNION
      JOIN public.committee_master cm ON ((((rc.cmte_type)::bpchar = (cm.cmte_type)::bpchar) AND ((rc.cmte_dsgn)::bpchar = (cm.cmte_dsgn)::bpchar))))
   WHERE ((rc.form_type)::text = 'F3L'::text);
 
+-- patch up a missing view
+create view public.forms_my_forms_view as select * from public.my_forms_view;
+
 
 --
 -- Name: notifications_filing_confirmations; Type: VIEW; Schema: public; Owner: -
@@ -27686,5 +27689,3 @@ ALTER DEFAULT PRIVILEGES FOR ROLE fecdbuser IN SCHEMA public GRANT SELECT ON TAB
 -- PostgreSQL database dump complete
 --
 
--- patch up a missing view
-create view public.forms_my_forms_view as select * from public.my_forms_view;
