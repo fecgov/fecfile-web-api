@@ -46,13 +46,33 @@ jobs:
 
       - run:
           name: Wait for the database to be active
-          command: python wait_for_db.py
+          command: pip install psycopg2 psycopg2-binary retry &&  python wait_for_db.py
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Load test database fixure
+          command: |
+            sudo apt-get update &&
+            sudo apt-get install postgresql-client-12 &&
+            export PGPASSWORD=${FECFILE_DB_PASSWORD} &&
+            psql -h ${FECFILE_DB_HOST}  ${FECFILE_DB_NAME} ${FECFILE_DB_USERNAME} < fec_clean_dev_db_backup-20211227.sql
+          working_directory: ~/project/db
+
+      - run:
+          name: Create migrations
+          command: python manage.py makemigrations
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: run migrations
+          # This assumes pytest is installed via the install-package step above
+          command: python manage.py migrate
           working_directory: ~/project/django-backend/
 
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: python manage.py test
+          command: python manage.py test --keep
           working_directory: ~/project/django-backend/
 
   lint-angular:
