@@ -29,7 +29,7 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities, 
+    undo_delete_entities,
     get_comittee_id,
     get_report_ids,
 )
@@ -1958,9 +1958,9 @@ def get_sla_summary_table(request):
     """
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
- 
+
     try:
-    
+
         #: Get the request parameters and set for Pagination
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
@@ -1975,7 +1975,7 @@ def get_sla_summary_table(request):
             sortcolumn = "name"
         else:
             sortcolumn = query_params.get("sortColumnName")
-        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        itemsperpage = get_int_value(query_params.get("itemsPerPage"))
         search_string = query_params.get("search")
         params = query_params.get("filters", {})
         keywords = params.get("keywords")
@@ -1985,8 +1985,6 @@ def get_sla_summary_table(request):
             descending = "ASC"
         trans_query_string_count = ""
 
-        #: Hardcode cmte value for now and remove after dev complete
-        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
 
         if not (
@@ -2064,7 +2062,7 @@ def get_sla_summary_table(request):
         )
 
 
-#: get the paginator page with other details like  
+#: get the paginator page with other details like
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False or json_res is None:
         json_result = {
@@ -2092,11 +2090,11 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
 
 
 def get_int_value(num):
-    if num is not None: 
+    if num is not None:
         num = int(num)
     else:
-        num = 1 
-    return int(num)          
+        num = 1
+    return int(num)
 
 
 def load_levin_account_data(transaction_id):
@@ -2126,7 +2124,7 @@ def get_slb_summary_table(request):
     """
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
-    
+
     try:
 
         #: Get the request parameters and set for Pagination
@@ -2143,7 +2141,7 @@ def get_slb_summary_table(request):
             sortcolumn = "name"
         else:
             sortcolumn = query_params.get("sortColumnName")
-        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        itemsperpage = get_int_value(query_params.get("itemsPerPage"))
         search_string = query_params.get("search")
         params = query_params.get("filters", {})
         keywords = params.get("keywords")
@@ -2153,8 +2151,6 @@ def get_slb_summary_table(request):
             descending = "ASC"
         trans_query_string_count = ""
 
-        #: Hardcode cmte value for now and remove after dev complete
-        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
 
         if not (
@@ -2208,7 +2204,7 @@ def get_slb_summary_table(request):
         #: update for pagination
         json_result = get_pagination_dataset(result, itemsperpage, page_num)
         return Response(json_result, status=status.HTTP_200_OK)
-        #return Response(result, status=status.HTTP_200_OK)
+        # return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The get_slb_summary_table API is throwing an error: " + str(e),

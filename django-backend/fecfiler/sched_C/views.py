@@ -129,19 +129,19 @@ def do_loan_carryover(report_id, cmte_id):
     - non-zero loan_balance
     - outstanding and dangled(not carried over before)
     - loan report date < current report coverge start(forward carryover only)
-    
+
     2. update all records with new transaction_id, new report_id
     3. set new loan back_ref_transaction_id to parent transaction_id
     """
     _sql = """
     insert into public.sched_c(
-					cmte_id, 
-                    report_id, 
+                    cmte_id,
+                    report_id,
                     line_number,
-					transaction_type,
-                    transaction_type_identifier, 
-                    transaction_id, 
-                    entity_id, 
+                    transaction_type,
+                    transaction_type_identifier,
+                    transaction_id,
+                    entity_id,
                     election_code,
                     election_other_description,
                     loan_amount_original,
@@ -164,17 +164,17 @@ def do_loan_carryover(report_id, cmte_id):
                     lender_cand_district,
                     memo_code,
                     memo_text,
-					back_ref_transaction_id,
+                    back_ref_transaction_id,
                     create_date
-					)
-					SELECT 
-					c.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    c.cmte_id,
+                    %s,
                     c.line_number,
-					'',
-                    c.transaction_type_identifier, 
-                    get_next_transaction_id('SC'), 
-                    c.entity_id, 
+                    '',
+                    c.transaction_type_identifier,
+                    get_next_transaction_id('SC'),
+                    c.entity_id,
                     c.election_code,
                     c.election_other_description,
                     c.loan_amount_original,
@@ -197,7 +197,7 @@ def do_loan_carryover(report_id, cmte_id):
                     c.lender_cand_district,
                     c.memo_code,
                     c.memo_text,
-					c.transaction_id,
+                    c.transaction_id,
                     now()
             FROM public.sched_c c, public.reports r
             WHERE 
@@ -316,6 +316,7 @@ def initial_loan(transaction_id):
         if not cursor.fetchone()[0]:
             return True
         return False
+
 
 @update_F3X
 @new_report_date
@@ -705,6 +706,7 @@ def remove_schedC(data):
         remove_sql_schedC(transaction_id, report_id, cmte_id)
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -1256,7 +1258,8 @@ def schedC(request):
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-#get_outstanding_loans before pagination implementation in DB as well as for front end
+
+# get_outstanding_loans before pagination implementation in DB as well as for front end
 '''@api_view(["GET"])
 def get_outstanding_loans(request):
     """
@@ -1401,6 +1404,7 @@ def get_outstanding_loans(request):
         raise
 '''
 
+
 @api_view(["GET"])
 def get_outstanding_loans(request):
     """
@@ -1421,12 +1425,12 @@ def get_outstanding_loans(request):
     1. it has a outstannding balance(>0) in current report
     2. it has live payment(even the balance become 0) in current report
     """
-    #: adding pagination, sorting and dynamic fields listing funcitonality  
+    #: adding pagination, sorting and dynamic fields listing funcitonality
     # URL coded for: GET /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false HTTP/1.1"
     param_string = ""
     query_params = request.query_params
     page_num = int(query_params.get("page"))
-    descending = query_params.get("descending")#request.data.get("descending", "false")
+    descending = query_params.get("descending")  # request.data.get("descending", "false")
     if not (
         "sortColumnName" in query_params
         and check_null_value(query_params.get("sortColumnName"))
@@ -1444,9 +1448,9 @@ def get_outstanding_loans(request):
         descending = "DESC"
     else:
         descending = "ASC"
-    trans_query_string_count = "" #get_trans_query_for_total_count(trans_query_string)
-    row1=""
-    totalcount=""
+    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
+    row1 = ""
+    totalcount = ""
 
     valid_transaction_types = ["LOANS_OWED_BY_CMTE", "LOANS_OWED_TO_CMTE"]
     logger.debug("POST request received.")
@@ -1492,17 +1496,17 @@ def get_outstanding_loans(request):
             trans_query_string_count = """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
             #: set transaction query with offsets.
             _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
-            #set prefix and suffix 
+            # set prefix and suffix
             _sql = _sql_prefix + _sql + _sql_suffix
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, tran_type, report_id])
                 json_result = cursor.fetchone()[0]
-                #: run the record count query        
+                #: run the record count query
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
                 )
                 row1 = cursor.fetchone()[0]
-                totalcount =  row1[0]['count']
+                totalcount = row1[0]['count']
         else:
             _sql = """
                         SELECT 
@@ -1557,16 +1561,16 @@ def get_outstanding_loans(request):
             #: set transaction query with offsets.
             _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
             _sql = _sql_prefix + _sql + _sql_suffix
-            #print(_sql)
+            # print(_sql)
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
                 json_result = cursor.fetchone()[0]
-            #: run the record count query        
-                #print(trans_query_string_count)
+            #: run the record count query
+                # print(trans_query_string_count)
                 trans_query_string_count = """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
                 cursor.execute(trans_query_string_count, [cmte_id, report_id, cmte_id, report_id])
                 row1 = cursor.fetchone()[0]
-                totalcount =  row1[0]['count']
+                totalcount = row1[0]['count']
 
         if not json_result:
             return Response([], status=status.HTTP_200_OK)
@@ -1594,14 +1598,14 @@ def get_outstanding_loans(request):
                     tran["child"] = child_tran
                 if loan_pyaments_obj:
                     tran["payments"] = loan_pyaments_obj
-            #return Response(json_result, status=status.HTTP_200_OK)
+            # return Response(json_result, status=status.HTTP_200_OK)
 
 
 #: Adding the pagination and composing response params
-        if totalcount > 0: 
+        if totalcount > 0:
             numofpages = get_num_of_pages(totalcount, itemsperpage)
         else:
-            numofpages = 0    
+            numofpages = 0
         json_result = {
             "items": list(json_result),
             "totalItems": totalcount,
@@ -1622,32 +1626,36 @@ def get_trans_query_for_total_count(trans_query_string):
     j = trans_query_string.index(""" FROM """)
     if i > j:
         i = j
-    s = trans_query_string[ 0 : i+6]
+    s = trans_query_string[0: i + 6]
     final_query = trans_query_string.replace(s, temp_string, 1)
     return final_query
 
-#: build query offset and record count to start getting the data 
+#: build query offset and record count to start getting the data
+
+
 def set_offset_n_fetch(trans_query_string, page_num, itemsperpage):
     trans_query_string = trans_query_string + """ OFFSET """
-    if page_num > 0 : 
-        trans_query_string = trans_query_string + str((page_num-1) * itemsperpage) 
-    else:    
+    if page_num > 0:
+        trans_query_string = trans_query_string + str((page_num - 1) * itemsperpage)
+    else:
         trans_query_string = trans_query_string + """ 0 """
-    trans_query_string = trans_query_string + """ ROWS """ + """ FETCH FIRST """ 
-    trans_query_string = trans_query_string + str( itemsperpage)
-    trans_query_string = trans_query_string + """ ROW ONLY """  
+    trans_query_string = trans_query_string + """ ROWS """ + """ FETCH FIRST """
+    trans_query_string = trans_query_string + str(itemsperpage)
+    trans_query_string = trans_query_string + """ ROW ONLY """
     return trans_query_string
 
 #: get page count or number of pages for pagination
+
+
 def get_num_of_pages(totalcount, itemsperpage):
     if (totalcount % itemsperpage) == 0:
         numofpages = totalcount / itemsperpage
     else:
-        numofpages = int(totalcount/itemsperpage) + 1                    
+        numofpages = int(totalcount / itemsperpage) + 1
     return numofpages
 
 
-#: get the paginator page with other details like  
+#: get the paginator page with other details like
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False or json_res is None:
         json_result = {
@@ -1672,7 +1680,6 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
             "totalPages": paginator.num_pages,
         }
         return json_result
-
 
 
 @api_view(["GET"])
@@ -2650,7 +2657,6 @@ def schedC1(request):
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
-
 """
 start of sched_C2 ************
 C2 is about loan endorsor - adding endorsor is considered child transaction of sched_c
@@ -3222,6 +3228,7 @@ def get_endorser_summary(request):
     except:
         raise
 
+
 def put_duplicate_future_reports(data):
     try:
         transaction_id = data.get("transaction_id")
@@ -3243,4 +3250,4 @@ def put_duplicate_future_reports(data):
             else:
                 break
     except Exception as e:
-        raise Exception("""The put_duplicate_future_reports function is throwing an error: """+ str(e))
+        raise Exception("""The put_duplicate_future_reports function is throwing an error: """ + str(e))

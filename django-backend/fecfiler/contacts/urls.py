@@ -1,5 +1,4 @@
 from django.conf.urls import url
-#from . import views, duplicate, merge, export
 from . import contacts_committee
 from .views import views
 from .views import duplicate
@@ -24,4 +23,3 @@ urlpatterns = [
     url(r"^contact/transaction/merge/options$", merge.merge_option, name="mergeOption"),
     url(r"^contact/transaction/merge/save$", merge.merge_contact, name="mergeContact"),
 ]
-

@@ -289,7 +289,6 @@ def transaction_exists(tran_id, sched_type):
         raise
 
 
-
 @lru_cache(maxsize=32)
 def populate_transaction_types():
     """
@@ -375,11 +374,9 @@ def get_line_number_trans_type(transaction_type_identifier):
         raise
 
 
-
 def get_sched_a_transactions(
     report_id, cmte_id, transaction_id=None, back_ref_transaction_id=None
 ):
-
     """
     load sched_a transacrtions
     """
@@ -895,9 +892,8 @@ def get_sched_c2_child(cmte_id, transaction_id):
 
 
 def get_sched_b_transactions(
-    report_id, cmte_id, include_deleted_trans_flag = False, transaction_id=None, back_ref_transaction_id=None
+    report_id, cmte_id, include_deleted_trans_flag=False, transaction_id=None, back_ref_transaction_id=None
 ):
-
     """
     load sched_b transactions
     """
@@ -1088,7 +1084,7 @@ def post_process_it(cursor, cmte_id):
     merged_list = []
     for item in transaction_list:
 
-        entity_id = item.get("entity_id",item.get("payee_entity_id"))
+        entity_id = item.get("entity_id", item.get("payee_entity_id"))
         data = {"entity_id": entity_id, "cmte_id": cmte_id}
 
         entity_list = get_entities(data)

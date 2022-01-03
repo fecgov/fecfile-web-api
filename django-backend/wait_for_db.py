@@ -26,7 +26,7 @@ def postgres_test():
                 os.environ.get('FECFILE_DB_HOST'),
                 os.environ.get('FECFILE_DB_PASSWORD')))
         conn.close()
-        print ("DB connection successful")
+        print("DB connection successful")
         return True
     except ImportError:
         return False

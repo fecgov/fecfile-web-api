@@ -544,8 +544,8 @@ def put_sql_schedA(
     levin_account_id,
     transaction_type_identifier,
     aggregation_ind,
-    semi_annual_refund_bundled_amount = None,
-    election_year = None,
+    semi_annual_refund_bundled_amount=None,
+    election_year=None,
 ):
     """
     update a schedule_a item
@@ -747,6 +747,7 @@ def get_in_kind_entity_name(entity_data):
 """
 **************************************************** API FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
+
 
 @update_F3X
 @new_report_date
@@ -983,6 +984,7 @@ def get_schedA(data):
         return forms_obj
     except:
         raise
+
 
 @update_F3X
 @new_earmarkout_expenditure_amount
@@ -1738,7 +1740,6 @@ def reattribution_auto_generate_transactions(
     contribution_amount,
     reattributed_id,
 ):
-
     """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
     of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
     ticket for the business rules that apply to reattribution"""
@@ -2260,7 +2261,6 @@ def force_aggregate_sa(request):
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
-
 @api_view(["PUT"])
 def force_unaggregate_sa(request):
     """
@@ -2729,7 +2729,7 @@ def update_redes_original_trans(
 def trash_restore_transactions(request):
     """api for trash and resore transactions. 
        we are doing soft-delete only, mark delete_ind to 'Y'
-       
+
        request payload in this format:
         {
             "actions": [
@@ -2745,7 +2745,7 @@ def trash_restore_transactions(request):
                 }
             ]
         }
- 
+
     """
     try:
         is_read_only_or_filer_reports(request)
@@ -2793,7 +2793,7 @@ def trash_restore_transactions(request):
                         # Handling aggregate update for sched_A transactions
                         if transaction_id[:2] == "SA":
                             datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                            if datum.get("transaction_type_identifier") not in ['IND_BNDLR','REG_ORG_BNDLR']:
+                            if datum.get("transaction_type_identifier") not in ['IND_BNDLR', 'REG_ORG_BNDLR']:
                                 update_linenumber_aggamt_transactions_SA(
                                     datetime.datetime.strptime(
                                         datum.get("contribution_date"), "%Y-%m-%d"
@@ -2909,7 +2909,7 @@ def trash_restore_transactions(request):
                                     )
                                 )
                             # datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
-                            if datum["transaction_type_identifier"] not in ['IND_REFUND','REG_ORG_REFUND']:
+                            if datum["transaction_type_identifier"] not in ['IND_REFUND', 'REG_ORG_REFUND']:
                                 update_schedB_aggamt_transactions(
                                     datetime.datetime.strptime(
                                         datum.get("expenditure_date"), "%Y-%m-%d"
@@ -2955,10 +2955,10 @@ def trash_restore_transactions(request):
                             update_aggregate_se(tran_data)
                             if find_form_type(report_id, cmte_id) == "F24":
                                 _actions.append({
-                                            "action": action,
-                                            "report_id": tran_data.get('mirror_report_id'),
-                                            "transaction_id": tran_data.get('mirror_transaction_id')
-                                        })
+                                    "action": action,
+                                    "report_id": tran_data.get('mirror_report_id'),
+                                    "transaction_id": tran_data.get('mirror_transaction_id')
+                                })
 
                         # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
                         if transaction_id[:2] == "SH" and _delete == "Y":
@@ -3019,13 +3019,16 @@ def trash_restore_transactions(request):
                     )
 
             except Exception as e:
-                     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
-                         status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    "The trash_restore_transactions API is throwing an error: "
+                    + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # update report last_update_date
             renew_report_update_date(report_id)
 
-            function_to_call_wrapper_update_F3X(cmte_id,report_id)
+            function_to_call_wrapper_update_F3X(cmte_id, report_id)
 
         return Response(
             {
