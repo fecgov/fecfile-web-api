@@ -6,13 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 from db_file_storage.model_utils import delete_file, delete_file_if_needed
 from fecfiler.custom_storages import MediaStorage
 
-#Table to store F99 attachment data (Refer this documentation: https://django-db-file-storage.readthedocs.io/en/master/)
+# Table to store F99 attachment data (Refer this documentation: https://django-db-file-storage.readthedocs.io/en/master/)
+
+
 class F99Attachment(models.Model):
     bytes = models.TextField()
     filename = models.CharField(max_length=255)
     mimetype = models.CharField(max_length=50)
 
 # added blank=True for null=True to avoid exception while saving to db.
+
+
 class CommitteeInfo(models.Model):
     # Committee Information Table Model
     id = models.AutoField(primary_key=True)
@@ -25,7 +29,6 @@ class CommitteeInfo(models.Model):
     city = models.CharField(max_length=30, null=False)
     state = models.CharField(max_length=2, null=False)
     zipcode = models.TextField(null=False, max_length=9)
-    #zipcode = models.IntegerField(null=False)
     treasurerlastname = models.CharField(max_length=30, null=False)
     treasurerfirstname = models.CharField(max_length=20, null=False)
     treasurermiddlename = models.CharField(max_length=20, null=True, blank=True)
@@ -36,19 +39,19 @@ class CommitteeInfo(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
     isdeleted = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
-    signee = models.CharField(max_length=30, null= False, default = "-")
-    email_on_file = models.TextField(max_length=100, null= False, default = "-")
+    signee = models.CharField(max_length=30, null=False, default="-")
+    email_on_file = models.TextField(max_length=100, null=False, default="-")
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
-    additional_email_1 = models.TextField(max_length=100, null= True, blank=True)
-    additional_email_2 = models.TextField(max_length=100, null= True, blank=True)
+    additional_email_1 = models.TextField(max_length=100, null=True, blank=True)
+    additional_email_2 = models.TextField(max_length=100, null=True, blank=True)
     filename = models.CharField(max_length=128, null=True, blank=True)
-    #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
+    # file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
     file = models.FileField(storage=MediaStorage(), null=True, blank=True)
     # implememted file upload using the following module: https://django-db-file-storage.readthedocs.io/en/master/
     form_type = models.CharField(max_length=3, default="F99")
     coverage_start_date = models.DateField(null=True, blank=True)
     coverage_end_date = models.DateField(null=True, blank=True)
-    
+
     # class constructor
     def __unicode__(self):
         return self.committeename
@@ -61,13 +64,12 @@ class CommitteeInfo(models.Model):
     def delete(self, *args, **kwargs):
         super(CommitteeInfo, self).delete(*args, **kwargs)
         delete_file(self, 'file')
-    
+
     """
 
     class Meta():
         verbose_name = _('CommitteeInfo')
         verbose_name_plural = _('CommitteeInfo')
-
 
 
 class Committee(models.Model):
@@ -85,22 +87,21 @@ class Committee(models.Model):
     treasurermiddlename = models.CharField(max_length=20)
     treasurerprefix = models.CharField(max_length=10)
     treasurersuffix = models.CharField(max_length=10)
-    email_on_file = models.TextField(max_length=100, null= False, default = "-")
+    email_on_file = models.TextField(max_length=100, null=False, default="-")
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
     isdeleted = models.BooleanField(default=False)
 
-
-    # class constructor
     def __unicode__(self):
+        # class constructor
         return self.committeename
-    
 
     class Meta():
         verbose_name = _('Committee')
         verbose_name_plural = _('Committee')
+
 
 class CommitteeMaster(models.Model):
     cmte_id = models.CharField(primary_key=True, max_length=9)
@@ -128,14 +129,16 @@ class CommitteeMaster(models.Model):
         managed = False
         db_table = 'committee_lookup'
 
+
 class My_Forms_View(models.Model):
     cmte_id = models.CharField(primary_key=True, max_length=9)
     category = models.CharField(max_length=25)
-    form_type = models.CharField(max_length=10)   
-    due_date = models.DateField(blank=True, null=True) 
+    form_type = models.CharField(max_length=10)
+    due_date = models.DateField(blank=True, null=True)
     form_description = models.CharField(max_length=300, blank=True, null=True)
     form_info = models.CharField(max_length=1000, blank=True, null=True)
-        
+
+
 class RefCmteTypeVsForms(models.Model):
     cmte_type = models.CharField(primary_key=True, max_length=1)
     cmte_dsgn = models.CharField(max_length=1)

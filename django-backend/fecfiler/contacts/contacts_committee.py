@@ -36,11 +36,11 @@ def reorder_user_data(contacts_added, contact_list):
             contacts_list_dict.zip_code = contacts_list_dict.zip_code.astype(str)
             contacts_added.reset_index(drop=True, inplace=True)
 
-            #json_added = contacts_added.to_json(orient='records')
-            #json_contact = contacts_list_dict.to_json(orient='records')
-            #contacts_added_dict = pd.read_json(json_added)
+            # json_added = contacts_added.to_json(orient='records')
+            # json_contact = contacts_list_dict.to_json(orient='records')
+            # contacts_added_dict = pd.read_json(json_added)
             contacts_added_dict = contacts_added
-            #contact_list_dict = pd.read_json(json_contact)
+            # contact_list_dict = pd.read_json(json_contact)
             contact_list_dict = contacts_list_dict
             contact_list_dict.fillna(value=pd.np.nan, inplace=True)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
@@ -49,7 +49,7 @@ def reorder_user_data(contacts_added, contact_list):
             contacts_added_dict1 = contacts_added_dict1[contacts_added_dict1.zip_code.notnull()]
             # contacts_added_dict1.drop(contacts_added_dict1.loc[contacts_added_dict1['zip_code']
             # != ''].index, inplace=True)
-            #contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(int)
+            # contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(int)
             contacts_added_dict1.zip_code = contacts_added_dict1.zip_code.astype(str)
             contacts_added_dict1.reset_index(drop=True, inplace=True)
 
@@ -81,7 +81,6 @@ def reorder_user_data(contacts_added, contact_list):
             json_added = contacts_added.to_json(orient='records')
             contacts_added_dict = pd.read_json(json_added)
             contacts_added_dict = contacts_added_dict[contacts_added_dict.zip_code.notnull()]
-            #contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(int)
             contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
             contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
             data = {"final_contact_df": contacts_added_dict1, "duplicate_contact_df": ""}
@@ -164,7 +163,7 @@ def save_contact_db(contacts_added, cmte_id, file_name):
     create_temp_transaction_association_model(all_contact, table_name)
 
     duplicate_contact_df = data.get("duplicate_contact_df")
-    #duplicate_contact_df['duplicate_entity'] = ''
+    # duplicate_contact_df['duplicate_entity'] = ''
     duplicate_contact_df['transaction_id'] = ''
     duplicate_contact_df['file_selected'] = 'true'
     duplicate_contact_df['file_name'] = file_name
@@ -243,7 +242,7 @@ def upload_cand_contact(request):
 
                 print(df.head())
                 file_name = file_name[(file_name.rfind("/") + 1):]
-                
+
                 data = custom_validate_cand_df(df, cmte_id)
 
                 contacts_added = data.get("final_list")

@@ -1,14 +1,9 @@
-# Create your models here.
-
 from django.db import models
 from django.core.validators import FileExtensionValidator
-#from .validators import validate_is_pdf
 from django.utils.translation import ugettext_lazy as _
 
-#class Reports(models.Model):
-#    reporttype = models.Charfield(max_length=50)
-    
-class Cmte_Report_Types_View(models.Model):   
+
+class Cmte_Report_Types_View(models.Model):
     cmte_id = models.CharField(max_length=9)
     filing_freq = models.CharField(max_length=1, blank=True, null=True)
     form_type = models.CharField(max_length=10)
@@ -22,7 +17,8 @@ class Cmte_Report_Types_View(models.Model):
     due_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        unique_together = (('cmte_id', 'form_type','report_type'),)
+        unique_together = (('cmte_id', 'form_type', 'report_type'),)
+
 
 class My_Forms_View(models.Model):
     cmte_id = models.CharField(primary_key=True, max_length=9)
@@ -31,6 +27,7 @@ class My_Forms_View(models.Model):
     due_date = models.DateField(blank=True, null=True)
     form_description = models.CharField(max_length=300, blank=True, null=True)
     form_info = models.CharField(max_length=1000, blank=True, null=True)
+
 
 class Filing_Notification(models.Model):
     notification_id = models.BigIntegerField(primary_key=True)

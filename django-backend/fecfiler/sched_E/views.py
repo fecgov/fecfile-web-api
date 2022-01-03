@@ -232,6 +232,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
     except:
         raise
 
+
 @update_F3X
 @new_report_date
 def put_schedE(data):
@@ -281,7 +282,7 @@ def put_schedE(data):
                         data.get("expenditure_amount"),
                         existing_expenditure,
                     )
-            #for F24 editing a duplicate transaction
+            # for F24 editing a duplicate transaction
             form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
             se_data = {}
             if form_type == 'F24' and data.get('mirror_report_id'):
@@ -313,6 +314,7 @@ def put_schedE(data):
     except:
         raise
 
+
 def update_mirror_report_id(data):
     try:
         with connection.cursor() as cursor:
@@ -326,6 +328,7 @@ def update_mirror_report_id(data):
                     found.""".format(data.get('transaction_id'), data.get('cmte_id')))
     except Exception as e:
         raise Exception('the update_mirror_report_id function is throwing an error: ' + str(e))
+
 
 def put_sql_schedE(data):
     """
@@ -495,8 +498,8 @@ def get_sched_e_ytd_amount(request):
             data['so_cand_district'] = cand_district
 
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
-                form_type, trans_dt
-            )
+            form_type, trans_dt
+        )
         transaction_list = get_transactions_election_and_office(
             aggregate_start_date, trans_dt, data, 'F3X'
         )
@@ -507,13 +510,13 @@ def get_sched_e_ytd_amount(request):
 
         # if cand_office == "P":
         #     _sql = """
-        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
+        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
         #     FROM public.sched_e
         #     WHERE cmte_id = %s
-        #     AND so_cand_office = %s 
-        #     AND election_code = %s 
+        #     AND so_cand_office = %s
+        #     AND election_code = %s
         #     AND delete_ind is distinct from 'Y'
-        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     ORDER BY transaction_dt DESC, create_date DESC;
         #     """
         #     _v = (cmte_id, cand_office, election_code)
         # elif cand_office == "S":
@@ -521,14 +524,14 @@ def get_sched_e_ytd_amount(request):
         #     if not cand_state:
         #         raise Exception("cand_state is required for cand_office S")
         #     _sql = """
-        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
+        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
         #     FROM public.sched_e
         #     WHERE cmte_id = %s
-        #     AND so_cand_office = %s 
-        #     AND election_code = %s 
-        #     AND so_cand_state = %s 
+        #     AND so_cand_office = %s
+        #     AND election_code = %s
+        #     AND so_cand_state = %s
         #     AND delete_ind is distinct from 'Y'
-        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     ORDER BY transaction_dt DESC, create_date DESC;
         #     """
         #     _v = (cmte_id, cand_office, election_code, cand_state)
         # elif cand_office == "H":
@@ -542,12 +545,12 @@ def get_sched_e_ytd_amount(request):
         #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
         #     FROM public.sched_e
         #     WHERE cmte_id = %s
-        #     AND so_cand_office = %s 
-        #     AND election_code = %s 
-        #     AND so_cand_state = %s 
-        #     AND so_cand_district = %s 
+        #     AND so_cand_office = %s
+        #     AND election_code = %s
+        #     AND so_cand_state = %s
+        #     AND so_cand_district = %s
         #     AND delete_ind is distinct from 'Y'
-        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     ORDER BY transaction_dt DESC, create_date DESC;
         #     """
         #     _v = (cmte_id, cand_office, election_code, cand_state, cand_district)
         # else:
@@ -568,6 +571,7 @@ def get_sched_e_ytd_amount(request):
             """The get_sched_e_ytd_amount API is throwing following error: """ + str(e)
         )
 
+
 def get_transactions_election_and_office(start_date, end_date, data, form_type='F3X'):
     """
     load all transactions by electtion code and office within the date range.
@@ -585,12 +589,12 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
         _sql = """
         SELECT  
                 e.transaction_id, 
-				e.expenditure_amount as transaction_amt,
-				COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
-        WHERE  
+        WHERE
             e.cmte_id = %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
@@ -602,26 +606,26 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), cand_office, form_type)
-    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK','DE','MT','ND','SD','VT','WY']):
+    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']):
         _sql = """
-        SELECT  
-                e.transaction_id, 
-				e.expenditure_amount as transaction_amt,
+        SELECT
+                e.transaction_id,
+                e.expenditure_amount as transaction_amt,
                 COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
-        WHERE  
+        WHERE
             e.cmte_id = %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.so_cand_office = %s
             AND e.so_cand_state = %s
-            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.delete_ind is distinct FROM 'Y'
             AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
-            ORDER BY transaction_dt ASC, e.create_date ASC; 
+            ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (
             data.get("cmte_id"),
@@ -632,12 +636,12 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             data.get("so_cand_state"),
             form_type
         )
-    elif cand_office == "H" and data.get("so_cand_state") not in ['AK','DE','MT','ND','SD','VT','WY']:
+    elif cand_office == "H" and data.get("so_cand_state") not in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']:
         _sql = """
-        SELECT  
-                e.transaction_id, 
-				e.expenditure_amount as transaction_amt,
-				COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+        SELECT
+                e.transaction_id,
+                e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
@@ -716,7 +720,7 @@ def update_aggregate_amt_se(data):
             )
             aggregate_amount = 0
             # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
-            # curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
+            # curr_tran_date = dissemination_date if dissemination_date else disbursement_date
             # curr_tran_date =  datetime.datetime.strptime(
             #                     curr_tran_date, "%Y-%m-%d"
             #                 ).date()
@@ -729,8 +733,8 @@ def update_aggregate_amt_se(data):
                 logger.debug("current aggregate amount:{}".format(aggregate_amount))
                 # if curr_tran_date <= transaction[2]:
                 update_aggregate_on_transaction(
-                        cmte_id, report_id, transaction[0], aggregate_amount
-                    )
+                    cmte_id, report_id, transaction[0], aggregate_amount
+                )
                 # # checking in reports table if the delete_ind flag is false for the corresponding report
                 # if transaction[5] != 'Y':
                 #     # checking if the back_ref_transaction_id is null or not.
@@ -797,6 +801,7 @@ def put_completing_entities(data):
     comp_data["entity_type"] = "IND"
     logger.debug("put_auth_entity with data:{}".format(comp_data))
     return put_entities(comp_data)
+
 
 @update_F3X
 @new_report_date
@@ -885,7 +890,7 @@ def post_schedE(data):
                 )
                 parent_update_fail = False
 
-            #for F24 creating a duplicate transaction
+            # for F24 creating a duplicate transaction
             se_data = {}
             if form_type == 'F24' and data.get('mirror_report_id'):
                 se_data = data.copy()
@@ -937,6 +942,7 @@ def post_schedE(data):
         return data
     except:
         raise
+
 
 def post_sql_schedE(data):
     """
@@ -1209,7 +1215,6 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             mirror_report_id
             FROM public.sched_e
             WHERE 
-            
             cmte_id = %s 
             AND delete_ind is distinct from 'Y'
             """
@@ -1274,6 +1279,7 @@ def delete_schedE(data):
     except Exception as e:
         raise
 
+
 def trash_sql_schedE(cmte_id, report_id, transaction_id):
     """
     do permanent delete sql transaction
@@ -1325,8 +1331,8 @@ def force_aggregate_se(request):
         tran_data = get_list_schedE(report_id, cmte_id, transaction_id)[0]
         update_aggregate_amt_se(tran_data)
         return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+            {"status": "success"}, status=status.HTTP_200_OK
+        )
     except Exception as e:
         return Response(
             "The force_aggregate_se API is throwing an error: " + str(e),
@@ -1351,8 +1357,8 @@ def force_unaggregate_se(request):
         tran_data = get_list_schedE(report_id, cmte_id, transaction_id)[0]
         update_aggregate_amt_se(tran_data)
         return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+            {"status": "success"}, status=status.HTTP_200_OK
+        )
     except Exception as e:
         return Response(
             "The force_aggregate_se API is throwing an error: " + str(e),
@@ -1377,13 +1383,13 @@ def schedE(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
-            #also check if an 'override' report_id present, and if so, use that instead. 
+            # also check if an 'override' report_id present, and if so, use that instead.
             if(request.data.get("associated_report_id") and check_null_value(request.data.get("associated_report_id"))):
                 report_id = request.data.get("associated_report_id")
                 associatedbydissemination = True
             # datum = schedE_sql_dict(request.data)
             datum = request.data.copy()
-            #handling F24
+            # handling F24
             if find_form_type(report_id, cmte_id) == 'F24':
                 if 'mirror_report_id' not in request.data:
                     raise Exception("Missing Input: mirror_report_id is mandatory")
@@ -1528,7 +1534,7 @@ def schedE(request):
                 report_id = "0"
             else:
                 report_id = check_report_id(request.data.get("report_id"))
-            #also check if an 'override' report_id present, and if so, use that instead. 
+            # also check if an 'override' report_id present, and if so, use that instead.
             if(request.data.get("associated_report_id") and check_null_value(request.data.get("associated_report_id"))):
                 report_id = request.data.get("associated_report_id")
                 associatedbydissemination = True
@@ -1550,12 +1556,14 @@ def schedE(request):
     else:
         raise NotImplementedError
 
+
 @api_view(['POST'])
 def mirror_to_F24(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        for param in ['transactionId','reportId']:
-            if not request.data.get(param): raise Exception('The parameter {} is mandatory.'.format(param))
+        for param in ['transactionId', 'reportId']:
+            if not request.data.get(param):
+                raise Exception('The parameter {} is mandatory.'.format(param))
 
         transaction_id = get_next_transaction_id("SE")
         _sql = """INSERT INTO public.sched_e(
@@ -1580,8 +1588,14 @@ def mirror_to_F24(request):
             line_number, aggregation_ind, associatedbydissemination, report_id, 
             transaction_id
             FROM public.sched_e WHERE cmte_id=%s AND transaction_id=%s AND delete_ind IS DISTINCT FROM 'Y'"""
-        _value_list = [request.data['reportId'], transaction_id, datetime.datetime.now(),
-              datetime.datetime.now(), cmte_id, request.data['transactionId']] 
+        _value_list = [
+            request.data['reportId'],
+            transaction_id,
+            datetime.datetime.now(),
+            datetime.datetime.now(),
+            cmte_id,
+            request.data['transactionId']
+        ]
 
         _sql2 = """UPDATE public.sched_e SET mirror_report_id = %s, mirror_transaction_id = %s
                 WHERE transaction_id = %s"""
@@ -1589,17 +1603,20 @@ def mirror_to_F24(request):
 
         with connection.cursor() as cursor:
             cursor.execute(_sql, _value_list)
-            if not cursor.rowcount: raise Exception('failed to create new transaction')
+            if not cursor.rowcount:
+                raise Exception('failed to create new transaction')
             cursor.execute(_sql2, _value_list2)
-            if not cursor.rowcount: raise Exception('failed to update transaction: {}'.format(
-                request.data['transactionId']))
-        data = {"cmte_id": cmte_id,
-                "report_id": request.data['reportId'],
-                "transaction_id": transaction_id}
+            if not cursor.rowcount:
+                raise Exception('failed to update transaction: {}'.format(request.data['transactionId']))
+        data = {
+            "cmte_id": cmte_id,
+            "report_id": request.data['reportId'],
+            "transaction_id": transaction_id
+        }
         get_data = get_schedE(data)[0]
         return Response(get_data, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response(
-          "The mirror_to_F24 API is throwing an error: " + str(e),
-          status=status.HTTP_400_BAD_REQUEST
-          )
+            "The mirror_to_F24 API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -234,7 +234,6 @@ def put_sql_schedA_from_schedB(
         raise
 
 
-
 def get_next_transaction_id(trans_char):
     """
     query the db for next transarion id
@@ -722,6 +721,7 @@ def put_cand_entity(data):
     """
     return save_cand_entity(data)
 
+
 @update_F3X
 @new_report_date
 def post_schedB(datum):
@@ -865,12 +865,12 @@ def post_schedB(datum):
 
             # do aggregation: regular sb transactions
             update_schedB_aggamt_transactions(
-                    datum.get("expenditure_date"),
-                    datum.get("transaction_type_identifier"),
-                    entity_id,
-                    datum.get("cmte_id"),
-                    datum.get("report_id"),
-                )
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                entity_id,
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
 
             # do aggregation: levin account transactions
             if transaction_id.startswith("LB"):
@@ -988,6 +988,7 @@ def get_existing_expenditure(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -1279,7 +1280,6 @@ def validate_parent_transaction_exist(data):
             pass
 
 
-
 def schedB_sql_dict(data):
     """
     build a formulated data dictionary based on loaded 
@@ -1392,7 +1392,6 @@ def redesignation_auto_generate_transactions(
     contribution_amount,
     redesignated_id,
 ):
-
     """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
     of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
     ticket for the business rules that apply to reattribution"""
@@ -1646,10 +1645,17 @@ def list_all_sb_transactions_entity(
                     AND transaction_type_identifier = 'ALLOC_EXP_DEBT'
                 ORDER BY expenditure_date ASC, create_date ASC
                 """,
-                [entity_id, cmte_id, aggregate_start_date, aggregate_end_date,
-                entity_id, cmte_id, aggregate_start_date, aggregate_end_date],
+                [
+                    entity_id,
+                    cmte_id,
+                    aggregate_start_date,
+                    aggregate_end_date,
+                    entity_id,
+                    cmte_id,
+                    aggregate_start_date,
+                    aggregate_end_date,
+                ],
             )
-            # print(cursor.query)
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
@@ -1730,7 +1736,7 @@ def update_schedB_aggamt_transactions(
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
     """
     try:
-        if transaction_type_identifier not in ('IND_REFUND','REG_ORG_REFUND'):
+        if transaction_type_identifier not in ('IND_REFUND', 'REG_ORG_REFUND'):
             itemization_value = 200
             # itemized_transaction_list = []
             # unitemized_transaction_list = []

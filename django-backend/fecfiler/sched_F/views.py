@@ -15,7 +15,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from fecfiler.authentication.authorization import  is_read_only_or_filer_reports
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -199,6 +199,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
     except:
         raise
 
+
 @update_F3X
 @new_report_date
 def put_schedF(data):
@@ -350,6 +351,7 @@ def validate_sF_data(data):
     validate sF json data
     """
     check_mandatory_fields_SF(data)
+
 
 @update_F3X
 @new_report_date
@@ -1129,6 +1131,7 @@ def get_election_year(office_sought, election_state, election_district):
             "The get_election_year function is throwing an error: " + str(e)
         )
 
+
 def update_sf_aggregation_status(transaction_id, status):
     """
     helpder function to update sf aggregation_ind
@@ -1169,11 +1172,11 @@ def force_aggregate_sf(request):
             update_sf_aggregation_status(transaction_id, "Y")
             tran_data = get_list_schedF(report_id, cmte_id, transaction_id)[0]
             update_aggregate_general_elec_exp(
-                    tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
-                )
+                tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
+            )
             return JsonResponse(
-                    {"status": "success"}, status=status.HTTP_200_OK
-                )
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         except Exception as e:
             return Response(
                 "The force_aggregate_sf API is throwing an error: " + str(e),
@@ -1203,11 +1206,11 @@ def force_unaggregate_sf(request):
             update_sf_aggregation_status(transaction_id, "N")
             tran_data = get_list_schedF(report_id, cmte_id, transaction_id)[0]
             update_aggregate_general_elec_exp(
-                    tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
-                )
+                tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
+            )
             return JsonResponse(
-                    {"status": "success"}, status=status.HTTP_200_OK
-                )
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         except Exception as e:
             return Response(
                 "The force_aggregate_sf API is throwing an error: " + str(e),

@@ -13,5 +13,5 @@ urlpatterns = [
         r"^sf/force_unaggregate_sf$",
         views.force_unaggregate_sf,
         name="force_unaggregate_sf",
-    ), 
+    ),
 ]
