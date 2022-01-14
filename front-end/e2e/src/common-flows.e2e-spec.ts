@@ -1,8 +1,10 @@
-import {browser, by, element, protractor} from 'protractor';
+import {browser, protractor} from 'protractor';
 import {LoginPage} from './login/login.po';
 import {DashboardPage} from './dashboard/dashboard.po';
+import menu from './menu/menu.po'
+import contactPage from './contact/contact.po'
 
-export class CommonFlows {
+export class CommonWorkflows {
 
     loginPage: LoginPage;
     dashboard: DashboardPage;
@@ -14,38 +16,44 @@ export class CommonFlows {
 
     async login() {
         this.loginPage.navigateTo();
-        browser.waitForAngular();
 
+        // login page
         this.loginPage.fillValidCredentials();
+        this.loginPage.getLoginBtn().click();
 
-        return this.loginPage.getLoginBtn().click().then(() => {
-            browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getTwoFactorInstruction())).then(() => {
-                this.loginPage.getTwoFactorInstruction().getText().then((t) => {
-                    expect(t).toMatch('Please choose one of the three options for code verification');
+        // two factor choice page
+        browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getTwoFactorInstruction()));
+        const t = await this.loginPage.getTwoFactorInstruction().getText();
+        expect(t).toMatch('Please choose one of the three options for code verification');
+        this.loginPage.getTwoFactorEmailRadioButton().click();
+        this.loginPage.getTwoFactorSubmitButton().click();
 
-                    this.loginPage.getTwoFactorEmailRadioButton().click();
-                    this.loginPage.getTwoFactorSubmitButton().click()
+        // enter two factor login token
+        browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getTwoFactorSecurityTextBox()));
+        this.loginPage.getTwoFactorSecurityTextBox().sendKeys('111111');
+        this.loginPage.getTwoFactorSecurtySubmitButton().click();
 
-                    browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getTwoFactorSecurityTextBox())).then(() => {
+        // Click through gov usage warning
+        browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getUsageWarningContinutButton()));
+        this.loginPage.getUsageWarningContinutButton().click();
 
-                        this.loginPage.getTwoFactorSecurityTextBox().sendKeys('111111');
-                        this.loginPage.getTwoFactorSecurtySubmitButton().click();
+        // Verify we get the dashboard page
+        browser.wait(protractor.ExpectedConditions.visibilityOf(this.dashboard.getNavbar()));
+        return  expect(this.dashboard.getNavbar().getText()).toMatch('Dashboard');
+    }
 
-                        browser.wait(protractor.ExpectedConditions.visibilityOf(this.loginPage.getUsageWarningContinutButton())).then( () => {
-                            this.loginPage.getUsageWarningContinutButton().click();
+    async gotoContacts() {
+        await this.dashboard.getNavbar().getText().then( () => {
+            //already logged in
+        }).catch( () => {
+            this.login();
+        }).finally( async () => {
+            await browser.wait(protractor.ExpectedConditions.visibilityOf(menu.getConstactMenuLinkElement())  );
+            menu.getConstactMenuLinkElement().click()
 
-                            browser.wait(protractor.ExpectedConditions.visibilityOf(this.dashboard.getNavbar())).then( () => {
-                                expect(this.dashboard.getNavbar().getText() ).toMatch('Dashboard')
-                            });
-
-
-                        })
-
-
-                    });
-                });
-
-            })
-        });
+            await browser.wait(protractor.ExpectedConditions.visibilityOf(contactPage.getPageTitle()))
+            return expect(contactPage.getPageTitle().getText()).toMatch('Contacts')
+        })
+        return;
     }
 }
