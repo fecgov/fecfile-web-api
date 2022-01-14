@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class SchedEConfig(AppConfig):
-    name = 'sched_E'
+    name = 'fecfiler.sched_E'
