@@ -1,18 +1,20 @@
-import { browser, by, element } from 'protractor';
+import {browser, by, element, protractor} from 'protractor';
 import { LoginPage } from './login.po';
 import { DashboardPage } from '../dashboard/dashboard.po';
 
-describe('login page', () => {
+describe('contact page', () => {
   let page: LoginPage;
 
   beforeEach(() => {
     page = new LoginPage();
+    browser.ignoreSynchronization = true;
   });
 
 
-  describe('login page loaded', () => {
+  describe('view contacts', () => {
 
-    it('should display welcome message', () => {
+    it('should display the manage contact screen', () => {
+
       page.navigateTo();
       expect(page.getParagraphText()).toEqual('FEC File Online');
     });
@@ -70,7 +72,7 @@ describe('login page', () => {
 
       it('there should be a login button with the text `Log In`', () => {
         page.navigateTo();
-        expect(page.getLoginBtn().getText()).toEqual('Log In');
+        expect(page.getLoginBtn().getText()).toEqual('Enter');
       });
     });
 
@@ -105,14 +107,16 @@ describe('login page', () => {
       it('should login with correct credentials', () => {
         let dashboardPage = new DashboardPage();
         page.navigateTo();
+        browser.waitForAngular();
 
         page.fillValidCredentials();
 
-        page.getLoginBtn().click().then(() => {
-          browser.waitForAngular();
-          browser.sleep(1000);
-
-          expect(dashboardPage.getParagraphText().getText()).toEqual('Dashboard Content');
+        page.getLoginBtn().click().then( () => {
+          browser.wait(protractor.ExpectedConditions.visibilityOf(page.getTwoFactorInstruction())).then( () => {
+            page.getTwoFactorInstruction().getText().then( (t) => {
+              expect(t).toMatch('Please choose one of the three options for code verification');
+            })
+          })
         });
       });
     });
