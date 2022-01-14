@@ -6,6 +6,6 @@ export class DashboardPage {
   }
 
   getNavbar() {
-    return element(by.xpath('//nav[contains(@class,\'navbar\')]'))
+    return element(by.xpath("//nav[contains(@class,'navbar')]"))
   }
 }
