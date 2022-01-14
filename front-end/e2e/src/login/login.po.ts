@@ -76,7 +76,7 @@ export class LoginPage {
   }
 
   getTwoFactorInstruction() {
-    return  element(by.xpath('//div[@class=\'title-front-sub\']'));
+    return  element(by.xpath("//div[@class='title-front-sub']"));
   }
 
   getTwoFactorEmailRadioButton() {
@@ -84,18 +84,18 @@ export class LoginPage {
   }
 
   getTwoFactorSubmitButton() {
-    return element(by.xpath('//button[contains(.,\'Submit\')]'))
+    return element(by.xpath("//button[contains(.,'Submit')]"))
   }
 
   getTwoFactorSecurityTextBox() {
-    return element(by.xpath('//input[@formcontrolname = \'securityCode\']'));
+    return element(by.xpath("//input[@formcontrolname = 'securityCode']"));
   }
 
   getTwoFactorSecurtySubmitButton() {
-    return element(by.xpath('//button[contains(.,\'Next\')]'));
+    return element(by.xpath("//button[contains(.,'Next')]"));
   }
 
   getUsageWarningContinutButton() {
-    return element(by.xpath('//button[contains(.,\'Continue\')]'))
+    return element(by.xpath("//button[contains(.,'Continue')]"))
   }
 }
