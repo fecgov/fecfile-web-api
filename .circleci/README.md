@@ -7,8 +7,11 @@ FECFILE_DB_HOST=localhost
 FECFILE_DB_USERNAME=postgres 
 FECFILE_DB_PASSWORD=postgres 
 FECFILE_DB_NAME=postgres 
+FECFILE_FEC_WEBSITE_API_KEY=
 ```
-NOTE that the FECFILE_DB_HOST is different here than what you need for your docker-compose configuration.
+Notes:
+* There is no default FECFILE_FEC_WEBSITE_API_KEY, you must obtain and set this yourself
+* that the FECFILE_DB_HOST is different here than what you need for your docker-compose configuration.
 
 # Using CircleCI local CLI 
 
