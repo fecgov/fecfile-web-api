@@ -59,6 +59,7 @@ API_PASSWORD = os.environ.get('API_PASSWORD', None)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 
+FECFILE_FEC_WEBSITE_API_KEY = os.environ.get('FECFILE_FEC_WEBSITE_API_KEY')
 
 ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'

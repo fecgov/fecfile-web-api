@@ -1,6 +1,7 @@
 import logging
 import datetime
 import requests
+import fecfiler.settings
 
 # from functools import lru_cache
 from django.db import connection
@@ -911,8 +912,8 @@ def get_election_year(office_sought, election_state, election_district):
         election_year_list = []
         while True:
             ab = requests.get(
-                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
-                    i, param_string
+                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
+                    fecfiler.settings.FECFILE_FEC_WEBSITE_API_KEY, i, param_string
                 )
             )
             results = results + ab.json()["results"]
