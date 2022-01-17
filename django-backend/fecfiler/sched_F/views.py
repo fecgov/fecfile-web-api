@@ -1103,10 +1103,10 @@ def get_election_year(office_sought, election_state, election_district):
         results = []
         election_year_list = []
         while True:
-            url = ( "https://api.open.fec.gov/v1/election-dates/?" +
-                    "sort=-election_date&api_key={}".format(settings.FECFILE_FEC_WEBSITE_API_KEY) +
-                    "&page={}".format(i) +
-                    "&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(param_string))
+            url = ("https://api.open.fec.gov/v1/election-dates/?"
+                   + "sort=-election_date&api_key={}".format(settings.FECFILE_FEC_WEBSITE_API_KEY)
+                   + "&page={}".format(i)
+                   + "&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(param_string))
 
             ab = requests.get(url)
             results = results + ab.json()["results"]
