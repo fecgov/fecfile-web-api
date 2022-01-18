@@ -898,7 +898,8 @@ def get_rad_analyst_info(request):
     if request.method == 'GET':
         try:
             if get_comittee_id(request.user.username):
-                ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + get_comittee_id(request.user.username) + '&sort_hide_null=false&sort_null_only=false')
+                url = 'https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key={}&committee_id='.format(settings.FECFILE_FEC_WEBSITE_API_KEY) + get_comittee_id(request.user.username) + '&sort_hide_null=false&sort_null_only=false'
+                ab = requests.get(url)
                 return JsonResponse({"response": ab.json()['results']})
             else:
                 return JsonResponse({"ERROR": "You must be logged in  for this operation."})
