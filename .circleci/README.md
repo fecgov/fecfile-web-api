@@ -11,7 +11,7 @@ FECFILE_FEC_WEBSITE_API_KEY=
 ```
 Notes:
 * There is no default FECFILE_FEC_WEBSITE_API_KEY, you must obtain and set this yourself
-* that the FECFILE_DB_HOST is different here than what you need for your docker-compose configuration.
+* The FECFILE_DB_HOST value here is different than what you need for your local docker-compose configuration.
 
 # Using CircleCI local CLI 
 
