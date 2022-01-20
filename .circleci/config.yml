@@ -10,7 +10,7 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  lint-python:
+  lint:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
@@ -29,7 +29,7 @@ jobs:
           command: flake8 fecfiler
           working_directory: ~/project/django-backend/
 
-  unit-test-django:
+  unit-test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
@@ -37,6 +37,16 @@ jobs:
       - image: cimg/postgres:12.8
 
     steps:
+      - run:
+          name: Check for necessary environment variables
+          command: |
+            while read var; do
+              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
+            done \<< EOF
+            FECFILE_FEC_WEBSITE_API_KEY
+            EOF
+            exit 0
+
       - checkout
 
       - python/install-packages:
@@ -93,7 +103,7 @@ jobs:
 workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - unit-test-django
-      - lint-python
+      - unit-test
+      - lint
 
 

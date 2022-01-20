@@ -46,7 +46,8 @@ circleci local execute -e FECFILE_DB_HOST=localhost \
          -e FECFILE_DB_USERNAME=postgres \
          -e FECFILE_DB_PASSWORD=postgres \
          -e FECFILE_DB_NAME=postgres \
-         --job unit-test-django
+         -e FECFILE_FEC_WEBSITE_API_KEY=${FECFILE_FEC_WEBSITE_API_KEY}\
+         --job unit-test
 ```
 
 ## CircleCI configuration
