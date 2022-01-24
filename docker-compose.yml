@@ -14,9 +14,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_NAME: postgres
       POSTGRES_PASSWORD: postgres
-      
     ports:
       - 5432:5432
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 
   api:
     # env_file: ../local.env
@@ -30,6 +32,8 @@ services:
       - ./django-backend:/opt/nxg_fec
     ports:
       - 8080:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
     environment:
@@ -38,29 +42,3 @@ services:
       - FECFILE_DB_PASSWORD
       - FECFILE_DB_NAME
 
-  web:
-    build:
-      context: './front-end'
-      dockerfile: './build-scripts/Dockerfile'
-    image: fecfile-web
-    container_name: fecfile-web
-    restart: always
-    volumes:
-#      - ./django-frontend:/opt/nxg_fec
-      - ./front-end:/usr/src/app
-    ports:
-      - 8081:80
-    depends_on:
-      - api
-
-  proxy:
-    build:
-      context: './proxy'
-      dockerfile: Dockerfile
-    image: fecfile-proxy
-    container_name: fecfile-proxy
-    restart: always
-    volumes:
-      - ./proxy/log:/var/log/nginx
-    ports:
-      - 80:80

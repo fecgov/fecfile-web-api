@@ -10,7 +10,7 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  lint-python:
+  lint:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
@@ -29,7 +29,7 @@ jobs:
           command: flake8 fecfiler
           working_directory: ~/project/django-backend/
 
-  unit-test-django:
+  unit-test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
@@ -37,6 +37,16 @@ jobs:
       - image: cimg/postgres:12.8
 
     steps:
+      - run:
+          name: Check for necessary environment variables
+          command: |
+            while read var; do
+              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
+            done \<< EOF
+            FECFILE_FEC_WEBSITE_API_KEY
+            EOF
+            exit 0
+
       - checkout
 
       - python/install-packages:
@@ -87,94 +97,13 @@ jobs:
           command: python manage.py test --keep
           working_directory: ~/project/django-backend/
 
-  lint-angular:
-    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
-    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
-    docker:
-      - image: cimg/node:14.18-browsers
-    steps:
-      - checkout
-
-      - run:
-          command: ls ~/project/front-end
-
-      # TODO: Decide if we should also incorporate package-lock.json in the cache
-      - restore_cache:
-          keys:
-            - front-end-modules-v1-{{ checksum "~/project/front-end/package.json" }}
-
-      - run:
-          name: Ensure packages are installed
-          command: npm install
-          working_directory: ~/project/front-end/
-
-      - save_cache:
-          key: front-end-modules-v1-{{ checksum "~/project/front-end/package.json" }}
-          paths:
-            - ~/project/front-end/node_modules
-
-
-      - run:
-          name: print the linter version
-          command: ./node_modules/.bin/eslint --version
-          working_directory: ~/project/front-end/
-
-      - run:
-          name: run linter
-          command: ./node_modules/.bin/eslint "src/**/*.ts"
-          working_directory: ~/project/front-end/
-
-  unit-test-angular:
-    docker:
-      - image: cimg/node:14.18-browsers
-    steps:
-      - checkout
-      - browser-tools/install-chrome
-      - browser-tools/install-chromedriver
-
-      - run:
-          name: Ensure packages are installed
-          command: npm install
-          working_directory: ~/project/front-end/
-
-      - run:
-          command: ls ~/project/front-end/node_modules/ || echo not found
-
-      - run:
-          name: run unit tests
-          command: ./node_modules/@angular/cli/bin/ng test --watch=false
-          working_directory: ~/project/front-end/
-
-  e2e-test-angular:
-    docker:
-      - image: cimg/node:14.18-browsers
-    steps:
-      - checkout
-      - browser-tools/install-chrome
-      - browser-tools/install-chromedriver
-
-      - run:
-          name: Ensure packages are installed
-          command: npm install
-          working_directory: ~/project/front-end/
-
-      - run:
-          command: ls ~/project/front-end/node_modules/ || echo not found
-
-      - run:
-          name: run e2e tests
-          command: ./node_modules/@angular/cli/bin/ng e2e
-          working_directory: ~/project/front-end/
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - unit-test-django
-      - lint-python
-      - lint-angular
-      - unit-test-angular
-      - e2e-test-angular
+      - unit-test
+      - lint
 
 
