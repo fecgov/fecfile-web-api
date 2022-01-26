@@ -95,7 +95,7 @@ jobs:
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: python manage.py test --keep
+          command: coverage run --source='.' manage.py test --keep
           working_directory: ~/project/django-backend/
 
 

@@ -79,3 +79,4 @@ pandas-schema==0.3.5
 django-otp==0.9.3
 callfire-api-client-python==0.0.9
 sqlalchemy==1.3.19
+coverage==6.3
