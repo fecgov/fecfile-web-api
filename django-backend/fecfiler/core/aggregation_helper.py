@@ -159,6 +159,7 @@ def date_agg_format(cvg_date):
     except:
         raise
 
+
 def list_all_transactions_entity_lb(
     aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
 ):
@@ -512,7 +513,7 @@ def update_aggregate_lb(datum):
                         transaction_id,
                         aggregate_amount,
                         itemized_ind
-                        )
+                    )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
@@ -646,7 +647,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), form_type)
-    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK','DE','MT','ND','SD','VT','WY']):
+    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']):
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -674,7 +675,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             data.get("so_cand_state"),
             form_type
         )
-    elif cand_office == "H" and data.get("so_cand_state") not in ['AK','DE','MT','ND','SD','VT','WY']:
+    elif cand_office == "H" and data.get("so_cand_state") not in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']:
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -715,6 +716,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             "Getting transactions for election and office is throwing an error: "
             + str(e)
         )
+
 
 def update_aggregate_on_transaction(
     cmte_id, report_id, transaction_id, aggregate_amount
@@ -1354,7 +1356,6 @@ def list_all_transactions_event_type_h4(start_dt, end_dt, activity_event_type, c
 
 
 def update_transaction_ytd_amount_h4(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -1515,7 +1516,6 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
 
 
 def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -1558,7 +1558,7 @@ def update_linenumber_aggamt_transactions_SA(
 
     """
     try:
-        if transaction_type_identifier not in ('IND_BNDLR','REG_ORG_BNDLR'):
+        if transaction_type_identifier not in ('IND_BNDLR', 'REG_ORG_BNDLR'):
             child_flag_SB = False
             child_flag_SA = False
             itemization_value = 200
@@ -1686,11 +1686,11 @@ def update_linenumber_aggamt_transactions_SA(
                     ]:
 
                         line_number, itemized_ind = get_linenumber_itemization(
-                                transaction[8],
-                                aggregate_amount,
-                                itemization_value,
-                                transaction[3],
-                            )
+                            transaction[8],
+                            aggregate_amount,
+                            itemization_value,
+                            transaction[3],
+                        )
                         if not transaction[11] in ["FU", "FI"]:  # if not forced
                             put_sql_linenumber_schedA(
                                 cmte_id,
@@ -1709,7 +1709,6 @@ def update_linenumber_aggamt_transactions_SA(
                                 entity_id,
                                 aggregate_amount,
                             )
-
 
                     # Updating aggregate amount to child auto generate sched A transactions
                     if child_flag_SA:
@@ -1823,6 +1822,7 @@ def list_all_transactions_entity(
             "The list_all_transactions_entity function is throwing an error: " + str(e)
         )
 
+
 @update_F3X
 def update_sa_itmization_status(data, item_status=None):
     """
@@ -1855,6 +1855,7 @@ def update_sa_itmization_status(data, item_status=None):
                 "update itemization status failed for {}".format(transaction_id)
             )
     return data
+
 
 def get_linenumber_itemization(
     transaction_type_identifier, aggregate_amount, itemization_value, line_number

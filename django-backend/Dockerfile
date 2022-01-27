@@ -1,5 +1,5 @@
 FROM python:3.7
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 RUN mkdir /opt/nxg_fec
 WORKDIR /opt/nxg_fec
@@ -12,4 +12,4 @@ RUN useradd nxgu --no-create-home --home /opt/nxg_fec && chown -R nxgu:nxgu /opt
 user nxgu
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "python wait_for_db.py && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w 10 -t 200"]
+ENTRYPOINT ["sh", "-c", "python wait_for_db.py && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w 10 -t 200 --reload"]

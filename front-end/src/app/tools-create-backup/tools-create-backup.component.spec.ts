@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ToolsCreateBackupComponent } from './tools-create-backup.component';
 
@@ -6,7 +6,7 @@ describe('ToolsCreateBackupComponent', () => {
   let component: ToolsCreateBackupComponent;
   let fixture: ComponentFixture<ToolsCreateBackupComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ToolsCreateBackupComponent ]
     })

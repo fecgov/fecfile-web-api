@@ -86,6 +86,7 @@ def check_transaction_id(transaction_id):
     except Exception:
         raise
 
+
 '''
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
@@ -278,14 +279,17 @@ def schedD(request):
 
 '''
 
+
 def get_int_value(num):
-    if num is not None: 
+    if num is not None:
         num = int(num)
     else:
-        num = 1 
-    return int(num)          
+        num = 1
+    return int(num)
 
-#: get the paginator page with other details like  
+#: get the paginator page with other details like
+
+
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False or json_res is None:
         json_result = {
@@ -312,7 +316,6 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
         return json_result
 
 
-
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedD(request):
     """
@@ -321,10 +324,10 @@ def schedD(request):
     #: Get the request parameters and set for Pagination
     query_params = request.query_params
     page_num = get_int_value(query_params.get("page"))
-    # if query_params.get("page") is not None: 
+    # if query_params.get("page") is not None:
     #     page_num = int(page_num)
     # else:
-    #     page_num = 1       
+    #     page_num = 1
 
     descending = query_params.get("descending")
     if not (
@@ -336,7 +339,7 @@ def schedD(request):
         sortcolumn = "name"
     else:
         sortcolumn = query_params.get("sortColumnName")
-    itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+    itemsperpage = get_int_value(query_params.get("itemsPerPage"))
     search_string = query_params.get("search")
     params = query_params.get("filters", {})
     keywords = params.get("keywords")
@@ -344,10 +347,9 @@ def schedD(request):
         descending = "DESC"
     else:
         descending = "ASC"
-    trans_query_string_count = "" #get_trans_query_for_total_count(trans_query_string)
-    row1=""
-    totalcount=""
-
+    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
+    row1 = ""
+    totalcount = ""
 
     # create new sched_d transaction
     if request.method == "POST":
@@ -403,18 +405,12 @@ def schedD(request):
 
     elif request.method == "GET":
         try:
-            #: Hardcode cmte value for now and remove after dev complete
-            #data = {"cmte_id": "C00000935"} 
-            data =  {"cmte_id": get_comittee_id(request.user.username)}
-     
+            data = {"cmte_id": get_comittee_id(request.user.username)}
+
             if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(
                     request.query_params.get("report_id")
                 )
-            # elif "report_id" in request.query_params:
-            #     data["report_id"] = check_report_id(
-            #         request.query_params.get("report_id")
-            #     )
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.query_params and check_null_value(
@@ -528,6 +524,7 @@ def schedD(request):
     else:
         raise NotImplementedError
 
+
 def do_post_carryover(transaction_id, cmte_id, report_id):
     try:
         _sql = """SELECT json_agg(t) FROM (
@@ -548,7 +545,7 @@ def do_post_carryover(transaction_id, cmte_id, report_id):
             for report in new_reports_list:
                 do_carryover(report['report_id'], cmte_id)
     except Exception as e:
-        raise Exception('The do_post_carryover is throwing an error: '+str(e))
+        raise Exception('The do_post_carryover is throwing an error: ' + str(e))
 
 
 def delete_schedD(data):
@@ -648,9 +645,9 @@ def valid_transaction_amounts(data):
     if not payment_amount:
         payment_amount = 0
     return (
-        float(beginning_balance) +
-        float(incurred_amount) - float(payment_amount)
+        float(beginning_balance) + float(incurred_amount) - float(payment_amount)
     ) == float(balance_at_close)
+
 
 @update_F3X
 @new_report_date
@@ -776,10 +773,15 @@ def update_child(transaction_id, new_beginning_balance, new_close_balance, data)
             WHERE transaction_id = %s 
             AND delete_ind is distinct from 'Y';
         """
-    _v = (new_close_balance, new_close_balance,
-            datetime.datetime.now(), data.get("entity_id"),
-            data.get("purpose"), data.get("memo_text"),
-            transaction_id)
+    _v = (
+        new_close_balance,
+        new_close_balance,
+        datetime.datetime.now(),
+        data.get("entity_id"),
+        data.get("purpose"),
+        data.get("memo_text"),
+        transaction_id,
+    )
     logger.debug("update child sched_d with values: {}".format(_v))
     do_transaction(_sql, _v)
 
@@ -822,8 +824,7 @@ def do_downstream_propagation(transaction_id, new_balance, data):
             incurred_amt = child_tran[1]
             payment_amt = child_tran[2]
             new_close_balance = (
-                float(new_beginning_balance) +
-                float(incurred_amt) - float(payment_amt)
+                float(new_beginning_balance) + float(incurred_amt) - float(payment_amt)
             )
             logger.debug("new close balance:{}".format(new_close_balance))
             update_child(child_id, new_beginning_balance, new_close_balance, data)
@@ -863,6 +864,7 @@ def validate_sd_data(data):
     """
     check_mandatory_fields_SD(data)
     # validate_transaction_type(data)
+
 
 @update_F3X
 @new_report_date
@@ -1068,6 +1070,7 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
     # # for obj in childB_forms_obj:
     # #     obj.update({'api_call':''})
 
+
 def get_schedD(data):
     """"
     load sched_d items
@@ -1201,32 +1204,32 @@ def do_carryover(report_id, cmte_id):
     """
     _sql = """
     insert into public.sched_d(
-					cmte_id, 
-                    report_id, 
+                    cmte_id,
+                    report_id,
                     line_num,
-                    transaction_type_identifier, 
-                    transaction_id, 
-                    entity_id, 
-                    beginning_balance, 
-                    balance_at_close, 
-                    incurred_amount, 
-                    payment_amount, 
-					purpose,
+                    transaction_type_identifier,
+                    transaction_id,
+                    entity_id,
+                    beginning_balance,
+                    balance_at_close,
+                    incurred_amount,
+                    payment_amount,
+                    purpose,
                     back_ref_transaction_id,
                     create_date
-					)
-					SELECT 
-					d.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    d.cmte_id,
+                    %s,
                     d.line_num,
-                    d.transaction_type_identifier, 
-                    get_next_transaction_id('SD'), 
-                    d.entity_id, 
-                    d.balance_at_close, 
-                    d.balance_at_close, 
-                    0, 
-                    0, 
-					d.purpose,
+                    d.transaction_type_identifier,
+                    get_next_transaction_id('SD'),
+                    d.entity_id,
+                    d.balance_at_close,
+                    d.balance_at_close,
+                    0,
+                    0,
+                    d.purpose,
                     d.transaction_id,
                     now()
             FROM public.sched_d d, public.reports r
@@ -1300,8 +1303,10 @@ def get_list_all_schedD(report_id, cmte_id, transaction_type_identifier):
             type_filter = 'AND transaction_type_identifier = %s'
             if transaction_type_identifier:
                 cursor.execute(
-                    """SELECT json_agg(t) FROM (""" +
-                    query_string + type_filter + """) t""",
+                    """SELECT json_agg(t) FROM ("""
+                    + query_string
+                    + type_filter
+                    + """) t""",
                     (report_id, cmte_id, transaction_type_identifier),
                 )
             else:

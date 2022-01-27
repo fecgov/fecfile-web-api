@@ -65,7 +65,7 @@
         width: 96%;
       }
       .sched-h3__item-range {
-        padding: 0m 0 0.25em 0;
+        padding: 0 0 0.25em 0;
       }
       .coord_expenditure_text {
         padding-top: 3em;
@@ -215,7 +215,7 @@
   }
 
   .subtitle {
-    font: 29;
+    font-size: 29px; /* error fix during Angular 8 upgrade */
   }
 
   .summary_text_amt{
@@ -287,14 +287,16 @@
   }
 }
 
-pagination-controls /deep/ .ngx-pagination .current{
+/* previously included /deep/ before it was removed in Angular 8*/
+pagination-controls  .ngx-pagination .current{
   padding: 0.1875rem 0.625rem;
   background: #9B9B9B !important;;
   color: #fefefe;
   cursor: default;
 }
 
-pagination-controls /deep/ .ngx-pagination a, .ngx-pagination button {
+/* previously included /deep/ before it was removed in Angular 8*/
+pagination-controls .ngx-pagination a, .ngx-pagination button {
   color: #9B9B9B !important;;
   display: block;
   padding: 0.1875rem 0.625rem;

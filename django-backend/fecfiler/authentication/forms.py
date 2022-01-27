@@ -17,4 +17,4 @@ class AccountCreationForm(UserCreationForm):
         raise forms.ValidationError(
             self.error_messages['duplicate_username'],
             code='duplicate_username',
-            )
+        )

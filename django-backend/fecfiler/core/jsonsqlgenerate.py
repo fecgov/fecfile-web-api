@@ -19,6 +19,7 @@ from django.conf import settings
 import re
 import csv
 
+
 @api_view(["GET"])
 def sample_sql_generate(request):
         tran = request.query_params.get("tran_type")
@@ -480,10 +481,9 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(OPEX_REC_STRING)
                 file.close()
 
-                List_SB_similar_OPEX__CC = ['OPEXP_CC_PAY','OPEXP_PMT_TO_PROL','OTH_DISB_CC_PAY','OTH_DISB_PMT_TO_PROL','OTH_DISB_RECNT',
+                List_SB_similar_OPEX__CC = ['OPEXP_CC_PAY', 'OPEXP_PMT_TO_PROL', 'OTH_DISB_CC_PAY', 'OTH_DISB_PMT_TO_PROL', 'OTH_DISB_RECNT',
                 'OTH_DISB_NP_RECNT_ACC', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL', 'OPEXP_HQ_ACC_TRIB_REF',
                 'OPEXP_CONV_ACC_TRIB_REF', 'OTH_DISB_NP_RECNT_TRIB_REF']
-
 
                 OPEX__CC_STRING = ""
                 if tran in List_SB_similar_OPEX__CC:
@@ -512,7 +512,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-                    #print(query)
+                    # print(query)
                     OPEX__CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
@@ -522,7 +522,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(OPEX__CC_STRING)
                 file.close()
 
-                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO','REF_CONT_IND', 'REF_CONT_IND_VOID','OTH_DISB_PMT_TO_PROL_MEMO',
+                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO', 'REF_CONT_IND', 'REF_CONT_IND_VOID', 'OTH_DISB_PMT_TO_PROL_MEMO',
                 'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO', 'OPEXP_HQ_ACC_IND_REF', 'OPEXP_CONV_ACC_IND_REF', 'OTH_DISB_NP_RECNT_IND_REF']
 
                 PAY_MEMO_STRING = ""
@@ -661,7 +661,6 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
 
                 List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID']
-                #import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
                 if tran in List_SB_similar_CONTR_CAND:
 
@@ -1129,7 +1128,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    IE_CC_STRING  += """
+                    IE_CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SE', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1137,7 +1136,6 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file = open("/tmp/IE_CC_sql.sql", 'w')
                 file.write(IE_CC_STRING)
                 file.close()
-
 
                 List_SE_similar_IE_STAF_REIM = ['IE_STAF_REIM', 'IE_PMT_TO_PROL_MEMO']
                 IE_STAF_REIM_STRING = ""
@@ -1193,7 +1191,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    IE_STAF_REIM_STRING+= """
+                    IE_STAF_REIM_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SE', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1261,7 +1259,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    CORD_EXP_STRING+= """
+                    CORD_EXP_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SF', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1269,7 +1267,6 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file = open("/tmp/CORD_EXP_sql.sql", 'w')
                 file.write(CORD_EXP_STRING)
                 file.close()
-
 
                 List_SF_similar_CORD_EXP_CC = ['COEXP_CC_PAY', 'COEXP_PMT_PROL']
 
@@ -1321,7 +1318,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    CORD_EXP_STRING+= """
+                    CORD_EXP_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SF', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1385,7 +1382,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    CORD_CC_MEMO_STRING+= """
+                    CORD_CC_MEMO_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SF', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1448,7 +1445,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
-                    CORD_REIM_STRING+= """
+                    CORD_REIM_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SF', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -1464,7 +1461,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(CORD_REIM_STRING)
                 file.close()
 
-                List_SD_similar_DEBT= ['DEBT_TO_VENDOR', 'DEBT_BY_VENDOR']
+                List_SD_similar_DEBT = ['DEBT_TO_VENDOR', 'DEBT_BY_VENDOR']
                 DEBT_STRING = ""
                 if tran in List_SD_similar_DEBT:
 
@@ -1505,8 +1502,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(DEBT_STRING)
                 file.close()
 
-
-                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEA_DISB_DEBT']
+                List_SH6_similar_ALLOC_FEA_DEBT_VEN = ['ALLOC_FEA_DISB_DEBT']
                 ALLOC_FEA_DEBT_VEN_STRING = ""
                 if tran in List_SH6_similar_ALLOC_FEA_DEBT_VEN:
 
@@ -1555,7 +1551,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(ALLOC_FEA_DEBT_VEN_STRING)
                 file.close()
 
-                List_SH4_similar_ALLOC_EXP_DEBT= ['ALLOC_EXP_DEBT']
+                List_SH4_similar_ALLOC_EXP_DEBT = ['ALLOC_EXP_DEBT']
                 ALLOC_EXP_DEBT_STRING = ""
                 if tran in List_SH4_similar_ALLOC_EXP_DEBT:
 
@@ -1604,7 +1600,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(ALLOC_EXP_DEBT_STRING)
                 file.close()
 
-                List_SC_similar_LOANS_OWED_BY_CMTE= ['LOANS_OWED_BY_CMTE']
+                List_SC_similar_LOANS_OWED_BY_CMTE = ['LOANS_OWED_BY_CMTE']
                 LOANS_OWED_BY_CMTE_STRING = ""
                 if tran in List_SC_similar_LOANS_OWED_BY_CMTE:
 
@@ -1844,15 +1840,13 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                 file.write(SC2_STRING)
                 file.close()
 
-
                 List_SH_similar_SH1 = ['ALLOC_H1']
                 List_SH_similar_SH2 = ['ALLOC_H2_RATIO']
                 List_SH_similar_SH3 = ['TRAN_FROM_NON_FED_ACC']
                 List_SH_similar_SH5 = ['TRAN_FROM_LEVIN_ACC']
-                parent = {'ALLOC_EXP_CC_PAY': 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM' :'ALLOC_EXP_STAF_REIM_MEMO',
+                parent = {'ALLOC_EXP_CC_PAY': 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM': 'ALLOC_EXP_STAF_REIM_MEMO',
                 'ALLOC_EXP_PMT_TO_PROL': 'ALLOC_EXP_PMT_TO_PROL_MEMO', 'ALLOC_FEA_CC_PAY': 'ALLOC_FEA_CC_PAY_MEMO',
-                'ALLOC_FEA_STAF_REIM': 'ALLOC_FEA_STAF_REIM_MEMO'
-                }
+                'ALLOC_FEA_STAF_REIM': 'ALLOC_FEA_STAF_REIM_MEMO'}
 
                 SH1_STRING = ""
                 if tran in List_SH_similar_SH1:
@@ -2631,7 +2625,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-                    IE_CC_STRING  += """
+                    IE_CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SE', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -2690,7 +2684,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-                    IE_STAF_REIM_STRING+= """
+                    IE_STAF_REIM_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SE', '{0}', '{1}');\n
                     """.format(tran, query)
@@ -2877,13 +2871,13 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
 @api_view(['GET'])
 def print_query(request):
     data = request.data['data']
-    output= ""
+    output = ""
     _sql = """select query_string from tran_query_string WHERE tran_type_identifier in ('{}')""".format("', '".join(data))
     with connection.cursor() as cursor:
         cursor.execute(_sql)
         result = cursor.fetchall()
         if result:
-            for i,item in enumerate(result):
+            for i, item in enumerate(result):
                 output += item[0] + " \n\n\n "
     file = open("/tmp/print_query.txt", 'w')
     file.write(output)

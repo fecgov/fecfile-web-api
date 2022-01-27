@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TransactionSidebarComponent } from './transaction-sidebar.component';
 
@@ -6,7 +6,7 @@ describe('FormSidebarComponent', () => {
   let component: TransactionSidebarComponent;
   let fixture: ComponentFixture<TransactionSidebarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TransactionSidebarComponent ]
     })

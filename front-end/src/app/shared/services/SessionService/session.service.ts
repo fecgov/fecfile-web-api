@@ -7,7 +7,7 @@ import { environment } from '../../../../environments/environment';
 import * as jwt_decode from 'jwt-decode';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { AppConfigService } from '../../../app-config.service';
-import { tokenKey } from '@angular/core/src/view';
+// import { tokenKey } from '@angular/core/src/view';
 
 @Injectable({
   providedIn: 'root'

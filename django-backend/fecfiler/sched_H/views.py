@@ -229,10 +229,10 @@ def validate_federal_nonfed_ratio(data):
     0.45 + 0.55 == 1.00
     """
     if not (
-            (
-                    float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
-                    == float(1)
-            )
+        (
+            float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
+            == float(1)
+        )
     ):
         raise Exception("Error: combined federal and non-federal value should be 100%.")
 
@@ -657,7 +657,6 @@ def schedH1(request):
 def validate_h1_h2_exist(request):
     """
     validate h1 or h2 exist or not - used to enable h3/h5 warning message
-    
     """
 
     logger.debug("validate h1/h2 exist with request:{}".format(request.query_params))
@@ -1606,9 +1605,9 @@ def do_h2_carryover(report_id, cmte_id):
                     back_ref_transaction_id,
                     create_date,
                     last_update_date
-					)
-					SELECT 
-					h.cmte_id, 
+                    )
+                    SELECT
+                    h.cmte_id,
                     %s, 
                     h.line_number,
                     h.transaction_type_identifier, 
@@ -1715,7 +1714,7 @@ def get_h2_summary_table(request):
             ) t;
     """
     try:
-    #: Get the request parameters and set for Pagination
+        # Get the request parameters and set for Pagination
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
@@ -1729,7 +1728,7 @@ def get_h2_summary_table(request):
             sortcolumn = "name"
         else:
             sortcolumn = query_params.get("sortColumnName")
-        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        itemsperpage = get_int_value(query_params.get("itemsPerPage"))
         search_string = query_params.get("search")
         params = query_params.get("filters", {})
         keywords = params.get("keywords")
@@ -1739,8 +1738,6 @@ def get_h2_summary_table(request):
             descending = "ASC"
         trans_query_string_count = ""
 
-        #: Hardcode cmte value for now and remove after dev complete
-        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # logger.debug('checking if it is a new report')
@@ -1788,7 +1785,7 @@ def get_h2_summary_table(request):
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
-        
+
 
 # : insert pagination functionality
 
@@ -1809,9 +1806,11 @@ def get_h2_summary_table(request):
             return Response(json_result, status=status.HTTP_200_OK)
     except:
         raise
-#: get the paginator page with other details like  
+#: get the paginator page with other details like
+
+
 def get_pagination_dataset(json_res, itemsperpage, page_num):
-    if check_null_value(json_res) is False  or json_res is None:
+    if check_null_value(json_res) is False or json_res is None:
         json_result = {
             "items": "",
             "totalItems": "",
@@ -1837,11 +1836,11 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
 
 
 def get_int_value(num):
-    if num is not None: 
+    if num is not None:
         num = int(num)
     else:
-        num = 1 
-    return int(num)          
+        num = 1
+    return int(num)
 
 
 def count_h2_transactions(cmte_id, report_id, activity_event_name):
@@ -1938,7 +1937,8 @@ def schedH2(request):
                 output = get_schedH2(data)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             except Exception as e:
-                return Response(str(e),
+                return Response(
+                    str(e),
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -2141,7 +2141,7 @@ def put_schedH3(data):
 def put_sql_schedH3(data):
     """
     update a schedule_H3 item                    
-            
+
     """
     _sql = """UPDATE public.sched_h3
               SET transaction_type_identifier = %s, 
@@ -2431,8 +2431,8 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
             if schedH3_list:
                 for _rec in schedH3_list:
                     aggregate_dic = load_h3_aggregate_amount(
-                            cmte_id, report_id, _rec.get("back_ref_transaction_id")
-                        )
+                        cmte_id, report_id, _rec.get("back_ref_transaction_id")
+                    )
                     if _rec["activity_event_name"]:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
@@ -2441,7 +2441,6 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_type"], 0
                         )
-                        # pass
             merged_list = []
             for dictH3 in schedH3_list:
                 merged_list.append(dictH3)
@@ -2556,28 +2555,19 @@ def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
            GROUP BY activity_event_type
             ) t
     """
-    # _sql = """
-    # SELECT json_agg(t) FROM(
-    #         SELECT activity_event_name as event,
-    #                SUM(transferred_amount) as sum
-    #         FROM   public.sched_h3
-    #         WHERE  cmte_id = %s
-    #             AND report_id = %s
-    #         GROUP BY activity_event_name
-    #         UNION
-    #         SELECT activity_event_type as event,
-    #                SUM(transferred_amount) as sum
-    #         FROM   public.sched_h3
-    #         WHERE  cmte_id = %s
-    #             AND report_id = %s
-    #         GROUP BY activity_event_type
-    #         ) t
-    # """.format(cmte_id, report_id, cmte_id, report_id)
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id, back_ref_transaction_id,
-                cmte_id, report_id, back_ref_transaction_id])
-            # cursor.execute(_sql)
+            cursor.execute(
+                _sql,
+                [
+                    cmte_id,
+                    report_id,
+                    back_ref_transaction_id,
+                    cmte_id,
+                    report_id,
+                    back_ref_transaction_id
+                ]
+            )
             records = cursor.fetchone()[0]
             if records:
                 for _rec in records:
@@ -2656,7 +2646,7 @@ def get_h3_summary(request):
             sortcolumn = "name"
         else:
             sortcolumn = query_params.get("sortColumnName")
-        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        itemsperpage = get_int_value(query_params.get("itemsPerPage"))
         search_string = query_params.get("search")
         params = query_params.get("filters", {})
         keywords = params.get("keywords")
@@ -2665,11 +2655,9 @@ def get_h3_summary(request):
         else:
             descending = "ASC"
         trans_query_string_count = ""
-        row1=""
-        totalcount=""
+        row1 = ""
+        totalcount = ""
 
-        #: Hardcode cmte value for now and remove after dev complete
-        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
 
         report_id = request.query_params.get("report_id")
@@ -2711,8 +2699,8 @@ def get_h3_summary(request):
             if _sum:
                 for _rec in _sum:
                     aggregate_dic = load_h3_aggregate_amount(
-                            cmte_id, report_id, _rec.get("back_ref_transaction_id")
-                        )
+                        cmte_id, report_id, _rec.get("back_ref_transaction_id")
+                    )
                     if _rec["activity_event_name"] not in [None, '']:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
@@ -2723,11 +2711,9 @@ def get_h3_summary(request):
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_type"], 0
                         )
-                        # pass
 
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
-            #return Response(_sum, status=status.HTTP_200_OK)
     except:
         raise
 
@@ -3209,7 +3195,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
 def put_schedH4(data):
     """
     update sched_H4 item
-    
+
     """
     try:
         check_mandatory_fields_SH4(data)
@@ -3541,7 +3527,7 @@ def update_activity_event_amount_ytd(data):
             if transaction[2] != "N":
                 aggregate_amount += transaction[0]
             transaction_id = transaction[1]
-            list_sub_transaction = list_all_sub_transaction(aggregate_start_date,aggregate_end_date,transaction_id,data.get("cmte_id"))
+            list_sub_transaction = list_all_sub_transaction(aggregate_start_date, aggregate_end_date, transaction_id, data.get("cmte_id"))
             for sub_transaction in list_sub_transaction:
                 sub_transaction_id = sub_transaction[1]
                 update_transaction_ytd_amount(
@@ -3854,7 +3840,7 @@ def schedH4(request):
         sortcolumn = "name"
     else:
         sortcolumn = query_params.get("sortColumnName")
-    itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+    itemsperpage = get_int_value(query_params.get("itemsPerPage"))
     search_string = query_params.get("search")
     params = query_params.get("filters", {})
     keywords = params.get("keywords")
@@ -3866,7 +3852,7 @@ def schedH4(request):
 
     try:
         is_read_only_or_filer_reports(request)
-    
+
         if request.method == "POST":
             try:
                 cmte_id = get_comittee_id(request.user.username)
@@ -3936,7 +3922,7 @@ def schedH4(request):
                     "totalPages": "",
                 }
                 return JsonResponse(
-                forms_obj, status=status.HTTP_200_OK, safe=False
+                    forms_obj, status=status.HTTP_200_OK, safe=False
                 )
         elif request.method == "DELETE":
             try:
@@ -4098,7 +4084,7 @@ def update_h5_total_amount(data):
 def put_schedH5(data):
     """
     update sched_H5 item
-    
+
     """
     try:
         check_mandatory_fields_SH5(data)
@@ -4123,7 +4109,7 @@ def put_schedH5(data):
 def put_sql_schedH5(data):
     """
     update a schedule_H5 item                    
-            
+
     """
     _sql = """UPDATE public.sched_h5
               SET transaction_type_identifier= %s, 
@@ -4456,7 +4442,7 @@ def get_h5_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
-    #: Get the request parameters and set for Pagination
+        # Get the request parameters and set for Pagination
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
@@ -4470,7 +4456,7 @@ def get_h5_summary(request):
             sortcolumn = "name"
         else:
             sortcolumn = query_params.get("sortColumnName")
-        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        itemsperpage = get_int_value(query_params.get("itemsPerPage"))
         search_string = query_params.get("search")
         params = query_params.get("filters", {})
         keywords = params.get("keywords")
@@ -4479,9 +4465,7 @@ def get_h5_summary(request):
         else:
             descending = "ASC"
         trans_query_string_count = ""
-                
-        #: Hardcode cmte value for now and remove after dev complete
-        #cmte_id = "C00000935"
+
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
@@ -4527,7 +4511,7 @@ def get_h5_summary(request):
             #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
             #     else:
             #         pass
-            
+
             #: update for pagination
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
@@ -4574,10 +4558,10 @@ def get_sched_h5_breakdown(request):
             _t = {k: 0 for k, v in result[0].items() if not v}
             result[0].update(_t)
             result[0]["total"] = (
-                    float(result[0].get("voter_id", 0))
-                    + float(result[0].get("voter_registration", 0))
-                    + float(result[0].get("gotv", 0))
-                    + float(result[0].get("generic_campaign", 0))
+                float(result[0].get("voter_id", 0))
+                + float(result[0].get("voter_registration", 0))
+                + float(result[0].get("gotv", 0))
+                + float(result[0].get("generic_campaign", 0))
             )
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4940,7 +4924,7 @@ def put_schedH6(data):
 def put_sql_schedH6(data):
     """
     update a schedule_H6 item                    
-            
+
     """
     _sql = """UPDATE public.sched_h6
               SET line_number = %s,
@@ -5447,7 +5431,7 @@ def schedH6(request):
                     sortcolumn = "name"
                 else:
                     sortcolumn = query_params.get("sortColumnName")
-                itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+                itemsperpage = get_int_value(query_params.get("itemsPerPage"))
                 search_string = query_params.get("search")
                 params = query_params.get("filters", {})
                 keywords = params.get("keywords")
@@ -5456,9 +5440,7 @@ def schedH6(request):
                 else:
                     descending = "ASC"
                 trans_query_string_count = ""
-                        
-                #: Hardcode cmte value for now and remove after dev complete
-                #data = {"cmte_id": "C00000935"}
+
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 # make sure we get query parameters from both
                 # request.data.update(request.query_params)
@@ -5467,14 +5449,14 @@ def schedH6(request):
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
-                )
+                    )
 
                 if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = request.query_params.get("transaction_id")
                 datum = get_schedH6(data)
-                if query_params.get("page") is None and query_params.get("itemsPerPage") is None: 
+                if query_params.get("page") is None and query_params.get("itemsPerPage") is None:
                     return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
 
                 #: update for pagination
@@ -5482,8 +5464,8 @@ def schedH6(request):
                 return Response(json_result, status=status.HTTP_200_OK)
             except NoOPError as e:
                 logger.debug(e)
-                #: tobe removed after development testing for 
-                forms_obj =  {
+                #: tobe removed after development testing for
+                forms_obj = {
                     "transactions": "",
                     "totaltransactionsCount": "",
                     "itemsPerPage": "",

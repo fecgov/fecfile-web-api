@@ -63,7 +63,6 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("email_2"))
 
-            # print(data.get('additional_email_1'))
     if "additional_email_1" in data and (
         not (
             data.get("additional_email_1") == "-"

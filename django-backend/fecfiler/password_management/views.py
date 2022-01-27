@@ -184,14 +184,15 @@ def send_email(token_val, email):
     SUBJECT = "Verify Account"
 
     # The email body for recipients with non-HTML email clients.
-    BODY_TEXT = ("Use the code provided below to continue the verification process of your account.\r\n" +
-                 token_val
-                 + "\r\nPlease do not reply to this message"
-                   "\r\nThis email was sent by FEC.gov. If you are receiving this email in error or have any "
-                   "questions, "
-                   "please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally "
-                   "at (202) 694-1307. "
-                 )
+    BODY_TEXT = (
+        "Use the code provided below to continue the verification process of your account.\r\n"
+        + token_val
+        + "\r\nPlease do not reply to this message"
+        "\r\nThis email was sent by FEC.gov. If you are receiving this email in error or have any "
+        "questions, "
+        "please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally "
+        "at (202) 694-1307. "
+    )
 
     data['token'] = token_val
 

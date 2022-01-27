@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ImportTrxCleanComponent } from './import-trx-clean.component';
 
@@ -6,7 +6,7 @@ describe('ImportTrxCleanComponent', () => {
   let component: ImportTrxCleanComponent;
   let fixture: ComponentFixture<ImportTrxCleanComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ImportTrxCleanComponent ]
     })

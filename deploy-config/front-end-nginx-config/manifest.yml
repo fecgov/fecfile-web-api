@@ -1,0 +1,6 @@
+applications:
+ - name: fecfile-online-frontend
+   instances: 1
+   memory: 256M
+   buildpack: paketo-buildpacks/nginx
+

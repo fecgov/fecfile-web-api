@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ReportTypeSidebarComponent } from './Report-type-sidebar.component';
 
@@ -6,7 +6,7 @@ describe('FormSidebarComponent', () => {
   let component: ReportTypeSidebarComponent;
   let fixture: ComponentFixture<ReportTypeSidebarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ReportTypeSidebarComponent ]
     })

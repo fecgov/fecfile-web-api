@@ -8,4 +8,4 @@ class AccountAdmin(UserAdmin):
     add_form_template = 'admin/authentication/account/add_form.html'
     add_form = AccountCreationForm
 
-#admin.site.register(Account, AccountAdmin)
+# admin.site.register(Account, AccountAdmin)

@@ -26,19 +26,19 @@ def schema_validation(uploaded_df):
         schema = Schema([
             Column('COMMITTEE_ID', [MatchesPatternValidation('[cC][0-9]{8}')]),
             Column('ENTITY_TYPE', [InListValidation(['IND', 'ORG'])]),
-            Column('STREET_1', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
-            Column('STREET_2', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
-            Column('CITY', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
-            Column('STATE', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{2}$')]),
-            Column('ZIP', [MatchesPatternValidation('^[\\w\\s]{1,9}$')]),
-            Column('EMPLOYER', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
-            Column('OCCUPATION', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
-            Column('ORGANIZATION_NAME', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,200}$')]),
-            Column('LASTNAME', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
-            Column('FIRSTNAME', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
-            Column('MIDDLENAME', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
-            Column('PREFIX', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')]),
-            Column('SUFFIX', [MatchesPatternValidation('^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')])
+            Column('STREET_1', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
+            Column('STREET_2', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,34}$')]),
+            Column('CITY', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
+            Column('STATE', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{2}$')]),
+            Column('ZIP', [MatchesPatternValidation(r'^[\\w\\s]{1,9}$')]),
+            Column('EMPLOYER', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
+            Column('OCCUPATION', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,38}$')]),
+            Column('ORGANIZATION_NAME', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,200}$')]),
+            Column('LASTNAME', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,30}$')]),
+            Column('FIRSTNAME', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
+            Column('MIDDLENAME', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,20}$')]),
+            Column('PREFIX', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')]),
+            Column('SUFFIX', [MatchesPatternValidation(r'^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,10}$')])
         ])
 
         errors = schema.validate(uploaded_df)
@@ -328,12 +328,13 @@ def delete_contact(request):
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
+
 @api_view(["GET"])
 def download_template(request):
 
     filename = r'Import Contacts Specs & Template.xlsx'
     dirname = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
-    xls_file_path = dirname +  '/../resources/' + filename
+    xls_file_path = dirname + '/../resources/' + filename
     response = FileResponse(open(xls_file_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'inline; filename = {}'.format(filename)
 

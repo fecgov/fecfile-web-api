@@ -1,7 +1,8 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
+// Angular 8 migration
+// import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularEditorModule } from '@kolkov/angular-editor';
@@ -220,7 +221,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     // FormsModule,
     // ReactiveFormsModule,
     HttpClientModule,
-    HttpModule,
+    // HttpModule,
     NoopAnimationsModule,
     routing,
     AngularFileUploaderModule,

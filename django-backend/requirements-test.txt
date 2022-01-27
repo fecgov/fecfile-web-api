@@ -1,0 +1,2 @@
+flake8==4.0.1
+pep8-naming

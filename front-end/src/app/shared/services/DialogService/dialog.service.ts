@@ -1,8 +1,9 @@
-import { Injectable, ViewChild } from '@angular/core';
+import { Injectable, ViewChild, Directive } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { ModalHeaderClassEnum } from '../../partials/confirm-modal/confirm-modal.component';
 
+@Directive()
 @Injectable({
   providedIn: 'root'
 })

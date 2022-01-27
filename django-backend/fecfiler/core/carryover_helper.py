@@ -8,6 +8,7 @@ from django.db import connection
 
 logger = logging.getLogger(__name__)
 
+
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
     try:
@@ -20,6 +21,7 @@ def get_next_transaction_id(trans_char):
         return transaction_id
     except Exception:
         raise
+
 
 def is_pac(cmte_id):
     _sql = """
@@ -268,17 +270,17 @@ def do_h2_carryover(cmte_id, report_id):
                     non_federal_percent,
                     back_ref_transaction_id,
                     create_date
-					)
-					SELECT 
-					h.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    h.cmte_id,
+                    %s,
                     h.line_number,
-                    h.transaction_type_identifier, 
+                    h.transaction_type_identifier,
                     h.transaction_type,
-                    get_next_transaction_id('SH'), 
+                    get_next_transaction_id('SH'),
                     h.activity_event_name,
                     h.fundraising,
-                    h.direct_cand_support, 
+                    h.direct_cand_support,
                     's',
                     h.revise_date,
                     h.federal_percent,
@@ -286,7 +288,7 @@ def do_h2_carryover(cmte_id, report_id):
                     h.transaction_id,
                     now()
             FROM public.sched_h2 h, public.reports r
-            WHERE 
+            WHERE
             h.cmte_id = %s
             AND h.report_id != %s
             AND h.report_id = r.report_id
@@ -328,13 +330,13 @@ def do_loan_carryover(cmte_id, report_id):
     """
     _sql = """
     insert into public.sched_c(
-					cmte_id, 
-                    report_id, 
+                    cmte_id,
+                    report_id,
                     line_number,
-					transaction_type,
-                    transaction_type_identifier, 
-                    transaction_id, 
-                    entity_id, 
+                    transaction_type,
+                    transaction_type_identifier,
+                    transaction_id,
+                    entity_id,
                     election_code,
                     election_other_description,
                     loan_amount_original,
@@ -357,17 +359,17 @@ def do_loan_carryover(cmte_id, report_id):
                     lender_cand_district,
                     memo_code,
                     memo_text,
-					back_ref_transaction_id,
+                    back_ref_transaction_id,
                     create_date
-					)
-					SELECT 
-					c.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    c.cmte_id,
+                    %s,
                     c.line_number,
-					'',
-                    c.transaction_type_identifier, 
-                    get_next_transaction_id('SC'), 
-                    c.entity_id, 
+                    '',
+                    c.transaction_type_identifier,
+                    get_next_transaction_id('SC'),
+                    c.entity_id,
                     c.election_code,
                     c.election_other_description,
                     c.loan_amount_original,
@@ -390,12 +392,12 @@ def do_loan_carryover(cmte_id, report_id):
                     c.lender_cand_district,
                     c.memo_code,
                     c.memo_text,
-					c.transaction_id,
+                    c.transaction_id,
                     now()
             FROM public.sched_c c, public.reports r
-            WHERE 
+            WHERE
             c.cmte_id = %s
-            AND c.loan_balance > 0 
+            AND c.loan_balance > 0
             AND c.report_id != %s
             AND c.report_id = r.report_id
             AND r.cvg_start_date < (
@@ -431,41 +433,41 @@ def do_loan_carryover(cmte_id, report_id):
 def do_levin_carryover(cmte_id, report_id):
     """
     carryover sched_l item for levin account
-    ending cash_on_hand become the beginning cash_on_hand of current report 
+    ending cash_on_hand become the beginning cash_on_hand of current report
     """
     _sql = """
        insert into public.sched_l(
-					cmte_id, 
+                    cmte_id,
                     report_id,
                     record_id,
-                    account_name, 
+                    account_name,
                     line_number,
-                    transaction_type_identifier, 
-                    transaction_id, 
+                    transaction_type_identifier,
+                    transaction_id,
                     coh_bop,
                     coh_cop,
                     create_date,
                     cvg_from_date,
                     cvg_end_date
-					)
-                    SELECT 
-					d.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    d.cmte_id,
+                    %s,
                     d.record_id,
                     d.account_name,
                     d.line_number,
-                    d.transaction_type_identifier, 
-                    get_next_transaction_id('SL'), 
+                    d.transaction_type_identifier,
+                    get_next_transaction_id('SL'),
                     d.coh_cop,
                     d.coh_cop,
                     now(),
                     r2.cvg_start_date,
                     r2.cvg_end_date
             FROM public.sched_l d, public.reports r1, public.reports r2
-            WHERE 
+            WHERE
             d.cmte_id = %s
             AND d.report_id = r1.report_id
-			AND DATE_PART('day', r2.cvg_start_date::timestamp - r1.cvg_end_date::timestamp) = 1 
+            AND DATE_PART('day', r2.cvg_start_date::timestamp - r1.cvg_end_date::timestamp) = 1
             AND r2.report_id = %s
             AND d.delete_ind is distinct from 'Y';
     """
@@ -502,38 +504,38 @@ def do_debt_carryover(cmte_id, report_id):
     """
     _sql = """
     insert into public.sched_d(
-					cmte_id, 
-                    report_id, 
+                    cmte_id,
+                    report_id,
                     line_num,
-                    transaction_type_identifier, 
-                    transaction_id, 
-                    entity_id, 
-                    beginning_balance, 
-                    balance_at_close, 
-                    incurred_amount, 
-                    payment_amount, 
-					purpose,
+                    transaction_type_identifier,
+                    transaction_id,
+                    entity_id,
+                    beginning_balance,
+                    balance_at_close,
+                    incurred_amount,
+                    payment_amount,
+                    purpose,
                     back_ref_transaction_id,
                     create_date
-					)
-					SELECT 
-					d.cmte_id, 
-                    %s, 
+                    )
+                    SELECT
+                    d.cmte_id,
+                    %s,
                     d.line_num,
-                    d.transaction_type_identifier, 
-                    get_next_transaction_id('SD'), 
-                    d.entity_id, 
-                    d.balance_at_close, 
-                    d.balance_at_close, 
-                    0, 
-                    0, 
-					d.purpose,
+                    d.transaction_type_identifier,
+                    get_next_transaction_id('SD'),
+                    d.entity_id,
+                    d.balance_at_close,
+                    d.balance_at_close,
+                    0,
+                    0,
+                    d.purpose,
                     d.transaction_id,
                     now()
             FROM public.sched_d d, public.reports r
-            WHERE 
+            WHERE
             d.cmte_id = %s
-            AND d.balance_at_close > 0 
+            AND d.balance_at_close > 0
             AND d.report_id != %s
             AND d.report_id = r.report_id
             AND r.cvg_start_date < (
@@ -574,20 +576,20 @@ def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
     """
     _sql = """
     INSERT INTO public.sched_b(
-        cmte_id, report_id, line_number, transaction_type, 
-            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-            entity_id, expenditure_date, expenditure_amount, 
-            semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, 
-            election_other_description, beneficiary_cmte_id, 
-            other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, 
-            nc_soft_account, transaction_type_identifier, 
+        cmte_id, report_id, line_number, transaction_type,
+            transaction_id, back_ref_transaction_id, back_ref_sched_name,
+            entity_id, expenditure_date, expenditure_amount,
+            semi_annual_refund_bundled_amount, expenditure_purpose,
+            category_code, memo_code, memo_text, election_code,
+            election_other_description, beneficiary_cmte_id,
+            other_name, other_street_1,
+            other_street_2, other_city, other_state, other_zip,
+            nc_soft_account, transaction_type_identifier,
             beneficiary_cmte_name,
             beneficiary_cand_entity_id,
             aggregate_amt,
             create_date
-					)
+                    )
     SELECT cmte_id, %s, line_number, transaction_type, 
             get_next_transaction_id('SB'), %s, back_ref_sched_name, 
             entity_id, expenditure_date, expenditure_amount, 
@@ -646,6 +648,7 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
                 # carryover_sched_h6_payments(cmte_id, report_id, parent_id, current_id)
     except:
         raise
+
 
 def do_in_between_report_carryover(cmte_id, report_id):
     try:
@@ -767,4 +770,4 @@ def do_in_between_report_carryover(cmte_id, report_id):
                 logger.debug("done with transaction id: {}".format(next_transaction_id))
             logger.debug("debts carryover done...")
     except Exception as e:
-        raise Exception('The do_in_between_report_carryover function is throwing an error: ' +str(e))
+        raise Exception('The do_in_between_report_carryover function is throwing an error: ' + str(e))

@@ -23,7 +23,7 @@ import { InputDialogService } from '../../shared/service/InputDialogService/inpu
 import { ExportService } from 'src/app/shared/services/ExportService/export.service';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
-import { forEach } from '@angular/router/src/utils/collection';
+// import { forEach } from '@angular/router/src/utils/collection';
 import { ContactLogModel } from '../model/contactLog.model';
 
 @Component({

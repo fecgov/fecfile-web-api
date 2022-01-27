@@ -96,7 +96,6 @@ class LoginView(views.APIView):
         username = data.get('username', None)
         password = data.get('password', None)
         email = data.get('email', None)
-        # import ipdb; ipdb.set_trace()
         account = authenticate(request=request, username=username, password=password, email=email)
 
         # fail, bad login info
@@ -367,7 +366,7 @@ def check_custom_validations(email, role):
 
 
 def check_email_validation(email):
-    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     if not re.search(regex, email):
         raise Exception("Email-id is not valid")
 

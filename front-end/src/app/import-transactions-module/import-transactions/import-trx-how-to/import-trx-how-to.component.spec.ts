@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ImportTrxHowToComponent } from './import-trx-how-to.component';
 
@@ -6,7 +6,7 @@ describe('ImportTrxHowToComponent', () => {
   let component: ImportTrxHowToComponent;
   let fixture: ComponentFixture<ImportTrxHowToComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ImportTrxHowToComponent ]
     })

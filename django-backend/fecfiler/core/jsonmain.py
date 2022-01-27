@@ -28,7 +28,7 @@ import csv
 from django.core.paginator import Paginator
 import time
 from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id, superceded_report_id_list)
-from fecfiler.password_management.views import  treasurer_encrypted_password
+from fecfiler.password_management.views import treasurer_encrypted_password
 
 # conn = boto.connect_s3()
 
@@ -160,10 +160,14 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
                 if empty_list_flag:
                     return []
                 else:
-                    raise NoOPError('No results are found in ' + error_string +
-                                    ' Table. Input received:{}'.format(','.join(query_values_list)))
+                    raise NoOPError(
+                        "No results are found in "
+                        + error_string
+                        + " Table. Input received:{}".format(
+                            ",".join(query_values_list)
+                        )
+                    )
             else:
-                # print(result)
                 return result
     except:
         raise
@@ -324,6 +328,7 @@ def get_data_details(report_id, cmte_id):
     except Exception:
         raise
 
+
 def get_f3l_summary_details(report_id, cmte_id):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -407,7 +412,6 @@ def get_f3x_summary_details(report_id, cmte_id):
                                 FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
                                         and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'"""
 
-
         values = [cvg_start_date, cmte_id]
 
         return {
@@ -455,7 +459,7 @@ def get_back_ref_transaction_ids(DB_table, identifier, report_list, cmte_id, tra
         output = []
         query = """SELECT DISTINCT(back_ref_transaction_id) FROM {} 
             WHERE transaction_type_identifier = %s AND report_id in ('{}') AND cmte_id = %s
-            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table,"', '".join(report_list),
+            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table, "', '".join(report_list),
                                                                                        "', '".join(transaction_id_list))
         query_values_list = [identifier, cmte_id]
         results = json_query(query, query_values_list, DB_table, True)
@@ -473,7 +477,7 @@ def get_transaction_type_identifier(DB_table, report_list, cmte_id, transaction_
             # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
             query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}') 
                 AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                DB_table, "', '".join(report_list),"', '".join(transaction_id_list))
+                DB_table, "', '".join(report_list), "', '".join(transaction_id_list))
             # else:
             #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
             #         DB_table, "', '".join(transaction_id_list))
@@ -574,8 +578,6 @@ def preappending_purpose_description(transaction):
 @api_view(["POST"])
 def create_json_builders(request):
     try:
-        # import ipdb;ipdb.set_trace()
-        # print("request",request)
         logger.debug('create json builder with {}'.format(request))
         MANDATORY_INPUTS = ['report_id', 'call_from']
         error_string = ""
@@ -713,9 +715,12 @@ def create_json_builders(request):
                             # pre-appending the purpose description
                             transaction = preappending_purpose_description(transaction)
                             # Handling electionOtherDescription value for 'primary' and 'general'
-                            if 'electionOtherDescription' in transaction and transaction[
-                                'electionOtherDescription'] in ['Primary', 'General']:
-                                transaction['electionOtherDescription'] = ""
+                            if (
+                                "electionOtherDescription" in transaction
+                                and transaction["electionOtherDescription"]
+                                in ["Primary", "General"]
+                            ):
+                                transaction["electionOtherDescription"] = ""
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
                                     if 'SL-A' not in output['data']['schedules']:
@@ -739,14 +744,16 @@ def create_json_builders(request):
         transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
         # return Response("Success", status=status.HTTP_201_CREATED)
         if call_from == "PrintPreviewPDF":
-            data_obj = {'form_type': form_type}
-            file_obj = {'json_file': ('data.json', open(
-                tmp_path, 'rb'), 'application/json')}
-
-            # print("data_obj = ", data_obj)
-            # print("file_obj = ", file_obj)
-            resp = requests.post(settings.NXG_FEC_PRINT_API_URL +
-                                 settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+            data_obj = {"form_type": form_type}
+            file_obj = {
+                "json_file": ("data.json", open(tmp_path, "rb"), "application/json")
+            }
+            resp = requests.post(
+                settings.NXG_FEC_PRINT_API_URL
+                + settings.NXG_FEC_PRINT_API_VERSION,
+                data=data_obj,
+                files=file_obj
+            )
             if not resp.ok:
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -799,8 +806,13 @@ def create_json_builders(request):
                     '',
                     ''
                     )
-            resp = requests.post(settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION +
-                                 "upload_filing", data=data_obj, files=file_obj)
+            resp = requests.post(
+                settings.DATA_RECEIVE_API_URL
+                + settings.DATA_RECEIVE_API_VERSION
+                + "upload_filing",
+                data=data_obj,
+                files=file_obj
+            )
             if not resp.ok:
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -837,25 +849,41 @@ def add_log(reportid,
             host_name=platform.uname()[1],
             process_name="create_json_builders"):
     with connection.cursor() as cursor:
-        cursor.execute("""INSERT INTO public.upload_logs(
-                                        report_id, 
-                                        cmte_id, 
-                                        process_name, 
-                                        message_type, 
-                                        message_text, 
-                                        response_json, 
-                                        error_code, 
-                                        error_json, 
-                                        app_error, 
-                                        host_name)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                       [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code,
-                        error_json, app_error, host_name])
+        cursor.execute(
+            """INSERT INTO public.upload_logs(
+            report_id,
+            cmte_id,
+            process_name,
+            message_type,
+            message_text,
+            response_json,
+            error_code,
+            error_json,
+            app_error,
+            host_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            [
+                reportid,
+                cmte_id,
+                process_name,
+                message_type,
+                message_text,
+                response_json,
+                error_code,
+                error_json,
+                app_error,
+                host_name
+            ]
+        )
 
 
 def checkForReportSubmission(submissionId):
-    filing_status_response = requests.get(settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION +
-                                        "track_filing", data={'submissionId': submissionId})
+    filing_status_response = requests.get(
+        + settings.DATA_RECEIVE_API_URL
+        + settings.DATA_RECEIVE_API_VERSION
+        + "track_filing",
+        data={'submissionId': submissionId}
+    )
     if filing_status_response.ok:
         if filing_status_response.json()['result'][0]['status'] == 'PROCESSING':
             time.sleep(5)

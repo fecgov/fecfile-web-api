@@ -621,6 +621,7 @@ def validate_before_submit(request_dict):
     except Exception as e:
         raise
 
+
 """
 ************************************ Form 1M CRUD Functions ******************************************
 """
@@ -737,7 +738,7 @@ def form1M(request):
                                                function_name='form1M-POST: step-2 Qualification')
                     if request.data['beneficiary_cand_entity_id'].startswith("FEC"):
                         new_entity_id = clone_fec_entity(cmte_id, 'CAN', request.data['beneficiary_cand_entity_id'])
-                        logger.debug('NEW candidate entity_id: '+new_entity_id)
+                        logger.debug('NEW candidate entity_id: ' + new_entity_id)
                     candidate_number = check_candidate_number(request.data['candidate_number'])
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     column_name = 'can' + candidate_number + '_id'
@@ -752,9 +753,12 @@ def form1M(request):
                             check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
                         f1m_flag, output_dict = f1m_put(request_dict)
                     elif candidate_number == '1':
-                        noneCheckMissingParameters(['committeeType'],
-                                               checking_dict=request.data, value_dict=request.data,
-                                               function_name='form1M-POST: step-2 Qualification cmtetype')
+                        noneCheckMissingParameters(
+                            ['committeeType'],
+                            checking_dict=request.data,
+                            value_dict=request.data,
+                            function_name='form1M-POST: step-2 Qualification cmtetype'
+                        )
                         request_dict['committee_type'] = request.data.get('committeeType')
                         report_flag, request_dict['report_id'] = report_post(request)
                         f1m_flag, output_dict = f1m_post(request_dict)
@@ -869,7 +873,7 @@ def form1M(request):
                                                function_name='form1M-PUT: step-2 Qualification')
                     if request.data['beneficiary_cand_entity_id'].startswith("FEC"):
                         new_entity_id = clone_fec_entity(cmte_id, 'CAN', request.data['beneficiary_cand_entity_id'])
-                        logger.debug('NEW candidate entity_id: '+new_entity_id)
+                        logger.debug('NEW candidate entity_id: ' + new_entity_id)
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     check_report_id_status(cmte_id, request_dict['report_id'])
                     candidate_number = check_candidate_number(request.data['candidate_number'])
@@ -878,7 +882,7 @@ def form1M(request):
                     request_dict[column_name[:-2] + 'con'] = request.data['contribution_date']
                     previous_f1m_dict = get_sql_f1m(request_dict)
                     if candidate_number == '1':
-                        if 'committeeType' in request.data: 
+                        if 'committeeType' in request.data:
                             request_dict['committee_type'] = request.data.get('committeeType') if request.data['committeeType'] else None
                         check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
                         request_dict['est_status'] = 'Q'
