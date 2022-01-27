@@ -3,6 +3,12 @@
 
 const { SpecReporter } = require('jasmine-spec-reporter');
 
+var baseUrl = 'http://localhost:4200/';
+if (process.env.FECFILE_URL) {
+  baseUrl = process.env.FECFILE_URL
+}
+
+
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [
@@ -12,7 +18,7 @@ exports.config = {
     'browserName': 'chrome'
   },
   directConnect: true,
-  baseUrl: 'http://localhost:4200/',
+  baseUrl: baseUrl,
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,

@@ -53,7 +53,7 @@ The launcher will run through the following steps
 - print running containers.
 
 ### docker basic usage.
-when running docker-compose you will need to be in the root directory of the project. The reason for this is that docker-compose looks for docker-compose.yml to be in the same directory where it's run
+when running docker-compose you will need to be in the root directory of the project. The reason for this is that docker-compose looks for docker-compose.yml to be in the same directory where it's run. You will also need at least 3GB of memory allocated for docker during the build. 
 
 # Build the application
 ` docker-compose build `
