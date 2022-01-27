@@ -1,0 +1,9 @@
+---
+applications:
+- name: fecfile-web-api
+  routes:
+  - route: fecfile-web-api-dev.app.cloud.gov
+  stack: cflinuxfs3
+  buildpacks:
+    - python_buildpack
+  memory: 512M
