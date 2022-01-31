@@ -20,7 +20,7 @@ jobs:
 
       - python/install-packages:
           pkg-manager: pip
-          pip-dependency-file: requirements-test.txt
+          pip-dependency-file: django-backend/requirements-test.txt
 
       - run:
           name: Run depency check

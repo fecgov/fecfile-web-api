@@ -1,0 +1,11 @@
+# Any  vulnerability ID numbers listed in this file will be ignored when
+# running the safety dependency check. Each line should have the ID number
+# and a date. The ID will be ignored by the CI pipeline check unitl the date
+# in YYYY-MM-DD format listed for that line.
+# If no date is listed, the exception will never expire. (NOT RECOMMENDED)
+#
+# test
+# Example:
+# 40104 2022-01-15
+#
+40104 2022-01-25  # gunicorn
