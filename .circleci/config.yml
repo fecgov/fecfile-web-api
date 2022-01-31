@@ -115,15 +115,6 @@ jobs:
           command: coverage xml -o ~/project/coverage-reports/coverage.xml
           working_directory: ~/project/django-backend
 
-      - run:
-          name: ls testsing
-          command: ls -l  ~/ && ls -l ~/project && ls -l ~/project/coverage-reports
-
-      - run:
-          name: cat coverage
-          command: cat ~/project/coverage-reports/coverage.xml
-
-
 
       # Sonar cloud setup and scanning
       - run:
