@@ -10,6 +10,38 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
+
+  dependency-check:
+    docker:
+      - image: cimg/python:3.8
+
+    steps:
+      - checkout
+
+      - python/install-packages:
+          pkg-manager: pip
+          pip-dependency-file: requirements-test.txt
+
+      - run:
+          name: Run depency check
+          command: |
+            export today=$(date "+%Y-%m-%d")
+
+            # gather up the -i ignore IDs fro safety check
+            export ignores=$(
+            grep -vE "^\s*#" .safety.dependency.ignore |  # print out any non-comment line
+              grep "[0-9]" |  # filter out any line that doesn't have a number in it
+              awk -v "today=${today}" '{ if ($2 > today || $2 == "") print "-i", $1}' | # print any line after today
+              xargs echo  # put all the output from previous command on one line
+            )
+            export command="safety check -r django-backend/requirements.txt --full-report $ignores"
+
+            echo "----------------------------------------------------"
+            echo "If you need to modify the ignore list for the safety"
+            echo "check, edit .safety.dependency.ignore file"
+            echo "----------------------------------------------------"
+            eval $command
+
   lint:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
@@ -19,10 +51,10 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Install python test requirements
-          command: pip install -r requirements-test.txt
-          working_directory: ~/project/django-backend/
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/django-backend/
+          pip-dependency-file: requirements-test.txt
 
       - run:
           name: Run lint
@@ -151,5 +183,6 @@ workflows:
     jobs:
       - test
       - lint
+      - dependency-check
 
 

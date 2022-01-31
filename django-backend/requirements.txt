@@ -9,7 +9,7 @@ cffi==1.15.0
 chardet==3.0.4
 coreapi==2.3.3
 coreschema==0.0.4
-cryptography>=3.2
+cryptography==36.0.1
 dateparser==0.7.0
 decorator==4.3.0
 dj-database-url==0.3.0
@@ -30,10 +30,10 @@ djangorestframework-jwt==1.11.0
 djangorestframework-sso==0.3.2
 docutils==0.14
 drf-nested-routers==0.11.1
-gunicorn==19.9.0
+gunicorn==19.10.0
 humanize==0.5.1
 itypes==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jmespath==0.9.3
 MarkupSafe==1.1.1
 maya==0.6.0
@@ -69,7 +69,7 @@ static3==0.6.1
 traitlets==4.3.2
 tzlocal==1.5.1
 uritemplate==3.0.0
-urllib3==1.25.8
+urllib3==1.21
 wcwidth==0.1.7
 fuzzywuzzy==0.17.0
 python-Levenshtein==0.12.0
