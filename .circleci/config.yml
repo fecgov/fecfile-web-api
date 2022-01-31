@@ -40,6 +40,8 @@ jobs:
             echo "If you need to modify the ignore list for the safety"
             echo "check, edit .safety.dependency.ignore file"
             echo "----------------------------------------------------"
+            echo ""
+            echo "Running: $command"
             eval $command
 
   lint:

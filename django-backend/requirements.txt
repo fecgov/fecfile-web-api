@@ -69,7 +69,7 @@ static3==0.6.1
 traitlets==4.3.2
 tzlocal==1.5.1
 uritemplate==3.0.0
-urllib3==1.21
+urllib3==1.25.9
 wcwidth==0.1.7
 fuzzywuzzy==0.17.0
 python-Levenshtein==0.12.0
