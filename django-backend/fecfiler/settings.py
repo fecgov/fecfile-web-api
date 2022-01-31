@@ -152,7 +152,10 @@ DATABASES = {
         'USER': os.environ.get('FECFILE_DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('FECFILE_DB_PASSWORD', 'postgres'),
         'HOST': os.environ.get('FECFILE_DB_HOST', 'localhost'),
-        'PORT': '5432'
+        'PORT': '5432',
+        'TEST': {
+            'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres')
+        }
     }
 }
 

@@ -1,5 +1,5 @@
-
 from django.db import models
+
 
 class SATransaction(models.Model):
     """Generated model from json schema"""

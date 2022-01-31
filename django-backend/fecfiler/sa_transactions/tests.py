@@ -14,8 +14,7 @@ class SATransactionTestCase(TestCase):
             CONTRIBUTOR_ORGANIZATION_NAME="John Smith & Co.",
             CONTRIBUTOR_FIRST_NAME="John",
             CONTRIBUTOR_LAST_NAME="Smith"
-        )
-        
+        ) 
 
     def test_save(self):
         self.sa_trans.full_clean()
