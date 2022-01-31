@@ -107,7 +107,7 @@ jobs:
 
       # Sonar cloud setup and scanning
       - run:
-          name: Create cache directory if it doesn't exist
+          name: Create sonar-scanner cache directory if it doesn't exist
           command: mkdir -p /tmp/cache/scanner
       - restore_cache:
           keys:

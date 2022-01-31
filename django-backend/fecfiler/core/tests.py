@@ -13,8 +13,13 @@ class SimpleTest(TestCase):
         self.assertGreater(result[0], 1776, "Invalid election year - too long ago")
 
     def test_date_agg_format(self):
-        self.assertEqual( date_agg_format("2022-11-17"), datetime.date(2022,11,17)  )
-        self.assertEqual( date_agg_format("2022-11-07"), datetime.date(2022,11,7)  )
-        self.assertEqual( date_agg_format("2022-02-07"), datetime.date(2022,2,7)  )
-        self.assertEqual( date_agg_format("2022-2-7"), datetime.date(2022,2,7)  )
 
+        #test security hotspot
+        password = "dsfjahe83hfnc3vdase4vasdni3cu7g"
+        username = "admin"
+
+
+        self.assertEqual(date_agg_format("2022-11-17"), datetime.date(2022, 11, 17))
+        self.assertEqual(date_agg_format("2022-11-07"), datetime.date(2022, 11, 7))
+        self.assertEqual(date_agg_format("2022-02-07"), datetime.date(2022, 2, 7))
+        self.assertEqual(date_agg_format("2022-2-7"), datetime.date(2022, 2, 7))
