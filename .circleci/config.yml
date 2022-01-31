@@ -29,7 +29,7 @@ jobs:
           command: flake8 fecfiler
           working_directory: ~/project/django-backend/
 
-  unit-test:
+  test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
@@ -84,6 +84,11 @@ jobs:
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
+      - run:
+          name: Run lint
+          command: |
+            flake8 --output-file ~/project/flake8.out . || echo "Found lint errors: " && cat ~/project/flake8.out
+          working_directory: ~/project/django-backend/
 
       - run:
           name: Run tests
@@ -140,7 +145,7 @@ jobs:
 workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - unit-test
+      - test
       - lint
 
 
