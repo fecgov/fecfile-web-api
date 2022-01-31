@@ -78,32 +78,17 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Create migrations
-          command: python manage.py makemigrations
+          name: Create/run migrations
+          command: |
+            python manage.py makemigrations
+            python manage.py migrate
           working_directory: ~/project/django-backend/
 
-      - run:
-          name: run migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py migrate
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: Create migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py makemigrations
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: run migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py migrate
-          working_directory: ~/project/django-backend/
 
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: coverage run --source='.' manage.py test --keep || echo "test fails"
+          command: coverage run --source='.' manage.py test --keep
           working_directory: ~/project/django-backend/
 
       - run:
