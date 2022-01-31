@@ -49,10 +49,19 @@ jobs:
 
       - checkout
 
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/django-backend
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/django-backend/
-          pip-dependency-file: requirements.txt
+          pip-dependency-file: requirements-all.txt
 
       - run:
           name: Wait for the database to be active
@@ -128,7 +137,10 @@ jobs:
           command: |
             set -e
             VERSION=4.6.2.2472
-#            SONAR_TOKEN=$<<parameters.sonar_token_variable_name>>
+            if [ -z "$SONAR_TOKEN" ]; then
+                 echo "You must set SONAR_TOKEN environemnt variable"
+                 exit 1
+            fi
             SCANNER_DIRECTORY=/tmp/cache/scanner
             export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
             OS="linux"
