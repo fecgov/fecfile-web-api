@@ -90,6 +90,11 @@ jobs:
             flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
 
       - run:
+          name: Bandit security checks
+          command: |
+            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
+
+      - run:
           name: Run tests
           # Use built-in Django test module
           command: coverage run --source='.' manage.py test --keep
