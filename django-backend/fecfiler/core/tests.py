@@ -13,6 +13,10 @@ class SimpleTest(TestCase):
         self.assertGreater(result[0], 1776, "Invalid election year - too long ago")
 
     def test_date_agg_format(self):
+        file = open("/tmp/contr_can_sql.sql", 'w')
+        file.write("Test bad tmp dir usage. Bandit should catch this.")
+        file.close()
+
         self.assertEqual(date_agg_format("2022-11-17"), datetime.date(2022, 11, 17))
         self.assertEqual(date_agg_format("2022-11-07"), datetime.date(2022, 11, 7))
         self.assertEqual(date_agg_format("2022-02-07"), datetime.date(2022, 2, 7))
