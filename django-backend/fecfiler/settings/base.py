@@ -54,7 +54,7 @@ API_LOGIN = os.environ.get('API_LOGIN', None)
 API_PASSWORD = os.environ.get('API_PASSWORD', None)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_string(50))
+SECRET_KEY = env.get_credential('DJANGO_SECRET_KEY', get_random_string(50))
 
 FECFILE_FEC_WEBSITE_API_KEY = env.get_credential('FECFILE_FEC_WEBSITE_API_KEY')
 
