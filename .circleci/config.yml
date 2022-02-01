@@ -44,24 +44,6 @@ jobs:
             echo "Running: $command"
             eval $command
 
-  lint:
-    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
-    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
-    docker:
-      - image: cimg/python:3.7
-
-    steps:
-      - checkout
-
-      - python/install-packages:
-          pkg-manager: pip
-          app-dir: ~/project/django-backend/
-          pip-dependency-file: requirements-test.txt
-
-      - run:
-          name: Run lint
-          command: flake8 fecfiler
-          working_directory: ~/project/django-backend/
 
   test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
@@ -118,15 +100,17 @@ jobs:
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
-      - run:
-          name: Run lint
-          command: |
-            flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
-
-      - run:
-          name: Bandit security checks
-          command: |
-            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
+# Only use SonarCloud linting or security checking for now.
+# Leaving this as a comment in case SonarCloud isn't good enough and we need to re-enable
+#      - run:
+#          name: Run lint
+#          command: |
+#            flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
+#
+#      - run:
+#          name: Bandit security checks
+#          command: |
+#            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
 
       - run:
           name: Run tests
@@ -184,7 +168,6 @@ workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
       - test
-      - lint
       - dependency-check
 
 
