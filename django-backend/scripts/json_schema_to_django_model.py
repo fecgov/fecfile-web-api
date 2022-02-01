@@ -41,8 +41,8 @@ def get_required_string(key_name, required_fields, field_type='string', is_pk_fi
 
     if field_type in ('number', 'array', 'object'):
         if key_name in required_fields:
-            return 'null=False'
-        return 'null=True'
+            return 'null=False, blank=False'
+        return 'null=True, blank=True'
     else:  # string, boolean
         if key_name in required_fields:
             return 'null=False, blank=False'
@@ -130,8 +130,7 @@ def parse_model(json_model): # noqa
                         "".format(key_name, auto_now_add, editable, required_str)
 
         elif key_attributes['type'] == 'string':
-            max_length = key_attributes['max_length']
-            print(max_length)
+            max_length = key_attributes.get('maxLength')
             if max_length is not None:
                 field_str = "    {} = models.CharField({}, max_length={})\n".format(key_name, required_str, max_length)
             else:
