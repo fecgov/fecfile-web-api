@@ -4,9 +4,7 @@ import git
 import sys
 import cfenv
 
-# from invoke import run
 from invoke import task
-# from slacker import Slacker
 
 env = cfenv.AppEnv()
 
@@ -76,9 +74,7 @@ def deploy(ctx, space=None, branch=None, login=None):
     if space is None:
         return
 
-    # Build static assets
-    # These must be built prior to deploying due to the collectstatic
-    # functionality of the Python buildpack conflicting with our setup.
+    # Use production settings
     ctx.run(
         'cd django-backend && DJANGO_SETTINGS_MODULE=fecfiler.settings.production',
         echo=True

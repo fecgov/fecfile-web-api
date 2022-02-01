@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Install python test requirements
           command: pip install -r requirements-test.txt
-          working_directory: ~/project/django-backend/
+          working_directory: ~/project/
 
       - run:
           name: Run lint
@@ -51,7 +51,7 @@ jobs:
 
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/project/django-backend/
+          app-dir: ~/project/
           pip-dependency-file: requirements.txt
 
       - run:
