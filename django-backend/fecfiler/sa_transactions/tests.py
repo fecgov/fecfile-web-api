@@ -38,18 +38,17 @@ class SATransactionTestCase(TestCase):
 
     def test_full_clean(self):
         self.sa_trans.full_clean()
-        
         self.assertRaises(ValidationError, self.bad_trans.full_clean)
 
     def test_save(self):
         self.sa_trans.save()
         trans = SATransaction.objects.get(transaction_id="A56123456789-1234")
         self.assertIsInstance(trans, SATransaction)
-        self.assertEquals(trans.transaction_id,"A56123456789-1234")
+        self.assertEquals(trans.transaction_id, "A56123456789-1234")
 
     def test_delete(self):
         self.trans_to_del.save()
         hit = SATransaction.objects.get(transaction_id="A56123456789-del")
-        self.assertEquals(hit.transaction_id,"A56123456789-del")
+        self.assertEquals(hit.transaction_id, "A56123456789-del")
         hit.delete()
-        self.assertRaises(SATransaction.DoesNotExist, SATransaction.objects.get,transaction_id="A56123456789-del")
+        self.assertRaises(SATransaction.DoesNotExist, SATransaction.objects.get, transaction_id="A56123456789-del")
