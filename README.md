@@ -22,7 +22,7 @@ Software necessary to run the application locally
 [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Docker basic usage.
-when running docker-compose you will need to be in the root directory of the project. The reason for this is that docker-compose looks for docker-compose.yml to be in the same directory where it's run. You will also need at least 3GB of memory allocated for docker during the build. 
+when running docker-compose you will need to be in the root directory of the project. The reason for this is that docker-compose looks for docker-compose.yml to be in the same directory where it's run. You will also need at least 3GB of memory allocated for docker during the build.
 
 ## Run the front-end application
 `docker-compose up`
@@ -36,11 +36,7 @@ when running docker-compose you will need to be in the root directory of the pro
 You should set the following environment variables in the shell where you are running 'docker-compose up'.
 Proper values for the development variables are shown here as an example
 ```
-export FECFILE_DB_HOST=db
-export FECFILE_DB_USERNAME=postgres
-export FECFILE_DB_PASSWORD=postgres
-export FECFILE_DB_NAME=postgres
-export FECFILE_URL=localhost
+export DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
 ```
 
 # Shut down the containers

@@ -144,20 +144,6 @@ CORS_ALLOW_HEADERS = default_headers + (
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# DATABASES = {
-
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres'),
-#         'USER': os.environ.get('FECFILE_DB_USER', 'postgres'),
-#         'PASSWORD': os.environ.get('FECFILE_DB_PASSWORD', 'postgres'),
-#         'HOST': os.environ.get('FECFILE_DB_HOST', 'localhost'),
-#         'PORT': '5432',
-#         'TEST': {
-#             'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres')
-#         }
-#     }
-# }
 DATABASES = {
     # Be sure to set the DATABASE_URL environment variable on your local
     # development machine so that the local database can be connected to.

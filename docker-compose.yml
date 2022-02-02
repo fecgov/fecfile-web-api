@@ -37,8 +37,5 @@ services:
     depends_on:
       - db
     environment:
-      - FECFILE_DB_HOST
-      - FECFILE_DB_USERNAME
-      - FECFILE_DB_PASSWORD
-      - FECFILE_DB_NAME
+      - DATABASE_URL
 
