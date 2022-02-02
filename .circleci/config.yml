@@ -13,7 +13,7 @@ jobs:
 
   dependency-check:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.7
 
     steps:
       - checkout
@@ -35,7 +35,7 @@ jobs:
               awk -v "today=${today}" '{ if ($2 > today || $2 == "") print "-i", $1}' | # print any line after today
               xargs echo  # put all the output from previous command on one line
             )
-            export command="safety check -r django-backend/requirements.txt --full-report $ignores"
+            export command="safety check -r requirements.txt --full-report $ignores"
 
             echo "----------------------------------------------------"
             echo "If you need to modify the ignore list for the safety"
@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Create unified requirements so CircleCI can cache them
           command: |
-            cd ~/project/django-backend
+            cd ~/project/
             ls -l
             cat requirements.txt > requirements-all.txt
             echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
@@ -78,11 +78,11 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
-          pip-dependency-file: requirements.txt
+          pip-dependency-file: requirements-all.txt
 
       - run:
           name: Wait for the database to be active
-          command: pip install psycopg2 psycopg2-binary retry &&  python wait_for_db.py
+          command: python wait_for_db.py
           working_directory: ~/project/django-backend/
 
       - run:
