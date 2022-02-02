@@ -11,4 +11,4 @@ applications:
     - fecfile-api-rds
   env:
     DISABLE_COLLECTSTATIC: 1
-    # DJANGO_SETTINGS_MODULE: django-backend.fecfiler.settings.production
+    DJANGO_SETTINGS_MODULE: fecfiler.settings.production

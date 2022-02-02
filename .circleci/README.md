@@ -4,11 +4,24 @@ When configuring CircleCI, you will need to set environment variables the databa
 configuration as follows:
 ```
 DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
+FECFILE_TEST_DB_NAME = "postgres"
 FECFILE_FEC_WEBSITE_API_KEY=
 ```
 Notes:
 * There is no default FECFILE_FEC_WEBSITE_API_KEY, you must obtain and set this yourself
-* The FECFILE_DB_HOST value here is different than what you need for your local docker-compose configuration.
+
+CircleCI will attempt to deploy commits made to specific branches:
+* branch __develop__ -> cloud.gov dev space
+* branch __release__* (any branch starting with release) -> cloud.gov staging space
+* branch __prod__ -> cloud.gov prod space
+
+Authentication must be configured in a set of evironment variables:
+* $FEC_CF_USERNAME_DEV
+* $FEC_CF_PASSWORD_DEV
+* $FEC_CF_USERNAME_STAGE
+* $FEC_CF_PASSWORD_STAGE
+* $FEC_CF_USERNAME_PROD
+* $FEC_CF_PASSWORD_PROD
 
 # Using CircleCI local CLI
 
@@ -40,7 +53,8 @@ To run in the local CircleCI for the django unit tests (for example), use the fo
 
 ```
 circleci local execute -e DATABASE_URL=${DATABASE_URL} \
-         -e FECFILE_FEC_WEBSITE_API_KEY=${FECFILE_FEC_WEBSITE_API_KEY}\
+         -e FECFILE_FEC_WEBSITE_API_KEY=${FECFILE_FEC_WEBSITE_API_KEY} \
+         -e FECFILE_TEST_DB_NAME=${FECFILE_TEST_DB_NAME} \
          --job unit-test
 ```
 

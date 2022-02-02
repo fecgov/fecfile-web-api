@@ -37,6 +37,7 @@ You should set the following environment variables in the shell where you are ru
 Proper values for the development variables are shown here as an example
 ```
 export DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
+export FECFILE_TEST_DB_NAME = "postgres"
 ```
 
 # Shut down the containers

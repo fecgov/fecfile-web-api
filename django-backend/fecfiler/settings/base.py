@@ -62,9 +62,6 @@ ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
 
-# TODO: this is an anti-pattern
-ALLOWED_HOSTS = ['*']
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -150,7 +147,7 @@ DATABASES = {
     'default': dj_database_url.config()
 }
 
-# Override default test name? TODO: should this be FECFILE_TEST_DB_NAME?
+# Override default test name
 DATABASES['default']['TEST'] = {
     'NAME': os.environ.get('FECFILE_TEST_DB_NAME', 'postgres')
 }
