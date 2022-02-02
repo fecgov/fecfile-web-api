@@ -152,7 +152,7 @@ DATABASES = {
 
 # Override default test name? TODO: should this be FECFILE_TEST_DB_NAME?
 DATABASES['default']['TEST'] = {
-    'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres')
+    'NAME': os.environ.get('FECFILE_TEST_DB_NAME', 'postgres')
 }
 
 # Password validation

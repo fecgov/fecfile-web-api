@@ -21,11 +21,11 @@ register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
 
-PG_HOST = os.getenv('FECFILE_DB_HOST', 'localhost')
-PG_PORT = os.getenv('FECFILE_DB_PORT', 5432)
-PG_DATABASE = os.getenv('FECFILE_DB_NAME', 'postgres')
-PG_USER = os.getenv('FECFILE_DB_USERNAME', 'postgres')
-PG_PASSWORD = os.getenv('FECFILE_DB_PASSWORD', 'postgres')
+PG_HOST = 'localhost'
+PG_PORT = 5432
+PG_DATABASE = 'postgres'
+PG_USER = 'postgres'
+PG_PASSWORD = 'postgres'
 SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME')
 
 
