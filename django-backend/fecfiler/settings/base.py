@@ -164,6 +164,10 @@ DATABASES = {
     'default': dj_database_url.config()
 }
 
+# Override default test name? TODO: should this be FECFILE_TEST_DB_NAME?
+DATABASES['default']['TEST'] = {
+    'NAME': os.environ.get('FECFILE_DB_NAME', 'postgres')
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
