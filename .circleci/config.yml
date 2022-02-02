@@ -129,6 +129,7 @@ workflows:
     jobs:
       - unit-test
       - lint
-      - deploy
-
-
+      - deploy:
+          requires:
+            - unit-test
+            - lint
