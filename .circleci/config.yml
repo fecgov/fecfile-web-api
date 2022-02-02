@@ -64,8 +64,7 @@ jobs:
           command: |
             sudo apt-get update &&
             sudo apt-get install postgresql-client-12 &&
-            export PGPASSWORD=${FECFILE_DB_PASSWORD} &&
-            psql -h ${FECFILE_DB_HOST}  ${FECFILE_DB_NAME} ${FECFILE_DB_USERNAME} < fec_clean_dev_db_backup-20211227.sql
+            psql ${DATABASE_URL} < fec_clean_dev_db_backup-20211227.sql
           working_directory: ~/project/db
 
       - run:
