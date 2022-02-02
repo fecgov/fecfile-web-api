@@ -10,30 +10,47 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  lint:
-    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
-    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+
+  dependency-check:
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
 
     steps:
       - checkout
 
-      - run:
-          name: Install python test requirements
-          command: pip install -r requirements-test.txt
-          working_directory: ~/project/
+      - python/install-packages:
+          pkg-manager: pip
+          pip-dependency-file: requirements-test.txt
+
 
       - run:
-          name: Run lint
-          command: flake8 fecfiler
-          working_directory: ~/project/django-backend/
+          name: Run depency check
+          command: |
+            export today=$(date "+%Y-%m-%d")
 
-  unit-test:
+            # gather up the -i ignore IDs fro safety check
+            export ignores=$(
+            grep -vE "^\s*#" .safety.dependency.ignore |  # print out any non-comment line
+              grep "[0-9]" |  # filter out any line that doesn't have a number in it
+              awk -v "today=${today}" '{ if ($2 > today || $2 == "") print "-i", $1}' | # print any line after today
+              xargs echo  # put all the output from previous command on one line
+            )
+            export command="safety check -r django-backend/requirements.txt --full-report $ignores"
+
+            echo "----------------------------------------------------"
+            echo "If you need to modify the ignore list for the safety"
+            echo "check, edit .safety.dependency.ignore file"
+            echo "----------------------------------------------------"
+            echo ""
+            echo "Running: $command"
+            eval $command
+
+
+  test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.7-node
       - image: cimg/postgres:12.8
 
     steps:
@@ -48,6 +65,15 @@ jobs:
             exit 0
 
       - checkout
+
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/django-backend
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
 
       - python/install-packages:
           pkg-manager: pip
@@ -68,33 +94,72 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Create migrations
-          command: python manage.py makemigrations
+          name: Create/run migrations
+          command: |
+            python manage.py makemigrations
+            python manage.py migrate
           working_directory: ~/project/django-backend/
 
-      - run:
-          name: run migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py migrate
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: Create migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py makemigrations
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: run migrations
-          # This assumes pytest is installed via the install-package step above
-          command: python manage.py migrate
-          working_directory: ~/project/django-backend/
+# Only use SonarCloud linting or security checking for now.
+# Leaving this as a comment in case SonarCloud isn't good enough and we need to re-enable
+#      - run:
+#          name: Run lint
+#          command: |
+#            flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
+#
+#      - run:
+#          name: Bandit security checks
+#          command: |
+#            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
 
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: python manage.py test --keep
+          command: coverage run --source='.' manage.py test --keep
           working_directory: ~/project/django-backend/
+
+      - run:
+          name: setup coverage dir
+          command: mkdir ~/project/coverage-reports
+
+      - run:
+          name: Make XML coverage report
+          command: coverage xml -o ~/project/coverage-reports/coverage.xml
+          working_directory: ~/project/django-backend
+
+      # Sonar cloud setup and scanning
+      - run:
+          name: Create sonar-scanner cache directory if it doesn't exist
+          command: mkdir -p /tmp/cache/scanner
+      - restore_cache:
+          keys:
+            - v1-sonarcloud-scanner-4.6.2.2472
+      - run:
+          name: SonarCloud
+          command: |
+            set -e
+            VERSION=4.6.2.2472
+            if [ -z "$SONAR_TOKEN" ]; then
+                 echo "You must set SONAR_TOKEN environemnt variable"
+                 exit 1
+            fi
+            SCANNER_DIRECTORY=/tmp/cache/scanner
+            export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
+            OS="linux"
+            echo $SONAR_USER_HOME
+            if [[ ! -x "$SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner" ]]; then
+              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$VERSION-$OS.zip
+              unzip -qq -o sonar-scanner-cli-$VERSION-$OS.zip -d $SCANNER_DIRECTORY
+            fi
+
+            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
+            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/jre/bin/java
+            $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
+          environment:
+            SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
+      - save_cache:
+          key: v1-sonarcloud-scanner-4.6.2.2472
+          paths: /tmp/cache/scanner
 
   deploy:
 
@@ -126,9 +191,9 @@ jobs:
 workflows:
   test: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - unit-test
-      - lint
+      - test
+      - dependency-check
       - deploy:
           requires:
-            - unit-test
-            - lint
+              - test
+              - dependency-check
