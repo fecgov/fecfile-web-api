@@ -56,8 +56,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ('prod', _detect_prod),
     ('stage', lambda _, branch: branch.startswith('release')),
-    #('dev', lambda _, branch: branch == 'develop'),
-    ('dev', lambda _, branch: branch == 'feature/40-test-cloud-gov'),
+    ('dev', lambda _, branch: branch == 'develop'),
 )
 
 
