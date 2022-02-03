@@ -85,7 +85,7 @@ INSTALLED_APPS = [
     'fecfiler.forms',
     'db_file_storage',
 
-    'fecfiler.sa_transactions',
+    'fecfiler.scha_transactions',
     'fecfiler.core',
     # 'fecfiler.form3x',
     'fecfiler.sched_A',

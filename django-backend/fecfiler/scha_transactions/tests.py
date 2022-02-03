@@ -1,13 +1,13 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import SATransaction
+from .models import SchATransaction
 
 
-class SATransactionTestCase(TestCase):
+class SchATransactionTestCase(TestCase):
     """ Test module for inserting a sched_a item"""
 
     def setUp(self):
-        self.sa_trans = SATransaction(
+        self.sa_trans = SchATransaction(
             form_type="SA11AI",
             filer_committee_id_number="C00123456",
             transaction_id="A56123456789-1234",
@@ -17,7 +17,7 @@ class SATransactionTestCase(TestCase):
             contributor_last_name="Smith"
         )
 
-        self.bad_trans = SATransaction(
+        self.bad_trans = SchATransaction(
             form_type="SA11AI",
             filer_committee_id_number="C00123456",
             transaction_id="A56123456789-4567",
@@ -26,7 +26,7 @@ class SATransactionTestCase(TestCase):
             contributor_first_name="John",
         )
 
-        self.trans_to_del = SATransaction(
+        self.trans_to_del = SchATransaction(
             form_type="SA11AI",
             filer_committee_id_number="C00123456",
             transaction_id="A56123456789-del",
@@ -42,13 +42,13 @@ class SATransactionTestCase(TestCase):
 
     def test_save(self):
         self.sa_trans.save()
-        trans = SATransaction.objects.get(transaction_id="A56123456789-1234")
-        self.assertIsInstance(trans, SATransaction)
+        trans = SchATransaction.objects.get(transaction_id="A56123456789-1234")
+        self.assertIsInstance(trans, SchATransaction)
         self.assertEquals(trans.transaction_id, "A56123456789-1234")
 
     def test_delete(self):
         self.trans_to_del.save()
-        hit = SATransaction.objects.get(transaction_id="A56123456789-del")
+        hit = SchATransaction.objects.get(transaction_id="A56123456789-del")
         self.assertEquals(hit.transaction_id, "A56123456789-del")
         hit.delete()
-        self.assertRaises(SATransaction.DoesNotExist, SATransaction.objects.get, transaction_id="A56123456789-del")
+        self.assertRaises(SchATransaction.DoesNotExist, SchATransaction.objects.get, transaction_id="A56123456789-del")
