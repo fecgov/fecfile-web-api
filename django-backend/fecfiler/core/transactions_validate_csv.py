@@ -1,34 +1,22 @@
-import hashlib
 import os
 import os.path
 from os import path
 import psycopg2
 import pandas as pd
 from pandas_schema import Column, Schema
-from pandas_schema.validation import MatchesPatternValidation, InListValidation
+from pandas_schema.validation import MatchesPatternValidation
 import boto3
 from botocore.exceptions import ClientError
 from io import StringIO
-from pandas.util import hash_pandas_object
-import numpy
-from psycopg2.extensions import register_adapter, AsIs
 import logging
 import time
 import re
 from sqlalchemy import create_engine
-from sqlalchemy.types import String
-from sqlalchemy.types import NVARCHAR
 from sqlalchemy.types import Text
-from django.db import connection
+from django.conf import settings
 
-# Postgres Database Settings - local
-PG_HOST = 'localhost'
-PG_PORT = '5432'
-PG_DATABASE = 'postgres'
-PG_USER = 'postgres'
 PG_PASSWORD = os.getenv('FECFILE_DB_PASSWORD', 'postgres')
 SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME')
-
 
 BACKEND_DB_HOST = os.getenv('BACKEND_DB_HOST')
 BACKEND_DB_PORT = os.getenv('BACKEND_DB_PORT')
@@ -57,7 +45,7 @@ def save_data_from_excel_to_db(data):
     postgreSQLTable = 'ref_forms_scheds_format_specs'
     try:
         # "postgres://PG_USER:PG_PASSWORD@PG_HOST:PG_PORT/PG_DATABASE"
-        connectionstring = "postgres://" + PG_USER + ":" + PG_PASSWORD + "@" + PG_HOST + ":" + PG_PORT + "/" + PG_DATABASE
+        connectionstring = settings.DATABASE_URL
         engine = create_engine(connectionstring, pool_recycle=3600)
         postgreSQLConnection = engine.connect()
         data.to_sql(postgreSQLTable, postgreSQLConnection, if_exists='append', index=False, dtype={'AUTO-GENERATE': Text})
@@ -176,11 +164,7 @@ def schema_validation(dataframe, schema, bktname, key, errorfilename):
 
 def build_schemas(formname, sched, trans_type):
     try:
-        connection = psycopg2.connect(user=PG_USER,
-                                      password=PG_PASSWORD,
-                                      host=PG_HOST,
-                                      port=PG_PORT,
-                                      database=PG_DATABASE)
+        connection = psycopg2.connect(settings.DATABASE_URL)
         cursor = connection.cursor()
         cursor.execute("SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL", (formname, sched, trans_type))
         format_specs = cursor.fetchall()
@@ -415,13 +399,7 @@ def check_data_processed(md5, fecfilename):
             WHERE tfd.fec_file_name = %s
             ORDER BY create_Date DESC   limit 1;
         '''
-        conn = psycopg2.connect(
-            user=PG_USER,
-            password=PG_PASSWORD,
-            host=PG_HOST,
-            port=PG_PORT,
-            database=PG_DATABASE
-        )
+        conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()
         cur.execute(selectsql, (fecfilename,))
         if cur.rowcount == 1:
@@ -450,11 +428,7 @@ def load_transactions_from_temp_perm_tables(fecfilename):
     try:
         res = ''
         selectsql = '''import_schedules'''
-        conn = psycopg2.connect(user=PG_USER,
-                                password=PG_PASSWORD,
-                                host=PG_HOST,
-                                port=PG_PORT,
-                                database=PG_DATABASE)
+        conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()
         cur.callproc(selectsql, (fecfilename,))
         if cur.rowcount == 1:
