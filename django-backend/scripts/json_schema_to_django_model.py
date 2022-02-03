@@ -175,15 +175,15 @@ if __name__ == "__main__":
     with open(filename) as f:
         json_model = json.load(f)
 
-    if ("S" == json_model['properties']['FORM_TYPE']['examples'][0][0]
-            and "TRANSACTION_TYPE_IDENTIFIER" not in json_model['properties']):
-        print("We've detected that this schema is likely a schedule and yet it has no TRANSACTION_TYPE_IDENTIFIER field.")
+    if ("S" == json_model['properties']['form_type']['examples'][0][0]
+            and "transaction_type_identifier" not in json_model['properties']):
+        print("We've detected that this schema is likely a schedule and yet it has no transaction_type_identifier field.")
         print("Would you like us to add this field (y/N)?")
         choice = input().lower()
         add_tti = choice in ["y", "ye", "yes"]
 
         if add_tti:
-            json_model['properties']['TRANSACTION_TYPE_IDENTIFIER'] = {
+            json_model['properties']['transaction_type_identifier'] = {
                 "title": "TRANSACTION TYPE IDENTIFIER",
                 "description": "",
                 "type": "string",

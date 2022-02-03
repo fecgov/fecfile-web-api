@@ -3,4 +3,4 @@
 [run]
 omit =
     # Excluding dev scripts from code coverage
-    scripts/json_schema_to_django_model.py
+    */scripts/json_schema_to_django_model.py
