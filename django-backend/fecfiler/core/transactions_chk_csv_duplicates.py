@@ -1,4 +1,3 @@
-import hashlib
 import os
 import psycopg2
 import pandas as pd
@@ -7,6 +6,7 @@ from io import StringIO
 from pandas.util import hash_pandas_object
 import numpy
 from psycopg2.extensions import register_adapter, AsIs
+from django.conf import settings
 
 
 def addapt_numpy_float64(numpy_float64):
@@ -20,12 +20,6 @@ def addapt_numpy_int64(numpy_int64):
 register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
-
-PG_HOST = 'localhost'
-PG_PORT = 5432
-PG_DATABASE = 'postgres'
-PG_USER = 'postgres'
-PG_PASSWORD = 'postgres'
 SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME')
 
 
@@ -50,13 +44,7 @@ def check_for_file_hash_in_db(cmteid, filename, hash, fecfilename):
         """ insert a transactions_file_details """
         selectsql = """SELECT cmte_id, md5, file_name, create_date FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;"""
 
-        conn = psycopg2.connect(
-            user=PG_USER,
-            password=PG_PASSWORD,
-            host=PG_HOST,
-            port=PG_PORT,
-            database=PG_DATABASE
-        )
+        conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()
         cur.execute(selectsql, (cmteid, filename, hash, fecfilename))
         dbhash = cur.fetchone()
@@ -82,13 +70,7 @@ def load_file_hash_to_db(cmteid, filename, hash, fecfilename):
         insertsql = """INSERT INTO transactions_file_details(cmte_id, file_name, md5, fec_file_name)
                 VALUES(%s, %s, %s, %s);"""
 
-        conn = psycopg2.connect(
-            user=PG_USER,
-            password=PG_PASSWORD,
-            host=PG_HOST,
-            port=PG_PORT,
-            database=PG_DATABASE
-        )
+        conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()
         cur.execute(insertsql, (cmteid, filename, hash, fecfilename))
         conn.commit()
@@ -140,17 +122,17 @@ def file_verify_upload(request):
             bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
             file_name = request.data.get("fileName")
             csv_obj = client.get_object(Bucket=bucket, Key=file_name)
-            hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest() 
+            hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
 
             #filepath = dirname(dirname(os.getcwd()))+"/csv/"
             filename = "Disbursements_1q2020.csv"
             hash_value = generate_md5_hash(filepath+filename)
             fileexists = check_for_file_hash_in_db('C00000018', filename, hash_value)
-            if fileexists is None: 
+            if fileexists is None:
                 load_file_hash_to_db('C00000018', filename, hash_value)
                 print('File loaded successfully!!!')
             else:
-                print('File exists in DB')    
+                print('File exists in DB')
 
             return JsonResponse(contacts, status=status.HTTP_201_CREATED, safe=False)
 

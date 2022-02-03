@@ -100,7 +100,8 @@ def deploy(ctx, space=None, branch=None, login=None):
     existing_deploy = ctx.run('cf app {0}'.format(APP_NAME), echo=True, warn=True)
     print("\n")
     cmd = 'push --strategy rolling' if existing_deploy.ok else 'push'
-    new_deploy = ctx.run('cf {0} {1} -f manifest-{2}.yml'.format(cmd, APP_NAME, space),
+    new_deploy = ctx.run(
+        'cf {0} {1} -f manifest-{2}.yml'.format(cmd, APP_NAME, space),
         echo=True,
         warn=True
     )

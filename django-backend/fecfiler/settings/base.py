@@ -373,11 +373,11 @@ NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.ef
 NXG_FEC_PRINT_API_VERSION = "/v1/print"
 
 # SUBMISSION REPORT SETTINGS
-NXG_COMMITTEE_DEFAULT_PASSWORD = "test"
+NXG_COMMITTEE_DEFAULT_PASSWORD = os.environ.get('NXG_COMMITTEE_DEFAULT_PASSWORD', "test")
 SUBMIT_REPORT_WAIT_FLAG = "False"
 
 # Service Endpoint for filing confirmation email
-NXG_FEC_FILING_CONFIRMATION_URL = os.environ.get('FILING_CONFIRMATION_URL', 'http://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email')
+NXG_FEC_FILING_CONFIRMATION_URL = os.environ.get('FILING_CONFIRMATION_URL', 'https://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email')
 
 # dcf_converter end point details
 NXG_FEC_DCF_CONVERTER_API_URL = os.environ.get('DCF_CONVERTER_URL', 'https://dev-efile-api.efdev.fec.gov/dcf_converter')
