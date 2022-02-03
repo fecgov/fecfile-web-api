@@ -105,7 +105,7 @@ def _do_deploy(ctx, space):
 def _print_help_text():
     help_text = """
     Usage:
-    invoke deploy [--space SPACE] [--branch BRANCH] [--login LOGIN] [--help]
+    invoke deploy [--space SPACE] [--branch BRANCH] [--login] [--help]
 
     --space SPACE    If provided, the SPACE space in cloud.gov will be targeted for deployment.
                      Either --space or --branch must be provided
