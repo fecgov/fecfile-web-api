@@ -184,7 +184,7 @@ jobs:
           name: Deploy API
           command: |
             export PATH=$HOME/bin:$PATH
-            invoke deploy --branch $CIRCLE_BRANCH --login True
+            invoke deploy --branch $CIRCLE_BRANCH --login
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows

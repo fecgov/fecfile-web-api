@@ -49,7 +49,7 @@ def _detect_space(repo, branch=None):
     if space is None:
         print('The current configuration does not require a deployment to cloud.gov.')
         return None
-    print('Detected space {space}'.format(**locals()))
+    print(f'Detected space {space}')
     return space
 
 
@@ -60,75 +60,143 @@ DEPLOY_RULES = (
 )
 
 
-@task
-def deploy(ctx, space=None, branch=None, login=None):
-    """Deploy app to Cloud Foundry. Log in using credentials stored in
-    `FEC_CF_USERNAME` and `FEC_CF_PASSWORD`; push to either `space` or the space
-    detected from the name and tags of the current branch. Note: Must pass `space`
-    or `branch` if repo is in detached HEAD mode, e.g. when running on Travis.
+def _login_to_cf(ctx, space):
+    # Set api
+    api = "https://api.fr.cloud.gov"
+    ctx.run(f"cf api {api}", echo=True)
+    # Authenticate
+    user_var_name = f'$FEC_CF_USERNAME_{space.upper()}'
+    pass_var_name = f'$FEC_CF_PASSWORD_{space.upper()}'
+
+    login_command = f'cf auth "{user_var_name}" "{pass_var_name}"'
+    result = ctx.run(login_command, echo=True, warn=True)
+    if result.return_code != 0:
+        print("\n\nError logging into cloud.gov.")
+        print("Please check your authentication environment variables:")
+
+        print(f"You must set the {user_var_name} and {pass_var_name} environment ")
+        print(f"variables with space-deployer service account credentials")
+        print(f"")
+        print(f"If you don't have a service account, you can create one with the following commands:")
+        print(f"   cf login -u [email-address] -o {ORG_NAME} -a api.fr.cloud.gov --sso")
+        print(f"   cf target -o {ORG_NAME} -s {space}")
+        print(f"   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]")
+        print(f"   cf create-service-key  [my-server-account-name] [my-service-key-name]")
+        print(f"   cf service-key  [my-server-account-name] [my-service-key-name]")
+
+        exit(1)
+
+
+def _do_deploy(ctx, space):
+
+    manifest_filename = f"manifest-{space}.yml"
+    existing_deploy = ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
+    print("\n")
+
+    cmd = "push --strategy rolling" if existing_deploy.ok else "push"
+    new_deploy = ctx.run(
+        f"cf {cmd} {APP_NAME} -f {manifest_filename}",
+        echo=True,
+        warn=True,
+    )
+    return new_deploy
+
+
+def _print_help_text():
+    help_text = """
+    Usage:
+    invoke deploy [--space SPACE] [--branch BRANCH] [--login LOGIN] [--help]
+
+    --space SPACE    If provided, the SPACE space in cloud.gov will be targeted for deployment.
+                     Either --space or --branch must be provided
+                     Allowed values are dev, stage, and prod.
+
+
+    --branch BRANCH  Name of the branch to use for deployment. Will auto-detect
+                     the git branch in the current directory by default
+                     Either --space or --branch must be provided
+
+    --login          If this flag is set, deploy with attempt to login to a
+                     service account specified in the environemnt variables
+                     $FEC_CF_USERNAME_[SPACE] and $FEC_CF_PASSWORD_[SPACE]
+
+    --help           If set, display help/usage text and exit
+
     """
+    print(help_text)
+
+
+def _rollback(ctx):
+    print("Build failed!")
+    # Check if there are active deployments
+    app_guid = ctx.run(f"cf app {APP_NAME} --guid", hide=True, warn=True)
+    app_guid_formatted = app_guid.stdout.strip()
+    status = ctx.run(
+        f'cf curl "/v3/deployments?app_guids={app_guid_formatted}&status_values=ACTIVE"',
+        hide=True,
+        warn=True,
+    )
+    active_deployments = (
+        json.loads(status.stdout).get("pagination").get("total_results")
+    )
+    # Try to roll back
+    if active_deployments > 0:
+        print("Attempting to roll back any deployment in progress...")
+        # Show the in-between state
+        ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
+        cancel_deploy = ctx.run(
+            f"cf cancel-deployment {APP_NAME}", echo=True, warn=True
+        )
+        if cancel_deploy.ok:
+            print("Successfully cancelled deploy. Check logs.")
+        else:
+            print("Unable to cancel deploy. Check logs.")
+
+
+@task
+def deploy(ctx, space=None, branch=None, login=False, help=False):
+    """Deploy app to Cloud Foundry.
+    Log in using credentials stored per environment
+    like `FEC_CF_USERNAME_DEV` and `FEC_CF_PASSWORD_DEV`;
+    Push to either `space` or the space detected from the name and tags
+    of the current branch.
+    Note: Must pass `space` or `branch` if repo is in detached HEAD mode,
+    e.g. when running on Circle.
+
+    Example usage: invoke deploy --space dev
+    """
+
+    if help:
+        _print_help_text()
+        exit(0)
+
     # Detect space
-    repo = git.Repo('.')
+    repo = git.Repo(".")
     branch = branch or _detect_branch(repo)
     space = space or _detect_space(repo, branch)
     if space is None:
-        return
+        # this is not an error condition, it just means the current space/branch is not
+        # a candidate for deployment. Return successful exit code
+        return sys.exit(0)
 
-    # Use production settings
-    ctx.run(
-        'cd django-backend && DJANGO_SETTINGS_MODULE=fecfiler.settings.production',
-        echo=True
-    )
-
-    if login == 'True':
-        # Set api
-        api = 'https://api.fr.cloud.gov'
-        ctx.run('cf api {0}'.format(api), echo=True)
-        # Authenticate
-        ctx.run('cf auth "$FEC_CF_USERNAME_{0}" "$FEC_CF_PASSWORD_{0}"'.format(
-            space.upper()), echo=True
-        )
+    if login:
+        _login_to_cf(ctx, space)
 
     # Target space
-    ctx.run('cf target -o {0} -s {1}'.format(ORG_NAME, space), echo=True)
+    ctx.run(f"cf target -o {ORG_NAME} -s {space}", echo=True)
 
     # Set deploy variables
-    with open('.cfmeta', 'w') as fp:
-        json.dump({'user': os.getenv('USER'), 'branch': branch}, fp)
+    with open(".cfmeta", "w") as fp:
+        json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    # Deploy app
-    existing_deploy = ctx.run('cf app {0}'.format(APP_NAME), echo=True, warn=True)
-    print("\n")
-    cmd = 'push --strategy rolling' if existing_deploy.ok else 'push'
-    new_deploy = ctx.run(
-        'cf {0} {1} -f manifest-{2}.yml'.format(cmd, APP_NAME, space),
-        echo=True,
-        warn=True
-    )
+    new_deploy = _do_deploy(ctx, space)
 
     if not new_deploy.ok:
-        print("Build failed!")
-        # Check if there are active deployments
-        app_guid = ctx.run('cf app {0} --guid'.format(APP_NAME), hide=True, warn=True)
-        app_guid_formatted = app_guid.stdout.strip()
-        status = ctx.run('cf curl "/v3/deployments?app_guids={}&status_values=ACTIVE"'.format(app_guid_formatted), hide=True, warn=True)
-        active_deployments = json.loads(status.stdout).get("pagination").get("total_results")
-        # Try to roll back
-        if active_deployments > 0:
-            print("Attempting to roll back any deployment in progress...")
-            # Show the in-between state
-            ctx.run('cf app {0}'.format(APP_NAME), echo=True, warn=True)
-            cancel_deploy = ctx.run('cf cancel-deployment {0}'.format(APP_NAME), echo=True, warn=True)
-            if cancel_deploy.ok:
-                print("Successfully cancelled deploy. Check logs.")
-            else:
-                print("Unable to cancel deploy. Check logs.")
-
-        # Fail the build
+        _rollback(ctx)
         return sys.exit(1)
 
-    print("\nA new version of your application '{0}' has been successfully pushed!".format(APP_NAME))
-    ctx.run('cf apps', echo=True, warn=True)
+    ctx.run("cf apps", echo=True, warn=True)
+    print(f"A new version of your application '{APP_NAME}' has been successfully pushed!")
 
-    # Needed by CircleCI
+    # Needed for CircleCI
     return sys.exit(0)
