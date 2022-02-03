@@ -1,5 +1,14 @@
-"""
-Json Schema to Django Model
+"""Converts JSON schema to a workable django model
+
+This is a utility script to create *starter* django model from
+a JSON schema file
+
+The JSON schema standard can be found here:
+
+http://json-schema.org/
+
+Note: Schema properties prefixed with "fec_" are not part of the JSON schema
+standard and are specific to the FEC data.
 """
 import json
 import argparse
@@ -152,6 +161,9 @@ def parse_model(json_model): # noqa
 
         model_str += field_str
 
+    # add created and updated fields
+    model_str += "    created = models.DateField(auto_now_add=True)\n"
+    model_str += "    updated = models.DateField(auto_now=True)\n"
     model_str += "\n    class Meta:\n        db_table = '{}s'\n".format(model_name.lower())
 
     return model_name, model_str
