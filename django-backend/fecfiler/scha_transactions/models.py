@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 

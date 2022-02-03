@@ -8,8 +8,12 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=SchATransaction)
 def log_post_save(sender, instance, created, **kwargs):
-    logger.info('Schedule A Transaction: %s was %s', instance.transaction_id, 'created' if created else 'updated')
+    id = instance.transaction_id
+    action = 'created' if created else 'updated'
+    logger.info('Schedule A Transaction: %s was %s', id, action)
+
 
 @receiver(post_delete, sender=SchATransaction)
 def log_post_delete(sender, instance, **kwargs):
-    logger.info('Schedule A Transaction: %s was deleted', instance.transaction_id)
+    id = instance.transaction_id
+    logger.info('Schedule A Transaction: %s was deleted', id)
