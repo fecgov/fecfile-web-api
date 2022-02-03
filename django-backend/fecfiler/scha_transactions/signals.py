@@ -13,6 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @receiver(post_save, sender=SchATransaction)
 def log_post_save(sender, instance, created, **kwargs):
     id = instance.transaction_id
