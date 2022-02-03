@@ -13,8 +13,8 @@ ORG_NAME = "fec-fecfileonline-prototyping"
 
 
 def _detect_prod(repo, branch):
-    """Deploy to production if master is checked out and tagged."""
-    if branch != 'master':
+    """Deploy to production if main branch is checked out and tagged."""
+    if branch != 'main':
         return False
     try:
         # Equivalent to `git describe --tags --exact-match`
@@ -47,7 +47,7 @@ def _detect_space(repo, branch=None):
     """
     space = _resolve_rule(repo, branch)
     if space is None:
-        print('No space detected')
+        print('The current configuration does not require a deployment to cloud.gov.')
         return None
     print('Detected space {space}'.format(**locals()))
     return space
