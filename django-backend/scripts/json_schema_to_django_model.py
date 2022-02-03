@@ -84,9 +84,6 @@ def parse_model(json_model): # noqa
         if key_name.endswith('_id') and key_name != '_id':
             print("WARNING: Possible ForeignKey {}".format(key_name))
 
-        # if key_attributes['type'] == 'array':
-        #     print("ERROR: Unsupported type array, skipping for field {}".format(key_name))
-
         if key_attributes['type'] == 'null':
             print("ERROR: Unsupported type null, skipping for field {}".format(key_name))
 
