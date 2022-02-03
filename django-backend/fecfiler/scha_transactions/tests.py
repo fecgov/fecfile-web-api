@@ -22,7 +22,7 @@ class SchATransactionTestCase(TestCase):
             filer_committee_id_number="C00123456",
             transaction_id="A56123456789-4567",
             entity_type="IND",
-            contributor_organization_name="John Smith & Co.",
+            contributor_organization_name="Some Org",
             contributor_first_name="John",
         )
 
@@ -31,7 +31,7 @@ class SchATransactionTestCase(TestCase):
             filer_committee_id_number="C00123456",
             transaction_id="A56123456789-del",
             entity_type="IND",
-            contributor_organization_name="John Smith & Co.",
+            contributor_organization_name="Group",
             contributor_first_name="John",
             contributor_last_name="Smith"
         )
