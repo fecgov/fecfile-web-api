@@ -1,1 +1,1 @@
-from .local import *  # noqa F401
+from .local import *  # NOSONAR # noqa F401, F403

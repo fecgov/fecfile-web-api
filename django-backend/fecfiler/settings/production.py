@@ -1,4 +1,4 @@
-from .base import *  # noqa F401, F403
+from .base import *  # NOSONAR # noqa F401, F403
 
 # These settings are used for all public environments:
 # dev, stage and production
