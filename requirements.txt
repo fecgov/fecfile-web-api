@@ -20,7 +20,7 @@ django-admin-shortcuts==2.0.0
 django-appconf==1.0.5
 django-bootstrap3==11.0.0
 django-compressor==3.1
-django-cors-headers==3.2.1
+django-cors-headers==3.11.0
 django-db-file-storage==0.5.3
 django-rest-swagger==2.2.0
 django-s3-upload==0.2.1

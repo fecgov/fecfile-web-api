@@ -6,7 +6,7 @@ applications:
   stack: cflinuxfs3
   buildpacks:
     - python_buildpack
-  memory: 512M
+  memory: 1G
   services:
     - fecfile-api-rds
   env:
