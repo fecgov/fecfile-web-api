@@ -70,8 +70,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'djangocms_admin_style',
-    'admin_shortcuts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,6 +85,7 @@ INSTALLED_APPS = [
     'fecfiler.forms',
     'db_file_storage',
 
+    'fecfiler.scha_transactions',
     'fecfiler.core',
     # 'fecfiler.form3x',
     'fecfiler.sched_A',

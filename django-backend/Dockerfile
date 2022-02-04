@@ -3,8 +3,6 @@ ENV PYTHONUNBUFFERED=1
 
 RUN mkdir /opt/nxg_fec
 WORKDIR /opt/nxg_fec
-# MacOS has trouble with these installs unless they're pulled out and run with these parameters
-RUN pip3 install Cython && pip3 install --no-binary :all: --no-use-pep517 numpy==1.17.2 && pip3 install pandas==0.25.1
 ADD requirements.txt /opt/nxg_fec/
 RUN pip3 install -r requirements.txt
 
