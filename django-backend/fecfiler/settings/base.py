@@ -152,6 +152,9 @@ DATABASES['default']['TEST'] = {
     'NAME': os.environ.get('FECFILE_TEST_DB_NAME', 'postgres')
 }
 
+# Connection string for connecting directly
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
