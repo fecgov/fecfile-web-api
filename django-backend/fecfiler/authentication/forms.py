@@ -5,7 +5,6 @@ from .models import Account
 
 
 class AccountCreationForm(UserCreationForm):
-
     class Meta:
         model = Account
         fields = ("username",)
@@ -15,6 +14,6 @@ class AccountCreationForm(UserCreationForm):
         if Account.objects.filter(username=username).count() == 0:
             return username
         raise forms.ValidationError(
-            self.error_messages['duplicate_username'],
-            code='duplicate_username',
+            self.error_messages["duplicate_username"],
+            code="duplicate_username",
         )

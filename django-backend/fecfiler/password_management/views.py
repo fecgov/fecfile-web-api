@@ -14,11 +14,21 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django_otp.oath import TOTP
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from fecfiler.authentication.auth_enum import Roles
 from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
-from fecfiler.settings import SECRET_KEY, JWT_PASSWORD_EXPIRY, API_LOGIN, API_PASSWORD, OTP_DISABLE
+from fecfiler.settings import (
+    SECRET_KEY,
+    JWT_PASSWORD_EXPIRY,
+    API_LOGIN,
+    API_PASSWORD,
+    OTP_DISABLE,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +37,7 @@ def find_account(cmte_id, personal_key, email):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s)
             AND personal_key = %s AND delete_ind !='Y' """
             cursor.execute(_sql, [cmte_id, email, personal_key])
             user_list = cursor.fetchone()
@@ -38,7 +48,9 @@ def find_account(cmte_id, personal_key, email):
             else:
                 return False
     except Exception as e:
-        logger.debug("exception occurred while checking if user was previously deleted", str(e))
+        logger.debug(
+            "exception occurred while checking if user was previously deleted", str(e)
+        )
         return False
 
 
@@ -66,7 +78,7 @@ def check_account_exist(cmte_id, email):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
+            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s)
             AND status ='Registered' AND delete_ind !='Y') t"""
             cursor.execute(_sql, [cmte_id, email])
             user_list = cursor.fetchone()
@@ -84,7 +96,7 @@ def check_register_account_exist(cmte_id, email):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
+            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s)
             AND status ='Pending' AND delete_ind !='Y') t"""
             cursor.execute(_sql, [cmte_id, email])
             user_list = cursor.fetchone()
@@ -113,9 +125,11 @@ def reset_code_counter(key):
 def reset_account_password(cmte_id, password, email):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET password = %s, status = %s WHERE cmtee_id = %s AND 
+            _sql = """UPDATE public.authentication_account SET password = %s, status = %s WHERE cmtee_id = %s AND
             email = %s AND delete_ind !='Y' """
-            cursor.execute(_sql, [make_password(password), "Registered", cmte_id, email])
+            cursor.execute(
+                _sql, [make_password(password), "Registered", cmte_id, email]
+            )
             if cursor.rowcount != 1:
                 raise Exception("Password was not reset.")
             else:
@@ -127,39 +141,49 @@ def reset_account_password(cmte_id, password, email):
 
 def token_verification(request):
     try:
-        token_received = request.headers['token']
+        token_received = request.headers["token"]
         payload = verify_token(token_received)
         return payload
     except Exception as e:
-        logger.debug("exception occurred while generating token for email option.", str(e))
+        logger.debug(
+            "exception occurred while generating token for email option.", str(e)
+        )
         raise e
 
 
 def create_jwt_token(email, cmte_id):
     now = int(time.time())
-    token = jwt.encode({
-        'email': email,
-        'committee_id': cmte_id,
-        'exp': now + JWT_PASSWORD_EXPIRY
-    }, SECRET_KEY, algorithm='HS256').decode('utf-8')
+    token = jwt.encode(
+        {"email": email, "committee_id": cmte_id, "exp": now + JWT_PASSWORD_EXPIRY},
+        SECRET_KEY,
+        algorithm="HS256",
+    ).decode("utf-8")
     return token
 
 
 def create_password_jwt_token(email, cmte_id):
     now = int(time.time())
-    token = jwt.encode({
-        'email': email,
-        'committee_id': cmte_id,
-        '2fVerified': True,
-        'exp': now + JWT_PASSWORD_EXPIRY
-    }, SECRET_KEY, algorithm='HS256').decode('utf-8')
+    token = jwt.encode(
+        {
+            "email": email,
+            "committee_id": cmte_id,
+            "2fVerified": True,
+            "exp": now + JWT_PASSWORD_EXPIRY,
+        },
+        SECRET_KEY,
+        algorithm="HS256",
+    ).decode("utf-8")
     return token
 
 
 def verify_token(token_received):
-    options = {'verify_exp': True,  # Skipping expiration date check
-               'verify_aud': False}  # Skipping audience check
-    payload = jwt.decode(token_received, key=SECRET_KEY, algorithms='HS256', options=options)
+    options = {
+        "verify_exp": True,  # Skipping expiration date check
+        "verify_aud": False,
+    }  # Skipping audience check
+    payload = jwt.decode(
+        token_received, key=SECRET_KEY, algorithms="HS256", options=options
+    )
     return payload
 
 
@@ -194,66 +218,64 @@ def send_email(token_val, email):
         "at (202) 694-1307. "
     )
 
-    data['token'] = token_val
+    data["token"] = token_val
 
-    BODY_HTML = render_to_string('forgot_password.html', {'data': data})
+    BODY_HTML = render_to_string("forgot_password.html", {"data": data})
 
     # The character encoding for the email.
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses', region_name='us-east-1')
+    client = boto3.client("ses", region_name="us-east-1")
 
     # Send the email.
     try:
         # Provide the contents of the email.
         response = client.send_email(
             Destination={
-                'ToAddresses':
-                    RECIPIENT,
-
+                "ToAddresses": RECIPIENT,
             },
             Message={
-                'Body': {
-                    'Html': {
-                        'Charset': CHARSET,
-                        'Data': BODY_HTML,
+                "Body": {
+                    "Html": {
+                        "Charset": CHARSET,
+                        "Data": BODY_HTML,
                     },
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': BODY_TEXT,
+                    "Text": {
+                        "Charset": CHARSET,
+                        "Data": BODY_TEXT,
                     },
                 },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': SUBJECT,
+                "Subject": {
+                    "Charset": CHARSET,
+                    "Data": SUBJECT,
                 },
             },
             Source=SENDER,
-
         )
     # Display an error if something goes wrong.
     except ClientError as e:
-        print(e.response['Error']['Message'])
+        print(e.response["Error"]["Message"])
 
 
 def send_text(token_val, phone_no):
     try:
 
-        token_val_formatted = "{:s}".format('\u0332'.join(token_val))
+        token_val_formatted = "{:s}".format("\u0332".join(token_val))
         client = CallfireClient(API_LOGIN, API_PASSWORD)
         response = client.texts.sendTexts(
-
             body=[
                 {
-                    'phoneNumber': phone_no,
-                    'message': 'From the Federal Election Commission: The one-time code you requested is ' + token_val + '.Please use this code to login. '
+                    "phoneNumber": phone_no,
+                    "message": "From the Federal Election Commission: The one-time code you requested is "
+                    + token_val
+                    + ".Please use this code to login. ",
                 }
             ]
         ).result()
         print(response)
     except Exception as e:
-        print(e.response['Error']['Message'])
+        print(e.response["Error"]["Message"])
 
 
 def send_call(token_val, phone_no):
@@ -261,21 +283,26 @@ def send_call(token_val, phone_no):
         token_formatted_val = " ,".join(token_val)
         client = CallfireClient(API_LOGIN, API_PASSWORD)
         response = client.calls.sendCalls(
-
-            defaultVoice='FEMALE1',
-
+            defaultVoice="FEMALE1",
             body=[
                 {
-                    'phoneNumber': phone_no,
-                    'liveMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ' , , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .',
-                    'machineMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ', , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .'
+                    "phoneNumber": phone_no,
+                    "liveMessage": "From the Federal Election Commission: The one-time code you requested is "
+                    + token_formatted_val
+                    + " , , , .Please use this code to login. Again the code is ,, "
+                    + token_formatted_val
+                    + ", .",
+                    "machineMessage": "From the Federal Election Commission: The one-time code you requested is "
+                    + token_formatted_val
+                    + ", , , .Please use this code to login. Again the code is ,, "
+                    + token_formatted_val
+                    + ", .",
                 }
-            ]
-
+            ],
         ).result()
         print(response)
     except Exception as e:
-        print(e.response['Error']['Message'])
+        print(e.response["Error"]["Message"])
 
 
 @api_view(["POST"])
@@ -286,8 +313,8 @@ def authenticate_password(request):
 
         try:
             data = request.data
-            cmte_id = data.get('committee_id', None)
-            email = data.get('email', None)
+            cmte_id = data.get("committee_id", None)
+            email = data.get("email", None)
             is_allowed = False
 
             list_mandatory_fields = ["committee_id", "email"]
@@ -296,25 +323,36 @@ def authenticate_password(request):
             user_list = check_account_exist(cmte_id, email)
 
             if user_list is None:
-                response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                            'email': email}
+                response = {
+                    "is_allowed": is_allowed,
+                    "committee_id": cmte_id,
+                    "email": email,
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-            elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed,
-                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+            elif user_list["role"] == Roles.C_ADMIN.value:
+                response = {
+                    "is_allowed": is_allowed,
+                    "message": "Not allowed to change password.Please use EFO to update/change password.",
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             else:
                 is_allowed = True
 
                 token = create_jwt_token(email, cmte_id)
-                response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                            'email': email, 'token': token}
+                response = {
+                    "is_allowed": is_allowed,
+                    "committee_id": cmte_id,
+                    "email": email,
+                    "token": token,
+                }
 
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while getting account information", str(e))
-            json_result = {'message': str(e)}
-            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            json_result = {"message": str(e)}
+            return JsonResponse(
+                json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+            )
 
 
 @api_view(["POST"])
@@ -323,24 +361,27 @@ def authenticate_password(request):
 def reset_options_password(request):
     if request.method == "POST":
 
-        if request.data.get("id") == 'EMAIL':
+        if request.data.get("id") == "EMAIL":
             try:
                 is_allowed = False
                 payload = token_verification(request)
-                cmte_id = payload.get('committee_id', None)
-                email = payload.get('email', None)
+                cmte_id = payload.get("committee_id", None)
+                email = payload.get("email", None)
                 data = {"committee_id": cmte_id, "email": email}
                 api_cal_from = request.data.get("call_from")
 
                 list_mandatory_fields = ["committee_id", "email"]
                 check_madatory_field(data, list_mandatory_fields)
-                if check_null_value(api_cal_from) and api_cal_from.upper() == 'REGISTRATION':
+                if (
+                    check_null_value(api_cal_from)
+                    and api_cal_from.upper() == "REGISTRATION"
+                ):
                     user_list = check_register_account_exist(cmte_id, email)
                 else:
                     user_list = check_account_exist(cmte_id, email)
 
                 if user_list is None:
-                    response = {'is_allowed': is_allowed}
+                    response = {"is_allowed": is_allowed}
                     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
                 username = user_list["username"]
@@ -353,35 +394,48 @@ def reset_options_password(request):
                 if is_allowed and not OTP_DISABLE:
                     send_email(token_val, email)
 
-                response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                            'email': email}
+                response = {
+                    "is_allowed": is_allowed,
+                    "committee_id": cmte_id,
+                    "email": email,
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug("exception occurred while generating token for email option.", str(e))
-                json_result = {'is_allowed': False}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                logger.debug(
+                    "exception occurred while generating token for email option.",
+                    str(e),
+                )
+                json_result = {"is_allowed": False}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
-        elif request.data.get("id") == 'TEXT' or request.data.get("id") == 'CALL':
+        elif request.data.get("id") == "TEXT" or request.data.get("id") == "CALL":
             try:
                 is_allowed = False
                 payload = token_verification(request)
-                cmte_id = payload.get('committee_id', None)
-                email = payload.get('email', None)
+                cmte_id = payload.get("committee_id", None)
+                email = payload.get("email", None)
                 data = {"committee_id": cmte_id, "email": email}
                 api_cal_from = request.data.get("call_from")
 
                 list_mandatory_fields = ["committee_id", "email"]
                 check_madatory_field(data, list_mandatory_fields)
-                if check_null_value(api_cal_from) and api_cal_from.upper() == 'REGISTRATION':
+                if (
+                    check_null_value(api_cal_from)
+                    and api_cal_from.upper() == "REGISTRATION"
+                ):
                     user_list = check_register_account_exist(cmte_id, email)
                 else:
                     user_list = check_account_exist(cmte_id, email)
 
                 if user_list is None:
-                    response = {'is_allowed': is_allowed}
+                    response = {"is_allowed": is_allowed}
                     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-                elif user_list is not None and not check_null_value(user_list["contact"]):
-                    response = {'is_allowed': is_allowed}
+                elif user_list is not None and not check_null_value(
+                    user_list["contact"]
+                ):
+                    response = {"is_allowed": is_allowed}
                     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
                 username = user_list["username"]
@@ -391,23 +445,32 @@ def reset_options_password(request):
                     is_allowed = True
 
                 if is_allowed and not OTP_DISABLE:
-                    if request.data.get("id") == 'TEXT':
+                    if request.data.get("id") == "TEXT":
                         send_text(token_val, user_list["contact"])
 
-                    elif request.data.get("id") == 'CALL':
+                    elif request.data.get("id") == "CALL":
                         send_call(token_val, user_list["contact"])
 
-                response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                            'email': email}
+                response = {
+                    "is_allowed": is_allowed,
+                    "committee_id": cmte_id,
+                    "email": email,
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug("exception occurred while getting account information", str(e))
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                logger.debug(
+                    "exception occurred while getting account information", str(e)
+                )
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
         else:
-            json_result = {'message': "Please select proper option."}
-            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            json_result = {"message": "Please select proper option."}
+            return JsonResponse(
+                json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+            )
 
 
 @api_view(["POST"])
@@ -418,11 +481,11 @@ def code_verify_password(request):
 
         try:
             is_allowed = False
-            token = ''
-            code = request.data.get('code', None)
+            token = ""
+            code = request.data.get("code", None)
             payload = token_verification(request)
-            cmte_id = payload.get('committee_id', None)
-            email = payload.get('email', None)
+            cmte_id = payload.get("committee_id", None)
+            email = payload.get("email", None)
             data = {"committee_id": cmte_id, "email": email, "code": code}
 
             list_mandatory_fields = ["committee_id", "email", "code"]
@@ -431,11 +494,13 @@ def code_verify_password(request):
 
             if user_list is None:
                 is_allowed = False
-                response = {'is_allowed': is_allowed}
+                response = {"is_allowed": is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-            elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed,
-                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+            elif user_list["role"] == Roles.C_ADMIN.value:
+                response = {
+                    "is_allowed": is_allowed,
+                    "message": "Not allowed to change password.Please use EFO to update/change password.",
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
             username = user_list["username"]
@@ -449,13 +514,19 @@ def code_verify_password(request):
                 reset_code_counter(key)
                 token = create_password_jwt_token(email, cmte_id)
 
-            response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                        'email': email, 'token': token}
+            response = {
+                "is_allowed": is_allowed,
+                "committee_id": cmte_id,
+                "email": email,
+                "token": token,
+            }
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while verifying code", str(e))
-            json_result = {'is_allowed': False}
-            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            json_result = {"is_allowed": False}
+            return JsonResponse(
+                json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+            )
 
 
 @api_view(["POST"])
@@ -465,12 +536,17 @@ def reset_password(request):
     if request.method == "POST":
         try:
             password_reset = False
-            password = request.data.get('password', None)
+            password = request.data.get("password", None)
             payload = token_verification(request)
-            cmte_id = payload.get('committee_id', None)
-            email = payload.get('email', None)
-            two_factor = payload.get('2fVerified', None)
-            data = {"committee_id": cmte_id, "email": email, "password": password, "verified": two_factor}
+            cmte_id = payload.get("committee_id", None)
+            email = payload.get("email", None)
+            two_factor = payload.get("2fVerified", None)
+            data = {
+                "committee_id": cmte_id,
+                "email": email,
+                "password": password,
+                "verified": two_factor,
+            }
 
             list_mandatory_fields = ["committee_id", "password", "email", "verified"]
             check_madatory_field(data, list_mandatory_fields)
@@ -478,31 +554,35 @@ def reset_password(request):
 
             if not two_factor:
                 is_allowed = False
-                response = {'is_allowed': is_allowed}
+                response = {"is_allowed": is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist is None:
                 is_allowed = False
-                response = {'is_allowed': is_allowed}
+                response = {"is_allowed": is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-            if account_exist['role'] == Roles.C_ADMIN.value:
-                response = {'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+            if account_exist["role"] == Roles.C_ADMIN.value:
+                response = {
+                    "message": "Not allowed to change password.Please use EFO to update/change password."
+                }
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist:
                 password_reset = reset_account_password(cmte_id, password, email)
 
-            response = {'password_reset': password_reset}
+            response = {"password_reset": password_reset}
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while getting account information", str(e))
-            json_result = {'message': "Password Reset was not successful."}
-            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            json_result = {"message": "Password Reset was not successful."}
+            return JsonResponse(
+                json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+            )
 
 
 def treasurer_encrypted_password(cmte_id):
     try:
         with connection.cursor() as cursor:
             # get treasurer password and use it in submission process
-            _sql = """Select password from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) 
+            _sql = """Select password from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s)
                         AND delete_ind !='Y' """
             cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
             treasurer_password = cursor.fetchone()[0]

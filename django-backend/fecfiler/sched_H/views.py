@@ -28,11 +28,9 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
-
     check_calendar_year,
     get_comittee_id,
-    update_F3X
-
+    update_F3X,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -100,7 +98,7 @@ Method of Allocation for:
 - Allocated Exempt Party Activity Costs (Party Committees Only)
 - Allocated Public Communications that Refer to any Political Party (but not
 a candidate) (Separate Segregated Funds and Nonconnected Committees
-Only) 
+Only)
 """
 
 
@@ -132,7 +130,7 @@ def schedH1_sql_dict(data):
         )
         # print(datum)
         return datum
-    except:
+    except BaseException:
         raise Exception("invalid h1 request data.")
 
 
@@ -151,7 +149,7 @@ def check_mandatory_fields_SH1(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -160,22 +158,22 @@ def put_sql_schedH1(data):
     sql and db_transaction for update sched_h1 item
     """
     _sql = """UPDATE public.sched_h1
-                SET 
-                line_number = %s, 
-                transaction_type_identifier = %s, 
-                transaction_type = %s, 
-                presidential_only = %s, 
-                presidential_and_senate = %s, 
-                senate_only = %s, 
-                non_pres_and_non_senate = %s, 
-                federal_percent = %s, 
-                non_federal_percent = %s, 
+                SET
+                line_number = %s,
+                transaction_type_identifier = %s,
+                transaction_type = %s,
+                presidential_only = %s,
+                presidential_and_senate = %s,
+                senate_only = %s,
+                non_pres_and_non_senate = %s,
+                federal_percent = %s,
+                non_federal_percent = %s,
                 election_year = %s,
                 administrative = %s,
-                generic_voter_drive = %s, 
+                generic_voter_drive = %s,
                 public_communications = %s,
                 last_update_date = %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -217,7 +215,7 @@ def put_schedH1(data):
                 "The put_sql_schedH3 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -286,19 +284,19 @@ def post_sql_schedH1(data):
             transaction_type_identifier,
             transaction_type,
             transaction_id,
-            presidential_only, 
-            presidential_and_senate, 
-            senate_only, 
-            non_pres_and_non_senate, 
-            federal_percent, 
-            non_federal_percent, 
+            presidential_only,
+            presidential_and_senate,
+            senate_only,
+            non_pres_and_non_senate,
+            federal_percent,
+            non_federal_percent,
             election_year,
             administrative,
-            generic_voter_drive, 
+            generic_voter_drive,
             public_communications,
             create_date
             )
-        VALUES ({}); 
+        VALUES ({});
         """.format(
             ",".join(["%s"] * 17)
         )
@@ -345,7 +343,7 @@ def post_schedH1(data):
                 "The post_sql_schedH1 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -363,7 +361,7 @@ def get_schedH1(data):
         else:
             forms_obj = get_list_all_schedH1(report_id, cmte_id)
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -383,15 +381,15 @@ def get_list_all_schedH1(report_id, cmte_id):
             transaction_type_identifier,
             transaction_type,
             transaction_id,
-            presidential_only, 
-            presidential_and_senate, 
-            senate_only, 
-            non_pres_and_non_senate, 
-            federal_percent, 
-            non_federal_percent, 
+            presidential_only,
+            presidential_and_senate,
+            senate_only,
+            non_pres_and_non_senate,
+            federal_percent,
+            non_federal_percent,
             election_year,
             administrative,
-            generic_voter_drive, 
+            generic_voter_drive,
             public_communications,
             create_date ,
             last_update_date
@@ -429,15 +427,15 @@ def get_list_schedH1(report_id, cmte_id, transaction_id):
             transaction_type_identifier,
             transaction_type,
             transaction_id,
-            presidential_only, 
-            presidential_and_senate, 
-            senate_only, 
-            non_pres_and_non_senate, 
-            federal_percent, 
-            non_federal_percent, 
+            presidential_only,
+            presidential_and_senate,
+            senate_only,
+            non_pres_and_non_senate,
+            federal_percent,
+            non_federal_percent,
             election_year,
             administrative,
-            generic_voter_drive, 
+            generic_voter_drive,
             public_communications,
             create_date ,
             last_update_date
@@ -467,7 +465,7 @@ def delete_sql_schedH1(cmte_id, report_id, transaction_id):
     """
     _sql = """
     UPDATE public.sched_h1
-    SET delete_ind = 'Y' 
+    SET delete_ind = 'Y'
     WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
     """
     _v = (transaction_id, report_id, cmte_id)
@@ -518,7 +516,7 @@ def schedH1(request):
                     datum["public_communications"] = True
 
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -542,7 +540,7 @@ def schedH1(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                        request.query_params.get("report_id")
+                    request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -550,7 +548,7 @@ def schedH1(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                        request.query_params.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -574,13 +572,13 @@ def schedH1(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -605,7 +603,7 @@ def schedH1(request):
                 cmte_id = get_comittee_id(request.user.username)
                 datum = schedH1_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -649,7 +647,7 @@ def schedH1(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -675,8 +673,8 @@ def validate_h1_h2_exist(request):
         if activity_event_type in ["DF", "DC"]:  # event-based, goes to h2
             _sql = """
             select count(*)
-            from public.sched_h2 
-            where cmte_id = %s 
+            from public.sched_h2
+            where cmte_id = %s
             and report_id = %s
             and delete_ind is distinct from 'Y'
             """
@@ -789,7 +787,7 @@ def validate_h1_h2_exist(request):
         # else:
         #     new_aggregate_amount = aggregate_amount
         return JsonResponse({"count": _count}, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -824,7 +822,7 @@ def validate_pac_h1(request):
                 _count = int(cursor.fetchone()[0])
                 _result.update({_event_type: _count})
         return JsonResponse(_result, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -845,7 +843,7 @@ def get_old_amount(transaction_id):
                 row_data = cursor.fetchone()
                 return row_data[0], row_data[1]
             return 0
-    except:
+    except BaseException:
         raise
 
 
@@ -866,7 +864,7 @@ def get_fed_nonfed_share(request):
     calculate fed and non-fed share based on ratio and update aggregate value
 
     update 20191112: 'election year' added to table - calendar year will match to
-    election_year in db. 
+    election_year in db.
     """
 
     logger.debug("get_fed_nonfed_share with request:{}".format(request.query_params))
@@ -917,9 +915,9 @@ def get_fed_nonfed_share(request):
 
         if event_name:  # event-based, goes to h2
             _sql = """
-            select federal_percent 
-            from public.sched_h2 
-            where cmte_id = %s 
+            select federal_percent
+            from public.sched_h2
+            where cmte_id = %s
             and report_id = %s
             and activity_event_name = %s
             and delete_ind is distinct from 'Y'
@@ -940,7 +938,7 @@ def get_fed_nonfed_share(request):
             # for esiting, just grab the aggregation amount
             if transaction_id:
                 _sql = """
-                select {} 
+                select {}
                 from {}
                 where transaction_id = %s
                 """.format(
@@ -954,7 +952,7 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             elif back_ref_transaction_id:
                 _sql = """
-                select {} 
+                select {}
                 from {}
                 where transaction_id = %s
                 """.format(
@@ -968,9 +966,9 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             else:
                 _sql = """
-                select {} 
-                from {} 
-                where cmte_id = %s 
+                select {}
+                from {}
+                where cmte_id = %s
                 and {} = %s
                 and create_date between %s and %s
                 and delete_ind is distinct from 'Y'
@@ -1001,7 +999,7 @@ def get_fed_nonfed_share(request):
                 # order by create_date desc, last_update_date desc
                 # """
                 _sql = """
-                select federal_percent 
+                select federal_percent
                 from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
@@ -1046,8 +1044,8 @@ def get_fed_nonfed_share(request):
 
             if transaction_id:
                 _sql = """
-                select {} 
-                from {} 
+                select {}
+                from {}
                 where transaction_id = %s
                 """.format(
                     f_ytd, tran_tbl
@@ -1060,8 +1058,8 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             elif back_ref_transaction_id:
                 _sql = """
-                select {} 
-                from {} 
+                select {}
+                from {}
                 where transaction_id = %s
                 """.format(
                     f_ytd, tran_tbl
@@ -1074,9 +1072,9 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             else:
                 _sql = """
-                select {} 
-                from {} 
-                where cmte_id = %s 
+                select {}
+                from {}
+                where cmte_id = %s
                 and activity_event_type = %s
                 and expenditure_date between %s and %s
                 and delete_ind is distinct from 'Y'
@@ -1113,7 +1111,7 @@ def get_fed_nonfed_share(request):
             },
             status=status.HTTP_200_OK,
         )
-    except:
+    except BaseException:
         raise
 
 
@@ -1130,8 +1128,8 @@ def get_h1_percentage(request):
         # raise Exception ('Missing Input: report_id is mandatory')
 
         if not (
-                "calendar_year" in request.query_params
-                and check_null_value(request.query_params.get("calendar_year"))
+            "calendar_year" in request.query_params
+            and check_null_value(request.query_params.get("calendar_year"))
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
@@ -1156,13 +1154,13 @@ def get_h1_percentage(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         return JsonResponse(json_data[0], status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
 """
 SCHED_H2:
-Ratios for Allocable Fundraising Events and Direct Candidate Support 
+Ratios for Allocable Fundraising Events and Direct Candidate Support
 """
 
 
@@ -1191,7 +1189,7 @@ def schedH2_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         return datum
-    except:
+    except BaseException:
         raise Exception("invalid h2 request data.")
 
 
@@ -1210,7 +1208,7 @@ def check_mandatory_fields_SH2(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -1219,9 +1217,9 @@ def put_sql_schedH2(data):
     sql and db_transaction for update sched_h1 item
     """
     _sql = """UPDATE public.sched_h2
-            SET 
-                line_number = %s, 
-                transaction_type_identifier = %s, 
+            SET
+                line_number = %s,
+                transaction_type_identifier = %s,
                 transaction_type = %s,
                 activity_event_name = %s,
                 fundraising = %s,
@@ -1231,7 +1229,7 @@ def put_sql_schedH2(data):
                 federal_percent = %s,
                 non_federal_percent = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -1258,7 +1256,7 @@ def put_schedH2(data):
     """
     save/update a sched_h2 item
 
-    here we are assuming entity_id are always 
+    here we are assuming entity_id are always
     referencing something already in our DB
     """
     try:
@@ -1272,7 +1270,7 @@ def put_schedH2(data):
                 "The put_sql_schedH2 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -1306,7 +1304,7 @@ def post_sql_schedH2(data):
             non_federal_percent,
             create_date
             )
-        VALUES ({}); 
+        VALUES ({});
         """.format(
             ",".join(["%s"] * 14)
         )
@@ -1349,7 +1347,7 @@ def post_schedH2(data):
                 "The post_sql_schedH2 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -1367,7 +1365,7 @@ def get_schedH2(data):
         else:
             forms_obj = get_list_all_schedH2(report_id, cmte_id)
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -1430,10 +1428,10 @@ def get_list_schedH2(report_id, cmte_id, transaction_id):
             transaction_type,
             transaction_id,
             activity_event_name,
-            ( CASE fundraising 
-            WHEN true THEN 'fundraising' 
-            ELSE 'direct_cand_suppot' 
-            END )  AS event_type, 
+            ( CASE fundraising
+            WHEN true THEN 'fundraising'
+            ELSE 'direct_cand_suppot'
+            END )  AS event_type,
             fundraising,
             direct_cand_support,
             ratio_code,
@@ -1468,7 +1466,7 @@ def delete_sql_schedH2(cmte_id, report_id, transaction_id):
     """
     _sql = """
     UPDATE public.sched_h2
-    SET delete_ind = 'Y' 
+    SET delete_ind = 'Y'
     WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
     """
     _v = (transaction_id, report_id, cmte_id)
@@ -1490,7 +1488,7 @@ def delete_schedH2(data):
 @api_view(["GET"])
 def get_h2_type_events(request):
     """
-    load all event names for each category(direct cand support or 
+    load all event names for each category(direct cand support or
     fundraising) to populate events dropdown list
     """
     logger.debug("get_h2_type_events with request:{}".format(request.query_params))
@@ -1502,8 +1500,8 @@ def get_h2_type_events(request):
     if event_type == "fundraising":
         _sql = """
         SELECT json_agg(t) from (
-        SELECT activity_event_name 
-        FROM   public.sched_h2 
+        SELECT activity_event_name
+        FROM   public.sched_h2
         WHERE  cmte_id = %s
         AND report_id = %s
         AND fundraising = true
@@ -1512,9 +1510,9 @@ def get_h2_type_events(request):
     else:
         _sql = """
         SELECT json_agg(t) from(
-        SELECT activity_event_name 
-        FROM   public.sched_h2 
-        WHERE  cmte_id = %s 
+        SELECT activity_event_name
+        FROM   public.sched_h2
+        WHERE  cmte_id = %s
         AND report_id = %s
         AND direct_cand_support = true
         AND delete_ind is distinct from 'Y') t
@@ -1531,7 +1529,7 @@ def get_h2_type_events(request):
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
         return Response(json_res, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -1539,7 +1537,7 @@ def is_new_report(report_id, cmte_id):
     """
     check if a report_id is new or not
     a report_id is new if:
-    1.  not exist in sched_h2 table 
+    1.  not exist in sched_h2 table
     2. and the cvg_date is newer than the most recent one
 
     TODO: may need to reconsider this
@@ -1549,19 +1547,19 @@ def is_new_report(report_id, cmte_id):
     # where report_id = %s and cmte_id = %s
     # """
     _sql = """
-        SELECT 1 AS seq, 
-            cvg_start_date 
-        FROM   PUBLIC.reports 
+        SELECT 1 AS seq,
+            cvg_start_date
+        FROM   PUBLIC.reports
         WHERE  report_id = %s
-        UNION 
-        SELECT 2 AS seq, 
-            Max(cvg_end_date) 
-        FROM   PUBLIC.reports r 
-            JOIN PUBLIC.sched_h2 sh 
-                ON r.report_id = sh.report_id 
-                    AND r.cmte_id = sh.cmte_id 
+        UNION
+        SELECT 2 AS seq,
+            Max(cvg_end_date)
+        FROM   PUBLIC.reports r
+            JOIN PUBLIC.sched_h2 sh
+                ON r.report_id = sh.report_id
+                    AND r.cmte_id = sh.cmte_id
                     AND r.cmte_id = %s
-        ORDER  BY seq 
+        ORDER  BY seq
     """
     try:
         with connection.cursor() as cursor:
@@ -1575,7 +1573,7 @@ def is_new_report(report_id, cmte_id):
                 if new_date and old_date and new_date > old_date:
                     return True
             return False
-    except:
+    except BaseException:
         raise
 
 
@@ -1608,14 +1606,14 @@ def do_h2_carryover(report_id, cmte_id):
                     )
                     SELECT
                     h.cmte_id,
-                    %s, 
+                    %s,
                     h.line_number,
-                    h.transaction_type_identifier, 
+                    h.transaction_type_identifier,
                     h.transaction_type,
-                    get_next_transaction_id('SH'), 
+                    get_next_transaction_id('SH'),
                     h.activity_event_name,
                     h.fundraising,
-                    h.direct_cand_support, 
+                    h.direct_cand_support,
                     's',
                     h.revise_date,
                     h.federal_percent,
@@ -1624,7 +1622,7 @@ def do_h2_carryover(report_id, cmte_id):
                     h.create_date,
                     now()
             FROM public.sched_h2 h, public.reports r
-            WHERE 
+            WHERE
             h.cmte_id = %s
             AND h.report_id != %s
             AND h.report_id = r.report_id
@@ -1647,7 +1645,7 @@ def do_h2_carryover(report_id, cmte_id):
                 logger.debug("No valid h2 items found.")
             logger.debug("h2 carryover done with report_id {}".format(report_id))
             logger.debug("total carryover h2 items:{}".format(cursor.rowcount))
-    except:
+    except BaseException:
         raise
 
 
@@ -1665,51 +1663,51 @@ def get_h2_summary_table(request):
     logger.debug("get_h2_summary_table with request:{}".format(request.query_params))
     _sql = """
     SELECT json_agg(t) from(
-    SELECT activity_event_name, 
-        ( CASE fundraising 
-            WHEN true THEN 'fundraising' 
-            ELSE 'direct_cand_suppot' 
-            END )  AS event_type, 
-        revise_date AS receipt_date, 
-        ratio_code, 
-        federal_percent, 
+    SELECT activity_event_name,
+        ( CASE fundraising
+            WHEN true THEN 'fundraising'
+            ELSE 'direct_cand_suppot'
+            END )  AS event_type,
+        revise_date AS receipt_date,
+        ratio_code,
+        federal_percent,
         non_federal_percent,
         transaction_id
-    FROM   public.sched_h2 
+    FROM   public.sched_h2
     WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
-            SELECT activity_event_identifier 
-            FROM   public.sched_h4 
+            SELECT activity_event_identifier
+            FROM   public.sched_h4
             WHERE  report_id = %s
             AND cmte_id = %s)
-    UNION SELECT activity_event_name, 
-        ( CASE fundraising 
-            WHEN true THEN 'fundraising' 
-            ELSE 'direct_cand_suppot' 
-            END )  AS event_type, 
-        revise_date AS receipt_date, 
-        ratio_code, 
-        federal_percent, 
+    UNION SELECT activity_event_name,
+        ( CASE fundraising
+            WHEN true THEN 'fundraising'
+            ELSE 'direct_cand_suppot'
+            END )  AS event_type,
+        revise_date AS receipt_date,
+        ratio_code,
+        federal_percent,
         non_federal_percent,
         transaction_id
-    FROM   public.sched_h2 
+    FROM   public.sched_h2
     WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
-            SELECT activity_event_name 
-            FROM   public.sched_h3 
+            SELECT activity_event_name
+            FROM   public.sched_h3
             WHERE  report_id = %s
             AND cmte_id = %s)
-    UNION SELECT activity_event_name, 
-        ( CASE fundraising 
-            WHEN true THEN 'fundraising' 
-            ELSE 'direct_cand_suppot' 
-            END )  AS event_type, 
-        revise_date AS receipt_date, 
-        ratio_code, 
-        federal_percent, 
+    UNION SELECT activity_event_name,
+        ( CASE fundraising
+            WHEN true THEN 'fundraising'
+            ELSE 'direct_cand_suppot'
+            END )  AS event_type,
+        revise_date AS receipt_date,
+        ratio_code,
+        federal_percent,
         non_federal_percent,
-        transaction_id 
-    FROM   public.sched_h2 
+        transaction_id
+    FROM   public.sched_h2
     WHERE  cmte_id = %s AND report_id = %s AND ratio_code = 'n' AND delete_ind is distinct from 'Y'
             ) t;
     """
@@ -1772,24 +1770,23 @@ def get_h2_summary_table(request):
                 _rec["trashable"] = False
                 if _rec["ratio_code"] == "n":
                     if (
-                            count_h2_transactions(
-                                cmte_id, report_id, _rec["activity_event_name"]
-                            )
-                            == 0
+                        count_h2_transactions(
+                            cmte_id, report_id, _rec["activity_event_name"]
+                        )
+                        == 0
                     ):
                         _rec["trashable"] = True
                 # else:
                 #     _rec['trashable'] - False
 
                 # 'Error: no valid h2 data found for this report.')
-        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
-        # start_dt = datetime.date(int(calendar_year), 1, 1)
-        # end_dt = datetime.date(int(calendar_year), 12, 31)
+            # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+            # start_dt = datetime.date(int(calendar_year), 1, 1)
+            # end_dt = datetime.date(int(calendar_year), 12, 31)
 
+            # : insert pagination functionality
 
-# : insert pagination functionality
-
-            '''total_count = len(json_res)
+            """total_count = len(json_res)
             paginator = Paginator(json_res, itemsperpage)
             if paginator.num_pages < page_num:
                 page_num = paginator.num_pages
@@ -1801,11 +1798,13 @@ def get_h2_summary_table(request):
                 "pageNumber": page_num,
                 "totalPages": paginator.num_pages,
             }
-            '''
+            """
             json_result = get_pagination_dataset(json_res, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
+
+
 #: get the paginator page with other details like
 
 
@@ -1848,10 +1847,10 @@ def count_h2_transactions(cmte_id, report_id, activity_event_name):
     helpfer function for counting current h2 assoicated transactions
     """
     _sql = """
-    select count(*) 
-    from all_other_transactions_view 
+    select count(*)
+    from all_other_transactions_view
     where activity_event_identifier = %s
-    and cmte_id = %s 
+    and cmte_id = %s
     and report_id = %s
     and delete_ind is distinct from 'Y'
     """
@@ -1864,7 +1863,7 @@ def count_h2_transactions(cmte_id, report_id, activity_event_name):
             )
             cursor.execute(_sql, (activity_event_name, cmte_id, report_id))
             return int(cursor.fetchone()[0])
-    except:
+    except BaseException:
         raise
 
 
@@ -1923,7 +1922,7 @@ def schedH2(request):
                 check_if_activity_present(datum)
 
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -1946,7 +1945,7 @@ def schedH2(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                        request.query_params.get("report_id")
+                    request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -1954,7 +1953,7 @@ def schedH2(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                        request.query_params.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -1978,13 +1977,13 @@ def schedH2(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -2008,7 +2007,7 @@ def schedH2(request):
             try:
                 datum = schedH2_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -2034,7 +2033,7 @@ def schedH2(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2061,7 +2060,7 @@ def check_mandatory_fields_SH3(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -2087,11 +2086,12 @@ def schedH3_sql_dict(data):
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
-        valid_data["line_number"], valid_data[
-            "transaction_type"
-        ] = get_line_number_trans_type(data["transaction_type_identifier"])
+        (
+            valid_data["line_number"],
+            valid_data["transaction_type"],
+        ) = get_line_number_trans_type(data["transaction_type_identifier"])
         return valid_data
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -2100,14 +2100,14 @@ def update_h3_total_amount(data):
     update total amount for all transactions have the same parent_id
     """
     _sql = """
-    UPDATE sched_h3 
+    UPDATE sched_h3
     SET    total_amount_transferred = (
-        SELECT Sum(transferred_amount) 
-        FROM   sched_h3 
-        WHERE 
-              back_ref_transaction_id = %s) 
-    WHERE  ( back_ref_transaction_id = %s 
-          OR transaction_id = %s ) 
+        SELECT Sum(transferred_amount)
+        FROM   sched_h3
+        WHERE
+              back_ref_transaction_id = %s)
+    WHERE  ( back_ref_transaction_id = %s
+          OR transaction_id = %s )
     """
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
@@ -2134,17 +2134,17 @@ def put_schedH3(data):
             )
         # return get_schedH3(data)
         return data
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedH3(data):
     """
-    update a schedule_H3 item                    
+    update a schedule_H3 item
 
     """
     _sql = """UPDATE public.sched_h3
-              SET transaction_type_identifier = %s, 
+              SET transaction_type_identifier = %s,
                   back_ref_transaction_id = %s,
                   back_ref_sched_name = %s,
                   account_name = %s,
@@ -2158,7 +2158,7 @@ def put_sql_schedH3(data):
                   line_number = %s,
                   transaction_type = %s,
                   last_update_date = %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -2215,7 +2215,7 @@ def post_schedH3(data):
             )
         logger.debug("data saved successfully.")
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -2242,7 +2242,7 @@ def post_sql_schedH3(data):
             create_date ,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -2296,7 +2296,7 @@ def get_schedH3(data):
                     if child_list:
                         _obj["child"] = child_list
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -2328,7 +2328,7 @@ def get_child_schedH3(transaction_id, report_id, cmte_id):
             create_date ,
             last_update_date
             FROM public.sched_h3
-            WHERE report_id = %s 
+            WHERE report_id = %s
             AND cmte_id = %s
             AND back_ref_transaction_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -2454,7 +2454,7 @@ def delete_sql_schedH3(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_h3
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -2481,9 +2481,9 @@ def get_sched_h3_breakdown(request):
     """
     _sql = """
     SELECT json_agg(t) FROM(
-    SELECT activity_event_type, sum(transferred_amount) 
-    FROM public.sched_h3 
-    WHERE report_id = %s 
+    SELECT activity_event_type, sum(transferred_amount)
+    FROM public.sched_h3
+    WHERE report_id = %s
     AND cmte_id = %s
     AND back_ref_transaction_id is not null
     AND delete_ind is distinct from 'Y'
@@ -2529,16 +2529,16 @@ def get_sched_h3_breakdown(request):
 
 def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
     """
-    query and caclcualte event_type or event_name based on aggregate amount 
+    query and caclcualte event_type or event_name based on aggregate amount
     for current report
     """
 
     aggregate_dic = {}
     _sql = """
     SELECT json_agg(t) FROM(
-            SELECT activity_event_name as event, 
+            SELECT activity_event_name as event,
                    SUM(transferred_amount) as sum
-            FROM   public.sched_h3 
+            FROM   public.sched_h3
             WHERE  cmte_id = %s
                 AND report_id = %s
                 AND back_ref_transaction_id = %s
@@ -2565,22 +2565,22 @@ def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
                     back_ref_transaction_id,
                     cmte_id,
                     report_id,
-                    back_ref_transaction_id
-                ]
+                    back_ref_transaction_id,
+                ],
             )
             records = cursor.fetchone()[0]
             if records:
                 for _rec in records:
                     aggregate_dic[_rec["event"]] = _rec["sum"]
         return aggregate_dic
-    except:
+    except BaseException:
         raise
 
 
 @api_view(["GET"])
 def get_h3_account_names(request):
     """
-    get existing h3 account names so people can choose one for use 
+    get existing h3 account names so people can choose one for use
     """
     try:
         logger.debug("get_h3_account_names...")
@@ -2591,7 +2591,7 @@ def get_h3_account_names(request):
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """
-            SELECT json_agg(t) FROM ( 
+            SELECT json_agg(t) FROM (
             SELECT distinct account_name
             FROM public.sched_h3
             WHERE report_id = %s AND cmte_id = %s
@@ -2614,7 +2614,7 @@ def get_h3_account_names(request):
             #             _rec['aggregate_amount'] = 0
             #             # pass
             return Response(_sum, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -2628,11 +2628,11 @@ def get_h3_summary(request):
     2. add aggregate amount
     3. report_id based.
 
-    # TODO: what is gonna happen when people click edit button? 
+    # TODO: what is gonna happen when people click edit button?
     """
     try:
         logger.debug("get_h3_summary...")
-#: Insert pagination functionality
+        #: Insert pagination functionality
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
@@ -2666,7 +2666,7 @@ def get_h3_summary(request):
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """
-            SELECT json_agg(t) FROM ( 
+            SELECT json_agg(t) FROM (
                 SELECT
             cmte_id,
             report_id,
@@ -2686,7 +2686,7 @@ def get_h3_summary(request):
             create_date ,
             last_update_date
             FROM public.sched_h3
-            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s 
+            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s
             AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y'
             ) t
@@ -2701,7 +2701,7 @@ def get_h3_summary(request):
                     aggregate_dic = load_h3_aggregate_amount(
                         cmte_id, report_id, _rec.get("back_ref_transaction_id")
                     )
-                    if _rec["activity_event_name"] not in [None, '']:
+                    if _rec["activity_event_name"] not in [None, ""]:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
                         )
@@ -2714,7 +2714,7 @@ def get_h3_summary(request):
 
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -2735,7 +2735,7 @@ def get_h3_total_amount(request):
             _sql = """
             SELECT json_agg(t) from(
             SELECT sum(transferred_amount) as aggregate_amount
-            FROM   public.sched_h3 
+            FROM   public.sched_h3
             WHERE  cmte_id = %s
                 AND report_id = %s
                     AND activity_event_name = %s
@@ -2753,7 +2753,7 @@ def get_h3_total_amount(request):
             _sql = """
             SELECT json_agg(t) from(
             SELECT sum(transferred_amount) as aggregate_amount
-            FROM   public.sched_h3 
+            FROM   public.sched_h3
             WHERE  cmte_id = %s
             AND report_id = %s
                 AND activity_event_type = %s
@@ -2772,7 +2772,7 @@ def get_h3_total_amount(request):
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
         return Response(json_res[0], status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -2794,7 +2794,7 @@ def get_h3_aggregate_amount(request):
             _sql = """
             SELECT json_agg(t) from(
             SELECT sum(transferred_amount) as aggregate_amount
-            FROM   public.sched_h3 
+            FROM   public.sched_h3
             WHERE  cmte_id = %s
                 AND report_id = %s
                     AND activity_event_name = %s
@@ -2814,7 +2814,7 @@ def get_h3_aggregate_amount(request):
             _sql = """
             SELECT json_agg(t) from(
             SELECT sum(transferred_amount) as aggregate_amount
-            FROM   public.sched_h3 
+            FROM   public.sched_h3
             WHERE  cmte_id = %s
             AND report_id = %s
                 AND activity_event_type = %s
@@ -2833,21 +2833,21 @@ def get_h3_aggregate_amount(request):
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
         return Response(json_res[0], status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
 def get_amount_type(category):
-    category_val = ''
+    category_val = ""
 
     if check_null_value(category):
-        if category.lower() == 'voter_id':
+        if category.lower() == "voter_id":
             category_val = "SELECT sum(voter_id_amount) as aggregate_amount"
-        elif category.lower() == 'voter_registration':
+        elif category.lower() == "voter_registration":
             category_val = "SELECT sum(voter_registration_amount) as aggregate_amount"
-        elif category.lower() == 'generic_campaign':
+        elif category.lower() == "generic_campaign":
             category_val = "SELECT sum(generic_campaign_amount) as aggregate_amount"
-        elif category.lower() == 'gotv':
+        elif category.lower() == "gotv":
             category_val = "SELECT sum(gotv_amount) as aggregate_amount"
 
     return category_val
@@ -2864,19 +2864,25 @@ def get_h5_aggregate_amount(request):
         report_id = request.query_params.get("report_id")
         account_name = request.query_params.get("account_name")
         category = request.query_params.get("category")
-        logger.debug("get_h5_aggregate_amount with request:{}".format(request.query_params))
+        logger.debug(
+            "get_h5_aggregate_amount with request:{}".format(request.query_params)
+        )
 
         query_sql = get_amount_type(category)
 
-        if check_null_value(report_id) and check_null_value(account_name) and check_null_value(category):
+        if (
+            check_null_value(report_id)
+            and check_null_value(account_name)
+            and check_null_value(category)
+        ):
 
             _sql = """
             SELECT json_agg(t) from(
             """
             _sql += query_sql
 
-            _sql += """           
-            FROM   public.sched_h5 
+            _sql += """
+            FROM   public.sched_h5
             WHERE  cmte_id = %s
                 AND report_id = %s
                     AND account_name = %s
@@ -2893,7 +2899,7 @@ def get_h5_aggregate_amount(request):
 
         return Response(json_res[0], status=status.HTTP_200_OK)
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2967,7 +2973,7 @@ def schedH3(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                        request.query_params.get("report_id")
+                    request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -2975,7 +2981,7 @@ def schedH3(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                        request.query_params.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -3003,13 +3009,13 @@ def schedH3(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -3033,7 +3039,7 @@ def schedH3(request):
             try:
                 datum = schedH3_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -3058,7 +3064,9 @@ def schedH3(request):
                 # else:
                 data = put_schedH3(datum)
                 output = get_schedH3(data)
-                return JsonResponse(output[0], status=status.HTTP_201_CREATED, safe=False)
+                return JsonResponse(
+                    output[0], status=status.HTTP_201_CREATED, safe=False
+                )
             except Exception as e:
                 logger.debug(e)
                 return Response(
@@ -3066,7 +3074,7 @@ def schedH3(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -3075,7 +3083,7 @@ def schedH3(request):
 
 Disbursements for Allocated Federal/Nonfederal Activity
 some check points:
-1. when h4 activity is submitted, make sure an h1 or h2 is there to calcualte 
+1. when h4 activity is submitted, make sure an h1 or h2 is there to calcualte
    the fed and non-fed amount
 2. when a memo transaction is submitted, need to verify the parent transaction exist
 
@@ -3102,7 +3110,7 @@ def check_mandatory_fields_SH4(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -3167,7 +3175,7 @@ def schedH4_sql_dict(data):
         if "expenditure_purpose" in data:
             valid_data["purpose"] = data.get("expenditure_purpose", "")
         return valid_data
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -3186,7 +3194,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, _v)
             return cursor.fetchone()[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -3250,16 +3258,16 @@ def put_schedH4(data):
                 "The put_sql_schedH4 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedH4(data):
     """
-    update a schedule_H4 item                    
+    update a schedule_H4 item
     """
     _sql = """UPDATE public.sched_h4
-              SET transaction_type_identifier= %s, 
+              SET transaction_type_identifier= %s,
                   back_ref_transaction_id = %s,
                   back_ref_sched_name = %s,
                   payee_entity_id = %s,
@@ -3274,11 +3282,11 @@ def put_sql_schedH4(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
-                  line_number = %s, 
+                  line_number = %s,
                   transaction_type = %s,
                   aggregation_ind = %s,
                   last_update_date= %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y'
         """
     _v = (
@@ -3327,7 +3335,7 @@ def validate_fed_nonfed_share(data):
         if "," in str(data.get(_rec)):
             data[_rec] = data[_rec].replace(",", "")
     if float(data.get("fed_share_amount")) + float(
-            data.get("non_fed_share_amount")
+        data.get("non_fed_share_amount")
     ) != float(data.get("total_amount")):
         raise Exception(
             "Error: fed_amount and non_fed_amount should sum to total amount."
@@ -3357,16 +3365,16 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_amount, 
+            SELECT t1.total_amount,
                 t1.transaction_id,
                 t1.aggregation_ind
-            FROM public.sched_h4 t1 
-            WHERE activity_event_type = %s 
+            FROM public.sched_h4 t1
+            WHERE activity_event_type = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -3391,7 +3399,7 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
 
 
 def list_all_transactions_event_identifier(
-        start_dt, end_dt, activity_event_identifier, cmte_id
+    start_dt, end_dt, activity_event_identifier, cmte_id
 ):
     """
     load all transactions with the specified activity event type
@@ -3405,16 +3413,16 @@ def list_all_transactions_event_identifier(
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_amount, 
+            SELECT t1.total_amount,
                 t1.transaction_id,
                 t1.aggregation_ind
-            FROM public.sched_h4 t1 
-            WHERE activity_event_identifier = %s 
+            FROM public.sched_h4 t1
+            WHERE activity_event_identifier = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -3446,7 +3454,7 @@ def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
         with connection.cursor() as cursor:
             cursor.execute(
                 """ UPDATE public.sched_h4
-                    SET activity_event_amount_ytd = %s 
+                    SET activity_event_amount_ytd = %s
                     WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
                     """,
                 [aggregate_amount, transaction_id, cmte_id],
@@ -3463,15 +3471,15 @@ def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
 
 def list_all_sub_transaction(start_dt, end_dt, transaction_id, cmte_id):
     _sql = """
-                SELECT t1.activity_event_amount_ytd, 
+                SELECT t1.activity_event_amount_ytd,
                     t1.transaction_id,
                     t1.aggregation_ind
-                FROM public.sched_h4 t1 
+                FROM public.sched_h4 t1
                 WHERE cmte_id = %s
                 AND expenditure_date >= %s
-                AND expenditure_date <= %s 
+                AND expenditure_date <= %s
                 AND back_ref_transaction_id = %s
-                AND delete_ind is distinct FROM 'Y' 
+                AND delete_ind is distinct FROM 'Y'
                 ORDER BY expenditure_date ASC, create_date ASC
         """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -3527,7 +3535,12 @@ def update_activity_event_amount_ytd(data):
             if transaction[2] != "N":
                 aggregate_amount += transaction[0]
             transaction_id = transaction[1]
-            list_sub_transaction = list_all_sub_transaction(aggregate_start_date, aggregate_end_date, transaction_id, data.get("cmte_id"))
+            list_sub_transaction = list_all_sub_transaction(
+                aggregate_start_date,
+                aggregate_end_date,
+                transaction_id,
+                data.get("cmte_id"),
+            )
             for sub_transaction in list_sub_transaction:
                 sub_transaction_id = sub_transaction[1]
                 update_transaction_ytd_amount(
@@ -3603,7 +3616,7 @@ def post_schedH4(data):
                 "The post_sql_schedH4 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -3634,7 +3647,7 @@ def post_sql_schedH4(data):
             aggregation_ind,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -3683,7 +3696,7 @@ def get_schedH4(data):
         # TODO: temp change, need to reove this code when h4, h6 schedma updated
         for obj in forms_obj:
             obj["expenditure_purpose"] = obj.get("purpose", "")
-            obj["api_call"] = '/sh4/schedH4'
+            obj["api_call"] = "/sh4/schedH4"
             child_data = get_sched_h4_child_transactions(
                 obj.get("report_id"), obj.get("cmte_id"), obj.get("transaction_id")
             )
@@ -3691,7 +3704,7 @@ def get_schedH4(data):
                 obj["child"] = child_data
 
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -3804,7 +3817,7 @@ def delete_sql_schedH4(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_h4
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -3876,7 +3889,7 @@ def schedH4(request):
                             request.data.get("transaction_id")
                         )
                         data = put_schedH4(datum)
-                    except:
+                    except BaseException:
                         datum["transaction_id"] = None
                         data = post_schedH4(datum)
                 else:
@@ -3896,7 +3909,7 @@ def schedH4(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                        request.query_params.get("report_id")
+                    request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -3904,7 +3917,7 @@ def schedH4(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                        request.query_params.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -3921,20 +3934,18 @@ def schedH4(request):
                     "pageNumber": "",
                     "totalPages": "",
                 }
-                return JsonResponse(
-                    forms_obj, status=status.HTTP_200_OK, safe=False
-                )
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -3958,7 +3969,7 @@ def schedH4(request):
             try:
                 datum = schedH4_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -3996,7 +4007,7 @@ def schedH4(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -4022,7 +4033,7 @@ def check_mandatory_fields_SH5(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -4046,11 +4057,12 @@ def schedH5_sql_dict(data):
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
-        valid_data["line_number"], valid_data[
-            "transaction_type"
-        ] = get_line_number_trans_type(data["transaction_type_identifier"])
+        (
+            valid_data["line_number"],
+            valid_data["transaction_type"],
+        ) = get_line_number_trans_type(data["transaction_type_identifier"])
         return valid_data
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -4060,18 +4072,18 @@ def update_h5_total_amount(data):
     """
 
     _sql = """
-    UPDATE sched_h5 
+    UPDATE sched_h5
     SET    total_amount_transferred = (
         SELECT Sum(coalesce(
                 voter_registration_amount,
                 voter_id_amount,
                 gotv_amount,
-                generic_campaign_amount)) 
-        FROM   sched_h5 
-        WHERE 
-              back_ref_transaction_id = %s) 
-    WHERE  ( back_ref_transaction_id = %s 
-          OR transaction_id = %s ) 
+                generic_campaign_amount))
+        FROM   sched_h5
+        WHERE
+              back_ref_transaction_id = %s)
+    WHERE  ( back_ref_transaction_id = %s
+          OR transaction_id = %s )
     """
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
@@ -4102,17 +4114,17 @@ def put_schedH5(data):
         return get_list_schedH5(
             data.get("report_id"), data.get("cmte_id"), data.get("transaction_id")
         )[0]
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedH5(data):
     """
-    update a schedule_H5 item                    
+    update a schedule_H5 item
 
     """
     _sql = """UPDATE public.sched_h5
-              SET transaction_type_identifier= %s, 
+              SET transaction_type_identifier= %s,
                   account_name= %s,
                   receipt_date= %s,
                   total_amount_transferred= %s,
@@ -4126,7 +4138,7 @@ def put_sql_schedH5(data):
                   transaction_type = %s,
                   back_ref_transaction_id = %s,
                   last_update_date= %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -4179,7 +4191,7 @@ def post_schedH5(data):
                 "The post_sql_schedH5 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -4206,7 +4218,7 @@ def post_sql_schedH5(data):
             create_date,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -4260,7 +4272,7 @@ def get_schedH5(data):
                     if child_list:
                         _obj["child"] = child_list
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -4291,7 +4303,7 @@ def get_child_schedH5(transaction_id, report_id, cmte_id):
             create_date,
             last_update_date
             FROM public.sched_h5
-            WHERE report_id = %s 
+            WHERE report_id = %s
             AND cmte_id = %s
             AND back_ref_transaction_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -4331,10 +4343,10 @@ def get_list_all_schedH5(report_id, cmte_id):
                 gotv_amount,
                 generic_campaign_amount) as transfer_amount,
             (
-                CASE 
-                WHEN  voter_registration_amount > 0  
+                CASE
+                WHEN  voter_registration_amount > 0
                 THEN 'Voter Registration'
-                WHEN  voter_id_amount > 0 
+                WHEN  voter_id_amount > 0
                 THEN 'Voter ID'
                 WHEN  gotv_amount > 0
                 THEN 'GOTV'
@@ -4387,10 +4399,10 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
                 gotv_amount,
                 generic_campaign_amount) as transfer_amount,
             (
-                CASE 
-                WHEN  voter_registration_amount > 0  
+                CASE
+                WHEN  voter_registration_amount > 0
                 THEN 'Voter Registration'
-                WHEN  voter_id_amount > 0 
+                WHEN  voter_id_amount > 0
                 THEN 'Voter ID'
                 WHEN  gotv_amount > 0
                 THEN 'GOTV'
@@ -4412,7 +4424,7 @@ def delete_sql_schedH5(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_h5
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -4439,7 +4451,7 @@ def get_h5_summary(request):
     1. load only child items
     3. report_id based.
 
-    # TODO: what is gonna happen when people click edit button? 
+    # TODO: what is gonna happen when people click edit button?
     """
     try:
         # Get the request parameters and set for Pagination
@@ -4485,10 +4497,10 @@ def get_h5_summary(request):
                 gotv_amount,
                 generic_campaign_amount) as transfer_amount,
             (
-                CASE 
-                WHEN  voter_registration_amount > 0  
+                CASE
+                WHEN  voter_registration_amount > 0
                 THEN 'Voter Registration'
-                WHEN  voter_id_amount > 0 
+                WHEN  voter_id_amount > 0
                 THEN 'Voter ID'
                 WHEN  gotv_amount > 0
                 THEN 'GOTV'
@@ -4515,7 +4527,7 @@ def get_h5_summary(request):
             #: update for pagination
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
 
 
@@ -4588,7 +4600,7 @@ def schedH5(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -4598,12 +4610,16 @@ def schedH5(request):
                         for _c in request.data["child"]:
                             child_data = data
                             child_data.update(_c)
-                            child_data["back_ref_transaction_id"] = data["transaction_id"]
+                            child_data["back_ref_transaction_id"] = data[
+                                "transaction_id"
+                            ]
                             child_data = schedH5_sql_dict(child_data)
                             child_data["cmte_id"] = cmte_id
                             child_data["report_id"] = report_id
                             logger.debug(
-                                "saving child transaction with data {}".format(child_data)
+                                "saving child transaction with data {}".format(
+                                    child_data
+                                )
                             )
                             post_schedH5(child_data)
                 else:
@@ -4642,7 +4658,7 @@ def schedH5(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                        request.query_params.get("report_id")
+                    request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -4650,7 +4666,7 @@ def schedH5(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                        request.query_params.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -4674,13 +4690,13 @@ def schedH5(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -4704,7 +4720,7 @@ def schedH5(request):
             try:
                 datum = schedH5_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -4738,7 +4754,7 @@ def schedH5(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -4764,7 +4780,7 @@ def check_mandatory_fields_SH6(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -4839,7 +4855,7 @@ def schedH6_sql_dict(data):
             )
 
         return valid_data
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -4858,7 +4874,7 @@ def get_existing_h6_total(cmte_id, transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, _v)
             return cursor.fetchone()[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -4917,13 +4933,13 @@ def put_schedH6(data):
                 "The put_sql_schedH6 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedH6(data):
     """
-    update a schedule_H6 item                    
+    update a schedule_H6 item
 
     """
     _sql = """UPDATE public.sched_h6
@@ -4946,7 +4962,7 @@ def put_sql_schedH6(data):
                   memo_text = %s,
                   aggregation_ind = %s,
                   last_update_date= %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -4990,7 +5006,7 @@ def validate_sh6_data(data):
 def post_sql_schedH6(data):
     try:
         _sql = """
-        INSERT INTO public.sched_h6 ( 
+        INSERT INTO public.sched_h6 (
             cmte_id,
             report_id,
             line_number,
@@ -5014,7 +5030,7 @@ def post_sql_schedH6(data):
             aggregation_ind,
             create_date
          )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -5058,16 +5074,16 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_fed_levin_amount, 
+            SELECT t1.total_fed_levin_amount,
                 t1.transaction_id,
                 t1.aggregation_ind
-            FROM public.sched_h6 t1 
-            WHERE activity_event_type = %s 
+            FROM public.sched_h6 t1
+            WHERE activity_event_type = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -5099,7 +5115,7 @@ def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
         with connection.cursor() as cursor:
             cursor.execute(
                 """ UPDATE public.sched_h6
-                    SET activity_event_total_ytd = %s 
+                    SET activity_event_total_ytd = %s
                     WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
                     """,
                 [aggregate_amount, transaction_id, cmte_id],
@@ -5202,7 +5218,7 @@ def post_schedH6(data):
                 "The post_sql_schedH6 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -5234,7 +5250,7 @@ def get_schedH6(data):
             if child_data:
                 obj["child"] = child_data
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -5346,7 +5362,7 @@ def delete_sql_schedH6(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_h6
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -5388,7 +5404,7 @@ def schedH6(request):
                 datum["cmte_id"] = cmte_id
                 datum["username"] = request.user.username
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -5456,7 +5472,10 @@ def schedH6(request):
                 ):
                     data["transaction_id"] = request.query_params.get("transaction_id")
                 datum = get_schedH6(data)
-                if query_params.get("page") is None and query_params.get("itemsPerPage") is None:
+                if (
+                    query_params.get("page") is None
+                    and query_params.get("itemsPerPage") is None
+                ):
                     return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
 
                 #: update for pagination
@@ -5472,20 +5491,18 @@ def schedH6(request):
                     "pageNumber": "",
                     "totalPages": "",
                 }
-                return JsonResponse(
-                    forms_obj, status=status.HTTP_200_OK, safe=False
-                )
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                        request.data.get("report_id")
+                    request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -5509,7 +5526,7 @@ def schedH6(request):
             try:
                 datum = schedH6_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                        request.data.get("transaction_id")
+                    request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -5544,5 +5561,5 @@ def schedH6(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

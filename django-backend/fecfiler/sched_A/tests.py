@@ -2,6 +2,7 @@ import json
 from rest_framework import status
 from django.test import TestCase, Client
 from django.urls import reverse
+
 # from ..models import Puppy
 # from ..serializers import PuppySerializer
 
@@ -11,7 +12,7 @@ client = Client()
 
 
 class CreateNewSchedATest(TestCase):
-    """ Test module for inserting a sched_a item"""
+    """Test module for inserting a sched_a item"""
 
     def setUp(self):
         self.valid_payload = {
@@ -35,8 +36,7 @@ class CreateNewSchedATest(TestCase):
             "purpose_description": null,
             "report_id": 1,
             "transaction_id": "SA20190325000000001",
-            "transaction_type": "15"
-
+            "transaction_type": "15",
         }
 
         # invalid transaction_id
@@ -61,7 +61,7 @@ class CreateNewSchedATest(TestCase):
             "purpose_description": null,
             "report_id": 1,
             "transaction_id": "VVBSTFQ9X78E",
-            "transaction_type": "15"
+            "transaction_type": "15",
         }
 
     # def test_create_valid_sechdA_item(self):
@@ -71,5 +71,6 @@ class CreateNewSchedATest(TestCase):
     #         content_type='application/json'
     #     )
     #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 
 # Create your tests here.

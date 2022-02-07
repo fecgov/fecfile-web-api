@@ -26,13 +26,15 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-
     undo_delete_entities,
     get_comittee_id,
-    update_F3X
-
+    update_F3X,
 )
-from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
+from fecfiler.core.transaction_util import (
+    transaction_exists,
+    update_sched_d_parent,
+    get_line_number_trans_type,
+)
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
 from fecfiler.core.report_helper import new_report_date
@@ -112,7 +114,7 @@ def check_mandatory_fields_SF(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -177,7 +179,7 @@ def schedF_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         return output
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -196,7 +198,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, _v)
             return cursor.fetchone()[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -254,17 +256,17 @@ def put_schedF(data):
                 "The put_sql_schedF function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedF(data):
     """
-    update a schedule_f item                    
+    update a schedule_f item
     """
     logger.debug("put_sql_schedF with data {}".format(data))
     _sql = """UPDATE public.sched_f
-              SET transaction_type_identifier = %s, 
+              SET transaction_type_identifier = %s,
                   back_ref_transaction_id = %s,
                   back_ref_sched_name = %s,
                   coordinated_exp_ind = %s,
@@ -299,7 +301,7 @@ def put_sql_schedF(data):
                   memo_text = %s,
                   aggregation_ind = %s,
                   last_update_date = %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -404,7 +406,7 @@ def post_schedF(data):
                 "The post_sql_schedF function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -415,7 +417,7 @@ def post_sql_schedF(data):
             cmte_id,
             report_id,
             transaction_type_identifier,
-            transaction_id, 
+            transaction_id,
             back_ref_transaction_id,
             back_ref_sched_name,
             coordinated_exp_ind,
@@ -432,7 +434,7 @@ def post_sql_schedF(data):
             expenditure_date,
             expenditure_amount,
             aggregate_general_elec_exp,
-            line_number, 
+            line_number,
             transaction_type,
             purpose,
             category_code,
@@ -452,7 +454,7 @@ def post_sql_schedF(data):
             create_date,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -522,7 +524,7 @@ def get_schedF(data):
                 if child_sf:
                     obj["child"] = child_sf
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -535,7 +537,7 @@ def get_list_all_schedF(report_id, cmte_id):
             cmte_id,
             report_id,
             transaction_type_identifier,
-            transaction_id, 
+            transaction_id,
             back_ref_transaction_id,
             back_ref_sched_name,
             coordinated_exp_ind,
@@ -604,7 +606,7 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
             sf.cmte_id,
             sf.report_id,
             sf.transaction_type_identifier,
-            sf.transaction_id, 
+            sf.transaction_id,
             sf.back_ref_transaction_id,
             sf.back_ref_sched_name,
             sf.coordinated_exp_ind,
@@ -641,8 +643,8 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
             sf.aggregation_ind,
             sf.create_date,
             sf.last_update_date,
-            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id 
-            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id) 
+            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id
+            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = sf.payee_cand_id AND e.delete_ind is distinct from 'Y'
                         ORDER BY e.ref_cand_cmte_id DESC, e.entity_id DESC) AS beneficiary_cand_entity_id
             FROM public.sched_f sf
@@ -685,7 +687,7 @@ def delete_sql_schedF(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_f
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -802,7 +804,9 @@ def schedF(request):
                 update_aggregate_general_elec_exp(
                     datum["cmte_id"],
                     datum["beneficiary_cand_id"],
-                    datetime.datetime.strptime(datum.get("expenditure_date"), "%Y-%m-%d")
+                    datetime.datetime.strptime(
+                        datum.get("expenditure_date"), "%Y-%m-%d"
+                    )
                     .date()
                     .strftime("%m/%d/%Y"),
                 )
@@ -861,7 +865,7 @@ def schedF(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -895,13 +899,13 @@ def get_aggregate_general_elec_exp(request):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT aggregate_general_elec_exp 
-                FROM public.sched_f 
-                WHERE payee_cand_id = %s 
-                AND expenditure_date >= %s 
-                AND expenditure_date <= %s 
+                SELECT aggregate_general_elec_exp
+                FROM public.sched_f
+                WHERE payee_cand_id = %s
+                AND expenditure_date >= %s
                 AND expenditure_date <= %s
-                AND delete_ind is distinct from 'Y' 
+                AND expenditure_date <= %s
+                AND delete_ind is distinct from 'Y'
                 ORDER BY expenditure_date DESC, create_date DESC""",
                 [beneficiary_cand_id, cvg_start_date, cvg_end_date, expenditure_date],
             )
@@ -930,8 +934,8 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
         end_date = None
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e 
-                WHERE e.cmte_id in ('C00000000') 
+                """SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e
+                WHERE e.cmte_id in ('C00000000')
                 AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = %s AND e.delete_ind is distinct from 'Y') as t""",
                 [beneficiary_cand_id],
             )
@@ -1017,8 +1021,8 @@ def update_aggregate_general_elec_exp(cmte_id, beneficiary_cand_id, expenditure_
             cvg_start_date, cvg_end_date, beneficiary_cand_id
         )
         for transaction in transaction_list:
-            if transaction["memo_code"] != 'X':
-                if transaction["aggregation_ind"] != 'N':
+            if transaction["memo_code"] != "X":
+                if transaction["aggregation_ind"] != "N":
                     aggregate_amount += float(transaction["expenditure_amount"])
             if transaction["expenditure_date"] >= expenditure_date:
                 put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
@@ -1034,18 +1038,18 @@ def get_SF_transactions_candidate(start_date, end_date, beneficiary_cand_id):
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT json_agg(t) FROM (
-                    SELECT 
-                    t1.transaction_id, 
-                    t1.expenditure_date, 
-                    t1.expenditure_amount, 
-                    t1.aggregate_general_elec_exp, 
+                    SELECT
+                    t1.transaction_id,
+                    t1.expenditure_date,
+                    t1.expenditure_amount,
+                    t1.aggregate_general_elec_exp,
                     t1.memo_code,
                     t1.aggregation_ind
-                    FROM public.sched_f t1 
-                    WHERE t1.payee_cand_id = %s 
-                    AND t1.expenditure_date >= %s 
-                    AND t1.expenditure_date <= %s 
-                    AND t1.delete_ind is distinct FROM 'Y' 
+                    FROM public.sched_f t1
+                    WHERE t1.payee_cand_id = %s
+                    AND t1.expenditure_date >= %s
+                    AND t1.expenditure_date <= %s
+                    AND t1.delete_ind is distinct FROM 'Y'
                     AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
                     ORDER BY t1.expenditure_date ASC, t1.create_date ASC
                 ) t""",
@@ -1093,8 +1097,10 @@ def get_election_year(office_sought, election_state, election_district):
             )
             add_year = 6
         elif office_sought == "H":
-            param_string = "&office_sought={}&election_state={}&election_district={}".format(
-                office_sought, election_state, election_district
+            param_string = (
+                "&office_sought={}&election_state={}&election_district={}".format(
+                    office_sought, election_state, election_district
+                )
             )
             add_year = 2
         else:
@@ -1103,10 +1109,16 @@ def get_election_year(office_sought, election_state, election_district):
         results = []
         election_year_list = []
         while True:
-            url = ("https://api.open.fec.gov/v1/election-dates/?"
-                   + "sort=-election_date&api_key={}".format(settings.FECFILE_FEC_WEBSITE_API_KEY)
-                   + "&page={}".format(i)
-                   + "&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(param_string))
+            url = (
+                "https://api.open.fec.gov/v1/election-dates/?"
+                + "sort=-election_date&api_key={}".format(
+                    settings.FECFILE_FEC_WEBSITE_API_KEY
+                )
+                + "&page={}".format(i)
+                + "&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
+                    param_string
+                )
+            )
 
             ab = requests.get(url)
             results = results + ab.json()["results"]
@@ -1151,7 +1163,7 @@ def update_sf_aggregation_status(transaction_id, status):
                         transaction_id
                     )
                 )
-    except:
+    except BaseException:
         raise
 
 
@@ -1173,18 +1185,18 @@ def force_aggregate_sf(request):
             update_sf_aggregation_status(transaction_id, "Y")
             tran_data = get_list_schedF(report_id, cmte_id, transaction_id)[0]
             update_aggregate_general_elec_exp(
-                tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
+                tran_data["cmte_id"],
+                tran_data["payee_cand_id"],
+                tran_data["expenditure_date"],
             )
-            return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 "The force_aggregate_sf API is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -1207,16 +1219,16 @@ def force_unaggregate_sf(request):
             update_sf_aggregation_status(transaction_id, "N")
             tran_data = get_list_schedF(report_id, cmte_id, transaction_id)[0]
             update_aggregate_general_elec_exp(
-                tran_data["cmte_id"], tran_data["payee_cand_id"], tran_data["expenditure_date"]
+                tran_data["cmte_id"],
+                tran_data["payee_cand_id"],
+                tran_data["expenditure_date"],
             )
-            return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 "The force_aggregate_sf API is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

@@ -49,9 +49,9 @@ def update_earmark_memo_contribution(transaction_id, contribution_amount):
             )
             cursor.execute(_sql2, [contribution_amount, aggregate_amt, transaction_id])
             if cursor.rowcount == 0:
-                logger.debug('no memo transaction found.')
+                logger.debug("no memo transaction found.")
                 # raise Exception("Error: updating earmark memo failed.")
-    except:
+    except BaseException:
         raise
 
 
@@ -80,7 +80,7 @@ def new_memo_contribution_amount(func):
 
 def update_earmark_out_expenditure(transaction_id, contribution_amount):
     """
-    helper function for updating earmark out expenditure amount when parent earmark 
+    helper function for updating earmark out expenditure amount when parent earmark
     transaction is updated
     """
     _sql = """
@@ -101,7 +101,7 @@ def update_earmark_out_expenditure(transaction_id, contribution_amount):
             cursor.execute(_sql, [contribution_amount, transaction_id])
             # if cursor.rowcount == 0:
             #     raise Exception("Error: updating earmark out memo failed.")
-    except:
+    except BaseException:
         raise
 
 

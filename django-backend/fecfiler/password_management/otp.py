@@ -12,8 +12,15 @@ from django_otp.util import random_hex
 from unittest import mock
 import time
 
-from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY, OTP_TIMEOUT_TIME, OTP_DISABLE, \
-    OTP_DEFAULT_PASSCODE
+from fecfiler.settings import (
+    OTP_DIGIT,
+    OTP_TIME_EXPIRY,
+    logger,
+    OTP_MAX_RETRY,
+    OTP_TIMEOUT_TIME,
+    OTP_DISABLE,
+    OTP_DEFAULT_PASSCODE,
+)
 
 
 def save_key_datbase(username, key_val, counter, unix_time):
@@ -62,10 +69,9 @@ def get_last_updated_time(username):
 
 
 class TOTPVerification:
-
     def __init__(self, username):
 
-        self.key = make_password(username).encode('utf-8').hex()
+        self.key = make_password(username).encode("utf-8").hex()
         self.number_of_digits = OTP_DIGIT
         self.token_validity_period = OTP_TIME_EXPIRY
 
@@ -79,13 +85,15 @@ class TOTPVerification:
         counter = get_current_counter_val(username)
         last_updated_time = get_last_updated_time(username)
         unix_time = int(time.time())
-        totp = TOTP(key=self.bin_key,
-                    step=self.token_validity_period,
-                    t0=unix_time,
-                    digits=self.number_of_digits)
+        totp = TOTP(
+            key=self.bin_key,
+            step=self.token_validity_period,
+            t0=unix_time,
+            digits=self.number_of_digits,
+        )
 
         totp.time = time.time()
-        est = pytz.timezone('US/Eastern')
+        est = pytz.timezone("US/Eastern")
         current_time_est = datetime.now(est)
 
         current_time_est1 = current_time_est.replace(tzinfo=None)
@@ -124,10 +132,12 @@ class TOTPVerification:
                 print(key)
                 print(key.encode("utf-8"))
                 encode_key = key.encode("utf-8")
-                totp = TOTP(key=encode_key,
-                            step=self.token_validity_period,
-                            t0=int(unix_time),
-                            digits=self.number_of_digits)
+                totp = TOTP(
+                    key=encode_key,
+                    step=self.token_validity_period,
+                    t0=int(unix_time),
+                    digits=self.number_of_digits,
+                )
                 token = str(totp.token()).zfill(6)
 
             print(token)

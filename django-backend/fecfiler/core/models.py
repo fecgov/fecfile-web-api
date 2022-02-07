@@ -17,7 +17,7 @@ class Cmte_Report_Types_View(models.Model):
     due_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        unique_together = (('cmte_id', 'form_type', 'report_type'),)
+        unique_together = (("cmte_id", "form_type", "report_type"),)
 
 
 class My_Forms_View(models.Model):

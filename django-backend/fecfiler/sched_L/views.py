@@ -73,7 +73,7 @@ API_CALL_LB = {"api_call": "/sb/schedB"}
 
 
 def get_next_transaction_id(trans_char):
-    """get next transaction_id with seeding letter, like 'SA' """
+    """get next transaction_id with seeding letter, like 'SA'"""
     try:
         with connection.cursor() as cursor:
             cursor.execute(
@@ -110,7 +110,7 @@ def check_mandatory_fields_SL(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -172,7 +172,7 @@ def schedL_sql_dict(data):
         #     valid_data['record_id'] = data.get('levin_account_id')
         #     levin_account = get_levin_account(data.get)
         return valid_data
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -193,16 +193,16 @@ def put_schedL(data):
                 "The put_sql_schedL function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
 def put_sql_schedL(data):
     """
-    update a schedule_L item                    
+    update a schedule_L item
     """
     _sql = """UPDATE public.sched_l
-              SET transaction_type_identifier = %s, 
+              SET transaction_type_identifier = %s,
                   line_number = %s,
                   record_id = %s,
                   account_name = %s,
@@ -244,7 +244,7 @@ def put_sql_schedL(data):
                   coh_cop_ytd = %s,
                   create_date = %s,
                   last_update_date= %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -323,7 +323,7 @@ def post_schedL(data):
                 "The post_sql_schedL function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -373,7 +373,7 @@ def post_sql_schedL(data):
             disbursements_ytd,
             coh_cop_ytd,
             create_date,
-            last_update_date 
+            last_update_date
             )
         VALUES ({})
         """.format(
@@ -444,7 +444,7 @@ def get_schedL(data):
         else:
             forms_obj = get_list_all_schedL(report_id, cmte_id)
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -592,7 +592,7 @@ def delete_sql_schedL(cmte_id, report_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_l
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
@@ -641,7 +641,9 @@ def schedL(request):
                     datum["record_id"] = levin_acct_id
                     levin_account = get_levin_account(cmte_id, levin_acct_id)
                     if levin_account:
-                        datum["account_name"] = levin_account[0].get("levin_account_name")
+                        datum["account_name"] = levin_account[0].get(
+                            "levin_account_name"
+                        )
                 if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
                 ):
@@ -749,7 +751,9 @@ def schedL(request):
                     datum["record_id"] = levin_acct_id
                     levin_account = get_levin_account(cmte_id, levin_acct_id)
                     if levin_account:
-                        datum["account_name"] = levin_account[0].get("levin_account_name")
+                        datum["account_name"] = levin_account[0].get(
+                            "levin_account_name"
+                        )
                 # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 #     datum['entity_id'] = request.data.get('entity_id')
                 # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
@@ -767,7 +771,7 @@ def schedL(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -784,25 +788,25 @@ def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt, levin_account_id=N
     if levin_account_id:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.expenditure_date BETWEEN %s and %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
-            GROUP BY t1.transaction_type_identifier 
+            GROUP BY t1.transaction_type_identifier
         """
     else:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.expenditure_date BETWEEN %s and %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
-            GROUP BY t1.transaction_type_identifier 
+            GROUP BY t1.transaction_type_identifier
         """
     try:
         logger.debug("loading LB ytd...")
@@ -857,12 +861,12 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
     if levin_account_id:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
@@ -870,23 +874,23 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
 
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
     else:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
@@ -894,11 +898,11 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
 
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
-            AND t1.contribution_date BETWEEN %s AND %s 
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.contribution_date BETWEEN %s AND %s
+            AND t1.delete_ind is distinct from 'Y'
             AND transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
@@ -956,23 +960,23 @@ def load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id=None)
     if not levin_account_id:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
             GROUP BY t1.transaction_type_identifier
         """
     else:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
             GROUP BY t1.transaction_type_identifier
         """
@@ -1027,50 +1031,50 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
     2. non-itemized receipts: line_number = 11AII
     3. 1and2_total: itemized + non-itemized
     4. other receipts
-    5. all_total: 3 + other 
+    5. all_total: 3 + other
     """
     if not levin_account_id:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
         """
     else:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
-            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC' 
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
@@ -1131,7 +1135,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
 def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
     """
     getting cash on hand at the beginning:
-    it is loadind the closing coh value from the sched_l 
+    it is loadind the closing coh value from the sched_l
     1. from previous report, report-based
     2. last report from previous year, year-based
     """
@@ -1150,10 +1154,10 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             if levin_account_id:
                 cursor.execute(
                     """
-                    SELECT COALESCE(coh_cop, 0) 
-                    FROM public.sched_l 
-                    WHERE cmte_id = %s 
-                    AND cvg_end_date <= %s 
+                    SELECT COALESCE(coh_cop, 0)
+                    FROM public.sched_l
+                    WHERE cmte_id = %s
+                    AND cvg_end_date <= %s
                     AND record_id = %s::varchar(9)
                     AND delete_ind is distinct from 'Y'
                     ORDER BY cvg_end_date DESC
@@ -1165,9 +1169,9 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                 cursor.execute(
                     """
                     SELECT COALESCE(coh_cop, 0)
-                    FROM public.sched_l 
-                    WHERE cmte_id = %s 
-                    AND cvg_end_date <= %s 
+                    FROM public.sched_l
+                    WHERE cmte_id = %s
+                    AND cvg_end_date <= %s
                     AND delete_ind is distinct from 'Y'
                     ORDER BY cvg_end_date DESC, record_id ASC
                     """,
@@ -1206,25 +1210,25 @@ def load_ytd_disbursements_summary_api(
     if levin_account_id:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.expenditure_date BETWEEN %s and %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
-            GROUP BY t1.transaction_type_identifier 
+            GROUP BY t1.transaction_type_identifier
         """
     else:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.expenditure_date BETWEEN %s and %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
-            GROUP BY t1.transaction_type_identifier 
+            GROUP BY t1.transaction_type_identifier
         """
     try:
         with connection.cursor() as cursor:
@@ -1277,12 +1281,12 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
     if levin_account_id:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
@@ -1290,23 +1294,23 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
 
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
     else:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.contribution_date BETWEEN %s AND %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
@@ -1314,11 +1318,11 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
 
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
-            AND t1.contribution_date BETWEEN %s AND %s 
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.contribution_date BETWEEN %s AND %s
+            AND t1.delete_ind is distinct from 'Y'
             AND transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
@@ -1374,23 +1378,23 @@ def load_report_disbursements_sumamry_api(cmte_id, report_id, levin_account_id=N
     if not levin_account_id:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
             GROUP BY t1.transaction_type_identifier
         """
     else:
         _sql = """
             SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-            FROM public.sched_b t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_b t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
             GROUP BY t1.transaction_type_identifier
         """
@@ -1442,50 +1446,50 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
     2. non-itemized receipts: line_number = 11AII
     3. 1and2_total: itemized + non-itemized
     4. other receipts
-    5. all_total: 3 + other 
+    5. all_total: 3 + other
     """
     if not levin_account_id:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
             AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
         """
     else:
         _sql1 = """
             SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
-            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC' 
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
-            FROM public.sched_a t1 
-            WHERE t1.memo_code IS NULL 
+            FROM public.sched_a t1
+            WHERE t1.memo_code IS NULL
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.levin_account_id = %s
-            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.delete_ind is distinct from 'Y'
             AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
         """
 
@@ -1730,7 +1734,7 @@ def get_sl_transaction_id(cmte_id, report_id, levin_account_id):
                 return cursor.fetchone()[0]
             else:
                 return None
-    except:
+    except BaseException:
         raise
 
 
@@ -1795,7 +1799,9 @@ def update_sl_summary(data):
         # if not sl_record_exist(levin_account_id):
         for report_id in report_id_list:
             sl_data = {}
-            report_cvg_start_date, report_cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            report_cvg_start_date, report_cvg_end_date = get_cvg_dates(
+                report_id, cmte_id
+            )
             dummy_data = {
                 "cmte_id": cmte_id,
                 "report_id": report_id,
@@ -1824,7 +1830,9 @@ def update_sl_summary(data):
                 load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id)
             )
             sl_data.update(
-                load_ytd_receipts_summary(cmte_id, cal_start, report_cvg_end_date, levin_account_id)
+                load_ytd_receipts_summary(
+                    cmte_id, cal_start, report_cvg_end_date, levin_account_id
+                )
             )
             sl_data.update(
                 load_ytd_disbursements_summary(
@@ -1834,7 +1842,9 @@ def update_sl_summary(data):
             coh_bop_report = get_cash_on_hand_cop(
                 report_id, cmte_id, False, levin_account_id
             )
-            coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True, levin_account_id)
+            coh_bop_ytd = get_cash_on_hand_cop(
+                report_id, cmte_id, True, levin_account_id
+            )
             # else:
             #     response.update(load_report_receipts_summary(cmte_id, report_id))
             #     response.update(
@@ -1918,7 +1928,7 @@ def update_sl_summary(data):
         # }
         # forms_obj = {"dev_status": "partial"}
         # return Response(response, status=status.HTTP_200_OK)
-    except:
+    except BaseException:
         raise
         # return Response(
         #     "The get_sl_summary_table API is throwing an error: " + str(e),
@@ -1996,14 +2006,14 @@ def get_sla_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT a.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type 
+            SELECT a.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type
             FROM public.sched_a a, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE a.cmte_id = %s
             AND a.report_id = %s
             AND a.back_ref_transaction_id is null
             AND a.levin_account_id = l.levin_account_id
             AND a.entity_id = e.entity_id
-            AND a.transaction_type_identifier = tp.tran_identifier 
+            AND a.transaction_type_identifier = tp.tran_identifier
             --AND a.transaction_type_identifier in ("""
 
         _sql_p2 = """)
@@ -2040,9 +2050,10 @@ def get_sla_summary_table(request):
                         # print(memo_objs)
                         if memo_objs:
                             for m_obj in memo_objs:
-                                levin_account_id, levin_account_name = load_levin_account_data(
-                                    m_obj.get("transaction_id")
-                                )
+                                (
+                                    levin_account_id,
+                                    levin_account_name,
+                                ) = load_levin_account_data(m_obj.get("transaction_id"))
                                 m_obj["levin_account_id"] = levin_account_id
                                 m_obj["levin_account_name"] = levin_account_name
                                 m_obj["tran_desc"] = tran_desc_dic.get(

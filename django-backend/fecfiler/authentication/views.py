@@ -38,27 +38,28 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 def jwt_response_payload_handler(token, user=None, request=None):
     """
-    JWT TOKEN handler. 
+    JWT TOKEN handler.
     Checks if Committee ID exists in forms.models.Committee first before allowing access.
     """
     if len(user.username) > 9:
         user.username = user.username[0:9]
     if not Committee.objects.filter(committeeid=user.username).exists():
         return {
-            'status': 'Unauthorized',
-            'message': 'This account has not been authorized.'
+            "status": "Unauthorized",
+            "message": "This account has not been authorized.",
         }
 
     return {
-        'token': token,
+        "token": token,
     }
 
 
 # payload = jwt_response_payload_handler(user)
 # token = jwt_encode_handler(payload)
 
+
 class AccountViewSet(viewsets.ModelViewSet):
-    lookup_field = 'username'
+    lookup_field = "username"
 
     serializer_class = AccountSerializer
 
@@ -70,9 +71,9 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
-            return permissions.AllowAny(),
-        if self.request.method == 'POST':
-            return permissions.AllowAny(),
+            return (permissions.AllowAny(),)
+        if self.request.method == "POST":
+            return (permissions.AllowAny(),)
         return permissions.IsAuthenticated(), IsAccountOwner()
 
     def create(self, request):
@@ -82,41 +83,54 @@ class AccountViewSet(viewsets.ModelViewSet):
             Account.objects.create_user(**serializer.validated_data)
             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
 
-        return Response({
-            'status': 'Bad request',
-            'message': 'Account could not be created with received data.',
-            'details': str(serializer.errors),
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "status": "Bad request",
+                "message": "Account could not be created with received data.",
+                "details": str(serializer.errors),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class LoginView(views.APIView):
-
     def post(self, request, format=None):
         data = request.data
-        username = data.get('username', None)
-        password = data.get('password', None)
-        email = data.get('email', None)
-        account = authenticate(request=request, username=username, password=password, email=email)
+        username = data.get("username", None)
+        password = data.get("password", None)
+        email = data.get("email", None)
+        account = authenticate(
+            request=request, username=username, password=password, email=email
+        )
 
         # fail, bad login info
         if account is None:
-            return Response({
-                'status': 'Unauthorized',
-                'message': 'ID/Password combination invalid.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "status": "Unauthorized",
+                    "message": "ID/Password combination invalid.",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # fail, inactive account
         if not account.is_active:
-            return Response({
-                'status': 'Unauthorized',
-                'message': 'This account has been disabled.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "status": "Unauthorized",
+                    "message": "This account has been disabled.",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         if not Committee.objects.filter(committeeid=username).exists():
-            return Response({
-                'status': 'Unauthorized',
-                'message': 'This account has not been authorized.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "status": "Unauthorized",
+                    "message": "This account has not been authorized.",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # success, login and respond
         login(request, account)
@@ -144,9 +158,7 @@ def get_users_list(cmte_id):
             user_list = cursor.fetchall()
             if user_list is None:
                 raise NoOPError(
-                    "No users for found for committee Id  {}".format(
-                        cmte_id
-                    )
+                    "No users for found for committee Id  {}".format(cmte_id)
                 )
             merged_list = []
             for dictL in user_list:
@@ -162,29 +174,26 @@ def delete_manage_user(data):
     try:
         with connection.cursor() as cursor:
             _sql = """UPDATE public.authentication_account
-                        SET delete_ind = 'Y' 
+                        SET delete_ind = 'Y'
                         WHERE id = %s AND cmtee_id = %s
                         AND upper(role) != %s
                     """
             _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN.value)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
-                logger.debug("deleting user for {} failed."
-                             " No record was found", data.get("id"))
+                logger.debug(
+                    "deleting user for {} failed." " No record was found",
+                    data.get("id"),
+                )
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred while deleting record for id"
-                     " : {}", data.get("id"))
+        logger.debug(
+            "exception occurred while deleting record for id" " : {}", data.get("id")
+        )
 
 
 def user_data_dict():
-    valid_fields = [
-        "first_name",
-        "last_name",
-        "email",
-        "role",
-        "contact"
-    ]
+    valid_fields = ["first_name", "last_name", "email", "role", "contact"]
     return valid_fields
 
 
@@ -213,9 +222,17 @@ def update_deleted_record(data):
         register_url_token = get_registration_token()
         with connection.cursor() as cursor:
             _sql = """UPDATE public.authentication_account SET role = %s, first_name = %s, last_name = %s,delete_ind ='N', status='Pending', register_token= %s  WHERE cmtee_id = %s AND lower(email) = lower(%s)"""
-            cursor.execute(_sql, [data.get("role"), data.get("first_name"),
-                                  data.get("last_name"), register_url_token, data.get("cmte_id"),
-                                  data.get("email")])
+            cursor.execute(
+                _sql,
+                [
+                    data.get("role"),
+                    data.get("first_name"),
+                    data.get("last_name"),
+                    register_url_token,
+                    data.get("cmte_id"),
+                    data.get("email"),
+                ],
+            )
             return register_url_token
 
     except Exception as e:
@@ -237,7 +254,9 @@ def user_previously_deleted(data):
             else:
                 return False, registration_token
     except Exception as e:
-        logger.debug("exception occurred while checking if user was previously deleted", str(e))
+        logger.debug(
+            "exception occurred while checking if user was previously deleted", str(e)
+        )
         raise e
 
 
@@ -285,9 +304,9 @@ def add_new_user(data, cmte_id, register_url_token):
                     (data.get("role")).upper(),
                     "false",
                     cmte_id,
-                    'N',
-                    'Pending',
-                    register_url_token
+                    "N",
+                    "Pending",
+                    register_url_token,
                 ],
             )
             if cursor.rowcount != 1:
@@ -316,8 +335,7 @@ def put_sql_user(data):
             )
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
-                logger.debug("Updating user info for {} failed."
-                             " No record was found")
+                logger.debug("Updating user info for {} failed." " No record was found")
         return cursor.rowcount
     except Exception as e:
         logger.debug("Exception occurred while updating user", str(e))
@@ -366,7 +384,7 @@ def check_custom_validations(email, role):
 
 
 def check_email_validation(email):
-    regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    regex = r"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
     if not re.search(regex, email):
         raise Exception("Email-id is not valid")
 
@@ -420,7 +438,7 @@ def manage_user(request):
                     raise Exception("Committe id is missing from request data")
 
                 datum = get_users_list(cmte_id)
-                json_result = {'users': datum, 'rows': len(datum)}
+                json_result = {"users": datum, "rows": len(datum)}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
                 logger.debug(e)
@@ -430,16 +448,16 @@ def manage_user(request):
                 )
             except Exception as e:
                 logger.debug(e)
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
         elif request.method == "DELETE":
             try:
                 cmte_id = get_comittee_id(request.user.username)
                 data = {"cmte_id": cmte_id}
-                if "id" in request.data and check_null_value(
-                        request.data.get("id")
-                ):
+                if "id" in request.data and check_null_value(request.data.get("id")):
                     data["user_id"] = request.data.get("id")
                 else:
                     raise Exception("Missing Input: ID is mandatory")
@@ -448,14 +466,20 @@ def manage_user(request):
                 if row > 0:
                     msg = "The User ID: {} has been successfully deleted"
                 else:
-                    msg = "The User ID: {} has not been successfully deleted." \
-                          "No matching record was found."
-                return JsonResponse(msg.format(data.get("user_id")),
-                                    status=status.HTTP_200_OK,
-                                    safe=False)
+                    msg = (
+                        "The User ID: {} has not been successfully deleted."
+                        "No matching record was found."
+                    )
+                return JsonResponse(
+                    msg.format(data.get("user_id")),
+                    status=status.HTTP_200_OK,
+                    safe=False,
+                )
             except Exception as e:
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
         elif request.method == "POST":
             try:
@@ -469,7 +493,10 @@ def manage_user(request):
                 # check if user was previously deleted, then reactivate
                 user_reactivated, register_url_token = user_previously_deleted(data)
 
-                if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
+                if (
+                    data.get("role").upper() == Roles.BC_ADMIN.value
+                    and request.user.role != Roles.C_ADMIN.value
+                ):
                     raise NoOPError(
                         "Current Role does not have authority to create Back Up Admin. Please reach out "
                         "to Committee "
@@ -485,11 +512,15 @@ def manage_user(request):
                     logger.debug("after sending email")
 
                 output = get_users_list(cmte_id)
-                json_result = {'users': output}
-                return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
+                json_result = {"users": output}
+                return JsonResponse(
+                    json_result, status=status.HTTP_201_CREATED, safe=False
+                )
             except Exception as e:
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
         elif request.method == "PUT":
             try:
@@ -497,7 +528,10 @@ def manage_user(request):
                 cmte_id = get_comittee_id(request.user.username)
                 username = cmte_id + request.data.get("email")
 
-                data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
+                data = {
+                    "cmte_id": cmte_id,
+                    "user_name": get_comittee_id(request.user.username),
+                }
                 fields = user_data_dict()
                 fields.append("id")
                 data = validate(data, fields, request)
@@ -505,14 +539,16 @@ def manage_user(request):
                 data["old_email"] = old_email
                 rows = update_user(data)
                 output = get_users_list(cmte_id)
-                json_result = {'users': output, "rows_updated": rows}
+                json_result = {"users": output, "rows_updated": rows}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 logger.debug(e)
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -525,9 +561,7 @@ def validate(data, fields, request):
 
 
 def validate_input_data(request, val, data):
-    if val in request.data and check_null_value(
-            request.data.get(val)
-    ):
+    if val in request.data and check_null_value(request.data.get(val)):
         data[val] = request.data.get(val)
     else:
         raise Exception("Missing Input: {} is mandatory", val)
@@ -560,7 +594,16 @@ def update_toggle_status(status, data):
         with connection.cursor() as cursor:
             # check if user already exist
             _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s AND status != %s"""
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN.value, "Pending"])
+            cursor.execute(
+                _sql,
+                [
+                    status,
+                    data.get("id"),
+                    data.get("cmte_id"),
+                    Roles.C_ADMIN.value,
+                    "Pending",
+                ],
+            )
 
             if cursor.rowcount != 1:
                 raise NoOPError(
@@ -582,20 +625,25 @@ def toggle_user(request):
                 username = request.user.username
                 if len(username) > 9:
                     cmte_id = get_comittee_id(request.user.username)
-                data = {"username": username, "id": request.data.get("id"),
-                        "cmte_id": cmte_id}
+                data = {
+                    "username": username,
+                    "id": request.data.get("id"),
+                    "cmte_id": cmte_id,
+                }
                 toggle_status = get_toggle_status(data)
                 rows = update_toggle_status(toggle_status, data)
                 output = get_users_list(cmte_id)
-                json_result = {'users': output, "rows_updated": rows}
+                json_result = {"users": output, "rows_updated": rows}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 logger.debug("exception occured while toggling status", str(e))
-                json_result = {'message': str(e)}
-                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+                json_result = {"message": str(e)}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -603,11 +651,17 @@ def toggle_user(request):
 def current_user(request):
     if request.method == "GET":
         try:
-            user = {"first_name": request.user.first_name, "last_name": request.user.last_name,
-                    "email": request.user.email, "phone": request.user.contact}
+            user = {
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+                "email": request.user.email,
+                "phone": request.user.contact,
+            }
 
             return JsonResponse(user, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while getting user information", str(e))
-            json_result = {'message': str(e)}
-            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            json_result = {"message": str(e)}
+            return JsonResponse(
+                json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+            )

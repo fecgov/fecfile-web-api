@@ -31,8 +31,7 @@ from fecfiler.core.views import (
     save_cand_entity,
     superceded_report_id_list,
     get_comittee_id,
-    update_F3X
-
+    update_F3X,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -159,11 +158,11 @@ ITEMIZED_SB_UPDATE_TRANSACTION_TYPE_IDENTIFIER = [
 
 def date_format_agg(cvg_date):
     try:
-        if cvg_date == None or cvg_date in ["none", "null", " ", ""]:
+        if cvg_date is None or cvg_date in ["none", "null", " ", ""]:
             return None
         cvg_dt = datetime.datetime.strptime(cvg_date, "%Y-%m-%d").date()
         return cvg_dt
-    except:
+    except BaseException:
         raise
 
 
@@ -196,9 +195,9 @@ def put_sql_schedA_from_schedB(
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute(
-                """UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
-                entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, 
-                election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s, last_update_date = %s 
+                """UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s,
+                entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s,
+                election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s, last_update_date = %s
                 WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
                     "', '".join(report_list)
                 ),
@@ -273,18 +272,17 @@ def check_type_list(data):
     make sure child transaction data is in a list
     """
     try:
-        if not type(data) is list:
+        if not isinstance(data, list):
             raise Exception(
                 """
-                The child transactions have to be sent in as an array or list. 
+                The child transactions have to be sent in as an array or list.
                 Input received: {}""".format(
                     data
                 )
-
             )
         else:
             return data
-    except:
+    except BaseException:
         raise
 
 
@@ -298,11 +296,10 @@ def check_decimal(value):
     except Exception as e:
         raise Exception(
             """
-            Invalid Input: Expecting a decimal value like 18.11, 24.07. 
+            Invalid Input: Expecting a decimal value like 18.11, 24.07.
             Input received: {}""".format(
                 value
             )
-
         )
 
 
@@ -321,12 +318,12 @@ def check_mandatory_fields_SB(data, list_mandatory_fields):
                 string = string + x + ", "
             string = string[0:-2]
             raise Exception(
-                """The following mandatory fields are required in order to 
+                """The following mandatory fields are required in order to
                 save data to schedB table: {}""".format(
                     string
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -380,33 +377,33 @@ def post_sql_schedB(
             # Insert data into schedB table
             cursor.execute(
                 """INSERT INTO public.sched_b (
-                    cmte_id, 
-                    report_id, 
-                    line_number, 
-                    transaction_type, 
-                    transaction_id, 
-                    back_ref_transaction_id, 
-                    back_ref_sched_name, 
-                    entity_id, 
-                    expenditure_date, 
-                    expenditure_amount, 
-                    semi_annual_refund_bundled_amount, 
-                    expenditure_purpose, 
-                    category_code, 
-                    memo_code, 
-                    memo_text, 
-                    election_code, 
-                    election_other_description, 
-                    beneficiary_cmte_id, 
-                    beneficiary_cand_id, 
-                    other_name, 
-                    other_street_1, 
-                    other_street_2, 
-                    other_city, 
-                    other_state, 
-                    other_zip, 
-                    nc_soft_account, 
-                    transaction_type_identifier,                     
+                    cmte_id,
+                    report_id,
+                    line_number,
+                    transaction_type,
+                    transaction_id,
+                    back_ref_transaction_id,
+                    back_ref_sched_name,
+                    entity_id,
+                    expenditure_date,
+                    expenditure_amount,
+                    semi_annual_refund_bundled_amount,
+                    expenditure_purpose,
+                    category_code,
+                    memo_code,
+                    memo_text,
+                    election_code,
+                    election_other_description,
+                    beneficiary_cmte_id,
+                    beneficiary_cand_id,
+                    other_name,
+                    other_street_1,
+                    other_street_2,
+                    other_city,
+                    other_state,
+                    other_zip,
+                    nc_soft_account,
+                    transaction_type_identifier,
                     beneficiary_cand_office,
                     beneficiary_cand_state,
                     beneficiary_cand_district,
@@ -426,7 +423,6 @@ def post_sql_schedB(
                 VALUES ("""
                 + ",".join(["%s"] * 42)
                 + ")",
-
                 [
                     cmte_id,
                     report_id,
@@ -556,31 +552,31 @@ def put_sql_schedB(
         report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE public.sched_b SET 
-                            line_number = %s, 
-                            transaction_type = %s, 
-                            back_ref_transaction_id = %s, 
-                            back_ref_sched_name = %s, 
-                            entity_id = %s, 
-                            expenditure_date = %s, 
-                            expenditure_amount = %s, 
-                            semi_annual_refund_bundled_amount = %s, 
-                            expenditure_purpose = %s, 
-                            category_code = %s, 
-                            memo_code = %s, 
-                            memo_text = %s, 
-                            election_code = %s, 
-                            election_other_description = %s, 
-                            beneficiary_cmte_id = %s, 
-                            beneficiary_cand_id = %s, 
-                            other_name = %s, 
-                            other_street_1 = %s, 
-                            other_street_2 = %s, 
-                            other_city = %s, 
-                            other_state = %s, 
-                            other_zip = %s, 
-                            nc_soft_account = %s, 
-                            transaction_type_identifier = %s, 
+                """UPDATE public.sched_b SET
+                            line_number = %s,
+                            transaction_type = %s,
+                            back_ref_transaction_id = %s,
+                            back_ref_sched_name = %s,
+                            entity_id = %s,
+                            expenditure_date = %s,
+                            expenditure_amount = %s,
+                            semi_annual_refund_bundled_amount = %s,
+                            expenditure_purpose = %s,
+                            category_code = %s,
+                            memo_code = %s,
+                            memo_text = %s,
+                            election_code = %s,
+                            election_other_description = %s,
+                            beneficiary_cmte_id = %s,
+                            beneficiary_cand_id = %s,
+                            other_name = %s,
+                            other_street_1 = %s,
+                            other_street_2 = %s,
+                            other_city = %s,
+                            other_state = %s,
+                            other_zip = %s,
+                            nc_soft_account = %s,
+                            transaction_type_identifier = %s,
                             beneficiary_cand_office = %s,
                             beneficiary_cand_state = %s,
                             beneficiary_cand_district = %s,
@@ -595,9 +591,9 @@ def put_sql_schedB(
                             levin_account_id = %s,
                             aggregation_ind = %s,
                             last_update_date = %s
-                    WHERE transaction_id = %s 
-                    AND report_id in ('{}') 
-                    AND cmte_id = %s 
+                    WHERE transaction_id = %s
+                    AND report_id in ('{}')
+                    AND cmte_id = %s
                     AND delete_ind is distinct from 'Y'
                 """.format(
                     "', '".join(report_list)
@@ -667,12 +663,12 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
             cursor.execute(
                 """
 
-                UPDATE public.sched_b 
+                UPDATE public.sched_b
                 SET delete_ind = 'Y',
-                last_update_date = %s 
-                WHERE transaction_id = %s 
+                last_update_date = %s
+                WHERE transaction_id = %s
                 AND report_id in ('{}')
-                AND cmte_id = %s 
+                AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
                 """.format(
                     "', '".join(report_list)
@@ -766,9 +762,10 @@ def post_schedB(datum):
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
             trans_char = "LB"  # for sched_l transactions
-            datum["line_number"], datum[
-                "transaction_type"
-            ] = get_line_number_trans_type(datum.get("transaction_type_identifier"))
+            (
+                datum["line_number"],
+                datum["transaction_type"],
+            ) = get_line_number_trans_type(datum.get("transaction_type_identifier"))
         else:
             trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
@@ -962,8 +959,9 @@ def get_schedB(data):
                 # obj.update({"election_year": REQT_ELECTION_YR})
         return forms_obj
 
-    except:
+    except BaseException:
         raise
+
 
 # TODO: need to add beneficiary fields
 
@@ -986,7 +984,7 @@ def get_existing_expenditure(cmte_id, transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, _v)
             return cursor.fetchone()[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -1201,7 +1199,7 @@ def put_schedB(datum):
             update_aggregate_lb(datum)
             update_sl_summary(datum)
         return datum
-    except:
+    except BaseException:
         raise
 
 
@@ -1242,7 +1240,7 @@ def delete_schedB(data):
                 datum.get("report_id"),
             )
         # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -1282,7 +1280,7 @@ def validate_parent_transaction_exist(data):
 
 def schedB_sql_dict(data):
     """
-    build a formulated data dictionary based on loaded 
+    build a formulated data dictionary based on loaded
     json and validate some field data
     """
     try:
@@ -1380,7 +1378,7 @@ def schedB_sql_dict(data):
         )
         logger.debug("schedB_sql_dict done with {}".format(datum))
         return datum
-    except:
+    except BaseException:
         raise
 
 
@@ -1392,71 +1390,71 @@ def redesignation_auto_generate_transactions(
     contribution_amount,
     redesignated_id,
 ):
-    """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
+    """This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy
     of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
     ticket for the business rules that apply to reattribution"""
     try:
         query_string_original = """UPDATE public.sched_b SET redesignation_id=%s, redesignation_ind='O' WHERE transaction_id=%s AND cmte_id=%s"""
         query_string_redesignation = """UPDATE public.sched_b SET redesignation_id=%s, redesignation_ind='R' WHERE transaction_id=%s AND cmte_id=%s"""
         query_string_auto_1 = """INSERT INTO public.sched_b(
-            cmte_id, report_id, line_number, transaction_type, 
-            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, 
-            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, election_other_description, 
-            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, nc_soft_account, 
-            delete_ind, beneficiary_cand_office, 
-            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
-            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
-            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
-            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+            cmte_id, report_id, line_number, transaction_type,
+            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date,
+            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose,
+            category_code, memo_code, memo_text, election_code, election_other_description,
+            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1,
+            other_street_2, other_city, other_state, other_zip, nc_soft_account,
+            delete_ind, beneficiary_cand_office,
+            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt,
+            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name,
+            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix,
+            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id,
             itemized_ind, levin_account_id, redesignation_ind,redesignation_id)
-            SELECT cmte_id, %s, line_number, transaction_type, 
-               null, null, entity_id, expenditure_date, 
+            SELECT cmte_id, %s, line_number, transaction_type,
+               null, null, entity_id, expenditure_date,
                expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose,
-               category_code, 'X', 
-               concat('MEMO: See ', (SELECT rrt.rpt_type_desc FROM public.ref_rpt_types rrt WHERE rrt.rpt_type = 
-               (SELECT r.report_type FROM public.reports r WHERE r.report_id = %s)), ' report. Redesignation below'), 
-               election_code, election_other_description, 
-               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
+               category_code, 'X',
+               concat('MEMO: See ', (SELECT rrt.rpt_type_desc FROM public.ref_rpt_types rrt WHERE rrt.rpt_type =
+               (SELECT r.report_type FROM public.reports r WHERE r.report_id = %s)), ' report. Redesignation below'),
+               election_code, election_other_description,
+               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1,
                other_street_2, other_city, other_state, other_zip, nc_soft_account,
-               delete_ind, beneficiary_cand_office, 
-               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
-               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
-               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
-               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+               delete_ind, beneficiary_cand_office,
+               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt,
+               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name,
+               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix,
+               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id,
                itemized_ind, levin_account_id, 'A', %s
             FROM public.sched_b WHERE transaction_id= %s and cmte_id= %s;"""
 
         query_string_auto_2 = """INSERT INTO public.sched_b(
-            cmte_id, report_id, line_number, transaction_type, 
-            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, 
-            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, election_other_description, 
-            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, nc_soft_account, 
-            delete_ind, beneficiary_cand_office, 
-            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
-            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
-            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
-            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+            cmte_id, report_id, line_number, transaction_type,
+            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date,
+            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose,
+            category_code, memo_code, memo_text, election_code, election_other_description,
+            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1,
+            other_street_2, other_city, other_state, other_zip, nc_soft_account,
+            delete_ind, beneficiary_cand_office,
+            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt,
+            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name,
+            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix,
+            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id,
             itemized_ind, levin_account_id, redesignation_ind,redesignation_id)
-            SELECT cmte_id, %s, line_number, transaction_type, 
-               null, null, entity_id, %s, 
+            SELECT cmte_id, %s, line_number, transaction_type,
+               null, null, entity_id, %s,
                %s, semi_annual_refund_bundled_amount, expenditure_purpose,
-               category_code, 'X', 'MEMO: Redesignated Below', election_code, election_other_description, 
-               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
-               other_street_2, other_city, other_state, other_zip, nc_soft_account, 
-               delete_ind, beneficiary_cand_office, 
-               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
-               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
-               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
-               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+               category_code, 'X', 'MEMO: Redesignated Below', election_code, election_other_description,
+               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1,
+               other_street_2, other_city, other_state, other_zip, nc_soft_account,
+               delete_ind, beneficiary_cand_office,
+               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt,
+               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name,
+               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix,
+               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id,
                itemized_ind, levin_account_id, 'A', %s
           FROM public.sched_b WHERE transaction_id= %s and cmte_id= %s;"""
 
         query_string_aggregate = """SELECT expenditure_date, transaction_type_identifier,
-        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and 
+        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and
         redesignation_ind='A' AND expenditure_amount >= 0 AND cmte_id=%s"""
 
         with connection.cursor() as cursor:
@@ -1529,7 +1527,7 @@ def redesignation_auto_update_transactions(
         WHERE redesignation_id = %s AND cmte_id = %s AND expenditure_amount < 0 AND redesignation_ind='A'"""
 
         query_string_aggregate = """SELECT expenditure_date, transaction_type_identifier,
-        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and 
+        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and
         redesignation_ind='A' AND expenditure_amount >= 0 AND cmte_id=%s"""
 
         with connection.cursor() as cursor:
@@ -1601,47 +1599,47 @@ def list_all_sb_transactions_entity(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT t1.expenditure_amount, 
-                    t1.transaction_id, 
-                    t1.report_id, 
-                    t1.line_number, 
-                    t1.expenditure_date, 
-                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                    t1.memo_code, 
+                SELECT t1.expenditure_amount,
+                    t1.transaction_id,
+                    t1.report_id,
+                    t1.line_number,
+                    t1.expenditure_date,
+                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
+                    t1.memo_code,
                     t1.back_ref_transaction_id,
                     t1.transaction_type_identifier,
-                    t1.redesignation_ind, 
+                    t1.redesignation_ind,
                     t1.aggregation_ind,
-                    t1.itemized_ind, 
+                    t1.itemized_ind,
                     'sched_b' as sched_type,
                     t1.create_date
-                    FROM public.sched_b t1 
-                    WHERE entity_id = %s 
-                    AND cmte_id = %s 
-                    AND expenditure_date >= %s 
-                    AND expenditure_date <= %s 
-                    AND delete_ind is distinct FROM 'Y'  
+                    FROM public.sched_b t1
+                    WHERE entity_id = %s
+                    AND cmte_id = %s
+                    AND expenditure_date >= %s
+                    AND expenditure_date <= %s
+                    AND delete_ind is distinct FROM 'Y'
                 UNION
                 SELECT h4.total_amount as expenditure_amount,
                     h4.transaction_id,
                     h4.report_id,
-                    h4.line_number, 
-                    h4.expenditure_date, 
-                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = h4.report_id), 
-                    h4.memo_code, 
+                    h4.line_number,
+                    h4.expenditure_date,
+                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = h4.report_id),
+                    h4.memo_code,
                     h4.back_ref_transaction_id,
                     h4.transaction_type_identifier,
-                    null as redesignation_ind, 
+                    null as redesignation_ind,
                     'Y' as aggregation_ind,
                     'I' as itemized_ind,
                     'sched_h4' as sched_type,
                     h4.create_date
-                    FROM public.sched_h4 h4 
-                    WHERE payee_entity_id = %s  
-                    AND cmte_id = %s 
-                    AND expenditure_date >= %s 
-                    AND expenditure_date <= %s 
-                    AND delete_ind is distinct FROM 'Y' 
+                    FROM public.sched_h4 h4
+                    WHERE payee_entity_id = %s
+                    AND cmte_id = %s
+                    AND expenditure_date >= %s
+                    AND expenditure_date <= %s
+                    AND delete_ind is distinct FROM 'Y'
                     AND transaction_type_identifier = 'ALLOC_EXP_DEBT'
                 ORDER BY expenditure_date ASC, create_date ASC
                 """,
@@ -1724,10 +1722,10 @@ def update_schedB_aggamt_transactions(
     helper function for updating private contribution line number based on aggrgate amount
     the aggregate amount is a contribution_date-based on incremental update, the line number
     is updated accordingly:
-    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table)
             and only when it is NOT add contribution_amount to aggregate amount
     edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
-    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount;
             if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
     e.g.
     date, contribution_amount, aggregate_amount, line_number
@@ -1736,7 +1734,7 @@ def update_schedB_aggamt_transactions(
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
     """
     try:
-        if transaction_type_identifier not in ('IND_REFUND', 'REG_ORG_REFUND'):
+        if transaction_type_identifier not in ("IND_REFUND", "REG_ORG_REFUND"):
             itemization_value = 200
             # itemized_transaction_list = []
             # unitemized_transaction_list = []
@@ -1764,7 +1762,10 @@ def update_schedB_aggamt_transactions(
                     # ):
                     if transaction[10] != "N":
                         aggregate_amount += transaction[0]
-                    if expenditure_date <= transaction[4] or transaction[12] == 'sched_b':
+                    if (
+                        expenditure_date <= transaction[4]
+                        or transaction[12] == "sched_b"
+                    ):
                         line_number, itemized_ind = transaction[3], transaction[11]
                         if itemized_ind and itemized_ind.startswith(
                             "F"
@@ -1811,7 +1812,7 @@ def update_sb_aggregation_status(transaction_id, status):
                         transaction_id
                     )
                 )
-    except:
+    except BaseException:
         raise
 
 
@@ -1994,7 +1995,9 @@ def schedB(request):
                 REQT_ELECTION_YR = request.query_params.get("election_year")
             try:
                 # checking if redesignation is triggered for a transaction
-                logger.debug("sched_b POST call with request data:{}".format(request.data))
+                logger.debug(
+                    "sched_b POST call with request data:{}".format(request.data)
+                )
                 redesignation_flag = False
                 if "redesignation_id" in request.data and request.data[
                     "redesignation_id"
@@ -2133,7 +2136,13 @@ def schedB(request):
                 if "isRedesignation" in request.data and request.data[
                     "isRedesignation"
                 ] not in ["None", "null", "", ""]:
-                    if request.data["isRedesignation"] in ["True", "true", "t", "T", True]:
+                    if request.data["isRedesignation"] in [
+                        "True",
+                        "true",
+                        "t",
+                        "T",
+                        True,
+                    ]:
                         redesignation_flag = True
                         if "redesignation_report_id" not in request.data:
                             raise Exception(
@@ -2239,20 +2248,20 @@ def schedB(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def update_auto_generated_redesignated_transactions(data):
     try:
         with connection.cursor() as cursor:
-            auto_sql_1 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, 
-            entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, 
-            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s, 
-            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, 
-            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s, 
+            auto_sql_1 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s,
+            entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s,
+            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s,
+            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s,
+            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s,
             beneficiary_cand_entity_id = %s, levin_account_id = %s
-            WHERE redesignation_ind = 'A' AND redesignation_id = %s 
+            WHERE redesignation_ind = 'A' AND redesignation_id = %s
             AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND expenditure_amount > 0"""
             cursor.execute(
                 auto_sql_1,
@@ -2290,13 +2299,13 @@ def update_auto_generated_redesignated_transactions(data):
                 )
 
         with connection.cursor() as cursor:
-            auto_sql_2 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, 
-            entity_id = %s, semi_annual_refund_bundled_amount = %s, 
-            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s, 
-            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, 
-            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s, 
+            auto_sql_2 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s,
+            entity_id = %s, semi_annual_refund_bundled_amount = %s,
+            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s,
+            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s,
+            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s,
             beneficiary_cand_entity_id = %s, levin_account_id = %s
-            WHERE redesignation_ind = 'A' AND redesignation_id = %s 
+            WHERE redesignation_ind = 'A' AND redesignation_id = %s
             AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND expenditure_amount < 0"""
             cursor.execute(
                 auto_sql_2,
@@ -2348,18 +2357,18 @@ def get_list_schedA_from_schedB(
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name,
+                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text,
                     election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                    FROM public.sched_a 
+                    FROM public.sched_a
                     WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name,
+                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text,
                     election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                    FROM public.sched_a 
+                    FROM public.sched_a
                     WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
                         "', '".join(report_list)
                     )
@@ -2370,18 +2379,18 @@ def get_list_schedA_from_schedB(
                 )
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code,
                     memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                    FROM public.sched_a 
+                    FROM public.sched_a
                     WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code,
                     memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                    FROM public.sched_a 
+                    FROM public.sched_a
                     WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )

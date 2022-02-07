@@ -82,7 +82,7 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("additional_email_2"))
 
-    logger.debug('***here is a list of email recipients:{}'.format(RECIPIENT))
+    logger.debug("***here is a list of email recipients:{}".format(RECIPIENT))
     SUBJECT = "Form {} submitted successfully".format(data.get("form_type"))
 
     # The email body for recipients with non-HTML email clients.

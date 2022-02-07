@@ -1,7 +1,12 @@
 import logging
 from functools import lru_cache
 from django.db import connection
-from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list, cmte_type
+from fecfiler.core.views import (
+    get_entities,
+    NoOPError,
+    superceded_report_id_list,
+    cmte_type,
+)
 import datetime
 
 logger = logging.getLogger(__name__)
@@ -10,12 +15,12 @@ logger = logging.getLogger(__name__)
 def validate_new_election_year(cmte_id, report_id):
     """
     helper function for checking a report a NEW election year:
-    checking cvg_start_date month = 1 and day = 1 
+    checking cvg_start_date month = 1 and day = 1
     """
 
     _sql = """
-    SELECT extract(day from cvg_start_date) as d, 
-    extract(month from cvg_start_date) as m 
+    SELECT extract(day from cvg_start_date) as d,
+    extract(month from cvg_start_date) as m
     FROM public.reports
     WHERE report_id = %s and cmte_id = %s
     and delete_ind is distinct from 'Y'
@@ -31,7 +36,7 @@ def validate_new_election_year(cmte_id, report_id):
                     logger.debug("new election year report identified.")
                     return True
         return False
-    except:
+    except BaseException:
         raise
 
 
@@ -40,7 +45,7 @@ def delete_child_transaction(table, cmte_id, transaction_id):
     delete sql transaction
     """
     _sql1 = """UPDATE public.{}""".format(table)
-    _sql2 = """ SET delete_ind = 'Y' 
+    _sql2 = """ SET delete_ind = 'Y'
             WHERE back_ref_transaction_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, cmte_id)
@@ -53,7 +58,7 @@ def restore_child_transaction(table, cmte_id, transaction_id):
     restore sql transaction
     """
     _sql1 = """UPDATE public.{}""".format(table)
-    _sql2 = """ SET delete_ind = '' 
+    _sql2 = """ SET delete_ind = ''
             WHERE back_ref_transaction_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, cmte_id)
@@ -64,11 +69,11 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
     """
     update parent sched_c transaction when a child payemnt transaction saved
     """
-    while 1:
+    while True:
         logger.debug("update_sched_c_parent...")
         _sql1 = """
             SELECT loan_payment_to_date, loan_balance
-            FROM public.sched_c 
+            FROM public.sched_c
             WHERE transaction_id = '{}'
             AND cmte_id = '{}'
             AND delete_ind is distinct from 'Y'
@@ -81,7 +86,7 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 SET loan_payment_to_date = %s,
                     loan_balance = %s,
                     last_update_date = %s
-                WHERE transaction_id = %s 
+                WHERE transaction_id = %s
                 AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
             """
@@ -126,7 +131,7 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
             logger.debug("update sched_c with values: {}".format(_v))
             do_transaction(_sql2, _v)
             logger.debug("loan {} update successful.".format(transaction_id))
-        except:
+        except BaseException:
             raise
         _sql3 = """SELECT json_agg(t) FROM (SELECT ch.transaction_id
                 FROM public.sched_c ch WHERE ch.back_ref_transaction_id = %s
@@ -136,8 +141,12 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
             json_result = cursor.fetchone()[0]
         if json_result:
             json_result = json_result[0]
-            transaction_id = json_result['transaction_id']
-            logger.debug("found duplicate record in next report with transaction_id: {}".format(transaction_id))
+            transaction_id = json_result["transaction_id"]
+            logger.debug(
+                "found duplicate record in next report with transaction_id: {}".format(
+                    transaction_id
+                )
+            )
         else:
             break
 
@@ -149,7 +158,7 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
     logger.debug("update_sched_d_parent...")
     _sql1 = """
         SELECT payment_amount, balance_at_close
-        FROM public.sched_d 
+        FROM public.sched_d
         WHERE transaction_id = '{}'
         AND cmte_id = '{}'
         AND delete_ind is distinct from 'Y'
@@ -162,7 +171,7 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
             SET payment_amount = %s,
                 balance_at_close = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s 
+            WHERE transaction_id = %s
             AND cmte_id = %s
             AND delete_ind is distinct from 'Y'
         """
@@ -201,7 +210,7 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
         logger.debug("update sched_d with values: {}".format(_v))
         do_transaction(_sql2, _v)
         logger.debug("parent update successful.")
-    except:
+    except BaseException:
         raise
 
 
@@ -223,7 +232,7 @@ def update_earmark_parent_purpose(data):
     """
     for earmark transaction only:
     when an earmark child transaction is added or updated,
-    the child entity_name should be updated in parent transaction 
+    the child entity_name should be updated in parent transaction
     'purpose_description' field
 
     update: part of the description like 'Earmarked for' and 'Earmarked through'
@@ -245,9 +254,9 @@ def update_earmark_parent_purpose(data):
     #     purpose = entity_name
     purpose = entity_name
     _sql = """
-    UPDATE public.sched_a 
-    SET purpose_description = %s 
-    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+    UPDATE public.sched_a
+    SET purpose_description = %s
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -285,7 +294,7 @@ def transaction_exists(tran_id, sched_type):
             if cursor.rowcount:
                 return True
         return False
-    except:
+    except BaseException:
         raise
 
 
@@ -302,7 +311,7 @@ def populate_transaction_types():
     """
     _sql = """
     SELECT tran_identifier as tran_id, line_num as line_num, tran_code as tran_code
-    FROM ref_transaction_types 
+    FROM ref_transaction_types
     """
     # WHERE sched_type = 'sched_a'
     # OR sched_type = 'sched_b'
@@ -334,7 +343,7 @@ def get_transaction_type_descriptions():
     """
     _sql = """
     SELECT tran_identifier as tran_id, tran_desc
-    FROM ref_transaction_types 
+    FROM ref_transaction_types
     """
     tran_dic = {}
     try:
@@ -365,12 +374,11 @@ def get_line_number_trans_type(transaction_type_identifier):
             return line_number, transaction_type
         else:
             raise Exception(
-
                 "The transaction type identifier is not in the specified list. Input Received: "
                 + transaction_type_identifier
             )
 
-    except:
+    except BaseException:
         raise
 
 
@@ -385,14 +393,14 @@ def get_sched_a_transactions(
             # GET single row from schedA table
             if transaction_id:
                 query_string = """
-                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                        back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, 
-                        purpose_description, memo_code, memo_text, election_code, election_other_description, 
+                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                        back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt,
+                        purpose_description, memo_code, memo_text, election_code, election_other_description,
                         create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                FROM public.sched_a 
-                WHERE report_id = %s 
-                AND cmte_id = %s 
-                AND transaction_id = %s 
+                FROM public.sched_a
+                WHERE report_id = %s
+                AND cmte_id = %s
+                AND transaction_id = %s
                 AND delete_ind is distinct from 'Y'
                 """
 
@@ -403,14 +411,14 @@ def get_sched_a_transactions(
 
             elif back_ref_transaction_id:
                 query_string = """
-                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                        back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, 
-                        purpose_description, memo_code, memo_text, election_code, election_other_description, 
+                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                        back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt,
+                        purpose_description, memo_code, memo_text, election_code, election_other_description,
                         create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                FROM public.sched_a 
-                WHERE report_id = %s 
-                AND cmte_id = %s 
-                AND back_ref_transaction_id = %s 
+                FROM public.sched_a
+                WHERE report_id = %s
+                AND cmte_id = %s
+                AND back_ref_transaction_id = %s
                 AND delete_ind is distinct from 'Y'
                 """
 
@@ -421,14 +429,14 @@ def get_sched_a_transactions(
 
             else:
                 query_string = """
-                SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                        back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, 
-                        memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, 
+                SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                        back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description,
+                        memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id,
                         donor_cmte_name, transaction_type_identifier
-                FROM public.sched_a 
-                WHERE report_id = %s 
-                AND cmte_id = %s 
-                AND delete_ind is distinct from 'Y' 
+                FROM public.sched_a
+                WHERE report_id = %s
+                AND cmte_id = %s
+                AND delete_ind is distinct from 'Y'
                 ORDER BY transaction_id DESC
                 """
 
@@ -469,12 +477,12 @@ def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
             memo_code,
             memo_text,
             line_number,
-            create_date, 
+            create_date,
             last_update_date
             FROM public.sched_e
-            WHERE report_id = %s 
-            AND cmte_id = %s 
-            AND back_ref_transaction_id = %s 
+            WHERE report_id = %s
+            AND cmte_id = %s
+            AND back_ref_transaction_id = %s
             AND delete_ind is distinct from 'Y'
             """
     try:
@@ -484,7 +492,7 @@ def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
                 [report_id, cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -493,11 +501,11 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
     load child transactions for sched_f
     """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             transaction_type_identifier,
-            transaction_id, 
+            transaction_id,
             back_ref_transaction_id,
             back_ref_sched_name,
             coordinated_exp_ind,
@@ -529,10 +537,10 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
             memo_code,
             memo_text,
             create_date
-    FROM public.sched_f 
-    WHERE report_id = %s 
-    AND cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    FROM public.sched_f
+    WHERE report_id = %s
+    AND cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -542,7 +550,7 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
                 [report_id, cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -552,7 +560,7 @@ def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
     TODO: those chiuld trnasaction functions can be refatored later on
     """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             transaction_type_identifier,
@@ -574,10 +582,10 @@ def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
             line_number,
             transaction_type,
             create_date
-    FROM public.sched_h4 
-    WHERE report_id = %s 
-    AND cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    FROM public.sched_h4
+    WHERE report_id = %s
+    AND cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -587,7 +595,7 @@ def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
                 [report_id, cmte_id, transaction_id],
             )
             return post_process_it_h4(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -596,7 +604,7 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
     load child transactions for sched_h6
     """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             line_number,
@@ -620,16 +628,16 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
                 WHEN activity_event_type = 'VR' THEN 'Voter Registration'
                 WHEN activity_event_type = 'GO' THEN 'GOTV'
                 WHEN activity_event_type = 'VI' THEN 'Voter ID'
-                WHEN activity_event_type = 'GC' THEN 'Generic Campaign' 
+                WHEN activity_event_type = 'GC' THEN 'Generic Campaign'
                 ELSE ''::text
-                END) AS activity_event_identifier, 
+                END) AS activity_event_identifier,
             memo_code,
-            memo_text, 
+            memo_text,
             create_date
     FROM public.sched_h6
-    WHERE report_id = %s 
-    AND cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    WHERE report_id = %s
+    AND cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -639,7 +647,7 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
                 [report_id, cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -648,19 +656,19 @@ def get_sched_c_loan_payments(cmte_id, transaction_id):
     load loan payments for a particular loan based on transaction_id
     """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             transaction_id,
             back_ref_transaction_id,
             expenditure_date,
             expenditure_amount,
-            transaction_type_identifier, 
-            expenditure_purpose, 
+            transaction_type_identifier,
+            expenditure_purpose,
             memo_text
     FROM public.sched_b
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    WHERE cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -672,7 +680,7 @@ def get_sched_c_loan_payments(cmte_id, transaction_id):
                 [cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -683,7 +691,7 @@ def get_sched_c1_child(cmte_id, transaction_id):
     # print(report_id)
     # print(transaction_id)
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             line_number,
@@ -725,8 +733,8 @@ def get_sched_c1_child(cmte_id, transaction_id):
             authorized_signed_date,
             create_date
     FROM public.sched_c1
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    WHERE cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -738,7 +746,7 @@ def get_sched_c1_child(cmte_id, transaction_id):
                 [cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -749,12 +757,12 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
     # print(report_id)
     # print(transaction_id)
     _sql = """
-        SELECT             
+        SELECT
             cmte_id,
             transaction_id
         FROM public.sched_c1
-        WHERE cmte_id = %s 
-        AND back_ref_transaction_id = %s 
+        WHERE cmte_id = %s
+        AND back_ref_transaction_id = %s
         AND delete_ind is distinct from 'Y'
     """
     # _sql = """
@@ -814,7 +822,7 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
             )
             return cursor.fetchone()[0]
             # return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         rais
 
 
@@ -840,12 +848,12 @@ def get_sched_c2_child_transactions(cmte_id, transaction_id):
     # AND delete_ind is distinct from 'Y'
     # """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             transaction_id
     FROM public.sched_c2
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    WHERE cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -855,7 +863,7 @@ def get_sched_c2_child_transactions(cmte_id, transaction_id):
                 [cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -864,7 +872,7 @@ def get_sched_c2_child(cmte_id, transaction_id):
     load c2 child transactions for sched_c without report_id
     """
     _sql = """
-    SELECT             
+    SELECT
             cmte_id,
             report_id,
             line_number,
@@ -876,8 +884,8 @@ def get_sched_c2_child(cmte_id, transaction_id):
             back_ref_sched_name,
             create_date
     FROM public.sched_c2
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    WHERE cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     try:
@@ -887,12 +895,16 @@ def get_sched_c2_child(cmte_id, transaction_id):
                 [cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
 def get_sched_b_transactions(
-    report_id, cmte_id, include_deleted_trans_flag=False, transaction_id=None, back_ref_transaction_id=None
+    report_id,
+    cmte_id,
+    include_deleted_trans_flag=False,
+    transaction_id=None,
+    back_ref_transaction_id=None,
 ):
     """
     load sched_b transactions
@@ -904,15 +916,15 @@ def get_sched_b_transactions(
             if transaction_id:
                 if not include_deleted_trans_flag:
                     query_string = """
-                    SELECT cmte_id, report_id, line_number, transaction_type, 
-                                            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                                            entity_id, expenditure_date, expenditure_amount, 
-                                            semi_annual_refund_bundled_amount, expenditure_purpose, 
-                                            category_code, memo_code, memo_text, election_code, 
-                                            election_other_description, beneficiary_cmte_id, 
-                                            other_name, other_street_1, 
-                                            other_street_2, other_city, other_state, other_zip, 
-                                            nc_soft_account, transaction_type_identifier, 
+                    SELECT cmte_id, report_id, line_number, transaction_type,
+                                            transaction_id, back_ref_transaction_id, back_ref_sched_name,
+                                            entity_id, expenditure_date, expenditure_amount,
+                                            semi_annual_refund_bundled_amount, expenditure_purpose,
+                                            category_code, memo_code, memo_text, election_code,
+                                            election_other_description, beneficiary_cmte_id,
+                                            other_name, other_street_1,
+                                            other_street_2, other_city, other_state, other_zip,
+                                            nc_soft_account, transaction_type_identifier,
                                             beneficiary_cmte_name,
                                             beneficiary_cand_entity_id,
                                             levin_account_id,
@@ -920,23 +932,23 @@ def get_sched_b_transactions(
                                             create_date,
                                             redesignation_id, redesignation_ind
                     FROM public.sched_b WHERE report_id in ('{}')
-                    AND cmte_id = %s 
-                    AND transaction_id = %s 
+                    AND cmte_id = %s
+                    AND transaction_id = %s
                     AND delete_ind is distinct from 'Y'
                     """.format(
                         "', '".join(report_list)
                     )
                 else:
                     query_string = """
-                    SELECT cmte_id, report_id, line_number, transaction_type, 
-                                            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                                            entity_id, expenditure_date, expenditure_amount, 
-                                            semi_annual_refund_bundled_amount, expenditure_purpose, 
-                                            category_code, memo_code, memo_text, election_code, 
-                                            election_other_description, beneficiary_cmte_id, 
-                                            other_name, other_street_1, 
-                                            other_street_2, other_city, other_state, other_zip, 
-                                            nc_soft_account, transaction_type_identifier, 
+                    SELECT cmte_id, report_id, line_number, transaction_type,
+                                            transaction_id, back_ref_transaction_id, back_ref_sched_name,
+                                            entity_id, expenditure_date, expenditure_amount,
+                                            semi_annual_refund_bundled_amount, expenditure_purpose,
+                                            category_code, memo_code, memo_text, election_code,
+                                            election_other_description, beneficiary_cmte_id,
+                                            other_name, other_street_1,
+                                            other_street_2, other_city, other_state, other_zip,
+                                            nc_soft_account, transaction_type_identifier,
                                             beneficiary_cmte_name,
                                             beneficiary_cand_entity_id,
                                             levin_account_id,
@@ -945,8 +957,8 @@ def get_sched_b_transactions(
                                             aggregation_ind,
                                             redesignation_id, redesignation_ind
                     FROM public.sched_b WHERE report_id in ('{}')
-                    AND cmte_id = %s 
-                    AND transaction_id = %s 
+                    AND cmte_id = %s
+                    AND transaction_id = %s
                     """.format(
                         "', '".join(report_list)
                     )
@@ -957,20 +969,20 @@ def get_sched_b_transactions(
                 )
             elif back_ref_transaction_id:
                 query_string = """
-                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
-                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
-                        other_state, other_zip, nc_soft_account, transaction_type_identifier, 
+                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount,
+                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description,
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city,
+                        other_state, other_zip, nc_soft_account, transaction_type_identifier,
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
                         levin_account_id,
                         aggregate_amt,
                         create_date
-                FROM public.sched_b 
+                FROM public.sched_b
                 WHERE report_id in ('{}')
-                AND cmte_id = %s 
-                AND back_ref_transaction_id = %s 
+                AND cmte_id = %s
+                AND back_ref_transaction_id = %s
                 AND delete_ind is distinct from 'Y'
                 """.format(
                     "', '".join(report_list)
@@ -981,19 +993,19 @@ def get_sched_b_transactions(
                 )
             else:
                 query_string = """
-                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
-                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
-                        other_state, other_zip, nc_soft_account, transaction_type_identifier, 
+                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id,
+                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount,
+                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description,
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city,
+                        other_state, other_zip, nc_soft_account, transaction_type_identifier,
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
                         levin_account_id,
                         aggregate_amt,
                         create_date
-                FROM public.sched_b 
+                FROM public.sched_b
                 WHERE report_id in ('{}')
-                AND cmte_id = %s 
+                AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
                 """.format(
                     "', '".join(report_list)

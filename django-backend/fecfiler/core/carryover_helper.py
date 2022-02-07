@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_next_transaction_id(trans_char):
-    """get next transaction_id with seeding letter, like 'SA' """
+    """get next transaction_id with seeding letter, like 'SA'"""
     try:
         with connection.cursor() as cursor:
             cursor.execute(
@@ -35,7 +35,7 @@ def is_pac(cmte_id):
             if cursor.rowcount > 0:
                 return cursor.fetchone()[0] == "PAC"
         return False
-    except:
+    except BaseException:
         raise
 
 
@@ -51,7 +51,7 @@ def is_pty(cmte_id):
             if cursor.rowcount > 0:
                 return cursor.fetchone()[0] == "PTY"
         return False
-    except:
+    except BaseException:
         raise
 
 
@@ -61,7 +61,7 @@ def do_pty_h1_carryover(cmte_id, report_id):
     if yes:
         no carryover
     else:
-        do carryover - grab the most recent h1 item 
+        do carryover - grab the most recent h1 item
         and clone it with current report id
     """
 
@@ -72,51 +72,51 @@ def do_pty_h1_carryover(cmte_id, report_id):
     """
 
     carryover_sql = """
-    INSERT INTO sched_h1 
-            (cmte_id, 
-             report_id, 
-             line_number, 
-             transaction_type_identifier, 
-             transaction_type, 
-             transaction_id, 
-             presidential_only, 
-             presidential_and_senate, 
-             senate_only, 
-             non_pres_and_non_senate, 
-             federal_percent, 
-             non_federal_percent, 
-             election_year, 
-             administrative, 
-             generic_voter_drive, 
-             public_communications, 
-             back_ref_transaction_id, 
-             create_date) 
-    SELECT h1.cmte_id, 
-        %s, 
-        h1.line_number, 
-        h1.transaction_type_identifier, 
-        h1.transaction_type, 
-        get_next_transaction_id('SH'), 
-        h1.presidential_only, 
-        h1.presidential_and_senate, 
-        h1.senate_only, 
-        h1.non_pres_and_non_senate, 
-        h1.federal_percent, 
-        h1.non_federal_percent, 
-        h1.election_year, 
-        h1.administrative, 
-        h1.generic_voter_drive, 
-        h1.public_communications, 
-        h1.transaction_id, 
-        Now() 
-    FROM   (SELECT cmte_id, 
-                Max(create_date) AS create_date 
-            FROM   sched_h1 
-            GROUP  BY cmte_id) AS max_h1 
-        JOIN sched_h1 h1 
-            ON max_h1.cmte_id = h1.cmte_id 
-                AND max_h1.create_date = h1.create_date 
-                AND h1.cmte_id = %s 
+    INSERT INTO sched_h1
+            (cmte_id,
+             report_id,
+             line_number,
+             transaction_type_identifier,
+             transaction_type,
+             transaction_id,
+             presidential_only,
+             presidential_and_senate,
+             senate_only,
+             non_pres_and_non_senate,
+             federal_percent,
+             non_federal_percent,
+             election_year,
+             administrative,
+             generic_voter_drive,
+             public_communications,
+             back_ref_transaction_id,
+             create_date)
+    SELECT h1.cmte_id,
+        %s,
+        h1.line_number,
+        h1.transaction_type_identifier,
+        h1.transaction_type,
+        get_next_transaction_id('SH'),
+        h1.presidential_only,
+        h1.presidential_and_senate,
+        h1.senate_only,
+        h1.non_pres_and_non_senate,
+        h1.federal_percent,
+        h1.non_federal_percent,
+        h1.election_year,
+        h1.administrative,
+        h1.generic_voter_drive,
+        h1.public_communications,
+        h1.transaction_id,
+        Now()
+    FROM   (SELECT cmte_id,
+                Max(create_date) AS create_date
+            FROM   sched_h1
+            GROUP  BY cmte_id) AS max_h1
+        JOIN sched_h1 h1
+            ON max_h1.cmte_id = h1.cmte_id
+                AND max_h1.create_date = h1.create_date
+                AND h1.cmte_id = %s
     """
     try:
         with connection.cursor() as cursor:
@@ -129,7 +129,7 @@ def do_pty_h1_carryover(cmte_id, report_id):
                 if cursor.rowcount != 1:
                     logger.debug("no valid h1 found for carryover.")
             logger.debug("pty h1 carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -146,45 +146,45 @@ def do_pac_h1_carryover(cmte_id, report_id):
     also, need to check report date and only do forward carryover
     """
     carryover_sql = """
-    INSERT INTO sched_h1 
-            (cmte_id, 
-             report_id, 
-             line_number, 
-             transaction_type_identifier, 
-             transaction_type, 
-             transaction_id, 
-             presidential_only, 
-             presidential_and_senate, 
-             senate_only, 
-             non_pres_and_non_senate, 
-             federal_percent, 
-             non_federal_percent, 
-             election_year, 
-             administrative, 
-             generic_voter_drive, 
-             public_communications, 
-             back_ref_transaction_id, 
-             create_date) 
-    SELECT h.cmte_id, 
-        %s, 
-        h.line_number, 
-        h.transaction_type_identifier, 
-        h.transaction_type, 
-        get_next_transaction_id('SH'), 
-        h.presidential_only, 
-        h.presidential_and_senate, 
-        h.senate_only, 
-        h.non_pres_and_non_senate, 
-        h.federal_percent, 
-        h.non_federal_percent, 
-        h.election_year, 
-        h.administrative, 
-        h.generic_voter_drive, 
-        h.public_communications, 
-        h.transaction_id, 
-        Now() 
+    INSERT INTO sched_h1
+            (cmte_id,
+             report_id,
+             line_number,
+             transaction_type_identifier,
+             transaction_type,
+             transaction_id,
+             presidential_only,
+             presidential_and_senate,
+             senate_only,
+             non_pres_and_non_senate,
+             federal_percent,
+             non_federal_percent,
+             election_year,
+             administrative,
+             generic_voter_drive,
+             public_communications,
+             back_ref_transaction_id,
+             create_date)
+    SELECT h.cmte_id,
+        %s,
+        h.line_number,
+        h.transaction_type_identifier,
+        h.transaction_type,
+        get_next_transaction_id('SH'),
+        h.presidential_only,
+        h.presidential_and_senate,
+        h.senate_only,
+        h.non_pres_and_non_senate,
+        h.federal_percent,
+        h.non_federal_percent,
+        h.election_year,
+        h.administrative,
+        h.generic_voter_drive,
+        h.public_communications,
+        h.transaction_id,
+        Now()
     FROM  public.sched_h1 h, public.reports r
-            WHERE 
+            WHERE
             h.cmte_id = %s
             AND h.report_id = r.report_id
             AND r.cvg_start_date < (
@@ -206,7 +206,7 @@ def do_pac_h1_carryover(cmte_id, report_id):
             logger.debug(
                 "pac h1 carryover done, carryover items:{}".format(cursor.rowcount)
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -220,8 +220,8 @@ def do_h1_carryover(cmte_id, report_id):
     )
 
     _sql = """
-    SELECT extract(day from cvg_start_date) as d, 
-    extract(month from cvg_start_date) as m 
+    SELECT extract(day from cvg_start_date) as d,
+    extract(month from cvg_start_date) as m
     FROM public.reports
     WHERE report_id = %s and cmte_id = %s
     """
@@ -313,7 +313,7 @@ def do_h2_carryover(cmte_id, report_id):
                 logger.debug("No valid h2 items found.")
             logger.debug("h2 carryover done with report_id {}".format(report_id))
             logger.debug("total carryover h2 items:{}".format(cursor.rowcount))
-    except:
+    except BaseException:
         raise
 
 
@@ -426,7 +426,7 @@ def do_loan_carryover(cmte_id, report_id):
                 logger.debug("total carryover loans:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
         logger.debug("carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -487,7 +487,7 @@ def do_levin_carryover(cmte_id, report_id):
                 logger.debug("total carryover levin summary:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -565,7 +565,7 @@ def do_debt_carryover(cmte_id, report_id):
                 logger.debug("total carryover debts:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -590,22 +590,22 @@ def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
             aggregate_amt,
             create_date
                     )
-    SELECT cmte_id, %s, line_number, transaction_type, 
-            get_next_transaction_id('SB'), %s, back_ref_sched_name, 
-            entity_id, expenditure_date, expenditure_amount, 
-            semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, 
-            election_other_description, beneficiary_cmte_id, 
-            other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, 
-            nc_soft_account, transaction_type_identifier, 
+    SELECT cmte_id, %s, line_number, transaction_type,
+            get_next_transaction_id('SB'), %s, back_ref_sched_name,
+            entity_id, expenditure_date, expenditure_amount,
+            semi_annual_refund_bundled_amount, expenditure_purpose,
+            category_code, memo_code, memo_text, election_code,
+            election_other_description, beneficiary_cmte_id,
+            other_name, other_street_1,
+            other_street_2, other_city, other_state, other_zip,
+            nc_soft_account, transaction_type_identifier,
             beneficiary_cmte_name,
             beneficiary_cand_entity_id,
             aggregate_amt,
             now()
-    FROM public.sched_b 
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
+    FROM public.sched_b
+    WHERE cmte_id = %s
+    AND back_ref_transaction_id = %s
     AND delete_ind is distinct from 'Y'
     """
     _v = [report_id, current_id, cmte_id, parent_id]
@@ -627,7 +627,7 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
     # first query the parent-child relationship in sched_d for current report
     # need this informattion for carrying over all the payments
     _sql = """
-    select back_ref_transaction_id as parent_id, transaction_id as current_id 
+    select back_ref_transaction_id as parent_id, transaction_id as current_id
     from public.sched_d d
     where d.cmte_id = %s
     and d.report_id = %s
@@ -646,14 +646,14 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
                 # carryover_sched_f_payments(cmte_id, report_id, parent_id, current_id)
                 # carryover_sched_h4_payments(cmte_id, report_id, parent_id, current_id)
                 # carryover_sched_h6_payments(cmte_id, report_id, parent_id, current_id)
-    except:
+    except BaseException:
         raise
 
 
 def do_in_between_report_carryover(cmte_id, report_id):
     try:
         logger.debug("inside do_in_between_report_carryover function...")
-        _sql = """SELECT r.report_id FROM public.reports r WHERE r.cmte_id = %s AND r.cvg_start_date > 
+        _sql = """SELECT r.report_id FROM public.reports r WHERE r.cmte_id = %s AND r.cvg_start_date >
                   (SELECT pr.cvg_end_date FROM public.reports pr WHERE pr.cmte_id = %s AND pr.report_id = %s)
                   AND r.delete_ind IS DISTINCT FROM 'Y' ORDER BY r.cvg_start_date ASC LIMIT 1"""
         _values = [cmte_id, cmte_id, report_id]
@@ -666,20 +666,25 @@ def do_in_between_report_carryover(cmte_id, report_id):
             else:
                 logger.debug("No future report found")
         if next_report_id:
-            _sql1 = """SELECT transaction_id FROM public.sched_c WHERE report_id = %s AND cmte_id = %s 
+            _sql1 = """SELECT transaction_id FROM public.sched_c WHERE report_id = %s AND cmte_id = %s
                     AND delete_ind IS DISTINCT FROM 'Y' """
             _values1 = [str(next_report_id), cmte_id]
             with connection.cursor() as cursor:
                 cursor.execute(_sql1, _values1)
                 next_transaction_id_list = cursor.fetchall()
             if next_transaction_id_list:
-                logger.debug("found loans in future report id: {}". format(
-                    next_report_id))
+                logger.debug(
+                    "found loans in future report id: {}".format(next_report_id)
+                )
             else:
-                logger.debug("No loan transactions found in future report id: {}".format(next_report_id))
+                logger.debug(
+                    "No loan transactions found in future report id: {}".format(
+                        next_report_id
+                    )
+                )
             for next_transaction_id in next_transaction_id_list:
                 next_transaction_id = next_transaction_id[0]
-                this_report_transaction_id = get_next_transaction_id('SC')
+                this_report_transaction_id = get_next_transaction_id("SC")
                 _sql2 = """INSERT INTO public.sched_c(cmte_id, report_id, line_number, transaction_type,
                       transaction_type_identifier, transaction_id, entity_id, election_code, election_other_description,
                       loan_amount_original, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date,
@@ -698,76 +703,132 @@ def do_in_between_report_carryover(cmte_id, report_id):
                         WHERE c.cmte_id = %s
                         AND c.report_id = %s AND c.transaction_id = %s
                         AND c.delete_ind is distinct from 'Y'"""
-                _values2 = [report_id, this_report_transaction_id, cmte_id, next_report_id, next_transaction_id]
+                _values2 = [
+                    report_id,
+                    this_report_transaction_id,
+                    cmte_id,
+                    next_report_id,
+                    next_transaction_id,
+                ]
 
                 _sql3 = """UPDATE public.sched_c SET back_ref_transaction_id = %s WHERE cmte_id = %s
                         AND report_id = %s AND transaction_id = %s
                         AND delete_ind is distinct from 'Y'"""
-                _values3 = [this_report_transaction_id, cmte_id, next_report_id, next_transaction_id]
+                _values3 = [
+                    this_report_transaction_id,
+                    cmte_id,
+                    next_report_id,
+                    next_transaction_id,
+                ]
 
                 with connection.cursor() as cursor:
                     cursor.execute(_sql2, _values2)
                     if cursor.rowcount == 0:
-                        logger.debug("could NOT create duplicate transaction for transaction id: {}".format(next_transaction_id))
+                        logger.debug(
+                            "could NOT create duplicate transaction for transaction id: {}".format(
+                                next_transaction_id
+                            )
+                        )
                     else:
-                        logger.debug("created duplicate transaction for transaction id: {}. New transaction id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "created duplicate transaction for transaction id: {}. New transaction id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                     cursor.execute(_sql3, _values3)
                     if cursor.rowcount == 0:
-                        logger.debug("could NOT update back_ref_transaction_id for transaction id: {} with id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "could NOT update back_ref_transaction_id for transaction id: {} with id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                     else:
-                        logger.debug("updated back_ref_transaction_id for transaction id: {} with id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "updated back_ref_transaction_id for transaction id: {} with id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                 logger.debug("done with transaction id: {}".format(next_transaction_id))
             logger.debug("loans carryover done...")
 
-            _sql4 = """SELECT transaction_id FROM public.sched_d WHERE report_id = %s AND cmte_id = %s 
+            _sql4 = """SELECT transaction_id FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
                   AND delete_ind IS DISTINCT FROM 'Y'"""
             _values4 = [str(next_report_id), cmte_id]
             with connection.cursor() as cursor:
                 cursor.execute(_sql4, _values4)
                 next_debt_transaction_id_list = cursor.fetchall()
             if next_debt_transaction_id_list:
-                logger.debug("found debts in future report id: {}.". format(
-                    next_report_id))
+                logger.debug(
+                    "found debts in future report id: {}.".format(next_report_id)
+                )
             else:
-                logger.debug("No debt transactions found in future report id: {}".format(next_report_id))
+                logger.debug(
+                    "No debt transactions found in future report id: {}".format(
+                        next_report_id
+                    )
+                )
             for next_transaction_id in next_debt_transaction_id_list:
                 next_transaction_id = next_transaction_id[0]
-                this_report_transaction_id = get_next_transaction_id('SD')
-                _sql5 = """INSERT INTO public.sched_d(cmte_id, report_id, line_num, transaction_type_identifier, 
-                      transaction_id, entity_id, beginning_balance, balance_at_close, incurred_amount, 
+                this_report_transaction_id = get_next_transaction_id("SD")
+                _sql5 = """INSERT INTO public.sched_d(cmte_id, report_id, line_num, transaction_type_identifier,
+                      transaction_id, entity_id, beginning_balance, balance_at_close, incurred_amount,
                       payment_amount, purpose, back_ref_transaction_id, create_date)
-                        SELECT d.cmte_id, %s, d.line_num, d.transaction_type_identifier, 
-                        %s, d.entity_id, d.beginning_balance, d.beginning_balance, 0, 
+                        SELECT d.cmte_id, %s, d.line_num, d.transaction_type_identifier,
+                        %s, d.entity_id, d.beginning_balance, d.beginning_balance, 0,
                         0, d.purpose, d.back_ref_transaction_id, now()
                         FROM public.sched_d d
                         WHERE d.cmte_id = %s
                         AND d.report_id = %s AND d.transaction_id = %s
                         AND d.delete_ind is distinct from 'Y'"""
-                _values5 = [report_id, this_report_transaction_id, cmte_id, next_report_id, next_transaction_id]
+                _values5 = [
+                    report_id,
+                    this_report_transaction_id,
+                    cmte_id,
+                    next_report_id,
+                    next_transaction_id,
+                ]
 
                 _sql6 = """UPDATE public.sched_d SET back_ref_transaction_id = %s WHERE cmte_id = %s
                         AND report_id = %s AND transaction_id = %s
                         AND delete_ind is distinct from 'Y'"""
-                _values6 = [this_report_transaction_id, cmte_id, next_report_id, next_transaction_id]
+                _values6 = [
+                    this_report_transaction_id,
+                    cmte_id,
+                    next_report_id,
+                    next_transaction_id,
+                ]
 
                 with connection.cursor() as cursor:
                     cursor.execute(_sql5, _values5)
                     if cursor.rowcount == 0:
-                        logger.debug("could NOT create duplicate transaction for transaction id: {}".format(next_transaction_id))
+                        logger.debug(
+                            "could NOT create duplicate transaction for transaction id: {}".format(
+                                next_transaction_id
+                            )
+                        )
                     else:
-                        logger.debug("created duplicate transaction for transaction id: {}. New transaction id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "created duplicate transaction for transaction id: {}. New transaction id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                     cursor.execute(_sql6, _values6)
                     if cursor.rowcount == 0:
-                        logger.debug("could NOT update back_ref_transaction_id for transaction id: {} with id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "could NOT update back_ref_transaction_id for transaction id: {} with id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                     else:
-                        logger.debug("updated back_ref_transaction_id for transaction id: {} with id: {}".format(
-                            next_transaction_id, this_report_transaction_id))
+                        logger.debug(
+                            "updated back_ref_transaction_id for transaction id: {} with id: {}".format(
+                                next_transaction_id, this_report_transaction_id
+                            )
+                        )
                 logger.debug("done with transaction id: {}".format(next_transaction_id))
             logger.debug("debts carryover done...")
     except Exception as e:
-        raise Exception('The do_in_between_report_carryover function is throwing an error: ' + str(e))
+        raise Exception(
+            "The do_in_between_report_carryover function is throwing an error: "
+            + str(e)
+        )
