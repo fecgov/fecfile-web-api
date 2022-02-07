@@ -81,7 +81,7 @@ class SchedC(models.Model):
     lender_cand_office = models.CharField(max_length=1, blank=True, null=True)
     lender_cand_state = models.CharField(max_length=2, blank=True, null=True)
     lender_cand_district = models.DecimalField(
-        max_digits=65535, blank=True, null=True)
+        max_digits=12, blank=True, null=True, decimal_places=2)
     memo_code = models.CharField(max_length=1, blank=True, null=True)
     memo_text = models.CharField(max_length=100, blank=True, null=True)
     delete_ind = models.CharField(max_length=1, blank=True, null=True)
