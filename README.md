@@ -30,11 +30,9 @@ When running docker-compose you will need to be in the root directory of the pro
 You should set the following environment variables in the shell where you are running 'docker-compose up -d'.
 Proper values for the development variables are shown here as an example
 ```
-export FECFILE_DB_HOST=db
-export FECFILE_DB_USERNAME=postgres
-export FECFILE_DB_PASSWORD=postgres
-export FECFILE_DB_NAME=postgres
-export FECFILE_URL=localhost
+export DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
+export FECFILE_TEST_DB_NAME = "postgres"
+export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 ```
 ### Shut down the containers
 `docker-compose down`

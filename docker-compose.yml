@@ -23,7 +23,7 @@ services:
   api:
     # env_file: ../local.env
     build:
-      context: './django-backend'
+      context: './'
       dockerfile: './Dockerfile'
     # command: python manage.py runserver 0.0.0.0:8080
     image: fecfile-api
@@ -37,8 +37,8 @@ services:
     depends_on:
       - db
     environment:
-      - FECFILE_DB_HOST
-      - FECFILE_DB_USERNAME
-      - FECFILE_DB_PASSWORD
-      - FECFILE_DB_NAME
+      - DATABASE_URL
+      - FECFILE_TEST_DB_NAME
+      - DJANGO_SETTINGS_MODULE=fecfiler.settings.local
+      - DJANGO_SECRET_KEY
 

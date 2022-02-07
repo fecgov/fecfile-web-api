@@ -13,14 +13,15 @@ jobs:
 
   dependency-check:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.7
 
     steps:
       - checkout
 
       - python/install-packages:
           pkg-manager: pip
-          pip-dependency-file: django-backend/requirements-test.txt
+          pip-dependency-file: requirements-test.txt
+
 
       - run:
           name: Run depency check
@@ -34,7 +35,7 @@ jobs:
               awk -v "today=${today}" '{ if ($2 > today || $2 == "") print "-i", $1}' | # print any line after today
               xargs echo  # put all the output from previous command on one line
             )
-            export command="safety check -r django-backend/requirements.txt --full-report $ignores"
+            export command="safety check -r requirements.txt --full-report $ignores"
 
             echo "----------------------------------------------------"
             echo "If you need to modify the ignore list for the safety"
@@ -68,7 +69,7 @@ jobs:
       - run:
           name: Create unified requirements so CircleCI can cache them
           command: |
-            cd ~/project/django-backend
+            cd ~/project/
             ls -l
             cat requirements.txt > requirements-all.txt
             echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
@@ -76,12 +77,12 @@ jobs:
 
       - python/install-packages:
           pkg-manager: pip
-          app-dir: ~/project/django-backend/
+          app-dir: ~/project/
           pip-dependency-file: requirements-all.txt
 
       - run:
           name: Wait for the database to be active
-          command: pip install psycopg2 psycopg2-binary retry &&  python wait_for_db.py
+          command: python wait_for_db.py
           working_directory: ~/project/django-backend/
 
       - run:
@@ -89,8 +90,7 @@ jobs:
           command: |
             sudo apt-get update &&
             sudo apt-get install postgresql-client-12 &&
-            export PGPASSWORD=${FECFILE_DB_PASSWORD} &&
-            psql -h ${FECFILE_DB_HOST}  ${FECFILE_DB_NAME} ${FECFILE_DB_USERNAME} < fec_clean_dev_db_backup-20211227.sql
+            psql ${DATABASE_URL} < fec_clean_dev_db_backup-20211227.sql
           working_directory: ~/project/db
 
       - run:
@@ -127,7 +127,6 @@ jobs:
           command: coverage xml -o ~/project/coverage-reports/coverage.xml
           working_directory: ~/project/django-backend
 
-
       # Sonar cloud setup and scanning
       - run:
           name: Create sonar-scanner cache directory if it doesn't exist
@@ -162,6 +161,31 @@ jobs:
           key: v1-sonarcloud-scanner-4.6.2.2472
           paths: /tmp/cache/scanner
 
+  deploy:
+
+    docker:
+      - image: cimg/python:3.7
+
+    steps:
+      - checkout
+
+      - python/install-packages:
+          pkg-manager: pip
+          pip-dependency-file: requirements.txt
+
+      - run:
+          name: Installs for deploy
+          command: |
+            mkdir -p $HOME/bin
+            export PATH=$HOME/bin:$PATH
+            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=7.1.0" | tar xzv -C $HOME/bin
+
+      - deploy:
+          name: Deploy API
+          command: |
+            export PATH=$HOME/bin:$PATH
+            invoke deploy --branch $CIRCLE_BRANCH --login
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -169,5 +193,7 @@ workflows:
     jobs:
       - test
       - dependency-check
-
-
+      - deploy:
+          requires:
+              - test
+              - dependency-check

@@ -1,0 +1,5 @@
+# Database creation script
+db
+
+# git secrets config
+install-git-secrets-hook.sh

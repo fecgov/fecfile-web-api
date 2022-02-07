@@ -1,0 +1,14 @@
+---
+applications:
+- name: fecfile-web-api
+  routes:
+  - route: fecfile-web-api-dev.app.cloud.gov
+  stack: cflinuxfs3
+  buildpacks:
+    - python_buildpack
+  memory: 1G
+  services:
+    - fecfile-api-rds
+  env:
+    DISABLE_COLLECTSTATIC: 1
+    DJANGO_SETTINGS_MODULE: fecfiler.settings.production
