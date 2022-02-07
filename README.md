@@ -32,6 +32,7 @@ Proper values for the development variables are shown here as an example
 ```
 export DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
 export FECFILE_TEST_DB_NAME = "postgres"
+export SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 ```
 ### Shut down the containers
 `docker-compose down`
