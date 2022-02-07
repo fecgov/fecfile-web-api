@@ -55,6 +55,8 @@ ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
 
+ALLOWED_HOSTS = ['*']
+
 # Application definition
 
 INSTALLED_APPS = [

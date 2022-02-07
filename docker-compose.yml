@@ -39,4 +39,5 @@ services:
     environment:
       - DATABASE_URL
       - FECFILE_TEST_DB_NAME
+      - DJANGO_SETTINGS_MODULE=fecfiler.settings.local
 
