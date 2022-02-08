@@ -1,14 +1,10 @@
-from django.shortcuts import render
+import datetime
+import logging
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import json
-import datetime
-import os
-import requests
-import logging
 from django.db import connection
-from django.conf import settings
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from functools import wraps
@@ -16,7 +12,6 @@ from functools import wraps
 # Create your views here.
 from fecfiler.authentication.authorization import (
     is_read_only_or_filer_reports,
-    is_not_read_only_or_filer,
     is_read_only_or_filer_submit,
 )
 from fecfiler.core.views import get_comittee_id, get_next_report_id, clone_fec_entity

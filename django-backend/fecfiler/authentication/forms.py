@@ -1,5 +1,4 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from .models import Account
 

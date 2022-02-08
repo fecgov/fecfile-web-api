@@ -1,17 +1,10 @@
-import datetime
-import json
-import logging
-import os
-from decimal import Decimal
-from django.utils import timezone
-import requests
 import copy
-from functools import lru_cache
-from django.conf import settings
+import datetime
+import logging
+
+from decimal import Decimal
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,12 +15,10 @@ from fecfiler.core.views import (
     check_null_value,
     check_report_id,
     date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     superceded_report_id_list,
     get_sched_h_transaction_table,
     get_comittee_id,
@@ -38,7 +29,6 @@ from fecfiler.core.views import (
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_earmark_parent_purpose,
-    cmte_type,
     get_sched_b_transactions,
     get_transaction_type_descriptions,
 )
@@ -66,14 +56,10 @@ from fecfiler.core.sched_a_helper import (
 )
 
 from fecfiler.sched_B.views import (
-    delete_schedB,
     get_list_child_schedB,
-    get_schedB,
     post_schedB,
     put_schedB,
-    schedB_sql_dict,
     put_sql_schedB,
-    post_sql_schedB,
     delete_sql_schedB,
     get_list_schedB,
     update_schedB_aggamt_transactions,
@@ -82,10 +68,7 @@ from fecfiler.sched_B.views import (
 from fecfiler.sched_L.views import update_sl_summary
 from fecfiler.core.report_helper import new_report_date
 
-# from fecfile.core.aggregation_helper import
-# from fecfiler.sched_H.views import get_list_schedH4, get_list_schedH6
 
-# Create your views here.
 logger = logging.getLogger(__name__)
 
 # mandatory fields for shcedule_a records
@@ -700,7 +683,6 @@ def remove_sql_schedA(transaction_id, report_id, cmte_id):
                 )
     except Exception:
         raise
-
 
 
 def find_form_type(report_id, cmte_id):

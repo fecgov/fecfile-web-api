@@ -1,40 +1,38 @@
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.decorators import api_view
-import maya
-from .models import Cmte_Report_Types_View, My_Forms_View
-from rest_framework.response import Response
-from fecfiler.forms.models import CommitteeInfo
-from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import string
 import datetime
 import os
 import psycopg2
 import requests
-from django.views.decorators.csrf import csrf_exempt
 import logging
+import boto3
+import boto
+import re
+import pandas
+import numpy
+import urllib
+
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+
+from .models import My_Forms_View
+from rest_framework.response import Response
+from fecfiler.forms.models import CommitteeInfo
+from fecfiler.forms.serializers import CommitteeInfoSerializer
+
 from django.db import connection
 from django.http import JsonResponse
 from functools import wraps
 
-import boto3
-from botocore.exceptions import ClientError
-import boto
 from boto.s3.key import Key
 from django.conf import settings
-import re
-import csv
+
 from django.core.paginator import Paginator
-from datetime import date, timedelta, time
-from dateutil.relativedelta import relativedelta
+from datetime import date
 from collections import OrderedDict
 from xml.etree import ElementTree
 from fuzzywuzzy import fuzz
-import pandas
-import numpy
-
-from fecfiler.core.email_helper import email
 
 from fecfiler.core.carryover_helper import (
     do_h1_carryover,
@@ -933,7 +931,6 @@ def check_mandatory_fields_form3x(data):
             )
     except BaseException:
         raise
-
 
 
 def get_next_report_id():

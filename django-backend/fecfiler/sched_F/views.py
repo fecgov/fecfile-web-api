@@ -1,16 +1,10 @@
-from django.shortcuts import render
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
-
 import requests
+
 from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -20,13 +14,10 @@ from fecfiler.core.views import (
     NoOPError,
     check_null_value,
     check_report_id,
-    date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     get_comittee_id,
     update_F3X,
 )
@@ -93,8 +84,8 @@ def validate_negative_transaction(data):
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SF"):
         raise Exception(
-            "The Transaction ID: {} is not in the specified format."
-            + "Transaction IDs start with SF characters".format(transaction_id)
+            "The Transaction ID: {} is not in the specified format. "
+            "Transaction IDs start with SF characters".format(transaction_id)
         )
     return transaction_id
 
@@ -967,7 +958,7 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
                 cand["cand_office_district"] = None
             else:
                 raise Exception(
-                    "The candidate id: {} does not belong to either Senate, House or Presidential office. " \
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. "
                     "Kindly check cand_office in entity table for details".format(
                         beneficiary_cand_id
                     )

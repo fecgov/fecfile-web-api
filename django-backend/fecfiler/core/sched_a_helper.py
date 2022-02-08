@@ -1,11 +1,7 @@
 import logging
+
 from functools import wraps
-
-# from functools import lru_cache
 from django.db import connection
-
-# from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-import datetime
 
 # for updating ear receipt memo
 EAR_RECEIPT_MEMO = [

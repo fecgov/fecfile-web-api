@@ -1,15 +1,9 @@
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-import requests
-from django.conf import settings
+from decimal import Decimal
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,16 +16,15 @@ from fecfiler.core.views import (
     check_null_value,
     check_report_id,
     date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     save_cand_entity,
     superceded_report_id_list,
     get_comittee_id,
     update_F3X,
+    cmte_type,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -41,7 +34,6 @@ from fecfiler.core.transaction_util import (
     update_sched_d_parent,
     update_sched_c_parent,
     get_transaction_type_descriptions,
-    cmte_type,
 )
 from fecfiler.core.report_helper import new_report_date
 
@@ -1691,7 +1683,7 @@ def put_sql_linenumber_schedB(
             )
             if cursor.rowcount == 0:
                 raise Exception(
-                    "put_sql_linenumber_schedB function: The Transaction ID: {} " \
+                    "put_sql_linenumber_schedB function: The Transaction ID: {} "
                     "does not exist in schedB table".format(
                         transaction_id
                     )

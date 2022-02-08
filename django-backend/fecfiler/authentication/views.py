@@ -1,36 +1,26 @@
-import json
 import datetime
 import logging
+import re
 import secrets
-import warnings
-from calendar import timegm
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.hashers import make_password
 from django.db import connection
 from django.http import JsonResponse
-from django.utils.crypto import salted_hmac
-from rest_framework import permissions, viewsets, status, views, generics
+from rest_framework import permissions, viewsets, status, views
 from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from rest_framework_jwt.compat import get_username_field, get_username
 
 from .auth_enum import Roles
 from .authorization import is_not_treasurer
 from .models import Account
-import re
+
 from .permissions import IsAccountOwner
 from .register import send_email_register
 from .serializers import AccountSerializer
 from fecfiler.forms.models import Committee
-
 from rest_framework_jwt.settings import api_settings
 
-from ..core.transaction_util import do_transaction
 from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
-
-# jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 from ..settings import OTP_DISABLE
 
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER

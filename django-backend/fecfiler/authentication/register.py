@@ -1,7 +1,7 @@
+import boto3
 import logging
 import uuid
 
-import boto3
 from rest_framework.response import Response
 from botocore.exceptions import ClientError
 from django.contrib.auth.hashers import make_password
@@ -19,13 +19,11 @@ from fecfiler.core.views import check_null_value, NoOPError
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import (
     check_madatory_field,
-    check_account_exist,
     create_jwt_token,
     send_email,
     send_text,
     send_call,
     token_verification,
-    reset_account_password,
     reset_code_counter,
     create_password_jwt_token,
 )

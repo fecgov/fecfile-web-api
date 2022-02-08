@@ -1,34 +1,22 @@
-from django.shortcuts import render
-from rest_framework import status
-from rest_framework.decorators import api_view
-import maya
-from .models import Cmte_Report_Types_View, My_Forms_View  # , GenericDocument
-from rest_framework.response import Response
-from fecfiler.forms.models import CommitteeInfo
-from fecfiler.forms.serializers import CommitteeInfoSerializer
-from fecfiler.core.views import submit_report
 import json
-import datetime
-import os
 import platform
 import requests
-from django.views.decorators.csrf import csrf_exempt
 import logging
+import boto3
+import time
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from django.db import connection
 from django.http import JsonResponse
-from datetime import datetime, date
-import boto3
+from datetime import datetime
 from boto3.s3.transfer import S3Transfer
-from botocore.exceptions import ClientError
-import boto
-from boto.s3.key import Key
 from django.conf import settings
-import re
-import csv
-from django.core.paginator import Paginator
-import time
+
+from fecfiler.core.views import submit_report
+
 from fecfiler.core.views import (
-    get_list_entity,
     NoOPError,
     get_cvg_dates,
     get_comittee_id,

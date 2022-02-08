@@ -1,23 +1,8 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
-import maya
-from .models import Cmte_Report_Types_View, My_Forms_View  # , GenericDocument
 from rest_framework.response import Response
-from fecfiler.forms.models import CommitteeInfo
-from fecfiler.forms.serializers import CommitteeInfoSerializer
-import json
-import datetime
-import os
-import requests
-from django.views.decorators.csrf import csrf_exempt
-import logging
+
 from django.db import connection
-from django.http import JsonResponse
-from datetime import datetime, date
-from django.conf import settings
-import re
-import csv
 
 
 @api_view(["GET"])

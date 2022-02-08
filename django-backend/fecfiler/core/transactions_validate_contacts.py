@@ -1,13 +1,7 @@
-import hashlib
-import os
-import psycopg2
+
 import pandas as pd
 import boto3
-from pandas.util import hash_pandas_object
-import numpy
-from psycopg2.extensions import register_adapter, AsIs
 import logging
-import time
 from io import StringIO
 from django.conf import settings
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
@@ -16,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 # Setting the logging level
 logging.basicConfig(level=logging.DEBUG)
-# logging.basicConfig(level=logging.ERROR)
 
 # mapping null columns for the contacts API
 

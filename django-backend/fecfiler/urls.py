@@ -1,13 +1,9 @@
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from django.conf.urls import url, include
-from django.contrib import admin
-from django.conf import settings
-from django.conf.urls.static import static
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from rest_framework_nested import routers
-from .authentication.views import AccountViewSet, LoginView, LogoutView
-from .views import IndexView
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework_swagger.views import get_swagger_view
+
+from .authentication.views import AccountViewSet, LogoutView
 
 schema_view = get_swagger_view(title="FEC-Filer API")
 

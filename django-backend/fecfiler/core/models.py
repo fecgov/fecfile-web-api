@@ -1,6 +1,4 @@
 from django.db import models
-from django.core.validators import FileExtensionValidator
-from django.utils.translation import ugettext_lazy as _
 
 
 class Cmte_Report_Types_View(models.Model):

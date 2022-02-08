@@ -1,11 +1,8 @@
-import logging
-import maya
-
-from django.db import connection
-from django.template.loader import render_to_string
 import boto3
-from botocore.exceptions import ClientError
+import logging
 
+from django.template.loader import render_to_string
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 

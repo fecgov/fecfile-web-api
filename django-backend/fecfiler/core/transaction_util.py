@@ -3,9 +3,7 @@ from functools import lru_cache
 from django.db import connection
 from fecfiler.core.views import (
     get_entities,
-    NoOPError,
     superceded_report_id_list,
-    cmte_type,
 )
 import datetime
 

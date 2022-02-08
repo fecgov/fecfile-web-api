@@ -1,16 +1,11 @@
-import datetime
+import pytz
+import time
 
 from binascii import unhexlify
-from datetime import datetime
-from datetime import timedelta
-
-import pytz
-from django.contrib.auth.hashers import get_hasher, make_password
+from datetime import datetime, timedelta
+from django.contrib.auth.hashers import make_password
 from django.db import connection
 from django_otp.oath import TOTP
-from django_otp.util import random_hex
-from unittest import mock
-import time
 
 from fecfiler.settings import (
     OTP_DIGIT,

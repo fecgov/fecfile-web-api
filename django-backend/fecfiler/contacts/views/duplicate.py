@@ -1,6 +1,4 @@
-import json
 import logging
-from datetime import datetime
 from io import StringIO
 
 import boto3
@@ -9,7 +7,6 @@ import numpy as np
 import pandas
 import pandas as pd
 import psycopg2
-import pytz
 from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
@@ -21,7 +18,6 @@ from pandas_schema.validation import (
 )
 from rest_framework import status
 from rest_framework.decorators import api_view
-from s3transfer import S3Transfer
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 
@@ -43,8 +39,6 @@ from fecfiler.core.views import (
 )
 from fecfiler.settings import (
     AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME,
-    AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY,
     CONTACT_MATCH_PERCENTAGE,
 )
 

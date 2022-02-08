@@ -1,16 +1,8 @@
-from django.shortcuts import render
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-import requests
-from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -20,13 +12,11 @@ from fecfiler.core.views import (
     check_null_value,
     check_report_id,
     date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
     function_to_call_wrapper_update_F3X,
-    undo_delete_entities,
     get_comittee_id,
     update_F3X,
 )
@@ -65,7 +55,7 @@ def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SE"):
         raise Exception(
             "The Transaction ID: {} is not in the specified format."
-            + "Transaction IDs start with SE characters".format(transaction_id)
+            "Transaction IDs start with SE characters".format(transaction_id)
         )
     return transaction_id
 

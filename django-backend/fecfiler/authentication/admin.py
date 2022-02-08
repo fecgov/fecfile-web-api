@@ -1,5 +1,3 @@
-from django.contrib import admin
-from .models import Account
 from .forms import AccountCreationForm
 from django.contrib.auth.admin import UserAdmin
 

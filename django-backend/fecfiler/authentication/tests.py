@@ -1,11 +1,7 @@
 import json
 
 from django.test import TestCase
-from .views import *
 from rest_framework_jwt.utils import jwt_decode_handler
-
-# Create your tests here
-from fecfiler.authentication.models import Account
 
 
 class SimpleTest(TestCase):

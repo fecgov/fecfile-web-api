@@ -1,16 +1,8 @@
-from django.shortcuts import render
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-import requests
-from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -22,21 +14,19 @@ from fecfiler.core.views import (
     check_null_value,
     check_report_id,
     date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     check_calendar_year,
     get_comittee_id,
     update_F3X,
+    cmte_type,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     transaction_exists,
     update_sched_d_parent,
-    cmte_type,
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
 )
@@ -84,8 +74,8 @@ MANDATORY_FIELDS_SCHED_H6 = ["cmte_id", "report_id", "transaction_id"]
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SH"):
         raise Exception(
-            "The Transaction ID: {} is not in the specified format."
-            + "Transaction IDs start with SH characters".format(transaction_id)
+            "The Transaction ID: {} is not in the specified format. "
+            "Transaction IDs start with SH characters".format(transaction_id)
         )
     return transaction_id
 

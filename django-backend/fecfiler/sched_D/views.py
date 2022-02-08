@@ -1,21 +1,13 @@
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-import requests
-from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_a_transactions,
@@ -25,20 +17,16 @@ from fecfiler.core.transaction_util import (
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
     get_transaction_type_descriptions,
-    # do_carryover_sc_payments,
 )
 
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
     check_report_id,
-    date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     get_comittee_id,
     update_F3X,
     create_amended,
@@ -384,7 +372,7 @@ def schedD(request):
                 )
                 logger.debug(
                     "update transaction {} with data:{}".format(
-                        datum.get("transaction_id", datum)
+                        datum.get("transaction_id"), datum
                     )
                 )
                 data = put_schedD(datum)

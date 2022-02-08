@@ -5,14 +5,12 @@ import boto3
 import jwt
 
 from datetime import datetime
-from datetime import timedelta
 from callfire.client import CallfireClient
 from botocore.exceptions import ClientError
 from django.contrib.auth.hashers import make_password
 from django.db import connection
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django_otp.oath import TOTP
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,

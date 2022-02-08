@@ -1,9 +1,5 @@
-# Create your models here.
 from django.db import models
-from django.core.validators import FileExtensionValidator
-from .validators import validate_is_pdf
 from django.utils.translation import ugettext_lazy as _
-from db_file_storage.model_utils import delete_file, delete_file_if_needed
 from fecfiler.custom_storages import MediaStorage
 from datetime import datetime
 

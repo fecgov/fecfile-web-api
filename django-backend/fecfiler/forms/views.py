@@ -1,45 +1,37 @@
-from django.shortcuts import render
-
-from rest_framework.decorators import api_view
 import maya
 import pytz
+import json
+import os
+import requests
+import logging
+import datetime
+import pdfrw
+import boto3
+import boto
+import urllib
+
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.http import JsonResponse, FileResponse
+from botocore.exceptions import ClientError
+from django.conf import settings
+from django.template.loader import render_to_string
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
+from django.db import connection
+from boto.s3.key import Key
+
 from .models import (
     CommitteeInfo,
     Committee,
-    CommitteeMaster,
-    RefFormTypes,
-    My_Forms_View,
 )
 from .serializers import (
     CommitteeInfoSerializer,
     CommitteeSerializer,
-    CommitteeInfoListSerializer,
 )
-import json
-import os
-import requests
-from django.views.decorators.csrf import csrf_exempt
-import logging
-import datetime
-import magic
-import pdfrw
-from django.http import JsonResponse, HttpResponse, FileResponse
-import fecfiler
-import boto3
-from botocore.exceptions import ClientError
-from django.conf import settings
-from django.template.loader import render_to_string
-from django.template import Context, Template
-import PyPDF2
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
-from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
-import urllib
-from django.db import connection
-import boto
-from boto.s3.key import Key
+
 from fecfiler.core.views import (
     NoOPError,
     get_levin_accounts,
@@ -50,7 +42,6 @@ from fecfiler.core.views import (
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
 from ..authentication.authorization import (
-    is_read_only_or_filer_submit,
     is_read_only_or_filer_reports,
     is_not_read_only_or_filer,
 )

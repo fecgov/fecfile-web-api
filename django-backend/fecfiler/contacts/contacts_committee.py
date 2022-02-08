@@ -8,8 +8,6 @@ import psycopg2
 from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from pandas_schema import Column, Schema
-from pandas_schema.validation import MatchesPatternValidation, InListValidation
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -23,7 +21,6 @@ from fecfiler.core.views import (
     get_comittee_id,
     NoOPError,
     get_next_entity_id,
-    check_null_value,
 )
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
 
