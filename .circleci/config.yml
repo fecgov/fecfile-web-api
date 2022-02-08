@@ -103,7 +103,7 @@ jobs:
       - run:
           name: Run lint
           command: |
-            flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
+            flake8 --config django-backend/.flake8
 
 # Only use SonarCloud linting or security checking for now.
 #      - run:
