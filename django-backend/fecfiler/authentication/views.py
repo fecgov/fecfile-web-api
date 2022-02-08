@@ -153,7 +153,12 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id, status from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
+            _sql = """
+            SELECT json_agg(t)
+            FROM (Select first_name, last_name, email, contact, is_active, role, id, status
+            from public.authentication_account
+            WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t
+            """
             cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
             user_list = cursor.fetchall()
             if user_list is None:
@@ -221,7 +226,12 @@ def update_deleted_record(data):
     try:
         register_url_token = get_registration_token()
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET role = %s, first_name = %s, last_name = %s,delete_ind ='N', status='Pending', register_token= %s  WHERE cmtee_id = %s AND lower(email) = lower(%s)"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET role = %s, first_name = %s, last_name = %s, delete_ind ='N',
+            status='Pending', register_token= %s
+            WHERE cmtee_id = %s AND lower(email) = lower(%s)
+            """
             cursor.execute(
                 _sql,
                 [
@@ -245,7 +255,10 @@ def user_previously_deleted(data):
         with connection.cursor() as cursor:
             registration_token = ""
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind ='Y'"""
+            _sql = """
+            Select * from public.authentication_account
+            WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind ='Y'
+            """
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
@@ -284,7 +297,12 @@ def add_new_user(data, cmte_id, register_url_token):
         with connection.cursor() as cursor:
             # Insert data into manage user table
             cursor.execute(
-                """INSERT INTO public.authentication_account (id, last_login, is_superuser, tagline, created_at, updated_at, is_staff, date_joined,username, first_name, last_name, email, contact, role, is_active,cmtee_id, delete_ind, status, register_token)
+                """
+                INSERT INTO public.authentication_account (
+                    id, last_login, is_superuser, tagline, created_at, updated_at,
+                    is_staff, date_joined,username, first_name, last_name, email,
+                    contact, role, is_active,cmtee_id, delete_ind, status, register_token
+                )
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
                 [
@@ -320,7 +338,13 @@ def add_new_user(data, cmte_id, register_url_token):
 def put_sql_user(data):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,contact = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y' AND status != %s"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET delete_ind = 'N', role = %s,is_active = %s, first_name = %s,
+            last_name = %s,email = %s,contact = %s,username = %s
+            WHERE id = %s
+            AND cmtee_id = %s AND delete_ind != 'Y' AND status != %s
+            """
             _v = (
                 data.get("role"),
                 "true",
@@ -346,7 +370,10 @@ def get_current_email(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select email from public.authentication_account WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            _sql = """
+            Select email from public.authentication_account
+            WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [data.get("id"), data.get("cmte_id")])
             email = cursor.fetchone()[0]
 
@@ -396,7 +423,11 @@ def backup_user_exist(data):
 
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) AND delete_ind !='Y' """
+            _sql = """
+                Select * from public.authentication_account
+                WHERE cmtee_id = %s AND lower(role) = lower(%s)
+                AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [data.get("cmte_id"), Roles.BC_ADMIN.value])
             backup_admin_list = cursor.fetchone()
             if backup_admin_list is not None:
@@ -417,7 +448,10 @@ def get_registration_token():
 
     with connection.cursor() as cursor:
         # check if user already exist
-        _sql = """Select * from public.authentication_account WHERE register_token = %s AND delete_ind !='Y' """
+        _sql = """
+        Select * from public.authentication_account
+        WHERE register_token = %s AND delete_ind !='Y'
+        """
         cursor.execute(_sql, [register_url_token])
         user_list = cursor.fetchone()
         if user_list is not None:
@@ -572,7 +606,11 @@ def get_toggle_status(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select is_active from public.authentication_account WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            _sql = """
+            Select is_active
+            from public.authentication_account
+            WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [data.get("id"), data.get("cmte_id")])
             current_status = cursor.fetchone()[0]
             if current_status is None:
@@ -593,7 +631,13 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s AND status != %s"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET is_active = %s
+            where id = %s
+            AND cmtee_id = %s AND delete_ind !='Y'
+            AND upper(role) != %s AND status != %s
+            """
             cursor.execute(
                 _sql,
                 [

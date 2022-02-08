@@ -346,16 +346,18 @@ def get_committee_details(request):
         payload = token_verification(request)
         cmte_id = payload.get("committee_id", None)
         with connection.cursor() as cursor:
-            query_string = """SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2",
-                cm.city, cm.state, cm.zip_code AS "zipcode",
-                cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn,
-                cm.cmte_filing_freq, cm.cmte_filed_type,
-                cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename",
-                cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax,
-                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
-                FROM public.committee_master cm
-                LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
-                WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
+            query_string = """
+            SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2",
+            cm.city, cm.state, cm.zip_code AS "zipcode",
+            cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn,
+            cm.cmte_filing_freq, cm.cmte_filed_type,
+            cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename",
+            cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax,
+            f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
+            FROM public.committee_master cm
+            LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
+            WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
             )

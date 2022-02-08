@@ -42,7 +42,11 @@ def check_for_file_hash_in_db(cmteid, filename, hash, fecfilename):
     conn = None
     try:
         """insert a transactions_file_details"""
-        selectsql = """SELECT cmte_id, md5, file_name, create_date FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;"""
+        selectsql = """
+            SELECT cmte_id, md5, file_name, create_date
+            FROM public.transactions_file_details
+            WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;
+        """
 
         conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()

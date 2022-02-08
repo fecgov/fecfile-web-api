@@ -72,8 +72,6 @@ def get_columns_for_schedules(filename):
     col_names_reindex = []
     if "f3x" in filename:
 
-        # SA: COMMITTEE ID', 6,13,14,15,16,17,23,24,7,8,9,10,11,12, 'CAND_OFFICE', 'CAND_OFFICE_STATE','CAND_OFFICE_DISTRICT',25,4
-
         if "schedulea" in filename:
             columnlist = [6, 13, 14, 15, 16, 17, 23, 24, 7, 8, 9, 10, 11, 12, 25, 4]
             col_names_reindex = [
@@ -94,9 +92,7 @@ def get_columns_for_schedules(filename):
                 "DONOR COMMITTEE FEC ID",
                 "TRANSACTION IDENTIFIER",
             ]
-            print("schedulea")
         elif "scheduleb" in filename:
-            # 6,13,14,15,16,17,'EMPLOYER','OCCUPATION',7,8,9,10,11,12,'REF_CAND_CMTE_ID', 'CAND_OFFICE', 'CAND_OFFICE_STATE','CAND_OFFICE_DISTRICT','COMMITTEE_ID'
             columnlist = [6, 13, 14, 15, 16, 17, 7, 8, 9, 10, 11, 12]
             col_names_reindex = [
                 "ENTITY TYPE",

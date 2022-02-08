@@ -531,14 +531,15 @@ def superceded_report_id_list(report_id):
         report_list = []
         report_list.append(str(report_id))
         reportId = []
-        # print(report_list)
         while True:
-            # print('in loop')
             with connection.cursor() as cursor:
-                query_string = """SELECT previous_report_id FROM public.reports WHERE report_id = %s AND form_type = 'F3X' AND delete_ind is distinct FROM 'Y' """
+                query_string = """
+                    SELECT previous_report_id FROM public.reports
+                    WHERE report_id = %s AND form_type = 'F3X'
+                    AND delete_ind is distinct FROM 'Y'
+                """
                 cursor.execute(query_string, [report_id])
                 reportId = cursor.fetchone()
-            # print(reportId)
             if reportId is None:
                 break
             elif reportId[0] is None:
@@ -546,7 +547,6 @@ def superceded_report_id_list(report_id):
             else:
                 report_list.append(str(reportId[0]))
                 report_id = reportId[0]
-        # print(report_list)
         return report_list
     except Exception as e:
         raise
@@ -926,7 +926,8 @@ def get_election_year(office_sought, election_state, election_district):
         election_year_list = []
         while True:
             ab = requests.get(
-                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
+                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date" \
+                "&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
                     fecfiler.settings.FECFILE_FEC_WEBSITE_API_KEY, i, param_string
                 )
             )
@@ -993,7 +994,8 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
                 cand["cand_office_district"] = None
             else:
                 raise Exception(
-                    "The candidate id: {} does not belong to either Senate, House or Presidential office. Kindly check cand_office in entity table for details".format(
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. " /
+                    "Kindly check cand_office in entity table for details".format(
                         beneficiary_cand_id
                     )
                 )
@@ -1915,7 +1917,10 @@ def put_sql_linenumber_schedA(
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute(
-                """UPDATE public.sched_a SET line_number = %s, itemized_ind = %s, aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
+                """
+                    UPDATE public.sched_a SET line_number = %s, itemized_ind = %s, aggregate_amt = %s
+                    WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'
+                """,
                 [
                     line_number,
                     itemized_ind,
@@ -1925,7 +1930,6 @@ def put_sql_linenumber_schedA(
                     entity_id,
                 ],
             )
-            # print(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception(
                     "put_sql_linenumber_schedA function: The Transaction ID: {} does not exist in schedA table".format(

@@ -25,11 +25,14 @@ from fecfiler.settings import (
 
 def save_key_datbase(username, key_val, counter, unix_time):
     try:
-        print(key_val)
-        print(key_val.decode("utf-8"))
         decode_key = key_val.decode("utf-8")
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET secret_key = %s, code_generated_counter = %s, updated_at = %s, code_time = %s WHERE username = %s AND delete_ind !='Y'"""
+            _sql = """
+                UPDATE public.authentication_account
+                SET secret_key = %s, code_generated_counter = %s,
+                updated_at = %s, code_time = %s
+                WHERE username = %s AND delete_ind !='Y'
+            """
             _v = (decode_key, counter, datetime.now(), unix_time, username)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:

@@ -36,8 +36,6 @@ from fecfiler.core.views import (
 )
 from fecfiler.password_management.views import treasurer_encrypted_password
 
-# conn = boto.connect_s3()
-
 # Dictionary mapping form type value to form type in forms_and_schedules table
 FORMTYPE_FORM_DICT = {"F3X": "form_3x", "F24": "form_24", "F3L": "form_3l"}
 
@@ -46,8 +44,6 @@ SCHED_SCHED_CODES_DICT = {
     "sched_a": "SA",
     "sched_b": "SB",
     "sched_c": "SC",
-    # 'sched_c1': 'SC1',
-    # 'sched_c2': 'SC2',
     "sched_d": "SD",
     "sched_e": "SE",
     "sched_f": "SF",
@@ -59,24 +55,12 @@ SCHED_SCHED_CODES_DICT = {
     "sched_h6": "SH",
     "sched_l": "SL",
 }
-# Dictionary that maps form type to the schedules that it should include
-# FORMTYPE_SCHEDULES_DICT = {
-#     'F3X': ['SA', 'SB']
-# }
-
-# Dictionary mapping schedules to DB table name
-# SCHEDULES_DBTABLES_DICT = {
-#     'SA': 'public.sched_a',
-#     'SB': 'public.sched_b',
-#     'SE': 'public.sched_e',
-#     'SF': 'public.sched_f',
-#     'SC': 'public.sched_c'
-# }
 
 # Dictionary that excludes line numbers from final json
 EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ["11AII"]
 
-# List of all sched D transction type identifiers. This has no back_ref_transaction_id column so modifying SQL based on this list
+# List of all sched D transction type identifiers. This has no back_ref_transaction_id column
+# so modifying SQL based on this list
 list_of_transaction_types_with_no_back_ref = [
     "DEBT_TO_VENDOR",
     "LOANS_OWED_TO_CMTE",
@@ -212,12 +196,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
         "OTH_DISB_NP_RECNT_IND_REF",
     ],
     "Recount: Purpose of Disbursement": ["OTH_DISB_RECNT"],
-    # 'Reimbursement: See Below': ['IE_STAF_REIM'],
     "Return/Void": ["PAC_NON_FED_RET", "PAC_RET"],
     "See Memos Below": ["LEVIN_PARTN_REC", "PARTN_REC"],
-    # Removing 'EAR_MEMO' from below as it being populated from front-end
-    # 'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
-    #                                     'PAC_EAR_MEMO'],
     "Staff Reimbursement Memo": ["COEXP_STAF_REIM_MEMO"],
 }
 
@@ -237,12 +217,11 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
     try:
         with connection.cursor() as cursor:
             sql_query = """SELECT json_agg(t) FROM ({}) t""".format(query)
-            # print(sql_query)
             cursor.execute(sql_query, query_values_list)
-            # print(cursor.query.decode("utf-8"))
             result = cursor.fetchone()[0]
             if result is None:
-                # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer using this condition
+                # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer
+                # using this condition
                 if empty_list_flag:
                     return []
                 else:
@@ -257,11 +236,6 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
                 return result
     except BaseException:
         raise
-
-
-"""
-***************************** CANDIDATE DETAILS API *************************************
-"""
 
 
 def get_candidate_details_jsonbuilder(request_dict):
@@ -291,10 +265,15 @@ def get_candidate_details_jsonbuilder(request_dict):
 
 def get_sql_candidate_jsonbuilder(candidate_id):
     try:
-        sql = """SELECT cand_id AS "candidateId", cand_last_name AS "candidateLastName", cand_first_name AS "candidateFirstName",
-    cand_middle_name AS "candidateMiddleName", cand_prefix AS "candidatePrefix", cand_suffix AS "candidateSuffix",
-    cand_office AS "candidateOffice", cand_office_state AS "candidateState",
-    cand_office_district AS "candidateDistrict" FROM public.candidate_master WHERE cand_id=%s"""
+        sql = """
+            SELECT cand_id AS "candidateId", cand_last_name AS "candidateLastName",
+            cand_first_name AS "candidateFirstName",
+            cand_middle_name AS "candidateMiddleName", cand_prefix AS "candidatePrefix",
+            cand_suffix AS "candidateSuffix",
+            cand_office AS "candidateOffice", cand_office_state AS "candidateState",
+            cand_office_district AS "candidateDistrict"
+            FROM public.candidate_master WHERE cand_id=%s
+        """
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT json_agg(t) FROM ({}) AS t""".format(sql), [candidate_id]
@@ -319,18 +298,31 @@ def get_sql_candidate_jsonbuilder(candidate_id):
 
 def get_data_details(report_id, cmte_id):
     try:
-        query_1 = """SELECT cmte_id AS "committeeId", COALESCE(cmte_name,'') AS "committeeName", COALESCE(street_1,'') AS "street1",
-                                        COALESCE(street_2,'') AS "street2", COALESCE(city,'') AS "city", COALESCE(state, '') AS "state", COALESCE(zip_code, '') AS "zipCode",
-                                        COALESCE(treasurer_last_name, '') AS "treasurerLastName", COALESCE(treasurer_first_name, '') AS "treasurerFirstName",
-                                        COALESCE(treasurer_middle_name, '') AS "treasurerMiddleName", COALESCE(treasurer_prefix, '') AS "treasurerPrefix",
-                                        COALESCE(treasurer_suffix, '') as "treasurerSuffix"
-                                FROM public.committee_master Where cmte_id = %s"""
+        query_1 = """
+            SELECT cmte_id AS "committeeId",
+            COALESCE(cmte_name,'') AS "committeeName",
+            COALESCE(street_1,'') AS "street1",
+            COALESCE(street_2,'') AS "street2",
+            COALESCE(city,'') AS "city",
+            COALESCE(state, '') AS "state",
+            COALESCE(zip_code, '') AS "zipCode",
+            COALESCE(treasurer_last_name, '') AS "treasurerLastName",
+            COALESCE(treasurer_first_name, '') AS "treasurerFirstName",
+            COALESCE(treasurer_middle_name, '') AS "treasurerMiddleName",
+            COALESCE(treasurer_prefix, '') AS "treasurerPrefix",
+            COALESCE(treasurer_suffix, '') as "treasurerSuffix"
+            FROM public.committee_master Where cmte_id = %s
+        """
         values_1 = [cmte_id]
         string_1 = "Committee Master"
 
-        query_3 = """SELECT COALESCE(amend_number, 0) AS "amendmentNumber", COALESCE(to_char(cvg_start_date,'MM/DD/YYYY'),'') AS "coverageStartDate", COALESCE(to_char(cvg_end_date,'MM/DD/YYYY'),'') AS "coverageEndDate",
-                                form_type AS "formType", report_id AS "reportId", memo_text as "memoText"
-                                FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
+        query_3 = """
+            SELECT COALESCE(amend_number, 0) AS "amendmentNumber",
+            COALESCE(to_char(cvg_start_date,'MM/DD/YYYY'),'') AS "coverageStartDate",
+            COALESCE(to_char(cvg_end_date,'MM/DD/YYYY'),'') AS "coverageEndDate",
+            form_type AS "formType", report_id AS "reportId", memo_text as "memoText"
+            FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+            """
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
 
@@ -340,31 +332,44 @@ def get_data_details(report_id, cmte_id):
         }
 
         if output["formType"] == "F3X":
-            query_2 = """SELECT COALESCE(cmte_addr_chg_flag,'') AS "changeOfAddress", COALESCE(state_of_election,'') AS "electionState",
-                                            COALESCE(report_type,'') AS "reportCode", COALESCE(amend_ind,'') AS "amendmentIndicator", COALESCE(election_code,'') AS "electionCode",
-                                            COALESCE(qual_cmte_flag,'') AS "qualifiedCommitteeIndicator", COALESCE(to_char(date_of_election,'MM/DD/YYYY'),'') AS "electionDate",
-                                            COALESCE(to_char(date_signed,'MM/DD/YYYY'),'') AS "dateSigned"
-                                    FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
+            query_2 = """
+                SELECT COALESCE(cmte_addr_chg_flag,'') AS "changeOfAddress",
+                COALESCE(state_of_election,'') AS "electionState",
+                COALESCE(report_type,'') AS "reportCode",
+                COALESCE(amend_ind,'') AS "amendmentIndicator",
+                COALESCE(election_code,'') AS "electionCode",
+                COALESCE(qual_cmte_flag,'') AS "qualifiedCommitteeIndicator",
+                COALESCE(to_char(date_of_election,'MM/DD/YYYY'),'') AS "electionDate",
+                COALESCE(to_char(date_signed,'MM/DD/YYYY'),'') AS "dateSigned"
+                FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'
+            """
             values_2 = [report_id, cmte_id]
             string_2 = "Form 3X"
             output = {**output, **json_query(query_2, values_2, string_2, False)[0]}
 
         elif output["formType"] == "F1M":
-            query_2 = """SELECT CASE WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'A'
-                            THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", aff_cmte_id AS "affiliatedCommitteeId",
-                            (SELECT cmte.cmte_name FROM committee_master cmte WHERE cmte.cmte_id = aff_cmte_id) AS "affiliatedCommitteeName",
-                            COALESCE(to_char(aff_date,'MM/DD/YYYY'),'') AS "affiliatedDate", sign_id AS "signatureId",
-                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
-                              FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
-                          WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'Q'
-                            THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", can1_id,
-                            COALESCE(to_char(can1_con,'MM/DD/YYYY'),'') AS "can1_con", can2_id, COALESCE(to_char(can2_con,'MM/DD/YYYY'),'') AS "can2_con",
-                            can3_id, COALESCE(to_char(can3_con,'MM/DD/YYYY'),'') AS "can3_con", can4_id, COALESCE(to_char(can4_con,'MM/DD/YYYY'),'') AS "can4_con",
-                            can5_id, COALESCE(to_char(can5_con,'MM/DD/YYYY'),'') AS "can5_con", COALESCE(to_char(date_51,'MM/DD/YYYY'),'') AS "51stContributorDate",
-                            COALESCE(to_char(orig_date,'MM/DD/YYYY'),'') AS "registrationDate", COALESCE(to_char(metreq_date,'MM/DD/YYYY'),'') AS "requirementsMetDate",
-                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
-                              FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
-                          END AS "output" """
+            query_2 = """
+                SELECT CASE WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'A'
+                  THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", aff_cmte_id AS "affiliatedCommitteeId",
+                  (SELECT cmte.cmte_name FROM committee_master cmte WHERE cmte.cmte_id = aff_cmte_id) AS "affiliatedCommitteeName",
+                  COALESCE(to_char(aff_date,'MM/DD/YYYY'),'') AS "affiliatedDate", sign_id AS "signatureId",
+                  COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
+                    FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
+                WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'Q'
+                  THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", can1_id,
+                  COALESCE(to_char(can1_con,'MM/DD/YYYY'),'') AS "can1_con", can2_id,
+                  COALESCE(to_char(can2_con,'MM/DD/YYYY'),'') AS "can2_con",
+                  can3_id, COALESCE(to_char(can3_con,'MM/DD/YYYY'),'') AS "can3_con", can4_id,
+                  COALESCE(to_char(can4_con,'MM/DD/YYYY'),'') AS "can4_con",
+                  can5_id, COALESCE(to_char(can5_con,'MM/DD/YYYY'),'') AS "can5_con",
+                  COALESCE(to_char(date_51,'MM/DD/YYYY'),'') AS "51stContributorDate",
+                  COALESCE(to_char(orig_date,'MM/DD/YYYY'),'') AS "registrationDate",
+                  COALESCE(to_char(metreq_date,'MM/DD/YYYY'),'') AS "requirementsMetDate",
+                  sign_id AS "signatureId",
+                  COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
+                    FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
+                END AS "output"
+            """
             values_2 = [
                 report_id,
                 cmte_id,
@@ -389,10 +394,16 @@ def get_data_details(report_id, cmte_id):
                 )
 
         elif output["formType"] == "F24":
-            query_3 = """SELECT  cm.cmte_id AS "committeeId", COALESCE(cm.cmte_name,'') AS "committeeName", r.report_type AS "reportType", r.amend_ind AS "amendIndicator",
-                  COALESCE(to_char(filed_date,'MM/DD/YYYY'),'') AS "filedDate", COALESCE((CASE WHEN r.previous_report_id IS NOT null THEN
-                  (SELECT COALESCE(to_char(pr.filed_date,'MM/DD/YYYY'),'') FROM reports pr WHERE pr.report_id=r.previous_report_id) ELSE '' END), '') AS "amendDate"
-                  FROM committee_master cm, reports r WHERE r.cmte_id = cm.cmte_id AND r.report_id=%s AND cm.cmte_id=%s"""
+            query_3 = """
+                SELECT  cm.cmte_id AS "committeeId", COALESCE(cm.cmte_name,'') AS "committeeName",
+                r.report_type AS "reportType", r.amend_ind AS "amendIndicator",
+                COALESCE(to_char(filed_date,'MM/DD/YYYY'),'') AS "filedDate",
+                COALESCE((CASE WHEN r.previous_report_id IS NOT null THEN
+                (SELECT COALESCE(to_char(pr.filed_date,'MM/DD/YYYY'),'')
+                 FROM reports pr WHERE pr.report_id=r.previous_report_id) ELSE '' END), '') AS "amendDate"
+                FROM committee_master cm, reports r
+                WHERE r.cmte_id = cm.cmte_id AND r.report_id=%s AND cm.cmte_id=%s
+            """
             values_3 = [report_id, cmte_id]
             string_3 = "Form 24"
             f24_data = json_query(query_3, values_3, string_3, False)
@@ -407,22 +418,36 @@ def get_data_details(report_id, cmte_id):
                 )
 
         elif output["formType"] == "F3L":
-            query_3 = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode,
-                                      rp.report_type as reportCode,  rt.rpt_type_desc as reportTypeDescription,
-                                      f3l.sign_date as date_signed,
-                                      rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState,
-                                      x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate,
-                                      rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
-                                      (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue,
-                                      email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1,
-                                      additional_email_2 as additionalEmail2,
-                                      (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
-                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state
-                                      FROM public.reports rp
-                                      LEFT JOIN form_3x x ON rp.report_id = x.report_id
-                                      LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
-                                      LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
-                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id =%s AND rp.report_id =%s"""
+            query_3 = """
+                SELECT rp.cmte_id as cmteId, rp.report_id as reportId,
+                rp.form_type as formType, '' as electionCode,
+                rp.report_type as reportCode,  rt.rpt_type_desc as reportTypeDescription,
+                f3l.sign_date as date_signed,
+                rt.regular_special_report_ind as regularSpecialReportInd,
+                x.state_of_election as electionState,
+                x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate,
+                rp.cvg_end_date as cvgEndDate,
+                rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
+                (
+                    SELECT CASE WHEN due_date IS NOT NULL
+                    THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date
+                    ELSE 0 END
+                ) AS daysUntilDue,
+                email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1,
+                additional_email_2 as additionalEmail2,
+                (
+                    SELECT CASE WHEN rp.due_date IS NOT NULL
+                    AND rp.due_date < now() THEN True
+                    ELSE False END
+                ) AS overdue,
+                rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date,
+                f3l.election_date, f3l.election_state
+                FROM public.reports rp
+                LEFT JOIN form_3x x ON rp.report_id = x.report_id
+                LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
+                WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id =%s AND rp.report_id =%s
+            """
 
             values_3 = [cmte_id, report_id]
             string_3 = "Form 3L"
@@ -453,7 +478,14 @@ def get_f3l_summary_details(report_id, cmte_id):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
-        contribute_amount_query = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total",COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total"FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR') AND delete_ind IS DISTINCT FROM 'Y'"""
+        contribute_amount_query = """
+            SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total",
+            COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total"
+            FROM public.sched_a
+            WHERE cmte_id = %s AND report_id = %s
+            AND transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
+            AND delete_ind IS DISTINCT FROM 'Y'
+        """
 
         values = [cmte_id, report_id]
 
@@ -479,63 +511,114 @@ def get_f3x_summary_details(report_id, cmte_id):
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         cashOnHandYear = cvg_start_date.year
 
-        colA_query = """SELECT COALESCE(coh_bop, 0.0) AS "6b_cashOnHandBeginning", COALESCE(ttl_receipts_sum_page_per, 0.0) AS "6c_totalReceipts",
-                                       COALESCE(subttl_sum_page_per, 0.0) AS "6d_subtotal", COALESCE(ttl_disb_sum_page_per, 0.0) AS "7_totalDisbursements",
-                                       COALESCE(coh_cop, 0.0) AS "8_cashOnHandAtClose", COALESCE(debts_owed_to_cmte, 0.0) AS "9_debtsTo",
-                                       COALESCE(debts_owed_by_cmte, 0.0) AS "10_debtsBy", COALESCE(indv_item_contb_per, 0.0) AS "11ai_Itemized",
-                                       COALESCE(indv_unitem_contb_per, 0.0) AS "11aii_Unitemized", COALESCE(ttl_indv_contb, 0.0) AS "11aiii_Total",
-                                       COALESCE(pol_pty_cmte_contb_per_i, 0.0) AS "11b_politicalPartyCommittees", COALESCE(other_pol_cmte_contb_per_i, 0.0) AS "11c_otherPoliticalCommitteesPACs",
-                                       COALESCE(ttl_contb_col_ttl_per, 0.0) AS "11d_totalContributions", COALESCE(tranf_from_affiliated_pty_per, 0.0) AS "12_transfersFromAffiliatedOtherPartyCommittees",
-                                       COALESCE(all_loans_received_per, 0.0) AS "13_allLoansReceived", COALESCE(loan_repymts_received_per, 0.0) AS "14_loanRepaymentsReceived",
-                                       COALESCE(offsets_to_op_exp_per_i, 0.0) AS "15_offsetsToOperatingExpendituresRefunds", COALESCE(fed_cand_contb_ref_per, 0.0) AS "16_refundsOfFederalContributions",
-                                       COALESCE(other_fed_receipts_per, 0.0) AS "17_otherFederalReceiptsDividends", COALESCE(tranf_from_nonfed_acct_per, 0.0) AS "18a_transfersFromNonFederalAccount_h3",
-                                       COALESCE(tranf_from_nonfed_levin_per, 0.0) AS "18b_transfersFromNonFederalLevin_h5", COALESCE(ttl_nonfed_tranf_per, 0.0) AS "18c_totalNonFederalTransfers",
-                                       COALESCE(ttl_receipts_per, 0.0) AS "19_totalReceipts", COALESCE(ttl_fed_receipts_per, 0.0) AS "20_totalFederalReceipts",
-                                       COALESCE(shared_fed_op_exp_per, 0.0) AS "21ai_federalShare", COALESCE(shared_nonfed_op_exp_per, 0.0) AS "21aii_nonFederalShare",
-                                       COALESCE(other_fed_op_exp_per, 0.0) AS "21b_otherFederalOperatingExpenditures", COALESCE(ttl_op_exp_per, 0.0) AS "21c_totalOperatingExpenditures",
-                                       COALESCE(tranf_to_affliliated_cmte_per, 0.0) AS "22_transfersToAffiliatedOtherPartyCommittees", COALESCE(fed_cand_cmte_contb_per, 0.0) AS "23_contributionsToFederalCandidatesCommittees",
-                                       COALESCE(indt_exp_per, 0.0) AS "24_independentExpenditures", COALESCE(coord_exp_by_pty_cmte_per, 0.0) AS "25_coordinatedExpenditureMadeByPartyCommittees",
-                                       COALESCE(loan_repymts_made_per, 0.0) AS "26_loanRepayments", COALESCE(loans_made_per, 0.0) AS "27_loansMade",
-                                       COALESCE(indv_contb_ref_per, 0.0) AS "28a_individualsPersons", COALESCE(pol_pty_cmte_contb_per_ii, 0.0) AS "28b_politicalPartyCommittees",
-                                       COALESCE(other_pol_cmte_contb_per_ii, 0.0) AS "28c_otherPoliticalCommittees", COALESCE(ttl_contb_ref_per_i, 0.0) AS "28d_totalContributionsRefunds",
-                                       COALESCE(other_disb_per, 0.0) AS "29_otherDisbursements", COALESCE(shared_fed_actvy_fed_shr_per, 0.0) AS "30ai_sharedFederalActivity_h6_fedShare",
-                                       COALESCE(shared_fed_actvy_nonfed_per, 0.0) AS "30aii_sharedFederalActivity_h6_nonFed", COALESCE(non_alloc_fed_elect_actvy_per, 0.0) AS "30b_nonAllocable_100_federalElectionActivity",
-                                       COALESCE(ttl_fed_elect_actvy_per, 0.0) AS "30c_totalFederalElectionActivity", COALESCE(ttl_disb_per, 0.0) AS "31_totalDisbursements",
-                                       COALESCE(ttl_fed_disb_per, 0.0) AS "32_totalFederalDisbursements", COALESCE(ttl_contb_per, 0.0) AS "33_totalContributions",
-                                       COALESCE(ttl_contb_ref_per_ii, 0.0) AS "34_totalContributionRefunds", COALESCE(net_contb_per, 0.0) AS "35_netContributions",
-                                       COALESCE(ttl_fed_op_exp_per, 0.0) AS "36_totalFederalOperatingExpenditures", COALESCE(offsets_to_op_exp_per_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
-                                       COALESCE(net_op_exp_per, 0.0) AS "38_netOperatingExpenditures"
-                                FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
-                                        and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'"""
+        colA_query = """
+            SELECT COALESCE(coh_bop, 0.0) AS "6b_cashOnHandBeginning",
+            COALESCE(ttl_receipts_sum_page_per, 0.0) AS "6c_totalReceipts",
+            COALESCE(subttl_sum_page_per, 0.0) AS "6d_subtotal",
+            COALESCE(ttl_disb_sum_page_per, 0.0) AS "7_totalDisbursements",
+            COALESCE(coh_cop, 0.0) AS "8_cashOnHandAtClose",
+            COALESCE(debts_owed_to_cmte, 0.0) AS "9_debtsTo",
+            COALESCE(debts_owed_by_cmte, 0.0) AS "10_debtsBy",
+            COALESCE(indv_item_contb_per, 0.0) AS "11ai_Itemized",
+            COALESCE(indv_unitem_contb_per, 0.0) AS "11aii_Unitemized",
+            COALESCE(ttl_indv_contb, 0.0) AS "11aiii_Total",
+            COALESCE(pol_pty_cmte_contb_per_i, 0.0) AS "11b_politicalPartyCommittees",
+            COALESCE(other_pol_cmte_contb_per_i, 0.0) AS "11c_otherPoliticalCommitteesPACs",
+            COALESCE(ttl_contb_col_ttl_per, 0.0) AS "11d_totalContributions",
+            COALESCE(tranf_from_affiliated_pty_per, 0.0) AS "12_transfersFromAffiliatedOtherPartyCommittees",
+            COALESCE(all_loans_received_per, 0.0) AS "13_allLoansReceived",
+            COALESCE(loan_repymts_received_per, 0.0) AS "14_loanRepaymentsReceived",
+            COALESCE(offsets_to_op_exp_per_i, 0.0) AS "15_offsetsToOperatingExpendituresRefunds",
+            COALESCE(fed_cand_contb_ref_per, 0.0) AS "16_refundsOfFederalContributions",
+            COALESCE(other_fed_receipts_per, 0.0) AS "17_otherFederalReceiptsDividends",
+            COALESCE(tranf_from_nonfed_acct_per, 0.0) AS "18a_transfersFromNonFederalAccount_h3",
+            COALESCE(tranf_from_nonfed_levin_per, 0.0) AS "18b_transfersFromNonFederalLevin_h5",
+            COALESCE(ttl_nonfed_tranf_per, 0.0) AS "18c_totalNonFederalTransfers",
+            COALESCE(ttl_receipts_per, 0.0) AS "19_totalReceipts",
+            COALESCE(ttl_fed_receipts_per, 0.0) AS "20_totalFederalReceipts",
+            COALESCE(shared_fed_op_exp_per, 0.0) AS "21ai_federalShare",
+            COALESCE(shared_nonfed_op_exp_per, 0.0) AS "21aii_nonFederalShare",
+            COALESCE(other_fed_op_exp_per, 0.0) AS "21b_otherFederalOperatingExpenditures",
+            COALESCE(ttl_op_exp_per, 0.0) AS "21c_totalOperatingExpenditures",
+            COALESCE(tranf_to_affliliated_cmte_per, 0.0) AS "22_transfersToAffiliatedOtherPartyCommittees",
+            COALESCE(fed_cand_cmte_contb_per, 0.0) AS "23_contributionsToFederalCandidatesCommittees",
+            COALESCE(indt_exp_per, 0.0) AS "24_independentExpenditures",
+            COALESCE(coord_exp_by_pty_cmte_per, 0.0) AS "25_coordinatedExpenditureMadeByPartyCommittees",
+            COALESCE(loan_repymts_made_per, 0.0) AS "26_loanRepayments",
+            COALESCE(loans_made_per, 0.0) AS "27_loansMade",
+            COALESCE(indv_contb_ref_per, 0.0) AS "28a_individualsPersons",
+            COALESCE(pol_pty_cmte_contb_per_ii, 0.0) AS "28b_politicalPartyCommittees",
+            COALESCE(other_pol_cmte_contb_per_ii, 0.0) AS "28c_otherPoliticalCommittees",
+            COALESCE(ttl_contb_ref_per_i, 0.0) AS "28d_totalContributionsRefunds",
+            COALESCE(other_disb_per, 0.0) AS "29_otherDisbursements",
+            COALESCE(shared_fed_actvy_fed_shr_per, 0.0) AS "30ai_sharedFederalActivity_h6_fedShare",
+            COALESCE(shared_fed_actvy_nonfed_per, 0.0) AS "30aii_sharedFederalActivity_h6_nonFed",
+            COALESCE(non_alloc_fed_elect_actvy_per, 0.0) AS "30b_nonAllocable_100_federalElectionActivity",
+            COALESCE(ttl_fed_elect_actvy_per, 0.0) AS "30c_totalFederalElectionActivity",
+            COALESCE(ttl_disb_per, 0.0) AS "31_totalDisbursements",
+            COALESCE(ttl_fed_disb_per, 0.0) AS "32_totalFederalDisbursements",
+            COALESCE(ttl_contb_per, 0.0) AS "33_totalContributions",
+            COALESCE(ttl_contb_ref_per_ii, 0.0) AS "34_totalContributionRefunds",
+            COALESCE(net_contb_per, 0.0) AS "35_netContributions",
+            COALESCE(ttl_fed_op_exp_per, 0.0) AS "36_totalFederalOperatingExpenditures",
+            COALESCE(offsets_to_op_exp_per_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
+            COALESCE(net_op_exp_per, 0.0) AS "38_netOperatingExpenditures"
+            FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
+            and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'
+            """
 
         colB_query = """SELECT COALESCE(coh_begin_calendar_yr, 0.0) AS "6a_cashOnHandJan_1",
-                                   COALESCE(ttl_receipts_sum_page_ytd, 0.0) AS "6c_totalReceipts",
-                                       COALESCE(subttl_sum_ytd, 0.0) AS "6d_subtotal", COALESCE(ttl_disb_sum_page_ytd, 0.0) AS "7_totalDisbursements",
-                                       COALESCE(coh_coy, 0.0) AS "8_cashOnHandAtClose", COALESCE(indv_item_contb_ytd, 0.0) AS "11ai_Itemized",
-                                       COALESCE(indv_unitem_contb_ytd, 0.0) AS "11aii_Unitemized", COALESCE(ttl_indv_contb_ytd, 0.0) AS "11aiii_Total",
-                                       COALESCE(pol_pty_cmte_contb_ytd_i, 0.0) AS "11b_politicalPartyCommittees", COALESCE(other_pol_cmte_contb_ytd_i, 0.0) AS "11c_otherPoliticalCommitteesPACs",
-                                       COALESCE(ttl_contb_col_ttl_ytd, 0.0) AS "11d_totalContributions", COALESCE(tranf_from_affiliated_pty_ytd, 0.0) AS "12_transfersFromAffiliatedOtherPartyCommittees",
-                                       COALESCE(all_loans_received_ytd, 0.0) AS "13_allLoansReceived", COALESCE(loan_repymts_received_ytd, 0.0) AS "14_loanRepaymentsReceived",
-                                       COALESCE(offsets_to_op_exp_ytd_i, 0.0) AS "15_offsetsToOperatingExpendituresRefunds", COALESCE(fed_cand_cmte_contb_ytd, 0.0) AS "16_refundsOfFederalContributions",
-                                       COALESCE(other_fed_receipts_ytd, 0.0) AS "17_otherFederalReceiptsDividends", COALESCE(tranf_from_nonfed_acct_ytd, 0.0) AS "18a_transfersFromNonFederalAccount_h3",
-                                       COALESCE(tranf_from_nonfed_levin_ytd, 0.0) AS "18b_transfersFromNonFederalLevin_h5", COALESCE(ttl_nonfed_tranf_ytd, 0.0) AS "18c_totalNonFederalTransfers",
-                                       COALESCE(ttl_receipts_ytd, 0.0) AS "19_totalReceipts", COALESCE(ttl_fed_receipts_ytd, 0.0) AS "20_totalFederalReceipts",
-                                       COALESCE(shared_fed_op_exp_ytd, 0.0) AS "21ai_federalShare", COALESCE(shared_nonfed_op_exp_ytd, 0.0) AS "21aii_nonFederalShare",
-                                       COALESCE(other_fed_op_exp_ytd, 0.0) AS "21b_otherFederalOperatingExpenditures", COALESCE(ttl_op_exp_ytd, 0.0) AS "21c_totalOperatingExpenditures",
-                                       COALESCE(tranf_to_affilitated_cmte_ytd, 0.0) AS "22_transfersToAffiliatedOtherPartyCommittees", COALESCE(fed_cand_cmte_contb_ref_ytd, 0.0) AS "23_contributionsToFederalCandidatesCommittees",
-                                       COALESCE(indt_exp_ytd, 0.0) AS "24_independentExpenditures", COALESCE(coord_exp_by_pty_cmte_ytd, 0.0) AS "25_coordinatedExpenditureMadeByPartyCommittees",
-                                       COALESCE(loan_repymts_made_ytd, 0.0) AS "26_loanRepayments", COALESCE(loans_made_ytd, 0.0) AS "27_loansMade",
-                                       COALESCE(indv_contb_ref_ytd, 0.0) AS "28a_individualsPersons", COALESCE(pol_pty_cmte_contb_ytd_ii, 0.0) AS "28b_politicalPartyCommittees",
-                                       COALESCE(other_pol_cmte_contb_ytd_ii, 0.0) AS "28c_otherPoliticalCommittees", COALESCE(ttl_contb_ref_ytd_i, 0.0) AS "28d_totalContributionsRefunds",
-                                       COALESCE(other_disb_ytd, 0.0) AS "29_otherDisbursements", COALESCE(shared_fed_actvy_fed_shr_ytd, 0.0) AS "30ai_sharedFederalActivity_h6_fedShare",
-                                       COALESCE(shared_fed_actvy_nonfed_ytd, 0.0) AS "30aii_sharedFederalActivity_h6_nonFed", COALESCE(non_alloc_fed_elect_actvy_ytd, 0.0) AS "30b_nonAllocable_100_federalElectionActivity",
-                                       COALESCE(ttl_fed_elect_actvy_ytd, 0.0) AS "30c_totalFederalElectionActivity", COALESCE(ttl_disb_ytd, 0.0) AS "31_totalDisbursements",
-                                       COALESCE(ttl_fed_disb_ytd, 0.0) AS "32_totalFederalDisbursements", COALESCE(ttl_contb_ytd, 0.0) AS "33_totalContributions",
-                                       COALESCE(ttl_contb_ref_ytd_ii, 0.0) AS "34_totalContributionRefunds", COALESCE(net_contb_ytd, 0.0) AS "35_netContributions",
-                                       COALESCE(ttl_fed_op_exp_ytd, 0.0) AS "36_totalFederalOperatingExpenditures", COALESCE(offsets_to_op_exp_ytd_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
-                                       COALESCE(net_op_exp_ytd, 0.0) AS "38_netOperatingExpenditures"
-                                FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
-                                        and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'"""
+            COALESCE(ttl_receipts_sum_page_ytd, 0.0) AS "6c_totalReceipts",
+            COALESCE(subttl_sum_ytd, 0.0) AS "6d_subtotal",
+            COALESCE(ttl_disb_sum_page_ytd, 0.0) AS "7_totalDisbursements",
+            COALESCE(coh_coy, 0.0) AS "8_cashOnHandAtClose",
+            COALESCE(indv_item_contb_ytd, 0.0) AS "11ai_Itemized",
+            COALESCE(indv_unitem_contb_ytd, 0.0) AS "11aii_Unitemized",
+            COALESCE(ttl_indv_contb_ytd, 0.0) AS "11aiii_Total",
+            COALESCE(pol_pty_cmte_contb_ytd_i, 0.0) AS "11b_politicalPartyCommittees",
+            COALESCE(other_pol_cmte_contb_ytd_i, 0.0) AS "11c_otherPoliticalCommitteesPACs",
+            COALESCE(ttl_contb_col_ttl_ytd, 0.0) AS "11d_totalContributions",
+            COALESCE(tranf_from_affiliated_pty_ytd, 0.0) AS "12_transfersFromAffiliatedOtherPartyCommittees",
+            COALESCE(all_loans_received_ytd, 0.0) AS "13_allLoansReceived",
+            COALESCE(loan_repymts_received_ytd, 0.0) AS "14_loanRepaymentsReceived",
+            COALESCE(offsets_to_op_exp_ytd_i, 0.0) AS "15_offsetsToOperatingExpendituresRefunds",
+            COALESCE(fed_cand_cmte_contb_ytd, 0.0) AS "16_refundsOfFederalContributions",
+            COALESCE(other_fed_receipts_ytd, 0.0) AS "17_otherFederalReceiptsDividends",
+            COALESCE(tranf_from_nonfed_acct_ytd, 0.0) AS "18a_transfersFromNonFederalAccount_h3",
+            COALESCE(tranf_from_nonfed_levin_ytd, 0.0) AS "18b_transfersFromNonFederalLevin_h5",
+            COALESCE(ttl_nonfed_tranf_ytd, 0.0) AS "18c_totalNonFederalTransfers",
+            COALESCE(ttl_receipts_ytd, 0.0) AS "19_totalReceipts",
+            COALESCE(ttl_fed_receipts_ytd, 0.0) AS "20_totalFederalReceipts",
+            COALESCE(shared_fed_op_exp_ytd, 0.0) AS "21ai_federalShare",
+            COALESCE(shared_nonfed_op_exp_ytd, 0.0) AS "21aii_nonFederalShare",
+            COALESCE(other_fed_op_exp_ytd, 0.0) AS "21b_otherFederalOperatingExpenditures",
+            COALESCE(ttl_op_exp_ytd, 0.0) AS "21c_totalOperatingExpenditures",
+            COALESCE(tranf_to_affilitated_cmte_ytd, 0.0) AS "22_transfersToAffiliatedOtherPartyCommittees",
+            COALESCE(fed_cand_cmte_contb_ref_ytd, 0.0) AS "23_contributionsToFederalCandidatesCommittees",
+            COALESCE(indt_exp_ytd, 0.0) AS "24_independentExpenditures",
+            COALESCE(coord_exp_by_pty_cmte_ytd, 0.0) AS "25_coordinatedExpenditureMadeByPartyCommittees",
+            COALESCE(loan_repymts_made_ytd, 0.0) AS "26_loanRepayments",
+            COALESCE(loans_made_ytd, 0.0) AS "27_loansMade",
+            COALESCE(indv_contb_ref_ytd, 0.0) AS "28a_individualsPersons",
+            COALESCE(pol_pty_cmte_contb_ytd_ii, 0.0) AS "28b_politicalPartyCommittees",
+            COALESCE(other_pol_cmte_contb_ytd_ii, 0.0) AS "28c_otherPoliticalCommittees",
+            COALESCE(ttl_contb_ref_ytd_i, 0.0) AS "28d_totalContributionsRefunds",
+            COALESCE(other_disb_ytd, 0.0) AS "29_otherDisbursements",
+            COALESCE(shared_fed_actvy_fed_shr_ytd, 0.0) AS "30ai_sharedFederalActivity_h6_fedShare",
+            COALESCE(shared_fed_actvy_nonfed_ytd, 0.0) AS "30aii_sharedFederalActivity_h6_nonFed",
+            COALESCE(non_alloc_fed_elect_actvy_ytd, 0.0) AS "30b_nonAllocable_100_federalElectionActivity",
+            COALESCE(ttl_fed_elect_actvy_ytd, 0.0) AS "30c_totalFederalElectionActivity",
+            COALESCE(ttl_disb_ytd, 0.0) AS "31_totalDisbursements",
+            COALESCE(ttl_fed_disb_ytd, 0.0) AS "32_totalFederalDisbursements",
+            COALESCE(ttl_contb_ytd, 0.0) AS "33_totalContributions",
+            COALESCE(ttl_contb_ref_ytd_ii, 0.0) AS "34_totalContributionRefunds",
+            COALESCE(net_contb_ytd, 0.0) AS "35_netContributions",
+            COALESCE(ttl_fed_op_exp_ytd, 0.0) AS "36_totalFederalOperatingExpenditures",
+            COALESCE(offsets_to_op_exp_ytd_ii, 0.0) AS "37_offsetsToOperatingExpenditures",
+            COALESCE(net_op_exp_ytd, 0.0) AS "38_netOperatingExpenditures"
+            FROM public.form_3x, reports r Where form_3x.report_id = r.report_id and r.cvg_start_date = %s
+            and previous_report_id is NULL and form_3x.cmte_id = %s AND form_3x.delete_ind is distinct from 'Y'
+            """
 
         values = [cvg_start_date, cmte_id]
 
@@ -560,8 +643,6 @@ def get_transactions(
     try:
         query_1 = """SELECT query_string FROM public.tran_query_string WHERE tran_type_identifier = %s"""
         query_values_list_1 = [identifier]
-        # print('get_transactions...')
-        # print('identifier: '+ identifier)
         output = json_query(query_1, query_values_list_1, "tran_query_string", False)[0]
         query = output.get("query_string")
         report_string = "t1.report_id in ('{}')".format("', '".join(report_list))
@@ -580,8 +661,6 @@ def get_transactions(
                 back_ref_transaction_id,
             ]
         error_string = identifier + ". Get all transactions"
-        # print(query)
-        # print(query_values_list)
         return json_query(query, query_values_list, error_string, True)
     except Exception:
         raise
@@ -617,9 +696,6 @@ def get_transaction_type_identifier(
                 AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
                 DB_table, "', '".join(report_list), "', '".join(transaction_id_list)
             )
-            # else:
-            #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
-            #         DB_table, "', '".join(transaction_id_list))
         else:
             # Addressing no back_ref_transaction_id column in sched_D
             if DB_table in [
@@ -642,7 +718,6 @@ def get_transaction_type_identifier(
                 )
         query_values_list = [cmte_id]
         result = json_query(query, query_values_list, DB_table, True)
-        # print(result)
         return result
     except Exception as e:
         raise Exception(
@@ -653,11 +728,13 @@ def get_transaction_type_identifier(
 
 def get_schedules_for_form_type(form_type):
     try:
-        query = """SELECT DISTINCT(sched_type) FROM public.forms_and_schedules WHERE form_type = %s AND json_builder_flag IS TRUE"""
+        query = """
+            SELECT DISTINCT(sched_type) FROM public.forms_and_schedules
+            WHERE form_type = %s AND json_builder_flag IS TRUE
+        """
         query_values_list = [form_type]
         error_string = "forms_and_schedules"
         result = json_query(query, query_values_list, error_string, False)
-        # print(result)
         return result
     except Exception as e:
         raise Exception(
@@ -668,11 +745,15 @@ def get_schedules_for_form_type(form_type):
 
 def get_child_identifer(identifier, form_type):
     try:
-        query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+        query = """
+            SELECT c.tran_identifier FROM ref_transaction_types p
+            LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id
+            WHERE p.tran_identifier = %s AND p.form_type = %s
+            ORDER BY p.line_num,p.ref_tran_id
+        """
         query_values_list = [identifier, form_type]
         error_string = "ref_transaction_types"
         result = json_query(query, query_values_list, error_string, True)
-        # print(result)
         return result
     except Exception as e:
         raise Exception(
@@ -683,7 +764,10 @@ def get_child_identifer(identifier, form_type):
 def get_all_child_transaction_identifers(form_type):
     try:
         output = []
-        query = """SELECT p.tran_identifier FROM ref_transaction_types p WHERE p.parent_tran_id IS NOT NULL AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+        query = """
+            SELECT p.tran_identifier FROM ref_transaction_types p
+            WHERE p.parent_tran_id IS NOT NULL AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id
+        """
         query_values_list = [form_type]
         error_string = "ref_transaction_types"
         results = json_query(query, query_values_list, error_string, True)

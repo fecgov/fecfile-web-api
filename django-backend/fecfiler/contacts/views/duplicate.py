@@ -495,28 +495,33 @@ def create_temp_db_model(contacts_final_dict, file_name, cmte_id):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity_import_temp (cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, duplicate_entity, transaction_id, file_name, file_selected) VALUES (
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(preffix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s,
-                            %(duplicate_entity)s,
-                            %(transaction_id)s,
-                            %(file_name)s,
-                            %(file_selected)s
-                        );
-                    """,
+                INSERT INTO public.entity_import_temp (
+                    cmte_id, entity_type, entity_name, first_name, last_name,
+                    middle_name, preffix, suffix, street_1, street_2, city, state,
+                    zip_code, occupation, employer, duplicate_entity, transaction_id,
+                    file_name, file_selected
+                ) VALUES (
+                    %(cmte_id)s,
+                    %(entity_type)s,
+                    %(entity_name)s,
+                    %(first_name)s,
+                    %(last_name)s,
+                    %(middle_name)s,
+                    %(preffix)s,
+                    %(suffix)s,
+                    %(street_1)s,
+                    %(street_2)s,
+                    %(city)s,
+                    %(state)s,
+                    %(zip_code)s,
+                    %(occupation)s,
+                    %(employer)s,
+                    %(duplicate_entity)s,
+                    %(transaction_id)s,
+                    %(file_name)s,
+                    %(file_selected)s
+                );
+                """,
                 all_contact,
             )
 
@@ -529,8 +534,13 @@ def create_temp_db_model(contacts_final_dict, file_name, cmte_id):
 def get_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id,street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
-                                                FROM public.entity WHERE cmte_id = %s AND entity_type in ('IND', 'ORG') AND delete_ind is distinct from 'Y'"""
+            query_string = """
+            SELECT entity_id, street_1, street_2, city, state, zip_code,
+            employer, occupation, entity_name, last_name, first_name, middle_name,
+            preffix, suffix
+            FROM public.entity
+            WHERE cmte_id = %s AND entity_type in ('IND', 'ORG') AND delete_ind is distinct from 'Y'
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
             )
@@ -549,8 +559,13 @@ def get_contact_list(cmte_id):
 def get_temp_contact_list(cmte_id, file_name):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
-                                                FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s"""
+            query_string = """
+            SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1,
+            street_2, city, state, zip_code, employer, occupation, entity_name, last_name,
+            first_name, middle_name, preffix, suffix
+            FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                 [cmte_id, file_name],
@@ -570,9 +585,14 @@ def get_temp_contact_list(cmte_id, file_name):
 def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db, exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
-                                                FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') ORDER BY entity_id ASC"""
-
+            query_string = """
+            SELECT entity_id, cmte_id, transaction_id, duplicate_entity, file_selected, update_db,
+            exsisting_db, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,
+            occupation,entity_name, last_name, first_name, middle_name, preffix, suffix
+            FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ')
+            ORDER BY entity_id ASC
+            """
             trans_query_string = set_offset_n_fetch(
                 query_string, page_num, itemsperpage
             )
@@ -594,8 +614,11 @@ def get_temp_contact_pagination_list(cmte_id, file_name, page_num, itemsperpage)
 def get_total_count(cmte_id, file_name):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT count(*) FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ')"""
-
+            query_string = """
+            SELECT count(*)
+            FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ')
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                 [cmte_id, file_name],
@@ -612,8 +635,11 @@ def get_total_count(cmte_id, file_name):
 def get_temp_count(cmte_id, file_name):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT count(*) FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s"""
-
+            query_string = """
+            SELECT count(*)
+            FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                 [cmte_id, file_name],
@@ -642,11 +668,6 @@ def custom_validate_df(uploaded_df_orig, cmte_id, transaction_included, file_nam
             uploaded_df, cmte_id, transaction_included, file_name
         )
         errors = schema_data.get("errors")
-        # data_clean = schema_data.get("data_clean")
-        #
-        # if isinstance(data_clean, list) and not data_clean:
-        #     response = {'error_list': errors, 'duplcate_file_count': len(uploaded_df_duplicates)}
-        #     return response
 
         response = {
             "error_list": errors,
@@ -794,25 +815,30 @@ def create_entity_db_model(contacts_final_dict):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity (entity_id, cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer) VALUES (
-                            %(entity_id)s,
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(preffix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s
-                        );
-                    """,
+                INSERT INTO public.entity (
+                    entity_id, cmte_id, entity_type, entity_name, first_name, last_name,
+                    middle_name, preffix, suffix, street_1, street_2, city, state, zip_code,
+                    occupation, employer
+                )
+                VALUES (
+                    %(entity_id)s,
+                    %(cmte_id)s,
+                    %(entity_type)s,
+                    %(entity_name)s,
+                    %(first_name)s,
+                    %(last_name)s,
+                    %(middle_name)s,
+                    %(preffix)s,
+                    %(suffix)s,
+                    %(street_1)s,
+                    %(street_2)s,
+                    %(city)s,
+                    %(state)s,
+                    %(zip_code)s,
+                    %(occupation)s,
+                    %(employer)s
+                );
+                """,
                 all_contact,
             )
         cursor.close()

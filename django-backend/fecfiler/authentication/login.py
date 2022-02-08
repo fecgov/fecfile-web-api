@@ -81,7 +81,11 @@ def lock_account(counter, key):
     try:
         time = datetime.now()
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET is_active = %s, last_login = %s, login_code_counter = %s WHERE secret_key = %s AND delete_ind !='Y'"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET is_active = %s, last_login = %s, login_code_counter = %s
+            WHERE secret_key = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, ["false", datetime.now(), counter + 1, key])
             if cursor.rowcount != 1:
                 logger.debug("Lock account failed for key {}", key)
@@ -93,7 +97,11 @@ def lock_account(counter, key):
 def reset_code_counter(key):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET code_generated_counter = 0, last_login = %s, updated_at = %s, login_code_counter = 0 WHERE secret_key = %s"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET code_generated_counter = 0, last_login = %s, updated_at = %s, login_code_counter = 0
+            WHERE secret_key = %s
+            """
             cursor.execute(_sql, [datetime.now(), datetime.now(), key])
             if cursor.rowcount != 1:
                 logger.debug("Reset key failed for key {}", key)
@@ -105,7 +113,10 @@ def reset_code_counter(key):
 def get_last_login_time(username):
     try:
         with connection.cursor() as cursor:
-            _sql = """select last_login from public.authentication_account where username = %s AND delete_ind !='Y'"""
+            _sql = """
+            select last_login from public.authentication_account
+            where username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [username])
             update_time = cursor.fetchone()[0]
 

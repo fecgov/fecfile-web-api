@@ -967,7 +967,8 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
                 cand["cand_office_district"] = None
             else:
                 raise Exception(
-                    "The candidate id: {} does not belong to either Senate, House or Presidential office. Kindly check cand_office in entity table for details".format(
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. " \
+                    "Kindly check cand_office in entity table for details".format(
                         beneficiary_cand_id
                     )
                 )

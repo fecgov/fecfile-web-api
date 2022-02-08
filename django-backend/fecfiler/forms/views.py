@@ -130,55 +130,7 @@ def print_pdf_info(request):
     response["content-Disposition"] = "inline; filename = {}_Form99_Preview.pdf".format(
         request.data.get("committeeid")
     )
-    """f = open(output_pdf_path, 'rb')
-    pdf_contents = f.read()
-    f.close()
-    response = HttpResponse(pdf_contents, content_type='application/pdf')
-    response['content-Disposition'] = 'inline; filename = {}.pdf'.format(request.data.get('id'))"""
     return response
-
-
-# API to create a .fec which can be used on webprint module to print pdf. The data being used is the data that was last saved in the database for f99.
-"""@api_view(['GET'])
-def print_f99_info(request):
-
-    #Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
-
-    try:
-        # fetch last comm_info object created that is not submitted, else return None
-        comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username),  is_submitted=False).last() #,)
-
-    except CommitteeInfo.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND) #status=status.HTTP_404_NOT_FOUND)
-
-    file_name = "%s.fec" %comm_info.id
-    with open(file_name, "w") as text_file:
-        text_file.write("HDRFEC8.3FECfile8.3.0.0(f32)F99")
-        text_file.write("%s" %comm_info.committeeid)
-        text_file.write("%s" %comm_info.committeename)
-        text_file.write("%s" %comm_info.street1)
-        text_file.write("%s" %comm_info.street2)
-        text_file.write("%s" %comm_info.city)
-        text_file.write("%s" %comm_info.state)
-        text_file.write("%s" %comm_info.zipcode)
-        text_file.write("%s" %comm_info.treasurerlastname)
-        text_file.write("%s" %comm_info.treasurerfirstname)
-        text_file.write("%s" %comm_info.zipcode)
-        date = comm_info.created_at.strftime('%Y%m%d')
-        text_file.write("%s" %date)
-        text_file.write("%s" %comm_info.reason)
-        text_file.write("[BEGINTEXT]")
-        text_file.write("%s" %comm_info.zipcode)
-        text_file.write("[ENDTEXT]")
-
-    # get details of a single comm_info
-    if request.method == 'GET':
-        if comm_info:
-            serializer = CommitteeInfoSerializer(comm_info)
-            return Response(status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-"""
 
 
 @api_view(["GET"])
@@ -241,31 +193,11 @@ def create_f99_info(request):
             "coverage_end_date": request.data.get("coverage_end_date"),
         }
 
-        """
-
-        if 'file' in request.data:
-            data['filename'] = request.data.get('file').name
-
-        serializer = CommitteeInfoSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        """
         logger.debug("Incoming parameters: create_f99_info" + str(request.data))
         incoming_data = data
 
-        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-
-        # if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == get_comittee_id(request.user.username)):
-        #     logger.debug("FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data")
-        #     return Response({"FEC Error 001":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
-        # just making sure that committeeid is not updated by mistake
-
-        print("Reason text= ", request.data.get("text"))
         strcheck_Reason = check_F99_Reason_Text(request.data.get("text"))
 
-        print("strcheck_Reason", strcheck_Reason)
         if strcheck_Reason != "":
             return Response(
                 {
@@ -285,7 +217,6 @@ def create_f99_info(request):
                     comm_info = CommitteeInfo.objects.filter(id=id_comm.id).last()
                     if comm_info:
                         if comm_info.is_submitted == False:
-                            # print(comm_info.created_at)
                             incoming_data["created_at"] = comm_info.created_at
                             id_comm.created_at = comm_info.created_at
                             comm_info.delete()
@@ -294,11 +225,6 @@ def create_f99_info(request):
                                 incoming_data["additional_email_2"] = None
                             if incoming_data["additional_email_1"] in [None, "", " "]:
                                 incoming_data["additional_email_1"] = None
-                            """if not 'file' in request.data:
-                                if not comm_info.file is None:
-                                    del incoming_data['file']
-                                    del incoming_data['filename']
-                            """
                             serializer = CommitteeInfoSerializer(
                                 id_comm, data=incoming_data
                             )
@@ -338,11 +264,6 @@ def create_f99_info(request):
                 {"FEC Error 006": "This form Id number is not an integer"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        # except:
-        # logger.
-        # return Response({"error":"An unexpected error occurred" +
-        # str(sys.exc_info()[0]) + ". Please contact administrator"},
-        # status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             if is_not_read_only_or_filer(request):
                 if is_not_read_only_or_filer:
@@ -350,24 +271,6 @@ def create_f99_info(request):
             return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-"""
-@api_view(['POST'])
-#class f99_file_upload(APIView):
-    #parser_class = (FileUploadParser,)
-
-def f99_file_upload(self, request, format=None):
-    import ipdb; ipdb.set_trace()
-    if 'file' not in request.data:
-        raise ParseError("Empty content")
-
-    f = request.data['file']
-    #import ipdb; ipdb.set_trace()
-
-    mymodel.my_file_field.save(f.name, f, save=True)
-    return Response(status=status.HTTP_201_CREATED)
-"""
 
 
 @api_view(["POST"])
@@ -500,48 +403,6 @@ def update_f99_info(request, print_flag=False):
         json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-    """
-    #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
-
-    # update details of a single comm_info
-    if request.method == 'POST':
-
-        try:
-            #import ipdb; ipdb.set_trace()
-            # fetch last comm_info object created, else return 404
-            try:
-
-                id_comm = CommitteeInfo()
-                id_comm.id = request.data['id']
-                comm_info = CommitteeInfo.objects.filter(id=id_comm.id, is_submitted=False).last()
-
-                comm_info.delete()
-            except CommitteeInfo.DoesNotExist:
-                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-        except:
-            #logger.
-            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
-
-        incoming_data = request.data
-        #import ipdb; ipdb.set_trace()
-        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-
-        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == get_comittee_id(request.user.username)):
-            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
-        # just making sure that committeeid is not updated by mistake
-
-        if 'file' in request.data:
-            incoming_data['filename'] = request.data.get('file').name
-
-
-        serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    """
-
 
 @api_view(["POST"])
 def submit_comm_info(request):
@@ -588,12 +449,6 @@ def submit_comm_info(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-
-            # not(request.data['is_submitted'] in['True',True,'true'] and
-            # if not incoming_data['committeeid'] == get_comittee_id(request.user.username):
-            # return Response({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
-            # just making sure that committeeid is not updated by mistake
             try:
                 comm_info = CommitteeInfo.objects.filter(id=request.data["id"]).last()
                 if comm_info:
@@ -640,107 +495,6 @@ def submit_comm_info(request):
                 json_result, status=status.HTTP_403_FORBIDDEN, safe=False
             )
 
-    """
-    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
-    validate_api/s3 not being called currently
-    #
-    #import ipdb; ipdb.set_trace()
-    if request.method == 'POST':
-        try:
-            comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
-            #print(comm_info.pk)
-            if comm_info:
-                comm_info.is_submitted = True
-                comm_info.updated_at = datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info)
-                #if serializer.is_valid():
-                #if True:
-                comm_info.save()
-
-                email(True, serializer.data)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-                #else:
-                #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except:
-            return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-
-    else:
-        return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
-    """
-
-
-# @api_view(['POST'])
-# def submit_comm_info(request):
-#     """
-#     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details.Call the data_receive API and fetch the response
-#     """
-#     #import ipdb; ipdb.set_trace()
-#     #if request.method == 'POST':
-#     if request.method == 'POST':
-#         try:
-#             #import ipdb; ipdb.set_trace()
-#             comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
-#             if comm_info:
-
-#                 comm_info.is_submitted=True
-#                 comm_info.updated_at=datetime.datetime.now()
-#                 comm_info.save()
-#                 new_data = comm_info.__dict__
-#                 serializer = CommitteeInfoSerializer(comm_info) #, data=new_data)
-#                 if True: #serializer.is_valid():
-#                     #serializer.save()
-
-#                     # make temp file, stream it , and close
-#                     try:
-#                         tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
-#                         json.dump(serializer.data, open(tmp_filename, 'w'))
-
-#                         f99_obj_to_s3 = {
-#                             'committeeid': new_data['committeeid'],
-#                             #'upload':open(tmp_filename, 'r')
-#                         }
-#                         resp = requests.post(fecfiler.settings.DATA_RECEIVE_API_URL + fecfiler.settings.DATA_RECEIVE_API_VERSION + "f99_data_receive", data=f99_obj_to_s3, files={'upload':open(tmp_filename,'r')})
-
-#                         if not resp.ok:
-#                             return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
-
-#                         # delete tmp file if exists
-#                         try:
-#                             os.remove(tmp_filename)
-#                         except:
-#                             pass
-
-#                     except:
-#                         try:
-#                             os.remove(tmp_filename)
-#                         except:
-#                             pass
-
-#                     return Response({'uploaded_file': resp.json(), 'obj_data':serializer.data}, status=status.HTTP_200_OK)
-#                 else:
-#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#             else:
-#                 return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-#         except:
-#             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-
-#     else:
-#         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-"""
-@api_view(["POST"])
-def create_json_file(request):
-
-   #creating a JSON file so that it is handy for all the public API's
-
-   try:
-       tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
-       json.dump(serializer.data, open(tmp_filename, 'w'))
-
-"""
-
 
 @api_view(["GET"])
 def get_f99_reasons(request):
@@ -773,16 +527,27 @@ def get_committee_details(request):
         cmte_id = get_comittee_id(request.user.username)
         with connection.cursor() as cursor:
             # GET all rows from committee table
-            query_string = """SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2",
+            query_string = """SELECT cm.cmte_id AS "committeeid",
+                cm.cmte_name AS "committeename", cm.street_1 AS "street1",
+                cm.street_2 AS "street2",
                 cm.city, cm.state, cm.zip_code AS "zipcode",
-                cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn,
+                cm.cmte_email_1 AS "email_on_file",
+                cm.cmte_email_2 AS "email_on_file_1",
+                cm.phone_number, cm.cmte_type, cm.cmte_dsgn,
                 cm.cmte_filing_freq, cm.cmte_filed_type,
-                cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename",
-                cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax,
-                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
+                cm.treasurer_last_name AS "treasurerlastname",
+                cm.treasurer_first_name AS "treasurerfirstname",
+                cm.treasurer_middle_name AS "treasurermiddlename",
+                cm.treasurer_prefix AS "treasurerprefix",
+                cm.treasurer_suffix AS "treasurersuffix",
+                cm.create_date AS "created_at", cm.cmte_type_category, f1.fax,
+                f1.tphone as "treasurerphone", f1.url as "website",
+                f1.email as "treasureremail"
                 FROM public.committee_master cm
                 LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
-                WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
+                WHERE cm.cmte_id = %s
+                ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
             )
@@ -793,33 +558,6 @@ def get_committee_details(request):
                     cmte_id
                 )
             )
-        #     for row in cursor.fetchone():
-        #         # print(row)
-        #         forms_obj=row[0]
-        #         # print(forms_obj)
-        # if forms_obj is None:
-        #     raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
-        # else:
-        #     modified_output = {"committeeid": forms_obj.get('cmte_id'),
-        #                         "committeename": forms_obj.get('cmte_name'),
-        #                         "street1": forms_obj.get('street_1'),
-        #                         "street2": forms_obj.get('street_2'),
-        #                         "city": forms_obj.get('city'),
-        #                         "state": forms_obj.get('state'),
-        #                         "zipcode": forms_obj.get('zip_code'),
-        #                         "treasurerprefix": forms_obj.get('treasurer_prefix'),
-        #                         "treasurerfirstname": forms_obj.get('treasurer_first_name'),
-        #                         "treasurermiddlename": forms_obj.get('treasurer_middle_name'),
-        #                         "treasurerlastname": forms_obj.get('treasurer_last_name'),
-        #                         "treasurersuffix": forms_obj.get('treasurer_suffix'),
-        #                         "email_on_file": forms_obj.get('cmte_email_1'),
-        #                         "email_on_file_1": forms_obj.get('cmte_email_2'),
-        #                         "phone_number": forms_obj.get('phone_number'),
-        #                         "cmte_type": forms_obj.get('cmte_type'),
-        #                         "cmte_dsgn": forms_obj.get('cmte_dsgn'),
-        #                         "cmte_filing_freq": forms_obj.get('cmte_filing_freq'),
-        #                         "cmte_filed_type": forms_obj.get('cmte_filed_type'),
-        #                         "created_at": forms_obj.get('create_date')}
         levin_accounts = get_levin_accounts(cmte_id)
         modified_output[0]["levin_accounts"] = levin_accounts
         return Response(modified_output[0], status=status.HTTP_200_OK)
@@ -1105,43 +843,63 @@ def get_form99list(request):
             forms_obj = None
             with connection.cursor() as cursor:
                 if reportid in ["None", "null", " ", "", "0"]:
-                    query_string = """SELECT json_agg(t) FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate, memo_text,
-                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype,
-                                            deleteddate,
-                                            memo_text
-                                         FROM public.reports_view WHERE cmte_id = %s AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0) AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
-                                    ) t1
-                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                    query_string = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id,
+                        report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id,
+                        previous_report_id, status, filed_date, fec_id, fec_accepted_date,
+                        fec_status, most_recent_flag, delete_ind, create_date, last_update_date,
+                        report_type_desc, viewtype,
+                        deleteddate, memo_text,
+                        (select count(1) from public.reports_view c
+                        where c.superceded_report_id = t1.report_id) as child_records_count
+                        FROM (SELECT report_id, form_type, amend_ind, amend_number, cmte_id,
+                        report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id,
+                        previous_report_id, status, filed_date, fec_id, fec_accepted_date,
+                        fec_status, most_recent_flag, delete_ind, create_date, last_update_date,
+                        report_type_desc,
+                        CASE
+                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                            THEN 'archieve'
+                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                            AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                            ELSE 'current'
+                        END AS viewtype,
+                            deleteddate,
+                            memo_text
+                         FROM public.reports_view WHERE cmte_id = %s
+                         AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0)
+                         AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                        ) t1
+                        WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
-                    query_string = """SELECT json_agg(t) FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate, memo_text,
-                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype,
-                                            deleteddate,
-                                            memo_text
-                                         FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
-                                    ) t1
-                                    WHERE report_id = %s AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0) AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                    query_string = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                            deleteddate, memo_text,
+                            (select count(1) from public.reports_view c
+                            where c.superceded_report_id = t1.report_id) as child_records_count
+                         FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                            CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype,
+                                deleteddate,
+                                memo_text
+                             FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
+                        ) t1
+                        WHERE report_id = %s AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0)
+                        AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-                # print("query_string =", query_string)
-
-                # print("query_string = ", query_string)
-                # Pull reports from reports_view
-                # query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "", "0"]:
                     cursor.execute(query_string, [cmte_id, parentid, viewtype])
                 else:
@@ -1165,36 +923,51 @@ def get_form99list(request):
             with connection.cursor() as cursor:
 
                 if reportid in ["None", "null", " ", "", "0"]:
-                    query_count_string = """SELECT count('a') as totalreportsCount FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                            delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                            delete_ind, create_date, last_update_date, report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype, deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null
-                                    ) t1
-                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                    query_count_string = """
+                        SELECT count('a') as totalreportsCount FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date,
+                            superceded_report_id, previous_report_id, status, filed_date, fec_id,
+                            fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                            deleteddate
+                         FROM (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date, report_type_desc,
+                             CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype, deleteddate
+                             FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                             AND last_update_date is not null
+                        ) t1
+                        WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
-                    query_count_string = """SELECT count('a') as totalreportsCount FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                        superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                        delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype, deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL)
-                                    ) t1
-                                    WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                    query_count_string = """
+                        SELECT count('a') as totalreportsCount FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate
+                         FROM (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                            CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype, deleteddate
+                             FROM public.reports_view
+                             WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                        ) t1
+                        WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
                 if reportid in ["None", "null", " ", "", "0"]:
                     cursor.execute(query_count_string, [cmte_id, viewtype])
@@ -1210,13 +983,11 @@ def get_form99list(request):
 
             json_result = {"reports": forms_obj, "totalreportsCount": forms_cnt_obj}
         except Exception as e:
-            # print (str(e))
             return Response(
                 "The reports view api - get_form99list is throwing an error" + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # return Response(forms_obj, status=status.HTTP_200_OK)
         return Response(json_result, status=status.HTTP_200_OK)
 
 
@@ -1239,44 +1010,66 @@ def get_previous_amend_reports(request):
             forms_obj = None
             with connection.cursor() as cursor:
                 if reportid in ["None", "null", " ", "", "0"]:
-                    query_string = """SELECT json_agg(t) FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate, memo_text,
-                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype,
-                                            deleteddate,
-                                            memo_text
-                                         FROM public.reports_view WHERE cmte_id = %s AND COALESCE(superceded_report_id, 0) in ('{}') AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
-                                    ) t1
-                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
-                        "', '".join(report_list)
-                    )
+                    query_string = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                            deleteddate, memo_text,
+                            (select count(1) from public.reports_view c
+                            where c.superceded_report_id = t1.report_id) as child_records_count
+                         FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                             CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype,
+                                deleteddate,
+                                memo_text
+                             FROM public.reports_view WHERE cmte_id = %s
+                             AND COALESCE(superceded_report_id, 0) in ('{}')
+                             AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                        ) t1
+                        WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
+                            "', '".join(report_list)
+                        )
                 else:
-                    query_string = """SELECT json_agg(t) FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate, memo_text,
-                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype,
-                                            deleteddate,
-                                            memo_text
-                                         FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
-                                    ) t1
-                                    WHERE report_id = %s AND COALESCE(superceded_report_id, 0) in ('{}') AND  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
+                    query_string = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                            deleteddate, memo_text,
+                            (select count(1) from public.reports_view c
+                            where c.superceded_report_id = t1.report_id) as child_records_count
+                         FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id,
+                            status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                             CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype,
+                                deleteddate,
+                                memo_text
+                             FROM public.reports_view
+                             WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
+                        ) t1
+                        WHERE report_id = %s AND COALESCE(superceded_report_id, 0) in ('{}') AND  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
                         "', '".join(report_list)
                     )
 
                 # Pull reports from reports_view
-                # query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "", "0"]:
                     cursor.execute(query_string, [cmte_id, viewtype])
                 else:
@@ -1299,35 +1092,54 @@ def get_previous_amend_reports(request):
 
                 if reportid in ["None", "null", " ", "", "0"]:
                     query_count_string = """SELECT count('a') as totalreportsCount FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                            delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                            delete_ind, create_date, last_update_date, report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype, deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null
-                                    ) t1
-                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id,
+                            report_type, cvg_start_date, cvg_end_date, due_date,
+                            superceded_report_id, previous_report_id, status, filed_date,
+                            fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                            viewtype, deleteddate
+                         FROM   (SELECT report_id, form_type, amend_ind, amend_number,
+                            cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
+                            superceded_report_id, previous_report_id, status, filed_date,
+                            fec_id, fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date, report_type_desc,
+                             CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype, deleteddate
+                             FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                             AND last_update_date is not null
+                        ) t1
+                        WHERE  viewtype = %s ORDER BY last_update_date DESC ) t;
+                    """
                 else:
-                    query_count_string = """SELECT count('a') as totalreportsCount FROM
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                        superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag,
-                                        delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate
-                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date,
-                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc,
-                                         CASE
-                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
-                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
-                                            ELSE 'current'
-                                        END AS viewtype, deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL)
-                                    ) t1
-                                    WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                    query_count_string = """
+                        SELECT count('a') as totalreportsCount FROM
+                        (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type,
+                            cvg_start_date, cvg_end_date, due_date,
+                            superceded_report_id, previous_report_id, status, filed_date, fec_id,
+                            fec_accepted_date, fec_status, most_recent_flag,
+                            delete_ind, create_date, last_update_date,report_type_desc,
+                            viewtype, deleteddate
+                         FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id,
+                            report_type, cvg_start_date, cvg_end_date, due_date,
+                            superceded_report_id, previous_report_id, status, filed_date, fec_id,
+                            fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date,
+                            last_update_date,report_type_desc,
+                             CASE
+                                WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1')
+                                THEN 'archieve'
+                                WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1')
+                                AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                ELSE 'current'
+                            END AS viewtype, deleteddate
+                             FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                        ) t1
+                        WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t;
+                    """
 
                 if reportid in ["None", "null", " ", "", "0"]:
                     cursor.execute(query_count_string, [cmte_id, viewtype])
@@ -1368,8 +1180,6 @@ def delete_forms(request):
                         comm_info = CommitteeInfo.objects.filter(
                             is_submitted=False, isdeleted=False, id=obj.get("id")
                         ).first()
-                        # or can be written like comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=request.data.get('id'))[0]
-                        # way to access single object out of multiple objects -> for object in objects:
 
                         if comm_info:
                             new_data = vars(comm_info)
@@ -1380,17 +1190,15 @@ def delete_forms(request):
                             )
                             if serializer.is_valid():
                                 serializer.save()
-                                # print(serializer.data)
                             else:
                                 return Response(
                                     serializer.errors,
                                     status=status.HTTP_400_BAD_REQUEST,
                                 )
                         else:
-                            # print(comm_info.id)
                             return Response(
                                 {
-                                    "error": "ERRCODE: FEC03. Form with id %d is already deleted or has been submitted beforehand."
+                                    "error": "ERRCODE: FEC03. Form with id %d is already deleted or has been submitted beforehand."  # noqa
                                     % obj.get("id")
                                 },
                                 status=status.HTTP_400_BAD_REQUEST,
@@ -1420,7 +1228,6 @@ def email(boolean, data):
 
     RECIPIENT.append("%s" % data.get("email_on_file"))
 
-    # print(data.get('additional_email_1'))
     if "additional_email_1" in data and (
         not (
             data.get("additional_email_1") == "-"
@@ -1430,7 +1237,6 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("additional_email_1"))
 
-    # print(data.get('additional_email_2'))
     if "additional_email_2" in data and (
         not (
             data.get("additional_email_2") == "-"
@@ -1440,7 +1246,6 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("additional_email_2"))
 
-    # print(data.get('email_on_file_1'))
     if "email_on_file_1" in data and (
         not (
             data.get("email_on_file_1") == "-"
@@ -1455,13 +1260,10 @@ def email(boolean, data):
     # The email body for recipients with non-HTML email clients.
     BODY_TEXT = (
         "Form 99 that we received has been validated and submitted\r\n"
-        "This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
+        "This email was sent by FEC.gov. If you are receiving this email " \
+        "in error or have any questions, please contact the FEC Electronic Filing Office " \
+        "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
     )
-
-    # The HTML body of the email.
-    # final_html = email_ack1.html.replace('{{@REPID}}',1234567).replace('{{@REPLACE_CMTE_ID}}',C0123456)
-    # t = Template(email_ack1)
-    # c= Context({'@REPID':123458},)
 
     data["updated_at"] = (
         maya.parse(data["updated_at"])
@@ -1481,7 +1283,9 @@ def email(boolean, data):
     <head></head>
     <body>
       <h1>Form 99 that we received has been validated and submitted</h1>
-      <p>This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."</p>
+      <p>This email was sent by FEC.gov. If you are receiving this email
+      in error or have any questions, please contact the FEC Electronic Filing Office
+      toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."</p>
     </body>
     </html>"""
 
@@ -1521,94 +1325,12 @@ def email(boolean, data):
         print(e.response["Error"]["Message"])
 
 
-"""
-@api_view(['GET'])
-def get_comm_lookup(request):
-
-    #fields for comm lookup
-
-    try:
-        import ipdb; ipdb.set_trace()
-
-        comm = CommitteeLookup.objects.get(cmte_id=get_comittee_id(request.user.username))
-    except CommitteeLookup.DoesNotExist:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    # get details wrt to the committeeid
-    if request.method == 'GET':
-        new_obj = {'committeeid':comm.cmte_id, 'committee_type': comm.cmte_type, 'committee_name':comm.cmte_name, 'committee_design':comm.cmte_dsgn, 'committee_filing_freq':comm.cmte_filing_freq}
-        return Response(new_obj)
-"""
-"""
-@api_view(['GET'])
-def get_filed_form_types(request):
-
-    #Fields for identifying the committee type and committee design and filter the forms category
-
-    try:
-        comm_id = get_comittee_id(request.user.username)
-
-        #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
-        forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
-
-        for form_obj in forms_obj:
-            if form_obj['due_date']:
-                form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
-
-        resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
-        return Response(resp_data, status=status.HTTP_200_OK)
-    except:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-"""
-
-"""
-@api_view(['GET'])
-def get_report_types_(request):
-
-    #fields fordentifying the committee type and committee design and filter the forms category
-
-    try:
-        comm_id = get_comittee_id(request.user.username)
-
-        #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
-        forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
-
-        for form_obj in forms_obj:
-            if form_obj['due_date']:
-                form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
-
-        resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
-        return Response(resp_data, status=status.HTTP_200_OK)
-    except:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-"""
-
-
 @api_view(["POST"])
 def save_print_f99(request):
     """ "
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     logger.debug("Incoming parameters: save_print_f99" + str(request.data))
-    # token_use = request.auth.decode("utf-8")
-
-    # token_use = "JWT" + " " + token_use
-
-    # if 'file' in request.data:
-    #     filename = request.data.get('file').name
-    #     attachment = request.data.get('file')
-    #     decode_file = attachment.read()
-    #     #attachment = open(request.data.get('file'), 'rb')
-    #     files = {'file': (filename, decode_file, 'application/pdf')}
-
-    #     #print(request._request.content)
-    #     #request._request.content
-    #     #'file': ('attachment.pdf', myfile, 'application/pdf')
-    #     createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
-    #     #createresp =
-    # else:
-    #     createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
-
     createresp = create_f99_info(request._request)
 
     if createresp.status_code != 201:
@@ -1616,14 +1338,8 @@ def save_print_f99(request):
         return Response(createresp.data, status=entity_status)
 
     else:
-        # print(createresp.content)
         create_json_data = json.loads(createresp.content.decode("utf-8"))
 
-    # #print(request.auth)
-    # if not createresp.ok:
-    #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
-    # #try:
-    # create_json_data = json.loads(createresp.text)
     est = pytz.timezone("US/Eastern")
 
     comm_info = CommitteeInfo.objects.filter(id=create_json_data["id"]).last()
@@ -1675,11 +1391,7 @@ def save_print_f99(request):
         )
         vdata = {}
         vdata["wait"] = "false"
-        # print("vdata",vdata)
         json.dump(data_obj, open(tmp_filename, "w"))
-
-        # with open('data.json', 'w') as outfile:
-        #   json.dump(data, outfile, ensure_ascii=False)
 
         # variables to be sent along the JSON file in form-data
         filing_type = "FEC"
@@ -1691,38 +1403,17 @@ def save_print_f99(request):
             "vendor_software_name": vendor_software_name,
         }
 
-        # print(comm_info.file)
-
         if not (comm_info.file in [None, "", "null", " ", ""]):
             filename = comm_info.file.name
-            # print(filename)
             myurl = (
                 "https://{}.s3.amazonaws.com/media/".format(
                     settings.AWS_STORAGE_BUCKET_NAME
                 )
                 + filename
             )
-            # print(myurl)
-            # url_request = urllib.request.Request(myurl, headers = {"User-Agent", "Mozilla/5.0"})
             url_request = urllib.request.Request(myurl)
             myfile = urllib.request.urlopen(url_request)
 
-            # s3 = boto3.client('s3')
-
-            # file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
-
-            # attachment = open(file_object['Body'], 'rb')
-
-            """
-                file_obj = {
-                    'json_file': ('data.json', open('data.json', 'r'), 'application/json'),
-                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
-                }
-            else:
-                file_obj = {
-                    'json_file': ('data.json', open('data.json', 'r'), 'application/json')
-                }
-            """
             file_obj = {
                 "json_file": ("data.json", open(tmp_filename, "r"), "application/json"),
                 "attachment_file": ("attachment.pdf", myfile, "application/pdf"),
@@ -1750,12 +1441,6 @@ def save_print_f99(request):
             {"FEC Error 003": "This form Id number does not exist"},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    """
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-    except ValueError:
-        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
-    """
 
 
 @api_view(["POST"])
@@ -1763,13 +1448,6 @@ def update_print_f99(request):
     """ "
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
-    # token_use = request.auth.decode("utf-8")
-
-    # token_use = "JWT" + " " + token_use
-
-    # createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
-    # if not createresp.ok:
-    #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
 
     updateresp = update_f99_info(request._request, print_flag=True)
 
@@ -1779,7 +1457,6 @@ def update_print_f99(request):
         return Response(updateresp.data, status=entity_status)
 
     else:
-        # print(updateresp.content)
         update_json_data = json.loads(updateresp.content.decode("utf-8"))
 
     est = pytz.timezone("US/Eastern")
@@ -1834,15 +1511,7 @@ def update_print_f99(request):
             )
             vdata = {}
             vdata["wait"] = "false"
-            # print("vdata",vdata)
             json.dump(data_obj, open(tmp_filename, "w"))
-
-            # with open('data.json', 'w') as outfile:
-            #   json.dump(data, outfile, ensure_ascii=False)
-
-            # obj = open('data.json', 'w')
-            # obj.write(serializer.data)
-            # obj.close
 
             # variables to be sent along the JSON file in form-data
             filing_type = "FEC"
@@ -1854,37 +1523,15 @@ def update_print_f99(request):
                 "vendor_software_name": vendor_software_name,
             }
 
-            # print(comm_info.file)
-
             if not (comm_info.file in [None, "", "null", " ", ""]):
                 filename = comm_info.file.name
-                # print(filename)
                 myurl = (
                     "https://{}.s3.amazonaws.com/media/".format(
                         settings.AWS_STORAGE_BUCKET_NAME
                     )
                     + filename
                 )
-                # myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
-                # print(myurl)
                 myfile = urllib.request.urlopen(myurl)
-
-                # s3 = boto3.client('s3')
-
-                # file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
-
-                # attachment = open(file_object['Body'], 'rb')
-
-                """
-                file_obj = {
-                    'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
-                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
-                }
-            else:
-                file_obj = {
-                    'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
-                }
-                """
 
                 file_obj = {
                     "json_file": (
@@ -1927,13 +1574,9 @@ def update_print_f99(request):
 def set_need_appearances_writer(writer):
 
     try:
-
         catalog = writer._root_object
-
         # get the AcroForm tree and add "/NeedAppearances attribute
-
         if "/AcroForm" not in catalog:
-
             writer._root_object.update(
                 {
                     NameObject("/AcroForm"): IndirectObject(
@@ -1943,9 +1586,7 @@ def set_need_appearances_writer(writer):
             )
 
         need_appearances = NameObject("/NeedAppearances")
-
         writer._root_object["/AcroForm"][need_appearances] = BooleanObject(True)
-
         return writer
 
     except Exception as e:
@@ -1967,7 +1608,6 @@ def update_checkbox_values(page, fields):
                     }
                 )
 
-
 # API which prints Form 99 data
 
 
@@ -1976,18 +1616,11 @@ def print_pdf(request):
 
     # try:
     data1 = request.data.get("data1")
-    # buff = data1.read()
-
     data_decode = json.load(data1)
-    # print(data_decode['IMGNO'])
-    # if data_decode['REASON_TYPE'] = "MST":
-    #    data_decode['']
 
     infile = "templates/forms/F99.pdf"
 
     outfile = "templates/forms/media/{}.pdf".format(data_decode["IMGNO"])
-
-    # print(data_decode['REASON_TYPE'])
 
     data_decode["FILER_FEC_ID_NUMBER"] = data_decode["FILER_FEC_ID_NUMBER"][1:]
 
@@ -2002,8 +1635,8 @@ def print_pdf(request):
 
     if data_decode["REASON_TYPE"] == "MSW":
         reason_type_data = {"REASON_TYPE_MSW": "/MSW"}
-    # open the input file
 
+    # open the input file
     input_stream = open(infile, "rb")
 
     pdf_reader = PdfFileReader(input_stream, strict=True)
@@ -2062,12 +1695,6 @@ def print_pdf(request):
 def check_F99_Reason_Text(strReasonText):
     print("In check_F99_Reason_Text...")
     try:
-        """f = open(r'/home/mahendra/Downloads/test.html', 'r')
-        for line in f:
-            for word in line.split():
-                validate_HTMLtag(word)
-        return ""
-        """
         for word in strReasonText.split():
             validate_HTMLtag(word)
         return ""

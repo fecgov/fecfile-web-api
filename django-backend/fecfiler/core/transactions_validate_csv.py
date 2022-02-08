@@ -189,7 +189,13 @@ def build_schemas(formname, sched, trans_type):
         connection = psycopg2.connect(settings.DATABASE_URL)
         cursor = connection.cursor()
         cursor.execute(
-            "SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type, rfsfs.field_description, rfsfs.type, rfsfs.required FROM public.ref_forms_scheds_format_specs rfsfs WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL",
+            """
+            SELECT rfsfs.formname, rfsfs.schedname, rfsfs.transaction_type,
+            rfsfs.field_description, rfsfs.type, rfsfs.required
+            FROM public.ref_forms_scheds_format_specs rfsfs
+            WHERE rfsfs.formname  = %s AND rfsfs.schedname = %s
+            AND rfsfs.transaction_type = %s and rfsfs.type IS NOT NULL
+            """,
             (formname, sched, trans_type),
         )
         format_specs = cursor.fetchall()
@@ -207,7 +213,6 @@ def build_schemas(formname, sched, trans_type):
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv], allow_empty=True)
                 else:
-                    # print('A/N is mandatory with len: ', len,' field: ',field)
                     if field in [
                         "REPORT TYPE",
                         "REPORT YEAR",
@@ -218,26 +223,20 @@ def build_schemas(formname, sched, trans_type):
                     ]:
                         pattern = "^(\\S)+[A-Za-z0-9_-]{1," + len + "}$"
                     else:
-                        # print('field:',field)
                         pattern = (
                             r"""^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$"""
                         )
-                    # pattern = '^[-@.\/#&+*%:;=?!=.-^*()\'%!\\w\\s]{1,' + len + '}$'
                     mpv = MatchesPatternValidation(pattern)
                     column = Column(field, [mpv], allow_empty=False)
                 columns.append(column)
                 headers.append(field)
-                # print(field)
             elif "NUM" in type:
-                # print(field)
                 pattern = r"""^[0-9]\d{0,' + len + '}(\.\d{1,3})?%?$"""
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
                 columns.append(column)
                 headers.append(field)
             elif "AMT" in type:
-                # print(field)
-                # pattern = '^-?\d\d*[,]?\d*[,]?\d*[.,]?\d*\d$' #'^((\d){1,3},*){1,5}\.(\d){2}$' #'^[\\w\\s]{1,'+ len + '}$'
                 pattern = r"""^[0-9]\d{0,' + len + '}(\.\d{1,3})?%?$"""
                 mpv = MatchesPatternValidation(pattern)
                 column = Column(field, [mpv])
@@ -389,9 +388,9 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
 def validate_transactions(bktname, key, cmteid):
     try:
         # send_message_to_queue()
-        # aws sqs receive-message --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions --attribute-names All --message-attribute-names All --max-number-of-messages 10
-        # aws sqs purge-queue --queue-url https://queue.amazonaws.com/813218302951/fecfile-importtransactions
-        # print("bktname: ",bktname, ", Key : ", key)
+        # aws sqs receive-message --queue-url $QUEUE_URL --attribute-names All /
+        #  --message-attribute-names All --max-number-of-messages 10
+        # aws sqs purge-queue --queue-url $QUEUE_URL
         returnstr = "File_not_found"
         check_errkey_exists(bktname, key)
         if check_file_exists(bktname, key):
@@ -399,16 +398,14 @@ def validate_transactions(bktname, key, cmteid):
                 res = load_dataframe_from_s3(
                     bktname, key, 100000, 1, cmteid
                 )  # 100,000 records and 1s timer is for testing and need to be updated.
-                # print(res)
                 if res != "Validate_Pass":
                     print("Error with data validation:", res)
                     returnstr = res
                 else:
                     print(
-                        "~~~~~~~~~~~~~~~~~~~~Parsing Success!!! Error Queue is empty!!!~~~~~~~~~~~~~~"
+                        "~~~~~Parsing Success!!! Error Queue is empty!!!~~~~"
                     )
 
-            # print(returnstr)
             if returnstr is not "File_not_found":
                 print(returnstr.split("/"))
 

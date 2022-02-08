@@ -385,25 +385,29 @@ def create_db_model(contacts_final_dict):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity (entity_id, cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer) VALUES (
-                            %(entity_id)s,
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(preffix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s
-                        );
-                    """,
+                INSERT INTO public.entity (
+                    entity_id, cmte_id, entity_type, entity_name, first_name, last_name,
+                    middle_name, preffix, suffix, street_1, street_2, city, state, zip_code,
+                    occupation, employer
+                ) VALUES (
+                %(entity_id)s,
+                %(cmte_id)s,
+                %(entity_type)s,
+                %(entity_name)s,
+                %(first_name)s,
+                %(last_name)s,
+                %(middle_name)s,
+                %(preffix)s,
+                %(suffix)s,
+                %(street_1)s,
+                %(street_2)s,
+                %(city)s,
+                %(state)s,
+                %(zip_code)s,
+                %(occupation)s,
+                %(employer)s
+                );
+                """,
                 all_contact,
             )
 

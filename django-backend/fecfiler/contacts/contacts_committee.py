@@ -180,30 +180,34 @@ def create_db_model(contacts_final_dict, file_name):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity (entity_id, cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city,
-                         state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id) VALUES (
-                            %(entity_id)s,
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(preffix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s,
-                            %(cand_office)s,
-                            %(cand_office_state)s,
-                            %(cand_office_district)s,
-                            %(ref_cand_cmte_id)s
-                        );
-                    """,
+                INSERT INTO public.entity (
+                    entity_id, cmte_id, entity_type, entity_name, first_name,
+                    last_name, middle_name, preffix, suffix, street_1, street_2,
+                    city, state, zip_code, occupation, employer, cand_office,
+                    cand_office_state, cand_office_district, ref_cand_cmte_id)
+                VALUES (
+                    %(entity_id)s,
+                    %(cmte_id)s,
+                    %(entity_type)s,
+                    %(entity_name)s,
+                    %(first_name)s,
+                    %(last_name)s,
+                    %(middle_name)s,
+                    %(preffix)s,
+                    %(suffix)s,
+                    %(street_1)s,
+                    %(street_2)s,
+                    %(city)s,
+                    %(state)s,
+                    %(zip_code)s,
+                    %(occupation)s,
+                    %(employer)s,
+                    %(cand_office)s,
+                    %(cand_office_state)s,
+                    %(cand_office_district)s,
+                    %(ref_cand_cmte_id)s
+                );
+                """,
                 all_contact,
             )
 
@@ -217,8 +221,14 @@ def create_db_model(contacts_final_dict, file_name):
 def get_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id as duplicate_entity, cmte_id,entity_type,street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                    FROM public.entity WHERE cmte_id = %s AND entity_type not in ('IND', 'ORG') AND delete_ind is distinct from 'Y'"""
+            query_string = """
+            SELECT entity_id as duplicate_entity, cmte_id, entity_type, street_1, street_2,
+            city, state, zip_code, employer, occupation, entity_name, last_name, first_name,
+            middle_name, preffix, suffix, cand_office, cand_office_state, cand_office_district,
+            ref_cand_cmte_id
+            FROM public.entity WHERE cmte_id = %s AND entity_type not in ('IND', 'ORG')
+            AND delete_ind is distinct from 'Y'
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
             )

@@ -60,9 +60,14 @@ def check_if_all_options_selected(cmte_id, file_name):
     try:
         all_selected = False
         with connection.cursor() as cursor:
-            query_string = """SELECT count(*) FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND duplicate_entity NOT IN ('', ' ') and
-             file_selected in ('', ' ') and (update_db <> '') is not true and (exsisting_db <> '') is not true"""
-
+            query_string = """
+            SELECT count(*) FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s
+            AND duplicate_entity NOT IN ('', ' ')
+            and file_selected in ('', ' ')
+            and (update_db <> '') is not true
+            and (exsisting_db <> '') is not true
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                 [cmte_id, file_name],
@@ -136,8 +141,13 @@ def merge_option(request):
 def get_add_contact(cmte_id, file_name):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1, street_2, city, state, zip_code,employer,occupation,entity_name,last_name,first_name, middle_name, preffix, suffix
-                                                FROM public.entity_import_temp WHERE cmte_id = %s AND file_name = %s AND file_selected = %s"""
+            query_string = """
+            SELECT entity_id, cmte_id, transaction_id, file_name, entity_type, street_1,
+            street_2, city, state, zip_code, employer, occupation, entity_name, last_name,
+            first_name, middle_name, preffix, suffix
+            FROM public.entity_import_temp
+            WHERE cmte_id = %s AND file_name = %s AND file_selected = %s
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                 [cmte_id, file_name, "true"],
@@ -202,10 +212,13 @@ def create_entity_update_db_model(contacts_final_dict):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        UPDATE public.entity SET entity_type = %(entity_type)s, entity_name = %(entity_name)s, first_name = %(first_name)s, last_name = %(last_name)s, middle_name = %(middle_name)s, preffix = %(preffix)s,
-                         suffix = %(suffix)s, street_1 = %(street_1)s, street_2 = %(street_2)s, city = %(city)s, state = %(state)s, zip_code = %(zip_code)s,
-                          occupation = %(occupation)s, employer = %(employer)s, last_update_date = %(last_update_date)s where cmte_id = %(cmte_id)s AND entity_id = %(update_db)s;
-                    """,
+                UPDATE public.entity
+                SET entity_type = %(entity_type)s, entity_name = %(entity_name)s, first_name = %(first_name)s,
+                last_name = %(last_name)s, middle_name = %(middle_name)s, preffix = %(preffix)s,
+                suffix = %(suffix)s, street_1 = %(street_1)s, street_2 = %(street_2)s, city = %(city)s,
+                state = %(state)s, zip_code = %(zip_code)s, occupation = %(occupation)s, employer = %(employer)s,
+                last_update_date = %(last_update_date)s where cmte_id = %(cmte_id)s AND entity_id = %(update_db)s;
+                """,
                 all_contact,
             )
         cursor.close()
@@ -233,25 +246,29 @@ def create_entity_db_model(contacts_final_dict):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity (entity_id, cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer) VALUES (
-                            %(entity_id)s,
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(preffix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s
-                        );
-                    """,
+                INSERT INTO public.entity (
+                    entity_id, cmte_id, entity_type, entity_name, first_name, last_name,
+                    middle_name, preffix, suffix, street_1, street_2, city, state, zip_code,
+                    occupation, employer
+                ) VALUES (
+                    %(entity_id)s,
+                    %(cmte_id)s,
+                    %(entity_type)s,
+                    %(entity_name)s,
+                    %(first_name)s,
+                    %(last_name)s,
+                    %(middle_name)s,
+                    %(preffix)s,
+                    %(suffix)s,
+                    %(street_1)s,
+                    %(street_2)s,
+                    %(city)s,
+                    %(state)s,
+                    %(zip_code)s,
+                    %(occupation)s,
+                    %(employer)s
+                );
+                """,
                 all_contact,
             )
         cursor.close()
@@ -280,29 +297,33 @@ def create_entity_log_model(old_update_list, username):
             psycopg2.extras.execute_batch(
                 cursor,
                 """
-                        INSERT INTO public.entity_log (entity_id, cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1,
-                         street_2, city, state, zip_code, occupation, employer, last_update_date, logged_date, username) VALUES (
-                            %(entity_id)s,
-                            %(cmte_id)s,
-                            %(entity_type)s,
-                            %(entity_name)s,
-                            %(first_name)s,
-                            %(last_name)s,
-                            %(middle_name)s,
-                            %(prefix)s,
-                            %(suffix)s,
-                            %(street_1)s,
-                            %(street_2)s,
-                            %(city)s,
-                            %(state)s,
-                            %(zip_code)s,
-                            %(occupation)s,
-                            %(employer)s,
-                            %(last_update_date)s,
-                            %(last_update_date)s,
-                            %(username)s
-                        );
-                    """,
+                INSERT INTO public.entity_log (
+                    entity_id, cmte_id, entity_type, entity_name, first_name,
+                    last_name, middle_name, preffix, suffix, street_1,
+                    street_2, city, state, zip_code, occupation, employer,
+                    last_update_date, logged_date, username
+                ) VALUES (
+                    %(entity_id)s,
+                    %(cmte_id)s,
+                    %(entity_type)s,
+                    %(entity_name)s,
+                    %(first_name)s,
+                    %(last_name)s,
+                    %(middle_name)s,
+                    %(prefix)s,
+                    %(suffix)s,
+                    %(street_1)s,
+                    %(street_2)s,
+                    %(city)s,
+                    %(state)s,
+                    %(zip_code)s,
+                    %(occupation)s,
+                    %(employer)s,
+                    %(last_update_date)s,
+                    %(last_update_date)s,
+                    %(username)s
+                );
+                """,
                 all_contact,
             )
         cursor.close()
@@ -327,7 +348,8 @@ def create_temp_contact_table(file_name):
             query_string = (
                 """CREATE TABLE IF NOT EXISTS public."""
                 + table_name
-                + """(cmte_id character varying(9) NOT NULL,file_name character varying(200) NOT NULL,entity_id varchar(30) NOT NULL,transaction_id character varying(200) NOT NULL)"""
+                + """(cmte_id character varying(9) NOT NULL, file_name character varying(200) NOT NULL,
+                entity_id varchar(30) NOT NULL, transaction_id character varying(200) NOT NULL)"""
             )
             cursor.execute(query_string)
 

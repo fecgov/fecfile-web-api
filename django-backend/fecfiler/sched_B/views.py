@@ -662,7 +662,6 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
             # UPDATE delete_ind flag on a single row from Sched_B table
             cursor.execute(
                 """
-
                 UPDATE public.sched_b
                 SET delete_ind = 'Y',
                 last_update_date = %s
@@ -684,23 +683,6 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
                 )
     except Exception:
         raise
-
-
-# def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
-#     """
-#     db transaction for deleting all child transactions
-#     """
-#     try:
-#         with connection.cursor() as cursor:
-
-#             # UPDATE back_ref_transaction_id value to null in sched_b table
-#             value = None
-#             cursor.execute(
-#                 """UPDATE public.sched_b SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-#                 [value, transaction_id, report_id, cmte_id],
-#             )
-#     except Exception:
-#         raise
 
 
 # not sure this function will ever be used - will implement this later
@@ -1695,7 +1677,9 @@ def put_sql_linenumber_schedB(
         with connection.cursor() as cursor:
             # Insert data into schedB table
             cursor.execute(
-                """UPDATE public.sched_b SET line_number = %s, itemized_ind = %s, aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
+                """UPDATE public.sched_b SET line_number = %s, itemized_ind = %s,
+                aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s
+                AND entity_id = %s AND delete_ind is distinct from 'Y'""",
                 [
                     line_number,
                     itemized_ind,
@@ -1707,7 +1691,8 @@ def put_sql_linenumber_schedB(
             )
             if cursor.rowcount == 0:
                 raise Exception(
-                    "put_sql_linenumber_schedB function: The Transaction ID: {} does not exist in schedB table".format(
+                    "put_sql_linenumber_schedB function: The Transaction ID: {} " \
+                    "does not exist in schedB table".format(
                         transaction_id
                     )
                 )

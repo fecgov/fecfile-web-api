@@ -896,24 +896,6 @@ def post_schedD(datum):
         datum["transaction_id"] = transaction_id
         validate_sd_data(datum)
 
-        # save entities rirst
-        # if 'creditor_entity_id' in datum:
-        #     get_data = {
-        #         'cmte_id': datum.get('cmte_id'),
-        #         'entity_id': datum.get('creditor_entity_id')
-        #     }
-        #     prev_entity_list = get_entities(get_data)
-        #     entity_data = put_entities(datum)
-        # else:
-        #     entity_data = post_entities(datum)
-
-        # continue to save transaction
-        # creditor_entity_id = entity_data.get('creditor_entity_id')
-        # datum['creditor_entity_id'] = creditor_entity_id
-        # datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
-        # trans_char = "SD"
-        # transaction_id = get_next_transaction_id(trans_char)
-        # datum['transaction_id'] = transaction_id
         try:
             post_sql_schedD(datum)
         except Exception as e:

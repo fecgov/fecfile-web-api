@@ -1,14 +1,11 @@
 import logging
 import maya
 
-# from functools import lru_cache
 from django.db import connection
 from django.template.loader import render_to_string
 import boto3
 from botocore.exceptions import ClientError
 
-# from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-# import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +14,6 @@ def email(boolean, data):
     SENDER = "donotreply@fec.gov"
     RECIPIENT = []
 
-    # print(data.get('email_on_file_1'))
     if "email_on_file" in data and (
         not (
             data.get("email_on_file") == "-"
@@ -72,7 +68,6 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("additional_email_1"))
 
-    # print(data.get('additional_email_2'))
     if "additional_email_2" in data and (
         not (
             data.get("additional_email_2") == "-"
@@ -88,32 +83,21 @@ def email(boolean, data):
     # The email body for recipients with non-HTML email clients.
     BODY_TEXT = (
         "Form 3X that we received has been validated and submitted\r\n"
-        "This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
+        "This email was sent by FEC.gov. If you are receiving this email " /
+        "in error or have any questions, please contact the FEC Electronic Filing Office " /
+        "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
     )
 
     # The HTML body of the email.
-    # final_html = email_ack1.html.replace('{{@REPID}}',1234567).replace('{{@REPLACE_CMTE_ID}}',C0123456)
-    # t = Template(email_ack1)
-    # c= Context({'@REPID':123458},)
-
-    # data["updated_at"] = (
-    #     maya.parse(data["updated_at"])
-    #     .datetime(to_timezone="US/Eastern", naive=True)
-    #     .strftime("%m-%d-%Y %T")
-    # )
-    # data["created_at"] = (
-    #     maya.parse(data["created_at"])
-    #     .datetime(to_timezone="US/Eastern", naive=True)
-    #     .strftime("%m-%d-%Y %T")
-    # )
     BODY_HTML = render_to_string("email_ack.html", {"data": data})
-    # data.get('committeeid')
 
     """<html>
     <head></head>
     <body>
       <h1>Form 99 that we received has been validated and submitted</h1>
-      <p>This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."</p>
+      <p>This email was sent by FEC.gov. If you are receiving this email in error
+      or have any questions, please contact the FEC Electronic Filing Office toll-free at
+      (800) 424-9530 ext. 1307 or locally at (202) 694-1307."</p>
     </body>
     </html>"""
 

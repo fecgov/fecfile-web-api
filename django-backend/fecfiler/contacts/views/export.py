@@ -8,8 +8,13 @@ from fecfiler.core.views import get_comittee_id, get_list_contact
 def get_entity_contact_list(cmte_id):
     try:
         with connection.cursor() as cursor:
-            query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
+            query_string = """
+            SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name,
+            middle_name, preffix as prefix, suffix, street_1, street_2, city, state,
+            zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district,
+            ref_cand_cmte_id
+            FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
+            """
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
             )
