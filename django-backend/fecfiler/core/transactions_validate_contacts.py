@@ -3,7 +3,6 @@ import pandas as pd
 import boto3
 import logging
 from io import StringIO
-from django.conf import settings
 from fecfiler.settings import AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
 
 logger = logging.getLogger(__name__)

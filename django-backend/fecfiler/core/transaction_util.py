@@ -741,8 +741,6 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
     """
     load child transactions for sched_f without report_id
     """
-    # print(report_id)
-    # print(transaction_id)
     _sql = """
         SELECT
             cmte_id,
@@ -752,56 +750,8 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
         AND back_ref_transaction_id = %s
         AND delete_ind is distinct from 'Y'
     """
-    # _sql = """
-    # SELECT
-    #         cmte_id,
-    #         report_id,
-    #         line_number,
-    #         transaction_type_identifier,
-    #         transaction_type,
-    #         transaction_id,
-    #         back_ref_transaction_id,
-    #         back_ref_sched_name,
-    #         lender_entity_id,
-    #         loan_amount,
-    #         loan_intrest_rate,
-    #         loan_incurred_date,
-    #         loan_due_date,
-    #         is_loan_restructured,
-    #         original_loan_date,
-    #         credit_amount_this_draw,
-    #         total_outstanding_balance,
-    #         other_parties_liable,
-    #         pledged_collateral_ind,
-    #         pledge_collateral_desc,
-    #         pledge_collateral_amount,
-    #         perfected_intrest_ind,
-    #         future_income_ind,
-    #         future_income_desc,
-    #         future_income_estimate,
-    #         depository_account_established_date,
-    #         depository_account_location,
-    #         depository_account_street_1,
-    #         depository_account_street_2,
-    #         depository_account_city,
-    #         depository_account_state,
-    #         depository_account_zip,
-    #         depository_account_auth_date,
-    #         basis_of_loan_desc,
-    #         treasurer_entity_id,
-    #         treasurer_signed_date,
-    #         authorized_entity_id,
-    #         authorized_entity_title,
-    #         authorized_signed_date,
-    #         create_date
-    # FROM public.sched_c1
-    # WHERE cmte_id = %s
-    # AND back_ref_transaction_id = %s
-    # AND delete_ind is distinct from 'Y'
-    # """
+
     try:
-        # if report_id:
-        # _sql = _sql + 'AND report_id = {}'.format(report_id)
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + _sql + """) t""",
@@ -810,30 +760,13 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
             return cursor.fetchone()[0]
             # return post_process_it(cursor, cmte_id)
     except BaseException:
-        rais
+        raise
 
 
 def get_sched_c2_child_transactions(cmte_id, transaction_id):
     """
     load child transactions for sched_f
     """
-    # _sql = """
-    # SELECT
-    #         cmte_id,
-    #         report_id,
-    #         line_number,
-    #         transaction_type_identifier,
-    #         guarantor_entity_id,
-    #         guaranteed_amount,
-    #         transaction_id,
-    #         back_ref_transaction_id,
-    #         back_ref_sched_name,
-    #         create_date
-    # FROM public.sched_c2
-    # WHERE cmte_id = %s
-    # AND back_ref_transaction_id = %s
-    # AND delete_ind is distinct from 'Y'
-    # """
     _sql = """
     SELECT
             cmte_id,
@@ -1034,30 +967,12 @@ def post_process_it_h4(cursor, cmte_id):
     transaction_list = cursor.fetchone()[0]
     if not transaction_list:
         return []
-    # if not transaction_list:
-    #     if (
-    #         not back_ref_transaction_id
-    #     ):  # raise exception for non_child transaction loading
-    #         raise NoOPError(
-    #             "No transactions found."
-    #         )
-    #     else:  # return empy list for child transaction loading
-    #         return []
     merged_list = []
     for item in transaction_list:
         entity_id = item.get("payee_entity_id")
         data = {"entity_id": entity_id, "cmte_id": cmte_id}
         entity_list = get_entities(data)
         dictEntity = entity_list[0]
-        # cand_entity = {}
-        # if item.get("beneficiary_cand_entity_id"):
-        #     cand_data = {
-        #         "entity_id": item.get("beneficiary_cand_entity_id"),
-        #         "cmte_id": cmte_id,
-        #     }
-        #     cand_entity = get_entities(cand_data)[0]
-        #     cand_entity = candify_it(cand_entity)
-
         merged_dict = {**item, **dictEntity}
         merged_list.append(merged_dict)
     return merged_list
@@ -1071,15 +986,7 @@ def post_process_it(cursor, cmte_id):
     transaction_list = cursor.fetchone()[0]
     if not transaction_list:
         return []
-    # if not transaction_list:
-    #     if (
-    #         not back_ref_transaction_id
-    #     ):  # raise exception for non_child transaction loading
-    #         raise NoOPError(
-    #             "No transactions found."
-    #         )
-    #     else:  # return empy list for child transaction loading
-    #         return []
+
     merged_list = []
     for item in transaction_list:
 

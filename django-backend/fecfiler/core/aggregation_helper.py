@@ -3,14 +3,12 @@ import datetime
 import requests
 import fecfiler.settings
 
-# from functools import lru_cache
 from django.db import connection
 from fecfiler.core.transaction_util import do_transaction
 from fecfiler.core.views import cmte_type, update_F3X, find_form_type
 
 
-# from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-# import datetime
+from fecfiler.core.views import get_entities
 
 logger = logging.getLogger(__name__)
 
@@ -828,7 +826,7 @@ def get_election_year(office_sought, election_state, election_district):
         election_year_list = []
         while True:
             ab = requests.get(
-                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date" \
+                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date"
                 "&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
                     fecfiler.settings.FECFILE_FEC_WEBSITE_API_KEY, i, param_string
                 )
@@ -896,7 +894,7 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
                 cand["cand_office_district"] = None
             else:
                 raise Exception(
-                    "The candidate id: {} does not belong to either Senate, House or Presidential office. " /
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. "
                     "Kindly check cand_office in entity table for details".format(
                         beneficiary_cand_id
                     )
@@ -1064,18 +1062,6 @@ def load_schedF(cmte_id, report_id, transaction_id):
                     )
                 )
             return schedF_list
-            # merged_list = []
-        #     for dictF in schedF_list:
-        #         entity_id = dictF.get("entity_id")
-        #         data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         entity_list = get_entities(data)
-        #         dictEntity = entity_list[0]
-        #         del dictEntity["cand_office"]
-        #         del dictEntity["cand_office_state"]
-        #         del dictEntity["cand_office_district"]
-        #         merged_dict = {**dictF, **dictEntity}
-        #         merged_list.append(merged_dict)
-        # return merged_list
     except Exception:
         raise
 
@@ -1120,13 +1106,6 @@ def load_schedH6(cmte_id, report_id, transaction_id):
                     )
                 )
             return schedH6_list
-        #     merged_list = []
-        #     for tran in schedH6_list:
-        #         entity_id = tran.get("entity_id")
-        #         q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         dictEntity = get_entities(q_data)[0]
-        #         merged_list.append({**tran, **dictEntity})
-        # return merged_list
     except Exception:
         raise
 
@@ -1175,13 +1154,6 @@ def load_schedH4(cmte_id, report_id, transaction_id):
                         transaction_id
                     )
                 )
-        #     merged_list = []
-        #     for tran in tran_list:
-        #         entity_id = tran.get("payee_entity_id")
-        #         q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         dictEntity = get_entities(q_data)[0]
-        #         merged_list.append({**tran, **dictEntity})
-        # return merged_list[0]
         return tran_list
     except Exception:
         raise

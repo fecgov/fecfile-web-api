@@ -12,7 +12,6 @@ import pandas
 import numpy
 import urllib
 
-
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -26,6 +25,7 @@ from django.http import JsonResponse
 from functools import wraps
 
 from boto.s3.key import Key
+from boto3.s3.transfer import S3Transfer
 from django.conf import settings
 
 from django.core.paginator import Paginator
@@ -6103,15 +6103,13 @@ def print_preview_pdf(request):
         printresp = requests.post(
             settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION,
             data=data_obj,
-            files=file_obj,
         )
 
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
             dictprint = printresp.json()
-            merged_dict = {**create_json_data, **dictprint}
-            return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+            return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
     except Exception:
         raise
 
@@ -6743,7 +6741,7 @@ def put_contact_data(data, username):
 
             if cursor.rowcount == 0:
                 raise Exception(
-                    "The Entity ID: {} does not exist in Entity table".format(entity_id)
+                    "The Entity ID: {} does not exist in Entity table".format(data.get("entity_id"))
                 )
 
     except Exception:
@@ -8926,7 +8924,7 @@ def levin_accounts(request):
             try:
                 cmte_id = get_comittee_id(request.user.username)
 
-                if not "levin_account_name" in request.data:
+                if "levin_account_name" not in request.data:
                     raise Exception("levin account name is required.")
                 if not request.data.get("levin_account_name"):
                     raise Exception("a valid levin account name is required.")

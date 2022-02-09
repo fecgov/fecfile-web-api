@@ -1,10 +1,8 @@
 import logging
 
-# from functools import lru_cache
 from django.db import connection
 
-# from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-# import datetime
+from fecfiler.core.transaction_util import do_transaction
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +15,6 @@ def get_next_transaction_id(trans_char):
                 """SELECT public.get_next_transaction_id(%s)""", [trans_char]
             )
             transaction_id = cursor.fetchone()[0]
-            # transaction_id = transaction_ids[0]
         return transaction_id
     except Exception:
         raise

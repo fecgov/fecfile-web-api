@@ -2,11 +2,14 @@ import os
 import psycopg2
 import pandas as pd
 import boto3
+import numpy
+import logging
 from io import StringIO
 from pandas.util import hash_pandas_object
-import numpy
 from psycopg2.extensions import register_adapter, AsIs
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def addapt_numpy_float64(numpy_float64):
@@ -22,18 +25,6 @@ register_adapter(numpy.int64, addapt_numpy_int64)
 
 SQS_QUEUE_NAME = os.getenv("SQS_QUEUE_NAME")
 
-
-"""
-
-
-CREATE TABLE public.transactions_file_details
-(
-  cmte_id 	character varying(9) NOT NULL,
-  file_name 	character varying(200),
-  md5 		character varying(100),
-  create_date 	timestamp without time zone DEFAULT now()
-)
-"""
 
 # check if file is new
 
@@ -113,43 +104,6 @@ def generate_md5_hash(filename):
         print(ex)
 
 
-"""
-
-@api_view(["POST"])
-def file_verify_upload(request):
-    try:
-        if request.method == 'POST':
-            cmte_id = get_comittee_id(request.user.username)
-            file_name = request.data.get("fileName")
-
-            client = boto3.client('s3',
-                                    settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
-                                    )
-            bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
-            file_name = request.data.get("fileName")
-            csv_obj = client.get_object(Bucket=bucket, Key=file_name)
-            hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
-
-            #filepath = dirname(dirname(os.getcwd()))+"/csv/"
-            filename = "Disbursements_1q2020.csv"
-            hash_value = generate_md5_hash(filepath+filename)
-            fileexists = check_for_file_hash_in_db('C00000018', filename, hash_value)
-            if fileexists is None:
-                load_file_hash_to_db('C00000018', filename, hash_value)
-                print('File loaded successfully!!!')
-            else:
-                print('File exists in DB')
-
-            return JsonResponse(contacts, status=status.HTTP_201_CREATED, safe=False)
-
-    except Exception as e:
-        json_result = {'message': str(e)}
-        return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
-
-
-"""
-
-
 def get_comittee_id(username):
     cmte_id = ""
     if len(username) > 9:
@@ -202,6 +156,5 @@ def chk_csv_uploaded(request):
             }
         return returnstr
     except Exception as e:
-        returnstr = {"message": str(e)}
-        logger.error(returnstr)
+        logger.error(e)
         raise

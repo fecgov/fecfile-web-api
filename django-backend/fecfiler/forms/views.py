@@ -1,5 +1,4 @@
 import maya
-import pytz
 import json
 import os
 import requests
@@ -205,7 +204,7 @@ def create_f99_info(request):
                     id_comm.id = request.data["id"]
                     comm_info = CommitteeInfo.objects.filter(id=id_comm.id).last()
                     if comm_info:
-                        if comm_info.is_submitted == False:
+                        if comm_info.is_submitted is False:
                             incoming_data["created_at"] = comm_info.created_at
                             id_comm.created_at = comm_info.created_at
                             comm_info.delete()
@@ -281,7 +280,7 @@ def update_f99_info(request, print_flag=False):
                     print(comm_info.email_on_file_1)
 
                     if comm_info:
-                        if comm_info.is_submitted == False:
+                        if comm_info.is_submitted is False:
                             comm_info.committeeid = request.data.get("committeeid")
                             comm_info.committeename = request.data.get("committeename")
                             comm_info.street1 = request.data.get("street1")
@@ -441,7 +440,7 @@ def submit_comm_info(request):
             try:
                 comm_info = CommitteeInfo.objects.filter(id=request.data["id"]).last()
                 if comm_info:
-                    if comm_info.is_submitted == False:
+                    if comm_info.is_submitted is False:
                         incoming_data["updated_at"] = datetime.datetime.now()
                         incoming_data["created_at"] = comm_info.created_at
                         comm_info.is_submitted = True
@@ -605,6 +604,10 @@ def get_signee(request):
 def update_committee(request, cid):
     try:
         is_read_only_or_filer_reports(request)
+        comm = Committee.objects.filter(
+            committeeid=get_comittee_id(request.user.username)
+        ).last()
+
         # # update details of a single comm
         if request.method == "POST":
             serializer = CommitteeSerializer(comm, data=request.data)
@@ -1208,8 +1211,8 @@ def email(boolean, data):
     # The email body for recipients with non-HTML email clients.
     BODY_TEXT = (
         "Form 99 that we received has been validated and submitted\r\n"
-        "This email was sent by FEC.gov. If you are receiving this email " \
-        "in error or have any questions, please contact the FEC Electronic Filing Office " \
+        "This email was sent by FEC.gov. If you are receiving this email "
+        "in error or have any questions, please contact the FEC Electronic Filing Office "
         "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
     )
 

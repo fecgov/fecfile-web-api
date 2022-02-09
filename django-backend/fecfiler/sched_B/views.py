@@ -24,7 +24,6 @@ from fecfiler.core.views import (
     superceded_report_id_list,
     get_comittee_id,
     update_F3X,
-    cmte_type,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -1209,7 +1208,7 @@ def delete_schedB(data):
             update_linenumber_aggamt_transactions_SA(
                 datum.get("expenditure_date"),
                 datum.get("transaction_type_identifier"),
-                entity_id,
+                datum.get("entity_id"),
                 datum.get("cmte_id"),
                 datum.get("report_id"),
             )

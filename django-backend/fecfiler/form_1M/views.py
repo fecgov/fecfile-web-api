@@ -336,7 +336,7 @@ def check_candidate_number(candidate_number):
     except Exception as e:
         raise Exception(
             """The check_candidate_number function is
-            throwing an error : """.format(
+            throwing an error for candidate_number {}: """.format(
                 candidate_number
             )
             + str(e)

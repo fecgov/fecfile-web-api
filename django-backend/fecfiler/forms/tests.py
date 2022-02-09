@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase
 
 from .models import CommitteeInfo, Committee
@@ -177,13 +178,3 @@ class Setup_submit_comm_info(TestCase):
         }
 
         CommitteeInfo.objects.create(**submit_data)
-
-
-class submit_comm_info_Test(TestCase):
-    def valid_submit_data_test():
-        data == submit_data
-        self.assertEqual(resp.status_code, 200)
-
-    def invalid_submit_data_test():
-        data != submit_data
-        self.assertEqual(resp.status_code, 400)

@@ -383,7 +383,7 @@ def validate_transactions(bktname, key, cmteid):
                         "~~~~~Parsing Success!!! Error Queue is empty!!!~~~~"
                     )
 
-            if returnstr is not "File_not_found":
+            if returnstr != "File_not_found":
                 print(returnstr.split("/"))
 
             returnstr = {
@@ -442,7 +442,7 @@ def check_data_processed(md5, fecfilename):
     except Exception as ex:
         print("error in check_data_processed:", ex)
         logging.debug("error in check_data_processed method")
-        logging.debug(error)
+        logging.debug(ex)
     finally:
         if conn is not None:
             conn.close()
@@ -472,7 +472,7 @@ def load_transactions_from_temp_perm_tables(fecfilename):
     except Exception as ex:
         print("error in load_transactions_from_temp_perm_tables:", ex)
         logging.debug("error in load_transactions_from_temp_perm_tables method")
-        logging.debug(error)
+        logging.debug(ex)
     finally:
         if conn is not None:
             conn.close()
