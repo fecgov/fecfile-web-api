@@ -34,7 +34,8 @@ def save_key_datbase(username, key_val, counter, unix_time):
                 logger.debug("key save failed for username {}", username)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred key save for username {}", username)
+        logger.error(e)
+        logger.error("exception occurred key save for username {}", username)
 
 
 def get_current_counter_val(username):

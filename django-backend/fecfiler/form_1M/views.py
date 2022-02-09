@@ -486,7 +486,7 @@ def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=Tru
                 + report_id
             )
     except Exception as e:
-        raise
+        raise e
 
 
 def report_post(request):
@@ -825,12 +825,8 @@ def validate_before_submit(request_dict):
                 )
             )
     except Exception as e:
-        raise
-
-
-"""
-************************************ Form 1M CRUD Functions ******************************************
-"""
+        logger.error(e)
+        raise e
 
 
 @report_last_update_date
@@ -1077,7 +1073,7 @@ def form1M(request):
                     f1m_flag, output_dict = f1m_put(request_dict)
                     report_flag, previous_report_dict = step4_reports_put(request)
                     validate_before_submit(output_dict)
-                    submit_flag = submit_f1m_report(request)
+                    submit_f1m_report(request)
                 except Exception as e:
                     json_result = {"message": str(e)}
                     return JsonResponse(
@@ -1094,7 +1090,7 @@ def form1M(request):
             output_dict = get_sql_f1m(request_dict, True)
             return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            logger.debug("ENTERED EXCEPTION CATCH - POST")
+            logger.error("ENTERED EXCEPTION CATCH - POST")
             if report_flag and previous_report_dict:
                 report_put(previous_report_dict)
             if report_flag and not previous_report_dict:
@@ -1103,7 +1099,7 @@ def form1M(request):
                 f1m_put(f1m_sql_dict(cmte_id, "All", previous_f1m_dict))
             if f1m_flag and not previous_f1m_dict:
                 f1m_remove(request_dict)
-            logger.debug(e)
+            logger.error(e)
             return Response(
                 "The form1M API - POST is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
@@ -1235,7 +1231,7 @@ def form1M(request):
                 output_dict = get_sql_f1m(request_dict, True)
                 return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug("ENTERED EXCEPTION CATCH - PUT")
+                logger.error("ENTERED EXCEPTION CATCH - PUT")
                 if report_flag and previous_report_dict:
                     report_put(previous_report_dict)
                 if report_flag and not previous_report_dict:
@@ -1244,7 +1240,7 @@ def form1M(request):
                     f1m_put(f1m_sql_dict(cmte_id, "All", previous_f1m_dict))
                 if f1m_flag and not previous_f1m_dict:
                     f1m_remove(request_dict)
-                logger.debug(e)
+                logger.error(e)
                 return Response(
                     "The form1M API - PUT is throwing an error: " + str(e),
                     status=status.HTTP_400_BAD_REQUEST,
@@ -1255,9 +1251,6 @@ def form1M(request):
                 json_result, status=status.HTTP_403_FORBIDDEN, safe=False
             )
 
-    """
-    ************************************ GET Call - form 1M ******************************************
-    """
     if request.method == "GET":
         try:
             step = "None"
@@ -1277,15 +1270,12 @@ def form1M(request):
             output_dict = get_sql_f1m(request_dict, True)
             return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            logger.debug(e)
+            logger.error(e)
             return Response(
                 "The form1M API - GET is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    ************************************ DELETE Call - form 1M ******************************************
-    """
     if request.method == "DELETE":
         try:
             is_read_only_or_filer_reports(request)
@@ -1307,21 +1297,17 @@ def form1M(request):
                 report_delete(request_dict)
                 return JsonResponse(request_dict, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug(e)
+                logger.error(e)
                 return Response(
-                    "The form1M API - DELETE is throwing an error: " + str(e),
+                    "The form1M API - DELETE is throwing an error",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as e:
-            json_result = {"message": str(e)}
+            logger.error(e)
+            json_result = {}
             return JsonResponse(
                 json_result, status=status.HTTP_403_FORBIDDEN, safe=False
             )
-
-
-"""
-************************************** END OF FORM 1M API Call *********************************************
-"""
 
 
 def noneCheckTrueorFalse(parameter, check_dict):
@@ -1473,7 +1459,6 @@ def get_original_registration_date(request):
 def get_committee_met_req_date(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        print(request.query_params)
         noneCheckMissingParameters(
             ["reportId", "fifty_first_contributor_date"],
             checking_dict=request.data,
@@ -1537,11 +1522,12 @@ def delete_candidate_f1m(request):
             output_dict = get_sql_f1m(request_dict)
             return JsonResponse(output_dict, status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
-            logger.debug(e)
+            logger.error(e)
             return Response(
-                "The delete_candidate_f1m API is throwing an error: " + str(e),
+                "The delete_candidate_f1m API is throwing an error ",
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

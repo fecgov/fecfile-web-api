@@ -277,9 +277,6 @@ def custom_validate_cand_df(uploaded_df_orig, cmte_id):
         uploaded_df_cmt = uploaded_df[
             uploaded_df.COMMITTEE_ID.str.contains(cmte_id, case=False)
         ]
-        uploaded_df_cmt_error = pd.concat(
-            [uploaded_df, uploaded_df_cmt]
-        ).drop_duplicates(keep=False)
 
         data_clean = uploaded_df_cmt.replace(r"^\s+$", np.NaN, regex=True)
 

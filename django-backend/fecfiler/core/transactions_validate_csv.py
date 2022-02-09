@@ -261,7 +261,6 @@ def check_errkey_exists(bktname, key):
     errkey = errkey[0] + "/error_files/" + errkey[1]
     s3 = boto3.client("s3")
     result = s3.list_objects(Bucket=bktname, Prefix=errkey)
-    exists = False
     if "Contents" not in result:
         s3.put_object(Bucket=bktname, Key=(errkey + "/"))
 
@@ -269,7 +268,6 @@ def check_errkey_exists(bktname, key):
 def create_cmte_error_folder(bktname, key, errfilerelpath):
     s3 = boto3.client("s3")
     result = s3.list_objects(Bucket=bktname, Prefix=errfilerelpath)
-    exists = False
     if "Contents" not in result:
         s3.put_object(Bucket=bktname, Key=(errfilerelpath + "/"))
 
@@ -298,27 +296,17 @@ def move_error_files_to_s3(bktname, key, errorfilename, cmteid):
 
 
 def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
-    # print(bktname, key)
-    resvalidation = ""
     errorfilename = ""
     try:
         str = key.split("_")
         schedule = str[1]
         formname = (str[0].split("/"))[1]
-        if "H" in schedule or "h" in schedule:
-            sched = schedule.replace("Schedule", "")
-        else:
-            sched = schedule.replace("Schedule", "S")
-        # print('sched:',sched)
-        # print('schedule ',schedule)
-        # print('formname ',formname)
         tablename = "temp"
         if "/" in key:
             tablename = key[key.find("/") + 1: -4].split()[0]
         else:
             raise Exception("S3 key not having a / char")
         tablename = tablename.lower()
-        # print("tablename:", tablename)
         s3 = boto3.client("s3")
         obj = s3.get_object(Bucket=bktname, Key=key)
         body = obj["Body"]
@@ -332,25 +320,17 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
             chunksize=size,
             na_filter=False,
         ):
-            # pd.core.strings.str_strip(data)
             data = data.dropna(axis=[0], how="all")
             res = validate_dataframe(data)
             if "Validate_Pass" != res:
                 return res
             data = data.sort_values(by=["TRANSACTION IDENTIFIER"], ascending=False)
-            # print('...............')
-            # loop through the data set to pick unique tranid's
             cntr = 1
-            # print(data['TRANSACTION IDENTIFIER'].unique())
             for tranid in data["TRANSACTION IDENTIFIER"].unique():
                 if tranid:
                     cntr += 1
-                    # print('cntr',cntr)
-                    # print('tranid:',tranid)
-                    # build schema based on tranid
                     head_schema = build_schemas(formname, schedule, tranid)
                     headers = head_schema[0]
-                    schema = head_schema[1]
 
                     data_temp = data[headers]
                     data_temp = data_temp.loc[
@@ -359,9 +339,6 @@ def load_dataframe_from_s3(bktname, key, size, sleeptime, cmteid):
                     errorfilename = (
                         re.match(r"(.*)\.csv", key).group(1).split("/")[1]
                         + "_error.csv"
-                    )
-                    resvalidation = schema_validation(
-                        data_temp, schema, bktname, key, errorfilename
                     )
 
             flag = True

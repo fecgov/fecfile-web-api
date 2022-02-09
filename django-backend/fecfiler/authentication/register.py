@@ -91,7 +91,7 @@ def send_email_register(user_data, cmte_id, register_url_token):
     # Send the email.
     try:
         # Provide the contents of the email.
-        response = client.send_email(
+        client.send_email(
             Destination={
                 "ToAddresses": RECIPIENT,
             },

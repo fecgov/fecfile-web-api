@@ -118,6 +118,7 @@ def email(boolean, data):
             },
             Source=SENDER,
         )
+        logger.debug(response)
     # Display an error if something goes wrong.
     except ClientError as e:
         print(e.response["Error"]["Message"])

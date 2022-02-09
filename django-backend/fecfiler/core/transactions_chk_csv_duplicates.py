@@ -174,12 +174,10 @@ def chk_csv_uploaded(request):
         if fileexists is None:
             load_file_hash_to_db(cmte_id, filename, hash_value, fecfilename)
 
-        rcmteid = ""
         rhash = ""
         rfilename = ""
         rcreate_date = ""
         if fileexists is not None:
-            rcmteid = fileexists[0]
             rhash = fileexists[1]
             rfilename = fileexists[2]
             rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
@@ -205,5 +203,5 @@ def chk_csv_uploaded(request):
         return returnstr
     except Exception as e:
         returnstr = {"message": str(e)}
-        print(returnstr)
+        logger.error(returnstr)
         raise

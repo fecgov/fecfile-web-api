@@ -288,6 +288,7 @@ def put_schedE(data):
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -426,8 +427,6 @@ def update_aggregate_on_transaction(
     """
     update transaction with updated aggregate amount
     """
-    # print(transaction_id)
-    # print(aggregate_amount)
     try:
         _sql = """
         WITH subquery AS (SELECT transaction_id, mirror_transaction_id FROM sched_e
@@ -441,6 +440,7 @@ def update_aggregate_on_transaction(
         """
         do_transaction(_sql, (transaction_id, cmte_id, aggregate_amount, cmte_id))
     except Exception as e:
+        logger.error(e)
         raise Exception(
             """error on update aggregate amount
                         for transaction:{}""".format(
@@ -946,6 +946,7 @@ def post_schedE(data):
 
             if completing_rollback_flag:
                 entity_data = put_entities(old_completing_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -1307,12 +1308,11 @@ def delete_schedE(data):
     function for handling delete request for se
     """
     try:
-
         delete_sql_schedE(
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        raise e
 
 
 def trash_sql_schedE(cmte_id, report_id, transaction_id):

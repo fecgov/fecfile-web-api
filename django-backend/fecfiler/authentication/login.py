@@ -32,54 +32,73 @@ logger = logging.getLogger(__name__)
 def activate_account(username):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET last_login = %s, is_active = %s WHERE username = %s AND delete_ind !='Y'"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET last_login = %s, is_active = %s
+            WHERE username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [datetime.now(), "true", username])
             if cursor.rowcount != 1:
-                logger.debug("Couldn't update login time")
+                logger.error("Couldn't update login time")
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred while updating last login time")
+        logger.error("exception occurred while updating last login time")
+        raise e
 
 
 def update_last_login_time(username):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET last_login = %s WHERE username = %s AND delete_ind !='Y'"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET last_login = %s
+            WHERE username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [datetime.now(), username])
             if cursor.rowcount != 1:
-                logger.debug("Couldn't update login time")
+                logger.error("Couldn't update login time")
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred while updating last login time")
+        logger.error("exception occurred while updating last login time")
+        raise e
 
 
 def update_counter(counter, username):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET last_login = %s, login_code_counter = %s WHERE username = %s AND delete_ind !='Y'"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET last_login = %s, login_code_counter = %s
+            WHERE username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [datetime.now(), counter + 1, username])
             if cursor.rowcount != 1:
-                logger.debug("Couldn't reset log-in counter")
+                logger.error("Couldn't reset log-in counter")
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred reset counter for login")
+        logger.error("exception occurred reset counter for login")
+        raise e
 
 
 def update_counter_val(counter, key):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET last_login = %s, login_code_counter = %s WHERE secret_key = %s"""
+            _sql = """
+            UPDATE public.authentication_account
+            SET last_login = %s, login_code_counter = %s
+            WHERE secret_key = %s
+            """
             cursor.execute(_sql, [datetime.now(), counter + 1, key])
             if cursor.rowcount != 1:
-                logger.debug("Couldn't reset log-in counter {}", key)
+                logger.error("Couldn't reset log-in counter {}", key)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred reset counter for login {}", key)
+        logger.error("exception occurred reset counter for login {}", key)
+        raise e
 
 
 def lock_account(counter, key):
     try:
-        time = datetime.now()
         with connection.cursor() as cursor:
             _sql = """
             UPDATE public.authentication_account
@@ -88,10 +107,11 @@ def lock_account(counter, key):
             """
             cursor.execute(_sql, ["false", datetime.now(), counter + 1, key])
             if cursor.rowcount != 1:
-                logger.debug("Lock account failed for key {}", key)
+                logger.error("Lock account failed for key {}", key)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred locking account for key {}", key)
+        logger.error("exception occurred locking account for key {}", key)
+        raise e
 
 
 def reset_code_counter(key):
@@ -104,10 +124,11 @@ def reset_code_counter(key):
             """
             cursor.execute(_sql, [datetime.now(), datetime.now(), key])
             if cursor.rowcount != 1:
-                logger.debug("Reset key failed for key {}", key)
+                logger.error("Reset key failed for key {}", key)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred reset key for key {}", key)
+        logger.error("exception occurred reset key for key {}", key)
+        raise e
 
 
 def get_last_login_time(username):
@@ -155,7 +176,6 @@ def verify_login(request):
 
             username = user_list["username"]
             key = user_list["secret_key"]
-            # unix_time = user_list["code_time"]
             unix_time = "code_time" in user_list and user_list["code_time"]
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key, unix_time)
@@ -175,23 +195,23 @@ def verify_login(request):
                 if counter <= LOGIN_MAX_RETRY - 1:
                     msg = "Invalid attempt"
                     update_counter_val(counter, key)
-                    print(
-                        "2 Factor login of Account ID{} was failed at {}.".format(
+                    logger.debug(
+                        "2 Factor login of Account ID{} failed at {}.".format(
                             user_list["id"], datetime.now()
                         )
                     )
                 elif counter >= LOGIN_MAX_RETRY:
                     msg = "Account is locked. Please try again after 15 mins or call IT support to unlock account."
                     lock_account(counter, key)
-                    print(
-                        "2 Factor login of Account ID{} was failed at {}. Max attempt reached. Account is "
+                    logger.debug(
+                        "2 Factor login of Account ID{} failed at {}. Max attempt reached. Account is "
                         "being locked.".format(user_list["id"], datetime.now())
                     )
                 is_allowed = False
                 response = {"is_allowed": is_allowed, "msg": msg}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
-            print(
+            logger.debug(
                 "2 Factor login of Account ID{} was successful at {}.".format(
                     user_list["id"], datetime.now()
                 )
@@ -204,7 +224,7 @@ def verify_login(request):
             }
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            logger.debug("exception occurred while verifying code", str(e))
+            logger.error("exception occurred while verifying code", str(e))
             json_result = {"is_allowed": False}
             return JsonResponse(
                 json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
@@ -234,7 +254,7 @@ def authenticate_login(request):
             if account is None:
                 user = Account.objects.filter(username=username).first()
                 if user is None:
-                    print(
+                    logger.debug(
                         "Attempt to login to Account with username : {} was denied at {}.".format(
                             username, datetime.now()
                         )
@@ -252,7 +272,7 @@ def authenticate_login(request):
                         if current_counter <= LOGIN_MAX_RETRY - 1:
                             update_last_login_time(username)
                             current_time = datetime.now()
-                            print(
+                            logger.debug(
                                 "Attempt to login to Account ID{} was denied at {}. Account is locked.".format(
                                     user.id, current_time
                                 )
@@ -287,7 +307,7 @@ def authenticate_login(request):
                                     token = create_jwt_token(
                                         account.email, account.cmtee_id
                                     )
-                                    print(
+                                    logger.debug(
                                         "Attempt to login to Account ID :{} was successful at {}.".format(
                                             account.id, datetime.now()
                                         )
@@ -305,7 +325,7 @@ def authenticate_login(request):
 
                             current_time = datetime.now()
                             update_last_login_time(username)
-                            print(
+                            logger.debug(
                                 "Attempt to login to Account ID: {} was denied at {}. Account is locked.".format(
                                     user.id, current_time
                                 )
@@ -335,7 +355,7 @@ def authenticate_login(request):
                         else:
                             lock_account(current_counter, user.secret_key)
 
-                    print(
+                    logger.debug(
                         "Attempt to login to Account with username : {} was denied at {}.".format(
                             username, datetime.now()
                         )
@@ -351,7 +371,7 @@ def authenticate_login(request):
             is_allowed = True
             update_last_login_time(username)
             token = create_jwt_token(account.email, account.cmtee_id)
-            print(
+            logger.debug(
                 "Attempt to login to Account ID :{} was successful at {}.".format(
                     account.id, datetime.now()
                 )
@@ -365,8 +385,8 @@ def authenticate_login(request):
             }
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            logger.debug("exception occurred while getting account information", str(e))
-            json_result = {"message": str(e)}
+            logger.error("exception occurred while getting account information", str(e))
+            json_result = {}
             return JsonResponse(
                 json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
             )

@@ -146,7 +146,6 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
             errors = schema.validate(uploaded_df)
 
             errors_index_rows = [e.row for e in errors]
-            error_dict = {}
             error_list = []
             i = 0
             for e in errors:
@@ -244,9 +243,6 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
             uploaded_df_cmt = test_data_final1[
                 test_data_final1.COMMITTEE_ID.str.contains(cmte_id, case=False)
             ]
-            uploaded_df_cmt_error = pd.concat(
-                [test_data_final1, uploaded_df_cmt]
-            ).drop_duplicates(keep=False)
             test_data_final1 = uploaded_df_cmt
 
         else:
@@ -315,7 +311,6 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                 potential_duplicate.append(temp_data)
 
         # traverse row by row bases
-        file_record = []
         exact_match = []
         moderation_score = CONTACT_MATCH_PERCENTAGE
         if len(contact_list) > 0:
@@ -408,9 +403,6 @@ def schema_validation(uploaded_df, cmte_id, transaction_included, file_name):
                     continue
 
                 else:
-                    duplicate_list = get_list_contact(
-                        cmte_id, combined_dataframe["EntityId"].values.tolist()
-                    )
                     joined_string = ",".join(
                         combined_dataframe["EntityId"].values.tolist()
                     )
@@ -926,7 +918,6 @@ def cancel_import(request):
         is_read_only_or_filer_reports(request)
         try:
             if request.method == "POST":
-                cmte_id = get_comittee_id(request.user.username)
                 file_name = request.data.get("fileName")
                 if not check_null_value(file_name):
                     msg = "FileName cannot be null. Please pass file Name."
@@ -935,7 +926,6 @@ def cancel_import(request):
                         json_result, status=status.HTTP_403_FORBIDDEN, safe=False
                     )
 
-                contacts_deleted_size = delete_import(cmte_id, file_name)
                 data = {"message": "Successfully cancelled the import."}
 
                 return JsonResponse(data, status=status.HTTP_204_NO_CONTENT, safe=False)

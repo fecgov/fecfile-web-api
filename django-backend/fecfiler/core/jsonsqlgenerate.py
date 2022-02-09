@@ -2206,13 +2206,13 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
         List_SH_similar_SH2 = ["ALLOC_H2_RATIO"]
         List_SH_similar_SH3 = ["TRAN_FROM_NON_FED_ACC"]
         List_SH_similar_SH5 = ["TRAN_FROM_LEVIN_ACC"]
-        parent = {
-            "ALLOC_EXP_CC_PAY": "ALLOC_EXP_CC_PAY_MEMO",
-            "ALLOC_EXP_STAF_REIM": "ALLOC_EXP_STAF_REIM_MEMO",
-            "ALLOC_EXP_PMT_TO_PROL": "ALLOC_EXP_PMT_TO_PROL_MEMO",
-            "ALLOC_FEA_CC_PAY": "ALLOC_FEA_CC_PAY_MEMO",
-            "ALLOC_FEA_STAF_REIM": "ALLOC_FEA_STAF_REIM_MEMO",
-        }
+        # parent = {
+        #     "ALLOC_EXP_CC_PAY": "ALLOC_EXP_CC_PAY_MEMO",
+        #     "ALLOC_EXP_STAF_REIM": "ALLOC_EXP_STAF_REIM_MEMO",
+        #     "ALLOC_EXP_PMT_TO_PROL": "ALLOC_EXP_PMT_TO_PROL_MEMO",
+        #     "ALLOC_FEA_CC_PAY": "ALLOC_FEA_CC_PAY_MEMO",
+        #     "ALLOC_FEA_STAF_REIM": "ALLOC_FEA_STAF_REIM_MEMO",
+        # }
 
         SH1_STRING = ""
         if tran in List_SH_similar_SH1:

@@ -312,32 +312,7 @@ def schedD(request):
     #: Get the request parameters and set for Pagination
     query_params = request.query_params
     page_num = get_int_value(query_params.get("page"))
-    # if query_params.get("page") is not None:
-    #     page_num = int(page_num)
-    # else:
-    #     page_num = 1
-
-    descending = query_params.get("descending")
-    if not (
-        "sortColumnName" in query_params
-        and check_null_value(query_params.get("sortColumnName"))
-    ):
-        sortcolumn = "name"
-    elif query_params.get("sortColumnName") == "default":
-        sortcolumn = "name"
-    else:
-        sortcolumn = query_params.get("sortColumnName")
     itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-    search_string = query_params.get("search")
-    params = query_params.get("filters", {})
-    keywords = params.get("keywords")
-    if str(descending).lower() == "true":
-        descending = "DESC"
-    else:
-        descending = "ASC"
-    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
-    row1 = ""
-    totalcount = ""
 
     # create new sched_d transaction
     if request.method == "POST":
@@ -360,10 +335,6 @@ def schedD(request):
             datum["cmte_id"] = cmte_id
             datum["username"] = request.user.username
 
-            # if 'creditor_entity_id' in request.data and check_null_value(
-            #         request.data.get('creditor_entity_id')):
-            #     datum['creditor_entity_id'] = request.data.get(
-            #         'creditor_entity_id')
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -411,12 +382,6 @@ def schedD(request):
                 data["transaction_type_identifier"] = request.query_params.get(
                     "transaction_type_identifier"
                 )
-            # if "transaction_id" in request.data and check_null_value(
-            #     request.data.get("transaction_id")
-            # ):
-            #     data["transaction_id"] = check_transaction_id(
-            #         request.data.get("transaction_id")
-            #     )
             datum = get_schedD(data)
 
             if "transaction_id" in request.query_params and check_null_value(
@@ -493,12 +458,6 @@ def schedD(request):
             datum["cmte_id"] = get_comittee_id(request.user.username)
             datum["username"] = request.user.username
 
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
             data = put_schedD(datum)
             output = get_schedD(data)
             # output = get_schedA(data)
@@ -544,7 +503,7 @@ def delete_schedD(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedD(cmte_id, report_id, transaction_id):
@@ -574,7 +533,6 @@ def schedD_sql_dict(data):
         "line_number",
         "back_ref_transaction_id",
         "back_ref_sched_name",
-        # entity_data
         "entity_id",
         "entity_type",
         "entity_name",
@@ -667,29 +625,10 @@ def put_schedD(datum):
         check_mandatory_fields_SD(datum)
         transaction_id = check_transaction_id(datum.get("transaction_id"))
 
-        # flag = False
-        # if 'entity_id' in datum:
-        #     flag = True
-        #     get_data = {
-        #         'cmte_id': datum.get('cmte_id'),
-        #         'entity_id': datum.get('entity_id')
-        #     }
-        #     prev_entity_list = get_entities(get_data)
-        #     entity_data = put_entities(datum)
-        # else:
-        #     entity_data = post_entities(datum)
-        # entity_id = entity_data.get('entity_id')
-        # datum['entity_id'] = entity_id
-        cmte_id = datum.get("cmte_id")
-        report_id = datum.get("report_id")
         current_close_balance = float(datum.get("balance_at_close"))
-        existing_close_balance = float(
-            get_existing_close_balance(cmte_id, transaction_id)
-        )
         try:
             put_sql_schedD(datum)
             # do downstream proprgation if necessary
-            # if not existing_close_balance == current_close_balance:
             do_downstream_propagation(transaction_id, current_close_balance, datum)
         except Exception as e:
             if entity_flag:

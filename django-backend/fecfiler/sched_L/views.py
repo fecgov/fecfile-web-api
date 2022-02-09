@@ -489,7 +489,7 @@ def get_list_all_schedL(report_id, cmte_id):
                     )
                 )
             merged_list = []
-            for dictL in schedL_list:
+            for dictL in schedl_list:
                 merged_list.append(dictL)
         return merged_list
     except Exception:
@@ -587,7 +587,7 @@ def delete_schedL(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        raise e
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
@@ -1674,10 +1674,8 @@ def update_sl_summary(data):
         cvg_start_date, cvg_end_date = get_cvg_dates(original_report_id, cmte_id)
         calendar_year = cvg_start_date.year
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
-        cal_end = cvg_end_date
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, True)
         # create a levin summary recvord if not exist yet
-        # if not sl_record_exist(levin_account_id):
         for report_id in report_id_list:
             sl_data = {}
             report_cvg_start_date, report_cvg_end_date = get_cvg_dates(
@@ -1782,26 +1780,7 @@ def get_sla_summary_table(request):
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
-        descending = query_params.get("descending")
-        if not (
-            "sortColumnName" in query_params
-            and check_null_value(query_params.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif query_params.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = query_params.get("sortColumnName")
         itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-        search_string = query_params.get("search")
-        params = query_params.get("filters", {})
-        keywords = params.get("keywords")
-        if str(descending).lower() == "true":
-            descending = "DESC"
-        else:
-            descending = "ASC"
-        trans_query_string_count = ""
-
         cmte_id = get_comittee_id(request.user.username)
 
         if not (
@@ -1939,26 +1918,13 @@ def get_slb_summary_table(request):
         #: Get the request parameters and set for Pagination
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
-
         descending = query_params.get("descending")
-        if not (
-            "sortColumnName" in query_params
-            and check_null_value(query_params.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif query_params.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = query_params.get("sortColumnName")
         itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-        search_string = query_params.get("search")
-        params = query_params.get("filters", {})
-        keywords = params.get("keywords")
+
         if str(descending).lower() == "true":
             descending = "DESC"
         else:
             descending = "ASC"
-        trans_query_string_count = ""
 
         cmte_id = get_comittee_id(request.user.username)
 
@@ -2001,7 +1967,7 @@ def get_slb_summary_table(request):
         #: update for pagination
         json_result = get_pagination_dataset(result, itemsperpage, page_num)
         return Response(json_result, status=status.HTTP_200_OK)
-        # return Response(result, status=status.HTTP_200_OK)
+
     except Exception as e:
         return Response(
             "The get_slb_summary_table API is throwing an error: " + str(e),

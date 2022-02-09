@@ -117,7 +117,8 @@ def reset_code_counter(key):
                 logger.debug("Reset key failed for key {}", key)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred reset key for key {}", key)
+        logger.error(e)
+        logger.error("exception occurred reset key for key {}", key)
 
 
 def reset_account_password(cmte_id, password, email):
@@ -251,6 +252,7 @@ def send_email(token_val, email):
             },
             Source=SENDER,
         )
+        logger.debug(response)
     # Display an error if something goes wrong.
     except ClientError as e:
         print(e.response["Error"]["Message"])
@@ -258,8 +260,6 @@ def send_email(token_val, email):
 
 def send_text(token_val, phone_no):
     try:
-
-        token_val_formatted = "{:s}".format("\u0332".join(token_val))
         client = CallfireClient(API_LOGIN, API_PASSWORD)
         response = client.texts.sendTexts(
             body=[

@@ -283,9 +283,9 @@ def check_decimal(value):
     check value is decimal data
     """
     try:
-        check_value = Decimal(value)
-        return value
+        return Decimal(value)
     except Exception as e:
+        logger.error(e)
         raise Exception(
             """
             Invalid Input: Expecting a decimal value like 18.11, 24.07.
@@ -1726,17 +1726,9 @@ def update_schedB_aggamt_transactions(
                 aggregate_start_date, aggregate_end_date, entity_id, cmte_id
             )
             aggregate_amount = 0
-            committee_type = cmte_type(cmte_id)
             for transaction in transactions_list:
                 # checking in reports table if the delete_ind flag is false for the corresponding report
                 if transaction[5] != "Y":
-                    # checking if the back_ref_transaction_id is null or not.
-                    # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                    # according to new spec, all transations need to be aggregated
-                    # if transaction[7] != None or (
-                    #     transaction[7] == None and
-                    #     (transaction[6] != "X")
-                    # ):
                     if transaction[10] != "N":
                         aggregate_amount += transaction[0]
                     if (
@@ -2027,7 +2019,6 @@ def schedB(request):
                 if "child" in request.data:
                     children = check_type_list(request.data.get("child"))
                     if len(children) > 0:
-                        child_output = []
                         for child in children:
                             child_datum = schedB_sql_dict(child)
                             child_datum["back_ref_transaction_id"] = data.get(
@@ -2047,8 +2038,10 @@ def schedB(request):
                                     child.get("transaction_id")
                                 )
                                 child_data = put_schedB(child_datum)
+                                logger.debug(child_data)
                             else:
                                 child_data = post_schedB(child_datum)
+                                logger.debug(child_data)
                 output = get_schedB(data)
                 # for earmark child transaction: update parent transction  purpose_description
                 if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:

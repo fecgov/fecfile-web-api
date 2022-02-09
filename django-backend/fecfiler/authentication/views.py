@@ -161,7 +161,7 @@ def get_users_list(cmte_id):
 
         return merged_list
     except Exception as e:
-        logger.debug(e)
+        logger.error(e)
         raise e
 
 
@@ -176,13 +176,14 @@ def delete_manage_user(data):
             _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN.value)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
-                logger.debug(
+                logger.error(
                     "deleting user for {} failed." " No record was found",
                     data.get("id"),
                 )
         return cursor.rowcount
     except Exception as e:
-        logger.debug(
+        logger.error(e)
+        logger.error(
             "exception occurred while deleting record for id" " : {}", data.get("id")
         )
 
@@ -208,7 +209,7 @@ def check_user_present(data):
             else:
                 return False
     except Exception as e:
-        logger.debug("Exception occurred while checking user already present", str(e))
+        logger.error("Exception occurred while checking user already present", str(e))
         raise e
 
 
@@ -236,7 +237,7 @@ def update_deleted_record(data):
             return register_url_token
 
     except Exception as e:
-        logger.debug("Exception occurred adding deleted user", str(e))
+        logger.error("Exception occurred adding deleted user", str(e))
         raise e
 
 
@@ -257,7 +258,7 @@ def user_previously_deleted(data):
             else:
                 return False, registration_token
     except Exception as e:
-        logger.debug(
+        logger.error(
             "exception occurred while checking if user was previously deleted", str(e)
         )
         raise e
@@ -321,8 +322,8 @@ def add_new_user(data, cmte_id, register_url_token):
                 logger.debug("Inserting new user in manage table failed")
 
     except Exception as e:
-        logger.debug("Exception occurred while inserting new user", str(e))
-        raise
+        logger.error("Exception occurred while inserting new user", str(e))
+        raise e
 
 
 def put_sql_user(data):
@@ -349,10 +350,10 @@ def put_sql_user(data):
             )
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
-                logger.debug("Updating user info for {} failed." " No record was found")
+                logger.error("Updating user info for {} failed." " No record was found")
         return cursor.rowcount
     except Exception as e:
-        logger.debug("Exception occurred while updating user", str(e))
+        logger.error("Exception occurred while updating user", str(e))
         raise e
 
 
@@ -369,7 +370,7 @@ def get_current_email(data):
 
             return email
     except Exception as e:
-        logger.debug("Exception occurred while toggling status", str(e))
+        logger.error("Exception occurred while toggling status", str(e))
         raise e
 
 
@@ -385,7 +386,6 @@ def update_user(data):
             rows = put_sql_user(data)
 
     except Exception as e:
-        # print(e)
         raise Exception(str(e))
     return rows
 
@@ -396,7 +396,7 @@ def check_custom_validations(email, role):
         if role.upper() not in ["BC_ADMIN", "ADMIN", "REVIEWER", "EDITOR"]:
             raise Exception("Role should be BC_ADMIN,ADMIN,REVIEWER, EDITOR")
     except Exception as e:
-        logger.debug("Custom validation failed")
+        logger.error("Custom validation failed")
         raise e
 
 
@@ -429,7 +429,7 @@ def backup_user_exist(data):
             else:
                 return False
     except Exception as e:
-        logger.debug("Exception occurred while adding user.", str(e))
+        logger.error("Exception occurred while adding user.", str(e))
         raise e
 
 
@@ -465,16 +465,16 @@ def manage_user(request):
                 json_result = {"users": datum, "rows": len(datum)}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
-                logger.debug(e)
+                logger.error(e)
+                json_result = {}
+                return JsonResponse(
+                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
+            except Exception as e:
+                logger.error(e)
                 forms_obj = []
                 return JsonResponse(
                     forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-            except Exception as e:
-                logger.debug(e)
-                json_result = {"message": str(e)}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
                 )
 
         elif request.method == "DELETE":
@@ -566,7 +566,7 @@ def manage_user(request):
                 json_result = {"users": output, "rows_updated": rows}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug(e)
+                logger.error(e)
                 json_result = {"message": str(e)}
                 return JsonResponse(
                     json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
@@ -613,7 +613,7 @@ def get_toggle_status(data):
                 else:
                     return True
     except Exception as e:
-        logger.debug("Exception occurred while toggling status", str(e))
+        logger.error("Exception occurred while toggling status", str(e))
         raise e
 
 
@@ -645,7 +645,7 @@ def update_toggle_status(status, data):
                 )
             return cursor.rowcount
     except Exception as e:
-        logger.debug("Exception occurred while toggling status", str(e))
+        logger.error("Exception occurred while toggling status", str(e))
         raise e
 
 
@@ -670,14 +670,15 @@ def toggle_user(request):
                 json_result = {"users": output, "rows_updated": rows}
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
-                logger.debug("exception occured while toggling status", str(e))
-                json_result = {"message": str(e)}
+                logger.error("exception occured while toggling status", str(e))
+                json_result = {}
                 return JsonResponse(
                     json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
                 )
 
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -694,8 +695,8 @@ def current_user(request):
 
             return JsonResponse(user, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            logger.debug("exception occurred while getting user information", str(e))
-            json_result = {"message": str(e)}
+            logger.error("exception occurred while getting user information", str(e))
+            json_result = {}
             return JsonResponse(
                 json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
             )

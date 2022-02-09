@@ -695,7 +695,8 @@ def delete_schedF(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])

@@ -471,7 +471,8 @@ def delete_schedH1(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
@@ -653,11 +654,7 @@ def validate_h1_h2_exist(request):
         report_id = request.query_params.get("report_id")
         cmte_type_category = request.query_params.get("cmte_type_category")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
-        start_dt = datetime.date(int(calendar_year), 1, 1)
-        end_dt = datetime.date(int(calendar_year), 12, 31)
         activity_event_type = request.query_params.get("activity_event_type")
-        # event_name = request.query_params.get('activity_event_identifier')
-        # transaction_type_identifier = request.query_params.get('transaction_type_identifier')
         _count = 0
 
         if activity_event_type in ["DF", "DC"]:  # event-based, goes to h2
@@ -676,43 +673,13 @@ def validate_h1_h2_exist(request):
 
             with connection.cursor() as cursor:
                 logger.debug("query with _sql:{}".format(_sql))
-                # logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
                 cursor.execute(_sql + add_on, (cmte_id, report_id))
                 if not cursor.rowcount:
                     raise Exception("Error: something warong with db query.")
                 _count = int(cursor.fetchone()[0])
 
-            # _sql = """
-            # select activity_event_amount_ytd
-            # from public.sched_h4
-            # where cmte_id = %s
-            # and activity_event_identifier = %s
-            # and create_date between %s and %s
-            # and delete_ind is distinct from 'Y'
-            # order by create_date desc, last_update_date desc;
-            # """
-            # with connection.cursor() as cursor:
-            #     cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
-            #     if not cursor.rowcount:
-            #         aggregate_amount = 0
-            #     else:
-            #         aggregate_amount = float(cursor.fetchone()[0])
-
         else:  # need to go to h1 for ratios
-            # activity_event_type = request.query_params.get('activity_event_type')
-
-            # if not activity_event_type:
-            #     raise Exception('Error: event type is required.')
-
             if cmte_type_category == "PTY":
-                # _sql = """
-                # select federal_percent from public.sched_h1
-                # where election_year = %s
-                # and cmte_id = %s
-                # and report_id = %s
-                # and delete_ind is distinct from 'Y'
-                # order by create_date desc, last_update_date desc
-                # """
                 _sql = """
                 select count(*) from public.sched_h1
                 where election_year = %s
@@ -726,9 +693,6 @@ def validate_h1_h2_exist(request):
                         raise Exception("Error: no valid h1 data found.")
                     _count = int(cursor.fetchone()[0])
             elif cmte_type_category == "PAC":
-                # activity_event_type = request.query_params.get('activity_event_type')
-                # if not activity_event_type:
-                # return Response('Error: event type is required for this committee.')
                 event_type_code = {
                     "AD": "administrative",  # TODO: need to fix this typo
                     "GV": "generic_voter_drive",
@@ -744,7 +708,6 @@ def validate_h1_h2_exist(request):
                 and report_id = %s
                 """
                 activity_part = """and {} = true """.format(h1_event_type)
-                # order_part = 'order by create_date desc, last_update_date desc'
                 _sql = _sql + activity_part
                 logger.debug("sql for query h1:{}".format(_sql))
                 with connection.cursor() as cursor:
@@ -755,27 +718,6 @@ def validate_h1_h2_exist(request):
             else:
                 raise Exception("invalid cmte_type_category.")
 
-        #     _sql = """
-        #         select activity_event_amount_ytd
-        #         from public.sched_h4
-        #         where cmte_id = %s
-        #         and activity_event_type = %s
-        #         and create_date between %s and %s
-        #         order by create_date desc, last_update_date desc
-        #     """
-        #     with connection.cursor() as cursor:
-        #         cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
-        #         if not cursor.rowcount:
-        #             aggregate_amount = 0
-        #         else:
-        #             aggregate_amount = float(cursor.fetchone()[0])
-        # # fed_percent = float(cursor.fetchone()[0])
-        # fed_share = float(total_amount) * fed_percent
-        # nonfed_share = float(total_amount) - fed_share
-        # if transaction_type_identifier and not transaction_type_identifier.endswith('_MEMO'):
-        #     new_aggregate_amount = aggregate_amount + float(total_amount)
-        # else:
-        #     new_aggregate_amount = aggregate_amount
         return JsonResponse({"count": _count}, status=status.HTTP_200_OK)
     except BaseException:
         raise
@@ -870,11 +812,6 @@ def get_fed_nonfed_share(request):
         back_ref_transaction_id = request.query_params.get("back_ref_transaction_id")
         if transaction_id and not transaction_id.startswith("SH"):
             back_ref_transaction_id = None
-        # print(transaction_id)
-        # if 'old_amount' in request.query_params:
-        #     old_amount = float(request.query_params.get('old_amount'))
-        # else:
-        #     old_amount = 0
 
         # for editing purpose, need grab old amount
         old_amount = 0
@@ -980,14 +917,6 @@ def get_fed_nonfed_share(request):
                 raise Exception("Error: event type is required.")
 
             if cmte_type_category == "PTY":
-                # _sql = """
-                # select federal_percent from public.sched_h1
-                # where election_year = %s
-                # and cmte_id = %s
-                # and report_id = %s
-                # and delete_ind is distinct from 'Y'
-                # order by create_date desc, last_update_date desc
-                # """
                 _sql = """
                 select federal_percent
                 from public.sched_h1
@@ -1003,9 +932,6 @@ def get_fed_nonfed_share(request):
                         raise Exception("Error: no h1 data found.")
                     fed_percent = float(cursor.fetchone()[0])
             elif cmte_type_category == "PAC":
-                # activity_event_type = request.query_params.get('activity_event_type')
-                # if not activity_event_type:
-                # return Response('Error: event type is required for this committee.')
                 event_type_code = {
                     "AD": "administrative",  # TODO: need to fix this typo
                     "GV": "generic_voter_drive",
@@ -1072,19 +998,14 @@ def get_fed_nonfed_share(request):
                 """.format(
                     f_ytd, tran_tbl
                 )
-                print("...")
-                print(_sql)
                 with connection.cursor() as cursor:
                     cursor.execute(
                         _sql, (cmte_id, activity_event_type, start_dt, end_dt)
                     )
-                    # logger.debug()
                     if not cursor.rowcount:
                         aggregate_amount = 0
                     else:
                         aggregate_amount = float(cursor.fetchone()[0])
-        # fed_percent = float(cursor.fetchone()[0])
-        # print(aggregate_amount)
         logger.debug("aggregate_amount loaded:{}".format(aggregate_amount))
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
@@ -1092,7 +1013,6 @@ def get_fed_nonfed_share(request):
             new_aggregate_amount = aggregate_amount
         else:
             new_aggregate_amount = aggregate_amount + float(total_amount) - old_amount
-            # new_aggregate_amount = aggregate_amount
         return JsonResponse(
             {
                 "fed_share": "{0:.2f}".format(fed_share),
@@ -1114,17 +1034,12 @@ def get_h1_percentage(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
 
-        # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
-        # raise Exception ('Missing Input: report_id is mandatory')
-
         if not (
             "calendar_year" in request.query_params
             and check_null_value(request.query_params.get("calendar_year"))
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
-        # start_dt = datetime.date(int(calendar_year), 1, 1)
-        # end_dt = datetime.date(int(calendar_year), 12, 31)
         _sql = """
             select json_agg(t) from
             (select federal_percent, non_federal_percent from public.sched_h1
@@ -1134,9 +1049,7 @@ def get_h1_percentage(request):
         """
         with connection.cursor() as cursor:
             cursor.execute(_sql, (calendar_year, cmte_id))
-            # print('rows:{}'.format(cursor.rowcount))
             json_data = cursor.fetchone()[0]
-            # print(json_data)
             if not json_data:
                 # raise Exception('Error: no h1 found.')
                 return Response(
@@ -1159,9 +1072,7 @@ def schedH2_sql_dict(data):
     filter out valid fileds for sched_H1
     """
     valid_h2_fields = [
-        # "line_number",
         "transaction_type_identifier",
-        # "transaction_type",
         "activity_event_name",
         "fundraising",
         "direct_cand_support",
@@ -1171,7 +1082,6 @@ def schedH2_sql_dict(data):
         "non_federal_percent",
     ]
     try:
-        # return {k: v for k, v in data.items() if k in valid_h2_fields}
         datum = {k: v for k, v in data.items() if k in valid_h2_fields}
         if "receipt_date" in data:
             datum["revise_date"] = data.get("receipt_date")
@@ -1250,9 +1160,7 @@ def put_schedH2(data):
     referencing something already in our DB
     """
     try:
-        # check_mandatory_fields_SH2(data)
         validate_sh2_data(data)
-        # check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH2(data)
         except Exception as e:
@@ -1472,7 +1380,8 @@ def delete_schedH2(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 @api_view(["GET"])
@@ -1706,30 +1615,9 @@ def get_h2_summary_table(request):
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
-        descending = query_params.get("descending")
-        if not (
-            "sortColumnName" in query_params
-            and check_null_value(query_params.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif query_params.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = query_params.get("sortColumnName")
         itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-        search_string = query_params.get("search")
-        params = query_params.get("filters", {})
-        keywords = params.get("keywords")
-        if str(descending).lower() == "true":
-            descending = "DESC"
-        else:
-            descending = "ASC"
-        trans_query_string_count = ""
-
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
-        # logger.debug('checking if it is a new report')
-        # if is_new_report(report_id, cmte_id):
         logger.debug("check and do h2 carryover.")
         do_h2_carryover(report_id, cmte_id)
         with connection.cursor() as cursor:
@@ -1753,7 +1641,6 @@ def get_h2_summary_table(request):
                 ),
             )
             json_res = cursor.fetchone()[0]
-            # print(json_res)
             if not json_res:
                 return Response([], status=status.HTTP_200_OK)
             for _rec in json_res:
@@ -1766,29 +1653,8 @@ def get_h2_summary_table(request):
                         == 0
                     ):
                         _rec["trashable"] = True
-                # else:
-                #     _rec['trashable'] - False
-
-                # 'Error: no valid h2 data found for this report.')
-            # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
-            # start_dt = datetime.date(int(calendar_year), 1, 1)
-            # end_dt = datetime.date(int(calendar_year), 12, 31)
 
             # : insert pagination functionality
-
-            """total_count = len(json_res)
-            paginator = Paginator(json_res, itemsperpage)
-            if paginator.num_pages < page_num:
-                page_num = paginator.num_pages
-            json_res = paginator.page(page_num)
-            json_result = {
-                "transactions": list(json_res),
-                "totaltransactionsCount": total_count,
-                "itemsPerPage": itemsperpage,
-                "pageNumber": page_num,
-                "totalPages": paginator.num_pages,
-            }
-            """
             json_result = get_pagination_dataset(json_res, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
     except BaseException:
@@ -2461,7 +2327,8 @@ def delete_schedH3(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 @api_view(["GET"])
@@ -2514,6 +2381,7 @@ def get_sched_h3_breakdown(request):
             logger.debug("h3 breakdown:{}".format(result))
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         raise Exception("Error on fetching h3 break down")
 
 
@@ -2626,32 +2494,9 @@ def get_h3_summary(request):
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
 
-        descending = query_params.get("descending")
-        if not (
-            "sortColumnName" in query_params
-            and check_null_value(query_params.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif query_params.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = query_params.get("sortColumnName")
         itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-        search_string = query_params.get("search")
-        params = query_params.get("filters", {})
-        keywords = params.get("keywords")
-        if str(descending).lower() == "true":
-            descending = "DESC"
-        else:
-            descending = "ASC"
-        trans_query_string_count = ""
-        row1 = ""
-        totalcount = ""
-
         cmte_id = get_comittee_id(request.user.username)
-
         report_id = request.query_params.get("report_id")
-        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -2682,10 +2527,7 @@ def get_h3_summary(request):
             ) t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            # print(_sql)
-            # cursor.execute(_sql)
             _sum = cursor.fetchone()[0]
-            # print(cursor.query)
             if _sum:
                 for _rec in _sum:
                     aggregate_dic = load_h3_aggregate_amount(
@@ -2695,8 +2537,6 @@ def get_h3_summary(request):
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
                         )
-                    # elif _rec['activity_event_type']:
-                    #     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
                     else:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_type"], 0
@@ -3824,35 +3664,13 @@ def delete_schedH4(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
+        logger.error(e)
         raise
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH4(request):
     #: Get the request parameters and set for Pagination
-    query_params = request.query_params
-    page_num = get_int_value(query_params.get("page"))
-
-    descending = query_params.get("descending")
-    if not (
-        "sortColumnName" in query_params
-        and check_null_value(query_params.get("sortColumnName"))
-    ):
-        sortcolumn = "name"
-    elif query_params.get("sortColumnName") == "default":
-        sortcolumn = "name"
-    else:
-        sortcolumn = query_params.get("sortColumnName")
-    itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-    search_string = query_params.get("search")
-    params = query_params.get("filters", {})
-    keywords = params.get("keywords")
-    if str(descending).lower() == "true":
-        descending = "DESC"
-    else:
-        descending = "ASC"
-    trans_query_string_count = ""
-
     try:
         is_read_only_or_filer_reports(request)
 
@@ -4431,7 +4249,8 @@ def delete_schedH5(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 @api_view(["GET"])
@@ -4447,30 +4266,10 @@ def get_h5_summary(request):
         # Get the request parameters and set for Pagination
         query_params = request.query_params
         page_num = get_int_value(query_params.get("page"))
-
-        descending = query_params.get("descending")
-        if not (
-            "sortColumnName" in query_params
-            and check_null_value(query_params.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif query_params.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = query_params.get("sortColumnName")
         itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-        search_string = query_params.get("search")
-        params = query_params.get("filters", {})
-        keywords = params.get("keywords")
-        if str(descending).lower() == "true":
-            descending = "DESC"
-        else:
-            descending = "ASC"
-        trans_query_string_count = ""
 
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
-        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
 
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -4503,16 +4302,7 @@ def get_h5_summary(request):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            # print(_sql)
-            # cursor.execute(_sql)
             _sum = cursor.fetchone()[0]
-            # for _rec in _sum:
-            #     if _rec['activity_event_name']:
-            #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'])
-            #     elif _rec['activity_event_type']:
-            #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
-            #     else:
-            #         pass
 
             #: update for pagination
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
@@ -4567,6 +4357,7 @@ def get_sched_h5_breakdown(request):
             )
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         raise Exception("Error on fetching h5 break down")
 
 
@@ -4885,12 +4676,12 @@ def put_schedH6(data):
                 get_data["cmte_id"] = "C00000000"
 
             prev_entity_list = get_entities(get_data)
-            entity_data = put_entities(data)
+            put_entities(data)
             roll_back = True
         else:
-            entity_data = post_entities(data)
+            post_entities(data)
             roll_back = False
-        # check_transaction_id(data.get('transaction_id'))
+
         existing_total = get_existing_h6_total(
             data.get("cmte_id"), data.get("transaction_id")
         )
@@ -4913,9 +4704,9 @@ def put_schedH6(data):
 
         except Exception as e:
             if roll_back:
-                entity_data = put_entities(prev_entity_list[0], False)
+                put_entities(prev_entity_list[0], False)
             else:
-                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": data.get("entity_id")}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedH6 function is throwing an error: " + str(e)
@@ -5367,6 +5158,7 @@ def delete_schedH6(data):
             data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
+        logger.error(e)
         raise
 
 
@@ -5424,30 +5216,10 @@ def schedH6(request):
                 #: Get the request parameters and set for Pagination
                 query_params = request.query_params
                 page_num = get_int_value(query_params.get("page"))
-
-                descending = query_params.get("descending")
-                if not (
-                    "sortColumnName" in query_params
-                    and check_null_value(query_params.get("sortColumnName"))
-                ):
-                    sortcolumn = "name"
-                elif query_params.get("sortColumnName") == "default":
-                    sortcolumn = "name"
-                else:
-                    sortcolumn = query_params.get("sortColumnName")
                 itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-                search_string = query_params.get("search")
-                params = query_params.get("filters", {})
-                keywords = params.get("keywords")
-                if str(descending).lower() == "true":
-                    descending = "DESC"
-                else:
-                    descending = "ASC"
-                trans_query_string_count = ""
 
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 # make sure we get query parameters from both
-                # request.data.update(request.query_params)
                 if "report_id" in request.query_params and check_null_value(
                     request.query_params.get("report_id")
                 ):

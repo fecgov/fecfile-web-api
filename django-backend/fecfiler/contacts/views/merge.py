@@ -96,8 +96,6 @@ def merge_option(request):
                 file_entity_id = int(merge_parameters["file_record_id"])
                 db_entity_id = merge_parameters["db_entity_id"]
                 add_list = []
-                update_list = []
-                exsist_list = []
                 if not check_null_value(file_name) and len(merge_parameters) == 0:
                     msg = "FileName or option list cannot be null. Please pass file Name and option list."
                     json_result = {"message": msg}

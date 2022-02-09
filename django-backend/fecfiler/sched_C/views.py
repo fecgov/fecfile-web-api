@@ -3,6 +3,7 @@ import logging
 
 from django.db import connection
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -356,6 +357,7 @@ def put_schedC(data):
             # remove entiteis if saving sched_a fails
             if rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -755,6 +757,7 @@ def post_schedC(data):
             # remove entiteis if saving sched_a fails
             if rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -1074,7 +1077,7 @@ def delete_schedC(data):
             delete_child_transaction(sched_tp, cmte_id, transaction_id)
         logger.debug("delete {} done".format(transaction_id))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC(cmte_id, transaction_id):
@@ -1416,30 +1419,10 @@ def get_outstanding_loans(request):
     # URL coded for: GET
     # /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false
     # HTTP/1.1"
-    param_string = ""
     query_params = request.query_params
     page_num = int(query_params.get("page"))
-    descending = query_params.get(
-        "descending"
-    )  # request.data.get("descending", "false")
-    if not (
-        "sortColumnName" in query_params
-        and check_null_value(query_params.get("sortColumnName"))
-    ):
-        sortcolumn = "name"
-    elif query_params.get("sortColumnName") == "default":
-        sortcolumn = "name"
-    else:
-        sortcolumn = query_params.get("sortColumnName")
     itemsperpage = int(query_params.get("itemsPerPage"))
-    search_string = query_params.get("search")
-    params = query_params.get("filters", {})
-    keywords = params.get("keywords")
-    if str(descending).lower() == "true":
-        descending = "DESC"
-    else:
-        descending = "ASC"
-    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
+    trans_query_string_count = ""
     row1 = ""
     totalcount = ""
 
@@ -1458,7 +1441,7 @@ def get_outstanding_loans(request):
 
         if "transaction_type_identifier" in query_params:
             tran_type = query_params.get("transaction_type_identifier")
-            if not tran_type in valid_transaction_types:
+            if tran_type not in valid_transaction_types:
                 raise Exception("Error: invalid transaction types.")
             _sql = """
                         SELECT
@@ -1715,7 +1698,7 @@ def get_outstanding_loans_old(request):
             raise Exception("report_id is required.")
         if "transaction_type_identifier" in request.query_params:
             tran_type = request.query_params.get("transaction_type_identifier")
-            if not tran_type in valid_transaction_types:
+            if tran_type not in valid_transaction_types:
                 raise Exception("Error: invalid transaction types.")
             _sql = """
                 SELECT Json_agg(t)
@@ -2188,6 +2171,7 @@ def post_schedC1(data):
             # rollback authorized entity
             if authorized_rollback_flag:
                 entity_data = put_entities(old_authorized_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2493,7 +2477,7 @@ def delete_schedC1(data):
         # check_mandatory_fields_SC2(data)
         delete_sql_schedC1(data.get("cmte_id"), data.get("transaction_id"))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC1(cmte_id, transaction_id):
@@ -2526,9 +2510,6 @@ def schedC1(request):
                     report_id = "0"
                 else:
                     report_id = check_report_id(request.data.get("report_id"))
-                # end of handling
-                # print(cmte_id)
-                # print(report_id)
                 datum = request.data.copy()
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
@@ -2591,11 +2572,6 @@ def schedC1(request):
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
-                # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                #     data['report_id'] = check_report_id(
-                #         request.data.get('report_id'))
-                # else:
-                #     raise Exception('Missing Input: report_id is mandatory')
                 if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
                 ):
@@ -2640,13 +2616,6 @@ def schedC1(request):
                 datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
-
-                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-                #     datum['entity_id'] = request.data.get('entity_id')
-                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-                #     data = put_schedB(datum)
-                #     output = get_schedB(data)
-                # else:
                 data = put_schedC1(datum)
                 output = get_schedC1(data)
                 return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -2676,12 +2645,7 @@ def check_mandatory_fields_SC2(data):
         for field in MANDATORY_FIELDS_SCHED_C2:
             if not (field in data and check_null_value(data.get(field))):
                 errors.append(field)
-        # if len(error) > 0:
         if errors:
-            # string = ""
-            # for x in error:
-            #     string = string + x + ", "
-            # string = string[0:-2]
             raise Exception(
                 "The following mandatory fields are required in order to save data: {}".format(
                     ",".join(errors)
@@ -2704,10 +2668,6 @@ def put_schedC2(data):
                 "cmte_id": data.get("cmte_id"),
                 "entity_id": data.get("guarantor_entity_id"),
             }
-
-            # need this update for FEC entity
-            # if get_data['entity_id'].startswith('FEC'):
-            #     get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
             entity_rollback_flag = True
@@ -2719,12 +2679,12 @@ def put_schedC2(data):
 
         data = schedC2_sql_dict(data)
         check_mandatory_fields_SC2(data)
-        transaction_id = check_transaction_id(data.get("transaction_id"))
         try:
             put_sql_schedC2(data)
         except Exception as e:
             if entity_rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2787,8 +2747,6 @@ def post_schedC2(data):
             }
 
             # need this update for FEC entity
-            # if get_data['entity_id'].startswith('FEC'):
-            #     get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
             entity_rollback_flag = True
@@ -2807,6 +2765,7 @@ def post_schedC2(data):
         except Exception as e:
             if entity_rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2876,10 +2835,9 @@ def delete_schedC2(data):
     function for handling delete request for sc2
     """
     try:
-        # check_mandatory_fields_SC2(data)
         delete_sql_schedC2(data.get("cmte_id"), data.get("transaction_id"))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC2(cmte_id, transaction_id):

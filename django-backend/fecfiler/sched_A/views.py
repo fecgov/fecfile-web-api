@@ -298,12 +298,6 @@ def check_decimal(value):
         )
 
 
-# @api_view(['GET'])
-# def date_print(request):
-#   print(datetime.datetime.now())
-#   print(timezone.now())
-#   return Response('SUCCESS', status=status.HTTP_200_OK)
-
 # TODO: update this function to take one argument of data_dic
 def post_sql_schedA(
     cmte_id,
@@ -709,7 +703,8 @@ def find_form_type(report_id, cmte_id):
         else:
             return form_types[0]
     except Exception as e:
-        raise Exception("The form_type function is throwing an error:" + str(e))
+        logger.error(e)
+        raise Exception("The form_type function is throwing an error")
 
 
 def find_aggregate_date(form_type, contribution_date):
@@ -725,8 +720,9 @@ def find_aggregate_date(form_type, contribution_date):
             aggregate_end_date = datetime.date(year, 12, 31)
         return aggregate_start_date, aggregate_end_date
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The aggregate_start_date function is throwing an error: " + str(e)
+            "The aggregate_start_date function is throwing an error"
         )
 
 
@@ -887,7 +883,7 @@ def post_schedA(datum):
                     datum.get("transaction_type_identifier")
                     in TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT
                 ):
-                    if not "child_datum" in datum:
+                    if "child_datum" not in datum:
                         raise Exception("child data missing!!!")
                     child_datum = datum.get("child_datum")
                     # update some filds and ensure the parent-child relationaship
@@ -907,12 +903,14 @@ def post_schedA(datum):
                     )
                     child_datum["back_ref_transaction_id"] = transaction_id
                     child_data = post_schedB(child_datum)
+                    logger.debug(child_data)
                 else:
                     pass
             except BaseException:
                 remove_schedA(datum)
                 raise
         except Exception as e:
+            logger.error(e)
             # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0], False)
@@ -920,7 +918,7 @@ def post_schedA(datum):
                 get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
-                "The post_sql_schedA function is throwing an error: " + str(e)
+                "The post_sql_schedA function is throwing an error"
             )
         # Auto generation of reattribution transactions
         if "reattribution_id" in datum:
@@ -942,7 +940,6 @@ def post_schedA(datum):
                 datum.get("report_id"),
             )
         if datum.get("transaction_type_identifier") in SCHED_L_A_TRAN_TYPES:
-            # print("haha")
             update_aggregate_la(datum)
             update_sl_summary(datum)
         return datum
@@ -1229,7 +1226,7 @@ def put_schedA(datum):
                     datum.get("transaction_type_identifier")
                     in TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT
                 ):
-                    if not "child_datum" in datum:
+                    if "child_datum" not in datum:
                         raise Exception("child data missing!!!")
                     child_datum = datum.get("child_datum")
                     # update some filds and ensure the parent-child relationaship
@@ -1248,7 +1245,7 @@ def put_schedA(datum):
                         child_datum.get("transaction_type_identifier")
                     )
                     child_datum["back_ref_transaction_id"] = transaction_id
-                    if not "transaction_id" in child_datum:
+                    if "transaction_id" not in child_datum:
                         child_SB_transaction_id = get_child_transaction_schedB(
                             datum.get("cmte_id"), datum.get("report_id"), transaction_id
                         )
@@ -1259,6 +1256,7 @@ def put_schedA(datum):
                             child_data = put_schedB(child_datum)
                     else:
                         child_data = put_schedB(child_datum)
+                        logger.debug(child_data)
                 elif (
                     datum.get("transaction_type_identifier")
                     in CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT
@@ -1336,13 +1334,14 @@ def put_schedA(datum):
                 )
                 raise
         except Exception as e:
+            logger.error(e)
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0], False)
             else:
                 get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
-                "The put_sql_schedA function is throwing an error: " + str(e)
+                "The put_sql_schedA function is throwing an error"
             )
 
         # update line number based on aggregate amount info
@@ -1440,9 +1439,9 @@ def update_auto_generated_reattribution_transactions(data, reattributed_id, enti
                 )
 
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The update_auto_generated_reattribution_transactions function is throwing an error: "
-            + str(e)
+            "The update_auto_generated_reattribution_transactions function is throwing an error"
         )
 
 
@@ -1849,9 +1848,7 @@ def reattribution_auto_generate_transactions(
                 [org_transaction_id, reattributed_id, cmte_id],
             )
             cursor.execute(query_string_aggregate, [reattributed_id, cmte_id])
-            # print(cursor.query)
             aggregate_data = cursor.fetchone()
-            # print(aggregate_data)
             if aggregate_data:
                 update_linenumber_aggamt_transactions_SA(
                     aggregate_data[0],
@@ -1870,9 +1867,9 @@ def reattribution_auto_generate_transactions(
                 )
 
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The reattribution_auto_generate_transactions function is throwing an error: "
-            + str(e)
+            "The reattribution_auto_generate_transactions function is throwing an error"
         )
 
 
@@ -1930,7 +1927,6 @@ def reattribution_auto_update_transactions(
                 ],
             )
             cursor.execute(query_string_aggregate, [reattributed_id, cmte_id])
-            # print(cursor.query)
             aggregate_data = cursor.fetchone()
             if aggregate_data:
                 update_linenumber_aggamt_transactions_SA(
@@ -1949,9 +1945,9 @@ def reattribution_auto_update_transactions(
                     aggregate_data[4],
                 )
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The reattribution_auto_update_transactions function is throwing an error: "
-            + str(e)
+            "The reattribution_auto_update_transactions function is throwing an error"
         )
 
 
@@ -1989,8 +1985,6 @@ def schedA(request):
                 validate_sa_data(request.data)
                 cmte_id = get_comittee_id(request.user.username)
                 report_id = check_report_id(request.data.get("report_id"))
-                # To check if the report id exists in reports table
-                form_type = find_form_type(report_id, cmte_id)
                 datum = schedA_sql_dict(request.data)
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
@@ -2011,8 +2005,9 @@ def schedA(request):
                     update_earmark_parent_purpose(datum)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             except Exception as e:
+                logger.error(e)
                 return Response(
-                    "The schedA API - POST is throwing an exception: " + str(e),
+                    "The schedA API - POST is throwing an exception",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -2033,8 +2028,6 @@ def schedA(request):
                     )
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
-                # To check if the report id exists in reports table
-                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
                 if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
                 ):
@@ -2046,24 +2039,20 @@ def schedA(request):
                 #     obj.update({'api_call' : 'sa/schedA'})
                 return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
-                logger.debug(e)
+                logger.error(e)
                 forms_obj = []
                 return JsonResponse(
                     forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
             except Exception as e:
-                logger.debug(e)
+                logger.error(e)
                 return Response(
-                    "The schedA API - GET is throwing an error: " + str(e),
+                    "The schedA API - GET is throwing an error",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
         # PUT api call handled here
         if request.method == "PUT":
-            # if "election_year" in request.data:
-            #     REQ_ELECTION_YR = request.data.get("election_year")
-            # if "election_year" in request.query_params:
-            #     REQ_ELECTION_YR = request.query_params.get("election_year")
             try:
                 # checking if reattribution is triggered for a transaction
                 reattribution_flag = False
@@ -2105,8 +2094,6 @@ def schedA(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = get_comittee_id(request.user.username)
                 datum["username"] = request.user.username
-                # To check if the report id exists in reports table
-                form_type = find_form_type(report_id, datum.get("cmte_id"))
                 # updating data for reattribution fields
                 if reattribution_flag:
                     datum["memo_code"] = "X"
@@ -2129,8 +2116,9 @@ def schedA(request):
                     update_earmark_parent_purpose(datum)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             except Exception as e:
+                logger.error(e)
                 return Response(
-                    "The schedA API - PUT is throwing an error: " + str(e),
+                    "The schedA API - PUT is throwing an error",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -2152,7 +2140,6 @@ def schedA(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 # To check if the report id exists in reports table
-                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
                 if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
                 ):
@@ -2169,12 +2156,14 @@ def schedA(request):
                     status=status.HTTP_201_CREATED,
                 )
             except Exception as e:
+                logger.error(e)
                 return Response(
-                    "The schedA API - DELETE is throwing an error: " + str(e),
+                    "The schedA API - DELETE is throwing an error",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2219,13 +2208,15 @@ def force_itemize_sa(request):
             update_sa_itmization_status(sa_data, item_status="FI")
             return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e)
             return Response(
-                "The force_aggregate_sa API is throwing an error: " + str(e),
+                "The force_aggregate_sa API is throwing an error",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2248,13 +2239,15 @@ def force_unitemize_sa(request):
             update_sa_itmization_status(sa_data, item_status="FU")
             return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e)
             return Response(
-                "The force_aggregate_sa API is throwing an error: " + str(e),
+                "The force_aggregate_sa API is throwing an error",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2286,12 +2279,14 @@ def force_aggregate_sa(request):
             )
             return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e)
             return Response(
-                "The force_aggregate_sa API is throwing an error: " + str(e),
+                "The force_aggregate_sa API is throwing an error",
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2322,13 +2317,15 @@ def force_unaggregate_sa(request):
             )
             return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e)
             return Response(
-                "The force_aggregate_sa API is throwing an error: " + str(e),
+                "The force_aggregate_sa API is throwing an error",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2383,8 +2380,9 @@ def contribution_aggregate(request):
                 {"contribution_aggregate": total_amt}, status=status.HTTP_201_CREATED
             )
         except Exception as e:
+            logger.error(e)
             return Response(
-                "The contribution_aggregate API is throwing an error: " + str(e),
+                "The contribution_aggregate API is throwing an error",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -2408,19 +2406,8 @@ def report_end_date(report_id, cmte_id):
             cvg_end_date = cursor.fetchone()[0]
         return cvg_end_date
     except Exception as e:
-        raise Exception("The report_end_date function is throwing an error: " + str(e))
-
-
-"""
-******************************************************************************************************************************
-END - AGGREGATE AMOUNT API - SCHED_A APP
-******************************************************************************************************************************
-"""
-"""
-******************************************************************************************************************************
-TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP TO AVOID FUNCTION USAGE RESTRICTIONS) - PRAVEEN
-******************************************************************************************************************************
-"""
+        logger.error(e)
+        raise Exception("The report_end_date function is throwing an error")
 
 
 def update_parent_amounts_to_trash(
@@ -2450,7 +2437,6 @@ def update_parent_amounts_to_trash(
 
         """Mapping value"""
         query_list.append(str(transaction_amount))
-        print(query_list)
 
         query_string = """
             {0} = {0} {2} {4},
@@ -2469,7 +2455,6 @@ def update_parent_amounts_to_trash(
         )
         with connection.cursor() as cursor:
             cursor.execute(_sql, [datetime.datetime.now(), transaction_id, cmte_id])
-            # print(cursor.query)
             if cursor.rowcount < 1:
                 raise Exception(
                     "There is no transaction associcated with the transaction_id: "
@@ -2509,8 +2494,9 @@ def get_child_transactions_to_trash(transaction_id, _delete):
             return []
 
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The get_child_transactions function is throwing an error:" + str(e)
+            "The get_child_transactions function is throwing an error"
         )
 
 
@@ -2599,7 +2585,6 @@ def delete_H1_carry_over(transaction_id, cmte_id):
                         AND sched_h1.delete_ind is distinct from 'Y';
                         """
                 cursor.execute(_sql1, [transaction_id, cmte_id])
-                # print(cursor.query)
 
     except Exception:
         raise
@@ -2633,9 +2618,9 @@ def get_auto_generated_reattribution_transactions(
         else:
             return []
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The get_auto_generated_reattribution_transactions function is throwing an error: "
-            + str(e)
+            "The get_auto_generated_reattribution_transactions function is throwing an error"
         )
 
 
@@ -2653,9 +2638,9 @@ def check_reattribution_original_delete(transaction_id, cmte_id):
                     )
                 )
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The check_reattribution_original_delete function is throwing an error: "
-            + str(e)
+            "The check_reattribution_original_delete function is throwing an error"
         )
 
 
@@ -2677,8 +2662,9 @@ def update_reatt_original_trans(
                     )
                 )
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The update_reatt_original_trans function is throwing an error: " + str(e)
+            "The update_reatt_original_trans function is throwing an error"
         )
 
 
@@ -2710,9 +2696,9 @@ def get_auto_generated_redesignation_transactions(
         else:
             return []
     except Exception as e:
+        logger.error(e)
         raise Exception(
             "The get_auto_generated_redesignation_transactions function is throwing an error: "
-            + str(e)
         )
 
 
@@ -2730,9 +2716,9 @@ def check_redesignation_original_delete(transaction_id, cmte_id):
                     )
                 )
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The check_redesignation_original_delete function is throwing an error: "
-            + str(e)
+            "The check_redesignation_original_delete function is throwing an error"
         )
 
 
@@ -2754,8 +2740,9 @@ def update_redes_original_trans(
                     )
                 )
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The update_redes_original_trans function is throwing an error: " + str(e)
+            "The update_redes_original_trans function is throwing an error"
         )
 
 
@@ -3103,12 +3090,9 @@ def trash_restore_transactions(request):
                     )
 
             except Exception as e:
+                logger.error(e)
                 return Response(
-                    "The trash_restore_transactions API is throwing an error: "
-                    + str(e)
-                    + ". Deleted transactions are: {}".format(
-                        ",".join(deleted_transaction_ids)
-                    ),
+                    "The trash_restore_transactions API is throwing an error",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -3125,21 +3109,9 @@ def trash_restore_transactions(request):
             status=status.HTTP_200_OK,
         )
     except Exception as e:
-        json_result = {"message": str(e)}
+        logger.error(e)
+        json_result = {}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
-
-"""
-******************************************************************************************************************************
-END - TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP)
-******************************************************************************************************************************
-"""
-"""
-******************************************************************************************************************************
-API TO GET LATEST OR MOST RECENT AMENDED REPORT ID AND ITS STATUS BASED ON TRANSACTION DATE INPUT
-USED IN REATTRIBUTION REPORT ID GENERATION
-******************************************************************************************************************************
-"""
 
 
 @api_view(["GET"])
@@ -3167,10 +3139,3 @@ def get_report_id_from_date(request):
         return Response(
             "The get_report_id_from_date API is throwing the following error: " + str(e)
         )
-
-
-"""
-******************************************************************************************************************************
-END - get_report_id_from_date API - SCHED_A APP (MOVED FROM CORE APP)
-******************************************************************************************************************************
-"""

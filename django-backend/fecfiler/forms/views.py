@@ -59,8 +59,6 @@ def print_pdf_info(request):
     # Configuration values
     ANNOT_KEY = "/Annots"
     ANNOT_FIELD_KEY = "/T"
-    ANNOT_VAL_KEY = "/V"
-    ANNOT_RECT_KEY = "/Rect"
     SUBTYPE_KEY = "/Subtype"
     WIDGET_SUBTYPE_KEY = "/Widget"
 
@@ -656,34 +654,8 @@ def create_committee(request):
 
 @api_view(["POST"])
 def validate_f99(request):
-    # # get all comm info
-    # if request.method == 'GET':
-    #     comm_info = CommitteeInfo.objects.all()
-    #     serializer = CommitteeInfoSerializer(comm_info, many=True)
-    #     return Response(serializer.data)
-
     # insert a new record for a comm_info
-    if request.method == "POST":
-        data = {
-            "committeeid": request.data.get("committeeid"),
-            "committeename": request.data.get("committeename"),
-            "street1": request.data.get("street1"),
-            "street2": request.data.get("street2"),
-            "city": request.data.get("city"),
-            "state": request.data.get("state"),
-            "text": request.data.get("text"),
-            "reason": request.data.get("reason"),
-            "zipcode": request.data.get("zipcode"),
-            "treasurerlastname": request.data.get("treasurerlastname"),
-            "treasurerfirstname": request.data.get("treasurerfirstname"),
-            "treasurermiddlename": request.data.get("treasurermiddlename"),
-            "treasurerprefix": request.data.get("treasurerprefix"),
-            "treasurersuffix": request.data.get("treasurersuffix"),
-            "email_on_file": request.data.get("email_on_file"),
-            "email_on_file_1": request.data.get("email_on_file_1"),
-            "file": request.data.get("file"),
-        }
-    else:
+    if request.method != "POST":
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     try:
@@ -765,21 +737,6 @@ def validate_f99(request):
     ]
     if not any(conditions):
         errormess.append("Reason does not match the pre-defined codes.")
-    """
-    #pdf validation for type, extension and size
-    if 'file' in request.data or request.data.get('file')=='':
-        valid_mime_types = ['application/pdf']
-        file = request.data.get('file')
-        file_mime_type = magic.from_buffer(file.read(1024), mime=True)
-        if file_mime_type not in valid_mime_types:
-            errormess.append('This is not a pdf file type. Kindly open your document using a pdf reader before uploading it.')
-        valid_file_extensions = ['.pdf']
-        ext = os.path.splitext(file.name)[1]
-        if ext.lower() not in valid_file_extensions:
-            errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
-        if file._size > 33554432:
-            errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
-    """
     if len(errormess) == 0:
         errormess.append("Validation successful!")
         return JsonResponse(errormess, status=200, safe=False)
@@ -1311,9 +1268,10 @@ def email(boolean, data):
             },
             Source=SENDER,
         )
+        logger.debug(response)
     # Display an error if something goes wrong.
     except ClientError as e:
-        print(e.response["Error"]["Message"])
+        logger.error(e.response["Error"]["Message"])
 
 
 @api_view(["POST"])
@@ -1331,8 +1289,6 @@ def save_print_f99(request):
     else:
         create_json_data = json.loads(createresp.content.decode("utf-8"))
 
-    est = pytz.timezone("US/Eastern")
-
     comm_info = CommitteeInfo.objects.filter(id=create_json_data["id"]).last()
     if comm_info:
         header = {
@@ -1343,6 +1299,7 @@ def save_print_f99(request):
         }
 
         serializer = CommitteeInfoSerializer(comm_info)
+        logger.debug(serializer)
         conn = boto.connect_s3(
             settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
         )
@@ -1375,7 +1332,6 @@ def save_print_f99(request):
 
         data_obj["data"] = f99data
         k.set_contents_from_string(json.dumps(data_obj))
-        url = k.generate_url(expires_in=0, query_auth=False).replace(":443", "")
 
         tmp_filename = (
             "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"
@@ -1450,8 +1406,6 @@ def update_print_f99(request):
     else:
         update_json_data = json.loads(updateresp.content.decode("utf-8"))
 
-    est = pytz.timezone("US/Eastern")
-
     try:
         comm_info = CommitteeInfo.objects.filter(id=update_json_data["id"]).last()
         if comm_info:
@@ -1463,6 +1417,7 @@ def update_print_f99(request):
             }
 
             serializer = CommitteeInfoSerializer(comm_info)
+            logger.debug(serializer)
             conn = boto.connect_s3(
                 settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
             )
@@ -1495,7 +1450,6 @@ def update_print_f99(request):
 
             data_obj["data"] = f99data
             k.set_contents_from_string(json.dumps(data_obj))
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443", "")
 
             tmp_filename = (
                 "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"
@@ -1784,6 +1738,7 @@ def submit_formf99(request):
             }
 
             serializer = CommitteeInfoSerializer(comm_info)
+            logger.debug(serializer)
             conn = boto.connect_s3(
                 settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
             )
@@ -1816,7 +1771,6 @@ def submit_formf99(request):
 
             data_obj["data"] = f99data
             k.set_contents_from_string(json.dumps(data_obj))
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443", "")
 
             tmp_filename = (
                 "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"

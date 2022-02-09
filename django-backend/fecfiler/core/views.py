@@ -380,7 +380,6 @@ def cmte_type(cmte_id):
 def get_transaction_types(request):
     try:
         with connection.cursor() as cursor:
-            forms_obj = {}
             form_type = request.query_params.get("form_type")
 
             cursor.execute(
@@ -739,7 +738,8 @@ def check_form_data(field, data):
         else:
             return None
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 def check_list_cvg_dates(args):
@@ -956,9 +956,9 @@ def get_prev_report_id(report_id):
 
 def check_report_id(report_id):
     try:
-        check_report_id = int(report_id)
-        return report_id
+        return int(report_id)
     except Exception as e:
+        logger.error(e)
         raise Exception(
             "Invalid Input: The report_id input should be an integer like 18, 24. Input received: {}".format(
                 report_id
@@ -1429,7 +1429,6 @@ def post_reports(data, reportid=None):
         form_type = data.get("form_type")
         cvg_start_dt = data.get("cvg_start_dt")
         cvg_end_dt = data.get("cvg_end_dt")
-        due_dt = data.get("due_dt")
         if form_type == "F3X":
             if cvg_start_dt is None:
                 raise Exception("The cvg_start_dt is null.")
@@ -1611,7 +1610,6 @@ def put_reports(data):
             prev_report_type = old_dict_report.get("reporttype")
             prev_cvg_start_dt = old_dict_report.get("cvgstartdate")
             prev_cvg_end_dt = old_dict_report.get("cvgenddate")
-            prev_last_update_date = datetime.datetime.now()
 
             try:
                 if data.get("form_type") == "F3X":
@@ -1673,20 +1671,16 @@ def delete_reports(data):
         form_type = data.get("form_type")
         report_id = check_report_id(data.get("report_id"))
         check_form_type(form_type)
-        old_list_report = get_list_report(report_id, cmte_id)
         delete_sql_report(report_id, cmte_id)
-        old_dict_report = old_list_report[0]
-        prev_last_update_date = old_dict_report.get("last_update_date")
 
         if form_type == "F3X":
-            with connection.cursor() as cursor:
-                try:
-                    delete_sql_form3x(report_id, cmte_id)
-                except Exception as e:
-                    undo_delete_sql_report(report_id, cmte_id)
-                    raise Exception(
-                        "The delete_sql_form3x function is throwing an error: " + str(e)
-                    )
+            try:
+                delete_sql_form3x(report_id, cmte_id)
+            except Exception as e:
+                undo_delete_sql_report(report_id, cmte_id)
+                raise Exception(
+                    "The delete_sql_form3x function is throwing an error: " + str(e)
+                )
     except BaseException:
         raise
 
@@ -2007,7 +2001,6 @@ def submit_report(request, submission_id, beginning_image_number, fec_id):
     try:
         is_read_only_or_filer_submit(request)
         SUBMIT_STATUS = "Submitted"
-        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         form_tp = request.data.get("form_type")
         if not report_id:
@@ -2562,6 +2555,7 @@ def check_entity_id(entity_id):
     try:
         check_entity_type(entity_type)
     except Exception as e:
+        logger.error(e)
         raise Exception(
             "The Entity ID is not in the specified format. Input received: " + entity_id
         )
@@ -3028,11 +3022,12 @@ def get_entities(data):
         cmte_id = data.get("cmte_id")
         entity_flag = False
         if "entity_id" in data:
-            # logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
+            logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get("entity_id"))
                 entity_flag = True
             except Exception as e:
+                logger.error(e)
                 entity_flag = False
 
         if entity_flag:
@@ -3430,7 +3425,6 @@ def autolookup_search_contacts(request):
         global_search_id = "C00000000"
         param_string = ""
         order_string = ""
-        search_string = ""
         query_string = ""
         query_params = {
             k: v for k, v in request.query_params.items() if k not in field_remapper
@@ -3720,6 +3714,7 @@ def create_json_file(request):
             }
 
             serializer = CommitteeInfoSerializer(comm_info)
+            logger.debug(serializer)
             conn = boto.connect_s3(
                 settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
             )
@@ -3745,17 +3740,14 @@ def create_json_file(request):
             f99data["reason"] = comm_info.reason
             f99data["text"] = comm_info.text
             f99data["dateSigned"] = datetime.datetime.now().strftime("%m/%d/%Y")
-            # f99data['dateSigned'] = '5/15/2019'
             f99data["email1"] = comm_info.email_on_file
             f99data["email2"] = comm_info.email_on_file_1
             f99data["formType"] = comm_info.form_type
             f99data["attachement"] = "X"
             f99data["password"] = "test"
 
-            # data_obj['data'] = serializer.data
             data_obj["data"] = f99data
             k.set_contents_from_string(json.dumps(data_obj))
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443", "")
 
             tmp_filename = (
                 "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"
@@ -3828,8 +3820,7 @@ def create_json_file(request):
                 return Response(res.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
                 dictprint = res.json()
-                merged_dict = {**update_json_data, **dictprint}
-                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
         else:
             return Response(
                 {
@@ -4114,6 +4105,7 @@ def superceded_report_id_list(report_id):
                 report_id = reportId[0]
         return report_list
     except Exception as e:
+        logger.error(e)
         raise
 
 
@@ -4943,7 +4935,8 @@ def check_calendar_year(calendar_year):
             )
         return calendar_year
     except Exception as e:
-        raise
+        logger.error(e)
+        raise e
 
 
 def loans_sql(sql, value_list, error_message):
@@ -4952,6 +4945,7 @@ def loans_sql(sql, value_list, error_message):
             cursor.execute(sql, value_list)
             return cursor.fetchone()
     except Exception as e:
+        logger.error(e)
         raise Exception(error_message + str(e))
 
 
@@ -5517,11 +5511,7 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
-            prev_cvg_year = cvg_start_date.year - 1
-            prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
             cvg_start_date = datetime.date(cvg_start_date.year, 1, 1)
-        else:
-            prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT COALESCE(t1.coh_cop, 0) from public.form_3x t1
@@ -5852,7 +5842,6 @@ def get_ReportTypes(request):
     Fields for identifying the committee type and committee design and filter the forms category
     """
     try:
-        cmte_id = get_comittee_id(request.user.username)
         forms_obj = []
         with connection.cursor() as cursor:
             cursor.execute(
@@ -5908,8 +5897,6 @@ def get_FormTypes(request):
 @api_view(["GET"])
 def get_Statuss(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
-
         data = """{
                     "data": [{
                             "status_cd": "S",
@@ -5937,8 +5924,6 @@ def get_Statuss(request):
 @api_view(["GET"])
 def get_AmendmentIndicators(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
-
         data = """{
                     "data":  [{
                             "amend_ind": "N",
@@ -5966,8 +5951,6 @@ def get_AmendmentIndicators(request):
 @api_view(["GET"])
 def get_ItemizationIndicators(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
-
         data = """{
                     "data":  [{
                             "itemized": "I",
@@ -5982,8 +5965,9 @@ def get_ItemizationIndicators(request):
         forms_obj = json.loads(data)
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         return Response(
-            "The get_ItemizationIndicators API is throwing an error: " + str(e),
+            "The get_ItemizationIndicators API is throwing an error",
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -6104,7 +6088,6 @@ def get_report_info(request):
 
 @api_view(["GET"])
 def print_preview_pdf(request):
-    cmte_id = get_comittee_id(request.user.username)
     report_id = request.data.get("reportid")
 
     try:
@@ -6531,8 +6514,6 @@ def get_contacts_dynamic_forms_fields(request):
 @api_view(["GET"])
 def get_entityTypes(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
-
         data = """{
                     "data":  [
                         {
@@ -6557,8 +6538,9 @@ def get_entityTypes(request):
         forms_obj = json.loads(data)
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         return Response(
-            "The get_entityTypes API is throwing an error: " + str(e),
+            "The get_entityTypes API is throwing an error",
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -7909,8 +7891,6 @@ def check_report_to_delete(cmte_id, report_id):
                 [cmte_id, report_id],
             )
 
-            report_ids = cursor.fetchone()
-            report_id_found = report_ids[0]
             if entity_id_found == "":
                 _delete = "Y"
             else:
@@ -7918,8 +7898,9 @@ def check_report_to_delete(cmte_id, report_id):
 
         return _delete
     except Exception as e:
+        logger.error(e)
         return Response(
-            "The check_report_to_delete function is throwing an error: " + str(e),
+            "The check_report_to_delete function is throwing an error",
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -8363,7 +8344,6 @@ def amend_form1m(request_dict):
     try:
         report_flag = False
         report_dict = {}
-        f1m_dict = {}
         for key, value in request_dict.items():
             if key in ["form_type", "cmte_id", "email_1", "email_2"]:
                 report_dict[key] = value
@@ -8844,6 +8824,7 @@ def post_levin_account(cmte_id, levin_account_id, levin_account_name):
         with connection.cursor() as cursor:
             cursor.execute(_sql, (levin_account_id, cmte_id, levin_account_name))
     except Exception as e:
+        logger.error(e)
         raise Exception("Error creating levin account.")
 
 
@@ -8861,6 +8842,7 @@ def put_levin_account(cmte_id, levin_account_id, levin_account_name):
         with connection.cursor() as cursor:
             cursor.execute(_sql, (levin_account_name, cmte_id, levin_account_id))
     except Exception as e:
+        logger.error(e)
         raise Exception("Error updating levin account.")
 
 
@@ -8878,6 +8860,7 @@ def delete_levin_account(cmte_id, levin_account_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, (cmte_id, levin_account_id))
     except Exception as e:
+        logger.error(e)
         raise Exception("Error deleting levin account.")
 
 
@@ -8899,6 +8882,7 @@ def levin_deletable(cmte_id, levin_account_id):
                 return False
             return True
     except Exception as e:
+        logger.error(e)
         raise Exception("Error deleting levin account.")
 
 
@@ -9163,7 +9147,6 @@ def get_sched_c_loanPayment_dynamic_forms_fields(request):
 @api_view(["GET"])
 def get_coverage_dates(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
 
         with connection.cursor() as cursor:
@@ -9188,11 +9171,9 @@ def get_coverage_dates(request):
 
 def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
     try:
-        prev_yr = False
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
         if yr_to_dat:
-            from_date = date(cvg_start_date.year, 1, 1)
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
 
@@ -9429,7 +9410,6 @@ def prepare_Schedl_summary_data(request):
         is_read_only_or_filer_reports(request)
         try:
             cmte_id = get_comittee_id(request.user.username)
-            param_string = ""
             report_id = request.data.get("report_id")
             sched_la_line_sum = {}
             sched_lb_line_sum = {}
@@ -9730,7 +9710,6 @@ def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
 
 def update_f3x_details(report_id, cmte_id):
     try:
-        param_string = ""
         report_list = superceded_report_id_list(report_id)
         ytd_report_list = get_year_reports(cmte_id, report_id)
         result_dict = F3X_values(cmte_id, report_list, False)
@@ -10591,7 +10570,6 @@ def get_notifications(request):
 @api_view(["GET"])
 def get_notification(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
         viewtype = request.GET.get("view", "Prior Notice")
         notification_id = int(request.query_params.get("id"))
 
@@ -10656,9 +10634,7 @@ def get_notification(request):
         with connection.cursor() as cursor:
             cursor.execute(sql, {"notification_id": notification_id})
             row1 = cursor.fetchone()[0]
-            email_subject = row1[0]["email_subject"]
             email_html_body = row1[0]["email_html_body"]
-            email_text_body = row1[0]["email_text_body"]
 
         email = email_html_body
         blob = email
@@ -10725,6 +10701,7 @@ def cashOnHand(request):
             if report_id_list:
                 reportid = report_id_list[0]
                 data_obj = amend_form3x_3l(reportid, cmte_id, "F3X", False)
+                logger.debug(data_obj)
                 function_to_call_wrapper_update_F3X(cmte_id, reportid)
             _sql = """SELECT json_agg(t) FROM (
                     SELECT coh as amount, coh_year as year FROM
@@ -10767,7 +10744,6 @@ def cashOnHandInfoStatus(request):
 @api_view(["GET"])
 def contact_logs(request):
     try:
-        cmte_id = get_comittee_id(request.user.username)
         if "entity_id" not in request.query_params:
             raise Exception("entity_id is mandatory")
         sql = """SELECT c.id, c.entity_type, c.name, concat_ws(', ', c.street1, c.street2) AS address,
@@ -10896,15 +10872,15 @@ def validate_import_transactions(request):
         key = request.data.get(
             "key"
         )  # "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-        auth = request.auth
         if bktname and key:
             resp = validate_transactions(bktname, key, cmteid)
         else:
             resp = "No data: both bktname and key need to be sent"
         return Response(resp, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         return Response(
-            "The validate_import_transactions API is throwing an error: " + str(e),
+            "The validate_import_transactions API is throwing an error",
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -10912,7 +10888,6 @@ def validate_import_transactions(request):
 @api_view(["POST"])
 def queue_transaction_message(request):
     try:
-        cmteid = get_comittee_id(request.user.username)
         bktname = request.data.get("bkt_name")  # "fecfile-filing-frontend"
         key = request.data.get(
             "key"
@@ -10925,8 +10900,9 @@ def queue_transaction_message(request):
 
         return Response(resp, status=status.HTTP_200_OK)
     except Exception as e:
+        logger.error(e)
         return Response(
-            "The queue_transaction_message API is throwing an error: " + str(e),
+            "The queue_transaction_message API is throwing an error",
             status=status.HTTP_400_BAD_REQUEST,
         )
 

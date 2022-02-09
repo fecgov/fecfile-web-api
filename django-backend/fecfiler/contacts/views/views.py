@@ -453,12 +453,10 @@ def upload_contact(request):
                     np.nan, "", regex=True
                 )
                 failed_validation_size = len(contacts_null_value)
-                contacts_null_dict = contacts_null_value.to_dict(orient="records")
 
                 save_data = save_contact_db(contacts_added, cmte_id)
                 final_contact_list = save_data.get("final_contact_df")
                 total_records_size = len(final_contact_list)
-                final_contact_list_dict = final_contact_list.to_dict(orient="records")
 
                 duplicate_file = data.get("duplicates_files")
                 save_duplicate = save_data.get("duplicate_contact_df")
@@ -492,7 +490,6 @@ def upload_contact(request):
                     )
 
                 duplicate_record_size = len(duplicates)
-                duplicate_dict = duplicates.to_dict(orient="records")
                 contacts_temp = {
                     "contacts_saved": int(total_records_size),
                     "contacts_failed_validation": int(failed_validation_size),

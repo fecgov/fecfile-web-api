@@ -358,15 +358,9 @@ def load_dataframe_from_s3(cmteid, bktname, key, size, sleeptime):
 def get_contact_details_from_transactions(cmteid, filename):
     try:
         cmteid = cmteid[0:9]
-        client = boto3.client(
-            "s3",
-            settings.AWS_ACCESS_KEY_ID,
-            settings.AWS_SECRET_ACCESS_KEY,
-        )
         bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
         file_name = filename
         if ".csv" in filename:
-            # cmte_id C00111476mkancherla.ctr@fec.gov , bucket:  fecfile-filing-frontend , file_name :  Disbursements_1q2020.csv
             if bucket:
                 print(bucket)
                 key = "transactions/" + file_name
