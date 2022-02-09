@@ -5,7 +5,7 @@ import fecfiler.settings
 
 from django.db import connection
 from fecfiler.core.transaction_util import do_transaction
-from fecfiler.core.views import cmte_type, update_F3X, find_form_type
+from fecfiler.core.views import cmte_type, get_entities, update_F3X, find_form_type
 
 
 from fecfiler.core.views import get_entities

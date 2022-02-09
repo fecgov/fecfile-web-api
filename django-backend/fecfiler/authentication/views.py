@@ -20,8 +20,8 @@ from .serializers import AccountSerializer
 from fecfiler.forms.models import Committee
 from rest_framework_jwt.settings import api_settings
 
-from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
-from ..settings import OTP_DISABLE
+from fecfiler.core.views import check_null_value, NoOPError, get_comittee_id, get_email
+from fecfiler.settings import OTP_DISABLE
 
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 

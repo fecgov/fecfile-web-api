@@ -1,13 +1,13 @@
 import logging
-
-from datetime import datetime
-from datetime import timedelta
-
 import pytz
+
+from datetime import datetime, timedelta
+
 from django.contrib.auth import authenticate
 from django.db import connection
 from django.http import JsonResponse
 from rest_framework import status
+from rest_framework_jwt.settings import api_settings
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -16,7 +16,6 @@ from rest_framework.decorators import (
 
 from fecfiler.authentication.models import Account
 from fecfiler.authentication.token import jwt_payload_handler
-from fecfiler.authentication.views import jwt_encode_handler
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import (
     token_verification,
@@ -25,6 +24,8 @@ from fecfiler.password_management.views import (
     create_jwt_token,
 )
 from fecfiler.settings import LOGIN_MAX_RETRY, LOGIN_TIMEOUT_TIME, OTP_DISABLE
+
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 logger = logging.getLogger(__name__)
 

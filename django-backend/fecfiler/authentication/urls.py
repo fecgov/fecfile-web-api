@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from . import views, login, register
+from fecfiler.authentication import views, login, register
 
 urlpatterns = [
     url(r"^user/manage$", views.manage_user, name="manageuser"),
