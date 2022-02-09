@@ -988,7 +988,7 @@ def get_previous_amend_reports(request):
                              AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
                         ) t1
                         WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
-                            "', '".join(report_list)
+                        "', '".join(report_list)
                     )
                 else:
                     query_string = """
@@ -1555,6 +1555,7 @@ def update_checkbox_values(page, fields):
                         NameObject("/AS"): NameObject(fields[field]),
                     }
                 )
+
 
 # API which prints Form 99 data
 

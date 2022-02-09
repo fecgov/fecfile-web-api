@@ -1880,11 +1880,11 @@ def sample_sql_generate(request):
             )
 
             ALLOC_FEA_DEBT_VEN_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SH6', '{0}', '{1}');\n
-                """.format(
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SH6', '{0}', '{1}');\n
+            """.format(
                 tran, query
-                )
+            )
 
         file = open("/tmp/SH6_ALLOC_FEA_DEBT_VEN_STRING_sql.sql", "w")
         file.write(ALLOC_FEA_DEBT_VEN_STRING)
