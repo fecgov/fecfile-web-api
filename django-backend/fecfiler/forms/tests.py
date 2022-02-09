@@ -92,9 +92,9 @@ class CommitteeTest(TestCase):
         self.assertEqual(comm.committeename, "Test Committee 1")
 
 
-class Validate_F99(TestCase):
-    """docstring for Validate_F99"TestCase def __init__(self, arg):
-    super(Validate_F99,TestCase.__init__()
+class ValidateF99(TestCase):
+    """docstring for ValidateF99"TestCase def __init__(self, arg):
+    super(ValidateF99,TestCase.__init__()
     self.arg = arg
     """
 
@@ -143,7 +143,7 @@ class Validate_F99(TestCase):
         self.assertEqual(resp.status_code, 204)
 
 
-class Setup_submit_comm_info(TestCase):
+class SetupSubmitCommInfo(TestCase):
     """Test Module for Submit_comm_info"""
 
     def setup(self):

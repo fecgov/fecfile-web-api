@@ -128,7 +128,7 @@ class CommitteeMaster(models.Model):
         db_table = "committee_lookup"
 
 
-class My_Forms_View(models.Model):
+class My_Forms_View(models.Model):  # noqa N801
     cmte_id = models.CharField(primary_key=True, max_length=9)
     category = models.CharField(max_length=25)
     form_type = models.CharField(max_length=10)

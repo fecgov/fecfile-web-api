@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Cmte_Report_Types_View(models.Model):
+class Cmte_Report_Types_View(models.Model):  # noqa N801
     cmte_id = models.CharField(max_length=9)
     filing_freq = models.CharField(max_length=1, blank=True, null=True)
     form_type = models.CharField(max_length=10)
@@ -18,7 +18,7 @@ class Cmte_Report_Types_View(models.Model):
         unique_together = (("cmte_id", "form_type", "report_type"),)
 
 
-class My_Forms_View(models.Model):
+class My_Forms_View(models.Model):  # noqa N801
     cmte_id = models.CharField(primary_key=True, max_length=9)
     category = models.CharField(max_length=25)
     form_type = models.CharField(max_length=10)
@@ -27,7 +27,7 @@ class My_Forms_View(models.Model):
     form_info = models.CharField(max_length=1000, blank=True, null=True)
 
 
-class Filing_Notification(models.Model):
+class Filing_Notification(models.Model):  # noqa N801
     notification_id = models.BigIntegerField(primary_key=True)
     cmte_id = models.CharField(max_length=9)
     notification_type = models.CharField(max_length=100)
