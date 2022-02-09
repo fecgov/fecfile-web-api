@@ -2089,7 +2089,7 @@ def submit_report(request, submission_id, beginning_image_number, fec_id):
             _sql_response = """
             SELECT json_agg(t) FROM (
                 SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id,
-                submission_id as submissionId, uploaded_date as upload_timestamp
+                submission_id as submission_id, uploaded_date as upload_timestamp
                 FROM public.reports
                 WHERE report_id = %s)t
             """
@@ -2102,7 +2102,7 @@ def submit_report(request, submission_id, beginning_image_number, fec_id):
                 WHEN is_submitted = true THEN updated_at
                 ELSE NULL::timestamp with time zone
                 END AS filed_date,
-                message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+                message, committeeid as committee_id, submission_id as submission_id, uploaded_date as upload_timestamp
                 FROM public.forms_committeeinfo
                 WHERE id = %s)t
             """
@@ -10612,7 +10612,7 @@ def get_notification(request):
                 # submission_id = "4d074079-53d3-4b3b-9d37-caf011633c55"
                 responses = requests.get(
                     settings.NXG_FEC_FILING_CONFIRMATION_URL
-                    + "?submissionId={}".format(submission_id)
+                    + "?submission_id={}".format(submission_id)
                 )
                 if responses.status_code == status.HTTP_200_OK:
                     blob = responses.text.replace("\n", "")

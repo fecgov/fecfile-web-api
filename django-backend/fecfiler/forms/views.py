@@ -1640,10 +1640,10 @@ def print_pdf(request):
     return JsonResponse(resp, status=status.HTTP_201_CREATED)
 
 
-def check_F99_Reason_Text(strReasonText):
+def check_F99_Reason_Text(reason_text):
     print("In check_F99_Reason_Text...")
     try:
-        for word in strReasonText.split():
+        for word in reason_text.split():
             validate_HTMLtag(word)
         return ""
     except Exception as e:
@@ -1653,9 +1653,9 @@ def check_F99_Reason_Text(strReasonText):
         )
 
 
-def validate_HTMLtag(strWord):
+def validate_HTMLtag(html_tag):
     print("validate_HTMLtag...")
-    print(" strWord = ", strWord)
+    print(" html_tag = ", html_tag)
     try:
         valideTags = [
             "div",
@@ -1669,14 +1669,14 @@ def validate_HTMLtag(strWord):
             "u",
             "i",
         ]
-        if ("</" in strWord and ">" in strWord) and (
-            "<div" not in strWord or "<span" not in strWord
+        if ("</" in html_tag and ">" in html_tag) and (
+            "<div" not in html_tag or "<span" not in html_tag
         ):
-            print(" word check strWord = ", strWord)
-            intstartpos = strWord.find("</")
-            substr = strWord[intstartpos + 2]
+            print(" word check html_tag = ", html_tag)
+            intstartpos = html_tag.find("</")
+            substr = html_tag[intstartpos + 2]
             intendpos = substr.find(">")
-            strsearch = strWord[intstartpos + 2: intendpos]
+            strsearch = html_tag[intstartpos + 2: intendpos]
             print(strsearch)
             if strsearch not in valideTags:
                 print(" Wrong tag =", strsearch)

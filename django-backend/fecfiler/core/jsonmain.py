@@ -655,17 +655,17 @@ def get_transactions(
 
 
 def get_back_ref_transaction_ids(
-    DB_table, identifier, report_list, cmte_id, transaction_id_list
+    db_table, identifier, report_list, cmte_id, transaction_id_list
 ):
     try:
         output = []
         query = """SELECT DISTINCT(back_ref_transaction_id) FROM {}
             WHERE transaction_type_identifier = %s AND report_id in ('{}') AND cmte_id = %s
             AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-            DB_table, "', '".join(report_list), "', '".join(transaction_id_list)
+            db_table, "', '".join(report_list), "', '".join(transaction_id_list)
         )
         query_values_list = [identifier, cmte_id]
-        results = json_query(query, query_values_list, DB_table, True)
+        results = json_query(query, query_values_list, db_table, True)
         for result in results:
             output.append(result["back_ref_transaction_id"])
         return output
@@ -674,19 +674,19 @@ def get_back_ref_transaction_ids(
 
 
 def get_transaction_type_identifier(
-    DB_table, report_list, cmte_id, transaction_id_list
+    db_table, report_list, cmte_id, transaction_id_list
 ):
     try:
         if transaction_id_list:
             # Addressing no back_ref_transaction_id column in sched_D
-            # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
+            # if db_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
             query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}')
                 AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                DB_table, "', '".join(report_list), "', '".join(transaction_id_list)
+                db_table, "', '".join(report_list), "', '".join(transaction_id_list)
             )
         else:
             # Addressing no back_ref_transaction_id column in sched_D
-            if DB_table in [
+            if db_table in [
                 "public.sched_d",
                 "public.sched_c",
                 "public.sched_h1",
@@ -697,15 +697,15 @@ def get_transaction_type_identifier(
             ]:
                 query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}')
                     AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
-                    DB_table, "', '".join(report_list)
+                    db_table, "', '".join(report_list)
                 )
             else:
                 query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id in ('{}')
                     AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
-                    DB_table, "', '".join(report_list)
+                    db_table, "', '".join(report_list)
                 )
         query_values_list = [cmte_id]
-        result = json_query(query, query_values_list, DB_table, True)
+        result = json_query(query, query_values_list, db_table, True)
         return result
     except Exception as e:
         raise Exception(
@@ -921,11 +921,11 @@ def create_json_builders(request):
                 if schedule:
                     if schedule not in output["data"]["schedules"]:
                         output["data"]["schedules"][schedule] = []
-                    DB_table = "public." + schedule_name.get("sched_type")
+                    db_table = "public." + schedule_name.get("sched_type")
                     report_list = superceded_report_id_list(report_id)
                     print(report_list)
                     list_identifier = get_transaction_type_identifier(
-                        DB_table, report_list, cmte_id, transaction_id_list
+                        db_table, report_list, cmte_id, transaction_id_list
                     )
                     # print('****')
                     # print(list_identifier)
@@ -961,7 +961,7 @@ def create_json_builders(request):
                             if transaction_id_list:
                                 parent_transactions = []
                                 back_ref_tran_id_list = get_back_ref_transaction_ids(
-                                    DB_table,
+                                    db_table,
                                     identifier,
                                     report_list,
                                     cmte_id,
@@ -1123,12 +1123,12 @@ def create_json_builders(request):
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
                 if call_from == "Submit":
-                    submissionId = resp.json()["result"]["submissionId"]
-                    submission_response = checkForReportSubmission(submissionId)
+                    submission_id = resp.json()["result"]["submission_id"]
+                    submission_response = checkForReportSubmission(submission_id)
                     if submission_response.json()["result"][0]["status"] == "ACCEPTED":
                         # update frontend database with Filing_id, Filed_by user
                         submission_id = submission_response.json()["result"][0][
-                            "submissionId"
+                            "submission_id"
                         ]
                         beginning_image_number = submission_response.json()["result"][
                             0
@@ -1196,15 +1196,15 @@ def add_log(
         )
 
 
-def checkForReportSubmission(submissionId):
+def checkForReportSubmission(submission_id):
     filing_status_response = requests.get(
         +settings.DATA_RECEIVE_API_URL
         + settings.DATA_RECEIVE_API_VERSION
         + "track_filing",
-        data={"submissionId": submissionId},
+        data={"submission_id": submission_id},
     )
     if filing_status_response.ok:
         if filing_status_response.json()["result"][0]["status"] == "PROCESSING":
             time.sleep(5)
-            filing_status_response = checkForReportSubmission(submissionId)
+            filing_status_response = checkForReportSubmission(submission_id)
     return filing_status_response
