@@ -2,8 +2,6 @@ import logging
 
 from django.db import connection
 
-from fecfiler.core.transaction_util import do_transaction
-
 logger = logging.getLogger(__name__)
 
 
@@ -606,6 +604,9 @@ def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
     AND delete_ind is distinct from 'Y'
     """
     _v = [report_id, current_id, cmte_id, parent_id]
+    # Moving this here for now due to circular import
+    from fecfiler.core.transaction_util import do_transaction
+
     do_transaction(_sql, _v)
     logger.debug("sched_b carryover done.")
 

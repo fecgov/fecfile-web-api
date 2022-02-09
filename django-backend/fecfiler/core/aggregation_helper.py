@@ -8,8 +8,6 @@ from fecfiler.core.transaction_util import do_transaction
 from fecfiler.core.views import cmte_type, get_entities, update_F3X, find_form_type
 
 
-from fecfiler.core.views import get_entities
-
 logger = logging.getLogger(__name__)
 
 PTY_AGGREGATE_TYPES_HQ = [

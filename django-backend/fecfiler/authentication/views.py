@@ -44,10 +44,6 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 
-# payload = jwt_response_payload_handler(user)
-# token = jwt_encode_handler(payload)
-
-
 class AccountViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
 
