@@ -80,8 +80,8 @@ def email(boolean, data):
     # The email body for recipients with non-HTML email clients.
     BODY_TEXT = (
         "Form 3X that we received has been validated and submitted\r\n"
-        "This email was sent by FEC.gov. If you are receiving this email " /
-        "in error or have any questions, please contact the FEC Electronic Filing Office " /
+        "This email was sent by FEC.gov. If you are receiving this email "
+        "in error or have any questions, please contact the FEC Electronic Filing Office "
         "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
     )
 

@@ -3666,9 +3666,9 @@ def autolookup_search_contacts(request):
 
         if query_string == "":
             raise Exception(
-                "One parameter has to be passed for this api to display results. " /
-                "The parameters should be limited to: " /
-                "['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', " /
+                "One parameter has to be passed for this api to display results. "
+                "The parameters should be limited to: "
+                "['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', "
                 "'cand_id', 'cand_last_name', 'cand_first_name', 'payee_cmte_id']"
             )
         with connection.cursor() as cursor:
