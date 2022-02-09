@@ -1,0 +1,13 @@
+[
+    {
+        "model": "f3x.f3x",
+        "fields": {
+            "form_type": "F3XN",
+            "treasurer_last_name": "Dobalina",
+            "treasurer_first_name": "Bob",
+            "date_signed": 20040729,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]

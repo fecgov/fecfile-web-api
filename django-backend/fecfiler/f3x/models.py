@@ -128,8 +128,8 @@ class F3X(models.Model):
     L36_total_federal_operating_expenditures_ytd = models.IntegerField(null=True, blank=True)
     L37_offsets_to_operating_expenditures_ytd = models.IntegerField(null=True, blank=True)
     L38_net_operating_expenditures_ytd = models.IntegerField(null=True, blank=True)
-    created = models.DateField(auto_now_add=True)
-    updated = models.DateField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'f3xs'

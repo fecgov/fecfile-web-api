@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 def log_post_save(sender, instance, created, **kwargs):
     action = 'created' if created else 'updated'
     logger.info('F3X: %s was %s',
-                instance.transaction_id, action)
+                instance.committee_name, action)
 
 
 @receiver(post_delete, sender=F3X)
 def log_post_delete(sender, instance, **kwargs):
     logger.info('F3X: %s was deleted',
-                instance.transaction_id)
+                instance.committee_name)
