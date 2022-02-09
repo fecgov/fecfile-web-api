@@ -68,16 +68,16 @@ def sample_sql_generate(request):
                 tran
             )
             INDV_REC_STRING += """
-                UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                AND form_type = '{2}' AND sched_type = '{3}';\n
-                """.format(
-                    query, tran, "F3X", "SA"
-                )
+            UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+            AND form_type = '{2}' AND sched_type = '{3}';\n
+            """.format(
+                query, tran, "F3X", "SA"
+            )
             INDV_REC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/indv_rec_sql.sql", "w")
         file.write(INDV_REC_STRING)
@@ -100,37 +100,37 @@ def sample_sql_generate(request):
         if tran in list_SA_similar_PAR_CON:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             PAR_CON_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/par_con_sql.sql", "w")
         file.write(PAR_CON_STRING)
@@ -180,41 +180,41 @@ def sample_sql_generate(request):
         if tran in list_SA_similar_COND_EARM_PAC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.donor_cmte_id, '''') AS "donorCommitteeId",
-                COALESCE(t1.donor_cmte_name, '''') AS "donorCommitteeName",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}''
-                AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.donor_cmte_id, '''') AS "donorCommitteeId",
+            COALESCE(t1.donor_cmte_name, '''') AS "donorCommitteeName",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}''
+            AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             COND_EARM_PAC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/con_earm_sql.sql", "w")
         file.write(COND_EARM_PAC_STRING)
@@ -229,48 +229,48 @@ def sample_sql_generate(request):
         SA_OTHER_STRING = ""
         if tran in list_SA_similar_F3L_IND:
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(to_char(t1.contribution_date,''MM/DD/YYYY''), '''') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.last_name, '''') AS "contributorLastName",
-                COALESCE(t2.first_name, '''') AS "contributorFirstName",
-                COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
-                COALESCE(t2.preffix, '''') AS "contributorPrefix",
-                COALESCE(t2.suffix, '''') AS "contributorSuffix",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode",
-                COALESCE(t2.employer, '''') AS "contributorEmployer",
-                COALESCE(t2.occupation, '''') AS "contributorOccupation"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''""".format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(to_char(t1.contribution_date,''MM/DD/YYYY''), '''') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.last_name, '''') AS "contributorLastName",
+            COALESCE(t2.first_name, '''') AS "contributorFirstName",
+            COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
+            COALESCE(t2.preffix, '''') AS "contributorPrefix",
+            COALESCE(t2.suffix, '''') AS "contributorSuffix",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode",
+            COALESCE(t2.employer, '''') AS "contributorEmployer",
+            COALESCE(t2.occupation, '''') AS "contributorOccupation"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''""".format(
+                tran
+            )
             INDV_REC_STRING += """
-                UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                AND form_type = '{2}' AND sched_type = '{3}';\n
-                """.format(
-                    query, tran, "F3L", "SA"
-                )
+            UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+            AND form_type = '{2}' AND sched_type = '{3}';\n
+            """.format(
+                query, tran, "F3L", "SA"
+            )
             INDV_REC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3L', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3L', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
             file = open("/tmp/indv_rec_f3L_sql.sql", "w")
             file.write(INDV_REC_STRING)
@@ -279,166 +279,166 @@ def sample_sql_generate(request):
         if tran in list_SA_similar_OFFSET:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.last_name, '''') AS "contributorLastName",
-                COALESCE(t2.first_name, '''') AS "contributorFirstName",
-                COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
-                COALESCE(t2.preffix, '''') AS "contributorPrefix",
-                COALESCE(t2.suffix, '''') AS "contributorSuffix",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.last_name, '''') AS "contributorLastName",
+            COALESCE(t2.first_name, '''') AS "contributorFirstName",
+            COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
+            COALESCE(t2.preffix, '''') AS "contributorPrefix",
+            COALESCE(t2.suffix, '''') AS "contributorSuffix",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SA_OTHER_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SA_similar_OTH_REC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.last_name, '''') AS "contributorLastName",
-                COALESCE(t2.first_name, '''') AS "contributorFirstName",
-                COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
-                COALESCE(t2.preffix, '''') AS "contributorPrefix",
-                COALESCE(t2.suffix, '''') AS "contributorSuffix",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode",
-                COALESCE(t2.employer, '''') AS "contributorEmployer",
-                COALESCE(t2.occupation, '''') AS "contributorOccupation"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}''
-                AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.last_name, '''') AS "contributorLastName",
+            COALESCE(t2.first_name, '''') AS "contributorFirstName",
+            COALESCE(t2.middle_name, '''') AS "contributorMiddleName",
+            COALESCE(t2.preffix, '''') AS "contributorPrefix",
+            COALESCE(t2.suffix, '''') AS "contributorSuffix",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode",
+            COALESCE(t2.employer, '''') AS "contributorEmployer",
+            COALESCE(t2.occupation, '''') AS "contributorOccupation"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}''
+            AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SA_OTHER_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SA_similar_REF_NFED_CAN:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}''
-                AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}''
+            AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SA_OTHER_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SA_similar_REF_FED_CAN:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
-                t1.contribution_amount AS "contributionAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
-                COALESCE(t1.donor_cmte_id, '''') AS "donorCommitteeId",
-                COALESCE(t1.donor_cmte_name, '''') AS "donorCommitteeName",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "contributorOrgName",
-                COALESCE(t2.street_1, '''') AS "contributorStreet1",
-                COALESCE(t2.street_2, '''') AS "contributorStreet2",
-                COALESCE(t2.city, '''') AS "contributorCity",
-                COALESCE(t2.state, '''') AS "contributorState",
-                COALESCE(t2.zip_code, '''') AS "contributorZipCode"
-                FROM public.sched_a t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s
-                AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate",
+            t1.contribution_amount AS "contributionAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription",
+            COALESCE(t1.donor_cmte_id, '''') AS "donorCommitteeId",
+            COALESCE(t1.donor_cmte_name, '''') AS "donorCommitteeName",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+            COALESCE(t2.street_1, '''') AS "contributorStreet1",
+            COALESCE(t2.street_2, '''') AS "contributorStreet2",
+            COALESCE(t2.city, '''') AS "contributorCity",
+            COALESCE(t2.state, '''') AS "contributorState",
+            COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+            FROM public.sched_a t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s
+            AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SA_OTHER_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/sa_oth_sql.sql", "w")
         file.write(SA_OTHER_STRING)
@@ -458,166 +458,166 @@ def sample_sql_generate(request):
         if tran in list_SB_similar_IK_OUT:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                tran
+            )
 
             SB_SA_CHILD_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SB_similar_IK_TF_OUT:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s
-                AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s
+            AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SB_SA_CHILD_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SB_similar_EAR_OUT:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SB_SA_CHILD_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         if tran in list_SB_similar_IK_OUT_PTY:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}''
-                AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}''
+            AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             SB_SA_CHILD_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/sb_sa_child_sql.sql", "w")
         file.write(SB_SA_CHILD_STRING)
@@ -657,44 +657,44 @@ def sample_sql_generate(request):
         OPEX_REC_STRING = ""
         if tran in List_SB_similar_OPEX_REC:
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             OPEX_REC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/opex_rec_sql.sql", "w")
         file.write(OPEX_REC_STRING)
@@ -717,36 +717,36 @@ def sample_sql_generate(request):
         OPEX__CC_STRING = ""
         if tran in List_SB_similar_OPEX__CC:
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
             OPEX__CC_STRING += """
-                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                    """.format(
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
                 tran, query
             )
 
@@ -768,42 +768,42 @@ def sample_sql_generate(request):
         PAY_MEMO_STRING = ""
         if tran in List_SB_similar_PAY_MEMO:
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             PAY_MEMO_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/pay_memo_sql.sql", "w")
         file.write(PAY_MEMO_STRING)
@@ -823,41 +823,41 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_OPEX_TRAN:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             OPEX_TRAN_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/opex_tran_sql.sql", "w")
         file.write(OPEX_TRAN_STRING)
@@ -869,51 +869,51 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_NONFED_PAC_RFD:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             NONFED_PAC_RFD_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/nonfed_pac_sql.sql", "w")
         file.write(NONFED_PAC_RFD_STRING)
@@ -924,53 +924,53 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_CONTR_CAND:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             CONTR_CAND_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/contr_can_sql.sql", "w")
         file.write(CONTR_CAND_STRING)
@@ -982,52 +982,52 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_VOID_RFND_PAC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                t1.semi_annual_refund_bundled_amount AS "semiAnnualRefundedBundledAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            t1.semi_annual_refund_bundled_amount AS "semiAnnualRefundedBundledAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             VOID_RFND_PAC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/void_pac_sql.sql", "w")
         file.write(VOID_RFND_PAC_STRING)
@@ -1039,58 +1039,58 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_FEA_PAYM:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             FEA_PAYM_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/fea_apym_sql.sql", "w")
         file.write(FEA_PAYM_STRING)
@@ -1102,54 +1102,54 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_FEA_CC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             FEA_CC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/fea_rcc_sql.sql", "w")
         file.write(FEA_CC_STRING)
@@ -1168,59 +1168,59 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_FEA_CC_MEMO:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             FEA_CC_MEMO_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/fea_cc_memo_sql.sql", "w")
         file.write(FEA_CC_MEMO_STRING)
@@ -1232,58 +1232,58 @@ def sample_sql_generate(request):
         if tran in List_SB_similar_FEA_PAY_MEMO:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
-                t1.expenditure_amount AS "expenditureAmount",
-                COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
-                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
-                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
-                COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
-                COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
-                COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
-                COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
-                COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
-                COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
-                COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
-                COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_b t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
+            to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate",
+            t1.expenditure_amount AS "expenditureAmount",
+            COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+            COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+            COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+            COALESCE(t3.cand_last_name, '''') AS "beneficiaryCandidateLastName",
+            COALESCE(t3.cand_first_name, '''') AS "beneficiaryCandidateFirstName",
+            COALESCE(t3.cand_middle_name, '''') AS "beneficiaryCandidateMiddleName",
+            COALESCE(t3.cand_prefix, '''') AS "beneficiaryCandidatePrefix",
+            COALESCE(t3.cand_suffix, '''') AS "beneficiaryCandidateSuffix",
+            COALESCE(t3.cand_office, '''') AS "beneficiaryCandidateOffice",
+            COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
+            COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_b t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+            LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             FEA_PAY_MEMO_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SB', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SB', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/fea_pay_memo_sql.sql", "w")
         file.write(FEA_PAY_MEMO_STRING)
@@ -1313,65 +1313,65 @@ def sample_sql_generate(request):
         IE_STRING = ""
         if tran in List_SE_similar_IE:
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
-                COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
-                COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
-                COALESCE(t1.so_cand_id, '''') AS "candidateId",
-                COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
-                COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
-                COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
-                COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
-                COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
-                COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
-                COALESCE(t1.so_cand_state, '''') AS "candidateState",
-                COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
-                COALESCE(t3.last_name, '''') AS "completingLastName",
-                COALESCE(t3.first_name, '''') AS "completingFirstName",
-                COALESCE(t3.middle_name, '''') AS "completingMiddleName",
-                COALESCE(t3.preffix, '''') AS "completingPrefix",
-                COALESCE(t3.suffix, '''') AS "completingSuffix",
-                COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_e t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+            COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+            COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+            COALESCE(t1.so_cand_id, '''') AS "candidateId",
+            COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
+            COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
+            COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
+            COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+            COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+            COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+            COALESCE(t1.so_cand_state, '''') AS "candidateState",
+            COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+            COALESCE(t3.last_name, '''') AS "completingLastName",
+            COALESCE(t3.first_name, '''') AS "completingFirstName",
+            COALESCE(t3.middle_name, '''') AS "completingMiddleName",
+            COALESCE(t3.preffix, '''') AS "completingPrefix",
+            COALESCE(t3.suffix, '''') AS "completingSuffix",
+            COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_e t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             IE_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SE', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SE', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/IE_sql.sql", "w")
         file.write(IE_STRING)
@@ -1382,61 +1382,61 @@ def sample_sql_generate(request):
         if tran in List_SE_similar_IE_CC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
-                COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
-                COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
-                COALESCE(t1.so_cand_id, '''') AS "candidateId",
-                COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
-                COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
-                COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
-                COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
-                COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
-                COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
-                COALESCE(t1.so_cand_state, '''') AS "candidateState",
-                COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
-                COALESCE(t3.last_name, '''') AS "completingLastName",
-                COALESCE(t3.first_name, '''') AS "completingFirstName",
-                COALESCE(t3.middle_name, '''') AS "completingMiddleName",
-                COALESCE(t3.preffix, '''') AS "completingPrefix",
-                COALESCE(t3.suffix, '''') AS "completingSuffix",
-                COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_e t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s  AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR  (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+            COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+            COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+            COALESCE(t1.so_cand_id, '''') AS "candidateId",
+            COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
+            COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
+            COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
+            COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+            COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+            COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+            COALESCE(t1.so_cand_state, '''') AS "candidateState",
+            COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+            COALESCE(t3.last_name, '''') AS "completingLastName",
+            COALESCE(t3.first_name, '''') AS "completingFirstName",
+            COALESCE(t3.middle_name, '''') AS "completingMiddleName",
+            COALESCE(t3.preffix, '''') AS "completingPrefix",
+            COALESCE(t3.suffix, '''') AS "completingSuffix",
+            COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_e t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s  AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR  (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             IE_CC_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SE', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SE', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/IE_CC_sql.sql", "w")
         file.write(IE_CC_STRING)
@@ -1447,64 +1447,64 @@ def sample_sql_generate(request):
         if tran in List_SE_similar_IE_STAF_REIM:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.election_code, '''') AS "electionCode",
-                COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
-                COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
-                COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
-                COALESCE(t1.so_cand_id, '''') AS "candidateId",
-                COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
-                COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
-                COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
-                COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
-                COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
-                COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
-                COALESCE(t1.so_cand_state, '''') AS "candidateState",
-                COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
-                COALESCE(t3.last_name, '''') AS "completingLastName",
-                COALESCE(t3.first_name, '''') AS "completingFirstName",
-                COALESCE(t3.middle_name, '''') AS "completingMiddleName",
-                COALESCE(t3.preffix, '''') AS "completingPrefix",
-                COALESCE(t3.suffix, '''') AS "completingSuffix",
-                COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_e t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
-                AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
-                AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.election_code, '''') AS "electionCode",
+            COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+            COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+            COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+            COALESCE(t1.so_cand_id, '''') AS "candidateId",
+            COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName",
+            COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName",
+            COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName",
+            COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+            COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+            COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+            COALESCE(t1.so_cand_state, '''') AS "candidateState",
+            COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+            COALESCE(t3.last_name, '''') AS "completingLastName",
+            COALESCE(t3.first_name, '''') AS "completingFirstName",
+            COALESCE(t3.middle_name, '''') AS "completingMiddleName",
+            COALESCE(t3.preffix, '''') AS "completingPrefix",
+            COALESCE(t3.suffix, '''') AS "completingSuffix",
+            COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_e t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s
+            AND (t1.back_ref_transaction_id = %s OR (t1.back_ref_transaction_id IS NULL AND %s IS NULL))
+            AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             IE_STAF_REIM_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SE', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SE', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/IE_STAF_REIM_sql.sql", "w")
         file.write(IE_STAF_REIM_STRING)
@@ -1521,62 +1521,62 @@ def sample_sql_generate(request):
         if tran in List_SF_similar_CORD_EXP:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
-                COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
-                COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
-                COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
-                COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
-                COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
-                COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
-                COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
-                COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
-                COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.payee_cand_id, '''') AS "candidateId",
-                COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
-                COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
-                COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
-                COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
-                COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
-                COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
-                COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
-                COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_f t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+            COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+            COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+            COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+            COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+            COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+            COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+            COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+            COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+            COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+            COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
+            COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
+            COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
+            COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+            COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+            COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+            COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+            COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_f t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             CORD_EXP_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SF', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SF', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/CORD_EXP_sql.sql", "w")
         file.write(CORD_EXP_STRING)
@@ -1588,58 +1588,58 @@ def sample_sql_generate(request):
         if tran in List_SF_similar_CORD_EXP_CC:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
-                COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
-                COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
-                COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
-                COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
-                COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
-                COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
-                COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
-                COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
-                COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.payee_cand_id, '''') AS "candidateId",
-                COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
-                COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
-                COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
-                COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
-                COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
-                COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
-                COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
-                COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_f t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+            COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+            COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+            COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+            COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+            COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+            COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+            COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+            COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+            COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+            COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
+            COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
+            COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
+            COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+            COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+            COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+            COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+            COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_f t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             CORD_EXP_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SF', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SF', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/CORD_EXP_CC_sql.sql", "w")
         file.write(CORD_EXP_CC_STRING)
@@ -1655,63 +1655,63 @@ def sample_sql_generate(request):
         if tran in List_SF_similar_CORD_CC_MEMO:
 
             query = """
-                SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
-                t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                t1.transaction_id AS "transactionId",
-                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
-                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
-                COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
-                COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
-                COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
-                COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
-                COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
-                COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
-                COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
-                COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
-                COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
-                COALESCE(t2.entity_type, '''') AS "entityType",
-                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
-                COALESCE(t2.last_name, '''') AS "payeeLastName",
-                COALESCE(t2.first_name, '''') AS "payeeFirstName",
-                COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
-                COALESCE(t2.preffix, '''') AS "payeePrefix",
-                COALESCE(t2.suffix, '''') AS "payeeSuffix",
-                COALESCE(t2.street_1, '''') AS "payeeStreet1",
-                COALESCE(t2.street_2, '''') AS "payeeStreet2",
-                COALESCE(t2.city, '''') AS "payeeCity",
-                COALESCE(t2.state, '''') AS "payeeState",
-                COALESCE(t2.zip_code, '''') AS "payeeZipCode",
-                COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
-                COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
-                COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
-                COALESCE(t1.category_code, '''') AS "categoryCode",
-                COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
-                COALESCE(t1.payee_cand_id, '''') AS "candidateId",
-                COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
-                COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
-                COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
-                COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
-                COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
-                COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
-                COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
-                COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
-                COALESCE(t1.memo_code, '''') AS "memoCode",
-                COALESCE(t1.memo_text, '''') AS "memoDescription"
-                FROM public.sched_f t1
-                LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
-                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
-                """.format(
-                    tran
-                )
+            SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+            t1.transaction_type_identifier AS "transactionTypeIdentifier",
+            t1.transaction_id AS "transactionId",
+            COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+            COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+            COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+            COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+            COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+            COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+            COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+            COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+            COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+            COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+            COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+            COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+            COALESCE(t2.entity_type, '''') AS "entityType",
+            COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+            COALESCE(t2.last_name, '''') AS "payeeLastName",
+            COALESCE(t2.first_name, '''') AS "payeeFirstName",
+            COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+            COALESCE(t2.preffix, '''') AS "payeePrefix",
+            COALESCE(t2.suffix, '''') AS "payeeSuffix",
+            COALESCE(t2.street_1, '''') AS "payeeStreet1",
+            COALESCE(t2.street_2, '''') AS "payeeStreet2",
+            COALESCE(t2.city, '''') AS "payeeCity",
+            COALESCE(t2.state, '''') AS "payeeState",
+            COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+            COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+            COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+            COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+            COALESCE(t1.category_code, '''') AS "categoryCode",
+            COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+            COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+            COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName",
+            COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName",
+            COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName",
+            COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+            COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+            COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+            COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+            COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+            COALESCE(t1.memo_code, '''') AS "memoCode",
+            COALESCE(t1.memo_text, '''') AS "memoDescription"
+            FROM public.sched_f t1
+            LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+            WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+            (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+            """.format(
+                tran
+            )
 
             CORD_CC_MEMO_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SF', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SF', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/CORD_CC_MEMO_sql.sql", "w")
         file.write(CORD_CC_MEMO_STRING)
@@ -1774,11 +1774,11 @@ def sample_sql_generate(request):
             )
 
             CORD_REIM_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SF', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SF', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/CORD_REIM_sql.sql", "w")
         file.write(CORD_REIM_STRING)
@@ -1826,11 +1826,11 @@ def sample_sql_generate(request):
             )
 
             DEBT_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SD', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SD', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/SD_DEBT_STRING_sql.sql", "w")
         file.write(DEBT_STRING)
@@ -1934,11 +1934,11 @@ def sample_sql_generate(request):
             )
 
             ALLOC_EXP_DEBT_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SH4', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SH4', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/SH4_ALLOC_EXP_DEBT_STRING_sql.sql", "w")
         file.write(ALLOC_EXP_DEBT_STRING)
@@ -2080,10 +2080,10 @@ def sample_sql_generate(request):
             )
 
             SA_LOAN_FROM_IND_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         List_SC1_similar_SC1 = ["SC1"]
         SC1_STRING = ""
@@ -2189,10 +2189,10 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
             )
 
             SC2_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         file = open("/tmp/SC_sql.sql", "w")
         file.write(LOANS_OWED_BY_CMTE_STRING)
@@ -2238,10 +2238,10 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(
             )
 
             SH1_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SH1', '{0}', '{1}');\n""".format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SH1', '{0}', '{1}');\n""".format(
+                tran, query
+            )
 
         SH2_STRING = ""
         if tran in List_SH_similar_SH2:
@@ -2637,11 +2637,11 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(
             )
 
             SL_STRING += """
-                INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                VALUES ('F3X', 'SL', '{0}', '{1}');\n
-                """.format(
-                    tran, query
-                )
+            INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+            VALUES ('F3X', 'SL', '{0}', '{1}');\n
+            """.format(
+                tran, query
+            )
 
         file = open("/tmp/SL_sql.sql", "w")
         file.write(SL_STRING)

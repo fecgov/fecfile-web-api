@@ -1721,25 +1721,25 @@ def update_transactions_change_cvg_dates(
             )
 
             _sql = """
-                WITH x AS (SELECT transaction_id FROM public.all_transactions_view WHERE (back_ref_transaction_id IS NULL OR back_ref_transaction_id like %s)
-                AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' {0} AND cmte_id = %s
-                AND transaction_table NOT IN ('sched_d', 'sched_h1', 'sched_h2', 'sched_h3', 'sched_h5', 'sched_l'))
+            WITH x AS (SELECT transaction_id FROM public.all_transactions_view WHERE (back_ref_transaction_id IS NULL OR back_ref_transaction_id like %s)
+            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' {0} AND cmte_id = %s
+            AND transaction_table NOT IN ('sched_d', 'sched_h1', 'sched_h2', 'sched_h3', 'sched_h5', 'sched_l'))
 
-                SELECT transaction_id FROM x
-                UNION
-                SELECT v2.transaction_id FROM public.all_transactions_view v2 WHERE v2.back_ref_transaction_id IN (SELECT transaction_id FROM x
-                WHERE transaction_id NOT LIKE %s)
-                AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
-                UNION
-                SELECT v3.transaction_id FROM public.sched_c2 v3 WHERE v3.back_ref_transaction_id IN (SELECT transaction_id FROM x
-                WHERE transaction_id NOT LIKE %s)
-                AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
-                UNION
-                SELECT transaction_id FROM public.all_transactions_view WHERE back_ref_transaction_id IS NOT NULL AND cmte_id = %s
-                AND delete_ind IS DISTINCT FROM 'Y' {0}
-                AND transaction_table IN ('sched_h3', 'sched_h5')""".format(
-                    param_string
-                )
+            SELECT transaction_id FROM x
+            UNION
+            SELECT v2.transaction_id FROM public.all_transactions_view v2 WHERE v2.back_ref_transaction_id IN (SELECT transaction_id FROM x
+            WHERE transaction_id NOT LIKE %s)
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+            UNION
+            SELECT v3.transaction_id FROM public.sched_c2 v3 WHERE v3.back_ref_transaction_id IN (SELECT transaction_id FROM x
+            WHERE transaction_id NOT LIKE %s)
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+            UNION
+            SELECT transaction_id FROM public.all_transactions_view WHERE back_ref_transaction_id IS NOT NULL AND cmte_id = %s
+            AND delete_ind IS DISTINCT FROM 'Y' {0}
+            AND transaction_table IN ('sched_h3', 'sched_h5')""".format(
+                param_string
+            )
             _value_list = ["SC%"]
             _value_list.extend(value_list)
             _value_list.extend([cmte_id, "SC%", cmte_id, "SC%", cmte_id, cmte_id])
@@ -6939,14 +6939,14 @@ def get_list_contact(
             if not name_select_flag:
                 if isinstance(entity_id, list):
                     query_string = """
-                        SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name,
-                        middle_name, preffix as prefix, suffix, street_1, street_2, city, state,
-                        zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district,
-                        ref_cand_cmte_id, notes
-                        FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}')
-                        AND delete_ind is distinct from 'Y'""".format(
-                            "', '".join(entity_id)
-                        )
+                    SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name,
+                    middle_name, preffix as prefix, suffix, street_1, street_2, city, state,
+                    zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district,
+                    ref_cand_cmte_id, notes
+                    FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}')
+                    AND delete_ind is distinct from 'Y'""".format(
+                        "', '".join(entity_id)
+                    )
 
                     cursor.execute(
                         """SELECT json_agg(t) FROM (""" + query_string + """) t""",

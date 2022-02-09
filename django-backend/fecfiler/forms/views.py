@@ -989,7 +989,7 @@ def get_previous_amend_reports(request):
                         ) t1
                         WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """.format(
                             "', '".join(report_list)
-                        )
+                    )
                 else:
                     query_string = """
                         SELECT json_agg(t) FROM
