@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 # semi_annual_refund_bundled_amount remmoed from ths list but is still needed
 # you need to pass in a valid decimal value: this is valid until db change happens
-list_mandatory_fields_schedB = [
+LIST_MANDATORY_FIELDS_SCHEDB = [
     "report_id",
     "expenditure_amount",
     "transaction_type_identifier",
@@ -700,7 +700,7 @@ def post_schedB(datum):
     try:
         cmte_id = datum.get("cmte_id")
         entity_flag = False
-        check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
+        check_mandatory_fields_SB(datum, LIST_MANDATORY_FIELDS_SCHEDB)
         logger.debug("...mandatory check done.")
         if "entity_id" in datum:
             entity_flag = True
@@ -968,7 +968,7 @@ def put_schedB(datum):
     save and update a sched_b item
     """
     try:
-        check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
+        check_mandatory_fields_SB(datum, LIST_MANDATORY_FIELDS_SCHEDB)
         transaction_id = datum.get("transaction_id")
         check_transaction_id(transaction_id)
         flag = False

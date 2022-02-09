@@ -49,7 +49,7 @@ EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ["11AII"]
 
 # List of all sched D transction type identifiers. This has no back_ref_transaction_id column
 # so modifying SQL based on this list
-list_of_transaction_types_with_no_back_ref = [
+LIST_OF_TRANSACTION_TYPES_WITH_NO_BACK_REF = [
     "DEBT_TO_VENDOR",
     "LOANS_OWED_TO_CMTE",
     "LOANS_OWED_BY_CMTE",
@@ -60,7 +60,7 @@ list_of_transaction_types_with_no_back_ref = [
     "SCHED_L_SUM",
 ]
 
-list_of_SL_SA_transaction_types = [
+LIST_OF_SL_SA_TRANSACTION_TYPES = [
     "LEVIN_TRIB_REC",
     "LEVIN_PARTN_REC",
     "LEVIN_ORG_REC",
@@ -70,7 +70,7 @@ list_of_SL_SA_transaction_types = [
     "LEVIN_PAC_REC",
 ]
 
-list_of_SL_SB_transaction_types = [
+LIST_OF_SL_SB_TRANSACTION_TYPES = [
     "LEVIN_VOTER_ID",
     "LEVIN_GOTV",
     "LEVIN_GEN",
@@ -640,7 +640,7 @@ def get_transactions(
                 "', '".join(transaction_id_list)
             )
         # Addressing no back_ref_transaction_id column in sched_D
-        if identifier in list_of_transaction_types_with_no_back_ref:
+        if identifier in LIST_OF_TRANSACTION_TYPES_WITH_NO_BACK_REF:
             query_values_list = [cmte_id]
         else:
             query_values_list = [
@@ -1016,7 +1016,7 @@ def create_json_builders(request):
                             ):
                                 if (
                                     transaction.get("transactionTypeIdentifier")
-                                    in list_of_SL_SA_transaction_types
+                                    in LIST_OF_SL_SA_TRANSACTION_TYPES
                                 ):
                                     if "SL-A" not in output["data"]["schedules"]:
                                         output["data"]["schedules"]["SL-A"] = []
@@ -1025,7 +1025,7 @@ def create_json_builders(request):
                                     )
                                 elif (
                                     transaction.get("transactionTypeIdentifier")
-                                    in list_of_SL_SB_transaction_types
+                                    in LIST_OF_SL_SB_TRANSACTION_TYPES
                                 ):
                                     if "SL-B" not in output["data"]["schedules"]:
                                         output["data"]["schedules"]["SL-B"] = []
