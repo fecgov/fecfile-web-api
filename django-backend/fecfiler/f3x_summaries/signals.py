@@ -1,4 +1,4 @@
-"""Logs Schedule A Transaction events
+"""Logs F3X events
 
 We use signals to log deletes rather than overwriting delete()
 to handle bulk delete cases
@@ -8,20 +8,20 @@ We use signals to log saves to be consistent with delete logging
 """
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import F3X
+from .models import F3XSummary
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=F3X)
+@receiver(post_save, sender=F3XSummary)
 def log_post_save(sender, instance, created, **kwargs):
     action = 'created' if created else 'updated'
-    logger.info('F3X: %s was %s',
-                instance.committee_name, action)
+    logger.info('F3XSummary for: %s was %s',
+                instance.filer_committee_id_number, action)
 
 
-@receiver(post_delete, sender=F3X)
+@receiver(post_delete, sender=F3XSummary)
 def log_post_delete(sender, instance, **kwargs):
-    logger.info('F3X: %s was deleted',
-                instance.committee_name)
+    logger.info('F3XSummary for: %s was deleted',
+                instance.filer_committee_id_number)
