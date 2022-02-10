@@ -24,7 +24,7 @@ class SchATransaction(models.Model):
     contributor_zip = models.CharField(null=True, blank=True, max_length=9)
     election_code = models.CharField(null=True, blank=True, max_length=5)
     election_other_description = models.CharField(null=True, blank=True, max_length=20)
-    contribution_date = models.IntegerField(null=True, blank=True)
+    contribution_date = models.CharField(null=True, blank=True, max_length=8)
     contribution_amount = models.IntegerField(null=True, blank=True)
     contribution_aggregate = models.IntegerField(null=True, blank=True)
     contribution_purpose_descrip = models.CharField(null=True, blank=True, max_length=100)
@@ -40,7 +40,7 @@ class SchATransaction(models.Model):
     donor_candidate_suffix = models.CharField(null=True, blank=True, max_length=10)
     donor_candidate_office = models.CharField(null=True, blank=True, max_length=1)
     donor_candidate_state = models.CharField(null=True, blank=True, max_length=2)
-    donor_candidate_district = models.IntegerField(null=True, blank=True)
+    donor_candidate_district = models.CharField(null=True, blank=True, max_length=2)
     conduit_name = models.CharField(null=True, blank=True, max_length=200)
     conduit_street1 = models.CharField(null=True, blank=True, max_length=34)
     conduit_street2 = models.CharField(null=True, blank=True, max_length=34)
@@ -51,8 +51,8 @@ class SchATransaction(models.Model):
     memo_text_description = models.CharField(null=True, blank=True, max_length=100)
     reference_to_si_or_sl_system_code_that_identifies_the_account = models.CharField(null=True, blank=True, max_length=9)
     transaction_type_identifier = models.CharField(null=True, blank=True, max_length=12)
-    created = models.DateField(auto_now_add=True)
-    updated = models.DateField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'scha_transactions'

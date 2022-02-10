@@ -159,8 +159,8 @@ def parse_model(json_model): # noqa
         model_str += field_str
 
     # add created and updated fields
-    model_str += "    created = models.DateField(auto_now_add=True)\n"
-    model_str += "    updated = models.DateField(auto_now=True)\n"
+    model_str += "    created = models.DateTimeField(auto_now_add=True)\n"
+    model_str += "    updated = models.DateTimeField(auto_now=True)\n"
     model_str += "\n    class Meta:\n        db_table = '{}s'\n".format(model_name.lower())
 
     return model_name, model_str
