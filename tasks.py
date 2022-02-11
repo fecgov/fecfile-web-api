@@ -12,18 +12,6 @@ APP_NAME = "fecfile-web-api"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 
-def _detect_prod(repo, branch):
-    """Deploy to production if main branch is checked out and tagged."""
-    if branch != 'main':
-        return False
-    try:
-        # Equivalent to `git describe --tags --exact-match`
-        repo.git().describe('--tags', '--exact-match')
-        return True
-    except git.exc.GitCommandError:
-        return False
-
-
 def _resolve_rule(repo, branch):
     """Get space associated with first matching rule."""
     for space, rule in DEPLOY_RULES:
@@ -54,7 +42,7 @@ def _detect_space(repo, branch=None):
 
 
 DEPLOY_RULES = (
-    ('prod', _detect_prod),
+    ('prod', lambda _, branch: branch == 'main'),
     ('stage', lambda _, branch: branch.startswith('release')),
     ('dev', lambda _, branch: branch == 'develop'),
 )
