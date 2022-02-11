@@ -1,9 +1,7 @@
 from django.db import models
-import logging
-logger = logging.getLogger(__name__)
+from fecfiler.core.models import SoftDeleteModel
 
-
-class F3XSummary(models.Model):
+class F3XSummary(SoftDeleteModel):
     """Generated model from json schema"""
     form_type = models.CharField(choices=(('F3XN', 'F3XN'), ('F3XA', 'F3XA'), ('F3XT', 'F3XT')), max_length=255, default='F3XN', null=False, blank=False)
     filer_committee_id_number = models.CharField(null=False, blank=False, max_length=9)

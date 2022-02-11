@@ -1,9 +1,8 @@
 from django.db import models
-import logging
-logger = logging.getLogger(__name__)
+from fecfiler.core.models import SoftDeleteModel
 
 
-class SchATransaction(models.Model):
+class SchATransaction(SoftDeleteModel):
     """Generated model from json schema"""
     form_type = models.CharField(null=False, blank=False, max_length=8)
     filer_committee_id_number = models.CharField(null=False, blank=False, max_length=9)

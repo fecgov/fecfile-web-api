@@ -1,6 +1,8 @@
+from datetime import datetime
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import ugettext_lazy as _
+from .managers import SoftDeleteManager
 
 
 class Cmte_Report_Types_View(models.Model):
@@ -36,3 +38,25 @@ class Filing_Notification(models.Model):
     sent_date = models.DateTimeField(null=True, blank=True)
     message_subject = models.CharField(max_length=500)
     message_body = models.TextField()
+
+"""Abstract SoftDeleteModel
+Inherit this model to add soft delete functionality to a model
+Implementation from https://adriennedomingus.com/blog/soft-deletion-in-django
+"""
+class SoftDeleteModel(models.Model):
+    deleted = models.DateTimeField(blank=True, null=True)
+    # objects will only return results that have not been deleted
+    objects = SoftDeleteManager()
+    # all_objects will return results even if they have been deleted
+    all_objects = SoftDeleteManager(include_deleted=True)
+
+
+    class Meta:
+        abstract = True
+
+    def delete(self):
+        self.deleted = datetime.now()
+        self.save()
+
+    def hard_delete(self):
+        super(SoftDeleteModel, self).delete()
