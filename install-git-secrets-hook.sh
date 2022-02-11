@@ -3,7 +3,7 @@
 # This utility script configures the git-secrets pre-commit hook globally
 # so that all repositories cloned to your computer will run the per-commit
 # scan for sensitive data. Although discouraged, you may install git secrets
-# locally to the fecfile-online repository only by running this script using
+# locally to the fecfile-web-api repository only by running this script using
 # the "--local" command line switch.
 #
 # To run, first install AWS git-secret utility in your PATH so it can
@@ -11,7 +11,7 @@
 # https://github.com/awslabs/git-secrets#installing-git-secrets
 #
 # Once you have git-secrets installed locally, run this script in the
-# root directory of your cloned fecfile-online repo to install the
+# root directory of your cloned fecfile-web-api repo to install the
 # pre-commit hooks globally.
 #
 # See git-secrets README for more features:
@@ -28,7 +28,7 @@
 # Install the git hooks for the repostory
 GLOBAL_TOKEN=
 if [ "$1" == "--local" ] || [ "$1" == "-l" ]; then
-    # Install only to the fecfile-online repo.
+    # Install only to the fecfile-web-api repo.
     git secrets --install
 else
     # Install globally by modifying the ~/.gitconfig file and creating
@@ -40,8 +40,8 @@ fi
 git secrets --register-aws $GLOBAL_TOKEN
 
 # Add general custom rules
-git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|key|api|password|user|guid|hostname|pw|auth)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
-git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|API_KEY|APIKEY|KEY|API|PASSWORD|USER|GUID|HOSTNAME|PW|AUTH)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
+git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|password|user|guid|hostname|pw|auth)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
+git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|API_KEY|APIKEY|PASSWORD|USER|GUID|HOSTNAME|PW|AUTH)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
 git secrets --add $GLOBAL_TOKEN '(aws_access_key_id|aws_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 git secrets --add $GLOBAL_TOKEN '(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 

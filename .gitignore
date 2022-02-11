@@ -67,3 +67,6 @@ testem.log
 Thumbs.db
 .vscode/settings.json
 front-end/.vscode/launch.json
+
+# cloud foundry
+.cfmeta

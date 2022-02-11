@@ -1,8 +1,0 @@
-<li class="transactions__filter-type-option" [ngClass]="categoryType.highlight">
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-      [(ngModel)]="categoryType.selected" (click)="clickTypeOption()">
-    <label class="form-check-label" for="{{ categoryType?.value }}">
-      {{ categoryType?.text }}</label>
-  </div>
-</li>
