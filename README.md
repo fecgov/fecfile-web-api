@@ -65,33 +65,33 @@ Without the git-flow extensions:
 ### Create a release branch
 
 Using git-flow extensions:
-    ```
-    git flow release start sprint-#
-    ```
+```
+git flow release start sprint-#
+```
 
 Without the git-flow extensions:
-    ```
-    git checkout develop
-    git pull
-    git checkout -b release/sprint-# develop
-    git push --set-upstream origin release/sprint-#
-    ```
+```
+git checkout develop
+git pull
+git checkout -b release/sprint-# develop
+git push --set-upstream origin release/sprint-#
+```
 
 ### Create and deploy a hotfix
 
 Using git-flow extensions:
-    ```
-    git flow hotfix start my-fix
-    # Work happens here
-    git flow hotfix finish my-fix
-    ```
+```
+git flow hotfix start my-fix
+# Work happens here
+git flow hotfix finish my-fix
+```
 
 Without the git-flow extensions:
-    ```
-    git checkout -b hotfix/my-fix main
-    # Work happens here
-    git push --set-upstream origin hotfix/my-fix
-    ```
+```
+git checkout -b hotfix/my-fix main
+# Work happens here
+git push --set-upstream origin hotfix/my-fix
+```
 
 * Developer creates a hotfix branch, commits changes, and **makes a PR to the `main` and `develop` branches**:
 * Reviewer merges hotfix/my-fix branch into `develop` and `main`
