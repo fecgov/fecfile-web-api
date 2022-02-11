@@ -1,21 +1,13 @@
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-import requests
-from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_a_transactions,
@@ -25,24 +17,19 @@ from fecfiler.core.transaction_util import (
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
     get_transaction_type_descriptions,
-    # do_carryover_sc_payments,
 )
 
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
     check_report_id,
-    date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
     get_comittee_id,
     update_F3X,
     create_amended,
-
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.core.report_helper import new_report_date
@@ -77,7 +64,7 @@ def check_transaction_id(transaction_id):
         # transaction_type = transaction_id[0:2]
         if not (transaction_id[0:2] == "SD"):
             raise Exception(
-                """The Transaction ID: {} is not in the specified format. 
+                """The Transaction ID: {} is not in the specified format.
                 Transaction IDs start with SD characters""".format(
                     transaction_id
                 )
@@ -263,7 +250,7 @@ def schedD(request):
 
 '''
 
-'''
+"""
 #http://localhost:8080/api/v1/sd/schedD?report_id=737&transaction_type_identifier=DEBT_TO_VENDOR
 #http://localhost:8080/api/v1/sd/schedD?username=C00000935&report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR
 
@@ -273,11 +260,11 @@ def schedD(request):
 # itemsPerPage=20&
 # sortColumnName=default&
 # descending=false&
-# transaction_type_identifier=DEBT_TO_VENDOR 
+# transaction_type_identifier=DEBT_TO_VENDOR
 #New URI GET /api/v1/sd/schedD?report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR HTTP/1.1"
 #http://localhost:8080/api/v1/sd/schedD?report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR
 
-'''
+"""
 
 
 def get_int_value(num):
@@ -286,6 +273,7 @@ def get_int_value(num):
     else:
         num = 1
     return int(num)
+
 
 #: get the paginator page with other details like
 
@@ -324,32 +312,7 @@ def schedD(request):
     #: Get the request parameters and set for Pagination
     query_params = request.query_params
     page_num = get_int_value(query_params.get("page"))
-    # if query_params.get("page") is not None:
-    #     page_num = int(page_num)
-    # else:
-    #     page_num = 1
-
-    descending = query_params.get("descending")
-    if not (
-        "sortColumnName" in query_params
-        and check_null_value(query_params.get("sortColumnName"))
-    ):
-        sortcolumn = "name"
-    elif query_params.get("sortColumnName") == "default":
-        sortcolumn = "name"
-    else:
-        sortcolumn = query_params.get("sortColumnName")
     itemsperpage = get_int_value(query_params.get("itemsPerPage"))
-    search_string = query_params.get("search")
-    params = query_params.get("filters", {})
-    keywords = params.get("keywords")
-    if str(descending).lower() == "true":
-        descending = "DESC"
-    else:
-        descending = "ASC"
-    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
-    row1 = ""
-    totalcount = ""
 
     # create new sched_d transaction
     if request.method == "POST":
@@ -372,10 +335,6 @@ def schedD(request):
             datum["cmte_id"] = cmte_id
             datum["username"] = request.user.username
 
-            # if 'creditor_entity_id' in request.data and check_null_value(
-            #         request.data.get('creditor_entity_id')):
-            #     datum['creditor_entity_id'] = request.data.get(
-            #         'creditor_entity_id')
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -384,14 +343,14 @@ def schedD(request):
                 )
                 logger.debug(
                     "update transaction {} with data:{}".format(
-                        datum.get("transaction_id", datum)
+                        datum.get("transaction_id"), datum
                     )
                 )
                 data = put_schedD(datum)
             else:
                 logger.debug("saving new sd transaction:{}".format(datum))
                 data = post_schedD(datum)
-                do_post_carryover(data['transaction_id'], cmte_id, report_id)
+                do_post_carryover(data["transaction_id"], cmte_id, report_id)
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedD(data)
@@ -419,15 +378,10 @@ def schedD(request):
                 data["transaction_id"] = check_transaction_id(
                     request.query_params.get("transaction_id")
                 )
-            if 'transaction_type_identifier' in request.query_params:
-                data['transaction_type_identifier'] = request.query_params.get(
-                    'transaction_type_identifier')
-            # if "transaction_id" in request.data and check_null_value(
-            #     request.data.get("transaction_id")
-            # ):
-            #     data["transaction_id"] = check_transaction_id(
-            #         request.data.get("transaction_id")
-            #     )
+            if "transaction_type_identifier" in request.query_params:
+                data["transaction_type_identifier"] = request.query_params.get(
+                    "transaction_type_identifier"
+                )
             datum = get_schedD(data)
 
             if "transaction_id" in request.query_params and check_null_value(
@@ -504,12 +458,6 @@ def schedD(request):
             datum["cmte_id"] = get_comittee_id(request.user.username)
             datum["username"] = request.user.username
 
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
             data = put_schedD(datum)
             output = get_schedD(data)
             # output = get_schedA(data)
@@ -528,7 +476,7 @@ def schedD(request):
 def do_post_carryover(transaction_id, cmte_id, report_id):
     try:
         _sql = """SELECT json_agg(t) FROM (
-            SELECT report_id, status FROM reports 
+            SELECT report_id, status FROM reports
             WHERE cmte_id=%s AND form_type='F3X' AND superceded_report_id is null
             AND cvg_start_date > (SELECT cvg_start_date FROM reports WHERE cmte_id=%s AND report_id=%s)
             ORDER BY cvg_start_date)t"""
@@ -537,26 +485,25 @@ def do_post_carryover(transaction_id, cmte_id, report_id):
             reports_list = cursor.fetchone()[0]
         if reports_list:
             for report in reports_list:
-                if report.get('status') and report.get('status') != 'Saved':
-                    create_amended(report['report_id'])
+                if report.get("status") and report.get("status") != "Saved":
+                    create_amended(report["report_id"])
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, cmte_id, report_id])
                 new_reports_list = cursor.fetchone()[0]
             for report in new_reports_list:
-                do_carryover(report['report_id'], cmte_id)
+                do_carryover(report["report_id"], cmte_id)
     except Exception as e:
-        raise Exception('The do_post_carryover is throwing an error: ' + str(e))
+        raise Exception("The do_post_carryover is throwing an error: " + str(e))
 
 
 def delete_schedD(data):
 
     try:
         delete_sql_schedD(
-            data.get("cmte_id"), data.get(
-                "report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedD(cmte_id, report_id, transaction_id):
@@ -572,7 +519,7 @@ def schedD_sql_dict(data):
     """
     filter data and build sched_d dictionary
 
-    Note: those are fields from json data, not the fields in the db 
+    Note: those are fields from json data, not the fields in the db
     table - they are not 100% match:
     like line_number, it is 'line_num' in db for now
     """
@@ -586,7 +533,6 @@ def schedD_sql_dict(data):
         "line_number",
         "back_ref_transaction_id",
         "back_ref_sched_name",
-        # entity_data
         "entity_id",
         "entity_type",
         "entity_name",
@@ -609,7 +555,7 @@ def schedD_sql_dict(data):
         "cand_election_year",
         "phone_number",
         "memo_code",
-        "memo_text"
+        "memo_text",
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
@@ -623,7 +569,7 @@ def schedD_sql_dict(data):
             return valid_data
         else:
             raise Exception("transaction amounts does not add up together.")
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -679,43 +625,22 @@ def put_schedD(datum):
         check_mandatory_fields_SD(datum)
         transaction_id = check_transaction_id(datum.get("transaction_id"))
 
-        # flag = False
-        # if 'entity_id' in datum:
-        #     flag = True
-        #     get_data = {
-        #         'cmte_id': datum.get('cmte_id'),
-        #         'entity_id': datum.get('entity_id')
-        #     }
-        #     prev_entity_list = get_entities(get_data)
-        #     entity_data = put_entities(datum)
-        # else:
-        #     entity_data = post_entities(datum)
-        # entity_id = entity_data.get('entity_id')
-        # datum['entity_id'] = entity_id
-        cmte_id = datum.get("cmte_id")
-        report_id = datum.get("report_id")
         current_close_balance = float(datum.get("balance_at_close"))
-        existing_close_balance = float(
-            get_existing_close_balance(cmte_id, transaction_id)
-        )
         try:
             put_sql_schedD(datum)
             # do downstream proprgation if necessary
-            # if not existing_close_balance == current_close_balance:
-            do_downstream_propagation(
-                transaction_id, current_close_balance, datum)
+            do_downstream_propagation(transaction_id, current_close_balance, datum)
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0], False)
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedD function is throwing an error: " + str(e)
             )
         return datum
-    except:
+    except BaseException:
         raise
 
 
@@ -737,8 +662,11 @@ def get_existing_close_balance(cmte_id, transaction_id):
             if output:
                 return output[0]
             else:
-                raise Exception('the transaction id cannot be found in schedD table: ' + transaction_id)
-    except:
+                raise Exception(
+                    "the transaction id cannot be found in schedD table: "
+                    + transaction_id
+                )
+    except BaseException:
         raise
 
 
@@ -747,14 +675,14 @@ def has_downstream_child(transaction_id):
     check if current sched_d transaction has other carry over child or not
     """
     _sql = """
-    select * from public.sched_d 
+    select * from public.sched_d
     where back_ref_transaction_id = %s
     """
     try:
         with connection.cursor() as cursor:
             cursor.execute(_sql, (transaction_id))
             return cursor.rowcount != 0
-    except:
+    except BaseException:
         raise
 
 
@@ -770,7 +698,7 @@ def update_child(transaction_id, new_beginning_balance, new_close_balance, data)
                 entity_id = %s,
                 purpose = %s,
                 memo_text = %s
-            WHERE transaction_id = %s 
+            WHERE transaction_id = %s
             AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -801,7 +729,7 @@ def do_downstream_propagation(transaction_id, new_balance, data):
 
     _sql = """
         SELECT transaction_id, incurred_amount, payment_amount
-        FROM public.sched_d 
+        FROM public.sched_d
         WHERE back_ref_transaction_id = '{}'
             AND delete_ind is distinct from 'Y'
     """.format(
@@ -830,7 +758,7 @@ def do_downstream_propagation(transaction_id, new_balance, data):
             update_child(child_id, new_beginning_balance, new_close_balance, data)
             # recrusive update
             do_downstream_propagation(child_id, new_close_balance, data)
-    except:
+    except BaseException:
         raise
 
 
@@ -854,7 +782,7 @@ def check_mandatory_fields_SD(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -895,38 +823,19 @@ def post_schedD(datum):
         datum["transaction_id"] = transaction_id
         validate_sd_data(datum)
 
-        # save entities rirst
-        # if 'creditor_entity_id' in datum:
-        #     get_data = {
-        #         'cmte_id': datum.get('cmte_id'),
-        #         'entity_id': datum.get('creditor_entity_id')
-        #     }
-        #     prev_entity_list = get_entities(get_data)
-        #     entity_data = put_entities(datum)
-        # else:
-        #     entity_data = post_entities(datum)
-
-        # continue to save transaction
-        # creditor_entity_id = entity_data.get('creditor_entity_id')
-        # datum['creditor_entity_id'] = creditor_entity_id
-        # datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
-        # trans_char = "SD"
-        # transaction_id = get_next_transaction_id(trans_char)
-        # datum['transaction_id'] = transaction_id
         try:
             post_sql_schedD(datum)
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0], False)
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedD function is throwing an error: " + str(e)
             )
         return datum
-    except:
+    except BaseException:
         raise
 
 
@@ -994,8 +903,8 @@ def put_sql_schedD(data):
                 memo_code = %s,
                 memo_text = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s 
-            AND cmte_id = %s 
+            WHERE transaction_id = %s
+            AND cmte_id = %s
             AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -1023,8 +932,7 @@ def do_transaction(sql, values):
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
             if cursor.rowcount == 0:
-                raise Exception(
-                    "The sql transaction: {} failed...".format(sql))
+                raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
         raise
 
@@ -1042,15 +950,18 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
     # TODO: will add all other transactions later on
-    sched_e_list = get_sched_e_child_transactions(
-        report_id, cmte_id, transaction_id)
-    sched_f_list = get_sched_f_child_transactions(
-        report_id, cmte_id, transaction_id)
-    sched_h4_list = get_sched_h4_child_transactions(
-        report_id, cmte_id, transaction_id)
-    sched_h6_list = get_sched_h6_child_transactions(
-        report_id, cmte_id, transaction_id)
-    return sched_a_list + sched_b_list + sched_e_list + sched_f_list + sched_h4_list + sched_h6_list
+    sched_e_list = get_sched_e_child_transactions(report_id, cmte_id, transaction_id)
+    sched_f_list = get_sched_f_child_transactions(report_id, cmte_id, transaction_id)
+    sched_h4_list = get_sched_h4_child_transactions(report_id, cmte_id, transaction_id)
+    sched_h6_list = get_sched_h6_child_transactions(report_id, cmte_id, transaction_id)
+    return (
+        sched_a_list
+        + sched_b_list
+        + sched_e_list
+        + sched_f_list
+        + sched_h4_list
+        + sched_h6_list
+    )
 
     #     childA_forms_obj = get_list_child_schedA(
     #     report_id, cmte_id, transaction_id)
@@ -1072,7 +983,7 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
 
 
 def get_schedD(data):
-    """"
+    """ "
     load sched_d items
     """
     try:
@@ -1085,8 +996,7 @@ def get_schedD(data):
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
 
         else:
-            transaction_type_identifier = data.get(
-                'transaction_type_identifier', '')
+            transaction_type_identifier = data.get("transaction_type_identifier", "")
             # when laod sched_d in bulk, need to do a carry-over when new report_id
             # passed in: duplicate all non-zero sched_d items with updated report_id
             # new transaction_id, close
@@ -1099,19 +1009,18 @@ def get_schedD(data):
             )
             do_carryover(report_id, cmte_id)
             forms_obj = get_list_all_schedD(
-                report_id, cmte_id, transaction_type_identifier)
+                report_id, cmte_id, transaction_type_identifier
+            )
         logger.debug("total schedD items loaded:{}".format(len(forms_obj)))
         if forms_obj:
             for f_obj in forms_obj:
 
                 tran_id = f_obj.get("transaction_type_identifier")
                 f_obj.update(
-                    {"transaction_type_description": tran_desc_dic.get(
-                        tran_id, "")}
+                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
                 )
                 transaction_id = f_obj.get("transaction_id")
-                child_objs = get_child_transactions(
-                    report_id, cmte_id, transaction_id)
+                child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
                 logger.debug("total childs:{}".format(len(child_objs)))
                 if child_objs:
                     logger.debug
@@ -1138,14 +1047,16 @@ def get_schedD(data):
                         if obj["transaction_id"].startswith("SF"):
                             obj.update(API_CALL_SF)
                         if "levin_share" in obj:
-                            obj['expenditure_amount'] = obj.get('total_fed_levin_amount', 0.0)
+                            obj["expenditure_amount"] = obj.get(
+                                "total_fed_levin_amount", 0.0
+                            )
                             obj.update(API_CALL_SH6)
                         if "non_fed_share_amount" in obj:
-                            obj['expenditure_amount'] = obj.get('total_amount', 0.0)
+                            obj["expenditure_amount"] = obj.get("total_amount", 0.0)
                             obj.update(API_CALL_SH4)
                         f_obj["child"] = child_objs
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -1153,7 +1064,7 @@ def is_new_report(report_id, cmte_id):
     """
     check if a report_id is new or not
     a report_id is new if:
-    1.  not exist in sched_d table 
+    1.  not exist in sched_d table
     2. and the cvg_date is newer than the most recent one
 
     TODO: may need to reconsider this
@@ -1164,19 +1075,19 @@ def is_new_report(report_id, cmte_id):
     # where report_id = %s and cmte_id = %s
     # """
     _sql = """
-        SELECT 1 AS seq, 
-            cvg_start_date 
-        FROM   PUBLIC.reports 
+        SELECT 1 AS seq,
+            cvg_start_date
+        FROM   PUBLIC.reports
         WHERE  report_id = %s
-        UNION 
-        SELECT 2 AS seq, 
-            Max(cvg_end_date) 
-        FROM   PUBLIC.reports r 
-            JOIN PUBLIC.sched_d sd 
-                ON r.report_id = sd.report_id 
-                    AND r.cmte_id = sd.cmte_id 
+        UNION
+        SELECT 2 AS seq,
+            Max(cvg_end_date)
+        FROM   PUBLIC.reports r
+            JOIN PUBLIC.sched_d sd
+                ON r.report_id = sd.report_id
+                    AND r.cmte_id = sd.cmte_id
                     AND r.cmte_id = %s
-        ORDER  BY seq 
+        ORDER  BY seq
     """
     try:
         with connection.cursor() as cursor:
@@ -1187,7 +1098,7 @@ def is_new_report(report_id, cmte_id):
             if new_date and old_date and new_date > old_date:
                 return True
             return False
-    except:
+    except BaseException:
         raise
 
 
@@ -1233,9 +1144,9 @@ def do_carryover(report_id, cmte_id):
                     d.transaction_id,
                     now()
             FROM public.sched_d d, public.reports r
-            WHERE 
+            WHERE
             d.cmte_id = %s
-            AND d.balance_at_close > 0 
+            AND d.balance_at_close > 0
             AND d.report_id != %s
             AND d.report_id = r.report_id
             AND r.cvg_start_date < (
@@ -1256,18 +1167,15 @@ def do_carryover(report_id, cmte_id):
     # """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id,
-                                  report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug(
-                    "debt carryover done with report_id {}".format(report_id))
-                logger.debug(
-                    "total carryover debts:{}".format(cursor.rowcount))
+                logger.debug("debt carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover debts:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -1281,26 +1189,26 @@ def get_list_all_schedD(report_id, cmte_id, transaction_type_identifier):
             # GET all rows from schedA table
             # GET single row from schedA table
             query_string = """
-            SELECT cmte_id, 
-                    report_id, 
+            SELECT cmte_id,
+                    report_id,
                     line_num,
-                    transaction_type_identifier, 
-                    transaction_id, 
-                    entity_id, 
-                    beginning_balance, 
-                    balance_at_close, 
-                    incurred_amount, 
-                    payment_amount, 
+                    transaction_type_identifier,
+                    transaction_id,
+                    entity_id,
+                    beginning_balance,
+                    balance_at_close,
+                    incurred_amount,
+                    payment_amount,
                     back_ref_transaction_id,
                     back_ref_sched_name,
                     purpose,
                     last_update_date
-            FROM public.sched_d 
-            WHERE report_id = %s 
-            AND cmte_id = %s 
+            FROM public.sched_d
+            WHERE report_id = %s
+            AND cmte_id = %s
             AND delete_ind is distinct from 'Y'
             """
-            type_filter = 'AND transaction_type_identifier = %s'
+            type_filter = "AND transaction_type_identifier = %s"
             if transaction_type_identifier:
                 cursor.execute(
                     """SELECT json_agg(t) FROM ("""
@@ -1362,10 +1270,10 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     transaction_type_identifier,
                     transaction_id,
                     entity_id,
-                    beginning_balance, 
-                    balance_at_close, 
-                    incurred_amount, 
-                    payment_amount, 
+                    beginning_balance,
+                    balance_at_close,
+                    incurred_amount,
+                    payment_amount,
                     back_ref_transaction_id,
                     back_ref_sched_name,
                     balance_at_close,

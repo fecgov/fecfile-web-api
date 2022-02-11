@@ -1,9 +1,5 @@
-# Create your models here.
 from django.db import models
-from django.core.validators import FileExtensionValidator
-from .validators import validate_is_pdf
 from django.utils.translation import ugettext_lazy as _
-from db_file_storage.model_utils import delete_file, delete_file_if_needed
 from fecfiler.custom_storages import MediaStorage
 from datetime import datetime
 
@@ -14,6 +10,7 @@ class F99Attachment(models.Model):
     bytes = models.TextField()
     filename = models.CharField(max_length=255)
     mimetype = models.CharField(max_length=50)
+
 
 # added blank=True for null=True to avoid exception while saving to db.
 
@@ -68,9 +65,9 @@ class CommitteeInfo(models.Model):
 
     """
 
-    class Meta():
-        verbose_name = _('CommitteeInfo')
-        verbose_name_plural = _('CommitteeInfo')
+    class Meta:
+        verbose_name = _("CommitteeInfo")
+        verbose_name_plural = _("CommitteeInfo")
 
 
 class Committee(models.Model):
@@ -99,9 +96,9 @@ class Committee(models.Model):
         # class constructor
         return self.committeename
 
-    class Meta():
-        verbose_name = _('Committee')
-        verbose_name_plural = _('Committee')
+    class Meta:
+        verbose_name = _("Committee")
+        verbose_name_plural = _("Committee")
 
 
 class CommitteeMaster(models.Model):
@@ -128,10 +125,10 @@ class CommitteeMaster(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'committee_lookup'
+        db_table = "committee_lookup"
 
 
-class My_Forms_View(models.Model):
+class My_Forms_View(models.Model):  # noqa N801
     cmte_id = models.CharField(primary_key=True, max_length=9)
     category = models.CharField(max_length=25)
     form_type = models.CharField(max_length=10)
@@ -149,8 +146,8 @@ class RefCmteTypeVsForms(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ref_cmte_type_vs_forms'
-        unique_together = (('cmte_type', 'cmte_dsgn', 'form_type'),)
+        db_table = "ref_cmte_type_vs_forms"
+        unique_together = (("cmte_type", "cmte_dsgn", "form_type"),)
 
 
 class RefFormTypes(models.Model):
@@ -161,7 +158,7 @@ class RefFormTypes(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ref_form_types'
+        db_table = "ref_form_types"
 
 
 class RefFormsVsReports(models.Model):
@@ -172,8 +169,8 @@ class RefFormsVsReports(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ref_forms_vs_reports'
-        unique_together = (('form_type', 'report_type'),)
+        db_table = "ref_forms_vs_reports"
+        unique_together = (("form_type", "report_type"),)
 
 
 class RefRptTypes(models.Model):
@@ -184,4 +181,4 @@ class RefRptTypes(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ref_rpt_types'
+        db_table = "ref_rpt_types"

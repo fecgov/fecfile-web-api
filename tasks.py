@@ -75,14 +75,14 @@ def _login_to_cf(ctx, space):
         print("Please check your authentication environment variables:")
 
         print(f"You must set the {user_var_name} and {pass_var_name} environment ")
-        print(f"variables with space-deployer service account credentials")
-        print(f"")
-        print(f"If you don't have a service account, you can create one with the following commands:")
+        print("variables with space-deployer service account credentials")
+        print("")
+        print("If you don't have a service account, you can create one with the following commands:")
         print(f"   cf login -u [email-address] -o {ORG_NAME} -a api.fr.cloud.gov --sso")
         print(f"   cf target -o {ORG_NAME} -s {space}")
-        print(f"   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]")
-        print(f"   cf create-service-key  [my-server-account-name] [my-service-key-name]")
-        print(f"   cf service-key  [my-server-account-name] [my-service-key-name]")
+        print("   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]")
+        print("   cf create-service-key  [my-server-account-name] [my-service-key-name]")
+        print("   cf service-key  [my-server-account-name] [my-service-key-name]")
 
         exit(1)
 

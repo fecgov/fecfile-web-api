@@ -4,7 +4,7 @@ from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
-    """ Test module for inserting a sched_a item"""
+    """Test module for inserting a sched_a item"""
 
     def setUp(self):
         self.sa_trans = SchATransaction(
@@ -14,7 +14,7 @@ class SchATransactionTestCase(TestCase):
             entity_type="IND",
             contributor_organization_name="John Smith & Co.",
             contributor_first_name="John",
-            contributor_last_name="Smith"
+            contributor_last_name="Smith",
         )
 
         self.bad_trans = SchATransaction(
@@ -33,7 +33,7 @@ class SchATransactionTestCase(TestCase):
             entity_type="IND",
             contributor_organization_name="Group",
             contributor_first_name="John",
-            contributor_last_name="Smith"
+            contributor_last_name="Smith",
         )
 
     def test_full_clean(self):
@@ -51,4 +51,8 @@ class SchATransactionTestCase(TestCase):
         hit = SchATransaction.objects.get(transaction_id="A56123456789-del")
         self.assertEquals(hit.transaction_id, "A56123456789-del")
         hit.delete()
-        self.assertRaises(SchATransaction.DoesNotExist, SchATransaction.objects.get, transaction_id="A56123456789-del")
+        self.assertRaises(
+            SchATransaction.DoesNotExist,
+            SchATransaction.objects.get,
+            transaction_id="A56123456789-del",
+        )
