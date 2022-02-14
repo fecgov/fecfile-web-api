@@ -45,14 +45,17 @@ export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 # Deployment (FEC team only)
 
 ### Create a feature branch
-* Developer creates a feature branch and pushes to `origin`:
 
+Using git-flow extensions:
+    ```
+    git flow feature start feature_branch
+    ```
+
+Without the git-flow extensions:
     ```
     git checkout develop
     git pull
-    git checkout -b feature/my-feature develop
-    # Work happens here
-    git push --set-upstream origin feature/my-feature
+    git checkout -b feature/feature_branch develop
     ```
 
 * Developer creates a GitHub PR when ready to merge to `develop` branch
@@ -60,46 +63,51 @@ export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 * [auto] `develop` is deployed to `dev`
 
 ### Create a release branch
-* Developer creates a release branch and pushes to `origin`:
 
-    ```
-    git checkout develop
-    git pull
-    git checkout -b release/sprint-# develop
-    git push --set-upstream origin release/sprint-#
-    ```
+Using git-flow extensions:
+```
+git flow release start sprint-#
+```
+
+Without the git-flow extensions:
+```
+git checkout develop
+git pull
+git checkout -b release/sprint-# develop
+git push --set-upstream origin release/sprint-#
+```
 
 ### Create and deploy a hotfix
-* Developer makes sure their local main and develop branches are up to date:
 
-   ```
-   git checkout develop
-   git pull
-   git checkout main
-   git pull
-   ```
+Using git-flow extensions:
+```
+git flow hotfix start my-fix
+# Work happens here
+git flow hotfix finish my-fix
+```
+
+Without the git-flow extensions:
+```
+git checkout -b hotfix/my-fix main
+# Work happens here
+git push --set-upstream origin hotfix/my-fix
+```
 
 * Developer creates a hotfix branch, commits changes, and **makes a PR to the `main` and `develop` branches**:
-
-    ```
-    git checkout -b hotfix/my-fix main
-    # Work happens here
-    git push --set-upstream origin hotfix/my-fix
-    ```
-
 * Reviewer merges hotfix/my-fix branch into `develop` and `main`
 * [auto] `develop` is deployed to `dev`. Make sure the build passes before deploying to `main`.
 * Developer deploys hotfix/my-fix branch to main using **Deploying a release to production** instructions below
 
 ### Deploying a release to production
 * Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch
-* Reviewer approves PR and merges into `main`
+* Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 * Check CircleCI for passing pipeline tests
 * If tests pass, continue
+* (If commits were made to release/sprint-#) Developer creates a PR in GitHub to merge release/sprint-# branch into the `develop` branch
+* Reviewer approves PR and merges into `develop`
 * Delete release/sprint-# branch
 * In GitHub, go to `Code -> tags -> releases -> Draft a new release`
 * Publish a new release using tag sprint-#, be sure to Auto-generate release notes
-* Deploy `sprint-#` tag to production
 
 
 ## Additional developer notes
