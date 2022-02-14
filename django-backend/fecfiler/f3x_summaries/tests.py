@@ -42,8 +42,8 @@ class F3XTestCase(TestCase):
             filer_committee_id_number="C00123456"
         )
 
-        softDeletedF3XSummary = F3XSummary.all_objects.get(filer_committee_id_number="C00123456")
-        self.assertEquals(softDeletedF3XSummary.filer_committee_id_number, "C00123456")
-        self.assertIsNotNone(softDeletedF3XSummary.deleted)
-        softDeletedF3XSummary.hard_delete()
+        soft_deleted_f3x_summary = F3XSummary.all_objects.get(filer_committee_id_number="C00123456")
+        self.assertEquals(soft_deleted_f3x_summary.filer_committee_id_number, "C00123456")
+        self.assertIsNotNone(soft_deleted_f3x_summary.deleted)
+        soft_deleted_f3x_summary.hard_delete()
         self.assertRaises(F3XSummary.DoesNotExist, F3XSummary.all_objects.get, filer_committee_id_number="C00123456")

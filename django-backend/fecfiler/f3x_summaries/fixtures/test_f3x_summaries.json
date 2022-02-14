@@ -3,7 +3,7 @@
         "model": "f3x_summaries.f3xsummary",
         "fields": {
             "form_type": "F3XN",
-            "filer_committee_id_number": "C123",
+            "filer_committee_id_number": "C00000000",
             "treasurer_last_name": "Lastname",
             "treasurer_first_name": "Firstname",
             "date_signed": "20040729",
