@@ -1,35 +1,41 @@
-import datetime
-
-from binascii import unhexlify
-from datetime import datetime
-from datetime import timedelta
-
 import pytz
-from django.contrib.auth.hashers import get_hasher, make_password
-from django.db import connection
-from django_otp.oath import TOTP
-from django_otp.util import random_hex
-from unittest import mock
 import time
 
-from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY, OTP_TIMEOUT_TIME, OTP_DISABLE, \
-    OTP_DEFAULT_PASSCODE
+from binascii import unhexlify
+from datetime import datetime, timedelta
+from django.contrib.auth.hashers import make_password
+from django.db import connection
+from django_otp.oath import TOTP
+
+from fecfiler.settings import (
+    OTP_DIGIT,
+    OTP_TIME_EXPIRY,
+    logger,
+    OTP_MAX_RETRY,
+    OTP_TIMEOUT_TIME,
+    OTP_DISABLE,
+    OTP_DEFAULT_PASSCODE,
+)
 
 
 def save_key_datbase(username, key_val, counter, unix_time):
     try:
-        print(key_val)
-        print(key_val.decode("utf-8"))
         decode_key = key_val.decode("utf-8")
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET secret_key = %s, code_generated_counter = %s, updated_at = %s, code_time = %s WHERE username = %s AND delete_ind !='Y'"""
+            _sql = """
+                UPDATE public.authentication_account
+                SET secret_key = %s, code_generated_counter = %s,
+                updated_at = %s, code_time = %s
+                WHERE username = %s AND delete_ind !='Y'
+            """
             _v = (decode_key, counter, datetime.now(), unix_time, username)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
                 logger.debug("key save failed for username {}", username)
         return cursor.rowcount
     except Exception as e:
-        logger.debug("exception occurred key save for username {}", username)
+        logger.error(e)
+        logger.error("exception occurred key save for username {}", username)
 
 
 def get_current_counter_val(username):
@@ -62,10 +68,9 @@ def get_last_updated_time(username):
 
 
 class TOTPVerification:
-
     def __init__(self, username):
 
-        self.key = make_password(username).encode('utf-8').hex()
+        self.key = make_password(username).encode("utf-8").hex()
         self.number_of_digits = OTP_DIGIT
         self.token_validity_period = OTP_TIME_EXPIRY
 
@@ -79,13 +84,15 @@ class TOTPVerification:
         counter = get_current_counter_val(username)
         last_updated_time = get_last_updated_time(username)
         unix_time = int(time.time())
-        totp = TOTP(key=self.bin_key,
-                    step=self.token_validity_period,
-                    t0=unix_time,
-                    digits=self.number_of_digits)
+        totp = TOTP(
+            key=self.bin_key,
+            step=self.token_validity_period,
+            t0=unix_time,
+            digits=self.number_of_digits,
+        )
 
         totp.time = time.time()
-        est = pytz.timezone('US/Eastern')
+        est = pytz.timezone("US/Eastern")
         current_time_est = datetime.now(est)
 
         current_time_est1 = current_time_est.replace(tzinfo=None)
@@ -124,10 +131,12 @@ class TOTPVerification:
                 print(key)
                 print(key.encode("utf-8"))
                 encode_key = key.encode("utf-8")
-                totp = TOTP(key=encode_key,
-                            step=self.token_validity_period,
-                            t0=int(unix_time),
-                            digits=self.number_of_digits)
+                totp = TOTP(
+                    key=encode_key,
+                    step=self.token_validity_period,
+                    t0=int(unix_time),
+                    digits=self.number_of_digits,
+                )
                 token = str(totp.token()).zfill(6)
 
             print(token)

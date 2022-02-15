@@ -100,13 +100,7 @@ jobs:
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
-# Only use SonarCloud linting or security checking for now.
-# Leaving this as a comment in case SonarCloud isn't good enough and we need to re-enable
-#      - run:
-#          name: Run lint
-#          command: |
-#            flake8 --config django-backend/.flake8 --output-file flake8.out . || echo "Found lint errors: " && cat flake8.out
-#
+# Only use SonarCloud security checking for now.
 #      - run:
 #          name: Bandit security checks
 #          command: |
@@ -160,6 +154,11 @@ jobs:
       - save_cache:
           key: v1-sonarcloud-scanner-4.6.2.2472
           paths: /tmp/cache/scanner
+
+      - run:
+          name: Run lint
+          command: |
+            flake8 --config django-backend/.flake8
 
   deploy:
 

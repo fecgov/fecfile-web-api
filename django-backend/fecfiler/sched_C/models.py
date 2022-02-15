@@ -50,19 +50,20 @@ class SchedC(models.Model):
     report_id = models.BigIntegerField()
     line_number = models.CharField(max_length=8)
     transaction_type = models.CharField(max_length=12)
-    transaction_type_identifier = models.CharField(
-        max_length=12, blank=True, null=True)
+    transaction_type_identifier = models.CharField(max_length=12, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=20)
     entity_id = models.CharField(max_length=20, blank=True, null=True)
     election_code = models.CharField(max_length=5, blank=True, null=True)
-    election_other_description = models.CharField(
-        max_length=20, blank=True, null=True)
+    election_other_description = models.CharField(max_length=20, blank=True, null=True)
     loan_amount_original = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     loan_payment_to_date = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     loan_balance = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     loan_incurred_date = models.DateField(blank=True, null=True)
     loan_due_date = models.CharField(max_length=15, blank=True, null=True)
     loan_intrest_rate = models.CharField(max_length=15, blank=True, null=True)
@@ -70,18 +71,16 @@ class SchedC(models.Model):
     is_personal_funds = models.CharField(max_length=1, blank=True, null=True)
     lender_cmte_id = models.CharField(max_length=9, blank=True, null=True)
     lender_cand_id = models.CharField(max_length=9, blank=True, null=True)
-    lender_cand_last_name = models.CharField(
-        max_length=30, blank=True, null=True)
-    lender_cand_first_name = models.CharField(
-        max_length=20, blank=True, null=True)
-    lender_cand_middle_name = models.CharField(
-        max_length=20, blank=True, null=True)
+    lender_cand_last_name = models.CharField(max_length=30, blank=True, null=True)
+    lender_cand_first_name = models.CharField(max_length=20, blank=True, null=True)
+    lender_cand_middle_name = models.CharField(max_length=20, blank=True, null=True)
     lender_cand_prefix = models.CharField(max_length=10, blank=True, null=True)
     lender_cand_suffix = models.CharField(max_length=10, blank=True, null=True)
     lender_cand_office = models.CharField(max_length=1, blank=True, null=True)
     lender_cand_state = models.CharField(max_length=2, blank=True, null=True)
     lender_cand_district = models.DecimalField(
-        max_digits=12, blank=True, null=True, decimal_places=2)
+        max_digits=12, blank=True, null=True, decimal_places=2
+    )
     memo_code = models.CharField(max_length=1, blank=True, null=True)
     memo_text = models.CharField(max_length=100, blank=True, null=True)
     delete_ind = models.CharField(max_length=1, blank=True, null=True)
@@ -90,7 +89,7 @@ class SchedC(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sched_c'
+        db_table = "sched_c"
 
 
 # sched_c1
@@ -147,61 +146,50 @@ class SchedC1(models.Model):
     report_id = models.BigIntegerField()
     line_number = models.CharField(max_length=8)
     transaction_type = models.CharField(max_length=12)
-    transaction_type_identifier = models.CharField(
-        max_length=12, blank=True, null=True)
+    transaction_type_identifier = models.CharField(max_length=12, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=20)
     lender_entity_id = models.CharField(max_length=20, blank=True, null=True)
     loan_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     loan_intrest_rate = models.CharField(max_length=15, blank=True, null=True)
     loan_incurred_date = models.DateField(blank=True, null=True)
     loan_due_date = models.DateField(blank=True, null=True)
-    is_loan_restructured = models.CharField(
-        max_length=1, blank=True, null=True)
+    is_loan_restructured = models.CharField(max_length=1, blank=True, null=True)
     original_loan_date = models.DateField(blank=True, null=True)
     credit_amount_this_draw = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     total_outstanding_balance = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
-    other_parties_liable = models.CharField(
-        max_length=1, blank=True, null=True)
-    pledged_collateral_ind = models.CharField(
-        max_length=1, blank=True, null=True)
-    pledge_collateral_desc = models.CharField(
-        max_length=100, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+    other_parties_liable = models.CharField(max_length=1, blank=True, null=True)
+    pledged_collateral_ind = models.CharField(max_length=1, blank=True, null=True)
+    pledge_collateral_desc = models.CharField(max_length=100, blank=True, null=True)
     pledge_collateral_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
-    perfected_intrest_ind = models.CharField(
-        max_length=1, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+    perfected_intrest_ind = models.CharField(max_length=1, blank=True, null=True)
     future_income_ind = models.CharField(max_length=1, blank=True, null=True)
-    future_income_desc = models.CharField(
-        max_length=100, blank=True, null=True)
+    future_income_desc = models.CharField(max_length=100, blank=True, null=True)
     future_income_estimate = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
-    depository_account_established_date = models.DateField(
-        blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+    depository_account_established_date = models.DateField(blank=True, null=True)
     depository_account_location = models.CharField(
-        max_length=200, blank=True, null=True)
-    depository_account_street_1 = models.CharField(
-        max_length=34, blank=True, null=True)
-    depository_account_street_2 = models.CharField(
-        max_length=34, blank=True, null=True)
-    depository_account_city = models.CharField(
-        max_length=30, blank=True, null=True)
-    depository_account_state = models.CharField(
-        max_length=2, blank=True, null=True)
-    depository_account_zip = models.CharField(
-        max_length=9, blank=True, null=True)
+        max_length=200, blank=True, null=True
+    )
+    depository_account_street_1 = models.CharField(max_length=34, blank=True, null=True)
+    depository_account_street_2 = models.CharField(max_length=34, blank=True, null=True)
+    depository_account_city = models.CharField(max_length=30, blank=True, null=True)
+    depository_account_state = models.CharField(max_length=2, blank=True, null=True)
+    depository_account_zip = models.CharField(max_length=9, blank=True, null=True)
     depository_account_auth_date = models.DateField(blank=True, null=True)
-    basis_of_loan_desc = models.CharField(
-        max_length=100, blank=True, null=True)
-    treasurer_entity_id = models.CharField(
-        max_length=20, blank=True, null=True)
+    basis_of_loan_desc = models.CharField(max_length=100, blank=True, null=True)
+    treasurer_entity_id = models.CharField(max_length=20, blank=True, null=True)
     treasurer_signed_date = models.DateField(blank=True, null=True)
-    authorized_entity_id = models.CharField(
-        max_length=20, blank=True, null=True)
-    authorized_entity_title = models.CharField(
-        max_length=20, blank=True, null=True)
+    authorized_entity_id = models.CharField(max_length=20, blank=True, null=True)
+    authorized_entity_title = models.CharField(max_length=20, blank=True, null=True)
     authorized_signed_date = models.DateField(blank=True, null=True)
     delete_ind = models.CharField(max_length=1, blank=True, null=True)
     create_date = models.DateTimeField(blank=True, null=True)
@@ -209,7 +197,7 @@ class SchedC1(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sched_c1'
+        db_table = "sched_c1"
 
 
 # sched_c2
@@ -233,17 +221,16 @@ CREATE TABLE public.sched_c2
 class SchedC2(models.Model):
     cmte_id = models.CharField(max_length=9)
     report_id = models.BigIntegerField()
-    transaction_type_identifier = models.CharField(
-        max_length=12, blank=True, null=True)
+    transaction_type_identifier = models.CharField(max_length=12, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=20)
-    guarantor_entity_id = models.CharField(
-        max_length=20, blank=True, null=True)
+    guarantor_entity_id = models.CharField(max_length=20, blank=True, null=True)
     guaranteed_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     delete_ind = models.CharField(max_length=1, blank=True, null=True)
     create_date = models.DateTimeField(blank=True, null=True)
     last_update_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'sched_c2'
+        db_table = "sched_c2"

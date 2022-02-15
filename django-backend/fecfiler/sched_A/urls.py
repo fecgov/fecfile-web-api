@@ -17,9 +17,7 @@ urlpatterns = [
         views.force_unaggregate_sa,
         name="force_unaggregate_sa",
     ),
-    url(
-        r"^sa/force_itemize_sa$", views.force_itemize_sa, name="force_itemize_sa"
-    ),
+    url(r"^sa/force_itemize_sa$", views.force_itemize_sa, name="force_itemize_sa"),
     url(
         r"^sa/force_unitemize_sa$",
         views.force_unitemize_sa,

@@ -1,16 +1,9 @@
 import datetime
-import json
 import logging
-import os
-from decimal import Decimal
 
-
-import requests
-from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -30,23 +23,16 @@ from fecfiler.core.views import (
     NoOPError,
     check_null_value,
     check_report_id,
-    date_format,
-    delete_entities,
     get_entities,
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
-
-    superceded_report_id_list,
     get_comittee_id,
-    update_F3X
-
+    update_F3X,
 )
 from fecfiler.sched_A.views import (
     get_list_child_schedA,
     get_next_transaction_id,
-    post_schedA,
     post_sql_schedA,
     put_sql_schedA,
 )
@@ -98,7 +84,9 @@ AUTO_SCHED_B_MAP = {"LOAN_OWN_TO_CMTE": "LOAN_OWN_TO_CMTE_OUT"}
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SC"):
         raise Exception(
-            "The Transaction ID: {} is not in the specified format. Transaction IDs start with SC characters".format(transaction_id)
+            "The Transaction ID: {} is not in the specified format. Transaction IDs start with SC characters".format(
+                transaction_id
+            )
         )
     return transaction_id
 
@@ -118,7 +106,7 @@ def check_mandatory_fields_SC(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -200,9 +188,9 @@ def do_loan_carryover(report_id, cmte_id):
                     c.transaction_id,
                     now()
             FROM public.sched_c c, public.reports r
-            WHERE 
+            WHERE
             c.cmte_id = %s
-            AND c.loan_balance > 0 
+            AND c.loan_balance > 0
             AND c.report_id != %s
             AND c.report_id = r.report_id
             AND r.cvg_start_date < (
@@ -230,7 +218,7 @@ def do_loan_carryover(report_id, cmte_id):
                 logger.debug("total carryover loans:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
-    except:
+    except BaseException:
         raise
 
 
@@ -299,7 +287,7 @@ def schedC_sql_dict(data):
 
         return datum
 
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -369,6 +357,7 @@ def put_schedC(data):
             # remove entiteis if saving sched_a fails
             if rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -377,7 +366,7 @@ def put_schedC(data):
                 "The put_sql_schedC function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -413,7 +402,7 @@ def put_sql_schedC(data):
                   memo_code = %s,
                   memo_text = %s,
                   last_update_date = %s
-              WHERE transaction_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND cmte_id = %s
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -627,7 +616,7 @@ def auto_generate_sched_a(data):
         data.get("transaction_type_identifier"),
         data.get("levin_account_id"),
         data.get("aggregation_ind"),
-        data.get("semi_annual_refund_bundled_amount")
+        data.get("semi_annual_refund_bundled_amount"),
     )
     logger.debug("auto-generation done.")
 
@@ -678,9 +667,9 @@ def remove_sql_schedC(transaction_id, report_id, cmte_id):
             # UPDATE delete_ind flag on a single row from Sched_A table
             cursor.execute(
                 """
-            DELETE FROM public.sched_c 
-            WHERE transaction_id = %s 
-            AND report_id = %s 
+            DELETE FROM public.sched_c
+            WHERE transaction_id = %s
+            AND report_id = %s
             AND cmte_id = %s""",
                 [transaction_id, report_id, cmte_id],
             )
@@ -704,7 +693,7 @@ def remove_schedC(data):
         report_id = data.get("report_id")
         transaction_id = check_transaction_id(data.get("transaction_id"))
         remove_sql_schedC(transaction_id, report_id, cmte_id)
-    except:
+    except BaseException:
         raise
 
 
@@ -768,6 +757,7 @@ def post_schedC(data):
             # remove entiteis if saving sched_a fails
             if rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
@@ -778,7 +768,7 @@ def post_schedC(data):
         data["transaction_id"] = new_transaction_id
         # return get_schedC(data)
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -923,7 +913,7 @@ def get_schedC(data):
         else:
             forms_obj = get_list_all_schedC(report_id, cmte_id)
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -1087,7 +1077,7 @@ def delete_schedC(data):
             delete_child_transaction(sched_tp, cmte_id, transaction_id)
         logger.debug("delete {} done".format(transaction_id))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC(cmte_id, transaction_id):
@@ -1095,7 +1085,7 @@ def delete_sql_schedC(cmte_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, cmte_id)
@@ -1111,7 +1101,7 @@ def schedC(request):
     try:
         is_read_only_or_filer_reports(request)
 
-    # create new sched_c1 transaction
+        # create new sched_c1 transaction
         if request.method == "POST":
             logger.debug("POST request received.")
             try:
@@ -1255,7 +1245,7 @@ def schedC(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -1292,27 +1282,27 @@ def get_outstanding_loans(request):
             if not tran_type in valid_transaction_types:
                 raise Exception("Error: invalid transaction types.")
             _sql = """
-                SELECT Json_agg(t) 
-                FROM   (SELECT 
+                SELECT Json_agg(t)
+                FROM   (SELECT
                             e.entity_name,
-                            e.entity_type, 
+                            e.entity_type,
                             e.last_name,
                             e.first_name,
                             e.middle_name,
                             e.preffix as prefix,
-                            e.suffix, 
+                            e.suffix,
                             c.transaction_id,
-                            c.loan_amount_original, 
-                            c.loan_payment_to_date, 
-                            c.loan_balance, 
+                            c.loan_amount_original,
+                            c.loan_payment_to_date,
+                            c.loan_balance,
                             c.loan_due_date,
-                            c.transaction_type_identifier 
-                        FROM   public.sched_c c, 
-                            public.entity e 
+                            c.transaction_type_identifier
+                        FROM   public.sched_c c,
+                            public.entity e
                         WHERE c.cmte_id = %s
                         AND c.transaction_type_identifier = %s
                         AND c.entity_id = e.entity_id
-                        AND c.report_id = %s 
+                        AND c.report_id = %s
                         AND delete_ind is distinct from 'Y'
                         ) t
             """
@@ -1321,49 +1311,49 @@ def get_outstanding_loans(request):
                 json_result = cursor.fetchone()[0]
         else:
             _sql = """
-                SELECT Json_agg(t) 
-                    FROM   (SELECT 
+                SELECT Json_agg(t)
+                    FROM   (SELECT
                                 e.entity_name,
-                                e.entity_type, 
+                                e.entity_type,
                                 e.last_name,
                                 e.first_name,
                                 e.middle_name,
                                 e.preffix as prefix,
-                                e.suffix, 
+                                e.suffix,
                                 c.transaction_id,
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
                                 c.loan_due_date,
                                 c.transaction_type_identifier
-                            FROM   public.sched_c c, 
-                                public.entity e 
+                            FROM   public.sched_c c,
+                                public.entity e
                             WHERE c.cmte_id = %s
                             AND c.entity_id = e.entity_id
-                            AND c.report_id = %s 
+                            AND c.report_id = %s
                             AND c.delete_ind is distinct from 'Y'
                             UNION
-                            SELECT e.entity_name, 
-                                e.entity_type, 
-                                e.last_name, 
-                                e.first_name, 
-                                e.middle_name, 
-                                e.preffix AS prefix, 
-                                e.suffix, 
-                                c.transaction_id, 
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
-                                c.loan_due_date, 
-                                c.transaction_type_identifier 
-                            FROM   PUBLIC.sched_c c, 
-                                PUBLIC.entity e 
-                            WHERE  c.entity_id = e.entity_id 
-                            AND    c.transaction_id IN 
-                            ( 
-                                    SELECT back_ref_transaction_id 
-                                    FROM   sched_b 
-                                    WHERE  cmte_id = %s 
+                            SELECT e.entity_name,
+                                e.entity_type,
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix AS prefix,
+                                e.suffix,
+                                c.transaction_id,
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   PUBLIC.sched_c c,
+                                PUBLIC.entity e
+                            WHERE  c.entity_id = e.entity_id
+                            AND    c.transaction_id IN
+                            (
+                                    SELECT back_ref_transaction_id
+                                    FROM   sched_b
+                                    WHERE  cmte_id = %s
                                     AND    report_id = %s
                                     AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
                                     transaction_type_identifier = 'LOAN_REPAY_RCVD')
@@ -1426,29 +1416,13 @@ def get_outstanding_loans(request):
     2. it has live payment(even the balance become 0) in current report
     """
     #: adding pagination, sorting and dynamic fields listing funcitonality
-    # URL coded for: GET /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false HTTP/1.1"
-    param_string = ""
+    # URL coded for: GET
+    # /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false
+    # HTTP/1.1"
     query_params = request.query_params
     page_num = int(query_params.get("page"))
-    descending = query_params.get("descending")  # request.data.get("descending", "false")
-    if not (
-        "sortColumnName" in query_params
-        and check_null_value(query_params.get("sortColumnName"))
-    ):
-        sortcolumn = "name"
-    elif query_params.get("sortColumnName") == "default":
-        sortcolumn = "name"
-    else:
-        sortcolumn = query_params.get("sortColumnName")
     itemsperpage = int(query_params.get("itemsPerPage"))
-    search_string = query_params.get("search")
-    params = query_params.get("filters", {})
-    keywords = params.get("keywords")
-    if str(descending).lower() == "true":
-        descending = "DESC"
-    else:
-        descending = "ASC"
-    trans_query_string_count = ""  # get_trans_query_for_total_count(trans_query_string)
+    trans_query_string_count = ""
     row1 = ""
     totalcount = ""
 
@@ -1461,39 +1435,41 @@ def get_outstanding_loans(request):
             raise Exception("report_id is required.")
         do_loan_carryover(report_id, cmte_id)
         _sql_prefix = """
-                SELECT Json_agg(t) 
+                SELECT Json_agg(t)
                 FROM   ( """
         _sql_suffix = """ ) t """
 
         if "transaction_type_identifier" in query_params:
             tran_type = query_params.get("transaction_type_identifier")
-            if not tran_type in valid_transaction_types:
+            if tran_type not in valid_transaction_types:
                 raise Exception("Error: invalid transaction types.")
             _sql = """
-                        SELECT 
+                        SELECT
                             e.entity_name,
-                            e.entity_type, 
+                            e.entity_type,
                             e.last_name,
                             e.first_name,
                             e.middle_name,
                             e.preffix as prefix,
-                            e.suffix, 
+                            e.suffix,
                             c.transaction_id,
-                            c.loan_amount_original, 
-                            c.loan_payment_to_date, 
-                            c.loan_balance, 
+                            c.loan_amount_original,
+                            c.loan_payment_to_date,
+                            c.loan_balance,
                             c.loan_due_date,
-                            c.transaction_type_identifier 
-                        FROM   public.sched_c c, 
-                            public.entity e 
+                            c.transaction_type_identifier
+                        FROM   public.sched_c c,
+                            public.entity e
                         WHERE c.cmte_id = %s
                         AND c.transaction_type_identifier = %s
                         AND c.entity_id = e.entity_id
-                        AND c.report_id = %s 
+                        AND c.report_id = %s
                         AND delete_ind is distinct from 'Y'
             """
             #: get the total count
-            trans_query_string_count = """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            trans_query_string_count = (
+                """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            )
             #: set transaction query with offsets.
             _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
             # set prefix and suffix
@@ -1503,61 +1479,65 @@ def get_outstanding_loans(request):
                 json_result = cursor.fetchone()[0]
                 #: run the record count query
                 cursor.execute(
-                    """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+                    """SELECT json_agg(t) FROM ("""
+                    + trans_query_string_count
+                    + """) t"""
                 )
                 row1 = cursor.fetchone()[0]
-                totalcount = row1[0]['count']
+                totalcount = row1[0]["count"]
         else:
             _sql = """
-                        SELECT 
+                        SELECT
                                 e.entity_name,
-                                e.entity_type, 
+                                e.entity_type,
                                 e.last_name,
                                 e.first_name,
                                 e.middle_name,
                                 e.preffix as prefix,
-                                e.suffix, 
+                                e.suffix,
                                 c.transaction_id,
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
                                 c.loan_due_date,
                                 c.transaction_type_identifier
-                            FROM   public.sched_c c, 
-                                public.entity e 
+                            FROM   public.sched_c c,
+                                public.entity e
                             WHERE c.cmte_id = %s
                             AND c.entity_id = e.entity_id
-                            AND c.report_id = %s 
+                            AND c.report_id = %s
                             AND c.delete_ind is distinct from 'Y'
                             UNION
-                            SELECT e.entity_name, 
-                                e.entity_type, 
-                                e.last_name, 
-                                e.first_name, 
-                                e.middle_name, 
-                                e.preffix AS prefix, 
-                                e.suffix, 
-                                c.transaction_id, 
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
-                                c.loan_due_date, 
-                                c.transaction_type_identifier 
-                            FROM   PUBLIC.sched_c c, 
-                                PUBLIC.entity e 
-                            WHERE  c.entity_id = e.entity_id 
-                            AND    c.transaction_id IN 
-                            ( 
-                                    SELECT back_ref_transaction_id 
-                                    FROM   sched_b 
-                                    WHERE  cmte_id = %s 
+                            SELECT e.entity_name,
+                                e.entity_type,
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix AS prefix,
+                                e.suffix,
+                                c.transaction_id,
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   PUBLIC.sched_c c,
+                                PUBLIC.entity e
+                            WHERE  c.entity_id = e.entity_id
+                            AND    c.transaction_id IN
+                            (
+                                    SELECT back_ref_transaction_id
+                                    FROM   sched_b
+                                    WHERE  cmte_id = %s
                                     AND    report_id = %s
                                     AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
                                     transaction_type_identifier = 'LOAN_REPAY_RCVD')
                                     AND    delete_ind IS distinct from 'Y')
                     """
             #: get the total count
-            trans_query_string_count = """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            trans_query_string_count = (
+                """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            )
             #: set transaction query with offsets.
             _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
             _sql = _sql_prefix + _sql + _sql_suffix
@@ -1565,12 +1545,18 @@ def get_outstanding_loans(request):
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
                 json_result = cursor.fetchone()[0]
-            #: run the record count query
+                #: run the record count query
                 # print(trans_query_string_count)
-                trans_query_string_count = """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
-                cursor.execute(trans_query_string_count, [cmte_id, report_id, cmte_id, report_id])
+                trans_query_string_count = (
+                    """SELECT json_agg(t) FROM ("""
+                    + trans_query_string_count
+                    + """) t"""
+                )
+                cursor.execute(
+                    trans_query_string_count, [cmte_id, report_id, cmte_id, report_id]
+                )
                 row1 = cursor.fetchone()[0]
-                totalcount = row1[0]['count']
+                totalcount = row1[0]["count"]
 
         if not json_result:
             return Response([], status=status.HTTP_200_OK)
@@ -1600,8 +1586,7 @@ def get_outstanding_loans(request):
                     tran["payments"] = loan_pyaments_obj
             # return Response(json_result, status=status.HTTP_200_OK)
 
-
-#: Adding the pagination and composing response params
+        #: Adding the pagination and composing response params
         if totalcount > 0:
             numofpages = get_num_of_pages(totalcount, itemsperpage)
         else:
@@ -1615,7 +1600,7 @@ def get_outstanding_loans(request):
         }
         return Response(json_result, status=status.HTTP_200_OK)
 
-    except:
+    except BaseException:
         raise
 
 
@@ -1630,6 +1615,7 @@ def get_trans_query_for_total_count(trans_query_string):
     final_query = trans_query_string.replace(s, temp_string, 1)
     return final_query
 
+
 #: build query offset and record count to start getting the data
 
 
@@ -1643,6 +1629,7 @@ def set_offset_n_fetch(trans_query_string, page_num, itemsperpage):
     trans_query_string = trans_query_string + str(itemsperpage)
     trans_query_string = trans_query_string + """ ROW ONLY """
     return trans_query_string
+
 
 #: get page count or number of pages for pagination
 
@@ -1711,29 +1698,29 @@ def get_outstanding_loans_old(request):
             raise Exception("report_id is required.")
         if "transaction_type_identifier" in request.query_params:
             tran_type = request.query_params.get("transaction_type_identifier")
-            if not tran_type in valid_transaction_types:
+            if tran_type not in valid_transaction_types:
                 raise Exception("Error: invalid transaction types.")
             _sql = """
-                SELECT Json_agg(t) 
-                FROM   (SELECT 
+                SELECT Json_agg(t)
+                FROM   (SELECT
                             e.entity_name,
-                            e.entity_type, 
+                            e.entity_type,
                             e.last_name,
                             e.first_name,
                             e.middle_name,
                             e.preffix as prefix,
-                            e.suffix, 
+                            e.suffix,
                             c.transaction_id,
-                            c.loan_amount_original, 
-                            c.loan_payment_to_date, 
-                            c.loan_balance, 
+                            c.loan_amount_original,
+                            c.loan_payment_to_date,
+                            c.loan_balance,
                             c.loan_due_date,
-                            c.transaction_type_identifier 
-                        FROM   public.sched_c c, 
-                            public.entity e 
+                            c.transaction_type_identifier
+                        FROM   public.sched_c c,
+                            public.entity e
                         WHERE c.cmte_id = %s
                         AND c.transaction_type_identifier = %s
-                        AND c.entity_id = e.entity_id 
+                        AND c.entity_id = e.entity_id
                         AND c.loan_balance > 0
                         AND c.loan_incurred_date <= (select cvg_end_date from public.reports where report_id = %s)
                         AND delete_ind is distinct from 'Y'
@@ -1745,50 +1732,50 @@ def get_outstanding_loans_old(request):
 
         else:
             _sql = """
-                SELECT Json_agg(t) 
-                    FROM   (SELECT 
+                SELECT Json_agg(t)
+                    FROM   (SELECT
                                 e.entity_name,
-                                e.entity_type, 
+                                e.entity_type,
                                 e.last_name,
                                 e.first_name,
                                 e.middle_name,
                                 e.preffix as prefix,
-                                e.suffix, 
+                                e.suffix,
                                 c.transaction_id,
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
                                 c.loan_due_date,
                                 c.transaction_type_identifier
-                            FROM   public.sched_c c, 
-                                public.entity e 
+                            FROM   public.sched_c c,
+                                public.entity e
                             WHERE c.cmte_id = %s
-                            AND c.entity_id = e.entity_id 
+                            AND c.entity_id = e.entity_id
                             AND c.loan_balance > 0
                             AND c.loan_incurred_date <= (select cvg_end_date from public.reports where report_id = %s)
                             AND c.delete_ind is distinct from 'Y'
                             UNION
-                            SELECT e.entity_name, 
-                                e.entity_type, 
-                                e.last_name, 
-                                e.first_name, 
-                                e.middle_name, 
-                                e.preffix AS prefix, 
-                                e.suffix, 
-                                c.transaction_id, 
-                                c.loan_amount_original, 
-                                c.loan_payment_to_date, 
-                                c.loan_balance, 
-                                c.loan_due_date, 
-                                c.transaction_type_identifier 
-                            FROM   PUBLIC.sched_c c, 
-                                PUBLIC.entity e 
-                            WHERE  c.entity_id = e.entity_id 
-                            AND    c.transaction_id IN 
-                            ( 
-                                    SELECT back_ref_transaction_id 
-                                    FROM   sched_b 
-                                    WHERE  cmte_id = %s 
+                            SELECT e.entity_name,
+                                e.entity_type,
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix AS prefix,
+                                e.suffix,
+                                c.transaction_id,
+                                c.loan_amount_original,
+                                c.loan_payment_to_date,
+                                c.loan_balance,
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   PUBLIC.sched_c c,
+                                PUBLIC.entity e
+                            WHERE  c.entity_id = e.entity_id
+                            AND    c.transaction_id IN
+                            (
+                                    SELECT back_ref_transaction_id
+                                    FROM   sched_b
+                                    WHERE  cmte_id = %s
                                     AND    report_id = %s
                                     AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
                                     transaction_type_identifier = 'LOAN_REPAY_RCVD')
@@ -1824,7 +1811,7 @@ def get_outstanding_loans_old(request):
                     tran["payments"] = loan_pyaments_obj
             return Response(json_result, status=status.HTTP_200_OK)
 
-    except:
+    except BaseException:
         raise
 
 
@@ -1880,7 +1867,7 @@ def schedC1_sql_dict(data):
         datum["line_number"] = ""
         datum["transaction_type"] = ""
         return datum
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -1904,7 +1891,7 @@ def check_mandatory_fields_SC1(data):
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -1924,7 +1911,7 @@ def put_schedC1(data):
                 "The put_sql_schedC1 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -2184,6 +2171,7 @@ def post_schedC1(data):
             # rollback authorized entity
             if authorized_rollback_flag:
                 entity_data = put_entities(old_authorized_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2195,7 +2183,7 @@ def post_schedC1(data):
                 "The post_sql_schedC1 function is throwing an error: " + str(e)
             )
         return data
-    except:
+    except BaseException:
         raise
 
 
@@ -2345,7 +2333,7 @@ def get_schedC1(data):
                     obj.update(entity_data)
                 merged_list.append(obj)
         return merged_list
-    except:
+    except BaseException:
         raise
 
 
@@ -2353,7 +2341,7 @@ def get_list_all_schedC1(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            _sql = """SELECT json_agg(t) FROM ( SELECT 
+            _sql = """SELECT json_agg(t) FROM ( SELECT
             cmte_id,
             report_id,
             line_number,
@@ -2420,7 +2408,7 @@ def get_list_schedC1(cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            _sql = """SELECT json_agg(t) FROM ( SELECT 
+            _sql = """SELECT json_agg(t) FROM ( SELECT
             cmte_id,
             report_id,
             line_number,
@@ -2489,7 +2477,7 @@ def delete_schedC1(data):
         # check_mandatory_fields_SC2(data)
         delete_sql_schedC1(data.get("cmte_id"), data.get("transaction_id"))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC1(cmte_id, transaction_id):
@@ -2497,7 +2485,7 @@ def delete_sql_schedC1(cmte_id, transaction_id):
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c1
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, cmte_id)
@@ -2511,7 +2499,7 @@ def schedC1(request):
     """
     try:
         is_read_only_or_filer_reports(request)
-    # create new sched_c1 transaction
+        # create new sched_c1 transaction
         if request.method == "POST":
             try:
                 cmte_id = get_comittee_id(request.user.username)
@@ -2522,9 +2510,6 @@ def schedC1(request):
                     report_id = "0"
                 else:
                     report_id = check_report_id(request.data.get("report_id"))
-                # end of handling
-                # print(cmte_id)
-                # print(report_id)
                 datum = request.data.copy()
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
@@ -2587,11 +2572,6 @@ def schedC1(request):
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
-                # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                #     data['report_id'] = check_report_id(
-                #         request.data.get('report_id'))
-                # else:
-                #     raise Exception('Missing Input: report_id is mandatory')
                 if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
                 ):
@@ -2636,13 +2616,6 @@ def schedC1(request):
                 datum["username"] = request.user.username
                 if "prefix" in request.data:
                     datum["preffix"] = request.data.get("prefix")
-
-                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-                #     datum['entity_id'] = request.data.get('entity_id')
-                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-                #     data = put_schedB(datum)
-                #     output = get_schedB(data)
-                # else:
                 data = put_schedC1(datum)
                 output = get_schedC1(data)
                 return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -2653,7 +2626,7 @@ def schedC1(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -2672,18 +2645,13 @@ def check_mandatory_fields_SC2(data):
         for field in MANDATORY_FIELDS_SCHED_C2:
             if not (field in data and check_null_value(data.get(field))):
                 errors.append(field)
-        # if len(error) > 0:
         if errors:
-            # string = ""
-            # for x in error:
-            #     string = string + x + ", "
-            # string = string[0:-2]
             raise Exception(
                 "The following mandatory fields are required in order to save data: {}".format(
                     ",".join(errors)
                 )
             )
-    except:
+    except BaseException:
         raise
 
 
@@ -2700,10 +2668,6 @@ def put_schedC2(data):
                 "cmte_id": data.get("cmte_id"),
                 "entity_id": data.get("guarantor_entity_id"),
             }
-
-            # need this update for FEC entity
-            # if get_data['entity_id'].startswith('FEC'):
-            #     get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
             entity_rollback_flag = True
@@ -2715,12 +2679,12 @@ def put_schedC2(data):
 
         data = schedC2_sql_dict(data)
         check_mandatory_fields_SC2(data)
-        transaction_id = check_transaction_id(data.get("transaction_id"))
         try:
             put_sql_schedC2(data)
         except Exception as e:
             if entity_rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2731,7 +2695,7 @@ def put_schedC2(data):
                 "The put_sql_schedC2 function is throwing an error: " + str(e)
             )
         return get_schedC2(data)[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -2783,8 +2747,6 @@ def post_schedC2(data):
             }
 
             # need this update for FEC entity
-            # if get_data['entity_id'].startswith('FEC'):
-            #     get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
             entity_rollback_flag = True
@@ -2803,6 +2765,7 @@ def post_schedC2(data):
         except Exception as e:
             if entity_rollback_flag:
                 entity_data = put_entities(old_entity, False)
+                logger.debug(entity_data)
             else:
                 get_data = {
                     "cmte_id": data.get("cmte_id"),
@@ -2816,7 +2779,7 @@ def post_schedC2(data):
         # update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
         #     'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return get_schedC2(data)[0]
-    except:
+    except BaseException:
         raise
 
 
@@ -2863,7 +2826,7 @@ def get_schedC2(data):
         else:
             forms_obj = get_list_all_schedC2(report_id, cmte_id)
         return forms_obj
-    except:
+    except BaseException:
         raise
 
 
@@ -2872,15 +2835,14 @@ def delete_schedC2(data):
     function for handling delete request for sc2
     """
     try:
-        # check_mandatory_fields_SC2(data)
         delete_sql_schedC2(data.get("cmte_id"), data.get("transaction_id"))
     except Exception as e:
-        raise
+        raise e
 
 
 def delete_sql_schedC2(cmte_id, transaction_id):
     _sql = """UPDATE public.sched_c2
-            SET delete_ind = 'Y' 
+            SET delete_ind = 'Y'
             WHERE transaction_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, cmte_id)
@@ -3003,7 +2965,7 @@ def schedC2_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         return datum
-    except:
+    except BaseException:
         raise Exception("invalid request data.")
 
 
@@ -3017,7 +2979,7 @@ def schedC2(request):
     try:
         is_read_only_or_filer_reports(request)
 
-    # create new sched_c2 transaction
+        # create new sched_c2 transaction
         if request.method == "POST":
             try:
                 cmte_id = get_comittee_id(request.user.username)
@@ -3162,7 +3124,7 @@ def schedC2(request):
                 )
 
     except Exception as e:
-        json_result = {'message': str(e)}
+        json_result = {"message": str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
@@ -3190,15 +3152,15 @@ def get_endorser_summary(request):
         # print(cmte_id)
         # print(report_id)
         _sql = """
-        SELECT Json_agg(t) 
-            FROM   (SELECT 
+        SELECT Json_agg(t)
+            FROM   (SELECT
                         e.entity_name,
-                        e.entity_type, 
+                        e.entity_type,
                         e.last_name,
                         e.first_name,
                         e.middle_name,
                         e.preffix,
-                        e.suffix, 
+                        e.suffix,
                         e.employer,
                         e.occupation,
                         e.street_1,
@@ -3207,13 +3169,13 @@ def get_endorser_summary(request):
                         e.state,
                         e.zip_code,
                         c.guaranteed_amount as contribution_amount,
-                        c.* 
-                    FROM   public.sched_c2 c, 
-                        public.entity e 
+                        c.*
+                    FROM   public.sched_c2 c,
+                        public.entity e
                     WHERE c.cmte_id = %s
                     AND c.back_ref_transaction_id = %s
-                    AND c.guarantor_entity_id = e.entity_id 
-                    AND c.delete_ind is distinct from 'Y' 
+                    AND c.guarantor_entity_id = e.entity_id
+                    AND c.delete_ind is distinct from 'Y'
                     ) t
         """
         with connection.cursor() as cursor:
@@ -3225,14 +3187,14 @@ def get_endorser_summary(request):
             else:
                 return Response(json_result, status=status.HTTP_200_OK)
 
-    except:
+    except BaseException:
         raise
 
 
 def put_duplicate_future_reports(data):
     try:
         transaction_id = data.get("transaction_id")
-        while 1:
+        while True:
             _sql = """SELECT json_agg(t) FROM (SELECT ch.transaction_id, ch.loan_payment_to_date
                     FROM public.sched_c ch WHERE ch.back_ref_transaction_id = %s
                     AND delete_ind IS DISTINCT FROM 'Y') t"""
@@ -3241,13 +3203,19 @@ def put_duplicate_future_reports(data):
                 json_result = cursor.fetchone()[0]
             if json_result:
                 json_result = json_result[0]
-                transaction_id = json_result['transaction_id']
-                data['transaction_id'] = transaction_id
-                data['loan_payment_to_date'] = json_result['loan_payment_to_date']
-                data['loan_balance'] = float(data['loan_amount_original']) - json_result['loan_payment_to_date']
+                transaction_id = json_result["transaction_id"]
+                data["transaction_id"] = transaction_id
+                data["loan_payment_to_date"] = json_result["loan_payment_to_date"]
+                data["loan_balance"] = (
+                    float(data["loan_amount_original"])
+                    - json_result["loan_payment_to_date"]
+                )
                 put_sql_schedC(data)
                 print(json_result)
             else:
                 break
     except Exception as e:
-        raise Exception("""The put_duplicate_future_reports function is throwing an error: """ + str(e))
+        raise Exception(
+            """The put_duplicate_future_reports function is throwing an error: """
+            + str(e)
+        )

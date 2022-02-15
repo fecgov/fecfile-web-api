@@ -7,8 +7,7 @@ from django.db import models
 class SchedE(models.Model):
     cmte_id = models.CharField(max_length=9)
     report_id = models.BigIntegerField()
-    transaction_type_identifier = models.CharField(
-        max_length=12, blank=True, null=True)
+    transaction_type_identifier = models.CharField(max_length=12, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=20)
     back_ref_transaction_id = models.CharField(max_length=20)
     back_ref_sched_name = models.CharField(max_length=8)
@@ -17,10 +16,12 @@ class SchedE(models.Model):
     election_other_desc = models.CharField(max_length=20)
     dissemination_date = models.DateField(blank=True, null=True)
     expenditure_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     disbursement_date = models.DateField(blank=True, null=True)
     calendar_ytd_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, blank=True, null=True)
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
     purpose = models.CharField(max_length=100)
     category_code = models.CharField(max_length=3)
     payee_cmte_id = models.CharField(max_length=9)
@@ -44,4 +45,4 @@ class SchedE(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sched_E'
+        db_table = "sched_E"
