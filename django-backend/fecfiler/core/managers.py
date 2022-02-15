@@ -12,6 +12,8 @@ This manager uses a queryset that excludes soft-deleted records by default
 passing in the argument 'include_deleted' uses a query set that returns all
 records, but still provides soft and hard delete functions
 """
+
+
 class SoftDeleteManager(models.Manager):
     def __init__(self, *args, **kwargs):
         self.include_deleted = kwargs.pop('include_deleted', False)
@@ -26,10 +28,12 @@ class SoftDeleteManager(models.Manager):
     def hard_delete(self):
         return self.get_queryset().hard_delete()
 
-"""Soft Delete QuerySet to provide soft delete, hard delete, and
-deleted filter
-"""
+
 class SoftDeleteQuerySet(models.QuerySet):
+    """Soft Delete QuerySet to provide soft delete, hard delete, and
+    deleted filter
+    """
+
     def delete(self):
         return super(SoftDeleteQuerySet, self).update(deleted=datetime.now())
 

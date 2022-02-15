@@ -71,7 +71,6 @@ def parse_model(json_model):  # noqa
     # Default model string
     model_str = "\nfrom django.db import models\nfrom fecfiler.core.models import SoftDeleteModel\nfrom django.models import json\n\n"
 
-
     model_name = determine_model_name(json_model.get('id'), args.filename)
     model_str += "class {}(SoftDeleteModel):\n".format(model_name)
     model_str += '    """Generated model from json schema"""\n'
