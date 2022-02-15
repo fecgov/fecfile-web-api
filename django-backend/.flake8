@@ -1,24 +1,6 @@
 [flake8]
+max-line-length = 160
 ignore =
-    E501  # line length,
-    W291  # trailing whitespace
-    W503  # line break before binary operator
-    E711  # comparison to None should be 'if cond is None:'
-    E712  # comparison to False should be 'if cond is False:' or 'if not cond:'
-    E713  # test for membership should be 'not in'
-    E722  # do not use bare 'except'
-    F401  # 'django.contrib.admin' imported but unused
-    F403  # 'from .views import *' used; unable to detect undefined names
-    F523  # '...'.format(...) has unused arguments at position(s): 0
-    F524  # '...'.format(...) is missing argument(s) for placeholder(s): 1
-    F632  # use ==/!= to compare constant literals (str, bytes, int, float, tuple)
-    F811  # redefinition of unused 'datetime' from line 11
-    F821  # undefined name 'get_entities'
-    F841  # local variable 'e' is assigned to but never used
-    N802  # function names should be lowercase
+    N802  # function name should be lowercase
     N806  # variable in function should be lowercase
-    N803  # argument name should be lowercase
-    N801  # class name should use CapWords convention
-    N816  # variable in global scope should not be mixedCase
-exclude:
-    fecfiler/core/jsonsqlgenerate.py  # this file needs significant work
+    W503  # line break before binary operator

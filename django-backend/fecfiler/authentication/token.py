@@ -11,17 +11,17 @@ def jwt_payload_handler(user):
     username = get_username(user)
 
     warnings.warn(
-        'The following fields will be removed in the future: '
-        '`email` and `user_id`. ',
-        DeprecationWarning
+        "The following fields will be removed in the future: "
+        "`email` and `user_id`. ",
+        DeprecationWarning,
     )
 
     payload = {
-        'user_id': user.pk,
-        'email': user.email,
-        'username': username,
-        'role': user.role,
-        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
+        "user_id": user.pk,
+        "email": user.email,
+        "username": username,
+        "role": user.role,
+        "exp": datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
     }
 
     payload[username_field] = username
@@ -29,14 +29,12 @@ def jwt_payload_handler(user):
     # Include original issued at time for a brand new token,
     # to allow token refresh
     if api_settings.JWT_ALLOW_REFRESH:
-        payload['orig_iat'] = timegm(
-            datetime.utcnow().utctimetuple()
-        )
+        payload["orig_iat"] = timegm(datetime.utcnow().utctimetuple())
 
     if api_settings.JWT_AUDIENCE is not None:
-        payload['aud'] = api_settings.JWT_AUDIENCE
+        payload["aud"] = api_settings.JWT_AUDIENCE
 
     if api_settings.JWT_ISSUER is not None:
-        payload['iss'] = api_settings.JWT_ISSUER
+        payload["iss"] = api_settings.JWT_ISSUER
 
     return payload
