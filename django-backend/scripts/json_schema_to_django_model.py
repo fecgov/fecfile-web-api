@@ -139,15 +139,7 @@ def parse_model(json_model): # noqa
                 field_str = "    {} = models.IntegerField({})\n".format(key_name, required_str)
 
         elif key_attributes['type'] == 'string':
-            max_length = key_attributes.get('maxLength')
-            max_length_str = ", max_length={}".format(max_length) if max_length is not None else ""
-            min_length = key_attributes.get('minLength')
-            min_length_str = ", min_length={}".format(min_length) if min_length is not None else ""
-            field_str = "    {} = models.TextField({}{}{})\n".format(
-                                                                    key_name,
-                                                                    required_str,
-                                                                    max_length_str,
-                                                                    min_length_str)
+            field_str = "    {} = models.TextField({})\n".format(key_name, required_str)
 
         elif key_attributes['type'] == 'number':
             field_str = "    {} = models.IntegerField({})\n".format(key_name, required_str)
