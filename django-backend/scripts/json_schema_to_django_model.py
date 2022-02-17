@@ -69,10 +69,10 @@ def parse_model(json_model):  # noqa
         print("Optional required fields detected: {}".format(json_model["oneOf"]))
 
     # Default model string
-    model_str = "\nfrom django import models\nfrom django.models import json\n\n"
+    model_str = "\nfrom django.db import models\nfrom fecfiler.core.models import SoftDeleteModel\nfrom django.models import json\n\n"
 
-    model_name = determine_model_name(json_model.get("id"), args.filename)
-    model_str += "class {}(models.Model):\n".format(model_name)
+    model_name = determine_model_name(json_model.get('id'), args.filename)
+    model_str += "class {}(SoftDeleteModel):\n".format(model_name)
     model_str += '    """Generated model from json schema"""\n'
     print("Model name is {}".format(model_name))
 
@@ -170,16 +170,8 @@ def parse_model(json_model):  # noqa
                     key_name, required_str
                 )
 
-        elif key_attributes["type"] == "string":
-            max_length = key_attributes.get("maxLength")
-            if max_length is not None:
-                field_str = "    {} = models.CharField({}, max_length={})\n".format(
-                    key_name, required_str, max_length
-                )
-            else:
-                field_str = "    {} = models.TextField({})\n".format(
-                    key_name, required_str
-                )
+        elif key_attributes['type'] == 'string':
+            field_str = "    {} = models.TextField({})\n".format(key_name, required_str)
 
         elif key_attributes["type"] == "number":
             field_str = "    {} = models.IntegerField({})\n".format(
@@ -204,8 +196,8 @@ def parse_model(json_model):  # noqa
         model_str += field_str
 
     # add created and updated fields
-    model_str += "    created = models.DateField(auto_now_add=True)\n"
-    model_str += "    updated = models.DateField(auto_now=True)\n"
+    model_str += "    created = models.DateTimeField(auto_now_add=True)\n"
+    model_str += "    updated = models.DateTimeField(auto_now=True)\n"
     model_str += "\n    class Meta:\n        db_table = '{}s'\n".format(
         model_name.lower()
     )

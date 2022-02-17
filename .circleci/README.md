@@ -55,7 +55,7 @@ To run in the local CircleCI for the django unit tests (for example), use the fo
 circleci local execute -e DATABASE_URL=${DATABASE_URL} \
          -e FECFILE_FEC_WEBSITE_API_KEY=${FECFILE_FEC_WEBSITE_API_KEY} \
          -e FECFILE_TEST_DB_NAME=${FECFILE_TEST_DB_NAME} \
-         --job unit-test
+         --job test
 ```
 
 ## CircleCI configuration

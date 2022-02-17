@@ -4,7 +4,6 @@ from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
-    """Test module for inserting a sched_a item"""
 
     def setUp(self):
         self.sa_trans = SchATransaction(
