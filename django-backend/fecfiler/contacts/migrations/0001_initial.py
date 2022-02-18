@@ -7,45 +7,71 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Contact',
+            name="Contact",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('type', models.CharField(
-                    choices=[('Committee', 'Committee'), ('Organization', 'Organization'), ('Individual', 'Individual'), ('Candidate', 'Candidate')], max_length=255)
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
                 ),
-                ('candidate_id', models.TextField(blank=True, null=True)),
-                ('committee_id', models.TextField(blank=True, null=True)),
-                ('name', models.TextField(blank=True, null=True)),
-                ('last_name', models.TextField(blank=True, null=True)),
-                ('first_name', models.TextField(blank=True, null=True)),
-                ('middle_name', models.TextField(blank=True, null=True)),
-                ('prefix', models.TextField(blank=True, null=True)),
-                ('suffix', models.TextField(blank=True, null=True)),
-                ('street_1', models.TextField()),
-                ('street_2', models.TextField(blank=True, null=True)),
-                ('city', models.TextField()),
-                ('state', models.TextField()),
-                ('zip', models.TextField()),
-                ('employer', models.TextField(blank=True, null=True)),
-                ('occupation', models.TextField(blank=True, null=True)),
-                ('candidate_office', models.CharField(
-                    blank=True, choices=[('House', 'House'), ('Senate', 'Senate'), ('Presidential', 'Presidential')], max_length=255, null=True)
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("Committee", "Committee"),
+                            ("Organization", "Organization"),
+                            ("Individual", "Individual"),
+                            ("Candidate", "Candidate"),
+                        ],
+                        max_length=255,
+                    ),
                 ),
-                ('candidate_state', models.TextField(blank=True, null=True)),
-                ('candidate_district', models.TextField(blank=True, null=True)),
-                ('telephone', models.TextField(blank=True, null=True)),
-                ('country', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
+                ("candidate_id", models.TextField(blank=True, null=True)),
+                ("committee_id", models.TextField(blank=True, null=True)),
+                ("name", models.TextField(blank=True, null=True)),
+                ("last_name", models.TextField(blank=True, null=True)),
+                ("first_name", models.TextField(blank=True, null=True)),
+                ("middle_name", models.TextField(blank=True, null=True)),
+                ("prefix", models.TextField(blank=True, null=True)),
+                ("suffix", models.TextField(blank=True, null=True)),
+                ("street_1", models.TextField()),
+                ("street_2", models.TextField(blank=True, null=True)),
+                ("city", models.TextField()),
+                ("state", models.TextField()),
+                ("zip", models.TextField()),
+                ("employer", models.TextField(blank=True, null=True)),
+                ("occupation", models.TextField(blank=True, null=True)),
+                (
+                    "candidate_office",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("House", "House"),
+                            ("Senate", "Senate"),
+                            ("Presidential", "Presidential"),
+                        ],
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
+                ("candidate_state", models.TextField(blank=True, null=True)),
+                ("candidate_district", models.TextField(blank=True, null=True)),
+                ("telephone", models.TextField(blank=True, null=True)),
+                ("country", models.TextField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'contacts',
+                "db_table": "contacts",
             },
         ),
     ]
