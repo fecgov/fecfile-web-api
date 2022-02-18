@@ -21,6 +21,8 @@ class Contact(SoftDeleteModel):
     )
     candidate_id = models.TextField(null=True, blank=True)
     committee_id = models.TextField(null=True, blank=True)
+    #: str: Name of contact when multi-part name is not used
+    name = models.TextField(null=True, blank=True)
     last_name = models.TextField(null=True, blank=True)
     first_name = models.TextField(null=True, blank=True)
     middle_name = models.TextField(null=True, blank=True)
@@ -45,3 +47,9 @@ class Contact(SoftDeleteModel):
 
     class Meta:
         db_table = 'contacts'
+
+    def __str__(self):
+        if type in [Contact.ContactType.CANDIDATE, Contact.ContactType.INDIVIDUAL]:
+            return f'{self.last_name}, {self.first_name}'
+        else:
+            return self.name

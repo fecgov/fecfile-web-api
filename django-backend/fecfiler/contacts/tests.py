@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from .models import Contact
 
 
-class F3XTestCase(TestCase):
+class ContactTestCase(TestCase):
     fixtures = ['test_contacts']
 
     def setUp(self):
@@ -11,7 +11,7 @@ class F3XTestCase(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
-            street="Street",
+            street_1="Street",
             city="City",
             state="State",
             zip="123456789",
@@ -22,7 +22,7 @@ class F3XTestCase(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
-            street="Street",
+            street_1="Street",
             city="City",
         )
 
@@ -37,7 +37,7 @@ class F3XTestCase(TestCase):
     def test_save_and_delete(self):
         self.valid_contact.save()
         contact_from_db = Contact.objects.get(last_name="Last")
-        self.assertIsInstance(f3x_summary_from_db, Contact)
+        self.assertIsInstance(contact_from_db, Contact)
         self.assertEquals(contact_from_db.first_name, "First")
         contact_from_db.delete()
         self.assertRaises(
