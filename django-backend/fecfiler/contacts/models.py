@@ -1,8 +1,8 @@
 from django.db import models
 from fecfiler.core.models import SoftDeleteModel
 
-class Contact(SoftDeleteModel):
 
+class Contact(SoftDeleteModel):
 
     class ContactType(models.TextChoices):
         COMMITTEE = "Committee",
