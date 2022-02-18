@@ -36,7 +36,7 @@ class Contact(SoftDeleteModel):
     employer = models.TextField(null=True, blank=True)
     occupation = models.TextField(null=True, blank=True)
     candidate_office = models.CharField(
-        choices=CandidateOffice.choices, max_length=255
+        choices=CandidateOffice.choices, max_length=255, null=True, blank=True
     )
     candidate_state = models.TextField(null=True, blank=True)
     candidate_district = models.TextField(null=True, blank=True)
@@ -49,7 +49,7 @@ class Contact(SoftDeleteModel):
         db_table = 'contacts'
 
     def __str__(self):
-        if type in [Contact.ContactType.CANDIDATE, Contact.ContactType.INDIVIDUAL]:
+        if self.type in [Contact.ContactType.CANDIDATE, Contact.ContactType.INDIVIDUAL]:
             return f'{self.last_name}, {self.first_name}'
         else:
             return self.name
