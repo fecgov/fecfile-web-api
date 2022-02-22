@@ -215,7 +215,8 @@ if __name__ == "__main__":
         json_model = json.load(f)
 
     if (
-        "S" == json_model["properties"]["form_type"]["examples"][0][0]
+        json_model["properties"].get("form_type") is not None
+        and "S" == json_model["properties"]["form_type"]["examples"][0][0]
         and "transaction_type_identifier" not in json_model["properties"]
     ):
         print(

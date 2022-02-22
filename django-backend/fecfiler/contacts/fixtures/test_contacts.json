@@ -1,0 +1,18 @@
+[
+    {
+        "model": "contacts.contact",
+        "fields": {
+            "type": "Individual",
+            "last_name": "Lastname",
+            "first_name": "Firstname",
+            "street_1": "Street",
+            "city": "City",
+            "state": "State",
+            "zip": "12345678",
+            "country": "Country",
+
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]
