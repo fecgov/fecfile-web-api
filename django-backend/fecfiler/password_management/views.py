@@ -157,6 +157,9 @@ def create_jwt_token(email, cmte_id):
         SECRET_KEY,
         algorithm="HS256",
     ).decode("utf-8")
+    logger.debug(f"token created: {token}")
+    logger.debug(f"using sk: {hash(SECRET_KEY)}")
+    logger.debug(f"email: {email} committee_id: {cmte_id} exp: {JWT_PASSWORD_EXPIRY}")
     return token
 
 
@@ -180,6 +183,8 @@ def verify_token(token_received):
         "verify_exp": True,  # Skipping expiration date check
         "verify_aud": False,
     }  # Skipping audience check
+    logger.debug(f"token received: {token_received}")
+    logger.debug(f"using sk: {hash(SECRET_KEY)}")
     payload = jwt.decode(
         token_received, key=SECRET_KEY, algorithms="HS256", options=options
     )
