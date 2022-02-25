@@ -6,7 +6,7 @@ OUTFILE="./docs/license_report.md"
 echo "Saving report as a markdown formatted file in ${OUTFILE}"
 
 if [ "$CURRENT_DIR" != "fecfile-web-api" ]; then
-  echo "Run this script from the root directory of the fecfile-validate repository:"
+  echo "Run this script from the root directory of the fecfile-web-api repository:"
 fi;
 
 mkdir -p docs
