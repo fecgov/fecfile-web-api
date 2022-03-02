@@ -11,14 +11,11 @@ router.register(r"accounts", AccountViewSet, basename="Accounts")
 accounts_router = routers.NestedSimpleRouter(router, r"accounts", lookup="account")
 
 urlpatterns = [
-    # url(r'^admin/', include(admin.site.urls)),
-    # url(r'^admin$', include(admin.site.urls)),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api/v1/", include(router.urls)),
     url(r"^api/v1/", include(accounts_router.urls)),
     url(r"^api/v1/", include("fecfiler.forms.urls")),
     url(r"^api/v1/", include("fecfiler.core.urls")),
-    # url(r'^api/v1/', include('fecfiler.form3x.urls')),
     url(r"^api/v1/", include("fecfiler.sched_A.urls")),
     url(r"^api/v1/", include("fecfiler.sched_B.urls")),
     url(r"^api/v1/", include("fecfiler.sched_C.urls")),
@@ -31,9 +28,6 @@ urlpatterns = [
     url(r"^api/v1/", include("fecfiler.authentication.urls")),
     url(r"^api/v1/", include("fecfiler.contacts.urls")),
     url(r"^api/v1/", include("fecfiler.password_management.urls")),
-    # url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
-    # url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
-    # url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
     url(r"^api/docs/", SpectacularSwaggerView.as_view(
@@ -43,7 +37,6 @@ urlpatterns = [
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
     url(r"^files/", include("db_file_storage.urls")),
-    # url('^.*$', IndexView.as_view(), name='index'),
 ]
 
 # if settings.DEBUG:
