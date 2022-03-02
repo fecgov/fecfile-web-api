@@ -22,7 +22,6 @@ django-bootstrap3==11.0.0
 django-compressor==3.1
 django-cors-headers==3.11.0
 django-db-file-storage==0.5.3
-django-rest-swagger==2.2.0
 django-s3-upload==0.2.1
 django-storages==1.12.3
 djangocms-admin-style
@@ -31,6 +30,7 @@ djangorestframework-jwt==1.11.0
 djangorestframework-sso==0.3.2
 docutils==0.14
 drf-nested-routers==0.11.1
+drf-spectacular==0.21.2
 GitPython==3.1.0
 gunicorn==19.10.0
 humanize==0.5.1
@@ -58,7 +58,7 @@ python-dateutil==2.7.5
 python-magic==0.4.15
 pytz==2018.5
 pytzdata==2018.7
-PyYAML==4.2b1
+PyYAML==6.0
 regex==2018.11.22
 requests==2.23.0
 requests-toolbelt==0.8.0

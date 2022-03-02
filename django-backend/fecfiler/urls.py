@@ -1,11 +1,9 @@
 from django.conf.urls import url, include
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from rest_framework_nested import routers
-from rest_framework_swagger.views import get_swagger_view
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .authentication.views import AccountViewSet, LogoutView
-
-schema_view = get_swagger_view(title="FEC-Filer API")
 
 router = routers.SimpleRouter()
 router.register(r"accounts", AccountViewSet, basename="Accounts")
@@ -37,7 +35,11 @@ urlpatterns = [
     # url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
     # url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
-    url(r"^api/docs$", schema_view),
+    url(r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
+    url(r"^api/docs/", SpectacularSwaggerView.as_view(
+        template_name="swagger-ui.html",
+        url_name="schema"
+    )),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
     url(r"^files/", include("db_file_storage.urls")),
