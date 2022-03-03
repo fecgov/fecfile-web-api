@@ -13,7 +13,7 @@ jobs:
 
   dependency-check:
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
 
     steps:
       - checkout
@@ -50,7 +50,7 @@ jobs:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
-      - image: cimg/python:3.7-node
+      - image: cimg/python:3.8-node
       - image: cimg/postgres:12.8
 
     steps:
@@ -163,7 +163,7 @@ jobs:
   deploy:
 
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.8
 
     steps:
       - checkout
