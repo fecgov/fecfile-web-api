@@ -96,7 +96,6 @@ jobs:
       - run:
           name: Create/run migrations
           command: |
-            python manage.py makemigrations
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
