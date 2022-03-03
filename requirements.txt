@@ -15,7 +15,7 @@ dateparser==0.7.0
 decorator==4.3.0
 dj-database-url==0.3.0
 dj-static==0.0.6
-Django==3.2.11
+Django==3.2.12
 django-admin-shortcuts==2.0.0
 django-appconf==1.0.5
 django-bootstrap3==11.0.0
@@ -72,11 +72,11 @@ static3==0.6.1
 traitlets==4.3.2
 tzlocal==1.5.1
 uritemplate==3.0.0
-urllib3==1.25.9
+urllib3==1.26.8
 wcwidth==0.1.7
 fuzzywuzzy==0.17.0
 python-levenshtein==0.12.2
-numpy==1.21.5
+numpy==1.22.2
 pandas==1.3.5
 pandas-schema==0.3.5
 django-otp==0.9.3
