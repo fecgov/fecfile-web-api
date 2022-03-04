@@ -3,12 +3,12 @@ from . import views, jsonmain, jsonsqlgenerate
 
 
 urlpatterns = [
-
     url(
         r"^core/queue_transaction_message$",
         views.queue_transaction_message,
         name="queue_transaction_message",
-    ), url(
+    ),
+    url(
         r"^core/validate_import_transactions$",
         views.validate_import_transactions,
         name="validate_import_transactions",
@@ -22,7 +22,8 @@ urlpatterns = [
         r"^core/queue_transaction_message$",
         views.queue_transaction_message,
         name="queue_transaction_message",
-    ), url(
+    ),
+    url(
         r"^core/validate_import_transactions$",
         views.validate_import_transactions,
         name="validate_import_transactions",
@@ -131,8 +132,16 @@ urlpatterns = [
     url(r"^core/print_preview_pdf$", views.print_preview_pdf, name="print_preview_pdf"),
     url(r"^core/reports$", views.reports, name="reports"),
     url(r"^core/upcoming_reports$", views.upcoming_reports, name="upcoming_reports"),
-    url(r"^core/recent_saved_reports$", views.recent_saved_reports, name="recent_saved_reports"),
-    url(r"^core/recent_submitted_reports$", views.recent_submitted_reports, name="recent_submitted_reports"),
+    url(
+        r"^core/recent_saved_reports$",
+        views.recent_saved_reports,
+        name="recent_saved_reports",
+    ),
+    url(
+        r"^core/recent_submitted_reports$",
+        views.recent_submitted_reports,
+        name="recent_submitted_reports",
+    ),
     url(r"^core/submit_report$", views.submit_report, name="submit_report"),
     url(r"^core/contacts$", views.contacts, name="contacts"),
     url(

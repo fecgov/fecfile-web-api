@@ -3,14 +3,10 @@ import datetime
 import requests
 import fecfiler.settings
 
-# from functools import lru_cache
 from django.db import connection
 from fecfiler.core.transaction_util import do_transaction
-from fecfiler.core.views import cmte_type, update_F3X, find_form_type
+from fecfiler.core.views import cmte_type, get_entities, update_F3X, find_form_type
 
-
-# from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-# import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -153,11 +149,11 @@ AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {}
 
 def date_agg_format(cvg_date):
     try:
-        if cvg_date == None or cvg_date in ["none", "null", " ", ""]:
+        if cvg_date is None or cvg_date in ["none", "null", " ", ""]:
             return None
         cvg_dt = datetime.datetime.strptime(cvg_date, "%Y-%m-%d").date()
         return cvg_dt
-    except:
+    except BaseException:
         raise
 
 
@@ -181,23 +177,23 @@ def list_all_transactions_entity_lb(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-            SELECT t1.expenditure_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.expenditure_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                t1.memo_code, 
+            SELECT t1.expenditure_amount,
+                t1.transaction_id,
+                t1.report_id,
+                t1.line_number,
+                t1.expenditure_date,
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
+                t1.memo_code,
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 t1.aggregation_ind
-            FROM public.sched_b t1 
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND expenditure_date >= %s 
+            FROM public.sched_b t1
+            WHERE entity_id = %s
+            AND cmte_id = %s
+            AND expenditure_date >= %s
             AND expenditure_date <= %s
-            AND levin_account_id = %s 
-            AND delete_ind is distinct FROM 'Y' 
+            AND levin_account_id = %s
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
             """,
                 [
@@ -237,23 +233,23 @@ def list_all_transactions_entity_la(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-            SELECT t1.contribution_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.contribution_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                t1.memo_code, 
+            SELECT t1.contribution_amount,
+                t1.transaction_id,
+                t1.report_id,
+                t1.line_number,
+                t1.contribution_date,
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
+                t1.memo_code,
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 t1.aggregation_ind
-            FROM public.sched_a t1 
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND contribution_date >= %s 
+            FROM public.sched_a t1
+            WHERE entity_id = %s
+            AND cmte_id = %s
+            AND contribution_date >= %s
             AND contribution_date <= %s
-            AND levin_account_id = %s 
-            AND delete_ind is distinct FROM 'Y' 
+            AND levin_account_id = %s
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY contribution_date ASC, create_date ASC
             """,
                 [
@@ -273,9 +269,7 @@ def list_all_transactions_entity_la(
         )
 
 
-def put_sql_agg_amount_schedA(
-    cmte_id, transaction_id, aggregate_amount, itemized_ind
-):
+def put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount, itemized_ind):
     """
     update aggregate amount
     """
@@ -283,11 +277,11 @@ def put_sql_agg_amount_schedA(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                UPDATE public.sched_a 
+                UPDATE public.sched_a
                 SET aggregate_amt = %s,
                     itemized_ind = %s
-                WHERE transaction_id = %s 
-                AND cmte_id = %s 
+                WHERE transaction_id = %s
+                AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
                 """,
                 [aggregate_amount, itemized_ind, transaction_id, cmte_id],
@@ -310,10 +304,10 @@ def update_aggregate_la(datum):
     helper function for updating private contribution line number based on aggrgate amount
     the aggregate amount is a contribution_date-based incremental update, the line number
     is updated accordingly:
-    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table)
             and only when it is NOT add contribution_amount to aggregate amount
     edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
-    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount;
             if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
     e.g.
     date, contribution_amount, aggregate_amount, line_number
@@ -336,8 +330,6 @@ def update_aggregate_la(datum):
         entity_id = datum.get("entity_id")
         levin_account_id = datum.get("levin_account_id")
         contribution_date = datum.get("contribution_date")
-        child_flag_SB = False
-        child_flag_SA = False
         itemization_value = 200
         form_type = find_form_type(report_id, cmte_id)
         if isinstance(contribution_date, str):
@@ -356,7 +348,6 @@ def update_aggregate_la(datum):
             return
         aggregate_amount = 0
         itemized_ind = ""
-        output_line_number = ""
         for transaction in transactions_list:
             if transaction[5] != "Y":
                 if not transaction[9] == "N":
@@ -365,11 +356,6 @@ def update_aggregate_la(datum):
                         itemized_ind = "U"
                     else:
                         itemized_ind = "I"
-
-                # if transaction[7] != None or (
-                #     transaction[7] == None and transaction[6] != "X"
-                # ):
-                # aggregate_amount += transaction[0]
 
                 if contribution_date <= transaction[4]:
                     transaction_id = transaction[1]
@@ -380,75 +366,10 @@ def update_aggregate_la(datum):
                         itemized_ind,
                     )
 
-                    # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
-                    # for child_SA_transaction in child_SA_transaction_list:
-                    #     put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
-                # #Updating aggregate amount to child auto generate sched B transactions
-                # if child_flag_SB:
-                #     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
-                #     for child_SB_transaction in child_SB_transaction_list:
-                #         put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
-
     except Exception as e:
         raise Exception(
             "The update_aggregate_la function is throwing an error: " + str(e)
         )
-
-
-# def list_all_transactions_entity_lb(
-#     aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
-# ):
-#     """
-#     load all transactions for an entity within a time window
-#     return value: a list of transction_records [
-#        (contribution_amount, transaction_id, report_id, line_number, contribution_date),
-#        ....
-#     ]
-#     return items are sorted by contribution_date in ASC order
-#     """
-#     logger.debug(
-#         "fetching transactions for entity {} and levin acct {}".format(
-#             entity_id, levin_account_id
-#         )
-#     )
-#     try:
-#         with connection.cursor() as cursor:
-#             cursor.execute(
-#                 """
-#             SELECT t1.expenditure_amount,
-#                 t1.transaction_id,
-#                 t1.report_id,
-#                 t1.line_number,
-#                 t1.expenditure_date,
-#                 (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
-#                 t1.memo_code,
-#                 t1.back_ref_transaction_id,
-#                 t1.transaction_type_identifier,
-#                 t1.aggregation_ind
-#             FROM public.sched_a t1
-#             WHERE entity_id = %s
-#             AND cmte_id = %s
-#             AND expenditure_date >= %s
-#             AND expenditure_date <= %s
-#             AND levin_account_id = %s
-#             AND delete_ind is distinct FROM 'Y'
-#             ORDER BY expenditure_date ASC, create_date ASC
-#             """,
-#                 [
-#                     entity_id,
-#                     cmte_id,
-#                     aggregate_start_date,
-#                     aggregate_end_date,
-#                     levin_account_id,
-#                 ],
-#             )
-#             transactions_list = cursor.fetchall()
-#         logger.debug("transaction list loaded.")
-#         return transactions_list
-#     except Exception as e:
-#         raise Exception(
-#             "The list_all_transactions_entity function is throwing an error: " + str(e)
-#         )
 
 
 def update_aggregate_lb(datum):
@@ -470,8 +391,6 @@ def update_aggregate_lb(datum):
         entity_id = datum.get("entity_id")
         levin_account_id = datum.get("levin_account_id")
         expenditure_date = datum.get("expenditure_date")
-        # child_flag_SB = False
-        # child_flag_SA = False
         itemization_value = 200
         form_type = find_form_type(report_id, cmte_id)
         if isinstance(expenditure_date, str):
@@ -489,7 +408,6 @@ def update_aggregate_lb(datum):
         if not transactions_list:
             return
         aggregate_amount = 0
-        line_number = None
         itemized_ind = None
         for transaction in transactions_list:
             if transaction[5] != "Y":
@@ -498,36 +416,21 @@ def update_aggregate_lb(datum):
                 if transaction[8] != "LEVIN_OTH_DISB":
                     itemized_ind = "I"
                 else:
-                    if aggregate_amount <= 200:
+                    if aggregate_amount <= itemization_value:
                         itemized_ind = "U"
                     else:
                         itemized_ind = "I"
 
-                # if transaction[7] != None or (
-                #     transaction[7] == None and transaction[6] != "X"
-                # ):
-                # aggregate_amount += transaction[0]
                 if expenditure_date <= transaction[4]:
                     transaction_id = transaction[1]
                     put_sql_agg_amount_LB(
-                        cmte_id,
-                        transaction_id,
-                        aggregate_amount,
-                        itemized_ind
+                        cmte_id, transaction_id, aggregate_amount, itemized_ind
                     )
 
-                    # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
-                    # for child_SA_transaction in child_SA_transaction_list:
-                    #     put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
-                # #Updating aggregate amount to child auto generate sched B transactions
-                # if child_flag_SB:
-                #     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
-                #     for child_SB_transaction in child_SB_transaction_list:
-                #         put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
-
     except Exception as e:
+        logger.error(e)
         raise Exception(
-            "The update_aggregate_lb function is throwing an error: " + str(e)
+            "The update_aggregate_lb function is throwing an error"
         )
 
 
@@ -536,14 +439,15 @@ def superceded_report_id_list(report_id):
         report_list = []
         report_list.append(str(report_id))
         reportId = []
-        # print(report_list)
         while True:
-            # print('in loop')
             with connection.cursor() as cursor:
-                query_string = """SELECT previous_report_id FROM public.reports WHERE report_id = %s AND form_type = 'F3X' AND delete_ind is distinct FROM 'Y' """
+                query_string = """
+                    SELECT previous_report_id FROM public.reports
+                    WHERE report_id = %s AND form_type = 'F3X'
+                    AND delete_ind is distinct FROM 'Y'
+                """
                 cursor.execute(query_string, [report_id])
                 reportId = cursor.fetchone()
-            # print(reportId)
             if reportId is None:
                 break
             elif reportId[0] is None:
@@ -551,9 +455,9 @@ def superceded_report_id_list(report_id):
             else:
                 report_list.append(str(reportId[0]))
                 report_id = reportId[0]
-        # print(report_list)
         return report_list
     except Exception as e:
+        logger.error(e)
         raise
 
 
@@ -566,10 +470,10 @@ def get_list_agg_child_schedA(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
-            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id,
+            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code,
             election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
-                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
+                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND
                             delete_ind is distinct from 'Y'""".format(
                 "', '".join(report_list)
             )
@@ -615,58 +519,67 @@ def find_aggregate_date(form_type, contribution_date):
         )
 
 
-def get_transactions_election_and_office(start_date, end_date, data, form_type='F3X'):
+def get_transactions_election_and_office(start_date, end_date, data, form_type="F3X"):
     """
     load all transactions by electtion code and office within the date range.
     - for president election: election_code + office
     - for senate electtion: election_code + office + state
     - for house: election_code + office + state + district
 
-    when both dissemination_date and disbursement_date are available, 
-    we take priority on dissemination_date 
+    when both dissemination_date and disbursement_date are available,
+    we take priority on dissemination_date
     """
     _sql = ""
     _params = set([])
     cand_office = data.get("so_cand_office", data.get("cand_office"))
     if cand_office == "P":
         _sql = """
-        SELECT  
-                e.transaction_id, 
+        SELECT
+                e.transaction_id,
                 e.expenditure_amount as transaction_amt,
                 COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
-        WHERE  
+        WHERE
             e.cmte_id = %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.delete_ind is distinct FROM 'Y'
-            AND e.memo_code is null 
+            AND e.memo_code is null
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
-        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), form_type)
-    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']):
+        _params = (
+            data.get("cmte_id"),
+            start_date,
+            end_date,
+            data.get("election_code"),
+            form_type,
+        )
+    elif cand_office == "S" or (
+        cand_office == "H"
+        and data.get("so_cand_state") in ["AK", "DE", "MT", "ND", "SD", "VT", "WY"]
+    ):
         _sql = """
-        SELECT  
-                e.transaction_id, 
+        SELECT
+                e.transaction_id,
                 e.expenditure_amount as transaction_amt,
                 COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
-        WHERE  
+        WHERE
             e.cmte_id = %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.so_cand_state = %s
-            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.delete_ind is distinct FROM 'Y'
             AND e.memo_code is null
             AND r.form_type = %s
-            ORDER BY transaction_dt ASC, e.create_date ASC; 
+            ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (
             data.get("cmte_id"),
@@ -674,28 +587,36 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             end_date,
             data.get("election_code"),
             data.get("so_cand_state"),
-            form_type
+            form_type,
         )
-    elif cand_office == "H" and data.get("so_cand_state") not in ['AK', 'DE', 'MT', 'ND', 'SD', 'VT', 'WY']:
+    elif cand_office == "H" and data.get("so_cand_state") not in [
+        "AK",
+        "DE",
+        "MT",
+        "ND",
+        "SD",
+        "VT",
+        "WY",
+    ]:
         _sql = """
-        SELECT  
-                e.transaction_id, 
+        SELECT
+                e.transaction_id,
                 e.expenditure_amount as transaction_amt,
                 COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
                 e.aggregation_ind
         FROM public.sched_e e
         LEFT JOIN public.reports r ON r.report_id = e.report_id
-        WHERE  
+        WHERE
             e.cmte_id = %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.so_cand_state = %s
             AND e.so_cand_district = %s
-            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.delete_ind is distinct FROM 'Y'
             AND e.memo_code is null
             AND r.form_type = %s
-            ORDER BY transaction_dt ASC, e.create_date ASC;  
+            ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (
             data.get("cmte_id"),
@@ -704,7 +625,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             data.get("election_code"),
             data.get("so_cand_state"),
             data.get("so_cand_district"),
-            form_type
+            form_type,
         )
 
     try:
@@ -731,11 +652,12 @@ def update_aggregate_on_transaction(
         _sql = """
         UPDATE public.sched_e
         SET calendar_ytd_amount= %s
-        WHERE transaction_id = %s AND cmte_id = %s 
+        WHERE transaction_id = %s AND cmte_id = %s
         AND delete_ind is distinct from 'Y'
         """
         do_transaction(_sql, (aggregate_amount, transaction_id, cmte_id))
     except Exception as e:
+        logger.error(e)
         raise Exception(
             """error on update aggregate amount
                         for transaction:{}""".format(
@@ -765,18 +687,6 @@ def update_aggregate_se(data):
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
             form_type, trans_dt
         )
-        # checking for child tranaction identifer for updating auto generated SB transactions
-        # if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
-        #     child_flag = True
-        #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
-        # make sure transaction list comes back sorted by contribution_date ASC
-        # transactions_list = list_all_transactions_entity(
-        #     aggregate_start_date,
-        #     aggregate_end_date,
-        #     transaction_type_identifier,
-        #     entity_id,
-        #     cmte_id,
-        # )
         transaction_list = get_transactions_election_and_office(
             aggregate_start_date, aggregate_end_date, data, form_type
         )
@@ -859,14 +769,14 @@ def load_schedE(cmte_id, report_id, transaction_id):
             memo_code,
             memo_text,
             line_number,
-            create_date, 
+            create_date,
             last_update_date,
             mirror_transaction_id,
             mirror_report_id
             FROM public.sched_e
             WHERE cmte_id = %s
             AND report_id = %s
-            AND transaction_id = %s) t 
+            AND transaction_id = %s) t
             """
             # if is_back_ref:
             #     _sql = _sql + """ AND back_ref_transaction_id = %s) t"""
@@ -901,8 +811,10 @@ def get_election_year(office_sought, election_state, election_district):
             )
             add_year = 6
         elif office_sought == "H":
-            param_string = "&office_sought={}&election_state={}&election_district={}".format(
-                office_sought, election_state, election_district
+            param_string = (
+                "&office_sought={}&election_state={}&election_district={}".format(
+                    office_sought, election_state, election_district
+                )
             )
             add_year = 2
         else:
@@ -912,7 +824,8 @@ def get_election_year(office_sought, election_state, election_district):
         election_year_list = []
         while True:
             ab = requests.get(
-                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
+                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date"
+                "&api_key={}&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
                     fecfiler.settings.FECFILE_FEC_WEBSITE_API_KEY, i, param_string
                 )
             )
@@ -946,8 +859,8 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
         end_date = None
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e 
-                WHERE e.cmte_id in ('C00000000') 
+                """SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e
+                WHERE e.cmte_id in ('C00000000')
                 AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = %s AND e.delete_ind is distinct from 'Y') as t""",
                 [beneficiary_cand_id],
             )
@@ -979,7 +892,8 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
                 cand["cand_office_district"] = None
             else:
                 raise Exception(
-                    "The candidate id: {} does not belong to either Senate, House or Presidential office. Kindly check cand_office in entity table for details".format(
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. "
+                    "Kindly check cand_office in entity table for details".format(
                         beneficiary_cand_id
                     )
                 )
@@ -1026,9 +940,9 @@ def get_SF_transactions_candidate(start_date, end_date, beneficiary_cand_id):
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT json_agg(t) FROM (SELECT t1.transaction_id, t1.expenditure_date, t1.expenditure_amount, 
-                t1.aggregate_general_elec_exp, t1.memo_code FROM public.sched_f t1 WHERE t1.payee_cand_id = %s AND t1.expenditure_date >= %s AND 
-                t1.expenditure_date <= %s AND t1.delete_ind is distinct FROM 'Y' 
+                """SELECT json_agg(t) FROM (SELECT t1.transaction_id, t1.expenditure_date, t1.expenditure_amount,
+                t1.aggregate_general_elec_exp, t1.memo_code FROM public.sched_f t1 WHERE t1.payee_cand_id = %s AND t1.expenditure_date >= %s AND
+                t1.expenditure_date <= %s AND t1.delete_ind is distinct FROM 'Y'
                 AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
                 ORDER BY t1.expenditure_date ASC, t1.create_date ASC) t""",
                 [beneficiary_cand_id, start_date, end_date],
@@ -1095,7 +1009,7 @@ def load_schedF(cmte_id, report_id, transaction_id):
             sf.cmte_id,
             sf.report_id,
             sf.transaction_type_identifier,
-            sf.transaction_id, 
+            sf.transaction_id,
             sf.back_ref_transaction_id,
             sf.back_ref_sched_name,
             sf.coordinated_exp_ind,
@@ -1129,8 +1043,8 @@ def load_schedF(cmte_id, report_id, transaction_id):
             sf.delete_ind,
             sf.create_date,
             sf.last_update_date,
-            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id 
-            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id) 
+            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id
+            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = sf.payee_cand_id AND e.delete_ind is distinct from 'Y'
                         ORDER BY e.ref_cand_cmte_id DESC, e.entity_id DESC) AS beneficiary_cand_entity_id
             FROM public.sched_f sf
@@ -1146,18 +1060,6 @@ def load_schedF(cmte_id, report_id, transaction_id):
                     )
                 )
             return schedF_list
-            # merged_list = []
-        #     for dictF in schedF_list:
-        #         entity_id = dictF.get("entity_id")
-        #         data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         entity_list = get_entities(data)
-        #         dictEntity = entity_list[0]
-        #         del dictEntity["cand_office"]
-        #         del dictEntity["cand_office_state"]
-        #         del dictEntity["cand_office_district"]
-        #         merged_dict = {**dictF, **dictEntity}
-        #         merged_list.append(merged_dict)
-        # return merged_list
     except Exception:
         raise
 
@@ -1202,13 +1104,6 @@ def load_schedH6(cmte_id, report_id, transaction_id):
                     )
                 )
             return schedH6_list
-        #     merged_list = []
-        #     for tran in schedH6_list:
-        #         entity_id = tran.get("entity_id")
-        #         q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         dictEntity = get_entities(q_data)[0]
-        #         merged_list.append({**tran, **dictEntity})
-        # return merged_list
     except Exception:
         raise
 
@@ -1257,13 +1152,6 @@ def load_schedH4(cmte_id, report_id, transaction_id):
                         transaction_id
                     )
                 )
-        #     merged_list = []
-        #     for tran in tran_list:
-        #         entity_id = tran.get("payee_entity_id")
-        #         q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
-        #         dictEntity = get_entities(q_data)[0]
-        #         merged_list.append({**tran, **dictEntity})
-        # return merged_list[0]
         return tran_list
     except Exception:
         raise
@@ -1324,15 +1212,15 @@ def list_all_transactions_event_type_h4(start_dt, end_dt, activity_event_type, c
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_amount, 
+            SELECT t1.total_amount,
                 t1.transaction_id
-            FROM public.sched_h4 t1 
-            WHERE activity_event_type = %s 
+            FROM public.sched_h4 t1
+            WHERE activity_event_type = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -1364,7 +1252,7 @@ def update_transaction_ytd_amount_h4(cmte_id, transaction_id, aggregate_amount):
         with connection.cursor() as cursor:
             cursor.execute(
                 """ UPDATE public.sched_h4
-                    SET activity_event_amount_ytd = %s 
+                    SET activity_event_amount_ytd = %s
                     WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
                     """,
                 [aggregate_amount, transaction_id, cmte_id],
@@ -1394,15 +1282,15 @@ def list_all_transactions_event_identifier_h4(
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_amount, 
+            SELECT t1.total_amount,
                 t1.transaction_id
-            FROM public.sched_h4 t1 
-            WHERE activity_event_identifier = %s 
+            FROM public.sched_h4 t1
+            WHERE activity_event_identifier = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -1438,7 +1326,7 @@ def is_pac(cmte_id):
             if cursor.rowcount > 0:
                 return cursor.fetchone()[0] == "PAC"
         return False
-    except:
+    except BaseException:
         raise
 
 
@@ -1484,15 +1372,15 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
     # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
-            SELECT t1.total_fed_levin_amount, 
+            SELECT t1.total_fed_levin_amount,
                 t1.transaction_id
-            FROM public.sched_h6 t1 
-            WHERE activity_event_type = %s 
+            FROM public.sched_h6 t1
+            WHERE activity_event_type = %s
             AND cmte_id = %s
             AND expenditure_date >= %s
-            AND expenditure_date <= %s 
+            AND expenditure_date <= %s
             AND back_ref_transaction_id is null
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
             ORDER BY expenditure_date ASC, create_date ASC
     """
     # .format(activity_event_type, cmte_id, start_dt, end_dt)
@@ -1524,7 +1412,7 @@ def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
         with connection.cursor() as cursor:
             cursor.execute(
                 """ UPDATE public.sched_h6
-                    SET activity_event_total_ytd = %s 
+                    SET activity_event_total_ytd = %s
                     WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
                     """,
                 [aggregate_amount, transaction_id, cmte_id],
@@ -1546,10 +1434,10 @@ def update_linenumber_aggamt_transactions_SA(
     helper function for updating private contribution line number based on aggrgate amount
     the aggregate amount is a contribution_date-based on incremental update, the line number
     is updated accordingly:
-    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table)
             and only when it is NOT add contribution_amount to aggregate amount
     edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
-    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount;
             if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
     e.g.
     date, contribution_amount, aggregate_amount, line_number
@@ -1559,7 +1447,7 @@ def update_linenumber_aggamt_transactions_SA(
 
     """
     try:
-        if transaction_type_identifier not in ('IND_BNDLR', 'REG_ORG_BNDLR'):
+        if transaction_type_identifier not in ("IND_BNDLR", "REG_ORG_BNDLR"):
             child_flag_SB = False
             child_flag_SA = False
             itemization_value = 200
@@ -1577,18 +1465,12 @@ def update_linenumber_aggamt_transactions_SA(
                 in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT
             ):
                 child_flag_SB = True
-                child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(
-                    transaction_type_identifier
-                )
             # checking for child tranaction identifer for updating auto generated SA transactions
             if (
                 transaction_type_identifier
                 in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT
             ):
                 child_flag_SA = True
-                child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(
-                    transaction_type_identifier
-                )
             # make sure transaction list comes back sorted by contribution_date ASC
             transactions_list = list_all_transactions_entity(
                 aggregate_start_date, aggregate_end_date, entity_id, cmte_id
@@ -1607,13 +1489,10 @@ def update_linenumber_aggamt_transactions_SA(
                     # checking if the back_ref_transaction_id is null or not.
                     # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
                     if (
-                        transaction[7] != None
+                        transaction[7] is not None
                         or (
-                            transaction[7] == None
+                            transaction[7] is None
                             and (
-                                # transaction[6] != "X" or
-                                # (transaction[9] == "A" and transaction[0] < 0)
-                                # or transaction[9] == "R"
                                 not (
                                     transaction[6] == "X"
                                     and transaction[9] == "A"
@@ -1673,7 +1552,6 @@ def update_linenumber_aggamt_transactions_SA(
                                 REMAIN_aggregate_amount += transaction[0]
                             aggregate_amount = REMAIN_aggregate_amount
                     # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
-                    # if str(report_id) == str(transaction[2]):
                     if contribution_date <= transaction[4] and transaction[8] not in [
                         "OPEXP_HQ_ACC_REG_REF",
                         "OPEXP_HQ_ACC_IND_REF",
@@ -1720,7 +1598,7 @@ def update_linenumber_aggamt_transactions_SA(
                             put_sql_agg_amount_schedA(
                                 cmte_id,
                                 child_SA_transaction.get("transaction_id"),
-                                aggregate_amount
+                                aggregate_amount,
                             )
                     # Updating aggregate amount to child auto generate sched B transactions
                     if child_flag_SB:
@@ -1754,32 +1632,32 @@ def list_all_transactions_entity(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-            (SELECT t1.contribution_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.contribution_date as transaction_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                t1.memo_code, 
+            (SELECT t1.contribution_amount,
+                t1.transaction_id,
+                t1.report_id,
+                t1.line_number,
+                t1.contribution_date as transaction_date,
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
+                t1.memo_code,
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 t1.reattribution_ind,
                 t1.aggregation_ind,
                 t1.itemized_ind,
                 t1.create_date
-            FROM public.sched_a t1 
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND contribution_date >= %s 
-            AND contribution_date <= %s 
+            FROM public.sched_a t1
+            WHERE entity_id = %s
+            AND cmte_id = %s
+            AND contribution_date >= %s
+            AND contribution_date <= %s
             AND delete_ind is distinct FROM 'Y'
             UNION ALL
-            SELECT t1.expenditure_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.expenditure_date as transaction_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),t1.memo_code, 
+            SELECT t1.expenditure_amount,
+                t1.transaction_id,
+                t1.report_id,
+                t1.line_number,
+                t1.expenditure_date as transaction_date,
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),t1.memo_code,
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 null as reattribution_ind,
@@ -1787,10 +1665,10 @@ def list_all_transactions_entity(
                 t1.itemized_ind,
                 t1.create_date
             FROM public.sched_b t1
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND expenditure_date >= %s 
-            AND expenditure_date <= %s 
+            WHERE entity_id = %s
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s
             AND transaction_type_identifier in ('OPEXP_HQ_ACC_REG_REF',
                                                 'OPEXP_HQ_ACC_IND_REF',
                                                 'OPEXP_HQ_ACC_TRIB_REF',
@@ -1801,7 +1679,7 @@ def list_all_transactions_entity(
                                                 'OTH_DISB_NP_RECNT_TRIB_REF',
                                                 'OTH_DISB_NP_RECNT_IND_REF')
             AND delete_ind is distinct FROM 'Y'
-            ) 
+            )
             ORDER BY transaction_date ASC, create_date ASC
             """,
                 [
@@ -1897,7 +1775,10 @@ def put_sql_linenumber_schedA(
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute(
-                """UPDATE public.sched_a SET line_number = %s, itemized_ind = %s, aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
+                """
+                    UPDATE public.sched_a SET line_number = %s, itemized_ind = %s, aggregate_amt = %s
+                    WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'
+                """,
                 [
                     line_number,
                     itemized_ind,
@@ -1907,7 +1788,6 @@ def put_sql_linenumber_schedA(
                     entity_id,
                 ],
             )
-            # print(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception(
                     "put_sql_linenumber_schedA function: The Transaction ID: {} does not exist in schedA table".format(
@@ -1927,9 +1807,9 @@ def get_list_child_transactionId_schedB(cmte_id, transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT transaction_id
-                FROM public.sched_b 
-                WHERE cmte_id = %s 
-                AND back_ref_transaction_id = %s 
+                FROM public.sched_b
+                WHERE cmte_id = %s
+                AND back_ref_transaction_id = %s
                 AND delete_ind is distinct from 'Y'""",
                 [cmte_id, transaction_id],
             )
@@ -1950,10 +1830,10 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                UPDATE public.sched_b 
+                UPDATE public.sched_b
                 SET aggregate_amt = %s
-                WHERE transaction_id = %s 
-                AND cmte_id = %s 
+                WHERE transaction_id = %s
+                AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
                 """,
                 [aggregate_amount, transaction_id, cmte_id],
@@ -1968,9 +1848,7 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
         raise
 
 
-def put_sql_agg_amount_LB(
-    cmte_id, transaction_id, aggregate_amount, itemized_ind
-):
+def put_sql_agg_amount_LB(cmte_id, transaction_id, aggregate_amount, itemized_ind):
     """
     update aggregate amount
     """
@@ -1978,11 +1856,11 @@ def put_sql_agg_amount_LB(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                UPDATE public.sched_b 
+                UPDATE public.sched_b
                 SET aggregate_amt = %s,
                     itemized_ind = %s
-                WHERE transaction_id = %s 
-                AND cmte_id = %s 
+                WHERE transaction_id = %s
+                AND cmte_id = %s
                 AND delete_ind is distinct from 'Y'
                 """,
                 [aggregate_amount, itemized_ind, transaction_id, cmte_id],
@@ -2038,13 +1916,13 @@ def func_aggregate_amount(
                 )
 
             query_string = """SELECT aggregate_amt, contribution_date as transaction_date, create_date
-                FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s 
+                FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s
                 AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
                 AND contribution_date <= %s::date
-                AND ((back_ref_transaction_id IS NULL 
-                AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
+                AND ((back_ref_transaction_id IS NULL
+                AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R'))
                 OR (back_ref_transaction_id IS NOT NULL))
-                AND delete_ind is distinct FROM 'Y' 
+                AND delete_ind is distinct FROM 'Y'
                 ORDER BY transaction_date DESC, create_date DESC;""".format(
                 params
             )

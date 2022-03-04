@@ -2,11 +2,14 @@ import os
 import psycopg2
 import pandas as pd
 import boto3
+import numpy
+import logging
 from io import StringIO
 from pandas.util import hash_pandas_object
-import numpy
 from psycopg2.extensions import register_adapter, AsIs
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def addapt_numpy_float64(numpy_float64):
@@ -20,20 +23,8 @@ def addapt_numpy_int64(numpy_int64):
 register_adapter(numpy.float64, addapt_numpy_float64)
 register_adapter(numpy.int64, addapt_numpy_int64)
 
-SQS_QUEUE_NAME = os.getenv('SQS_QUEUE_NAME')
+SQS_QUEUE_NAME = os.getenv("SQS_QUEUE_NAME")
 
-
-'''
-
-
-CREATE TABLE public.transactions_file_details
-(
-  cmte_id 	character varying(9) NOT NULL,
-  file_name 	character varying(200),
-  md5 		character varying(100),
-  create_date 	timestamp without time zone DEFAULT now()
-)
-'''
 
 # check if file is new
 
@@ -41,8 +32,12 @@ CREATE TABLE public.transactions_file_details
 def check_for_file_hash_in_db(cmteid, filename, hash, fecfilename):
     conn = None
     try:
-        """ insert a transactions_file_details """
-        selectsql = """SELECT cmte_id, md5, file_name, create_date FROM public.transactions_file_details WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;"""
+        """insert a transactions_file_details"""
+        selectsql = """
+            SELECT cmte_id, md5, file_name, create_date
+            FROM public.transactions_file_details
+            WHERE cmte_id = %s AND file_name = %s AND md5 = %s AND fec_file_name = %s;
+        """
 
         conn = psycopg2.connect(settings.DATABASE_URL)
         cur = conn.cursor()
@@ -75,7 +70,7 @@ def load_file_hash_to_db(cmteid, filename, hash, fecfilename):
         cur.execute(insertsql, (cmteid, filename, hash, fecfilename))
         conn.commit()
         cur.close
-        return 'done'
+        return "done"
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     finally:
@@ -84,19 +79,21 @@ def load_file_hash_to_db(cmteid, filename, hash, fecfilename):
 
 
 def generate_md5_hash(filename):
-    print('generate_md5_hash')
+    print("generate_md5_hash")
     try:
-        bucket = 'fecfile-filing-frontend'
+        bucket = "fecfile-filing-frontend"
         # key = 'transactions/Disbursements_1q2020.csv'
-        key = 'transactions/' + filename  # srini_test1.csv
-        s3 = boto3.client('s3')
+        key = "transactions/" + filename  # srini_test1.csv
+        s3 = boto3.client("s3")
         obj = s3.get_object(Bucket=bucket, Key=key)
-        body = obj['Body']
+        body = obj["Body"]
         # print(body)
-        csv_string = body.read().decode('utf-8')
+        csv_string = body.read().decode("utf-8")
         # print(csv_string)
         # i=0
-        for data in pd.read_csv(StringIO(csv_string), dtype=object, iterator=True, chunksize=200000):
+        for data in pd.read_csv(
+            StringIO(csv_string), dtype=object, iterator=True, chunksize=200000
+        ):
             # print(i)
             # i+=1
             filehash = hash_pandas_object(data).sum()
@@ -105,43 +102,6 @@ def generate_md5_hash(filename):
         return filehash
     except Exception as ex:
         print(ex)
-
-
-'''
-
-@api_view(["POST"])
-def file_verify_upload(request):
-    try:
-        if request.method == 'POST':
-            cmte_id = get_comittee_id(request.user.username)
-            file_name = request.data.get("fileName")
-
-            client = boto3.client('s3',
-                                    settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY
-                                    )
-            bucket = AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME
-            file_name = request.data.get("fileName")
-            csv_obj = client.get_object(Bucket=bucket, Key=file_name)
-            hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
-
-            #filepath = dirname(dirname(os.getcwd()))+"/csv/"
-            filename = "Disbursements_1q2020.csv"
-            hash_value = generate_md5_hash(filepath+filename)
-            fileexists = check_for_file_hash_in_db('C00000018', filename, hash_value)
-            if fileexists is None:
-                load_file_hash_to_db('C00000018', filename, hash_value)
-                print('File loaded successfully!!!')
-            else:
-                print('File exists in DB')
-
-            return JsonResponse(contacts, status=status.HTTP_201_CREATED, safe=False)
-
-    except Exception as e:
-        json_result = {'message': str(e)}
-        return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
-
-
-'''
 
 
 def get_comittee_id(username):
@@ -162,38 +122,39 @@ def chk_csv_uploaded(request):
         filename = file_name  # "srini_test1.csv"#"Disbursements_1q2020.csv"
         hash_value = md5  # generate_md5_hash(filename)
         fecfilename = fec_file_name  # "F3X_ScheduleLA_Import_Transactions_C0011147_part1_11_25.csv"
-        fileexists = check_for_file_hash_in_db(cmte_id, filename, hash_value, fecfilename)
+        fileexists = check_for_file_hash_in_db(
+            cmte_id, filename, hash_value, fecfilename
+        )
         if fileexists is None:
             load_file_hash_to_db(cmte_id, filename, hash_value, fecfilename)
 
-        rcmteid = ""
         rhash = ""
         rfilename = ""
         rcreate_date = ""
         if fileexists is not None:
-            rcmteid = fileexists[0]
             rhash = fileexists[1]
             rfilename = fileexists[2]
             rcreate_date = fileexists[3].strftime("%Y-%m-%d %H:%M:%S")
             returnstr = {
                 "error_list": [],
                 "fileName": filename,
-                "duplicate_file_list": [{
-                    "fileName": rfilename,
-                    "uploadDate": rcreate_date,
-                    "checkSum": rhash
-                }],
-                "duplicate_db_count": 0
+                "duplicate_file_list": [
+                    {
+                        "fileName": rfilename,
+                        "uploadDate": rcreate_date,
+                        "checkSum": rhash,
+                    }
+                ],
+                "duplicate_db_count": 0,
             }
         else:
             returnstr = {
                 "error_list": [],
                 "fileName": filename,
                 "duplicate_file_list": [],
-                "duplicate_db_count": 0
+                "duplicate_db_count": 0,
             }
         return returnstr
     except Exception as e:
-        returnstr = {'message': str(e)}
-        print(returnstr)
+        logger.error(e)
         raise

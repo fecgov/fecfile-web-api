@@ -12,7 +12,4 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 
-ALLOWED_HOSTS = [
-    '.fec.gov',
-    '.app.cloud.gov'
-]
+ALLOWED_HOSTS = [".fec.gov", ".app.cloud.gov"]
