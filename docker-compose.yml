@@ -39,3 +39,4 @@ services:
       - FECFILE_TEST_DB_NAME
       - DJANGO_SETTINGS_MODULE=fecfiler.settings.local
       - DJANGO_SECRET_KEY
+      - FECFILE_FEC_WEBSITE_API_KEY=DEMO_KEY

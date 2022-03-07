@@ -5,10 +5,9 @@ configuration as follows:
 ```
 DATABASE_URL = "postgres://postgres:postgres@0.0.0.0/postgres"
 FECFILE_TEST_DB_NAME = "postgres"
-FECFILE_FEC_WEBSITE_API_KEY=
+FECFILE_FEC_WEBSITE_API_KEY="DEMO_KEY"
 ```
 Notes:
-* There is no default FECFILE_FEC_WEBSITE_API_KEY, you must obtain and set this yourself
 
 CircleCI will attempt to deploy commits made to specific branches:
 * branch __develop__ -> cloud.gov dev space
