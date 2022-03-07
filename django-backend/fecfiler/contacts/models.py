@@ -55,6 +55,6 @@ class Contact(SoftDeleteModel):
         else:
             return self.name
 
-    def fecfile_validate():
+    def fecfile_validate(self):
         schema = f"Contact_{self.type}"
-        return validate.validate(schema, self)
+        return validate.validate(schema, self.__dict__)

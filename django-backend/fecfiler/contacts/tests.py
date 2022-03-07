@@ -34,6 +34,13 @@ class ContactTestCase(TestCase):
         self.valid_contact.full_clean()
         self.assertRaises(ValidationError, self.invalid_contact.full_clean)
 
+    def test_fecfile_validate(self):
+        validation_result = self.valid_contact.fecfile_validate()
+        self.assertEquals(validation_result.errors, [])
+        validation_result = self.invalid_contact.fecfile_validate()
+        self.assertNotEquals(validation_result.errors, [])
+
+
     def test_save_and_delete(self):
         self.valid_contact.save()
         contact_from_db = Contact.objects.get(last_name="Last")
