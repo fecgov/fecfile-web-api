@@ -12,8 +12,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
-from fecfiler.contacts.views.duplicate import create_temp_db_model
-from fecfiler.contacts.views.merge import (
+from fecfiler.contacts.views_v1.duplicate import create_temp_db_model
+from fecfiler.contacts.views_v1.merge import (
     create_temp_contact_table,
     create_temp_transaction_association_model,
 )
