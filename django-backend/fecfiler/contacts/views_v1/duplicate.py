@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 
 
-from fecfiler.contacts.views.merge import (
+from fecfiler.contacts.views_v1.merge import (
     check_if_all_options_selected,
     create_temp_contact_table,
     create_temp_transaction_association_model,
