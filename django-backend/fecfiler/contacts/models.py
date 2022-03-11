@@ -55,4 +55,3 @@ class Contact(SoftDeleteModel):
             return f'{self.last_name}, {self.first_name}'
         else:
             return self.name
-

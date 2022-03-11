@@ -5,7 +5,7 @@ from .serializers import ContactSerializer
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['test_contacts']
+    fixtures = ["test_contacts"]
 
     def setUp(self):
         self.valid_contact = Contact(
@@ -16,7 +16,7 @@ class ContactTestCase(TestCase):
             city="City",
             state="St",
             zip="123456789",
-            country="Country"
+            country="Country",
         )
 
         self.invalid_contact = Contact(
@@ -37,14 +37,15 @@ class ContactTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_data = ContactSerializer(self.valid_contact).data
-        self.assertTrue(ContactSerializer(data = valid_data).is_valid(raise_exception=True))
+        self.assertTrue(
+            ContactSerializer(data=valid_data).is_valid(raise_exception=True)
+        )
         invalid_data = ContactSerializer(self.invalid_contact).data
-        invalid_serializer = ContactSerializer(data = invalid_data)
+        invalid_serializer = ContactSerializer(data=invalid_data)
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["state"])
         self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["country"])
-
 
     def test_save_and_delete(self):
         self.valid_contact.save()
@@ -52,14 +53,12 @@ class ContactTestCase(TestCase):
         self.assertIsInstance(contact_from_db, Contact)
         self.assertEquals(contact_from_db.first_name, "First")
         contact_from_db.delete()
-        self.assertRaises(
-            Contact.DoesNotExist,
-            Contact.objects.get,
-            first_name="First"
-        )
+        self.assertRaises(Contact.DoesNotExist, Contact.objects.get, first_name="First")
 
         soft_deleted_contact = Contact.all_objects.get(last_name="Last")
         self.assertEquals(soft_deleted_contact.first_name, "First")
         self.assertIsNotNone(soft_deleted_contact.deleted)
         soft_deleted_contact.hard_delete()
-        self.assertRaises(Contact.DoesNotExist, Contact.all_objects.get, last_name="Last")
+        self.assertRaises(
+            Contact.DoesNotExist, Contact.all_objects.get, last_name="Last"
+        )

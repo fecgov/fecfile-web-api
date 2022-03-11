@@ -8,6 +8,7 @@ class ContactViewSet(viewsets.ModelViewSet):
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
+
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     permission_classes = []

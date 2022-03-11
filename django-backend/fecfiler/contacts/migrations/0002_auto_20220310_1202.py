@@ -6,38 +6,47 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contacts', '0001_initial'),
+        ("contacts", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='city',
+            model_name="contact",
+            name="city",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='country',
+            model_name="contact",
+            name="country",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='state',
+            model_name="contact",
+            name="state",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='street_1',
+            model_name="contact",
+            name="street_1",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='type',
-            field=models.CharField(choices=[('Committee', 'Committee'), ('Organization', 'Organization'), ('Individual', 'Individual'), ('Candidate', 'Candidate')], max_length=255, null=True),
+            model_name="contact",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("Committee", "Committee"),
+                    ("Organization", "Organization"),
+                    ("Individual", "Individual"),
+                    ("Candidate", "Candidate"),
+                ],
+                max_length=255,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='zip',
+            model_name="contact",
+            name="zip",
             field=models.TextField(null=True),
         ),
     ]

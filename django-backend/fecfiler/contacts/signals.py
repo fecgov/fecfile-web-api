@@ -14,7 +14,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 @receiver(post_save, sender=Contact)
 def log_post_save(sender, instance, created, **kwargs):
     action = "created" if created else "updated"
