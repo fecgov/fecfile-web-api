@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from .models import Contact
+from .serializers import ContactSerializer
 
 
 class ContactTestCase(TestCase):
@@ -13,7 +14,6 @@ class ContactTestCase(TestCase):
             first_name="First",
             street_1="Street",
             city="City",
-            country="Country",
             state="St",
             zip="123456789",
             country="Country"
@@ -35,11 +35,15 @@ class ContactTestCase(TestCase):
         self.valid_contact.full_clean()
         self.assertRaises(ValidationError, self.invalid_contact.full_clean)
 
-    def test_fecfile_validate(self):
-        validation_result = self.valid_contact.fecfile_validate()
-        self.assertEquals(validation_result.errors, [])
-        validation_result = self.invalid_contact.fecfile_validate()
-        self.assertNotEquals(validation_result.errors, [])
+    def test_serializer_validate(self):
+        valid_data = ContactSerializer(self.valid_contact).data
+        self.assertTrue(ContactSerializer(data = valid_data).is_valid())
+        invalid_data = ContactSerializer(self.invalid_contact).data
+        invalid_serializer = ContactSerializer(data = invalid_data)
+        self.assertFalse(invalid_serializer.is_valid())
+        self.assertIsNotNone(invalid_serializer.errors["state"])
+        self.assertIsNotNone(invalid_serializer.errors["zip"])
+        self.assertIsNotNone(invalid_serializer.errors["country"])
 
 
     def test_save_and_delete(self):
