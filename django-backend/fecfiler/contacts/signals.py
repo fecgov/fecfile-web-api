@@ -14,9 +14,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
 @receiver(post_save, sender=Contact)
 def log_post_save(sender, instance, created, **kwargs):
     action = "created" if created else "updated"
+    if action == "updated" and instance.deleted:
+        action = "soft deleted"
     logger.info("Contact: %s was %s", str(instance), action)
 
 
