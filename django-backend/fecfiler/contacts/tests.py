@@ -37,7 +37,7 @@ class ContactTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_data = ContactSerializer(self.valid_contact).data
-        self.assertTrue(ContactSerializer(data = valid_data).is_valid())
+        self.assertTrue(ContactSerializer(data = valid_data).is_valid(raise_exception=True))
         invalid_data = ContactSerializer(self.invalid_contact).data
         invalid_serializer = ContactSerializer(data = invalid_data)
         self.assertFalse(invalid_serializer.is_valid())
