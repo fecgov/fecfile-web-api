@@ -1,6 +1,5 @@
 from django.db import models
 from fecfiler.core.models import SoftDeleteModel
-from fecfile_validate import validate
 
 
 class Contact(SoftDeleteModel):
@@ -57,6 +56,3 @@ class Contact(SoftDeleteModel):
         else:
             return self.name
 
-    def fecfile_validate(self):
-        schema_name = f"Contact_{self.type}"
-        return validate.validate(schema_name, self.__dict__)

@@ -10,4 +10,4 @@ class ContactViewSet(viewsets.ModelViewSet):
     """
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = []

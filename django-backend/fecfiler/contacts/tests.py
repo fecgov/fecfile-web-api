@@ -13,6 +13,7 @@ class ContactTestCase(TestCase):
             first_name="First",
             street_1="Street",
             city="City",
+            country="Country",
             state="St",
             zip="123456789",
             country="Country"
