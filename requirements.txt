@@ -31,7 +31,7 @@ djangorestframework-jwt==1.11.0
 djangorestframework-sso==0.3.2
 docutils==0.14
 drf-nested-routers==0.11.1
-git+https://github.com/fecgov/fecfile-validate@develop#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@develop#egg=fecfile_validate&subdirectory=fecfile_validate_python&cachebust=123
 GitPython==3.1.0
 gunicorn==19.10.0
 humanize==0.5.1
