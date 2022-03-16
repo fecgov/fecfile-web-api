@@ -29,7 +29,6 @@ urlpatterns = [
     url(r"^api/v1/", include("fecfiler.sched_F.urls")),
     url(r"^api/v1/", include("fecfiler.sched_H.urls")),
     url(r"^api/v1/", include("fecfiler.sched_L.urls")),
-    url(r"^api/v1/", include("fecfiler.form_1M.urls")),
     url(r"^api/v1/", include("fecfiler.authentication.urls")),
     url(r"^api/v1/", include("fecfiler.contacts.urls")),
     url(r"^api/v1/", include("fecfiler.password_management.urls")),
