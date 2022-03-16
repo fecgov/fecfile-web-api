@@ -16,7 +16,6 @@ urlpatterns = [
     url(r"^api/v1/", include("fecfiler.forms.urls")),
     url(r"^api/v1/", include("fecfiler.core.urls")),
     url(r"^api/v1/", include("fecfiler.authentication.urls")),
-    url(r"^api/v1/", include("fecfiler.contacts.urls_v1")),
     url(r"^api/v2/", include("fecfiler.contacts.urls")),
     url(r"^api/v1/", include("fecfiler.password_management.urls")),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
