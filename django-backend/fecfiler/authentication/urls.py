@@ -3,7 +3,6 @@ from fecfiler.authentication import views, login, register
 
 urlpatterns = [
     url(r"^user/info$", views.current_user, name="userInfo"),
-    url(r"^user/login/verify$", login.verify_login, name="code-verify-login"),
     url(
         r"^user/register/authenticate$",
         register.authenticate,

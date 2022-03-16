@@ -37,7 +37,6 @@ def get_levin_accounts(cmte_id):
 @api_view(["GET"])
 def get_committee_details(request):
     try:
-        print(f"HULLO {request.user}")
         cmte_id = get_comittee_id(request.user.username)
         with connection.cursor() as cursor:
             # GET all rows from committee table
