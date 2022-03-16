@@ -1,5 +1,6 @@
 from django.db import connection
-from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ def get_levin_accounts(cmte_id):
         raise
 
 
+@api_view(["GET"])
 def get_committee_details(request):
     try:
         print(f"HULLO {request.user}")
@@ -72,9 +74,9 @@ def get_committee_details(request):
             )
         levin_accounts = get_levin_accounts(cmte_id)
         modified_output[0]["levin_accounts"] = levin_accounts
-        return HttpResponse(modified_output[0], status=200)
+        return Response(modified_output[0], status=200)
     except Exception as e:
-        return HttpResponse(
+        return Response(
             "The get_committee_details API is throwing  an error: " + str(e),
             status=400,
         )
