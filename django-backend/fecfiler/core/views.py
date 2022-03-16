@@ -261,52 +261,6 @@ def update_F3X(func):
 
 
 @api_view(["GET"])
-def get_filed_report_types(request):
-    # Fields for identifying the committee type and committee design and filter the forms category
-
-    try:
-        comm_id = get_comittee_id(request.user.username)
-        forms_obj = []
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info,
-                cvg_start_date,cvg_end_date,due_date from public.cmte_report_types_view
-                where cmte_id = %s order by rpt_type_order""",
-                [comm_id],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                for idx, elem in enumerate(row):
-                    if not elem:
-                        data_row[idx] = ""
-                    if isinstance(elem, datetime.date):
-                        data_row[idx] = elem.strftime("%m-%d-%Y")
-                forms_obj.append(
-                    {
-                        "report_type": data_row,
-                        "rpt_type_desc": data_row[1],
-                        "regular_special_report_ind": data_row[2],
-                        "rpt_type_info": data_row[3],
-                        "cvg_start_date": data_row[4],
-                        "cvg_end_date": data_row[5],
-                        "due_date": data_row[6],
-                    }
-                )
-
-        if len(forms_obj) == 0:
-            return Response(
-                "No entries were found for this committee",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        return Response(forms_obj, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response(
-            "The get_filed_report_types API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-@api_view(["GET"])
 def get_transaction_categories(request):
     try:
         with connection.cursor() as cursor:
@@ -857,14 +811,12 @@ def check_null_value(check_value):
     # else:
     return True
 
-
 def get_comittee_id(username):
     cmte_id = ""
     if len(username) > 9:
         cmte_id = username[0:9]
 
     return cmte_id
-
 
 def get_email(username):
     email = ""
@@ -10821,88 +10773,6 @@ def contact_report_details(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-
-@api_view(["POST"])
-def chk_csv_uploaded_in_db(request):
-    try:
-        resp = chk_csv_uploaded(request)
-        return JsonResponse(resp, status=status.HTTP_201_CREATED, safe=False)
-    except Exception as e:
-        json_result = {"message": str(e)}
-        return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
-
-
-@api_view(["POST"])
-def save_csv_md5_to_db(request):
-    try:
-        cmteid = request.user.username
-        filename = request.data.get("file_name")  # request.file_name
-        hash = request.data.get("md5hash")  # request.md5hash
-        resp = load_file_hash_to_db(cmteid, filename, hash)
-        return Response(resp, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response(
-            "The save_csv_md5_to_db API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-@api_view(["POST"])
-def generate_contact_details_from_csv(request):
-    try:
-        cmteid = request.user.username
-        filename = request.data.get("file_name")  # request.file_name
-        resp = get_contact_details_from_transactions(cmteid, filename)
-        return Response(resp, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response(
-            "The get_contact_details_from_csv API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-@api_view(["POST"])
-def validate_import_transactions(request):
-    try:
-
-        cmteid = get_comittee_id(request.user.username)
-        bktname = request.data.get("bkt_name")  # "fecfile-filing-frontend"
-        key = request.data.get(
-            "key"
-        )  # "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-        if bktname and key:
-            resp = validate_transactions(bktname, key, cmteid)
-        else:
-            resp = "No data: both bktname and key need to be sent"
-        return Response(resp, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(e)
-        return Response(
-            "The validate_import_transactions API is throwing an error",
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-@api_view(["POST"])
-def queue_transaction_message(request):
-    try:
-        bktname = request.data.get("bkt_name")  # "fecfile-filing-frontend"
-        key = request.data.get(
-            "key"
-        )  # "transactions/F3X_ScheduleE_Import_Transactions_11_25_TEST_Data.csv"
-
-        if bktname and key:
-            resp = send_message_to_queue(bktname, key)
-        else:
-            resp = "No data: both bktname and key need to be sent"
-
-        return Response(resp, status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(e)
-        return Response(
-            "The queue_transaction_message API is throwing an error",
-            status=status.HTTP_400_BAD_REQUEST,
-        )
 
 
 @api_view(["POST"])

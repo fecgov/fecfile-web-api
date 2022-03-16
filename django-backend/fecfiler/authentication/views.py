@@ -20,7 +20,7 @@ from .serializers import AccountSerializer
 from fecfiler.forms.models import Committee
 from rest_framework_jwt.settings import api_settings
 
-from fecfiler.core.views import check_null_value, NoOPError, get_comittee_id, get_email
+from fecfiler.core.views import check_null_value, NoOPError, get_email
 from fecfiler.settings import OTP_DISABLE
 
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -446,132 +446,6 @@ def get_registration_token():
             return register_url_token
 
 
-@api_view(["POST", "GET", "DELETE", "PUT"])
-def manage_user(request):
-    try:
-        is_not_treasurer(request)
-
-        if request.method == "GET":
-            try:
-                cmte_id = get_comittee_id(request.user.username)
-                if not check_null_value(cmte_id):
-                    raise Exception("Committe id is missing from request data")
-
-                datum = get_users_list(cmte_id)
-                json_result = {"users": datum, "rows": len(datum)}
-                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-            except NoOPError as e:
-                logger.error(e)
-                json_result = {}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-            except Exception as e:
-                logger.error(e)
-                forms_obj = []
-                return JsonResponse(
-                    forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-
-        elif request.method == "DELETE":
-            try:
-                cmte_id = get_comittee_id(request.user.username)
-                data = {"cmte_id": cmte_id}
-                if "id" in request.data and check_null_value(request.data.get("id")):
-                    data["user_id"] = request.data.get("id")
-                else:
-                    raise Exception("Missing Input: ID is mandatory")
-
-                row = delete_manage_user(data)
-                if row > 0:
-                    msg = "The User ID: {} has been successfully deleted"
-                else:
-                    msg = (
-                        "The User ID: {} has not been successfully deleted."
-                        "No matching record was found."
-                    )
-                return JsonResponse(
-                    msg.format(data.get("user_id")),
-                    status=status.HTTP_200_OK,
-                    safe=False,
-                )
-            except Exception as e:
-                json_result = {"message": str(e)}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-
-        elif request.method == "POST":
-            try:
-                cmte_id = get_comittee_id(request.user.username)
-                data = {"cmte_id": cmte_id}
-                fields = user_data_dict()
-                data = validate(data, fields, request)
-                # check if user already exsist
-                user_exist = check_user_present(data)
-                backup_admin_exist = backup_user_exist(data)
-                # check if user was previously deleted, then reactivate
-                user_reactivated, register_url_token = user_previously_deleted(data)
-
-                if (
-                    data.get("role").upper() == Roles.BC_ADMIN.value
-                    and request.user.role != Roles.C_ADMIN.value
-                ):
-                    raise NoOPError(
-                        "Current Role does not have authority to create Back Up Admin. Please reach out "
-                        "to Committee "
-                        "Admin."
-                    )
-
-                if not user_exist and not user_reactivated and not backup_admin_exist:
-                    register_url_token = get_registration_token()
-                    add_new_user(data, cmte_id, register_url_token)
-                    logger.debug(OTP_DISABLE)
-                if not user_exist and not OTP_DISABLE and not backup_admin_exist:
-                    send_email_register(data, cmte_id, register_url_token)
-                    logger.debug("after sending email")
-
-                output = get_users_list(cmte_id)
-                json_result = {"users": output}
-                return JsonResponse(
-                    json_result, status=status.HTTP_201_CREATED, safe=False
-                )
-            except Exception as e:
-                json_result = {"message": str(e)}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-
-        elif request.method == "PUT":
-            try:
-                old_email = get_email(request.user.username)
-                cmte_id = get_comittee_id(request.user.username)
-                username = cmte_id + request.data.get("email")
-
-                data = {
-                    "cmte_id": cmte_id,
-                    "user_name": get_comittee_id(request.user.username),
-                }
-                fields = user_data_dict()
-                fields.append("id")
-                data = validate(data, fields, request)
-                data["new_user_name"] = username
-                data["old_email"] = old_email
-                rows = update_user(data)
-                output = get_users_list(cmte_id)
-                json_result = {"users": output, "rows_updated": rows}
-                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-            except Exception as e:
-                logger.error(e)
-                json_result = {"message": str(e)}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-    except Exception as e:
-        json_result = {"message": str(e)}
-        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
-
 def validate(data, fields, request):
     for val in fields:
         data = validate_input_data(request, val, data)
@@ -643,39 +517,6 @@ def update_toggle_status(status, data):
     except Exception as e:
         logger.error("Exception occurred while toggling status", str(e))
         raise e
-
-
-@api_view(["PUT"])
-def toggle_user(request):
-    try:
-        is_not_treasurer(request)
-
-        if request.method == "PUT":
-            try:
-                username = request.user.username
-                if len(username) > 9:
-                    cmte_id = get_comittee_id(request.user.username)
-                data = {
-                    "username": username,
-                    "id": request.data.get("id"),
-                    "cmte_id": cmte_id,
-                }
-                toggle_status = get_toggle_status(data)
-                rows = update_toggle_status(toggle_status, data)
-                output = get_users_list(cmte_id)
-                json_result = {"users": output, "rows_updated": rows}
-                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-            except Exception as e:
-                logger.error("exception occured while toggling status", str(e))
-                json_result = {}
-                return JsonResponse(
-                    json_result, status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
-
-    except Exception as e:
-        logger.error(e)
-        json_result = {}
-        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET"])
