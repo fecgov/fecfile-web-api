@@ -5,15 +5,15 @@ from fecfiler.core.models import SoftDeleteModel
 class SchATransaction(SoftDeleteModel):
     """Generated model from json schema"""
 
-    form_type = models.TextField(null=False, blank=False)
-    filer_committee_id_number = models.TextField(null=False, blank=False)
-    transaction_id = models.TextField(null=False, blank=False)
+    form_type = models.TextField(null=True, blank=False)
+    filer_committee_id_number = models.TextField(null=True, blank=False)
+    transaction_id = models.TextField(null=True, blank=False)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
     back_reference_sched_name = models.TextField(null=True, blank=True)
-    entity_type = models.TextField(null=False, blank=False)
-    contributor_organization_name = models.TextField(null=False, blank=False)
-    contributor_last_name = models.TextField(null=False, blank=False)
-    contributor_first_name = models.TextField(null=False, blank=False)
+    entity_type = models.TextField(null=True, blank=False)
+    contributor_organization_name = models.TextField(null=True, blank=False)
+    contributor_last_name = models.TextField(null=True, blank=False)
+    contributor_first_name = models.TextField(null=True, blank=False)
     contributor_middle_name = models.TextField(null=True, blank=True)
     contributor_prefix = models.TextField(null=True, blank=True)
     contributor_suffix = models.TextField(null=True, blank=True)

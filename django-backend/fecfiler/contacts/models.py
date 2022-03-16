@@ -17,7 +17,7 @@ class Contact(SoftDeleteModel):
 
     """Generated model from json schema"""
     type = models.CharField(
-        choices=ContactType.choices, max_length=255, null=False, blank=False
+        choices=ContactType.choices, max_length=255, null=True, blank=False
     )
     candidate_id = models.TextField(null=True, blank=True)
     committee_id = models.TextField(null=True, blank=True)
@@ -28,11 +28,11 @@ class Contact(SoftDeleteModel):
     middle_name = models.TextField(null=True, blank=True)
     prefix = models.TextField(null=True, blank=True)
     suffix = models.TextField(null=True, blank=True)
-    street_1 = models.TextField(null=False, blank=False)
+    street_1 = models.TextField(null=True, blank=False)
     street_2 = models.TextField(null=True, blank=True)
-    city = models.TextField(null=False, blank=False)
-    state = models.TextField(null=False, blank=False)
-    zip = models.TextField(null=False, blank=False)
+    city = models.TextField(null=True, blank=False)
+    state = models.TextField(null=True, blank=False)
+    zip = models.TextField(null=True, blank=False)
     employer = models.TextField(null=True, blank=True)
     occupation = models.TextField(null=True, blank=True)
     candidate_office = models.CharField(
@@ -41,9 +41,11 @@ class Contact(SoftDeleteModel):
     candidate_state = models.TextField(null=True, blank=True)
     candidate_district = models.TextField(null=True, blank=True)
     telephone = models.TextField(null=True, blank=True)
-    country = models.TextField(null=False, blank=False)
+    country = models.TextField(null=True, blank=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    # owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'contacts'
