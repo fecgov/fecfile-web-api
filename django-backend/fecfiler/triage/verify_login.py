@@ -8,7 +8,7 @@ from .token import token_verification
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
 from django.db import connection
-from fecfiler.authentication.models import Account
+from .models import Account
 from datetime import datetime
 from django.http import JsonResponse
 from fecfiler.settings import LOGIN_MAX_RETRY

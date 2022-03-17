@@ -1,18 +1,17 @@
 from django.db import models
-from fecfiler.core.models import SoftDeleteModel
+from fecfiler.soft_delete.models import SoftDeleteModel
 
 
 class Contact(SoftDeleteModel):
-
     class ContactType(models.TextChoices):
-        COMMITTEE = "Committee",
-        ORGANIZATION = "Organization",
-        INDIVIDUAL = "Individual",
+        COMMITTEE = "Committee"
+        ORGANIZATION = "Organization"
+        INDIVIDUAL = "Individual"
         CANDIDATE = "Candidate"
 
     class CandidateOffice(models.TextChoices):
-        HOUSE = "House",
-        SENATE = "Senate",
+        HOUSE = "House"
+        SENATE = "Senate"
         PRESIDENTIAL = "Presidential"
 
     """Generated model from json schema"""
@@ -48,10 +47,10 @@ class Contact(SoftDeleteModel):
     # owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'contacts'
+        db_table = "contacts"
 
     def __str__(self):
         if self.type in [Contact.ContactType.CANDIDATE, Contact.ContactType.INDIVIDUAL]:
-            return f'{self.last_name}, {self.first_name}'
+            return f"{self.last_name}, {self.first_name}"
         else:
             return self.name

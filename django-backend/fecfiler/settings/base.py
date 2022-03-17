@@ -55,7 +55,6 @@ FECFILE_FEC_WEBSITE_API_KEY = env.get_credential("FECFILE_FEC_WEBSITE_API_KEY")
 
 ROOT_URLCONF = "fecfiler.urls"
 WSGI_APPLICATION = "fecfiler.wsgi.application"
-AUTH_USER_MODEL = "authentication.Account"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -69,19 +68,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "rest_framework_swagger",
     "compressor",
     "corsheaders",
-    "fecfiler.authentication",
-    "fecfiler.forms",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
-    "fecfiler.core",
-    "storages",
     "fecfiler.contacts",
+    "fecfiler.soft_delete",
     "django_otp",
     "django_otp.plugins.otp_totp",
-    "fecfiler.password_management",
     "fecfiler.triage",
 ]
 
@@ -242,8 +236,7 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
     "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
-    "JWT_RESPONSE_PAYLOAD_HANDLER": "fecfiler.authentication.views.jwt_response_payload_handler",
-    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
+    "JWT_PAYLOAD_HANDLER": "fecfiler.triage.token.jwt_payload_handler",
 }
 
 

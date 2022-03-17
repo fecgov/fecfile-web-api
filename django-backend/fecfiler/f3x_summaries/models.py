@@ -1,5 +1,5 @@
 from django.db import models
-from fecfiler.core.models import SoftDeleteModel
+from fecfiler.soft_delete.models import SoftDeleteModel
 
 
 class F3XSummary(SoftDeleteModel):

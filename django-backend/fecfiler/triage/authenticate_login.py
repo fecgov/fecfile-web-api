@@ -1,16 +1,25 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
     api_view,
 )
+from rest_framework import permissions, status, views, viewsets
+from rest_framework.response import Response
 import pytz
+import time
 from django.db import connection
-from fecfiler.authentication.models import Account
+from .models import Account
 from datetime import datetime, timedelta
 from django.http import JsonResponse
-from fecfiler.password_management.views import create_jwt_token
-from fecfiler.settings import LOGIN_MAX_RETRY, LOGIN_TIMEOUT_TIME
+from .serializers import AccountSerializer
+from .permissions import IsAccountOwner
+from fecfiler.settings import (
+    LOGIN_MAX_RETRY,
+    LOGIN_TIMEOUT_TIME,
+    SECRET_KEY,
+    JWT_PASSWORD_EXPIRY,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -97,6 +106,19 @@ def activate_account(username):
     except Exception as e:
         logger.error("exception occurred while updating last login time")
         raise e
+
+
+def create_jwt_token(email, cmte_id):
+    now = int(time.time())
+    token = jwt.encode(
+        {"email": email, "committee_id": cmte_id, "exp": now + JWT_PASSWORD_EXPIRY},
+        SECRET_KEY,
+        algorithm="HS256",
+    ).decode("utf-8")
+    logger.debug(f"token created: {token}")
+    logger.debug(f"using sk: {hash(SECRET_KEY)}")
+    logger.debug(f"email: {email} committee_id: {cmte_id} exp: {JWT_PASSWORD_EXPIRY}")
+    return token
 
 
 @api_view(["POST"])
@@ -253,3 +275,47 @@ def authenticate_login(request):
             logger.error("exception occurred while getting account information", str(e))
             json_result = {}
             return JsonResponse(json_result, status=400, safe=False)
+
+
+class AccountViewSet(viewsets.ModelViewSet):
+    lookup_field = "username"
+
+    serializer_class = AccountSerializer
+
+    def get_queryset(self):
+        queryset = Account.objects.all()
+        queryset = queryset.filter(self.request.user)
+        serializer_class = AccountSerializer(Account, many=True)
+        return JsonResponse(serializer_class.data, safe=False)
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return (permissions.AllowAny(),)
+        if self.request.method == "POST":
+            return (permissions.AllowAny(),)
+        return permissions.IsAuthenticated(), IsAccountOwner()
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            Account.objects.create_user(**serializer.validated_data)
+            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+
+        return Response(
+            {
+                "status": "Bad request",
+                "message": "Account could not be created with received data.",
+                "details": str(serializer.errors),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class LogoutView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, format=None):
+        print(f"HULLO")
+        logout(request)
+        return Response({}, status=status.HTTP_204_NO_CONTENT)

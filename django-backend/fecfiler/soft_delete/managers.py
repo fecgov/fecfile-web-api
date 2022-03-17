@@ -16,7 +16,7 @@ records, but still provides soft and hard delete functions
 
 class SoftDeleteManager(models.Manager):
     def __init__(self, *args, **kwargs):
-        self.include_deleted = kwargs.pop('include_deleted', False)
+        self.include_deleted = kwargs.pop("include_deleted", False)
         super(SoftDeleteManager, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
