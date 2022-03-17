@@ -4,7 +4,7 @@ from fecfile_validate import validate
 from functools import reduce
 
 
-class ContactSerializer(serializers.HyperlinkedModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Overrides Django Rest Framework's Serializer validate to validate with
         fecfile_validate rules.

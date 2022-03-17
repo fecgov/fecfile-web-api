@@ -55,6 +55,7 @@ FECFILE_FEC_WEBSITE_API_KEY = env.get_credential("FECFILE_FEC_WEBSITE_API_KEY")
 
 ROOT_URLCONF = "fecfiler.urls"
 WSGI_APPLICATION = "fecfiler.wsgi.application"
+AUTH_USER_MODEL = "authentication.Account"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "compressor",
     "corsheaders",
+    "fecfiler.authentication",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
     "fecfiler.contacts",
@@ -236,7 +238,7 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
     "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
-    "JWT_PAYLOAD_HANDLER": "fecfiler.triage.token.jwt_payload_handler",
+    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
 }
 
 

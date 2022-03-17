@@ -4,15 +4,15 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 
 class Contact(SoftDeleteModel):
     class ContactType(models.TextChoices):
-        COMMITTEE = "Committee"
-        ORGANIZATION = "Organization"
-        INDIVIDUAL = "Individual"
-        CANDIDATE = "Candidate"
+        COMMITTEE = "COM"
+        ORGANIZATION = "ORG"
+        INDIVIDUAL = "IND"
+        CANDIDATE = "CAN"
 
     class CandidateOffice(models.TextChoices):
-        HOUSE = "House"
-        SENATE = "Senate"
-        PRESIDENTIAL = "Presidential"
+        HOUSE = "H"
+        SENATE = "S"
+        PRESIDENTIAL = "P"
 
     """Generated model from json schema"""
     type = models.CharField(

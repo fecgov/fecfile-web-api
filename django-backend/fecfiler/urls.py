@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from rest_framework_nested import routers
-from .triage.authenticate_login import AccountViewSet, LogoutView
+from .authentication.authenticate_login import AccountViewSet, LogoutView
 
 router = routers.SimpleRouter()
 router.register(r"accounts", AccountViewSet, basename="Accounts")
@@ -18,4 +18,5 @@ urlpatterns = [
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
     path("api/v1/", include("fecfiler.triage.urls")),
+    path("api/v1/", include("fecfiler.authentication.urls")),
 ]

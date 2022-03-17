@@ -2,7 +2,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -30,7 +30,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -58,7 +58,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -86,7 +86,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -114,7 +114,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -142,7 +142,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -170,7 +170,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -198,7 +198,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -226,7 +226,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -254,7 +254,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -282,7 +282,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -310,7 +310,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -338,7 +338,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -366,7 +366,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -394,7 +394,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -422,7 +422,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -450,7 +450,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -478,7 +478,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -506,7 +506,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -534,7 +534,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -562,7 +562,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -590,7 +590,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -618,7 +618,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -646,7 +646,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -674,7 +674,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -702,7 +702,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -730,7 +730,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -758,7 +758,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
@@ -786,7 +786,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "candidate_id": null,
             "committee_id": "C00601211",
             "name": null,
