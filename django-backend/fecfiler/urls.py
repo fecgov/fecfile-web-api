@@ -13,7 +13,7 @@ urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api/v1/", include(router.urls)),
     url(r"^api/v1/", include(accounts_router.urls)),
-    url(r"^api/v2/", include("fecfiler.contacts.urls")),
+    url(r"^api/v1/", include("fecfiler.contacts.urls")),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),

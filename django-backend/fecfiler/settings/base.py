@@ -126,6 +126,8 @@ DATABASES["default"]["TEST"] = {
 # Connection string for connecting directly
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
