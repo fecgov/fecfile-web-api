@@ -2,7 +2,7 @@
     {
         "model": "contacts.contact",
         "fields": {
-            "type": "Individual",
+            "type": "IND",
             "last_name": "Lastname",
             "first_name": "Firstname",
             "street_1": "Street",

@@ -5,19 +5,19 @@ from fecfiler.core.models import SoftDeleteModel
 class Contact(SoftDeleteModel):
 
     class ContactType(models.TextChoices):
-        COMMITTEE = "Committee",
-        ORGANIZATION = "Organization",
-        INDIVIDUAL = "Individual",
-        CANDIDATE = "Candidate"
+        COMMITTEE = "COM",
+        ORGANIZATION = "ORG",
+        INDIVIDUAL = "IND",
+        CANDIDATE = "CAN"
 
     class CandidateOffice(models.TextChoices):
-        HOUSE = "House",
-        SENATE = "Senate",
-        PRESIDENTIAL = "Presidential"
+        HOUSE = "H",
+        SENATE = "S",
+        PRESIDENTIAL = "P"
 
     """Generated model from json schema"""
     type = models.CharField(
-        choices=ContactType.choices, max_length=255, null=True, blank=False
+        choices=ContactType.choices, max_length=3, null=True, blank=False
     )
     candidate_id = models.TextField(null=True, blank=True)
     committee_id = models.TextField(null=True, blank=True)
@@ -36,7 +36,7 @@ class Contact(SoftDeleteModel):
     employer = models.TextField(null=True, blank=True)
     occupation = models.TextField(null=True, blank=True)
     candidate_office = models.CharField(
-        choices=CandidateOffice.choices, max_length=255, null=True, blank=True
+        choices=CandidateOffice.choices, max_length=1, null=True, blank=True
     )
     candidate_state = models.TextField(null=True, blank=True)
     candidate_district = models.TextField(null=True, blank=True)

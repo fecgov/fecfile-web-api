@@ -9,6 +9,6 @@ class ContactViewSet(viewsets.ModelViewSet):
     `update` and `destroy` actions.
     """
 
-    queryset = Contact.objects.all()
+    queryset = Contact.objects.all().order_by('-id')
     serializer_class = ContactSerializer
     permission_classes = []
