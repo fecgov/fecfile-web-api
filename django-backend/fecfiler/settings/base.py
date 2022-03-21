@@ -164,65 +164,13 @@ STATIC_ROOT = "static"
 
 COMPRESS_ENABLED = os.environ.get("COMPRESS_ENABLED", not DEBUG)
 
-# add the credentials from IAM and bucket name
-AWS_STORAGE_BUCKET_NAME = "fecfile-filing"  # or None if using service role
-AWS_STORAGE_UPLOAD_BUCKET_NAME = (
-    "fecfile-filing-uploads"  # or None if using service role
-)
-AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME = "fecfile-filing-frontend"
-
-# if False it will create unique file names for every uploaded file
-AWS_S3_FILE_OVERWRITE = False
-# the url, that your media and static files will be available at
-S3_URL = "%s.s3.amazonaws.com"
-AWS_S3_CUSTOM_DOMAIN = S3_URL % AWS_STORAGE_BUCKET_NAME
-AWS_S3_CUSTOM_UPLOAD_DOMAIN = S3_URL % AWS_STORAGE_UPLOAD_BUCKET_NAME
 
 # a custom storage file, so we can easily put static and media in one bucket
 DEFAULT_FILE_STORAGE = "fecfiler.custom_storages.MediaStorage"
 
-AWS_ACCESS_KEY_ID = os.environ.get("ACCESS_KEY", None)
-AWS_SECRET_ACCESS_KEY = os.environ.get("SECRET_KEY", None)
-AWS_HOST_NAME = "us-east-1"
-AWS_REGION = "us-east-1"
-AWS_DEFAULT_ACL = None
-AWS_SES_AUTO_THROTTLE = 0.5  # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
-
-USPS_USERNAME = os.environ.get("USPS_USERNAME", None)
-USPS_API_URL = os.environ.get("USPS_API_URL", None)
 
 # the sub-directories of media and static files
 STATICFILES_LOCATION = "static"
-MEDIAFILES_LOCATION = "media"
-
-NXG_FEC_API_URL = os.environ.get("NXG_API_URL", "127.0.0.1:8080")
-NXG_FEC_API_VERSION = os.environ.get("NXG_API_VERSION", "/api/v1/")
-
-NXG_FEC_PRINT_API_URL = os.environ.get(
-    "PRINTPDF_URL", "https://dev-efile-api.efdev.fec.gov/printpdf"
-)
-NXG_FEC_PRINT_API_VERSION = "/v1/print"
-
-# SUBMISSION REPORT SETTINGS
-NXG_COMMITTEE_DEFAULT_PASSWORD = os.environ.get(
-    "NXG_COMMITTEE_DEFAULT_PASSWORD", "test"
-)
-SUBMIT_REPORT_WAIT_FLAG = "False"
-
-# Service Endpoint for filing confirmation email
-NXG_FEC_FILING_CONFIRMATION_URL = os.environ.get(
-    "FILING_CONFIRMATION_URL",
-    "https://dev-efile-api.efdev.fec.gov/receiver/v1/acknowledgement_email",
-)
-
-# dcf_converter end point details
-NXG_FEC_DCF_CONVERTER_API_URL = os.environ.get(
-    "DCF_CONVERTER_URL", "https://dev-efile-api.efdev.fec.gov/dcf_converter"
-)
-NXG_FEC_DCF_CONVERTER_API_VERSION = "/v1/import"
-
-# the regular Django file settings but with the custom S3 URLs
-MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION)
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
@@ -242,22 +190,6 @@ JWT_AUTH = {
     "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
     "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
 }
-
-
-ADMIN_SHORTCUTS = [
-    {
-        "shortcuts": [
-            {
-                "url": "/",
-                "open_new_window": True,
-            },
-            {
-                "url_name": "admin:authentication_account_changelist",
-                "title": "Users",
-            },
-        ]
-    },
-]
 
 LOGGING = {
     "version": 1,
