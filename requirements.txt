@@ -1,10 +1,4 @@
-asn1crypto==0.24.0
-backcall==0.1.0
-bcrypt==3.1.4
-boto==2.49.0
-boto3==1.21.11
-botocore==1.24.11
-certifi==2018.8.24
+
 cfenv==0.5.2
 cffi==1.15.0
 chardet==3.0.4
@@ -22,7 +16,6 @@ django-compressor==3.1
 django-cors-headers==3.11.0
 django-db-file-storage==0.5.3
 django-rest-swagger==2.2.0
-django-s3-upload==0.2.1
 django-storages==1.12.3
 djangocms-admin-style
 djangorestframework==3.13.1
@@ -70,10 +63,6 @@ static3==0.6.1
 traitlets==4.3.2
 tzlocal==1.5.1
 uritemplate==3.0.0
-urllib3==1.26.8
-wcwidth==0.1.7
-fuzzywuzzy==0.17.0
-python-levenshtein==0.12.2
 django-otp==0.9.3
 callfire-api-client-python==0.0.9
 sqlalchemy==1.3.19
