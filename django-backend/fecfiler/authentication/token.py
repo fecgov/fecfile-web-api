@@ -49,8 +49,6 @@ def verify_token(token_received):
         "verify_exp": True,  # Skipping expiration date check
         "verify_aud": False,
     }  # Skipping audience check
-    logger.debug(f"token received: {token_received}")
-    logger.debug(f"using sk: {hash(SECRET_KEY)}")
     payload = jwt.decode(
         token_received, key=SECRET_KEY, algorithms="HS256", options=options
     )
