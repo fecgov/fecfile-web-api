@@ -11,6 +11,7 @@ djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
 drf-nested-routers==0.11.1
 git+https://github.com/fecgov/fecfile-validate@develop#egg=fecfile_validate&subdirectory=fecfile_validate_python
+GitPython==3.1.0
 gunicorn==19.10.0
 Jinja2==2.11.3
 invoke==0.15.0
