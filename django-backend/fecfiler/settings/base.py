@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "compressor",
     "corsheaders",
     "fecfiler.authentication",
     "fecfiler.f3x_summaries",
