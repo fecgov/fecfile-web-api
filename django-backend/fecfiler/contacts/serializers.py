@@ -13,7 +13,14 @@ class ContactSerializer(serializers.ModelSerializer):
             of ```path``` -> ```message``` to comply with DJR's validation error
             pattern
         """
-        schema_name = f"Contact_{data.get('type', None)}"
+
+        contact_value = dict(
+            COM='Committee',
+            IND='Individual',
+            ORG='Organization',
+            CAN='Candidate',
+        )
+        schema_name = f"Contact_{contact_value[data.get('type', None)]}"
         validation_result = validate.validate(schema_name, data)
         if validation_result.errors:
 
