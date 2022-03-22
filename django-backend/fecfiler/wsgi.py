@@ -12,5 +12,6 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fecfiler.settings.production")
 
 from django.core.wsgi import get_wsgi_application  # noqa
+from dj_static import Cling  # noqa
 
-application = get_wsgi_application()
+application = Cling(get_wsgi_application())
