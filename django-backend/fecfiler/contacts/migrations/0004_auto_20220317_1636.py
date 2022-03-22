@@ -6,18 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contacts', '0003_auto_20220317_1320'),
+        ("contacts", "0003_auto_20220317_1320"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='candidate_office',
-            field=models.CharField(blank=True, choices=[('H', 'House'), ('S', 'Senate'), ('P', 'Presidential')], max_length=1, null=True),
+            model_name="contact",
+            name="candidate_office",
+            field=models.CharField(
+                blank=True,
+                choices=[("H", "House"), ("S", "Senate"), ("P", "Presidential")],
+                max_length=1,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='type',
-            field=models.CharField(choices=[('COM', 'Committee'), ('ORG', 'Organization'), ('IND', 'Individual'), ('CAN', 'Candidate')], max_length=3, null=True),
+            model_name="contact",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("COM", "Committee"),
+                    ("ORG", "Organization"),
+                    ("IND", "Individual"),
+                    ("CAN", "Candidate"),
+                ],
+                max_length=3,
+                null=True,
+            ),
         ),
     ]

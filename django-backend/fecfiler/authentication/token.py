@@ -3,12 +3,11 @@ from calendar import timegm
 from datetime import datetime
 from fecfiler.settings import SECRET_KEY
 import jwt
+from rest_framework_jwt.compat import get_username_field, get_username
+from rest_framework_jwt.settings import api_settings
 import logging
 
 logger = logging.getLogger(__name__)
-
-from rest_framework_jwt.compat import get_username_field, get_username
-from rest_framework_jwt.settings import api_settings
 
 
 def jwt_payload_handler(user):
