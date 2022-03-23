@@ -164,8 +164,8 @@ html, body {
 }
 
 footer {
-/*  position: absolute;
-  bottom: 0; */
+  position: absolute;
+  bottom: 0;
   left: 0;
   clear: both;
   z-index: 10;

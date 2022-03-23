@@ -1,19 +1,19 @@
 from django.db import models
-from fecfiler.core.models import SoftDeleteModel
+from fecfiler.soft_delete.models import SoftDeleteModel
 
 
 class SchATransaction(SoftDeleteModel):
     """Generated model from json schema"""
 
-    form_type = models.TextField(null=False, blank=False)
-    filer_committee_id_number = models.TextField(null=False, blank=False)
-    transaction_id = models.TextField(null=False, blank=False)
+    form_type = models.TextField(null=True, blank=False)
+    filer_committee_id_number = models.TextField(null=True, blank=False)
+    transaction_id = models.TextField(null=True, blank=False)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
     back_reference_sched_name = models.TextField(null=True, blank=True)
-    entity_type = models.TextField(null=False, blank=False)
-    contributor_organization_name = models.TextField(null=False, blank=False)
-    contributor_last_name = models.TextField(null=False, blank=False)
-    contributor_first_name = models.TextField(null=False, blank=False)
+    entity_type = models.TextField(null=True, blank=False)
+    contributor_organization_name = models.TextField(null=True, blank=False)
+    contributor_last_name = models.TextField(null=True, blank=False)
+    contributor_first_name = models.TextField(null=True, blank=False)
     contributor_middle_name = models.TextField(null=True, blank=True)
     contributor_prefix = models.TextField(null=True, blank=True)
     contributor_suffix = models.TextField(null=True, blank=True)
@@ -49,7 +49,9 @@ class SchATransaction(SoftDeleteModel):
     conduit_zip = models.TextField(null=True, blank=True)
     memo_code = models.TextField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
-    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(null=True, blank=True)
+    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
+        null=True, blank=True
+    )
     transaction_type_identifier = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

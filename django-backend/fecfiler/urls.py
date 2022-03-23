@@ -1,9 +1,10 @@
 from django.conf.urls import url, include
+from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from rest_framework_nested import routers
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from .authentication.views import AccountViewSet, LogoutView
+from .authentication.authenticate_login import AccountViewSet, LogoutView
 
 router = routers.SimpleRouter()
 router.register(r"accounts", AccountViewSet, basename="Accounts")
@@ -14,30 +15,17 @@ urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^api/v1/", include(router.urls)),
     url(r"^api/v1/", include(accounts_router.urls)),
-    url(r"^api/v1/", include("fecfiler.forms.urls")),
-    url(r"^api/v1/", include("fecfiler.core.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_A.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_B.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_C.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_D.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_E.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_F.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_H.urls")),
-    url(r"^api/v1/", include("fecfiler.sched_L.urls")),
-    url(r"^api/v1/", include("fecfiler.form_1M.urls")),
-    url(r"^api/v1/", include("fecfiler.authentication.urls")),
-    url(r"^api/v1/", include("fecfiler.contacts.urls")),
-    url(r"^api/v1/", include("fecfiler.password_management.urls")),
-    url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
-    url(r"^api/docs/", SpectacularSwaggerView.as_view(
-        template_name="swagger-ui.html",
-        url_name="schema"
-    )),
+    url(
+        r"^api/docs/",
+        SpectacularSwaggerView.as_view(
+            template_name="swagger-ui.html", url_name="schema"
+        ),
+    ),
+    url(r"^api/v1/", include("fecfiler.contacts.urls")),
+    url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
-    url(r"^files/", include("db_file_storage.urls")),
+    path("api/v1/", include("fecfiler.triage.urls")),
+    path("api/v1/", include("fecfiler.authentication.urls")),
 ]
-
-# if settings.DEBUG:
-#  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
