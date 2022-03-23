@@ -35,16 +35,16 @@ def _detect_space(repo, branch=None):
     """
     space = _resolve_rule(repo, branch)
     if space is None:
-        print('The current configuration does not require a deployment to cloud.gov.')
+        print("The current configuration does not require a deployment to cloud.gov.")
         return None
-    print(f'Detected space {space}')
+    print(f"Detected space {space}")
     return space
 
 
 DEPLOY_RULES = (
-    ('prod', lambda _, branch: branch == 'main'),
-    ('stage', lambda _, branch: branch.startswith('release')),
-    ('dev', lambda _, branch: branch == 'develop'),
+    ("prod", lambda _, branch: branch == "main"),
+    ("stage", lambda _, branch: branch.startswith("release")),
+    ("dev", lambda _, branch: branch == "develop"),
 )
 
 
@@ -53,8 +53,8 @@ def _login_to_cf(ctx, space):
     api = "https://api.fr.cloud.gov"
     ctx.run(f"cf api {api}", echo=True)
     # Authenticate
-    user_var_name = f'$FEC_CF_USERNAME_{space.upper()}'
-    pass_var_name = f'$FEC_CF_PASSWORD_{space.upper()}'
+    user_var_name = f"$FEC_CF_USERNAME_{space.upper()}"
+    pass_var_name = f"$FEC_CF_PASSWORD_{space.upper()}"
 
     login_command = f'cf auth "{user_var_name}" "{pass_var_name}"'
     result = ctx.run(login_command, echo=True, warn=True)
@@ -65,11 +65,17 @@ def _login_to_cf(ctx, space):
         print(f"You must set the {user_var_name} and {pass_var_name} environment ")
         print("variables with space-deployer service account credentials")
         print("")
-        print("If you don't have a service account, you can create one with the following commands:")
+        print(
+            "If you don't have a service account, you can create one with the following commands:"
+        )
         print(f"   cf login -u [email-address] -o {ORG_NAME} -a api.fr.cloud.gov --sso")
         print(f"   cf target -o {ORG_NAME} -s {space}")
-        print("   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]")
-        print("   cf create-service-key  [my-server-account-name] [my-service-key-name]")
+        print(
+            "   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]"
+        )
+        print(
+            "   cf create-service-key  [my-server-account-name] [my-service-key-name]"
+        )
         print("   cf service-key  [my-server-account-name] [my-service-key-name]")
 
         exit(1)
@@ -184,7 +190,9 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         return sys.exit(1)
 
     ctx.run("cf apps", echo=True, warn=True)
-    print(f"A new version of your application '{APP_NAME}' has been successfully pushed!")
+    print(
+        f"A new version of your application '{APP_NAME}' has been successfully pushed!"
+    )
 
     # Needed for CircleCI
     return sys.exit(0)

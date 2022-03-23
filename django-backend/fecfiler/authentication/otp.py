@@ -42,7 +42,10 @@ def get_current_counter_val(username):
     default_sequence = 0
     try:
         with connection.cursor() as cursor:
-            _sql = """select code_generated_counter from public.authentication_account where username = %s AND delete_ind !='Y'"""
+            _sql = """
+                select code_generated_counter from public.authentication_account
+                where username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [username])
             code_counter = cursor.fetchone()[0]
             if code_counter is None:
@@ -58,7 +61,10 @@ def get_current_counter_val(username):
 def get_last_updated_time(username):
     try:
         with connection.cursor() as cursor:
-            _sql = """select updated_at from public.authentication_account where username = %s AND delete_ind !='Y'"""
+            _sql = """
+                select updated_at from public.authentication_account
+                where username = %s AND delete_ind !='Y'
+            """
             cursor.execute(_sql, [username])
             update_time = cursor.fetchone()[0]
 

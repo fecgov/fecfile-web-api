@@ -44,8 +44,6 @@ class Contact(SoftDeleteModel):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    # owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
-
     class Meta:
         db_table = "contacts"
 

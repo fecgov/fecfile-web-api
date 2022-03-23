@@ -143,7 +143,8 @@ def authenticate_login(request):
                 user = Account.objects.filter(username=username).first()
                 if user is None:
                     logger.debug(
-                        "Attempt to login to Account with username : {} was denied at {}.".format(
+                        "Attempt to login to Account "
+                        "with username : {} was denied at {}.".format(
                             username, datetime.now()
                         )
                     )
@@ -161,14 +162,17 @@ def authenticate_login(request):
                             update_last_login_time(username)
                             current_time = datetime.now()
                             logger.debug(
-                                "Attempt to login to Account ID{} was denied at {}. Account is locked.".format(
+                                "Attempt to login to Account ID{} was "
+                                "denied at {}. Account is locked.".format(
                                     user.id, current_time
                                 )
                             )
+                            msg = "Account is locked. Please try again after 15"
+                            msg += " mins or call IT support to unlock account. "
                             return JsonResponse(
                                 {
                                     "status": "Unauthorized",
-                                    "message": "Account is locked. Please try again after 15 mins or call IT support to unlock account. ",
+                                    "message": msg,
                                 },
                                 status=403,
                             )
@@ -196,7 +200,8 @@ def authenticate_login(request):
                                         account.email, account.cmtee_id
                                     )
                                     logger.debug(
-                                        "Attempt to login to Account ID :{} was successful at {}.".format(
+                                        "Attempt to login to Account ID :{} "
+                                        "was successful at {}.".format(
                                             account.id, datetime.now()
                                         )
                                     )
@@ -214,15 +219,17 @@ def authenticate_login(request):
                             current_time = datetime.now()
                             update_last_login_time(username)
                             logger.debug(
-                                "Attempt to login to Account ID: {} was denied at {}. Account is locked.".format(
+                                "Attempt to login to Account ID: {} was"
+                                " denied at {}. Account is locked.".format(
                                     user.id, current_time
                                 )
                             )
+                            msg = "Account is locked. Please try again after 15"
+                            msg += " mins or call IT support to unlock account. "
                             return JsonResponse(
                                 {
                                     "status": "Unauthorized",
-                                    "message": "Account is locked. Please try again after 15 mins or call IT support to "
-                                    "unlock account. ",
+                                    "message": msg,
                                 },
                                 status=403,
                             )
@@ -244,9 +251,8 @@ def authenticate_login(request):
                             lock_account(current_counter, user.secret_key)
 
                     logger.debug(
-                        "Attempt to login to Account with username : {} was denied at {}.".format(
-                            username, datetime.now()
-                        )
+                        "Attempt to login to Account with username:"
+                        " {} was denied at {}.".format(username, datetime.now())
                     )
                     return JsonResponse(
                         {

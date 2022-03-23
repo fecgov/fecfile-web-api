@@ -26,7 +26,8 @@ def reset_code_counter(key):
         with connection.cursor() as cursor:
             _sql = """
             UPDATE public.authentication_account
-            SET code_generated_counter = 0, last_login = %s, updated_at = %s, login_code_counter = 0
+            SET code_generated_counter = 0, last_login = %s,
+            updated_at = %s, login_code_counter = 0
             WHERE secret_key = %s
             """
             cursor.execute(_sql, [datetime.now(), datetime.now(), key])
@@ -59,7 +60,9 @@ def check_account_exist(cmte_id, email):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s)
+            _sql = """SELECT json_agg(t) FROM
+            (Select * from public.authentication_account
+            WHERE cmtee_id = %s AND lower(email) = lower(%s)
             AND status ='Registered' AND delete_ind !='Y') t"""
             cursor.execute(_sql, [cmte_id, email])
             user_list = cursor.fetchone()
@@ -111,7 +114,8 @@ def verify_login(request):
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if not user_list["is_active"]:
                 is_allowed = False
-                msg = "Account is locked. Please try again after 15 mins or call IT support to unlock account."
+                msg = "Account is locked. Please try again after 15 mins"
+                msg += " or call IT support to unlock account."
                 response = {"is_allowed": is_allowed, "msg": msg}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
@@ -142,10 +146,12 @@ def verify_login(request):
                         )
                     )
                 elif counter >= LOGIN_MAX_RETRY:
-                    msg = "Account is locked. Please try again after 15 mins or call IT support to unlock account."
+                    msg = "Account is locked. Please try again after 15 mins"
+                    msg += " or call IT support to unlock account."
                     lock_account(counter, key)
                     logger.debug(
-                        "2 Factor login of Account ID{} failed at {}. Max attempt reached. Account is "
+                        "2 Factor login of Account ID{} failed at {}. "
+                        "Max attempt reached. Account is "
                         "being locked.".format(user_list["id"], datetime.now())
                     )
                 is_allowed = False
