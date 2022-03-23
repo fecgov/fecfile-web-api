@@ -67,8 +67,8 @@ def check_account_exist(cmte_id, email):
             cursor.execute(_sql, [cmte_id, email])
             user_list = cursor.fetchone()
             merged_list = []
-            for dictL in user_list:
-                merged_list = dictL[0]
+            for dict_l in user_list:
+                merged_list = dict_l[0]
 
         return merged_list
     except Exception as e:

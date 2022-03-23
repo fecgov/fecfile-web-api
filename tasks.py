@@ -66,12 +66,14 @@ def _login_to_cf(ctx, space):
         print("variables with space-deployer service account credentials")
         print("")
         print(
-            "If you don't have a service account, you can create one with the following commands:"
+            "If you don't have a service account, you can create one with the"
+            " following commands:"
         )
         print(f"   cf login -u [email-address] -o {ORG_NAME} -a api.fr.cloud.gov --sso")
         print(f"   cf target -o {ORG_NAME} -s {space}")
         print(
-            "   cf create-service cloud-gov-service-account space-deployer [my-service-account-name]"
+            "   cf create-service cloud-gov-service-account space-deployer"
+            " [my-service-account-name]"
         )
         print(
             "   cf create-service-key  [my-server-account-name] [my-service-key-name]"
@@ -101,7 +103,8 @@ def _print_help_text():
     Usage:
     invoke deploy [--space SPACE] [--branch BRANCH] [--login] [--help]
 
-    --space SPACE    If provided, the SPACE space in cloud.gov will be targeted for deployment.
+    --space SPACE    If provided, the SPACE space in cloud.gov will be targeted
+                     for deployment.
                      Either --space or --branch must be provided
                      Allowed values are dev, stage, and prod.
 
