@@ -1,9 +1,13 @@
 import warnings
 from calendar import timegm
 from datetime import datetime
-
+from fecfiler.settings import SECRET_KEY
+import jwt
 from rest_framework_jwt.compat import get_username_field, get_username
 from rest_framework_jwt.settings import api_settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def jwt_payload_handler(user):
@@ -38,3 +42,26 @@ def jwt_payload_handler(user):
         payload["iss"] = api_settings.JWT_ISSUER
 
     return payload
+
+
+def verify_token(token_received):
+    options = {
+        "verify_exp": True,  # Skipping expiration date check
+        "verify_aud": False,
+    }  # Skipping audience check
+    payload = jwt.decode(
+        token_received, key=SECRET_KEY, algorithms="HS256", options=options
+    )
+    return payload
+
+
+def token_verification(request):
+    try:
+        token_received = request.headers["token"]
+        payload = verify_token(token_received)
+        return payload
+    except Exception as e:
+        logger.debug(
+            "exception occurred while generating token for email option.", str(e)
+        )
+        raise e

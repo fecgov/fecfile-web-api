@@ -1,5 +1,5 @@
 from django.db import models
-from fecfiler.core.models import SoftDeleteModel
+from fecfiler.soft_delete.models import SoftDeleteModel
 
 
 class SchATransaction(SoftDeleteModel):
@@ -49,7 +49,9 @@ class SchATransaction(SoftDeleteModel):
     conduit_zip = models.TextField(null=True, blank=True)
     memo_code = models.TextField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
-    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(null=True, blank=True)
+    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
+        null=True, blank=True
+    )
     transaction_type_identifier = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
