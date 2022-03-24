@@ -1,6 +1,4 @@
 [flake8]
-max-line-length = 160
+max-line-length = 90
 ignore =
-    N802  # function name should be lowercase
-    N806  # variable in function should be lowercase
     W503  # line break before binary operator

@@ -4,7 +4,7 @@ from .models import F3XSummary
 
 
 class F3XTestCase(TestCase):
-    fixtures = ['test_f3x_summaries']
+    fixtures = ["test_f3x_summaries"]
 
     def setUp(self):
         self.valid_f3x_summary = F3XSummary(
@@ -12,14 +12,14 @@ class F3XTestCase(TestCase):
             filer_committee_id_number="C00123456",
             treasurer_last_name="Validlastname",
             treasurer_first_name="Validfirstname",
-            date_signed="20220101"
+            date_signed="20220101",
         )
 
         self.invalid_f3x_summary = F3XSummary(
             form_type="invalidformtype",
             treasurer_last_name=1,
             treasurer_first_name="",
-            date_signed="abcdefgh"
+            date_signed="abcdefgh",
         )
 
     def test_get_f3x_summary(self):
@@ -32,18 +32,28 @@ class F3XTestCase(TestCase):
 
     def test_save_and_delete(self):
         self.valid_f3x_summary.save()
-        f3x_summary_from_db = F3XSummary.objects.get(filer_committee_id_number="C00123456")
+        f3x_summary_from_db = F3XSummary.objects.get(
+            filer_committee_id_number="C00123456"
+        )
         self.assertIsInstance(f3x_summary_from_db, F3XSummary)
         self.assertEquals(f3x_summary_from_db.filer_committee_id_number, "C00123456")
         f3x_summary_from_db.delete()
         self.assertRaises(
             F3XSummary.DoesNotExist,
             F3XSummary.objects.get,
-            filer_committee_id_number="C00123456"
+            filer_committee_id_number="C00123456",
         )
 
-        soft_deleted_f3x_summary = F3XSummary.all_objects.get(filer_committee_id_number="C00123456")
-        self.assertEquals(soft_deleted_f3x_summary.filer_committee_id_number, "C00123456")
+        soft_deleted_f3x_summary = F3XSummary.all_objects.get(
+            filer_committee_id_number="C00123456"
+        )
+        self.assertEquals(
+            soft_deleted_f3x_summary.filer_committee_id_number, "C00123456"
+        )
         self.assertIsNotNone(soft_deleted_f3x_summary.deleted)
         soft_deleted_f3x_summary.hard_delete()
-        self.assertRaises(F3XSummary.DoesNotExist, F3XSummary.all_objects.get, filer_committee_id_number="C00123456")
+        self.assertRaises(
+            F3XSummary.DoesNotExist,
+            F3XSummary.all_objects.get,
+            filer_committee_id_number="C00123456",
+        )
