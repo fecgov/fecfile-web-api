@@ -15,10 +15,10 @@ class ContactSerializer(serializers.ModelSerializer):
         """
 
         contact_value = dict(
-            COM='Committee',
-            IND='Individual',
-            ORG='Organization',
-            CAN='Candidate',
+            COM="Committee",
+            IND="Individual",
+            ORG="Organization",
+            CAN="Candidate",
         )
         schema_name = f"Contact_{contact_value[data.get('type', None)]}"
         validation_result = validate.validate(schema_name, data)
@@ -58,6 +58,12 @@ class ContactSerializer(serializers.ModelSerializer):
             "candidate_district",
             "telephone",
             "country",
+            "created",
+            "updated",
+        ]
+        read_only_fields = [
+            "id",
+            "deleted",
             "created",
             "updated",
         ]
