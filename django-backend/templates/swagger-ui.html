@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>FECFile API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui.css"
+      integrity="sha384-NYk8IDQuLP9FVPiLTRpPctm/DNyEr5RYM+oWo/bKuKuULbzRx4vXXe0PtYp+61w6"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+    <script
+      src="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui-bundle.js"
+      integrity="sha384-BWurT7DoPmvNONn2eTOVKmI5hnmyyI/aZucEobRr6vXYEquesdCvhVbYMzMJjKkn"
+      crossorigin="anonymous">
+    </script>
+    <script>
+      const ui = SwaggerUIBundle({
+        url: "{% url 'schema' %}",
+        dom_id: "#swagger-ui",
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset,
+        ],
+        layout: "BaseLayout",
+        requestInterceptor: (request) => {
+          request.headers["X-CSRFToken"] = "{{ csrf_token }}";
+          return request;
+        },
+      });
+    </script>
+  </body>
+</html>

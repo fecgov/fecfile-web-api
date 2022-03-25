@@ -6,10 +6,9 @@ dj-database-url==0.3.0
 dj-static==0.0.6
 Django==3.2.12
 django-cors-headers==3.11.0
-django-rest-swagger==2.2.0
 djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
-drf-nested-routers==0.11.1
+drf-spectacular==0.21.2
 git+https://github.com/fecgov/fecfile-validate@develop#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.0
 gunicorn==19.10.0
