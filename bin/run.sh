@@ -1,7 +1,6 @@
 cd django-backend
 
 # Run migrations
-./manage.py makemigrations
 ./manage.py migrate --noinput
 
 # Run application
