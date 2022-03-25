@@ -7,13 +7,19 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="https://unpkg.com/swagger-ui-dist@3/swagger-ui.css"
+      href="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui.css"
+      integrity="sha384-NYk8IDQuLP9FVPiLTRpPctm/DNyEr5RYM+oWo/bKuKuULbzRx4vXXe0PtYp+61w6"
+      crossorigin="anonymous"
     />
   </head>
 
   <body>
     <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <script
+      src="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui-bundle.js"
+      integrity="sha384-BWurT7DoPmvNONn2eTOVKmI5hnmyyI/aZucEobRr6vXYEquesdCvhVbYMzMJjKkn"
+      crossorigin="anonymous">
+    </script>
     <script>
       const ui = SwaggerUIBundle({
         url: "{% url 'schema' %}",
