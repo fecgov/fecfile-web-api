@@ -47,6 +47,15 @@ class ContactTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["country"])
 
+    def test_read_only_fields(self):
+        update = self.valid_contact.__dict__.copy()
+        update["deleted"] = "2022-03-24T15:24:53.865149-04:00"
+        update["last_name"] = "Newlastname"
+        contact_serializer = ContactSerializer(self.valid_contact, data=update)
+        contact_serializer.is_valid()
+        self.assertEquals(contact_serializer.validated_data["last_name"], "Newlastname")
+        self.assertIsNone(contact_serializer.validated_data.get("deleted"))
+
     def test_save_and_delete(self):
         self.valid_contact.save()
         contact_from_db = Contact.objects.get(last_name="Last")
