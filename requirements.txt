@@ -13,7 +13,7 @@ git+https://github.com/fecgov/fecfile-validate@develop#egg=fecfile_validate&subd
 GitPython==3.1.0
 gunicorn==19.10.0
 Jinja2==2.11.3
-invoke==0.15.0
+invoke==1.7.0
 itypes==1.1.0
 MarkupSafe==1.1.1
 openapi-codec==1.3.2
