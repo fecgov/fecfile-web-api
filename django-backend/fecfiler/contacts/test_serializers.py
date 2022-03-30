@@ -4,9 +4,7 @@ from .models import Contact
 from .serializers import ContactSerializer
 
 
-class ContactTestCase(TestCase):
-    fixtures = ["test_contacts"]
-
+class ContactSerializerTestCase(TestCase):
     def setUp(self):
         self.valid_contact = Contact(
             type=Contact.ContactType.INDIVIDUAL,
@@ -27,14 +25,6 @@ class ContactTestCase(TestCase):
             city="City",
         )
 
-    def test_get_contact(self):
-        contact = Contact.objects.get(last_name="Lastname")
-        self.assertEquals(contact.type, Contact.ContactType.INDIVIDUAL)
-
-    def test_full_clean(self):
-        self.valid_contact.full_clean()
-        self.assertRaises(ValidationError, self.invalid_contact.full_clean)
-
     def test_serializer_validate(self):
         valid_data = ContactSerializer(self.valid_contact).data
         self.assertTrue(
@@ -46,19 +36,3 @@ class ContactTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["state"])
         self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["country"])
-
-    def test_save_and_delete(self):
-        self.valid_contact.save()
-        contact_from_db = Contact.objects.get(last_name="Last")
-        self.assertIsInstance(contact_from_db, Contact)
-        self.assertEquals(contact_from_db.first_name, "First")
-        contact_from_db.delete()
-        self.assertRaises(Contact.DoesNotExist, Contact.objects.get, first_name="First")
-
-        soft_deleted_contact = Contact.all_objects.get(last_name="Last")
-        self.assertEquals(soft_deleted_contact.first_name, "First")
-        self.assertIsNotNone(soft_deleted_contact.deleted)
-        soft_deleted_contact.hard_delete()
-        self.assertRaises(
-            Contact.DoesNotExist, Contact.all_objects.get, last_name="Last"
-        )
