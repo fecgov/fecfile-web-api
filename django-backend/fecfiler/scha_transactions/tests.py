@@ -4,7 +4,6 @@ from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
-
     def setUp(self):
         self.sa_trans = SchATransaction(
             form_type="SA11AI",
@@ -53,5 +52,16 @@ class SchATransactionTestCase(TestCase):
         self.assertRaises(
             SchATransaction.DoesNotExist,
             SchATransaction.objects.get,
+            transaction_id="A56123456789-del",
+        )
+
+        soft_deleted_transaction = SchATransaction.all_objects.get(
+            transaction_id="A56123456789-del"
+        )
+        self.assertIsNotNone(soft_deleted_transaction.deleted)
+        soft_deleted_transaction.hard_delete()
+        self.assertRaises(
+            SchATransaction.DoesNotExist,
+            SchATransaction.all_objects.get,
             transaction_id="A56123456789-del",
         )
