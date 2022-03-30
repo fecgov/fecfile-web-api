@@ -32,9 +32,7 @@ class ContactSerializer(serializers.ModelSerializer):
                 return all_errors
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
-            logger.warning(
-                f"Contact: Failed validation with the following fields [{translated_errors.keys()}]"
-            )
+            logger.warning(f"Contact: Failed validation for {translated_errors.keys()}")
             raise exceptions.ValidationError(translated_errors)
         return data
 
@@ -64,6 +62,12 @@ class ContactSerializer(serializers.ModelSerializer):
             "candidate_district",
             "telephone",
             "country",
+            "created",
+            "updated",
+        ]
+        read_only_fields = [
+            "id",
+            "deleted",
             "created",
             "updated",
         ]
