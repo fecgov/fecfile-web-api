@@ -2,6 +2,9 @@ from .models import F3XSummary
 from rest_framework import serializers, exceptions
 from fecfile_validate import validate
 from functools import reduce
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class F3XSummarySerializer(serializers.ModelSerializer):
@@ -21,12 +24,16 @@ class F3XSummarySerializer(serializers.ModelSerializer):
                 return all_errors
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
+            logger.warning(
+                f"F3X Summary: Failed validation with the following fields [{translated_errors.keys()}]"
+            )
             raise exceptions.ValidationError(translated_errors)
         return data
 
     class Meta:
         model = F3XSummary
         fields = [
+            "id",
             "form_type",
             "filer_committee_id_number",
             "committee_name",

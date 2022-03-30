@@ -2,6 +2,9 @@ from .models import Contact
 from rest_framework import serializers, exceptions
 from fecfile_validate import validate
 from functools import reduce
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -15,10 +18,10 @@ class ContactSerializer(serializers.ModelSerializer):
         """
 
         contact_value = dict(
-            COM='Committee',
-            IND='Individual',
-            ORG='Organization',
-            CAN='Candidate',
+            COM="Committee",
+            IND="Individual",
+            ORG="Organization",
+            CAN="Candidate",
         )
         schema_name = f"Contact_{contact_value[data.get('type', None)]}"
         validation_result = validate.validate(schema_name, data)
@@ -29,6 +32,9 @@ class ContactSerializer(serializers.ModelSerializer):
                 return all_errors
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
+            logger.warning(
+                f"Contact: Failed validation with the following fields [{translated_errors.keys()}]"
+            )
             raise exceptions.ValidationError(translated_errors)
         return data
 

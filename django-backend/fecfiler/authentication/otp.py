@@ -10,12 +10,14 @@ from django_otp.oath import TOTP
 from fecfiler.settings import (
     OTP_DIGIT,
     OTP_TIME_EXPIRY,
-    logger,
     OTP_MAX_RETRY,
     OTP_TIMEOUT_TIME,
     OTP_DISABLE,
     OTP_DEFAULT_PASSCODE,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def save_key_datbase(username, key_val, counter, unix_time):
