@@ -1,7 +1,5 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 from .models import Contact
-from .serializers import ContactSerializer
 
 
 class ContactTestCase(TestCase):

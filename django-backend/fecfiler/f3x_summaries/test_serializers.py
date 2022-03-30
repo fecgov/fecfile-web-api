@@ -1,6 +1,4 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
-from .models import F3XSummary
 from .serializers import F3XSummarySerializer
 
 
