@@ -32,7 +32,7 @@ class ContactSerializer(serializers.ModelSerializer):
                 return all_errors
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
-            logger.warning(f"Contact: Failed validation for {translated_errors.keys()}")
+            logger.warning(f"Contact: Failed validation for {list(translated_errors)}")
             raise exceptions.ValidationError(translated_errors)
         return data
 

@@ -25,7 +25,7 @@ class F3XSummarySerializer(serializers.ModelSerializer):
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
             logger.warning(
-                f"F3X Summary: Failed validation for {translated_errors.keys()}"
+                f"F3X Summary: Failed validation for {list(translated_errors)}"
             )
             raise exceptions.ValidationError(translated_errors)
         return data
