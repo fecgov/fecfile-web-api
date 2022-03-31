@@ -1,6 +1,7 @@
 ---
 applications:
 - name: fecfile-web-api
+  instances: 2
   routes:
   - route: fecfile-web-api-stage.app.cloud.gov
   stack: cflinuxfs3
