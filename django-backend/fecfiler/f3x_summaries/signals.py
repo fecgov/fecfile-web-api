@@ -16,12 +16,14 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=F3XSummary)
 def log_post_save(sender, instance, created, **kwargs):
-    action = 'created' if created else 'updated'
-    logger.info('F3XSummary for: %s was %s',
-                instance.filer_committee_id_number, action)
+    action = "updated"
+    if created:
+        action = "created"
+    elif instance.deleted:
+        action = "deleted"
+    logger.info(f"F3X Summary: {instance.id} was {action}")
 
 
 @receiver(post_delete, sender=F3XSummary)
 def log_post_delete(sender, instance, **kwargs):
-    logger.info('F3XSummary for: %s was deleted',
-                instance.filer_committee_id_number)
+    logger.info(f"F3X Summary: {instance.id} was deleted")

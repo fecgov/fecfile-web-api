@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 from .models import F3XSummary
 
 
@@ -15,20 +14,9 @@ class F3XTestCase(TestCase):
             date_signed="20220101",
         )
 
-        self.invalid_f3x_summary = F3XSummary(
-            form_type="invalidformtype",
-            treasurer_last_name=1,
-            treasurer_first_name="",
-            date_signed="abcdefgh",
-        )
-
     def test_get_f3x_summary(self):
         f3x_summary = F3XSummary.objects.get(treasurer_last_name="Lastname")
         self.assertEquals(f3x_summary.form_type, "F3XN")
-
-    def test_full_clean(self):
-        self.valid_f3x_summary.full_clean()
-        self.assertRaises(ValidationError, self.invalid_f3x_summary.full_clean)
 
     def test_save_and_delete(self):
         self.valid_f3x_summary.save()
