@@ -33,11 +33,11 @@ def save_key_datbase(username, key_val, counter, unix_time):
             _v = (decode_key, counter, datetime.now(), unix_time, username)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
-                logger.debug("key save failed for username {}", username)
+                logger.debug(f"key save failed for username {username}")
         return cursor.rowcount
     except Exception as e:
         logger.error(e)
-        logger.error("exception occurred key save for username {}", username)
+        logger.error(f"exception occurred key save for username {username}")
 
 
 def get_current_counter_val(username):
