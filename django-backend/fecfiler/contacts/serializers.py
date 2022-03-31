@@ -38,33 +38,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = [
-            "id",
-            "deleted",
-            "type",
-            "candidate_id",
-            "committee_id",
-            "name",
-            "last_name",
-            "first_name",
-            "middle_name",
-            "prefix",
-            "suffix",
-            "street_1",
-            "street_2",
-            "city",
-            "state",
-            "zip",
-            "employer",
-            "occupation",
-            "candidate_office",
-            "candidate_state",
-            "candidate_district",
-            "telephone",
-            "country",
-            "created",
-            "updated",
-        ]
+        fields = [f.name for f in Contact._meta.get_fields() if f.name != "deleted"]
         read_only_fields = [
             "id",
             "deleted",
