@@ -56,7 +56,7 @@ class SchATransaction(SoftDeleteModel):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     committee_account_id = models.ForeignKey(
-        'committee_accounts.CommiteeAccount', on_delete=models.CASCADE)
+        'committee_accounts.CommitteeAccount', on_delete=models.CASCADE)
 
     class Meta:
         db_table = "scha_transactions"

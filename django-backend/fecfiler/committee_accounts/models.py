@@ -13,6 +13,7 @@ class CommitteeAccount(SoftDeleteModel):
 
     class Meta:
         db_table = "committee_accounts"
+        app_label = "committee_accounts"
 
     def __str__(self):
         return self.committee_id
