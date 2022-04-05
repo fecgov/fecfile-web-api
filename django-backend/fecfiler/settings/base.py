@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
     "fecfiler.contacts",
+    "fecfiler.committee_accounts",
     "fecfiler.soft_delete",
     "django_otp",
     "django_otp.plugins.otp_totp",
