@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fecfiler.scha_transactions package &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="fecfiler-scha-transactions-package">
+<h1>fecfiler.scha_transactions package<a class="headerlink" href="#fecfiler-scha-transactions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html">fecfiler.scha_transactions.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations.0001_initial">fecfiler.scha_transactions.migrations.0001_initial module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations.0002_auto_20220210_1638">fecfiler.scha_transactions.migrations.0002_auto_20220210_1638 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations.0003_schatransaction_deleted">fecfiler.scha_transactions.migrations.0003_schatransaction_deleted module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations.0004_auto_20220303_1326">fecfiler.scha_transactions.migrations.0004_auto_20220303_1326 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations.0005_auto_20220310_1202">fecfiler.scha_transactions.migrations.0005_auto_20220310_1202 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html#module-fecfiler.scha_transactions.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.apps">
+<span id="fecfiler-scha-transactions-apps-module"></span><h2>fecfiler.scha_transactions.apps module<a class="headerlink" href="#module-fecfiler.scha_transactions.apps" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.apps.SchedAConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.apps.</span></span><span class="sig-name descname"><span class="pre">SchedAConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.apps.SchedAConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.apps.SchedAConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fecfiler.scha_transactions'</span></em><a class="headerlink" href="#fecfiler.scha_transactions.apps.SchedAConfig.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.apps.SchedAConfig.ready">
+<span class="sig-name descname"><span class="pre">ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.apps.SchedAConfig.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method in subclasses to run code when Django starts.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.models">
+<span id="fecfiler-scha-transactions-models-module"></span><h2>fecfiler.scha_transactions.models module<a class="headerlink" href="#module-fecfiler.scha_transactions.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.models.</span></span><span class="sig-name descname"><span class="pre">SchATransaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.soft_delete.models.SoftDeleteModel</span></code></p>
+<p>Generated model from json schema</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.back_reference_sched_name">
+<span class="sig-name descname"><span class="pre">back_reference_sched_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.back_reference_sched_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.back_reference_tran_id_number">
+<span class="sig-name descname"><span class="pre">back_reference_tran_id_number</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.back_reference_tran_id_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_city">
+<span class="sig-name descname"><span class="pre">conduit_city</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_city" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_name">
+<span class="sig-name descname"><span class="pre">conduit_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_state">
+<span class="sig-name descname"><span class="pre">conduit_state</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_street1">
+<span class="sig-name descname"><span class="pre">conduit_street1</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_street1" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_street2">
+<span class="sig-name descname"><span class="pre">conduit_street2</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_street2" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.conduit_zip">
+<span class="sig-name descname"><span class="pre">conduit_zip</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.conduit_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contribution_aggregate">
+<span class="sig-name descname"><span class="pre">contribution_aggregate</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contribution_aggregate" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contribution_amount">
+<span class="sig-name descname"><span class="pre">contribution_amount</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contribution_amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contribution_date">
+<span class="sig-name descname"><span class="pre">contribution_date</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contribution_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contribution_purpose_descrip">
+<span class="sig-name descname"><span class="pre">contribution_purpose_descrip</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contribution_purpose_descrip" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_city">
+<span class="sig-name descname"><span class="pre">contributor_city</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_city" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_employer">
+<span class="sig-name descname"><span class="pre">contributor_employer</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_employer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_first_name">
+<span class="sig-name descname"><span class="pre">contributor_first_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_first_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_last_name">
+<span class="sig-name descname"><span class="pre">contributor_last_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_last_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_middle_name">
+<span class="sig-name descname"><span class="pre">contributor_middle_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_middle_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_occupation">
+<span class="sig-name descname"><span class="pre">contributor_occupation</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_occupation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_organization_name">
+<span class="sig-name descname"><span class="pre">contributor_organization_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_organization_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_prefix">
+<span class="sig-name descname"><span class="pre">contributor_prefix</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_state">
+<span class="sig-name descname"><span class="pre">contributor_state</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_street_1">
+<span class="sig-name descname"><span class="pre">contributor_street_1</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_street_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_street_2">
+<span class="sig-name descname"><span class="pre">contributor_street_2</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_street_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_suffix">
+<span class="sig-name descname"><span class="pre">contributor_suffix</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.contributor_zip">
+<span class="sig-name descname"><span class="pre">contributor_zip</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.contributor_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.created">
+<span class="sig-name descname"><span class="pre">created</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_district">
+<span class="sig-name descname"><span class="pre">donor_candidate_district</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_district" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_fec_id">
+<span class="sig-name descname"><span class="pre">donor_candidate_fec_id</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_fec_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_first_name">
+<span class="sig-name descname"><span class="pre">donor_candidate_first_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_first_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_last_name">
+<span class="sig-name descname"><span class="pre">donor_candidate_last_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_last_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_middle_name">
+<span class="sig-name descname"><span class="pre">donor_candidate_middle_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_middle_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_office">
+<span class="sig-name descname"><span class="pre">donor_candidate_office</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_office" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_prefix">
+<span class="sig-name descname"><span class="pre">donor_candidate_prefix</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_state">
+<span class="sig-name descname"><span class="pre">donor_candidate_state</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_candidate_suffix">
+<span class="sig-name descname"><span class="pre">donor_candidate_suffix</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_candidate_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_committee_fec_id">
+<span class="sig-name descname"><span class="pre">donor_committee_fec_id</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_committee_fec_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.donor_committee_name">
+<span class="sig-name descname"><span class="pre">donor_committee_name</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.donor_committee_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.election_code">
+<span class="sig-name descname"><span class="pre">election_code</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.election_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.election_other_description">
+<span class="sig-name descname"><span class="pre">election_other_description</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.election_other_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.entity_type">
+<span class="sig-name descname"><span class="pre">entity_type</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.entity_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.filer_committee_id_number">
+<span class="sig-name descname"><span class="pre">filer_committee_id_number</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.filer_committee_id_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.form_type">
+<span class="sig-name descname"><span class="pre">form_type</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.form_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.get_next_by_created">
+<span class="sig-name descname"><span class="pre">get_next_by_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">created&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.get_next_by_created" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.get_next_by_updated">
+<span class="sig-name descname"><span class="pre">get_next_by_updated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">updated&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.get_next_by_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.get_previous_by_created">
+<span class="sig-name descname"><span class="pre">get_previous_by_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">created&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.get_previous_by_created" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.get_previous_by_updated">
+<span class="sig-name descname"><span class="pre">get_previous_by_updated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">updated&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.get_previous_by_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.memo_code">
+<span class="sig-name descname"><span class="pre">memo_code</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.memo_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.memo_text_description">
+<span class="sig-name descname"><span class="pre">memo_text_description</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.memo_text_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.reference_to_si_or_sl_system_code_that_identifies_the_account">
+<span class="sig-name descname"><span class="pre">reference_to_si_or_sl_system_code_that_identifies_the_account</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.reference_to_si_or_sl_system_code_that_identifies_the_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.transaction_id">
+<span class="sig-name descname"><span class="pre">transaction_id</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.transaction_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.transaction_type_identifier">
+<span class="sig-name descname"><span class="pre">transaction_type_identifier</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.transaction_type_identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.models.SchATransaction.updated">
+<span class="sig-name descname"><span class="pre">updated</span></span><a class="headerlink" href="#fecfiler.scha_transactions.models.SchATransaction.updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.signals">
+<span id="fecfiler-scha-transactions-signals-module"></span><h2>fecfiler.scha_transactions.signals module<a class="headerlink" href="#module-fecfiler.scha_transactions.signals" title="Permalink to this headline">¶</a></h2>
+<p>Logs Schedule A Transaction events</p>
+<p>We use signals to log deletes rather than overwriting delete()
+to handle bulk delete cases
+<a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/db/models/#overriding-predefined-model-methods">https://docs.djangoproject.com/en/dev/topics/db/models/#overriding-predefined-model-methods</a></p>
+<p>We use signals to log saves to be consistent with delete logging</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.signals.log_post_delete">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.signals.</span></span><span class="sig-name descname"><span class="pre">log_post_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.signals.log_post_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.signals.log_post_save">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.signals.</span></span><span class="sig-name descname"><span class="pre">log_post_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.signals.log_post_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.tests">
+<span id="fecfiler-scha-transactions-tests-module"></span><h2>fecfiler.scha_transactions.tests module<a class="headerlink" href="#module-fecfiler.scha_transactions.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.tests.SchATransactionTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.tests.</span></span><span class="sig-name descname"><span class="pre">SchATransactionTestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.tests.SchATransactionTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.tests.SchATransactionTestCase.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.tests.SchATransactionTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.tests.SchATransactionTestCase.test_delete">
+<span class="sig-name descname"><span class="pre">test_delete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.tests.SchATransactionTestCase.test_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.tests.SchATransactionTestCase.test_full_clean">
+<span class="sig-name descname"><span class="pre">test_full_clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.tests.SchATransactionTestCase.test_full_clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.tests.SchATransactionTestCase.test_save">
+<span class="sig-name descname"><span class="pre">test_save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.tests.SchATransactionTestCase.test_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.urls">
+<span id="fecfiler-scha-transactions-urls-module"></span><h2>fecfiler.scha_transactions.urls module<a class="headerlink" href="#module-fecfiler.scha_transactions.urls" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fecfiler.scha_transactions.views">
+<span id="fecfiler-scha-transactions-views-module"></span><h2>fecfiler.scha_transactions.views module<a class="headerlink" href="#module-fecfiler.scha_transactions.views" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fecfiler.scha_transactions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fecfiler.scha_transactions" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, FEC.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/fecfiler.scha_transactions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
