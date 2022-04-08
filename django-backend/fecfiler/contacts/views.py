@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import Contact
 from .serializers import ContactSerializer
 import logging
@@ -6,19 +6,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ContactViewSet(viewsets.ModelViewSet):
+class ContactViewSet(CommitteeOwnedViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
 
-    # queryset = Contact.objects.all().order_by('-id')
     serializer_class = ContactSerializer
     permission_classes = []
 
-    def get_queryset(self):
-        committee_id = self.request.user.cmtee_id
-        queryset = Contact.objects.all().filter(
-            committee_account_id__committee_id=committee_id
-        )
-        return queryset.order_by("-id")
+    """Note that this ViewSet inherits from CommitteeOwnedViewSet
+    The queryset will be further limmited by the user's committee
+    in CommitteeOwnedViewSet's implementation of get_queryset()
+    """
+    queryset = Contact.objects.all().order_by("-id")

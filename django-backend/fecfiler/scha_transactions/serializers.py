@@ -1,4 +1,4 @@
-from .models import F3XSummary
+from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from rest_framework import exceptions
 from fecfile_validate import validate
@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class F3XSummarySerializer(CommitteeOwnedSerializer):
+class SchATransactionSerializer(CommitteeOwnedSerializer):
     def validate(self, data):
         """Overrides Django Rest Framework's Serializer validate to validate with
         fecfile_validate rules.
@@ -17,7 +17,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer):
             of ```path``` -> ```message``` to comply with DJR's validation error
             pattern
         """
-        validation_result = validate.validate("F3X", data)
+        validation_result = validate.validate("SchA", data)
         if validation_result.errors:
 
             def collect_error(all_errors, error):
@@ -26,14 +26,16 @@ class F3XSummarySerializer(CommitteeOwnedSerializer):
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
             logger.warning(
-                f"F3X Summary: Failed validation for {list(translated_errors)}"
+                f"Schedule A: Failed validation for {list(translated_errors)}"
             )
             raise exceptions.ValidationError(translated_errors)
         return data
 
     class Meta:
-        model = F3XSummary
-        fields = [f.name for f in F3XSummary._meta.get_fields() if f.name != "deleted"]
+        model = SchATransaction
+        fields = [
+            f.name for f in SchATransaction._meta.get_fields() if f.name != "deleted"
+        ]
         read_only_fields = [
             "id",
             "deleted",

@@ -6,15 +6,15 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
-    form_type = models.TextField(null=True, blank=False)
-    filer_committee_id_number = models.TextField(null=True, blank=False)
-    transaction_id = models.TextField(null=True, blank=False)
+    form_type = models.TextField(null=True, blank=True)
+    filer_committee_id_number = models.TextField(null=True, blank=True)
+    transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
     back_reference_sched_name = models.TextField(null=True, blank=True)
-    entity_type = models.TextField(null=True, blank=False)
-    contributor_organization_name = models.TextField(null=True, blank=False)
-    contributor_last_name = models.TextField(null=True, blank=False)
-    contributor_first_name = models.TextField(null=True, blank=False)
+    entity_type = models.TextField(null=True, blank=True)
+    contributor_organization_name = models.TextField(null=True, blank=True)
+    contributor_last_name = models.TextField(null=True, blank=True)
+    contributor_first_name = models.TextField(null=True, blank=True)
     contributor_middle_name = models.TextField(null=True, blank=True)
     contributor_prefix = models.TextField(null=True, blank=True)
     contributor_suffix = models.TextField(null=True, blank=True)
