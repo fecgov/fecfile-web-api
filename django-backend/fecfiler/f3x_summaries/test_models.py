@@ -12,6 +12,7 @@ class F3XTestCase(TestCase):
             treasurer_last_name="Validlastname",
             treasurer_first_name="Validfirstname",
             date_signed="20220101",
+            committee_account_id=1000,
         )
 
     def test_get_f3x_summary(self):
