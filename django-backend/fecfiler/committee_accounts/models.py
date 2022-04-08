@@ -26,7 +26,7 @@ class CommitteeOwnedModel(models.Model):
     ownership of the object by a CommitteeAccount
     """
 
-    committee_account_id = models.ForeignKey(
+    committee_account = models.ForeignKey(
         "committee_accounts.CommitteeAccount", on_delete=models.CASCADE
     )
 

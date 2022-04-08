@@ -20,6 +20,6 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
         if isinstance(queryset, QuerySet):
             committee_id = self.request.user.cmtee_id
             queryset = queryset.all().filter(
-                committee_account_id__committee_id=committee_id
+                committee_account__committee_id=committee_id
             )
         return queryset

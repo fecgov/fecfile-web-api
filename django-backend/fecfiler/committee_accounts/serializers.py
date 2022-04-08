@@ -11,7 +11,7 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
     owning CommitteeAccount
     """
 
-    committee_account_id = relations.PrimaryKeyRelatedField(
+    committee_account = relations.PrimaryKeyRelatedField(
         queryset=CommitteeAccount.objects.all()
     )
 
@@ -20,7 +20,7 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         CommitteeAccount as the owner of the object
         """
         request = self.context["request"]
-        committee_id = request.user.cmtee_id
+        committee_id = request.get("user").get("cmtee_id")
         committee = CommitteeAccount.objects.get(committee_id=committee_id)
-        data["committee_account_id"] = committee.id
+        data["committee_account"] = committee.id
         return super().to_internal_value(data)
