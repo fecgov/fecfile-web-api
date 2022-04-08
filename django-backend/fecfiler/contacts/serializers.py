@@ -1,5 +1,7 @@
 from .models import Contact
-from rest_framework import serializers, exceptions
+from fecfiler.authentication.models import Account
+from fecfiler.committee_accounts.models import CommitteeAccount
+from rest_framework import serializers, exceptions, relations
 from fecfile_validate import validate
 from functools import reduce
 import logging
@@ -8,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    committee_account_id = relations.PrimaryKeyRelatedField(
+        queryset=CommitteeAccount.objects.all()
+    )
+
     def validate(self, data):
         """Overrides Django Rest Framework's Serializer validate to validate with
         fecfile_validate rules.
@@ -36,9 +42,18 @@ class ContactSerializer(serializers.ModelSerializer):
             raise exceptions.ValidationError(translated_errors)
         return data
 
+    def to_internal_value(self, data):
+        request = self.context["request"]
+        user = request.user
+        committee = CommitteeAccount.objects.get(committee_id=user.cmtee_id)
+        data["committee_account_id"] = committee.id
+        return super().to_internal_value(data)
+
     class Meta:
         model = Contact
-        fields = [f.name for f in Contact._meta.get_fields() if f.name != "deleted"]
+        fields = [
+            f.name for f in Contact._meta.get_fields() if f.name not in ["deleted"]
+        ]
         read_only_fields = [
             "id",
             "deleted",

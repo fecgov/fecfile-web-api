@@ -1,8 +1,9 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
-class SchATransaction(SoftDeleteModel):
+class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=False)
@@ -55,8 +56,6 @@ class SchATransaction(SoftDeleteModel):
     transaction_type_identifier = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    committee_account_id = models.ForeignKey(
-        'committee_accounts.CommitteeAccount', on_delete=models.CASCADE)
 
     class Meta:
         db_table = "scha_transactions"

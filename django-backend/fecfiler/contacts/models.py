@@ -1,8 +1,9 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
-class Contact(SoftDeleteModel):
+class Contact(SoftDeleteModel, CommitteeOwnedModel):
     class ContactType(models.TextChoices):
         COMMITTEE = "COM"
         ORGANIZATION = "ORG"
@@ -43,9 +44,6 @@ class Contact(SoftDeleteModel):
     country = models.TextField(null=True, blank=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    committee_account_id = models.ForeignKey(
-        'committee_accounts.CommitteeAccount', on_delete=models.CASCADE)
-
 
     class Meta:
         db_table = "contacts"
