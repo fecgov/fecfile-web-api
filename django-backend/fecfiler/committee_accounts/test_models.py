@@ -3,7 +3,7 @@ from .models import CommitteeAccount
 
 
 class CommitteeAccountTestCase(TestCase):
-    fixtures = ["test_db_committee_accounts"]
+    fixtures = ["test_committee_accounts"]
 
     def setUp(self):
         self.valid_committee_account = CommitteeAccount(
@@ -11,8 +11,8 @@ class CommitteeAccountTestCase(TestCase):
         )
 
     def test_get_contact(self):
-        committee_account = CommitteeAccount.objects.get(committee_id="C00277616")
-        self.assertEquals(committee_account.committee_id, "C00277616")
+        committee_account = CommitteeAccount.objects.get(committee_id="C87654321")
+        self.assertEquals(committee_account.committee_id, "C87654321")
 
     def test_save_and_delete(self):
         self.valid_committee_account.save()
