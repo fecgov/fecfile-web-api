@@ -1,9 +1,9 @@
-from rest_framework import viewsets
+from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import SchATransaction
 from .serializers import SchATransactionSerializer
 
 
-class SchATransactionViewSet(viewsets.ModelViewSet):
+class SchATransactionViewSet(CommitteeOwnedViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.

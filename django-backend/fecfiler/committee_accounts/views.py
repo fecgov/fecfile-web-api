@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
-    """
-    This viewset filters the queryset by the user's committee
+    """ModelViewSet for models using CommitteeOwnedModel
+    Inherit this view set to filter the queryset by the user's committee
     """
 
     def get_queryset(self):
