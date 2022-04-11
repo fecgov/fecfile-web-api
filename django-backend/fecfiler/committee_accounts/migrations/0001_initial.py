@@ -10,10 +10,6 @@ def forwards_func(apps, schema_editor):
     )
 
 
-def reverse_func(apps, schema_editor):
-    pass
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -53,5 +49,5 @@ class Migration(migrations.Migration):
                 "db_table": "committee_accounts",
             },
         ),
-        migrations.RunPython(forwards_func, reverse_func),
+        migrations.RunPython(forwards_func),
     ]
