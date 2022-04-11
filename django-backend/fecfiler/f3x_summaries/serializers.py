@@ -1,5 +1,6 @@
 from .models import F3XSummary
-from rest_framework import serializers, exceptions
+from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
+from rest_framework import exceptions
 from fecfile_validate import validate
 from functools import reduce
 import logging
@@ -7,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class F3XSummarySerializer(serializers.ModelSerializer):
+class F3XSummarySerializer(CommitteeOwnedSerializer):
     def validate(self, data):
         """Overrides Django Rest Framework's Serializer validate to validate with
         fecfile_validate rules.

@@ -3,7 +3,7 @@ from .models import F3XSummary
 
 
 class F3XTestCase(TestCase):
-    fixtures = ["test_f3x_summaries"]
+    fixtures = ["test_committee_accounts", "test_f3x_summaries"]
 
     def setUp(self):
         self.valid_f3x_summary = F3XSummary(
@@ -12,6 +12,7 @@ class F3XTestCase(TestCase):
             treasurer_last_name="Validlastname",
             treasurer_first_name="Validfirstname",
             date_signed="20220101",
+            committee_account_id=1000,
         )
 
     def test_get_f3x_summary(self):

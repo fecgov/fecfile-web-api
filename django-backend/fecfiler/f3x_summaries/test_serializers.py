@@ -3,6 +3,8 @@ from .serializers import F3XSummarySerializer
 
 
 class F3XSerializerTestCase(TestCase):
+    fixtures = ["test_committee_accounts"]
+
     def setUp(self):
         self.valid_f3x_summary = {
             "form_type": "F3XN",
@@ -19,9 +21,15 @@ class F3XSerializerTestCase(TestCase):
         }
 
     def test_serializer_validate(self):
-        valid_serializer = F3XSummarySerializer(data=self.valid_f3x_summary)
+        valid_serializer = F3XSummarySerializer(
+            data=self.valid_f3x_summary,
+            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+        )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
-        invalid_serializer = F3XSummarySerializer(data=self.invalid_f3x_summary)
+        invalid_serializer = F3XSummarySerializer(
+            data=self.invalid_f3x_summary,
+            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+        )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])

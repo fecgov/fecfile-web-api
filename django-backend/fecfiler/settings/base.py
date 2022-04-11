@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "fecfiler.authentication",
+    "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
     "fecfiler.contacts",
