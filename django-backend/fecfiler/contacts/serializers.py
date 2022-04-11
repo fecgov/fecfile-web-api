@@ -1,5 +1,4 @@
 from .models import Contact
-from fecfiler.authentication.models import Account
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from rest_framework import exceptions
 from fecfile_validate import validate
