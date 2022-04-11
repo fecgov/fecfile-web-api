@@ -1,5 +1,17 @@
 import django.core.validators
 from django.db import migrations, models
+from django.core.management import call_command
+
+
+def forwards_func(apps, schema_editor):
+    call_command(
+        "loaddata",
+        "fecfiler/committee_accounts/fixtures/test_db_committee_accounts.json",
+    )
+
+
+def reverse_func(apps, schema_editor):
+    pass
 
 
 class Migration(migrations.Migration):
@@ -41,4 +53,5 @@ class Migration(migrations.Migration):
                 "db_table": "committee_accounts",
             },
         ),
+        migrations.RunPython(forwards_func, reverse_func),
     ]
