@@ -7,14 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('committee_accounts', '0001_initial'),
-        ('contacts', '0004_auto_20220317_1636'),
+        ("committee_accounts", "0001_initial"),
+        ("contacts", "0004_auto_20220317_1636"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='contact',
-            name='committee_account',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount'),
+            model_name="contact",
+            name="committee_account",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="committee_accounts.committeeaccount",
+            ),
         ),
     ]
