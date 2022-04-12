@@ -1,5 +1,7 @@
 from django.test import TestCase
 from .serializers import SchATransactionSerializer
+from django.http import HttpRequest
+from fecfiler.authentication.models import Account
 
 
 class SchATransactionTestCase(TestCase):
@@ -21,15 +23,22 @@ class SchATransactionTestCase(TestCase):
             "contributor_last_name": "Validlastname",
         }
 
+        self.mock_request = HttpRequest()
+        self.mock_request.method = "POST"
+        self.mock_request.META["SERVER_NAME"] = "localhost"
+        user = Account()
+        user.cmtee_id = "C00277616"
+        self.mock_request.user = user
+
     def test_serializer_validate(self):
         valid_serializer = SchATransactionSerializer(
             data=self.valid_scha_transaction,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = SchATransactionSerializer(
             data=self.invalid_scha_transaction,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])

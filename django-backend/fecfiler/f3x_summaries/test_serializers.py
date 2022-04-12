@@ -1,5 +1,7 @@
 from django.test import TestCase
 from .serializers import F3XSummarySerializer
+from django.http import HttpRequest
+from fecfiler.authentication.models import Account
 
 
 class F3XSerializerTestCase(TestCase):
@@ -20,15 +22,22 @@ class F3XSerializerTestCase(TestCase):
             "date_signed": "20220101",
         }
 
+        self.mock_request = HttpRequest()
+        self.mock_request.method = "POST"
+        self.mock_request.META["SERVER_NAME"] = "localhost"
+        user = Account()
+        user.cmtee_id = "C00277616"
+        self.mock_request.user = user
+
     def test_serializer_validate(self):
         valid_serializer = F3XSummarySerializer(
             data=self.valid_f3x_summary,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = F3XSummarySerializer(
             data=self.invalid_f3x_summary,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
