@@ -1,6 +1,8 @@
 from django.test import TestCase
 from .models import Contact
 from .serializers import ContactSerializer
+from django.http import HttpRequest
+from fecfiler.authentication.models import Account
 
 
 class ContactSerializerTestCase(TestCase):
@@ -26,15 +28,22 @@ class ContactSerializerTestCase(TestCase):
             "city": "City",
         }
 
+        self.mock_request = HttpRequest()
+        self.mock_request.method = "POST"
+        self.mock_request.META["SERVER_NAME"] = "localhost"
+        user = Account()
+        user.cmtee_id = "C00277616"
+        self.mock_request.user = user
+
     def test_serializer_validate(self):
         valid_serializer = ContactSerializer(
             data=self.valid_contact,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = ContactSerializer(
             data=self.invalid_contact,
-            context={"request": {"user": {"cmtee_id": "C00277616"}}},
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["state"])
@@ -46,7 +55,7 @@ class ContactSerializerTestCase(TestCase):
         update["deleted"] = "2022-03-24T15:24:53.865149-04:00"
         update["last_name"] = "Newlastname"
         contact_serializer = ContactSerializer(
-            data=update, context={"request": {"user": {"cmtee_id": "C00277616"}}}
+            data=update, context={"request": self.mock_request}
         )
         self.assertTrue(contact_serializer.is_valid(raise_exception=True))
         self.assertEquals(contact_serializer.validated_data["last_name"], "Newlastname")
