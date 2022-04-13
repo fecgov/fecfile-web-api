@@ -1,25 +1,26 @@
 from django.test import TestCase
-from .serializers import F3XSummarySerializer
+from .serializers import SchATransactionSerializer
 from django.http import HttpRequest
 from fecfiler.authentication.models import Account
 
 
-class F3XSerializerTestCase(TestCase):
+class SchATransactionTestCase(TestCase):
     fixtures = ["test_committee_accounts"]
 
     def setUp(self):
-        self.valid_f3x_summary = {
-            "form_type": "F3XN",
+        self.valid_scha_transaction = {
+            "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
-            "treasurer_last_name": "Validlastname",
-            "treasurer_first_name": "Validfirstname",
-            "date_signed": "20220101",
+            "transaction_id": "A561234567891234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith Co",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
         }
 
-        self.invalid_f3x_summary = {
+        self.invalid_scha_transaction = {
             "form_type": "invalidformtype",
-            "treasurer_last_name": "Validlastname",
-            "date_signed": "20220101",
+            "contributor_last_name": "Validlastname",
         }
 
         self.mock_request = HttpRequest()
@@ -30,15 +31,15 @@ class F3XSerializerTestCase(TestCase):
         self.mock_request.user = user
 
     def test_serializer_validate(self):
-        valid_serializer = F3XSummarySerializer(
-            data=self.valid_f3x_summary,
+        valid_serializer = SchATransactionSerializer(
+            data=self.valid_scha_transaction,
             context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
-        invalid_serializer = F3XSummarySerializer(
-            data=self.invalid_f3x_summary,
+        invalid_serializer = SchATransactionSerializer(
+            data=self.invalid_scha_transaction,
             context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
-        self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])
+        self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])

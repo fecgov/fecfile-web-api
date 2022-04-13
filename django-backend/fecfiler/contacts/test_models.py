@@ -3,7 +3,7 @@ from .models import Contact
 
 
 class ContactTestCase(TestCase):
-    fixtures = ["test_contacts"]
+    fixtures = ["test_committee_accounts", "test_contacts"]
 
     def setUp(self):
         self.valid_contact = Contact(
@@ -15,6 +15,7 @@ class ContactTestCase(TestCase):
             state="St",
             zip="123456789",
             country="Country",
+            committee_account_id=1000,
         )
 
     def test_get_contact(self):

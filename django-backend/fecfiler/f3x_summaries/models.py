@@ -1,8 +1,9 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
-class F3XSummary(SoftDeleteModel):
+class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)

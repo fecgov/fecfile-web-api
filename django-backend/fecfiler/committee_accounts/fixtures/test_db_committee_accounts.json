@@ -1,0 +1,42 @@
+[
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "committee_id": "C00601211",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "committee_id": "C00277608",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "committee_id": "C00277616",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "committee_id": "C00277673",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "committee_id": "C00277863",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]
