@@ -5,7 +5,8 @@ Provides Committee Account
 
 Also provides abstract model, viewset, and serializer for 
 apps that need committee-owned records
-:py:class:`fecfiler.committee_accounts.models.CommitteeOwnedModel
-:py:class:`fecfiler.committee_accounts.views.CommitteeOwnedViewSet
-:py:class:`fecfiler.committee_accounts.serializera.CommitteeOwnedSerializer
+
+:py:class:`fecfiler.committee_accounts.models.CommitteeOwnedModel`
+:py:class:`fecfiler.committee_accounts.views.CommitteeOwnedViewSet`
+:py:class:`fecfiler.committee_accounts.serializera.CommitteeOwnedSerializer`
 """
