@@ -22,6 +22,7 @@ class CommitteeAccount(SoftDeleteModel):
 
 class CommitteeOwnedModel(models.Model):
     """Abstract model for committee ownership
+
     Inherit this model to add a CommitteeAccount foreign key, attributing
     ownership of the object by a CommitteeAccount
     """
