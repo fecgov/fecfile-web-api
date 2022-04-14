@@ -204,7 +204,7 @@ jobs:
       - run:
           name: Run Sphinx
           command: make html
-          working_directory: ~/project/django-backend/docs
+          working_directory: ~/project/docs
 
       - persist_to_workspace:
           root: docs/_build
