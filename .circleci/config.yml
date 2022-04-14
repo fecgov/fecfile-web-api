@@ -184,6 +184,52 @@ jobs:
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
 
+  docs-build:
+    docker:
+      - image: cimg/python:3.8
+
+    steps:
+      - checkout
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/
+          pip-dependency-file: requirements-all.txt
+
+      - run:
+          name: Run Sphinx
+          command: make html
+          working_directory: ~/project/django-backend/docs
+      
+      -persist_to_workspace:
+          root: docs/_build
+          paths: html
+
+  docs-deploy:
+      docker:
+        - image: node:8.10.0
+      steps:
+        - checkout
+        - attach_workspace:
+            at: docs/_build
+        - run:
+            name: Install and configure dependencies
+            command: |
+              npm install -g --silent gh-pages@2.0.1
+              git config user.email "ci-build@fec.gov"
+              git config user.name "ci-build"
+        - run:
+            name: Deploy docs to gh-pages branch
+            command: gh-pages --dist docs/_build/html
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -195,3 +241,10 @@ workflows:
           requires:
               - test
               - dependency-check
+      - docs-build:
+          requires:
+              - test
+              - dependency-check
+      - docs-deploy:
+          requires:
+              - docs-build

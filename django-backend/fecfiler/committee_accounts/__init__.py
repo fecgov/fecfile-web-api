@@ -3,7 +3,7 @@
 Provides Committee Account
 :py:class:`fecfiler.committee_accounts.models.CommitteeAccount`
 
-Also provides abstract model, viewset, and serializer for 
+Also provides abstract model, viewset, and serializer for
 apps that need committee-owned records
 
 :py:class:`fecfiler.committee_accounts.models.CommitteeOwnedModel`
