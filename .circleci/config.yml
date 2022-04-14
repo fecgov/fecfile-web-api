@@ -10,7 +10,6 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-
   dependency-check:
     docker:
       - image: cimg/python:3.8
@@ -21,7 +20,6 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           pip-dependency-file: requirements-test.txt
-
 
       - run:
           name: Run depency check
@@ -44,7 +42,6 @@ jobs:
             echo ""
             echo "Running: $command"
             eval $command
-
 
   test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
@@ -99,11 +96,11 @@ jobs:
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
-# Only use SonarCloud security checking for now.
-#      - run:
-#          name: Bandit security checks
-#          command: |
-#            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
+      # Only use SonarCloud security checking for now.
+      #      - run:
+      #          name: Bandit security checks
+      #          command: |
+      #            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
 
       - run:
           name: Run tests
@@ -160,7 +157,6 @@ jobs:
             flake8 --config django-backend/.flake8
 
   deploy:
-
     docker:
       - image: cimg/python:3.8
 
@@ -190,6 +186,7 @@ jobs:
 
     steps:
       - checkout
+
       - run:
           name: Create unified requirements so CircleCI can cache them
           command: |
@@ -208,27 +205,27 @@ jobs:
           name: Run Sphinx
           command: make html
           working_directory: ~/project/django-backend/docs
-      
-      -persist_to_workspace:
+
+      - persist_to_workspace:
           root: docs/_build
           paths: html
 
   docs-deploy:
-      docker:
-        - image: node:8.10.0
-      steps:
-        - checkout
-        - attach_workspace:
-            at: docs/_build
-        - run:
-            name: Install and configure dependencies
-            command: |
-              npm install -g --silent gh-pages@2.0.1
-              git config user.email "ci-build@fec.gov"
-              git config user.name "ci-build"
-        - run:
-            name: Deploy docs to gh-pages branch
-            command: gh-pages --dist docs/_build/html
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs/_build
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@fec.gov"
+            git config user.name "ci-build"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dist docs/_build/html
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -239,12 +236,12 @@ workflows:
       - dependency-check
       - deploy:
           requires:
-              - test
-              - dependency-check
+            - test
+            - dependency-check
       - docs-build:
           requires:
-              - test
-              - dependency-check
+            - test
+            - dependency-check
       - docs-deploy:
           requires:
-              - docs-build
+            - docs-build
