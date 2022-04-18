@@ -220,7 +220,7 @@ jobs:
           at: docs/_build
       - run:
           name: Disable jekyll builds
-          command: touch html/.nojekyll
+          command: touch docs/_build/html/.nojekyll
       - node/install:
           install-yarn: false
           node-version: "16.13"
