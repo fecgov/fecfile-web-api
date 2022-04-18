@@ -224,8 +224,10 @@ jobs:
       - node/install:
           install-yarn: false
           node-version: "16.13"
+          working_directory: ~/project/docs
       - node/install-packages:
           pkg-manager: npm
+          working_directory: ~/project/docs
       - run:
           name: Configure git
           command: git config user.name "ci-build"
