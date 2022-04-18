@@ -208,7 +208,7 @@ jobs:
           working_directory: ~/project/docs
 
       - persist_to_workspace:
-          root: docs/_build
+          root: ~/project/docs/_build
           paths: html
 
   docs-deploy:
@@ -217,7 +217,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: _build
+          at: ~/project/docs/_build
       - run:
           name: Disable jekyll builds
           command: touch ~/project/docs/_build/html/.nojekyll
