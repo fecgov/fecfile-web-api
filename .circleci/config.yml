@@ -218,14 +218,19 @@ jobs:
       - attach_workspace:
           at: docs/_build
       - run:
-          name: Install and configure dependencies
-          command: |
-            npm install -g --silent gh-pages@2.0.1
-            git config user.email "ci-build@fec.gov"
-            git config user.name "ci-build"
+          name: Disable jekyll builds
+          command: touch docs/_build/html/.nojekyll
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Configure git
+          command: git config user.name "ci-build"
+      - add_ssh_keys:
+          fingerprints:
+            - "deploy key fingerprint here"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dist docs/_build/html
+          command: gh-pages --dotfiles ---dist docs/_build/html
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -245,3 +250,6 @@ workflows:
       - docs-deploy:
           requires:
             - docs-build
+          # filters:
+          #   branches:
+          #     only: develops

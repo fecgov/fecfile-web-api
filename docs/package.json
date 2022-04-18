@@ -1,0 +1,7 @@
+{
+    "name": "fecfile-web-api",
+    "version": "0.0.1",
+    "dependencies": {
+        "gh-pages": "^3.2.3"
+    }
+}
