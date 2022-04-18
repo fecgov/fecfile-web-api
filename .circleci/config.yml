@@ -214,14 +214,13 @@ jobs:
   docs-deploy:
     docker:
       - image: node:8.10.0
-    working_directory: ~/project/docs
     steps:
       - checkout
       - attach_workspace:
           at: _build
       - run:
           name: Disable jekyll builds
-          command: touch _build/html/.nojekyll
+          command: touch ~/project/docs/_build/html/.nojekyll
       - node/install:
           install-yarn: false
           node-version: "16.13"
@@ -235,7 +234,7 @@ jobs:
             - "deploy key fingerprint here"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dotfiles ---dist _build/html
+          command: gh-pages --dotfiles ---dist ~/project/docs/_build/html
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
