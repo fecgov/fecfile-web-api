@@ -7,6 +7,7 @@ orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
   browser-tools: circleci/browser-tools@1.2.3
+  node: circleci/node@5.0.2
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -220,6 +221,9 @@ jobs:
       - run:
           name: Disable jekyll builds
           command: touch docs/_build/html/.nojekyll
+      - node/install:
+          install-yarn: true
+          node-version: "16.13"
       - node/install-packages:
           pkg-manager: npm
       - run:
