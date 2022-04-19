@@ -231,7 +231,7 @@ jobs:
           command: git config user.name "ci-build"
       - add_ssh_keys:
           fingerprints:
-            - "deploy key fingerprint here"
+            - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
       - run:
           name: Deploy docs to gh-pages branch
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
@@ -256,4 +256,4 @@ workflows:
             - docs-build
           # filters:
           #   branches:
-          #     only: develops
+          #     only: develop
