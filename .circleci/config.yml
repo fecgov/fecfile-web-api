@@ -228,7 +228,9 @@ jobs:
           pkg-manager: npm
       - run:
           name: Configure git
-          command: git config user.name "ci-build"
+          command: |
+            git config user.email "apiinfo@fec.gov"
+            git config user.name "apiinfo"
       - add_ssh_keys:
           fingerprints:
             - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
