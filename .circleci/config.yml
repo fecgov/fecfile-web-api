@@ -256,6 +256,6 @@ workflows:
       - docs-deploy:
           requires:
             - docs-build
-          # filters:
-          #   branches:
-          #     only: develop
+          filters:
+            branches:
+              only: develop
