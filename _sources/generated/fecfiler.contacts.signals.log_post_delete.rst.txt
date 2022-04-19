@@ -1,0 +1,6 @@
+fecfiler.contacts.signals.log\_post\_delete
+===========================================
+
+.. currentmodule:: fecfiler.contacts.signals
+
+.. autofunction:: log_post_delete

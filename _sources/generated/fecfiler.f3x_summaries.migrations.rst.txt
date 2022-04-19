@@ -1,0 +1,40 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.f3x\_summaries.migrations
+==================================
+
+.. automodule:: fecfiler.f3x_summaries.migrations
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.f3x_summaries.migrations.0001_initial
+   fecfiler.f3x_summaries.migrations.0002_f3xsummary_deleted
+   fecfiler.f3x_summaries.migrations.0003_auto_20220303_1326
+   fecfiler.f3x_summaries.migrations.0004_auto_20220310_1202
+   fecfiler.f3x_summaries.migrations.0005_auto_20220408_1757
+   fecfiler.f3x_summaries.migrations.0006_alter_f3xsummary_committee_account
+

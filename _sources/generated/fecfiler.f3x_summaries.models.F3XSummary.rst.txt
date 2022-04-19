@@ -1,0 +1,185 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.models.F3XSummary
+=========================================
+
+.. currentmodule:: fecfiler.f3x_summaries.models
+
+.. autoclass:: F3XSummary
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSummary.__init__
+      ~F3XSummary.check
+      ~F3XSummary.clean
+      ~F3XSummary.clean_fields
+      ~F3XSummary.date_error_message
+      ~F3XSummary.delete
+      ~F3XSummary.from_db
+      ~F3XSummary.full_clean
+      ~F3XSummary.get_deferred_fields
+      ~F3XSummary.get_next_by_created
+      ~F3XSummary.get_next_by_updated
+      ~F3XSummary.get_previous_by_created
+      ~F3XSummary.get_previous_by_updated
+      ~F3XSummary.hard_delete
+      ~F3XSummary.prepare_database_save
+      ~F3XSummary.refresh_from_db
+      ~F3XSummary.save
+      ~F3XSummary.save_base
+      ~F3XSummary.serializable_value
+      ~F3XSummary.unique_error_message
+      ~F3XSummary.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSummary.L10_debts_by_period
+      ~F3XSummary.L11ai_itemized_period
+      ~F3XSummary.L11ai_itemized_ytd
+      ~F3XSummary.L11aii_unitemized_period
+      ~F3XSummary.L11aii_unitemized_ytd
+      ~F3XSummary.L11aiii_total_period
+      ~F3XSummary.L11aiii_total_ytd
+      ~F3XSummary.L11b_political_party_committees_period
+      ~F3XSummary.L11b_political_party_committees_ytd
+      ~F3XSummary.L11c_other_political_committees_pacs_period
+      ~F3XSummary.L11c_other_political_committees_pacs_ytd
+      ~F3XSummary.L11d_total_contributions_period
+      ~F3XSummary.L11d_total_contributions_ytd
+      ~F3XSummary.L12_transfers_from_affiliated_other_party_cmtes_period
+      ~F3XSummary.L12_transfers_from_affiliated_other_party_cmtes_ytd
+      ~F3XSummary.L13_all_loans_received_period
+      ~F3XSummary.L13_all_loans_received_ytd
+      ~F3XSummary.L14_loan_repayments_received_period
+      ~F3XSummary.L14_loan_repayments_received_ytd
+      ~F3XSummary.L15_offsets_to_operating_expenditures_refunds_period
+      ~F3XSummary.L15_offsets_to_operating_expenditures_refunds_ytd
+      ~F3XSummary.L16_refunds_of_federal_contributions_period
+      ~F3XSummary.L16_refunds_of_federal_contributions_ytd
+      ~F3XSummary.L17_other_federal_receipts_dividends_period
+      ~F3XSummary.L17_other_federal_receipts_dividends_ytd
+      ~F3XSummary.L18a_transfers_from_nonfederal_account_h3_period
+      ~F3XSummary.L18a_transfers_from_nonfederal_account_h3_ytd
+      ~F3XSummary.L18b_transfers_from_nonfederal_levin_h5_period
+      ~F3XSummary.L18b_transfers_from_nonfederal_levin_h5_ytd
+      ~F3XSummary.L18c_total_nonfederal_transfers_18a_18b_period
+      ~F3XSummary.L18c_total_nonfederal_transfers_18a_18b_ytd
+      ~F3XSummary.L19_total_receipts_period
+      ~F3XSummary.L19_total_receipts_ytd
+      ~F3XSummary.L20_total_federal_receipts_period
+      ~F3XSummary.L20_total_federal_receipts_ytd
+      ~F3XSummary.L21ai_federal_share_period
+      ~F3XSummary.L21ai_federal_share_ytd
+      ~F3XSummary.L21aii_nonfederal_share_period
+      ~F3XSummary.L21aii_nonfederal_share_ytd
+      ~F3XSummary.L21b_other_federal_operating_expenditures_period
+      ~F3XSummary.L21b_other_federal_operating_expenditures_ytd
+      ~F3XSummary.L21c_total_operating_expenditures_period
+      ~F3XSummary.L21c_total_operating_expenditures_ytd
+      ~F3XSummary.L22_transfers_to_affiliated_other_party_cmtes_period
+      ~F3XSummary.L22_transfers_to_affiliated_other_party_cmtes_ytd
+      ~F3XSummary.L23_contributions_to_federal_candidates_cmtes_period
+      ~F3XSummary.L23_contributions_to_federal_candidates_cmtes_ytd
+      ~F3XSummary.L24_independent_expenditures_period
+      ~F3XSummary.L24_independent_expenditures_ytd
+      ~F3XSummary.L25_coordinated_expend_made_by_party_cmtes_period
+      ~F3XSummary.L25_coordinated_expend_made_by_party_cmtes_ytd
+      ~F3XSummary.L26_loan_repayments_made_ytd
+      ~F3XSummary.L26_loan_repayments_period
+      ~F3XSummary.L27_loans_made_period
+      ~F3XSummary.L27_loans_made_ytd
+      ~F3XSummary.L28a_individuals_persons_period
+      ~F3XSummary.L28a_individuals_persons_ytd
+      ~F3XSummary.L28b_political_party_committees_period
+      ~F3XSummary.L28b_political_party_committees_ytd
+      ~F3XSummary.L28c_other_political_committees_period
+      ~F3XSummary.L28c_other_political_committees_ytd
+      ~F3XSummary.L28d_total_contributions_refunds_period
+      ~F3XSummary.L28d_total_contributions_refunds_ytd
+      ~F3XSummary.L29_other_disbursements_period
+      ~F3XSummary.L29_other_disbursements_ytd
+      ~F3XSummary.L30ai_shared_federal_activity_h6_fed_share_period
+      ~F3XSummary.L30ai_shared_federal_activity_h6_fed_share_ytd
+      ~F3XSummary.L30aii_shared_federal_activity_h6_nonfed_period
+      ~F3XSummary.L30aii_shared_federal_activity_h6_nonfed_ytd
+      ~F3XSummary.L30b_nonallocable_fed_election_activity_period
+      ~F3XSummary.L30b_nonallocable_fed_election_activity_ytd
+      ~F3XSummary.L30c_total_federal_election_activity_period
+      ~F3XSummary.L30c_total_federal_election_activity_ytd
+      ~F3XSummary.L31_total_disbursements_period
+      ~F3XSummary.L31_total_disbursements_ytd
+      ~F3XSummary.L32_total_federal_disbursements_period
+      ~F3XSummary.L32_total_federal_disbursements_ytd
+      ~F3XSummary.L33_total_contributions_period
+      ~F3XSummary.L33_total_contributions_ytd
+      ~F3XSummary.L34_total_contribution_refunds_period
+      ~F3XSummary.L34_total_contribution_refunds_ytd
+      ~F3XSummary.L35_net_contributions_period
+      ~F3XSummary.L35_net_contributions_ytd
+      ~F3XSummary.L36_total_federal_operating_expenditures_period
+      ~F3XSummary.L36_total_federal_operating_expenditures_ytd
+      ~F3XSummary.L37_offsets_to_operating_expenditures_period
+      ~F3XSummary.L37_offsets_to_operating_expenditures_ytd
+      ~F3XSummary.L38_net_operating_expenditures_period
+      ~F3XSummary.L38_net_operating_expenditures_ytd
+      ~F3XSummary.L6a_cash_on_hand_jan_1_ytd
+      ~F3XSummary.L6a_year_for_above_ytd
+      ~F3XSummary.L6b_cash_on_hand_beginning_period
+      ~F3XSummary.L6c_total_receipts_period
+      ~F3XSummary.L6c_total_receipts_ytd
+      ~F3XSummary.L6d_subtotal_period
+      ~F3XSummary.L6d_subtotal_ytd
+      ~F3XSummary.L7_total_disbursements_period
+      ~F3XSummary.L7_total_disbursements_ytd
+      ~F3XSummary.L8_cash_on_hand_at_close_period
+      ~F3XSummary.L8_cash_on_hand_close_ytd
+      ~F3XSummary.L9_debts_to_period
+      ~F3XSummary.all_objects
+      ~F3XSummary.change_of_address
+      ~F3XSummary.city
+      ~F3XSummary.committee_account
+      ~F3XSummary.committee_account_id
+      ~F3XSummary.committee_name
+      ~F3XSummary.coverage_from_date
+      ~F3XSummary.coverage_through_date
+      ~F3XSummary.created
+      ~F3XSummary.date_of_election
+      ~F3XSummary.date_signed
+      ~F3XSummary.deleted
+      ~F3XSummary.election_code
+      ~F3XSummary.filer_committee_id_number
+      ~F3XSummary.form_type
+      ~F3XSummary.id
+      ~F3XSummary.objects
+      ~F3XSummary.pk
+      ~F3XSummary.qualified_committee
+      ~F3XSummary.report_code
+      ~F3XSummary.state
+      ~F3XSummary.state_of_election
+      ~F3XSummary.street_1
+      ~F3XSummary.street_2
+      ~F3XSummary.treasurer_first_name
+      ~F3XSummary.treasurer_last_name
+      ~F3XSummary.treasurer_middle_name
+      ~F3XSummary.treasurer_prefix
+      ~F3XSummary.treasurer_suffix
+      ~F3XSummary.updated
+      ~F3XSummary.zip
+   
+   

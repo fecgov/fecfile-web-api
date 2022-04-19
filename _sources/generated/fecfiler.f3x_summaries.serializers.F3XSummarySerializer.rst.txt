@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.serializers.F3XSummarySerializer
+========================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.serializers
+
+.. autoclass:: F3XSummarySerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSummarySerializer.__init__
+      ~F3XSummarySerializer.bind
+      ~F3XSummarySerializer.build_field
+      ~F3XSummarySerializer.build_nested_field
+      ~F3XSummarySerializer.build_property_field
+      ~F3XSummarySerializer.build_relational_field
+      ~F3XSummarySerializer.build_standard_field
+      ~F3XSummarySerializer.build_unknown_field
+      ~F3XSummarySerializer.build_url_field
+      ~F3XSummarySerializer.create
+      ~F3XSummarySerializer.fail
+      ~F3XSummarySerializer.get_attribute
+      ~F3XSummarySerializer.get_default
+      ~F3XSummarySerializer.get_default_field_names
+      ~F3XSummarySerializer.get_extra_kwargs
+      ~F3XSummarySerializer.get_field_names
+      ~F3XSummarySerializer.get_fields
+      ~F3XSummarySerializer.get_initial
+      ~F3XSummarySerializer.get_unique_for_date_validators
+      ~F3XSummarySerializer.get_unique_together_validators
+      ~F3XSummarySerializer.get_uniqueness_extra_kwargs
+      ~F3XSummarySerializer.get_validators
+      ~F3XSummarySerializer.get_value
+      ~F3XSummarySerializer.include_extra_kwargs
+      ~F3XSummarySerializer.is_valid
+      ~F3XSummarySerializer.many_init
+      ~F3XSummarySerializer.run_validation
+      ~F3XSummarySerializer.run_validators
+      ~F3XSummarySerializer.save
+      ~F3XSummarySerializer.to_internal_value
+      ~F3XSummarySerializer.to_representation
+      ~F3XSummarySerializer.update
+      ~F3XSummarySerializer.validate
+      ~F3XSummarySerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSummarySerializer.context
+      ~F3XSummarySerializer.data
+      ~F3XSummarySerializer.default_error_messages
+      ~F3XSummarySerializer.default_validators
+      ~F3XSummarySerializer.errors
+      ~F3XSummarySerializer.fields
+      ~F3XSummarySerializer.initial
+      ~F3XSummarySerializer.root
+      ~F3XSummarySerializer.serializer_field_mapping
+      ~F3XSummarySerializer.url_field_name
+      ~F3XSummarySerializer.validated_data
+      ~F3XSummarySerializer.validators
+   
+   

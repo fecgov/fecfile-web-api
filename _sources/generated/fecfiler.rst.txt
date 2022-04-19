@@ -1,0 +1,42 @@
+﻿..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler
+========
+
+.. automodule:: fecfiler
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.committee_accounts
+   fecfiler.contacts
+   fecfiler.f3x_summaries
+   fecfiler.scha_transactions
+   fecfiler.settings
+   fecfiler.triage
+   fecfiler.urls
+   fecfiler.wsgi
+

@@ -1,0 +1,64 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.models.CommitteeAccount
+====================================================
+
+.. currentmodule:: fecfiler.committee_accounts.models
+
+.. autoclass:: CommitteeAccount
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeAccount.__init__
+      ~CommitteeAccount.check
+      ~CommitteeAccount.clean
+      ~CommitteeAccount.clean_fields
+      ~CommitteeAccount.date_error_message
+      ~CommitteeAccount.delete
+      ~CommitteeAccount.from_db
+      ~CommitteeAccount.full_clean
+      ~CommitteeAccount.get_deferred_fields
+      ~CommitteeAccount.get_next_by_created
+      ~CommitteeAccount.get_next_by_updated
+      ~CommitteeAccount.get_previous_by_created
+      ~CommitteeAccount.get_previous_by_updated
+      ~CommitteeAccount.hard_delete
+      ~CommitteeAccount.prepare_database_save
+      ~CommitteeAccount.refresh_from_db
+      ~CommitteeAccount.save
+      ~CommitteeAccount.save_base
+      ~CommitteeAccount.serializable_value
+      ~CommitteeAccount.unique_error_message
+      ~CommitteeAccount.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeAccount.all_objects
+      ~CommitteeAccount.committee_id
+      ~CommitteeAccount.contact_set
+      ~CommitteeAccount.created
+      ~CommitteeAccount.deleted
+      ~CommitteeAccount.f3xsummary_set
+      ~CommitteeAccount.id
+      ~CommitteeAccount.objects
+      ~CommitteeAccount.pk
+      ~CommitteeAccount.schatransaction_set
+      ~CommitteeAccount.updated
+   
+   

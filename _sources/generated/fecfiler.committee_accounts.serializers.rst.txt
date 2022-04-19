@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.serializers
+========================================
+
+.. automodule:: fecfiler.committee_accounts.serializers
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      CommitteeOwnedSerializer
+   
+   
+
+   
+   
+   
+
+
+

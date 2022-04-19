@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.test\_models.F3XTestCase
+================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.test_models
+
+.. autoclass:: F3XTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XTestCase.__init__
+      ~F3XTestCase.addClassCleanup
+      ~F3XTestCase.addCleanup
+      ~F3XTestCase.addTypeEqualityFunc
+      ~F3XTestCase.assertAlmostEqual
+      ~F3XTestCase.assertAlmostEquals
+      ~F3XTestCase.assertContains
+      ~F3XTestCase.assertCountEqual
+      ~F3XTestCase.assertDictContainsSubset
+      ~F3XTestCase.assertDictEqual
+      ~F3XTestCase.assertEqual
+      ~F3XTestCase.assertEquals
+      ~F3XTestCase.assertFalse
+      ~F3XTestCase.assertFieldOutput
+      ~F3XTestCase.assertFormError
+      ~F3XTestCase.assertFormsetError
+      ~F3XTestCase.assertGreater
+      ~F3XTestCase.assertGreaterEqual
+      ~F3XTestCase.assertHTMLEqual
+      ~F3XTestCase.assertHTMLNotEqual
+      ~F3XTestCase.assertIn
+      ~F3XTestCase.assertInHTML
+      ~F3XTestCase.assertIs
+      ~F3XTestCase.assertIsInstance
+      ~F3XTestCase.assertIsNone
+      ~F3XTestCase.assertIsNot
+      ~F3XTestCase.assertIsNotNone
+      ~F3XTestCase.assertJSONEqual
+      ~F3XTestCase.assertJSONNotEqual
+      ~F3XTestCase.assertLess
+      ~F3XTestCase.assertLessEqual
+      ~F3XTestCase.assertListEqual
+      ~F3XTestCase.assertLogs
+      ~F3XTestCase.assertMultiLineEqual
+      ~F3XTestCase.assertNotAlmostEqual
+      ~F3XTestCase.assertNotAlmostEquals
+      ~F3XTestCase.assertNotContains
+      ~F3XTestCase.assertNotEqual
+      ~F3XTestCase.assertNotEquals
+      ~F3XTestCase.assertNotIn
+      ~F3XTestCase.assertNotIsInstance
+      ~F3XTestCase.assertNotRegex
+      ~F3XTestCase.assertNotRegexpMatches
+      ~F3XTestCase.assertNumQueries
+      ~F3XTestCase.assertQuerysetEqual
+      ~F3XTestCase.assertRaises
+      ~F3XTestCase.assertRaisesMessage
+      ~F3XTestCase.assertRaisesRegex
+      ~F3XTestCase.assertRaisesRegexp
+      ~F3XTestCase.assertRedirects
+      ~F3XTestCase.assertRegex
+      ~F3XTestCase.assertRegexpMatches
+      ~F3XTestCase.assertSequenceEqual
+      ~F3XTestCase.assertSetEqual
+      ~F3XTestCase.assertTemplateNotUsed
+      ~F3XTestCase.assertTemplateUsed
+      ~F3XTestCase.assertTrue
+      ~F3XTestCase.assertTupleEqual
+      ~F3XTestCase.assertURLEqual
+      ~F3XTestCase.assertWarns
+      ~F3XTestCase.assertWarnsMessage
+      ~F3XTestCase.assertWarnsRegex
+      ~F3XTestCase.assertXMLEqual
+      ~F3XTestCase.assertXMLNotEqual
+      ~F3XTestCase.assert_
+      ~F3XTestCase.captureOnCommitCallbacks
+      ~F3XTestCase.countTestCases
+      ~F3XTestCase.debug
+      ~F3XTestCase.defaultTestResult
+      ~F3XTestCase.doClassCleanups
+      ~F3XTestCase.doCleanups
+      ~F3XTestCase.fail
+      ~F3XTestCase.failIf
+      ~F3XTestCase.failIfAlmostEqual
+      ~F3XTestCase.failIfEqual
+      ~F3XTestCase.failUnless
+      ~F3XTestCase.failUnlessAlmostEqual
+      ~F3XTestCase.failUnlessEqual
+      ~F3XTestCase.failUnlessRaises
+      ~F3XTestCase.id
+      ~F3XTestCase.modify_settings
+      ~F3XTestCase.run
+      ~F3XTestCase.setUp
+      ~F3XTestCase.setUpClass
+      ~F3XTestCase.setUpTestData
+      ~F3XTestCase.settings
+      ~F3XTestCase.shortDescription
+      ~F3XTestCase.skipTest
+      ~F3XTestCase.subTest
+      ~F3XTestCase.tearDown
+      ~F3XTestCase.tearDownClass
+      ~F3XTestCase.test_get_f3x_summary
+      ~F3XTestCase.test_save_and_delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XTestCase.available_apps
+      ~F3XTestCase.databases
+      ~F3XTestCase.fixtures
+      ~F3XTestCase.longMessage
+      ~F3XTestCase.maxDiff
+      ~F3XTestCase.reset_sequences
+      ~F3XTestCase.serialized_rollback
+   
+   

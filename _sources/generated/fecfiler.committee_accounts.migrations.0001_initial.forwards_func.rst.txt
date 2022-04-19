@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.migrations.0001\_initial.forwards\_func
+====================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.migrations.0001_initial
+
+.. autofunction:: forwards_func

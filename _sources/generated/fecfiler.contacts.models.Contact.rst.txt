@@ -1,0 +1,85 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.models.Contact
+================================
+
+.. currentmodule:: fecfiler.contacts.models
+
+.. autoclass:: Contact
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Contact.__init__
+      ~Contact.check
+      ~Contact.clean
+      ~Contact.clean_fields
+      ~Contact.date_error_message
+      ~Contact.delete
+      ~Contact.from_db
+      ~Contact.full_clean
+      ~Contact.get_candidate_office_display
+      ~Contact.get_deferred_fields
+      ~Contact.get_next_by_created
+      ~Contact.get_next_by_updated
+      ~Contact.get_previous_by_created
+      ~Contact.get_previous_by_updated
+      ~Contact.get_type_display
+      ~Contact.hard_delete
+      ~Contact.prepare_database_save
+      ~Contact.refresh_from_db
+      ~Contact.save
+      ~Contact.save_base
+      ~Contact.serializable_value
+      ~Contact.unique_error_message
+      ~Contact.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Contact.all_objects
+      ~Contact.candidate_district
+      ~Contact.candidate_id
+      ~Contact.candidate_office
+      ~Contact.candidate_state
+      ~Contact.city
+      ~Contact.committee_account
+      ~Contact.committee_account_id
+      ~Contact.committee_id
+      ~Contact.country
+      ~Contact.created
+      ~Contact.deleted
+      ~Contact.employer
+      ~Contact.first_name
+      ~Contact.id
+      ~Contact.last_name
+      ~Contact.middle_name
+      ~Contact.name
+      ~Contact.objects
+      ~Contact.occupation
+      ~Contact.pk
+      ~Contact.prefix
+      ~Contact.state
+      ~Contact.street_1
+      ~Contact.street_2
+      ~Contact.suffix
+      ~Contact.telephone
+      ~Contact.type
+      ~Contact.updated
+      ~Contact.zip
+   
+   

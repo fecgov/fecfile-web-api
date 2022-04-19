@@ -1,0 +1,40 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.apps.F3XSummariesConfig
+===============================================
+
+.. currentmodule:: fecfiler.f3x_summaries.apps
+
+.. autoclass:: F3XSummariesConfig
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSummariesConfig.__init__
+      ~F3XSummariesConfig.create
+      ~F3XSummariesConfig.get_model
+      ~F3XSummariesConfig.get_models
+      ~F3XSummariesConfig.import_models
+      ~F3XSummariesConfig.ready
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSummariesConfig.default_auto_field
+      ~F3XSummariesConfig.name
+   
+   

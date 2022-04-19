@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.serializers.ContactSerializer
+===============================================
+
+.. currentmodule:: fecfiler.contacts.serializers
+
+.. autoclass:: ContactSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactSerializer.__init__
+      ~ContactSerializer.bind
+      ~ContactSerializer.build_field
+      ~ContactSerializer.build_nested_field
+      ~ContactSerializer.build_property_field
+      ~ContactSerializer.build_relational_field
+      ~ContactSerializer.build_standard_field
+      ~ContactSerializer.build_unknown_field
+      ~ContactSerializer.build_url_field
+      ~ContactSerializer.create
+      ~ContactSerializer.fail
+      ~ContactSerializer.get_attribute
+      ~ContactSerializer.get_default
+      ~ContactSerializer.get_default_field_names
+      ~ContactSerializer.get_extra_kwargs
+      ~ContactSerializer.get_field_names
+      ~ContactSerializer.get_fields
+      ~ContactSerializer.get_initial
+      ~ContactSerializer.get_unique_for_date_validators
+      ~ContactSerializer.get_unique_together_validators
+      ~ContactSerializer.get_uniqueness_extra_kwargs
+      ~ContactSerializer.get_validators
+      ~ContactSerializer.get_value
+      ~ContactSerializer.include_extra_kwargs
+      ~ContactSerializer.is_valid
+      ~ContactSerializer.many_init
+      ~ContactSerializer.run_validation
+      ~ContactSerializer.run_validators
+      ~ContactSerializer.save
+      ~ContactSerializer.to_internal_value
+      ~ContactSerializer.to_representation
+      ~ContactSerializer.update
+      ~ContactSerializer.validate
+      ~ContactSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactSerializer.context
+      ~ContactSerializer.data
+      ~ContactSerializer.default_error_messages
+      ~ContactSerializer.default_validators
+      ~ContactSerializer.errors
+      ~ContactSerializer.fields
+      ~ContactSerializer.initial
+      ~ContactSerializer.root
+      ~ContactSerializer.serializer_field_mapping
+      ~ContactSerializer.url_field_name
+      ~ContactSerializer.validated_data
+      ~ContactSerializer.validators
+   
+   

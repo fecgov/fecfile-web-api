@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.signals.log\_post\_save
+===============================================
+
+.. currentmodule:: fecfiler.f3x_summaries.signals
+
+.. autofunction:: log_post_save

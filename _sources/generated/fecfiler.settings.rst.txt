@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.settings
+=================
+
+.. automodule:: fecfiler.settings
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.settings.base
+   fecfiler.settings.env
+   fecfiler.settings.local
+   fecfiler.settings.production
+

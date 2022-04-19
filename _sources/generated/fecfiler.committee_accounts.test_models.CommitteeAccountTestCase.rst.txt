@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
+==================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.test_models
+
+.. autoclass:: CommitteeAccountTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeAccountTestCase.__init__
+      ~CommitteeAccountTestCase.addClassCleanup
+      ~CommitteeAccountTestCase.addCleanup
+      ~CommitteeAccountTestCase.addTypeEqualityFunc
+      ~CommitteeAccountTestCase.assertAlmostEqual
+      ~CommitteeAccountTestCase.assertAlmostEquals
+      ~CommitteeAccountTestCase.assertContains
+      ~CommitteeAccountTestCase.assertCountEqual
+      ~CommitteeAccountTestCase.assertDictContainsSubset
+      ~CommitteeAccountTestCase.assertDictEqual
+      ~CommitteeAccountTestCase.assertEqual
+      ~CommitteeAccountTestCase.assertEquals
+      ~CommitteeAccountTestCase.assertFalse
+      ~CommitteeAccountTestCase.assertFieldOutput
+      ~CommitteeAccountTestCase.assertFormError
+      ~CommitteeAccountTestCase.assertFormsetError
+      ~CommitteeAccountTestCase.assertGreater
+      ~CommitteeAccountTestCase.assertGreaterEqual
+      ~CommitteeAccountTestCase.assertHTMLEqual
+      ~CommitteeAccountTestCase.assertHTMLNotEqual
+      ~CommitteeAccountTestCase.assertIn
+      ~CommitteeAccountTestCase.assertInHTML
+      ~CommitteeAccountTestCase.assertIs
+      ~CommitteeAccountTestCase.assertIsInstance
+      ~CommitteeAccountTestCase.assertIsNone
+      ~CommitteeAccountTestCase.assertIsNot
+      ~CommitteeAccountTestCase.assertIsNotNone
+      ~CommitteeAccountTestCase.assertJSONEqual
+      ~CommitteeAccountTestCase.assertJSONNotEqual
+      ~CommitteeAccountTestCase.assertLess
+      ~CommitteeAccountTestCase.assertLessEqual
+      ~CommitteeAccountTestCase.assertListEqual
+      ~CommitteeAccountTestCase.assertLogs
+      ~CommitteeAccountTestCase.assertMultiLineEqual
+      ~CommitteeAccountTestCase.assertNotAlmostEqual
+      ~CommitteeAccountTestCase.assertNotAlmostEquals
+      ~CommitteeAccountTestCase.assertNotContains
+      ~CommitteeAccountTestCase.assertNotEqual
+      ~CommitteeAccountTestCase.assertNotEquals
+      ~CommitteeAccountTestCase.assertNotIn
+      ~CommitteeAccountTestCase.assertNotIsInstance
+      ~CommitteeAccountTestCase.assertNotRegex
+      ~CommitteeAccountTestCase.assertNotRegexpMatches
+      ~CommitteeAccountTestCase.assertNumQueries
+      ~CommitteeAccountTestCase.assertQuerysetEqual
+      ~CommitteeAccountTestCase.assertRaises
+      ~CommitteeAccountTestCase.assertRaisesMessage
+      ~CommitteeAccountTestCase.assertRaisesRegex
+      ~CommitteeAccountTestCase.assertRaisesRegexp
+      ~CommitteeAccountTestCase.assertRedirects
+      ~CommitteeAccountTestCase.assertRegex
+      ~CommitteeAccountTestCase.assertRegexpMatches
+      ~CommitteeAccountTestCase.assertSequenceEqual
+      ~CommitteeAccountTestCase.assertSetEqual
+      ~CommitteeAccountTestCase.assertTemplateNotUsed
+      ~CommitteeAccountTestCase.assertTemplateUsed
+      ~CommitteeAccountTestCase.assertTrue
+      ~CommitteeAccountTestCase.assertTupleEqual
+      ~CommitteeAccountTestCase.assertURLEqual
+      ~CommitteeAccountTestCase.assertWarns
+      ~CommitteeAccountTestCase.assertWarnsMessage
+      ~CommitteeAccountTestCase.assertWarnsRegex
+      ~CommitteeAccountTestCase.assertXMLEqual
+      ~CommitteeAccountTestCase.assertXMLNotEqual
+      ~CommitteeAccountTestCase.assert_
+      ~CommitteeAccountTestCase.captureOnCommitCallbacks
+      ~CommitteeAccountTestCase.countTestCases
+      ~CommitteeAccountTestCase.debug
+      ~CommitteeAccountTestCase.defaultTestResult
+      ~CommitteeAccountTestCase.doClassCleanups
+      ~CommitteeAccountTestCase.doCleanups
+      ~CommitteeAccountTestCase.fail
+      ~CommitteeAccountTestCase.failIf
+      ~CommitteeAccountTestCase.failIfAlmostEqual
+      ~CommitteeAccountTestCase.failIfEqual
+      ~CommitteeAccountTestCase.failUnless
+      ~CommitteeAccountTestCase.failUnlessAlmostEqual
+      ~CommitteeAccountTestCase.failUnlessEqual
+      ~CommitteeAccountTestCase.failUnlessRaises
+      ~CommitteeAccountTestCase.id
+      ~CommitteeAccountTestCase.modify_settings
+      ~CommitteeAccountTestCase.run
+      ~CommitteeAccountTestCase.setUp
+      ~CommitteeAccountTestCase.setUpClass
+      ~CommitteeAccountTestCase.setUpTestData
+      ~CommitteeAccountTestCase.settings
+      ~CommitteeAccountTestCase.shortDescription
+      ~CommitteeAccountTestCase.skipTest
+      ~CommitteeAccountTestCase.subTest
+      ~CommitteeAccountTestCase.tearDown
+      ~CommitteeAccountTestCase.tearDownClass
+      ~CommitteeAccountTestCase.test_get_contact
+      ~CommitteeAccountTestCase.test_save_and_delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeAccountTestCase.available_apps
+      ~CommitteeAccountTestCase.databases
+      ~CommitteeAccountTestCase.fixtures
+      ~CommitteeAccountTestCase.longMessage
+      ~CommitteeAccountTestCase.maxDiff
+      ~CommitteeAccountTestCase.reset_sequences
+      ~CommitteeAccountTestCase.serialized_rollback
+   
+   

@@ -1,0 +1,107 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.views.F3XSummaryViewSet
+===============================================
+
+.. currentmodule:: fecfiler.f3x_summaries.views
+
+.. autoclass:: F3XSummaryViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSummaryViewSet.__init__
+      ~F3XSummaryViewSet.as_view
+      ~F3XSummaryViewSet.check_object_permissions
+      ~F3XSummaryViewSet.check_permissions
+      ~F3XSummaryViewSet.check_throttles
+      ~F3XSummaryViewSet.create
+      ~F3XSummaryViewSet.destroy
+      ~F3XSummaryViewSet.determine_version
+      ~F3XSummaryViewSet.dispatch
+      ~F3XSummaryViewSet.filter_queryset
+      ~F3XSummaryViewSet.finalize_response
+      ~F3XSummaryViewSet.get_authenticate_header
+      ~F3XSummaryViewSet.get_authenticators
+      ~F3XSummaryViewSet.get_content_negotiator
+      ~F3XSummaryViewSet.get_exception_handler
+      ~F3XSummaryViewSet.get_exception_handler_context
+      ~F3XSummaryViewSet.get_extra_action_url_map
+      ~F3XSummaryViewSet.get_extra_actions
+      ~F3XSummaryViewSet.get_format_suffix
+      ~F3XSummaryViewSet.get_object
+      ~F3XSummaryViewSet.get_paginated_response
+      ~F3XSummaryViewSet.get_parser_context
+      ~F3XSummaryViewSet.get_parsers
+      ~F3XSummaryViewSet.get_permissions
+      ~F3XSummaryViewSet.get_queryset
+      ~F3XSummaryViewSet.get_renderer_context
+      ~F3XSummaryViewSet.get_renderers
+      ~F3XSummaryViewSet.get_serializer
+      ~F3XSummaryViewSet.get_serializer_class
+      ~F3XSummaryViewSet.get_serializer_context
+      ~F3XSummaryViewSet.get_success_headers
+      ~F3XSummaryViewSet.get_throttles
+      ~F3XSummaryViewSet.get_view_description
+      ~F3XSummaryViewSet.get_view_name
+      ~F3XSummaryViewSet.handle_exception
+      ~F3XSummaryViewSet.http_method_not_allowed
+      ~F3XSummaryViewSet.initial
+      ~F3XSummaryViewSet.initialize_request
+      ~F3XSummaryViewSet.list
+      ~F3XSummaryViewSet.options
+      ~F3XSummaryViewSet.paginate_queryset
+      ~F3XSummaryViewSet.partial_update
+      ~F3XSummaryViewSet.perform_authentication
+      ~F3XSummaryViewSet.perform_content_negotiation
+      ~F3XSummaryViewSet.perform_create
+      ~F3XSummaryViewSet.perform_destroy
+      ~F3XSummaryViewSet.perform_update
+      ~F3XSummaryViewSet.permission_denied
+      ~F3XSummaryViewSet.raise_uncaught_exception
+      ~F3XSummaryViewSet.retrieve
+      ~F3XSummaryViewSet.reverse_action
+      ~F3XSummaryViewSet.setup
+      ~F3XSummaryViewSet.throttled
+      ~F3XSummaryViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSummaryViewSet.allowed_methods
+      ~F3XSummaryViewSet.authentication_classes
+      ~F3XSummaryViewSet.basename
+      ~F3XSummaryViewSet.default_response_headers
+      ~F3XSummaryViewSet.description
+      ~F3XSummaryViewSet.detail
+      ~F3XSummaryViewSet.filter_backends
+      ~F3XSummaryViewSet.http_method_names
+      ~F3XSummaryViewSet.lookup_field
+      ~F3XSummaryViewSet.lookup_url_kwarg
+      ~F3XSummaryViewSet.name
+      ~F3XSummaryViewSet.paginator
+      ~F3XSummaryViewSet.parser_classes
+      ~F3XSummaryViewSet.permission_classes
+      ~F3XSummaryViewSet.queryset
+      ~F3XSummaryViewSet.renderer_classes
+      ~F3XSummaryViewSet.schema
+      ~F3XSummaryViewSet.settings
+      ~F3XSummaryViewSet.suffix
+      ~F3XSummaryViewSet.throttle_classes
+      ~F3XSummaryViewSet.versioning_class
+   
+   

@@ -1,0 +1,107 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.views.ContactViewSet
+======================================
+
+.. currentmodule:: fecfiler.contacts.views
+
+.. autoclass:: ContactViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactViewSet.__init__
+      ~ContactViewSet.as_view
+      ~ContactViewSet.check_object_permissions
+      ~ContactViewSet.check_permissions
+      ~ContactViewSet.check_throttles
+      ~ContactViewSet.create
+      ~ContactViewSet.destroy
+      ~ContactViewSet.determine_version
+      ~ContactViewSet.dispatch
+      ~ContactViewSet.filter_queryset
+      ~ContactViewSet.finalize_response
+      ~ContactViewSet.get_authenticate_header
+      ~ContactViewSet.get_authenticators
+      ~ContactViewSet.get_content_negotiator
+      ~ContactViewSet.get_exception_handler
+      ~ContactViewSet.get_exception_handler_context
+      ~ContactViewSet.get_extra_action_url_map
+      ~ContactViewSet.get_extra_actions
+      ~ContactViewSet.get_format_suffix
+      ~ContactViewSet.get_object
+      ~ContactViewSet.get_paginated_response
+      ~ContactViewSet.get_parser_context
+      ~ContactViewSet.get_parsers
+      ~ContactViewSet.get_permissions
+      ~ContactViewSet.get_queryset
+      ~ContactViewSet.get_renderer_context
+      ~ContactViewSet.get_renderers
+      ~ContactViewSet.get_serializer
+      ~ContactViewSet.get_serializer_class
+      ~ContactViewSet.get_serializer_context
+      ~ContactViewSet.get_success_headers
+      ~ContactViewSet.get_throttles
+      ~ContactViewSet.get_view_description
+      ~ContactViewSet.get_view_name
+      ~ContactViewSet.handle_exception
+      ~ContactViewSet.http_method_not_allowed
+      ~ContactViewSet.initial
+      ~ContactViewSet.initialize_request
+      ~ContactViewSet.list
+      ~ContactViewSet.options
+      ~ContactViewSet.paginate_queryset
+      ~ContactViewSet.partial_update
+      ~ContactViewSet.perform_authentication
+      ~ContactViewSet.perform_content_negotiation
+      ~ContactViewSet.perform_create
+      ~ContactViewSet.perform_destroy
+      ~ContactViewSet.perform_update
+      ~ContactViewSet.permission_denied
+      ~ContactViewSet.raise_uncaught_exception
+      ~ContactViewSet.retrieve
+      ~ContactViewSet.reverse_action
+      ~ContactViewSet.setup
+      ~ContactViewSet.throttled
+      ~ContactViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactViewSet.allowed_methods
+      ~ContactViewSet.authentication_classes
+      ~ContactViewSet.basename
+      ~ContactViewSet.default_response_headers
+      ~ContactViewSet.description
+      ~ContactViewSet.detail
+      ~ContactViewSet.filter_backends
+      ~ContactViewSet.http_method_names
+      ~ContactViewSet.lookup_field
+      ~ContactViewSet.lookup_url_kwarg
+      ~ContactViewSet.name
+      ~ContactViewSet.paginator
+      ~ContactViewSet.parser_classes
+      ~ContactViewSet.permission_classes
+      ~ContactViewSet.queryset
+      ~ContactViewSet.renderer_classes
+      ~ContactViewSet.schema
+      ~ContactViewSet.settings
+      ~ContactViewSet.suffix
+      ~ContactViewSet.throttle_classes
+      ~ContactViewSet.versioning_class
+   
+   

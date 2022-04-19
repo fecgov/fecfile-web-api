@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.serializers.CommitteeOwnedSerializer
+=================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.serializers
+
+.. autoclass:: CommitteeOwnedSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeOwnedSerializer.__init__
+      ~CommitteeOwnedSerializer.bind
+      ~CommitteeOwnedSerializer.build_field
+      ~CommitteeOwnedSerializer.build_nested_field
+      ~CommitteeOwnedSerializer.build_property_field
+      ~CommitteeOwnedSerializer.build_relational_field
+      ~CommitteeOwnedSerializer.build_standard_field
+      ~CommitteeOwnedSerializer.build_unknown_field
+      ~CommitteeOwnedSerializer.build_url_field
+      ~CommitteeOwnedSerializer.create
+      ~CommitteeOwnedSerializer.fail
+      ~CommitteeOwnedSerializer.get_attribute
+      ~CommitteeOwnedSerializer.get_default
+      ~CommitteeOwnedSerializer.get_default_field_names
+      ~CommitteeOwnedSerializer.get_extra_kwargs
+      ~CommitteeOwnedSerializer.get_field_names
+      ~CommitteeOwnedSerializer.get_fields
+      ~CommitteeOwnedSerializer.get_initial
+      ~CommitteeOwnedSerializer.get_unique_for_date_validators
+      ~CommitteeOwnedSerializer.get_unique_together_validators
+      ~CommitteeOwnedSerializer.get_uniqueness_extra_kwargs
+      ~CommitteeOwnedSerializer.get_validators
+      ~CommitteeOwnedSerializer.get_value
+      ~CommitteeOwnedSerializer.include_extra_kwargs
+      ~CommitteeOwnedSerializer.is_valid
+      ~CommitteeOwnedSerializer.many_init
+      ~CommitteeOwnedSerializer.run_validation
+      ~CommitteeOwnedSerializer.run_validators
+      ~CommitteeOwnedSerializer.save
+      ~CommitteeOwnedSerializer.to_internal_value
+      ~CommitteeOwnedSerializer.to_representation
+      ~CommitteeOwnedSerializer.update
+      ~CommitteeOwnedSerializer.validate
+      ~CommitteeOwnedSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeOwnedSerializer.context
+      ~CommitteeOwnedSerializer.data
+      ~CommitteeOwnedSerializer.default_error_messages
+      ~CommitteeOwnedSerializer.default_validators
+      ~CommitteeOwnedSerializer.errors
+      ~CommitteeOwnedSerializer.fields
+      ~CommitteeOwnedSerializer.initial
+      ~CommitteeOwnedSerializer.root
+      ~CommitteeOwnedSerializer.serializer_field_mapping
+      ~CommitteeOwnedSerializer.url_field_name
+      ~CommitteeOwnedSerializer.validated_data
+      ~CommitteeOwnedSerializer.validators
+   
+   

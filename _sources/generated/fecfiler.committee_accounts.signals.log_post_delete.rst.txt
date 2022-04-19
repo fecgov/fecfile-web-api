@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.signals.log\_post\_delete
+======================================================
+
+.. currentmodule:: fecfiler.committee_accounts.signals
+
+.. autofunction:: log_post_delete

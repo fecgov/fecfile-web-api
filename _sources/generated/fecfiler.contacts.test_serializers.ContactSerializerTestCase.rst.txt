@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.test\_serializers.ContactSerializerTestCase
+=============================================================
+
+.. currentmodule:: fecfiler.contacts.test_serializers
+
+.. autoclass:: ContactSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactSerializerTestCase.__init__
+      ~ContactSerializerTestCase.addClassCleanup
+      ~ContactSerializerTestCase.addCleanup
+      ~ContactSerializerTestCase.addTypeEqualityFunc
+      ~ContactSerializerTestCase.assertAlmostEqual
+      ~ContactSerializerTestCase.assertAlmostEquals
+      ~ContactSerializerTestCase.assertContains
+      ~ContactSerializerTestCase.assertCountEqual
+      ~ContactSerializerTestCase.assertDictContainsSubset
+      ~ContactSerializerTestCase.assertDictEqual
+      ~ContactSerializerTestCase.assertEqual
+      ~ContactSerializerTestCase.assertEquals
+      ~ContactSerializerTestCase.assertFalse
+      ~ContactSerializerTestCase.assertFieldOutput
+      ~ContactSerializerTestCase.assertFormError
+      ~ContactSerializerTestCase.assertFormsetError
+      ~ContactSerializerTestCase.assertGreater
+      ~ContactSerializerTestCase.assertGreaterEqual
+      ~ContactSerializerTestCase.assertHTMLEqual
+      ~ContactSerializerTestCase.assertHTMLNotEqual
+      ~ContactSerializerTestCase.assertIn
+      ~ContactSerializerTestCase.assertInHTML
+      ~ContactSerializerTestCase.assertIs
+      ~ContactSerializerTestCase.assertIsInstance
+      ~ContactSerializerTestCase.assertIsNone
+      ~ContactSerializerTestCase.assertIsNot
+      ~ContactSerializerTestCase.assertIsNotNone
+      ~ContactSerializerTestCase.assertJSONEqual
+      ~ContactSerializerTestCase.assertJSONNotEqual
+      ~ContactSerializerTestCase.assertLess
+      ~ContactSerializerTestCase.assertLessEqual
+      ~ContactSerializerTestCase.assertListEqual
+      ~ContactSerializerTestCase.assertLogs
+      ~ContactSerializerTestCase.assertMultiLineEqual
+      ~ContactSerializerTestCase.assertNotAlmostEqual
+      ~ContactSerializerTestCase.assertNotAlmostEquals
+      ~ContactSerializerTestCase.assertNotContains
+      ~ContactSerializerTestCase.assertNotEqual
+      ~ContactSerializerTestCase.assertNotEquals
+      ~ContactSerializerTestCase.assertNotIn
+      ~ContactSerializerTestCase.assertNotIsInstance
+      ~ContactSerializerTestCase.assertNotRegex
+      ~ContactSerializerTestCase.assertNotRegexpMatches
+      ~ContactSerializerTestCase.assertNumQueries
+      ~ContactSerializerTestCase.assertQuerysetEqual
+      ~ContactSerializerTestCase.assertRaises
+      ~ContactSerializerTestCase.assertRaisesMessage
+      ~ContactSerializerTestCase.assertRaisesRegex
+      ~ContactSerializerTestCase.assertRaisesRegexp
+      ~ContactSerializerTestCase.assertRedirects
+      ~ContactSerializerTestCase.assertRegex
+      ~ContactSerializerTestCase.assertRegexpMatches
+      ~ContactSerializerTestCase.assertSequenceEqual
+      ~ContactSerializerTestCase.assertSetEqual
+      ~ContactSerializerTestCase.assertTemplateNotUsed
+      ~ContactSerializerTestCase.assertTemplateUsed
+      ~ContactSerializerTestCase.assertTrue
+      ~ContactSerializerTestCase.assertTupleEqual
+      ~ContactSerializerTestCase.assertURLEqual
+      ~ContactSerializerTestCase.assertWarns
+      ~ContactSerializerTestCase.assertWarnsMessage
+      ~ContactSerializerTestCase.assertWarnsRegex
+      ~ContactSerializerTestCase.assertXMLEqual
+      ~ContactSerializerTestCase.assertXMLNotEqual
+      ~ContactSerializerTestCase.assert_
+      ~ContactSerializerTestCase.captureOnCommitCallbacks
+      ~ContactSerializerTestCase.countTestCases
+      ~ContactSerializerTestCase.debug
+      ~ContactSerializerTestCase.defaultTestResult
+      ~ContactSerializerTestCase.doClassCleanups
+      ~ContactSerializerTestCase.doCleanups
+      ~ContactSerializerTestCase.fail
+      ~ContactSerializerTestCase.failIf
+      ~ContactSerializerTestCase.failIfAlmostEqual
+      ~ContactSerializerTestCase.failIfEqual
+      ~ContactSerializerTestCase.failUnless
+      ~ContactSerializerTestCase.failUnlessAlmostEqual
+      ~ContactSerializerTestCase.failUnlessEqual
+      ~ContactSerializerTestCase.failUnlessRaises
+      ~ContactSerializerTestCase.id
+      ~ContactSerializerTestCase.modify_settings
+      ~ContactSerializerTestCase.run
+      ~ContactSerializerTestCase.setUp
+      ~ContactSerializerTestCase.setUpClass
+      ~ContactSerializerTestCase.setUpTestData
+      ~ContactSerializerTestCase.settings
+      ~ContactSerializerTestCase.shortDescription
+      ~ContactSerializerTestCase.skipTest
+      ~ContactSerializerTestCase.subTest
+      ~ContactSerializerTestCase.tearDown
+      ~ContactSerializerTestCase.tearDownClass
+      ~ContactSerializerTestCase.test_read_only_fields
+      ~ContactSerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactSerializerTestCase.available_apps
+      ~ContactSerializerTestCase.databases
+      ~ContactSerializerTestCase.fixtures
+      ~ContactSerializerTestCase.longMessage
+      ~ContactSerializerTestCase.maxDiff
+      ~ContactSerializerTestCase.reset_sequences
+      ~ContactSerializerTestCase.serialized_rollback
+   
+   
