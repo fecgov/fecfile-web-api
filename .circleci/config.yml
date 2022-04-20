@@ -7,10 +7,10 @@ orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
   browser-tools: circleci/browser-tools@1.2.3
+  node: circleci/node@5.0.2
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-
   dependency-check:
     docker:
       - image: cimg/python:3.8
@@ -21,7 +21,6 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           pip-dependency-file: requirements-test.txt
-
 
       - run:
           name: Run depency check
@@ -44,7 +43,6 @@ jobs:
             echo ""
             echo "Running: $command"
             eval $command
-
 
   test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
@@ -99,11 +97,11 @@ jobs:
             python manage.py migrate
           working_directory: ~/project/django-backend/
 
-# Only use SonarCloud security checking for now.
-#      - run:
-#          name: Bandit security checks
-#          command: |
-#            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
+      # Only use SonarCloud security checking for now.
+      #      - run:
+      #          name: Bandit security checks
+      #          command: |
+      #            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
 
       - run:
           name: Run tests
@@ -160,7 +158,6 @@ jobs:
             flake8 --config django-backend/.flake8
 
   deploy:
-
     docker:
       - image: cimg/python:3.8
 
@@ -184,6 +181,63 @@ jobs:
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
 
+  docs-build:
+    docker:
+      - image: cimg/python:3.8
+
+    steps:
+      - checkout
+
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/
+          pip-dependency-file: requirements-all.txt
+
+      - run:
+          name: Run Sphinx
+          command: make html
+          working_directory: ~/project/docs
+
+      - persist_to_workspace:
+          root: ~/project/docs/_build
+          paths: html
+
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project/docs/_build
+      - run:
+          name: Disable jekyll builds
+          command: touch ~/project/docs/_build/html/.nojekyll
+      - node/install:
+          install-yarn: false
+          node-version: "16.13"
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Configure git
+          command: |
+            git config user.email "apiinfo@fec.gov"
+            git config user.name "apiinfo"
+      - add_ssh_keys:
+          fingerprints:
+            - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -193,5 +247,15 @@ workflows:
       - dependency-check
       - deploy:
           requires:
-              - test
-              - dependency-check
+            - test
+            - dependency-check
+      - docs-build:
+          requires:
+            - test
+            - dependency-check
+      - docs-deploy:
+          requires:
+            - docs-build
+          filters:
+            branches:
+              only: develop

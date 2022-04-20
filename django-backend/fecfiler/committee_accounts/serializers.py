@@ -16,7 +16,7 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
     )
 
     def to_internal_value(self, data):
-        """ "Exctract committee_id from request to assign the corresponding
+        """Extract committee_id from request to assign the corresponding
         CommitteeAccount as the owner of the object
         """
         request = self.context["request"]
