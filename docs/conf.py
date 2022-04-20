@@ -19,7 +19,6 @@ sys.path.insert(0, os.path.abspath("../django-backend/"))
 # -- Project information -----------------------------------------------------
 
 project = "FECFile Web API"
-copyright = "2022, FEC"
 author = "FEC"
 
 
