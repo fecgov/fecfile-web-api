@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "fecfiler.authentication",
+    "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
     "fecfiler.contacts",
@@ -178,38 +179,12 @@ LOGGING = {
         "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
     },
     "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "standard",
-        },
         "default": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/access.log",
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 5,
-            "formatter": "standard",
-        },
-        "request_handler": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/access.log",
-            "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 5,
+            "class": "logging.StreamHandler",
             "formatter": "standard",
         },
     },
     "loggers": {
-        "": {"handlers": ["default"], "level": "DEBUG", "propagate": True},
-        "django.request": {
-            "handlers": ["request_handler"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
+        "": {"handlers": ["default"], "level": "INFO", "propagate": True},
     },
 }
-
-# make all loggers use the console.
-for logger in LOGGING["loggers"]:
-    LOGGING["loggers"][logger]["handlers"] = ["console"]

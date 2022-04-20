@@ -1,18 +1,13 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
-class F3XSummary(SoftDeleteModel):
+class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
-    form_type = models.CharField(
-        choices=(("F3XT", "F3XT"), ("F3XN", "F3XN"), ("F3XA", "F3XA")),
-        max_length=255,
-        default="F3XN",
-        null=True,
-        blank=False,
-    )
-    filer_committee_id_number = models.TextField(null=True, blank=False)
+    form_type = models.TextField(null=True, blank=True)
+    filer_committee_id_number = models.TextField(null=True, blank=True)
     committee_name = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
@@ -28,12 +23,12 @@ class F3XSummary(SoftDeleteModel):
     coverage_from_date = models.TextField(null=True, blank=True)
     coverage_through_date = models.TextField(null=True, blank=True)
     qualified_committee = models.BooleanField(default=False, null=True, blank=True)
-    treasurer_last_name = models.TextField(null=True, blank=False)
-    treasurer_first_name = models.TextField(null=True, blank=False)
+    treasurer_last_name = models.TextField(null=True, blank=True)
+    treasurer_first_name = models.TextField(null=True, blank=True)
     treasurer_middle_name = models.TextField(null=True, blank=True)
     treasurer_prefix = models.TextField(null=True, blank=True)
     treasurer_suffix = models.TextField(null=True, blank=True)
-    date_signed = models.TextField(null=True, blank=False)
+    date_signed = models.TextField(null=True, blank=True)
     L6b_cash_on_hand_beginning_period = models.IntegerField(null=True, blank=True)
     L6c_total_receipts_period = models.IntegerField(null=True, blank=True)
     L6d_subtotal_period = models.IntegerField(null=True, blank=True)
