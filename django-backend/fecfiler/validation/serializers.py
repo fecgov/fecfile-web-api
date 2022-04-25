@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FecSchemaValidatorSerializerMixin(serializers.ModelSerializer):
+class FecSchemaValidatorSerializerMixin(serializers.Serializer):
     """Serializer Mixin that runs fecfile_validate over incoming data
 
     Runs :py:function:`fecfile_validate.validate` over incoming data for the configured
@@ -20,8 +20,7 @@ class FecSchemaValidatorSerializerMixin(serializers.ModelSerializer):
 
     """
 
-    def __init__(self):
-        self.schema_name = None
+    schema_name = None
 
     def get_schema_name(self, data):
         """Gets the schema name to retrieve the correct schema from fecfile_validate
@@ -51,7 +50,13 @@ class FecSchemaValidatorSerializerMixin(serializers.ModelSerializer):
             of ```path``` -> ```message``` to comply with DJR's validation error
             pattern
         """
-        validation_result = validate.validate(self.get_schema_name(data), data)
+        fields_to_validate = []
+        request = self.context.get("request", None)
+        if request:
+            fields_to_validate = request.META.get("fields_to_validate", [])
+        validation_result = validate.validate(
+            self.get_schema_name(data), data, fields_to_validate
+        )
         if validation_result.errors:
 
             def collect_error(all_errors, error):
