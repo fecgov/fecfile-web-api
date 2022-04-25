@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class SchATransactionSerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializer
+    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "SchA"
 

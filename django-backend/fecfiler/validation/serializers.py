@@ -7,10 +7,36 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FecSchemaValidatorSerializer(serializers.ModelSerializer):
-    schema_name = None
+class FecSchemaValidatorSerializerMixin(serializers.ModelSerializer):
+    """Serializer Mixin that runs fecfile_validate over incoming data
+
+    Runs :py:function:`fecfile_validate.validate` over incoming data for the configured
+    schema. Set the schema by defining :py:attribue:`schema_name` or
+    overriding :py:function:`get_schema_name`
+
+    Attributes:
+        schema_name (str): schema name that can be passed to :py:function:`fecfile_validate.validate`
+            that will match a schema defined in the package
+
+    """
+
+    def __init__(self):
+        self.schema_name = None
 
     def get_schema_name(self, data):
+        """Gets the schema name to retrieve the correct schema from fecfile_validate
+
+        You need to either define `schema_name` or overide this function to provide the
+        `validate` function with a schema
+
+        Args:
+            data: data being serialized.  May contain information needed to determine
+                what schema you want to use
+
+        Returns:
+            string: schema name that can be passed to :py:function:`fecfile_validate.validate`
+            that will match a schema defined in the package
+        """
         assert self.schema_name is not None, (
             f"'{self.__class__.__name__}' should either include a `schema_name` attribute, "
             "or override the `get_schema_name()` method."

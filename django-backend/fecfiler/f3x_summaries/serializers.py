@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class F3XSummarySerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializer
+    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "F3X"
 
