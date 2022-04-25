@@ -1,41 +1,24 @@
 from .models import Contact
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from rest_framework import exceptions
-from fecfile_validate import validate
+from fecfiler.validation import serializers
 from functools import reduce
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ContactSerializer(CommitteeOwnedSerializer):
-    def validate(self, data):
-        """Overrides Django Rest Framework's Serializer validate to validate with
-        fecfile_validate rules.
+class ContactSerializer(
+    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializer
+):
+    contact_value = dict(
+        COM="Committee",
+        IND="Individual",
+        ORG="Organization",
+        CAN="Candidate",
+    )
 
-        We need to translate the list of fecfile validation errors to a dictionary
-            of ```path``` -> ```message``` to comply with DJR's validation error
-            pattern
-        """
-
-        contact_value = dict(
-            COM="Committee",
-            IND="Individual",
-            ORG="Organization",
-            CAN="Candidate",
-        )
-        schema_name = f"Contact_{contact_value[data.get('type', None)]}"
-        validation_result = validate.validate(schema_name, data)
-        if validation_result.errors:
-
-            def collect_error(all_errors, error):
-                all_errors[error.path] = error.message
-                return all_errors
-
-            translated_errors = reduce(collect_error, validation_result.errors, {})
-            logger.warning(f"Contact: Failed validation for {list(translated_errors)}")
-            raise exceptions.ValidationError(translated_errors)
-        return data
+    def get_schema_name(self, data):
+        return f"Contact_{self.contact_value[data.get('type', None)]}"
 
     class Meta:
         model = Contact
