@@ -1,0 +1,64 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin
+=================================================================
+
+.. currentmodule:: fecfiler.validation.serializers
+
+.. autoclass:: FecSchemaValidatorSerializerMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FecSchemaValidatorSerializerMixin.__init__
+      ~FecSchemaValidatorSerializerMixin.bind
+      ~FecSchemaValidatorSerializerMixin.create
+      ~FecSchemaValidatorSerializerMixin.fail
+      ~FecSchemaValidatorSerializerMixin.get_attribute
+      ~FecSchemaValidatorSerializerMixin.get_default
+      ~FecSchemaValidatorSerializerMixin.get_fields
+      ~FecSchemaValidatorSerializerMixin.get_initial
+      ~FecSchemaValidatorSerializerMixin.get_schema_name
+      ~FecSchemaValidatorSerializerMixin.get_validators
+      ~FecSchemaValidatorSerializerMixin.get_value
+      ~FecSchemaValidatorSerializerMixin.is_valid
+      ~FecSchemaValidatorSerializerMixin.many_init
+      ~FecSchemaValidatorSerializerMixin.run_validation
+      ~FecSchemaValidatorSerializerMixin.run_validators
+      ~FecSchemaValidatorSerializerMixin.save
+      ~FecSchemaValidatorSerializerMixin.to_internal_value
+      ~FecSchemaValidatorSerializerMixin.to_representation
+      ~FecSchemaValidatorSerializerMixin.update
+      ~FecSchemaValidatorSerializerMixin.validate
+      ~FecSchemaValidatorSerializerMixin.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FecSchemaValidatorSerializerMixin.context
+      ~FecSchemaValidatorSerializerMixin.data
+      ~FecSchemaValidatorSerializerMixin.default_error_messages
+      ~FecSchemaValidatorSerializerMixin.default_validators
+      ~FecSchemaValidatorSerializerMixin.errors
+      ~FecSchemaValidatorSerializerMixin.fields
+      ~FecSchemaValidatorSerializerMixin.initial
+      ~FecSchemaValidatorSerializerMixin.root
+      ~FecSchemaValidatorSerializerMixin.schema_name
+      ~FecSchemaValidatorSerializerMixin.validated_data
+      ~FecSchemaValidatorSerializerMixin.validators
+   
+   

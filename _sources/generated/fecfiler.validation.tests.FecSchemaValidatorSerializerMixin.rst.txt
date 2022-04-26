@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
+===========================================================
+
+.. currentmodule:: fecfiler.validation.tests
+
+.. autoclass:: FecSchemaValidatorSerializerMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FecSchemaValidatorSerializerMixin.__init__
+      ~FecSchemaValidatorSerializerMixin.addClassCleanup
+      ~FecSchemaValidatorSerializerMixin.addCleanup
+      ~FecSchemaValidatorSerializerMixin.addTypeEqualityFunc
+      ~FecSchemaValidatorSerializerMixin.assertAlmostEqual
+      ~FecSchemaValidatorSerializerMixin.assertAlmostEquals
+      ~FecSchemaValidatorSerializerMixin.assertContains
+      ~FecSchemaValidatorSerializerMixin.assertCountEqual
+      ~FecSchemaValidatorSerializerMixin.assertDictContainsSubset
+      ~FecSchemaValidatorSerializerMixin.assertDictEqual
+      ~FecSchemaValidatorSerializerMixin.assertEqual
+      ~FecSchemaValidatorSerializerMixin.assertEquals
+      ~FecSchemaValidatorSerializerMixin.assertFalse
+      ~FecSchemaValidatorSerializerMixin.assertFieldOutput
+      ~FecSchemaValidatorSerializerMixin.assertFormError
+      ~FecSchemaValidatorSerializerMixin.assertFormsetError
+      ~FecSchemaValidatorSerializerMixin.assertGreater
+      ~FecSchemaValidatorSerializerMixin.assertGreaterEqual
+      ~FecSchemaValidatorSerializerMixin.assertHTMLEqual
+      ~FecSchemaValidatorSerializerMixin.assertHTMLNotEqual
+      ~FecSchemaValidatorSerializerMixin.assertIn
+      ~FecSchemaValidatorSerializerMixin.assertInHTML
+      ~FecSchemaValidatorSerializerMixin.assertIs
+      ~FecSchemaValidatorSerializerMixin.assertIsInstance
+      ~FecSchemaValidatorSerializerMixin.assertIsNone
+      ~FecSchemaValidatorSerializerMixin.assertIsNot
+      ~FecSchemaValidatorSerializerMixin.assertIsNotNone
+      ~FecSchemaValidatorSerializerMixin.assertJSONEqual
+      ~FecSchemaValidatorSerializerMixin.assertJSONNotEqual
+      ~FecSchemaValidatorSerializerMixin.assertLess
+      ~FecSchemaValidatorSerializerMixin.assertLessEqual
+      ~FecSchemaValidatorSerializerMixin.assertListEqual
+      ~FecSchemaValidatorSerializerMixin.assertLogs
+      ~FecSchemaValidatorSerializerMixin.assertMultiLineEqual
+      ~FecSchemaValidatorSerializerMixin.assertNotAlmostEqual
+      ~FecSchemaValidatorSerializerMixin.assertNotAlmostEquals
+      ~FecSchemaValidatorSerializerMixin.assertNotContains
+      ~FecSchemaValidatorSerializerMixin.assertNotEqual
+      ~FecSchemaValidatorSerializerMixin.assertNotEquals
+      ~FecSchemaValidatorSerializerMixin.assertNotIn
+      ~FecSchemaValidatorSerializerMixin.assertNotIsInstance
+      ~FecSchemaValidatorSerializerMixin.assertNotRegex
+      ~FecSchemaValidatorSerializerMixin.assertNotRegexpMatches
+      ~FecSchemaValidatorSerializerMixin.assertNumQueries
+      ~FecSchemaValidatorSerializerMixin.assertQuerysetEqual
+      ~FecSchemaValidatorSerializerMixin.assertRaises
+      ~FecSchemaValidatorSerializerMixin.assertRaisesMessage
+      ~FecSchemaValidatorSerializerMixin.assertRaisesRegex
+      ~FecSchemaValidatorSerializerMixin.assertRaisesRegexp
+      ~FecSchemaValidatorSerializerMixin.assertRedirects
+      ~FecSchemaValidatorSerializerMixin.assertRegex
+      ~FecSchemaValidatorSerializerMixin.assertRegexpMatches
+      ~FecSchemaValidatorSerializerMixin.assertSequenceEqual
+      ~FecSchemaValidatorSerializerMixin.assertSetEqual
+      ~FecSchemaValidatorSerializerMixin.assertTemplateNotUsed
+      ~FecSchemaValidatorSerializerMixin.assertTemplateUsed
+      ~FecSchemaValidatorSerializerMixin.assertTrue
+      ~FecSchemaValidatorSerializerMixin.assertTupleEqual
+      ~FecSchemaValidatorSerializerMixin.assertURLEqual
+      ~FecSchemaValidatorSerializerMixin.assertWarns
+      ~FecSchemaValidatorSerializerMixin.assertWarnsMessage
+      ~FecSchemaValidatorSerializerMixin.assertWarnsRegex
+      ~FecSchemaValidatorSerializerMixin.assertXMLEqual
+      ~FecSchemaValidatorSerializerMixin.assertXMLNotEqual
+      ~FecSchemaValidatorSerializerMixin.assert_
+      ~FecSchemaValidatorSerializerMixin.captureOnCommitCallbacks
+      ~FecSchemaValidatorSerializerMixin.countTestCases
+      ~FecSchemaValidatorSerializerMixin.debug
+      ~FecSchemaValidatorSerializerMixin.defaultTestResult
+      ~FecSchemaValidatorSerializerMixin.doClassCleanups
+      ~FecSchemaValidatorSerializerMixin.doCleanups
+      ~FecSchemaValidatorSerializerMixin.fail
+      ~FecSchemaValidatorSerializerMixin.failIf
+      ~FecSchemaValidatorSerializerMixin.failIfAlmostEqual
+      ~FecSchemaValidatorSerializerMixin.failIfEqual
+      ~FecSchemaValidatorSerializerMixin.failUnless
+      ~FecSchemaValidatorSerializerMixin.failUnlessAlmostEqual
+      ~FecSchemaValidatorSerializerMixin.failUnlessEqual
+      ~FecSchemaValidatorSerializerMixin.failUnlessRaises
+      ~FecSchemaValidatorSerializerMixin.id
+      ~FecSchemaValidatorSerializerMixin.modify_settings
+      ~FecSchemaValidatorSerializerMixin.run
+      ~FecSchemaValidatorSerializerMixin.setUp
+      ~FecSchemaValidatorSerializerMixin.setUpClass
+      ~FecSchemaValidatorSerializerMixin.setUpTestData
+      ~FecSchemaValidatorSerializerMixin.settings
+      ~FecSchemaValidatorSerializerMixin.shortDescription
+      ~FecSchemaValidatorSerializerMixin.skipTest
+      ~FecSchemaValidatorSerializerMixin.subTest
+      ~FecSchemaValidatorSerializerMixin.tearDown
+      ~FecSchemaValidatorSerializerMixin.tearDownClass
+      ~FecSchemaValidatorSerializerMixin.test_serializer_partial_validate
+      ~FecSchemaValidatorSerializerMixin.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FecSchemaValidatorSerializerMixin.available_apps
+      ~FecSchemaValidatorSerializerMixin.databases
+      ~FecSchemaValidatorSerializerMixin.fixtures
+      ~FecSchemaValidatorSerializerMixin.longMessage
+      ~FecSchemaValidatorSerializerMixin.maxDiff
+      ~FecSchemaValidatorSerializerMixin.reset_sequences
+      ~FecSchemaValidatorSerializerMixin.serialized_rollback
+   
+   

@@ -1,0 +1,64 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.validation.tests.MockF3XSerializerClass
+================================================
+
+.. currentmodule:: fecfiler.validation.tests
+
+.. autoclass:: MockF3XSerializerClass
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MockF3XSerializerClass.__init__
+      ~MockF3XSerializerClass.bind
+      ~MockF3XSerializerClass.create
+      ~MockF3XSerializerClass.fail
+      ~MockF3XSerializerClass.get_attribute
+      ~MockF3XSerializerClass.get_default
+      ~MockF3XSerializerClass.get_fields
+      ~MockF3XSerializerClass.get_initial
+      ~MockF3XSerializerClass.get_schema_name
+      ~MockF3XSerializerClass.get_validators
+      ~MockF3XSerializerClass.get_value
+      ~MockF3XSerializerClass.is_valid
+      ~MockF3XSerializerClass.many_init
+      ~MockF3XSerializerClass.run_validation
+      ~MockF3XSerializerClass.run_validators
+      ~MockF3XSerializerClass.save
+      ~MockF3XSerializerClass.to_internal_value
+      ~MockF3XSerializerClass.to_representation
+      ~MockF3XSerializerClass.update
+      ~MockF3XSerializerClass.validate
+      ~MockF3XSerializerClass.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MockF3XSerializerClass.context
+      ~MockF3XSerializerClass.data
+      ~MockF3XSerializerClass.default_error_messages
+      ~MockF3XSerializerClass.default_validators
+      ~MockF3XSerializerClass.errors
+      ~MockF3XSerializerClass.fields
+      ~MockF3XSerializerClass.initial
+      ~MockF3XSerializerClass.root
+      ~MockF3XSerializerClass.schema_name
+      ~MockF3XSerializerClass.validated_data
+      ~MockF3XSerializerClass.validators
+   
+   

@@ -38,5 +38,6 @@ fecfiler
    fecfiler.settings
    fecfiler.triage
    fecfiler.urls
+   fecfiler.validation
    fecfiler.wsgi
 

@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>fecfiler.validation.tests.MockF3XSerializerClass &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.wsgi" href="fecfiler.wsgi.html" />
+    <link rel="prev" title="fecfiler.validation.tests.FecSchemaValidatorSerializerMixin" href="fecfiler.validation.tests.FecSchemaValidatorSerializerMixin.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-validation-tests-mockf3xserializerclass">
+<h1>fecfiler.validation.tests.MockF3XSerializerClass<a class="headerlink" href="#fecfiler-validation-tests-mockf3xserializerclass" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.validation.tests.</span></span><span class="sig-name descname"><span class="pre">MockF3XSerializerClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.html#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.__init__" title="fecfiler.validation.tests.MockF3XSerializerClass.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([instance, data])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.bind" title="fecfiler.validation.tests.MockF3XSerializerClass.bind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bind</span></code></a>(field_name, parent)</p></td>
+<td><p>Initializes the field name and parent for the field instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.fail" title="fecfiler.validation.tests.MockF3XSerializerClass.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
+<td><p>A helper method that simply raises a validation error.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_attribute" title="fecfiler.validation.tests.MockF3XSerializerClass.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
+<td><p>Given the <em>outgoing</em> object instance, return the primitive value that should be used for this field.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_default" title="fecfiler.validation.tests.MockF3XSerializerClass.get_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default</span></code></a>()</p></td>
+<td><p>Return the default value to use when validating data if no input is provided for this field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_fields" title="fecfiler.validation.tests.MockF3XSerializerClass.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
+<td><p>Returns a dictionary of {field_name: field_instance}.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_initial" title="fecfiler.validation.tests.MockF3XSerializerClass.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
+<td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_schema_name" title="fecfiler.validation.tests.MockF3XSerializerClass.get_schema_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schema_name</span></code></a>(data)</p></td>
+<td><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_validators" title="fecfiler.validation.tests.MockF3XSerializerClass.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
+<td><p>Returns a list of validator callables.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_value" title="fecfiler.validation.tests.MockF3XSerializerClass.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
+<td><p>Given the <em>incoming</em> primitive data, return the value for this field that should be validated and transformed to a native value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>([raise_exception])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.many_init" title="fecfiler.validation.tests.MockF3XSerializerClass.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This method implements the creation of a <cite>ListSerializer</cite> parent class when <cite>many=True</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.run_validation" title="fecfiler.validation.tests.MockF3XSerializerClass.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
+<td><p>We override the default <cite>run_validation</cite>, because the validation performed by validators and the <cite>.validate()</cite> method should be coerced into an error dictionary with a 'non_fields_error' key.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.run_validators" title="fecfiler.validation.tests.MockF3XSerializerClass.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
+<td><p>Add read_only fields with defaults to value before running validators.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.to_internal_value" title="fecfiler.validation.tests.MockF3XSerializerClass.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.to_representation" title="fecfiler.validation.tests.MockF3XSerializerClass.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.validate" title="fecfiler.validation.tests.MockF3XSerializerClass.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
+<td><p>Overrides Django Rest Framework's Serializer validate to validate with fecfile_validate rules.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.validate_empty_values" title="fecfiler.validation.tests.MockF3XSerializerClass.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<td><p>Validate empty values, and either:</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.context" title="fecfiler.validation.tests.MockF3XSerializerClass.context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">context</span></code></a></p></td>
+<td><p>Returns the context as passed to the root serializer on initialization.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_error_messages</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_validators</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.fields" title="fecfiler.validation.tests.MockF3XSerializerClass.fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code></a></p></td>
+<td><p>field_instance}.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.tests.MockF3XSerializerClass.root" title="fecfiler.validation.tests.MockF3XSerializerClass.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
+<td><p>Returns the top-level serializer for this field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.bind">
+<span class="sig-name descname"><span class="pre">bind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the field name and parent for the field instance.
+Called when a field is added to the parent serializer instance.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.context">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.default_empty_html">
+<span class="sig-name descname"><span class="pre">default_empty_html</span></span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.default_empty_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.fields.empty</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.fail">
+<span class="sig-name descname"><span class="pre">fail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper method that simply raises a validation error.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>field_instance}.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>A dictionary of {field_name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_attribute">
+<span class="sig-name descname"><span class="pre">get_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the <em>outgoing</em> object instance, return the primitive value
+that should be used for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_default">
+<span class="sig-name descname"><span class="pre">get_default</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default value to use when validating data if no input
+is provided for this field.</p>
+<p>If a default has not been set for this field then this will simply
+raise <cite>SkipField</cite>, indicating that no value should be set in the
+validated data for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_fields">
+<span class="sig-name descname"><span class="pre">get_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of {field_name: field_instance}.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_initial">
+<span class="sig-name descname"><span class="pre">get_initial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value to use when the field is being returned as a primitive
+value, without any object instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_schema_name">
+<span class="sig-name descname"><span class="pre">get_schema_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_schema_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p>
+<p>You need to either define <cite>schema_name</cite> or overide this function to provide the
+<cite>validate</cite> function with a schema</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – data being serialized.  May contain information needed to determine
+what schema you want to use</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>schema name that can be passed to
+<a href="#id1"><span class="problematic" id="id2">:py:function:`fecfile_validate.validate`</span></a> that will
+match a schema defined in the package</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_validators">
+<span class="sig-name descname"><span class="pre">get_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of validator callables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the <em>incoming</em> primitive data, return the value for this field
+that should be validated and transformed to a native value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.many_init">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">many_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.many_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method implements the creation of a <cite>ListSerializer</cite> parent
+class when <cite>many=True</cite> is used. You can customize it if you need to
+control which keyword arguments are passed to the parent, and
+which are passed to the child.</p>
+<p>Note that we’re over-cautious in passing most arguments to both parent
+and child classes in order to try to cover the general case. If you’re
+overriding this method you’ll probably want something much simpler, eg:</p>
+<p>&#64;classmethod
+def many_init(cls, <a href="#id3"><span class="problematic" id="id4">*</span></a>args, <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs):</p>
+<blockquote>
+<div><p>kwargs[‘child’] = cls()
+return CustomListSerializer(<a href="#id7"><span class="problematic" id="id8">*</span></a>args, <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.root">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">root</span></span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the top-level serializer for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.run_validation">
+<span class="sig-name descname"><span class="pre">run_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.run_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>We override the default <cite>run_validation</cite>, because the validation
+performed by validators and the <cite>.validate()</cite> method should
+be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.run_validators">
+<span class="sig-name descname"><span class="pre">run_validators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.run_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add read_only fields with defaults to value before running validators.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.to_internal_value">
+<span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.to_internal_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.to_representation">
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.to_representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object instance -&gt; Dict of primitive datatypes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides Django Rest Framework’s Serializer validate to validate with
+fecfile_validate rules.</p>
+<dl class="simple">
+<dt>We need to translate the list of fecfile validation errors to a dictionary</dt><dd><p>of <code class="docutils literal notranslate"><span class="pre">`path`</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">`message`</span></code> to comply with DJR’s validation error
+pattern</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.tests.MockF3XSerializerClass.validate_empty_values">
+<span class="sig-name descname"><span class="pre">validate_empty_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.tests.MockF3XSerializerClass.validate_empty_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate empty values, and either:</p>
+<ul class="simple">
+<li><p>Raise <cite>ValidationError</cite>, indicating invalid data.</p></li>
+<li><p>Raise <cite>SkipField</cite>, indicating that the field should be ignored.</p></li>
+<li><p>Return (True, data), indicating an empty value that should be
+returned without any further validation being applied.</p></li>
+<li><p>Return (False, data), indicating a non-empty value, that should
+have validation applied as normal.</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.validation.serializers.html">fecfiler.validation.serializers</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.validation.tests.html">fecfiler.validation.tests</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.validation.tests.FecSchemaValidatorSerializerMixin.html">fecfiler.validation.tests.FecSchemaValidatorSerializerMixin</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.validation.tests.MockF3XSerializerClass</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.validation.html">fecfiler.validation</a><ul>
+  <li><a href="fecfiler.validation.tests.html">fecfiler.validation.tests</a><ul>
+      <li>Previous: <a href="fecfiler.validation.tests.FecSchemaValidatorSerializerMixin.html" title="previous chapter">fecfiler.validation.tests.FecSchemaValidatorSerializerMixin</a></li>
+      <li>Next: <a href="fecfiler.wsgi.html" title="next chapter">fecfiler.wsgi</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.validation.tests.MockF3XSerializerClass.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

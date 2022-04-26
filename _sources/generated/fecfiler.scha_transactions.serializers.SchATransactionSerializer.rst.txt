@@ -37,6 +37,7 @@ fecfiler.scha\_transactions.serializers.SchATransactionSerializer
       ~SchATransactionSerializer.get_field_names
       ~SchATransactionSerializer.get_fields
       ~SchATransactionSerializer.get_initial
+      ~SchATransactionSerializer.get_schema_name
       ~SchATransactionSerializer.get_unique_for_date_validators
       ~SchATransactionSerializer.get_unique_together_validators
       ~SchATransactionSerializer.get_uniqueness_extra_kwargs
@@ -70,6 +71,7 @@ fecfiler.scha\_transactions.serializers.SchATransactionSerializer
       ~SchATransactionSerializer.fields
       ~SchATransactionSerializer.initial
       ~SchATransactionSerializer.root
+      ~SchATransactionSerializer.schema_name
       ~SchATransactionSerializer.serializer_field_mapping
       ~SchATransactionSerializer.url_field_name
       ~SchATransactionSerializer.validated_data

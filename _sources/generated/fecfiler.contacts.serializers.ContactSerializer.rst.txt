@@ -37,6 +37,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.get_field_names
       ~ContactSerializer.get_fields
       ~ContactSerializer.get_initial
+      ~ContactSerializer.get_schema_name
       ~ContactSerializer.get_unique_for_date_validators
       ~ContactSerializer.get_unique_together_validators
       ~ContactSerializer.get_uniqueness_extra_kwargs
@@ -62,6 +63,7 @@ fecfiler.contacts.serializers.ContactSerializer
 
    .. autosummary::
    
+      ~ContactSerializer.contact_value
       ~ContactSerializer.context
       ~ContactSerializer.data
       ~ContactSerializer.default_error_messages
@@ -70,6 +72,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.fields
       ~ContactSerializer.initial
       ~ContactSerializer.root
+      ~ContactSerializer.schema_name
       ~ContactSerializer.serializer_field_mapping
       ~ContactSerializer.url_field_name
       ~ContactSerializer.validated_data

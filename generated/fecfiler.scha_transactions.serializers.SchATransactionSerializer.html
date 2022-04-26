@@ -38,7 +38,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.serializers.SchATransactionSerializer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.scha_transactions.serializers.</span></span><span class="sig-name descname"><span class="pre">SchATransactionSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer.html#fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer" title="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer.html#fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer" title="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer</span></code></a>, <a class="reference internal" href="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.html#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.serializers.SchATransactionSerializer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.__init__" title="Permalink to this definition">¶</a></dt>
@@ -105,52 +105,55 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_initial" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
 <td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_for_date_validators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_schema_name" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_schema_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schema_name</span></code></a>(data)</p></td>
+<td><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_for_date_validators</span></code></a>()</p></td>
 <td><p>Determine a default set of validators for the following constraints:</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_together_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_together_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_validators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_together_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_together_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_validators</span></code></a>()</p></td>
 <td><p>Determine a default set of validators for any unique_together constraints.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_uniqueness_extra_kwargs" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_uniqueness_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_uniqueness_extra_kwargs</span></code></a>(field_names, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_uniqueness_extra_kwargs" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_uniqueness_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_uniqueness_extra_kwargs</span></code></a>(field_names, ...)</p></td>
 <td><p>Return any additional field options that need to be included as a result of uniqueness constraints on the model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
 <td><p>Determine the set of validators to use when instantiating serializer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_value" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_value" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
 <td><p>Given the <em>incoming</em> primitive data, return the value for this field that should be validated and transformed to a native value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.include_extra_kwargs" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.include_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">include_extra_kwargs</span></code></a>(kwargs, extra_kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.include_extra_kwargs" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.include_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">include_extra_kwargs</span></code></a>(kwargs, extra_kwargs)</p></td>
 <td><p>Include any 'extra_kwargs' that have been included for this field, possibly removing any incompatible existing keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>([raise_exception])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>([raise_exception])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.many_init" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.many_init" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
 <td><p>This method implements the creation of a <cite>ListSerializer</cite> parent class when <cite>many=True</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validation" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validation" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
 <td><p>We override the default <cite>run_validation</cite>, because the validation performed by validators and the <cite>.validate()</cite> method should be coerced into an error dictionary with a 'non_fields_error' key.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validators" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
 <td><p>Add read_only fields with defaults to value before running validators.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_internal_value" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_internal_value" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
 <td><p>Extract committee_id from request to assign the corresponding CommitteeAccount as the owner of the object</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_representation" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_representation" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
 <td><p>Overrides Django Rest Framework's Serializer validate to validate with fecfile_validate rules.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
 <td><p>Validate empty values, and either:</p></td>
 </tr>
 </tbody>
@@ -186,16 +189,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.root" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
 <td><p>Returns the top-level serializer for this field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -356,6 +362,28 @@ value, without any object instance.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_schema_name">
+<span class="sig-name descname"><span class="pre">get_schema_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_schema_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p>
+<p>You need to either define <cite>schema_name</cite> or overide this function to provide the
+<cite>validate</cite> function with a schema</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – data being serialized.  May contain information needed to determine
+what schema you want to use</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>schema name that can be passed to
+<a href="#id5"><span class="problematic" id="id6">:py:function:`fecfile_validate.validate`</span></a> that will
+match a schema defined in the package</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators">
 <span class="sig-name descname"><span class="pre">get_unique_for_date_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.get_unique_for_date_validators" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine a default set of validators for the following constraints:</p>
@@ -412,10 +440,10 @@ which are passed to the child.</p>
 and child classes in order to try to cover the general case. If you’re
 overriding this method you’ll probably want something much simpler, eg:</p>
 <p>&#64;classmethod
-def many_init(cls, <a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs):</p>
+def many_init(cls, <a href="#id7"><span class="problematic" id="id8">*</span></a>args, <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs):</p>
 <blockquote>
 <div><p>kwargs[‘child’] = cls()
-return CustomListSerializer(<a href="#id9"><span class="problematic" id="id10">*</span></a>args, <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs)</p>
+return CustomListSerializer(<a href="#id11"><span class="problematic" id="id12">*</span></a>args, <a href="#id13"><span class="problematic" id="id14">**</span></a>kwargs)</p>
 </div></blockquote>
 </dd></dl>
 
@@ -534,6 +562,7 @@ have validation applied as normal.</p></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
 </ul>
 </li>
