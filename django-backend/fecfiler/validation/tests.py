@@ -1,7 +1,6 @@
 from django.test import TestCase
 from .serializers import FecSchemaValidatorSerializerMixin
 from django.http import HttpRequest
-from fecfiler.authentication.models import Account
 
 
 class MockF3XSerializerClass(FecSchemaValidatorSerializerMixin):
