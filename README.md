@@ -44,6 +44,8 @@ export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 
 # Deployment (FEC team only)
 
+*Special Note:* If the fecfile-validate repo was updated, the commit of the update needs to be updated in the requirements.txt file otherwise the CircleCI cache will not roll out the change.
+
 ### Create a feature branch
 
 Using git-flow extensions:
