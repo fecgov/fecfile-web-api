@@ -1,7 +1,6 @@
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from functools import reduce
 import logging
 
 logger = logging.getLogger(__name__)

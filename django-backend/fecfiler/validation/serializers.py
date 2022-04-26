@@ -1,4 +1,4 @@
-from rest_framework import serializers, relations
+from rest_framework import serializers
 from fecfile_validate import validate
 from rest_framework import exceptions
 from functools import reduce
@@ -12,11 +12,12 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     Runs :py:function:`fecfile_validate.validate` over incoming data for the configured
     schema. Set the schema by defining :py:attribue:`schema_name` or
-    overriding :py:function:`get_schema_name`
+    overriding :py:function:`get_schema_name`p
 
     Attributes:
-        schema_name (str): schema name that can be passed to :py:function:`fecfile_validate.validate`
-            that will match a schema defined in the package
+        schema_name (str): schema name that can be passed to
+            :py:function:`fecfile_validate.validate` that will
+            match a schema defined in the package
 
     """
 
@@ -33,12 +34,13 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
                 what schema you want to use
 
         Returns:
-            string: schema name that can be passed to :py:function:`fecfile_validate.validate`
-            that will match a schema defined in the package
+            string: schema name that can be passed to
+            :py:function:`fecfile_validate.validate` that will
+            match a schema defined in the package
         """
         assert self.schema_name is not None, (
-            f"'{self.__class__.__name__}' should either include a `schema_name` attribute, "
-            "or override the `get_schema_name()` method."
+            f"'{self.__class__.__name__}' should either include a "
+            "`schema_name` attribute, or override the `get_schema_name()` method."
         )
         return self.schema_name
 
@@ -65,7 +67,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
             translated_errors = reduce(collect_error, validation_result.errors, {})
             logger.warning(
-                f"'{self.__class__.__name__}': Failed validation for {list(translated_errors)}"
+                f"{self.__class__.__name__}: Failed validation {list(translated_errors)}"
             )
             raise exceptions.ValidationError(translated_errors)
         return data
