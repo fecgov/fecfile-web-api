@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.migrations.0007\_add\_test\_data.forwards\_func
+=======================================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.migrations.0007_add_test_data
+
+.. autofunction:: forwards_func

@@ -93,6 +93,8 @@ fecfiler.f3x\_summaries.views.F3XSummaryViewSet
       ~F3XSummaryViewSet.lookup_field
       ~F3XSummaryViewSet.lookup_url_kwarg
       ~F3XSummaryViewSet.name
+      ~F3XSummaryViewSet.ordering
+      ~F3XSummaryViewSet.ordering_fields
       ~F3XSummaryViewSet.paginator
       ~F3XSummaryViewSet.parser_classes
       ~F3XSummaryViewSet.permission_classes
