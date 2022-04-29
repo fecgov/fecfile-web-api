@@ -3,7 +3,7 @@ import os
 from retry import retry
 
 
-@retry(delay=2, tries=15)
+@retry(delay=5, tries=30)
 def postgres_test():
     try:
         database_uri = os.environ.get("DATABASE_URL")
