@@ -40,7 +40,7 @@ class FecSchemaValidatorSerializerMixin(TestCase):
 
     def test_serializer_partial_validate(self):
         partial_validate_request = HttpRequest()
-        partial_validate_request.META["fields_to_validate"] = ["treasurer_last_name"]
+        partial_validate_request.META["FIELDS_TO_VALIDATE"] = ["treasurer_last_name"]
         """ Notice that we are putting `invalid_f3x_summery in here`
         This serializer will come out valid because the request asks
         to ONLY validate `treasurer_first_name`
@@ -54,7 +54,7 @@ class FecSchemaValidatorSerializerMixin(TestCase):
         This serailizer should fail
         """
         partial_validate_request_invalid = HttpRequest()
-        partial_validate_request_invalid.META["fields_to_validate"] = ["form_type"]
+        partial_validate_request_invalid.META["FIELDS_TO_VALIDATE"] = ["form_type"]
         invalid_serializer = MockF3XSerializerClass(
             data=self.invalid_f3x_summary,
             context={"request": partial_validate_request_invalid},
