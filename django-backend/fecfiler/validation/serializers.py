@@ -55,7 +55,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         fields_to_validate = []
         request = self.context.get("request", None)
         if request:
-            fields_to_validate = request.META.get("fields_to_validate", [])
+            fields_to_validate = request.META.get("HTTP_FIELDS_TO_VALIDATE", [])
         validation_result = validate.validate(
             self.get_schema_name(data), data, fields_to_validate
         )
