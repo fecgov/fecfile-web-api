@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
             name='qualified_committee',
             field=models.TextField(blank=True, null=True),
         ),
-        migrations.RunSQL('UPDATE f3x_summaries SET ' \
-                          'change_of_address = NULL, ' \
+        migrations.RunSQL('UPDATE f3x_summaries SET change_of_address = NULL, '
                           'qualified_committee = NULL;')
     ]
