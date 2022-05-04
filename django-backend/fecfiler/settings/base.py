@@ -97,7 +97,7 @@ TEMPLATES = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
+CORS_ALLOW_HEADERS = default_headers + ("enctype", "token", "fields_to_validate")
 
 # Database
 DATABASES = {
