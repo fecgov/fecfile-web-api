@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .models import Contact
 from .serializers import ContactSerializer
-from django.http import HttpRequest
+from rest_framework.request import HttpRequest, Request
 from fecfiler.authentication.models import Account
 
 
@@ -28,9 +28,7 @@ class ContactSerializerTestCase(TestCase):
             "city": "City",
         }
 
-        self.mock_request = HttpRequest()
-        self.mock_request.method = "POST"
-        self.mock_request.META["SERVER_NAME"] = "localhost"
+        self.mock_request = Request(HttpRequest())
         user = Account()
         user.cmtee_id = "C00277616"
         self.mock_request.user = user
