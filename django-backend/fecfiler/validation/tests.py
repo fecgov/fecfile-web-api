@@ -1,6 +1,7 @@
 from django.test import TestCase
 from .serializers import FecSchemaValidatorSerializerMixin
-from django.http import HttpRequest
+from django.http import QueryDict
+from rest_framework.request import Request, HttpRequest
 
 
 class MockF3XSerializerClass(FecSchemaValidatorSerializerMixin):
@@ -40,26 +41,26 @@ class FecSchemaValidatorSerializerMixin(TestCase):
 
     def test_serializer_partial_validate(self):
         partial_validate_request = HttpRequest()
-        partial_validate_request.META["HTTP_FIELDS_TO_VALIDATE"] = [
-            "treasurer_last_name"
-        ]
+        partial_validate_request.GET = QueryDict(
+            "fields_to_validate=treasurer_last_name"
+        )
         """ Notice that we are putting `invalid_f3x_summery in here`
         This serializer will come out valid because the request asks
         to ONLY validate `treasurer_first_name`
         """
         valid_serializer = MockF3XSerializerClass(
             data=self.invalid_f3x_summary,
-            context={"request": partial_validate_request},
+            context={"request": Request(partial_validate_request)},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         """ Now, we ask to validate a field that we have given a bad value
         This serailizer should fail
         """
         partial_validate_request_invalid = HttpRequest()
-        partial_validate_request_invalid.META["HTTP_FIELDS_TO_VALIDATE"] = ["form_type"]
+        partial_validate_request_invalid.GET = QueryDict("fields_to_validate=form_type")
         invalid_serializer = MockF3XSerializerClass(
             data=self.invalid_f3x_summary,
-            context={"request": partial_validate_request_invalid},
+            context={"request": Request(partial_validate_request_invalid)},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
