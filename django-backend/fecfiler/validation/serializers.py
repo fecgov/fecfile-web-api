@@ -55,10 +55,10 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         fields_to_validate = []
         request = self.context.get("request", None)
         if request:
-            fields_to_validate = request.query_params.get(
-                "fields_to_validate", ""
-            ).split(",")
-
+            fields_to_validate_str = request.query_params.get("fields_to_validate")
+            fields_to_validate = (
+                fields_to_validate_str.split(",") if fields_to_validate_str else []
+            )
         validation_result = validate.validate(
             self.get_schema_name(data), data, fields_to_validate
         )
