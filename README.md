@@ -44,6 +44,8 @@ export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
 
 # Deployment (FEC team only)
 
+*Special Note:* If the fecfile-validate repo was updated, the commit of the update needs to be updated in the requirements.txt file otherwise the CircleCI cache will not roll out the change.
+
 ### Create a feature branch
 
 Using git-flow extensions:
@@ -64,29 +66,30 @@ Without the git-flow extensions:
 
 ### Create a release branch
 
-Using git-flow extensions:
+* Using git-flow extensions:
 ```
 git flow release start sprint-#
 ```
 
-Without the git-flow extensions:
+* Without the git-flow extensions:
 ```
 git checkout develop
 git pull
 git checkout -b release/sprint-# develop
 git push --set-upstream origin release/sprint-#
 ```
+* Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to production.
 
 ### Create and deploy a hotfix
 
-Using git-flow extensions:
+* Using git-flow extensions:
 ```
 git flow hotfix start my-fix
 # Work happens here
 git flow hotfix finish my-fix
 ```
 
-Without the git-flow extensions:
+* Without the git-flow extensions:
 ```
 git checkout -b hotfix/my-fix main
 # Work happens here
@@ -99,7 +102,6 @@ git push --set-upstream origin hotfix/my-fix
 * Developer deploys hotfix/my-fix branch to main using **Deploying a release to production** instructions below
 
 ### Deploying a release to production
-* Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch
 * Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 * Check CircleCI for passing pipeline tests
 * If tests pass, continue

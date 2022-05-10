@@ -53,6 +53,8 @@ testem.log
 /typings
 *.env
 */target
+django-backend/.cache/
+django-backend/.local/
 
 ### Bower ###
 */bower_components
