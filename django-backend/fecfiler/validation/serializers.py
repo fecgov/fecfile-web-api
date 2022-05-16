@@ -39,7 +39,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             match a schema defined in the package
         """
         request = self.context.get("request", None)
-        if request:
+        if request and request.query_params.get("schema"):
             self.schema_name = request.query_params.get("schema")
 
         assert self.schema_name is not None, (
