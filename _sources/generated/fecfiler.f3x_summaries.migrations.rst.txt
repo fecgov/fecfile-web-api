@@ -39,4 +39,5 @@ fecfiler.f3x\_summaries.migrations
    fecfiler.f3x_summaries.migrations.0006_alter_f3xsummary_committee_account
    fecfiler.f3x_summaries.migrations.0007_add_test_data
    fecfiler.f3x_summaries.migrations.0008_auto_20220503_1411
+   fecfiler.f3x_summaries.migrations.0009_auto_20220515_2116
 
