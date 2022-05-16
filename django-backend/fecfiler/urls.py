@@ -17,6 +17,7 @@ urlpatterns = [
     ),
     url(r"^api/v1/", include("fecfiler.contacts.urls")),
     url(r"^api/v1/", include("fecfiler.f3x_summaries.urls")),
+    url(r"^api/v1/", include("fecfiler.scha_transactions.urls")),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
