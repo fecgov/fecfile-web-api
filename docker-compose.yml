@@ -4,7 +4,7 @@ services:
   db:
     build:
       context: './db'
-      dockerfile: Dockerfile
+      dockerfile: ${DOCKERFILE:-Dockerfile}
       args:
         ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
     image: fecfile-db
