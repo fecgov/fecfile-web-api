@@ -8,7 +8,7 @@ from invoke import task
 
 env = cfenv.AppEnv()
 
-APP_NAME = "fecfile-web-api"
+APP_NAME = "fecfile-web-api-login"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 
@@ -44,7 +44,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "feature/109-django-login-dot-gov"),
 )
 
 
