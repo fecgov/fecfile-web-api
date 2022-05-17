@@ -5,6 +5,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .authentication.authenticate_login import LogoutView
 
+BASE_V1_URL = r"^api/v1/"
 
 urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
@@ -15,9 +16,9 @@ urlpatterns = [
             template_name="swagger-ui.html", url_name="schema"
         ),
     ),
-    url(r"^api/v1/", include("fecfiler.contacts.urls")),
-    url(r"^api/v1/", include("fecfiler.f3x_summaries.urls")),
-    url(r"^api/v1/", include("fecfiler.scha_transactions.urls")),
+    url(BASE_V1_URL, include("fecfiler.contacts.urls")),
+    url(BASE_V1_URL, include("fecfiler.f3x_summaries.urls")),
+    url(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
