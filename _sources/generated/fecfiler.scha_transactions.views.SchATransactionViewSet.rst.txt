@@ -84,11 +84,15 @@ fecfiler.scha\_transactions.views.SchATransactionViewSet
    
       ~SchATransactionViewSet.allowed_methods
       ~SchATransactionViewSet.authentication_classes
+      ~SchATransactionViewSet.basename
       ~SchATransactionViewSet.default_response_headers
+      ~SchATransactionViewSet.description
+      ~SchATransactionViewSet.detail
       ~SchATransactionViewSet.filter_backends
       ~SchATransactionViewSet.http_method_names
       ~SchATransactionViewSet.lookup_field
       ~SchATransactionViewSet.lookup_url_kwarg
+      ~SchATransactionViewSet.name
       ~SchATransactionViewSet.paginator
       ~SchATransactionViewSet.parser_classes
       ~SchATransactionViewSet.permission_classes
@@ -96,6 +100,7 @@ fecfiler.scha\_transactions.views.SchATransactionViewSet
       ~SchATransactionViewSet.renderer_classes
       ~SchATransactionViewSet.schema
       ~SchATransactionViewSet.settings
+      ~SchATransactionViewSet.suffix
       ~SchATransactionViewSet.throttle_classes
       ~SchATransactionViewSet.versioning_class
    

@@ -38,4 +38,5 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0005_auto_20220310_1202
    fecfiler.scha_transactions.migrations.0006_auto_20220408_1757
    fecfiler.scha_transactions.migrations.0007_alter_schatransaction_committee_account
+   fecfiler.scha_transactions.migrations.0008_alter_schatransaction_memo_code
 
