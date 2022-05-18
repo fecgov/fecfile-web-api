@@ -11,7 +11,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     `update` and `destroy` actions.
 
     Note that this ViewSet inherits from CommitteeOwnedViewSet
-    The queryset will be further limmited by the user's committee
+    The queryset will be further limited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
