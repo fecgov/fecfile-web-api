@@ -2,7 +2,7 @@ from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import SchATransaction
 from .serializers import SchATransactionSerializer
-from django.db.models import TextField, Value as V
+from django.db.models import TextField, Value
 from django.db.models.functions import Concat, Coalesce
 
 
@@ -21,7 +21,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             "contributor_organization_name",
             Concat(
                 "contributor_last_name",
-                V(", "),
+                Value(", "),
                 "contributor_first_name",
                 output_field=TextField(),
             ),
