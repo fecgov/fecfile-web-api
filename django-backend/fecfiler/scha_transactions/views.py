@@ -23,14 +23,14 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
         f3x_summary = None
         request = self.context.get("request", None)
         if request:
-            f3x_summary = request.query_params.get("f3x_summary")
+            f3x_summary_id = request.query_params.get("f3x_summary_id")
 
-        if f3x_summary == None:
+        if f3x_summary_id == None:
             queryset = self.queryset
         else:
             if isinstance(queryset, QuerySet):
                 queryset = queryset.all().filter(
-                    f3x_summary_form=f3x_summary
+                    f3x_summary=f3x_summary_id
                 )
         return queryset
 
