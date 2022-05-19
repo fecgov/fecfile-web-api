@@ -30,7 +30,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
         else:
             if isinstance(queryset, QuerySet):
                 queryset = queryset.all().filter(
-                    scha_transaction__f3x_summary_id=f3x_summary_id
+                    scha_transaction__f3x_summary=f3x_summary_id
                 )
         return queryset
 
