@@ -262,6 +262,12 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ordering</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ordering_fields</span></code></p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.paginator" title="fecfiler.scha_transactions.views.SchATransactionViewSet.paginator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginator</span></code></a></p></td>
 <td><p>The paginator instance associated with the view, or <cite>None</cite>.</p></td>
 </tr>
@@ -271,8 +277,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.queryset" title="fecfiler.scha_transactions.views.SchATransactionViewSet.queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></a></p></td>
+<td><p>all schedule a transactions with an aditional contributor_name field</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renderer_classes</span></code></p></td>
 <td><p></p></td>
@@ -589,6 +595,17 @@ will instead be performed lazily, the first time either
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.views.SchATransactionViewSet.permission_denied">
 <span class="sig-name descname"><span class="pre">permission_denied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.permission_denied" title="Permalink to this definition">¶</a></dt>
 <dd><p>If request is not permitted, determine what kind of exception to raise.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.views.SchATransactionViewSet.queryset">
+<span class="sig-name descname"><span class="pre">queryset</span></span><a class="headerlink" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>all schedule a transactions with an aditional contributor_name field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>QuerySet</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

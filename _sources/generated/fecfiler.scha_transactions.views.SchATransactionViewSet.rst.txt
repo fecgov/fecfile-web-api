@@ -93,6 +93,8 @@ fecfiler.scha\_transactions.views.SchATransactionViewSet
       ~SchATransactionViewSet.lookup_field
       ~SchATransactionViewSet.lookup_url_kwarg
       ~SchATransactionViewSet.name
+      ~SchATransactionViewSet.ordering
+      ~SchATransactionViewSet.ordering_fields
       ~SchATransactionViewSet.paginator
       ~SchATransactionViewSet.parser_classes
       ~SchATransactionViewSet.permission_classes
