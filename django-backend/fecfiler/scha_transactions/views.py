@@ -41,10 +41,11 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             f3x_summary_id = self.request.query_params.get("f3x_summary_id")
 
         queryset = self.queryset
-        if f3x_summary_id is not None and isinstance(queryset, QuerySet):
-            queryset = SchATransaction.objects.all().filter(
-                f3x_summary__id=f3x_summary_id
-            )
+        if f3x_summary_id is not None and f3x_summary_id is not '': 
+            if isinstance(queryset, QuerySet):
+                queryset = SchATransaction.objects.all().filter(
+                    f3x_summary__id=f3x_summary_id
+                )
         return queryset
 
     serializer_class = SchATransactionSerializer
