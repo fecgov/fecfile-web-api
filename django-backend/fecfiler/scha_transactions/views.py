@@ -16,7 +16,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
-    
+
     queryset = SchATransaction.objects.alias(
         contributor_name=Coalesce(
             "contributor_organization_name",
@@ -41,14 +41,12 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             f3x_summary_id = self.request.query_params.get("f3x_summary_id")
 
         queryset = self.queryset
-        if f3x_summary_id is not None:
-            if isinstance(queryset, QuerySet):
-                queryset = SchATransaction.objects.all().filter(
-                    f3x_summary__id = f3x_summary_id
-                )
+        if f3x_summary_id is not None and isinstance(queryset, QuerySet):
+            queryset = SchATransaction.objects.all().filter(
+                f3x_summary__id=f3x_summary_id
+            )
         return queryset
 
-    
     serializer_class = SchATransactionSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
