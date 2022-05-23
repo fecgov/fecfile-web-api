@@ -16,27 +16,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
-
-    def get_queryset(self):
-        assert self.queryset is not None, (
-            "'%s' should either include a `queryset` attribute, "
-            "or override the `get_queryset()` method." % self.__class__.__name__
-        )
-
-        f3x_summary = None
-        request = self.context.get("request", None)
-        if request:
-            f3x_summary_id = request.query_params.get("f3x_summary_id")
-
-        if f3x_summary_id == None:
-            queryset = self.queryset
-        else:
-            if isinstance(queryset, QuerySet):
-                queryset = queryset.all().filter(
-                    scha_transaction__f3x_summary=f3x_summary_id
-                )
-        return queryset
-
+    
     queryset = SchATransaction.objects.alias(
         contributor_name=Coalesce(
             "contributor_organization_name",
@@ -50,6 +30,25 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     ).all()
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
+    def get_queryset(self):
+        assert self.queryset is not None, (
+            "'%s' should either include a `queryset` attribute, "
+            "or override the `get_queryset()` method." % self.__class__.__name__
+        )
+
+        f3x_summary_id = None
+        if self.request is not None:
+            f3x_summary_id = self.request.query_params.get("f3x_summary_id")
+
+        queryset = self.queryset
+        if f3x_summary_id is not None:
+            if isinstance(queryset, QuerySet):
+                queryset = SchATransaction.objects.all().filter(
+                    f3x_summary__id = f3x_summary_id
+                )
+        return queryset
+
+    
     serializer_class = SchATransactionSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
