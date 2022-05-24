@@ -245,7 +245,7 @@ class ReportCodeLabel(SoftDeleteModel):
     }
     """
 
-    label = models.TextField(null=True, blank=True);
+    label = models.TextField(null=True, blank=True, unique=True);
     report_code = models.TextField(null=True, blank=True);
     
     class Meta:
