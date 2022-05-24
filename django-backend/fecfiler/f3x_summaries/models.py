@@ -1,4 +1,5 @@
 from locale import MON_3, MON_8
+from logging import raiseExceptions
 from tkinter.messagebox import YES
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
@@ -213,7 +214,8 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
         db_table = "f3x_summaries"
 
 
-class ReportCodeLabels(SoftDeleteModel):
+class ReportCodeLabel(SoftDeleteModel):
+    """
     labels = {
         "Q1":"APRIL 15 (Q1)",
         "Q2": "JULY 15 (Q2)",
@@ -241,6 +243,13 @@ class ReportCodeLabels(SoftDeleteModel):
         "M11":"NOVEMBER 20 (M11)",
         "M12":"DECEMBER 20 (M12)"
     }
+    """
 
+    label = models.TextField(null=True, blank=True);
+    report_code = models.TextField(null=True, blank=True);
+    
     class Meta:
         db_table = "report_code_labels"
+        indexes = [
+            models.Index(fields=["report_code"])
+        ]

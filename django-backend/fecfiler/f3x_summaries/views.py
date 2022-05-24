@@ -1,8 +1,10 @@
 from rest_framework import filters
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import ListModelMixin
 from django.db.models import Case, Value, When
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import F3XSummary, ReportCodeLabels
-from .serializers import F3XSummarySerializer
+from .models import F3XSummary, ReportCodeLabel
+from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
 
 
 class F3XSummaryViewSet(CommitteeOwnedViewSet):
@@ -15,12 +17,16 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    report_code_labels = ReportCodeLabels()
-    for label in report_code_labels.labels:
-        ""
-    
-
     """
+    report_code_labels = ReportCodeLabel.labels.keys()
+    case_objects = []
+    for label in report_code_labels:
+        case_objects.append(When(report_code=label, then=Value(ReportCodeLabels.labels[label])))
+    
+    ## The "*" dereferences the case_objects list, making the When() objects inside it the arguments for the Case() constructor
+    queryset = F3XSummary.objects.alias(report_code_label=Case(*case_objects)); 
+    """    
+    
     queryset = F3XSummary.objects.alias(report_code_label=Case(
         When(report_code='Q1', then=Value('APRIL 15 (Q1)')),
         When(report_code='Q2', then=Value('JULY 15 (Q2)')),
@@ -49,10 +55,14 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         When(report_code='M12', then=Value('DECEMBER 20 (M12)')),
         default=Value('_NOT_FOUND_'),
     )).all()
-    """
 
     serializer_class = F3XSummarySerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['form_type', 'report_code_label', 'coverage_through_date']
     ordering = ['form_type']
+
+class ReportCodeLabelViewSet(GenericViewSet, ListModelMixin):
+    queryset = ReportCodeLabel.objects.all()
+    serializer_class = ReportCodeLabelSerializer
+    pagination_class = None

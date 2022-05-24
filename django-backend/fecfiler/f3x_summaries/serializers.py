@@ -1,4 +1,5 @@
-from .models import F3XSummary
+from .models import F3XSummary, ReportCodeLabel
+from rest_framework.serializers import ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 import logging
@@ -20,3 +21,11 @@ class F3XSummarySerializer(
             "created",
             "updated",
         ]
+
+class ReportCodeLabelSerializer(ModelSerializer):
+    class Meta:
+        model = ReportCodeLabel
+        fields = (
+            'label',
+            'report_code'
+        )
