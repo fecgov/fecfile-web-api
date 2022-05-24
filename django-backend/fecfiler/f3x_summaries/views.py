@@ -1,7 +1,7 @@
 from rest_framework import filters
 from django.db.models import Case, Value, When
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import F3XSummary
+from .models import F3XSummary, ReportCodeLabels
 from .serializers import F3XSummarySerializer
 
 
@@ -15,6 +15,12 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
+    report_code_labels = ReportCodeLabels()
+    for label in report_code_labels.labels:
+        ""
+    
+
+    """
     queryset = F3XSummary.objects.alias(report_code_label=Case(
         When(report_code='Q1', then=Value('APRIL 15 (Q1)')),
         When(report_code='Q2', then=Value('JULY 15 (Q2)')),
@@ -43,6 +49,8 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         When(report_code='M12', then=Value('DECEMBER 20 (M12)')),
         default=Value('_NOT_FOUND_'),
     )).all()
+    """
+
     serializer_class = F3XSummarySerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
