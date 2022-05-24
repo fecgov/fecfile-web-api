@@ -1,0 +1,227 @@
+[
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 1,
+    "fields": {
+        "deleted": null,
+        "label": "APRIL 15 (Q1)",
+        "report_code": "Q1"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 2,
+    "fields": {
+        "deleted": null,
+        "label": "JULY 15 (Q2)",
+        "report_code": "Q2"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 3,
+    "fields": {
+        "deleted": null,
+        "label": "OCTOBER 15 (Q3)",
+        "report_code": "Q3"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 4,
+    "fields": {
+        "deleted": null,
+        "label": "JANUARY 31 (YE)",
+        "report_code": "YE"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 5,
+    "fields": {
+        "deleted": null,
+        "label": "TERMINATION (TER)",
+        "report_code": "TER"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 6,
+    "fields": {
+        "deleted": null,
+        "label": "JANUARY 31 (31)",
+        "report_code": "MY"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 7,
+    "fields": {
+        "deleted": null,
+        "label": "GENERAL (12G)",
+        "report_code": "12G"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 8,
+    "fields": {
+        "deleted": null,
+        "label": "PRIMARY (12P)",
+        "report_code": "12P"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 9,
+    "fields": {
+        "deleted": null,
+        "label": "RUNOFF (12R)",
+        "report_code": "12R"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 10,
+    "fields": {
+        "deleted": null,
+        "label": "SPECIAL (12S)",
+        "report_code": "12S"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 11,
+    "fields": {
+        "deleted": null,
+        "label": "CONVENTION (12C)",
+        "report_code": "12C"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 12,
+    "fields": {
+        "deleted": null,
+        "label": "GENERAL (30G)",
+        "report_code": "30G"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 13,
+    "fields": {
+        "deleted": null,
+        "label": "RUNOFF (30R)",
+        "report_code": "30R"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 14,
+    "fields": {
+        "deleted": null,
+        "label": "SPECIAL (30S)",
+        "report_code": "30S"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 15,
+    "fields": {
+        "deleted": null,
+        "label": "FEBRUARY 20 (M2)",
+        "report_code": "M2"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 16,
+    "fields": {
+        "deleted": null,
+        "label": "MARCH 30 (M3)",
+        "report_code": "M3"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 17,
+    "fields": {
+        "deleted": null,
+        "label": "APRIL 20 (M4)",
+        "report_code": "M4"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 18,
+    "fields": {
+        "deleted": null,
+        "label": "MAY 20 (M5)",
+        "report_code": "M5"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 19,
+    "fields": {
+        "deleted": null,
+        "label": "JUNE 20 (M6)",
+        "report_code": "M6"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 20,
+    "fields": {
+        "deleted": null,
+        "label": "JULY 20 (M7)",
+        "report_code": "M7"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 21,
+    "fields": {
+        "deleted": null,
+        "label": "AUGUST 20 (M8)",
+        "report_code": "M8"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 22,
+    "fields": {
+        "deleted": null,
+        "label": "SEPTEMBER 20 (M9)",
+        "report_code": "M9"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 23,
+    "fields": {
+        "deleted": null,
+        "label": "OCTOBER 20 (M10)",
+        "report_code": "M10"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 24,
+    "fields": {
+        "deleted": null,
+        "label": "NOVEMBER 20 (M11)",
+        "report_code": "M11"
+    }
+},
+{
+    "model": "f3x_summaries.reportcodelabel",
+    "pk": 25,
+    "fields": {
+        "deleted": null,
+        "label": "DECEMBER 20 (M12)",
+        "report_code": "M12"
+    }
+}
+]
