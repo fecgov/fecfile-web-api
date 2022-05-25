@@ -57,9 +57,10 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         """
         validation_candidate = data.copy()
         for (foreign_key_field, actual_key) in self.get_foreign_key_fields().items():
-            validation_candidate[foreign_key_field] = getattr(
-                validation_candidate.get(foreign_key_field, {}), actual_key
-            )
+            if hasattr(validation_candidate.get(foreign_key_field, {}), actual_key):
+                validation_candidate[foreign_key_field] = getattr(
+                    validation_candidate.get(foreign_key_field, {}), actual_key
+                )
 
         return validation_candidate
 
