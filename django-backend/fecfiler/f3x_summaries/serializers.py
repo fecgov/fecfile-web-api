@@ -14,6 +14,7 @@ class F3XSummarySerializer(
     schema_name = "F3X"
     report_code = SlugRelatedField(
         many=False,
+        required=False,
         read_only=False,
         slug_field="report_code",
         queryset=ReportCodeLabel.objects.all(),
