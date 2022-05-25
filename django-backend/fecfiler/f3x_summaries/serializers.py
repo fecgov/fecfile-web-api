@@ -1,5 +1,6 @@
+from django.forms import SlugField
 from .models import F3XSummary, ReportCodeLabel
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SlugRelatedField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 import logging
@@ -11,6 +12,12 @@ class F3XSummarySerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "F3X"
+    report_code = SlugRelatedField(
+        many=False,
+        read_only=False,
+        slug_field="report_code",
+        queryset=ReportCodeLabel.objects.all(),
+    )
 
     class Meta:
         model = F3XSummary
@@ -21,11 +28,10 @@ class F3XSummarySerializer(
             "created",
             "updated",
         ]
+        foreign_key_fields = {"report_code": "report_code"}
+
 
 class ReportCodeLabelSerializer(ModelSerializer):
     class Meta:
         model = ReportCodeLabel
-        fields = (
-            'label',
-            'report_code'
-        )
+        fields = ("label", "report_code")
