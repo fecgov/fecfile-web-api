@@ -45,6 +45,16 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         return self.schema_name
 
     def get_validation_candidate(self, data):
+        """Returns a copy of data where foreign key fields are replaced with the
+        underlying foreign key field.
+
+        Example:  the f3x table is related to the report code label table by the
+            report code field.  DRF gives us the whole
+            :py:class:`fecfiler.f3x_summaries.models.ReportCodeLabel` object.
+            for validating purposes, we just want the report code.  With the
+            foreign_key_fields mapping defined in Meta, we replace the foreign-key-
+            related object with the key only.
+        """
         validation_candidate = data.copy()
         for (foreign_key_field, actual_key) in self.get_foreign_key_fields().items():
             validation_candidate[foreign_key_field] = getattr(
@@ -54,9 +64,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         return validation_candidate
 
     def get_foreign_key_fields(self):
-        """
-        Returns a dictionary of foreign key fields
-        """
+        """Returns a dictionary of foreign key fields"""
         meta = getattr(self, "Meta", None)
         foreign_key_fields = getattr(meta, "foreign_key_fields", None)
         return dict(foreign_key_fields) if foreign_key_fields else {}
