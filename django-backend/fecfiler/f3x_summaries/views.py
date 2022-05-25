@@ -2,6 +2,7 @@ from rest_framework import filters
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
 from django.db.models import Case, Value, When
+from django.db.models.expressions import RawSQL
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary, ReportCodeLabel
 from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
@@ -27,6 +28,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     queryset = F3XSummary.objects.alias(report_code_label=Case(*case_objects)); 
     """    
     
+    """ 
     queryset = F3XSummary.objects.alias(report_code_label=Case(
         When(report_code='Q1', then=Value('APRIL 15 (Q1)')),
         When(report_code='Q2', then=Value('JULY 15 (Q2)')),
@@ -55,6 +57,19 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         When(report_code='M12', then=Value('DECEMBER 20 (M12)')),
         default=Value('_NOT_FOUND_'),
     )).all()
+    """
+
+    def get_queryset(self):
+        SQLCommand = """
+        SELECT * FROM f3x_summaries
+        INNER JOIN (SELECT label AS report_code_label, report_code from report_code_labels) report_code_labels 
+        ON f3x_summaries.report_code = report_code_labels.report_code
+        """
+        
+        rawqueryset = F3XSummary.objects.raw(SQLCommand)
+        rawqueryset.order_by = F3XSummary.objects.order_by
+        ##print(rawqueryset[0].report_code_label)
+        return rawqueryset
 
     serializer_class = F3XSummarySerializer
     permission_classes = []
