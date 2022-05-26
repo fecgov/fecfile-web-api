@@ -7,38 +7,11 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
 class ReportCodeLabel(models.Model):
-    """
-    labels = {
-        "Q1":"APRIL 15 (Q1)",
-        "Q2": "JULY 15 (Q2)",
-        "Q3":"OCTOBER 15 (Q3)",
-        "YE":"JANUARY 31 (YE)",
-        "TER":"TERMINATION (TER)",
-        "MY":"JANUARY 31 (31)",
-        "12G":"GENERAL (12G)",
-        "12P":"PRIMARY (12P)",
-        "12R":"RUNOFF (12R)",
-        "12S":"SPECIAL (12S)",
-        "12C":"CONVENTION (12C)",
-        "30G":"GENERAL (30G)",
-        "30R":"RUNOFF (30R)",
-        "30S":"SPECIAL (30S)",
-        "M2":"FEBRUARY 20 (M2)",
-        "M3":"MARCH 30 (M3)",
-        "M4":"APRIL 20 (M4)",
-        "M5":"MAY 20 (M5)",
-        "M6":"JUNE 20 (M6)",
-        "M7":"JULY 20 (M7)",
-        "M8":"AUGUST 20 (M8)",
-        "M9":"SEPTEMBER 20 (M9)",
-        "M10":"OCTOBER 20 (M10)",
-        "M11":"NOVEMBER 20 (M11)",
-        "M12":"DECEMBER 20 (M12)"
-    }
-    """
-
     label = models.TextField(null=True, blank=True)
     report_code = models.TextField(null=True, blank=True, unique=True)
+
+    def __str__(self):
+        return self.label
 
     class Meta:
         db_table = "report_code_labels"

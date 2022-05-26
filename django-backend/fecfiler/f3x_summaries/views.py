@@ -27,7 +27,6 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     ordering_fields = ["form_type", "report_code__label", "coverage_through_date"]
     ordering = ["form_type"]
 
-
 class ReportCodeLabelViewSet(GenericViewSet, ListModelMixin):
     queryset = ReportCodeLabel.objects.all()
     serializer_class = ReportCodeLabelSerializer
