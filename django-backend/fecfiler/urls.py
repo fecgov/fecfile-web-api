@@ -24,4 +24,5 @@ urlpatterns = [
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
     path("api/v1/", include("fecfiler.triage.urls")),
     path("api/v1/", include("fecfiler.authentication.urls")),
+    path('oidc/', include('mozilla_django_oidc.urls')),
 ]

@@ -17,7 +17,9 @@ class AccountManager(BaseUserManager):
             raise ValueError("Users must have a valid username.")
 
         account = self.model(
-            email=self.normalize_email(email), username=kwargs.get("username")
+            email=self.normalize_email(email), 
+            username=kwargs.get("username"),
+            uuid=kwargs.get("uuid")
         )
         account.set_password(password)
         account.save()
@@ -69,6 +71,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     status = models.CharField(max_length=15, blank=True)
     code_generated_counter = models.CharField(max_length=2, blank=False, default=0)
     secret_key = models.CharField(max_length=100, blank=True)
+    uuid = models.CharField(max_length=36, blank=True)
 
     class Meta:
         unique_together = (("username", "email"),)

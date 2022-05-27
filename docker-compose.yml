@@ -40,3 +40,6 @@ services:
       - DJANGO_SETTINGS_MODULE=fecfiler.settings.local
       - DJANGO_SECRET_KEY
       - FECFILE_FEC_WEBSITE_API_KEY=DEMO_KEY
+      - OIDC_RP_CLIENT_ID
+      - OIDC_RP_CLIENT_SECRET
+
