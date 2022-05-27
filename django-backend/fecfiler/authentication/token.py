@@ -22,6 +22,9 @@ def jwt_get_username_from_payload_handler(payload):
     return payload.get('sub')
 
 def jwt_payload_handler(user):
+    print("hihihihi")
+    logger.info(" ======= ")
+
     username_field = get_username_field()
     username = get_username(user)
 
