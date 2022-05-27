@@ -1,4 +1,3 @@
-from django.forms import SlugField
 from .models import F3XSummary, ReportCodeLabel
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
