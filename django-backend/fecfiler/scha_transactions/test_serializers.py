@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .serializers import SchATransactionSerializer
-from django.http import HttpRequest
+from rest_framework.request import Request, HttpRequest
 from fecfiler.authentication.models import Account
 
 
@@ -23,9 +23,7 @@ class SchATransactionTestCase(TestCase):
             "contributor_last_name": "Validlastname",
         }
 
-        self.mock_request = HttpRequest()
-        self.mock_request.method = "POST"
-        self.mock_request.META["SERVER_NAME"] = "localhost"
+        self.mock_request = Request(HttpRequest())
         user = Account()
         user.cmtee_id = "C00277616"
         self.mock_request.user = user

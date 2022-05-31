@@ -26,8 +26,8 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
     def get_schema_name(self, data):
         """Gets the schema name to retrieve the correct schema from fecfile_validate
 
-        You need to either define `schema_name` or overide this function to provide the
-        `validate` function with a schema
+        You need to either define `schema_name`, set the query parameter 'schema',
+        or overide this function to provide the `validate` function with a schema
 
         Args:
             data: data being serialized.  May contain information needed to determine
@@ -38,6 +38,10 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             :py:function:`fecfile_validate.validate` that will
             match a schema defined in the package
         """
+        request = self.context.get("request", None)
+        if request and request.query_params.get("schema"):
+            self.schema_name = request.query_params.get("schema")
+
         assert self.schema_name is not None, (
             f"'{self.__class__.__name__}' should either include a "
             "`schema_name` attribute, or override the `get_schema_name()` method."
@@ -55,7 +59,10 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         fields_to_validate = []
         request = self.context.get("request", None)
         if request:
-            fields_to_validate = request.META.get("fields_to_validate", [])
+            fields_to_validate_str = request.query_params.get("fields_to_validate")
+            fields_to_validate = (
+                fields_to_validate_str.split(",") if fields_to_validate_str else []
+            )
         validation_result = validate.validate(
             self.get_schema_name(data), data, fields_to_validate
         )

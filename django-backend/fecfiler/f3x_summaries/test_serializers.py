@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .serializers import F3XSummarySerializer
-from django.http import HttpRequest
 from fecfiler.authentication.models import Account
+from rest_framework.request import Request, HttpRequest
 
 
 class F3XSerializerTestCase(TestCase):
@@ -22,9 +22,7 @@ class F3XSerializerTestCase(TestCase):
             "date_signed": "20220101",
         }
 
-        self.mock_request = HttpRequest()
-        self.mock_request.method = "POST"
-        self.mock_request.META["SERVER_NAME"] = "localhost"
+        self.mock_request = Request(HttpRequest())
         user = Account()
         user.cmtee_id = "C00277616"
         self.mock_request.user = user
