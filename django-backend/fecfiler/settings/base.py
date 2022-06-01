@@ -111,6 +111,8 @@ TEMPLATES = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
+CORS_ALLOW_CREDENTIALS = True
+
 # Database
 DATABASES = {
     # Be sure to set the DATABASE_URL environment variable on your local
@@ -180,8 +182,8 @@ OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
 # TODO: Make this an env var
-LOGIN_REDIRECT_URL = "http://localhost:4200/dashboard"
-LOGOUT_REDIRECT_URL = "http://localhost:8080/api/login/"
+LOGIN_REDIRECT_URL = "http://localhost:8080/api/v1/auth/fecredirect"
+LOGOUT_REDIRECT_URL = "http://localhost:8080/api/v1/auth/feclogoutredirect"
 
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
@@ -253,7 +255,7 @@ LOGGING = {
 JWT_AUTH = {
  #   "JWT_ALLOW_REFRESH": True,
  #   "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
-    # "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
+ #    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
     "JWT_PAYLOAD_GET_USERNAME_HANDLER": "fecfiler.authentication.token.jwt_get_username_from_payload_handler",
 
 
@@ -263,7 +265,6 @@ JWT_AUTH = {
     "JWT_PUBLIC_KEY": loginDotGovPublicKey,
     "JWT_PRIVATE_KEY": loginDotGovPublicKey,
     "JWT_AUDIENCE": "urn:gov:gsa:openidconnect.profiles:sp:sso:fec:fecfile-web-api",
-    "JWT_AUTH_COOKIE": "ffapi_jwt"
 }
 """
 LOGGING = {
