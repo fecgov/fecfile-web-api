@@ -6,8 +6,6 @@ import os
 import datetime
 import dj_database_url
 import requests
-import base64
-import hashlib
 
 import json
 import jwt
@@ -15,11 +13,6 @@ import jwt
 from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
-from django.utils.encoding import force_bytes, smart_str, smart_bytes
-
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -182,15 +175,14 @@ OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
 # TODO: Make this an env var
-LOGIN_REDIRECT_URL = "http://localhost:8080/api/v1/auth/fecredirect"
-LOGOUT_REDIRECT_URL = "http://localhost:8080/api/v1/auth/feclogoutredirect"
+LOGIN_REDIRECT_URL = "http://localhost:8080/api/v1/auth/login-redirect"
+LOGOUT_REDIRECT_URL = "http://localhost:8080/api/v1/auth/logout-redirect"
 
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
 }
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
-OIDC_STORE_ID_TOKEN = True
 
 ## OIDC settings end
 
@@ -235,6 +227,14 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
+JWT_AUTH = {
+    "JWT_PAYLOAD_GET_USERNAME_HANDLER": "fecfiler.authentication.token.jwt_get_username_from_payload_handler",
+    "JWT_ALGORITHM": "RS256",
+    "JWT_PUBLIC_KEY": loginDotGovPublicKey,
+    "JWT_PRIVATE_KEY": loginDotGovPublicKey,
+    "JWT_AUDIENCE": "urn:gov:gsa:openidconnect.profiles:sp:sso:fec:fecfile-web-api",
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -248,47 +248,8 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {"handlers": ["default"], "level": "DEBUG", "propagate": True},
+        "": {"handlers": ["default"], "level": "INFO", "propagate": True},
     },
 }
 
-JWT_AUTH = {
- #   "JWT_ALLOW_REFRESH": True,
- #   "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
- #    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
-    "JWT_PAYLOAD_GET_USERNAME_HANDLER": "fecfiler.authentication.token.jwt_get_username_from_payload_handler",
-
-
-
-
-    "JWT_ALGORITHM": "RS256",
-    "JWT_PUBLIC_KEY": loginDotGovPublicKey,
-    "JWT_PRIVATE_KEY": loginDotGovPublicKey,
-    "JWT_AUDIENCE": "urn:gov:gsa:openidconnect.profiles:sp:sso:fec:fecfile-web-api",
-}
-"""
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'mozilla_django_oidc': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        }
-    },
-"""
 

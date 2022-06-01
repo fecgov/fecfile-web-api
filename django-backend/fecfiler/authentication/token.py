@@ -5,13 +5,7 @@ from fecfiler.settings import SECRET_KEY
 import jwt
 from rest_framework_jwt.compat import get_username_field, get_username
 from rest_framework_jwt.settings import api_settings
-from django.utils.encoding import force_bytes, smart_str, smart_bytes
-
-import base64
-import hashlib
-
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +16,6 @@ def jwt_get_username_from_payload_handler(payload):
     return payload.get('sub')
 
 def jwt_payload_handler(user):
-    print("hihihihi")
-    logger.info(" ======= ")
-
     username_field = get_username_field()
     username = get_username(user)
 

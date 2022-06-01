@@ -142,7 +142,7 @@ def authenticate_login(request):
             if account is None:
                 user = Account.objects.filter(username=username).first()
                 if user is None:
-                    logger.info(
+                    logger.debug(
                         "Attempt to login to Account "
                         "with username : {} was denied at {}.".format(
                             username, datetime.now()
@@ -161,7 +161,7 @@ def authenticate_login(request):
                         if current_counter <= LOGIN_MAX_RETRY - 1:
                             update_last_login_time(username)
                             current_time = datetime.now()
-                            logger.info(
+                            logger.debug(
                                 "Attempt to login to Account ID{} was "
                                 "denied at {}. Account is locked.".format(
                                     user.id, current_time
@@ -250,7 +250,7 @@ def authenticate_login(request):
                         else:
                             lock_account(current_counter, user.secret_key)
 
-                    logger.info(
+                    logger.debug(
                         "Attempt to login to Account with username:"
                         " {} was denied at {}.".format(username, datetime.now())
                     )
