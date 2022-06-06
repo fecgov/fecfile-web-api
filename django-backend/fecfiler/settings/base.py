@@ -144,7 +144,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ## OIDC settings start
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
     'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
 )
 
@@ -158,7 +157,7 @@ OIDC_RP_CLIENT_ID = os.environ.get('OIDC_RP_CLIENT_ID')
 OIDC_RP_CLIENT_SECRET = os.environ.get('OIDC_RP_CLIENT_SECRET')
 
 # The Django field used to identify users - default is email
-OIDC_RP_UNIQUE_IDENTIFIER = "uuid"
+OIDC_RP_UNIQUE_IDENTIFIER = "username"
 
 # Sometimes the OP (IDP - login.gov)has a different label for the unique ID
 OIDC_OP_UNIQUE_IDENTIFIER = "sub"
@@ -174,9 +173,13 @@ OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
 OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
-# TODO: Make this an env var
-LOGIN_REDIRECT_URL = "http://localhost:8080/api/v1/auth/login-redirect"
-LOGOUT_REDIRECT_URL = "http://localhost:8080/api/v1/auth/logout-redirect"
+FFAPI_JWT_COOKIE_NAME = "ffapi_jwt"
+FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
+FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
+
+LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_SERVER_URL')
+LOGIN_REDIRECT_CLIENT_URL = os.environ.get('LOGIN_REDIRECT_CLIENT_URL')
+LOGOUT_REDIRECT_URL = os.environ.get('LOGOUT_REDIRECT_URL')
 
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
@@ -232,7 +235,7 @@ JWT_AUTH = {
     "JWT_ALGORITHM": "RS256",
     "JWT_PUBLIC_KEY": loginDotGovPublicKey,
     "JWT_PRIVATE_KEY": loginDotGovPublicKey,
-    "JWT_AUDIENCE": "urn:gov:gsa:openidconnect.profiles:sp:sso:fec:fecfile-web-api",
+    "JWT_AUDIENCE": os.environ.get('OIDC_RP_CLIENT_ID'),
 }
 
 LOGGING = {
@@ -251,5 +254,3 @@ LOGGING = {
         "": {"handlers": ["default"], "level": "INFO", "propagate": True},
     },
 }
-
-
