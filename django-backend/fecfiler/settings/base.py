@@ -194,7 +194,7 @@ OIDC_OP_CERTS_ENDPOINT = (
 )
 OIDC_OP_CERTS = requests.get(OIDC_OP_CERTS_ENDPOINT).json()
 for jwk in OIDC_OP_CERTS.get('keys'):
-    loginDotGovPublicKey = (
+    login_dot_gov_pk = (
         jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
     )
 
@@ -240,8 +240,8 @@ JWT_AUTH = {
         "fecfiler.authentication.token.jwt_get_username_from_payload_handler"
     ),
     "JWT_ALGORITHM": "RS256",
-    "JWT_PUBLIC_KEY": loginDotGovPublicKey,
-    "JWT_PRIVATE_KEY": loginDotGovPublicKey,
+    "JWT_PUBLIC_KEY": login_dot_gov_pk,
+    "JWT_PRIVATE_KEY": login_dot_gov_pk,
     "JWT_AUDIENCE": os.environ.get('OIDC_RP_CLIENT_ID'),
 }
 
