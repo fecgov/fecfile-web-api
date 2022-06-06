@@ -17,7 +17,8 @@ class AccountManager(BaseUserManager):
             raise ValueError("Users must have a valid username.")
 
         account = self.model(
-            email=self.normalize_email(email), username=kwargs.get("username")
+            email=self.normalize_email(email), 
+            username=kwargs.get("username"),
         )
         account.set_password(password)
         account.save()
