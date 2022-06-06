@@ -3,7 +3,6 @@ Django settings for the FECFile project.
 """
 
 import os
-import datetime
 import dj_database_url
 import requests
 
@@ -131,18 +130,17 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa
     },
 ]
 
-## OIDC settings start
-
+# OIDC settings start
 AUTHENTICATION_BACKENDS = (
     'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
 )
@@ -165,7 +163,9 @@ OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 # Default implicit_flow is considered vulnerable
 OIDC_OP_CLIENT_AUTH_METHOD = "private_key_jwt"
 
-OIDC_OP_AUTODISCOVER_ENDPOINT = "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+OIDC_OP_AUTODISCOVER_ENDPOINT = (
+    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+)
 OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
 
 OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
@@ -186,16 +186,19 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
 }
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
+# OIDC settings end
 
-## OIDC settings end
-
-## Extra OIDC settings for django start
-OIDC_OP_CERTS_ENDPOINT = "https://idp.int.identitysandbox.gov/api/openid_connect/certs"
+# Extra OIDC settings for django start
+OIDC_OP_CERTS_ENDPOINT = (
+    "https://idp.int.identitysandbox.gov/api/openid_connect/certs"
+)
 OIDC_OP_CERTS = requests.get(OIDC_OP_CERTS_ENDPOINT).json()
 for jwk in OIDC_OP_CERTS.get('keys'):
-    loginDotGovPublicKey = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+    loginDotGovPublicKey = (
+        jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+    )
 
-## Extra OIDC settings for django end
+# Extra OIDC settings for django end
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
@@ -226,12 +229,16 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": (
+        "rest_framework.pagination.PageNumberPagination"
+    ),
     "PAGE_SIZE": 10,
 }
 
 JWT_AUTH = {
-    "JWT_PAYLOAD_GET_USERNAME_HANDLER": "fecfiler.authentication.token.jwt_get_username_from_payload_handler",
+    "JWT_PAYLOAD_GET_USERNAME_HANDLER": (
+        "fecfiler.authentication.token.jwt_get_username_from_payload_handler"
+    ),
     "JWT_ALGORITHM": "RS256",
     "JWT_PUBLIC_KEY": loginDotGovPublicKey,
     "JWT_PRIVATE_KEY": loginDotGovPublicKey,
@@ -242,7 +249,9 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "standard": (
+            {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"}
+        ),
     },
     "handlers": {
         "default": {

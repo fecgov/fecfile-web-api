@@ -9,11 +9,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def generate_username(uuid):
     return uuid
 
+
 def jwt_get_username_from_payload_handler(payload):
     return payload.get('sub')
+
 
 def jwt_payload_handler(user):
     username_field = get_username_field()
@@ -67,6 +70,7 @@ def token_verification(request):
         return payload
     except Exception as e:
         logger.debug(
-            "exception occurred while generating token for email option.", str(e)
+            "exception occurred while generating token for email option.",
+            str(e)
         )
         raise e
