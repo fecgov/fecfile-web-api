@@ -6,6 +6,7 @@ from fecfiler.settings import (
     FFAPI_JWT_COOKIE_NAME,
     FFAPI_COMMITTEE_ID_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
+    FFAPI_COOKIE_DOMAIN,
 )
 
 
@@ -13,10 +14,14 @@ class LoginDotGovSuccessSpaRedirect(View):
     def get(self, request, *args, **kwargs):
         redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
         redirect.set_cookie(FFAPI_JWT_COOKIE_NAME,
-                            self.request.session.get("oidc_id_token"))
+                            self.request.session.get("oidc_id_token"),
+                            domain=FFAPI_COOKIE_DOMAIN)
         redirect.set_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
-                            request.user.cmtee_id)
-        redirect.set_cookie(FFAPI_EMAIL_COOKIE_NAME, request.user.email)
+                            request.user.cmtee_id,
+                            domain=FFAPI_COOKIE_DOMAIN)
+        redirect.set_cookie(FFAPI_EMAIL_COOKIE_NAME,
+                            request.user.email,
+                            domain=FFAPI_COOKIE_DOMAIN)
         return redirect
 
 
