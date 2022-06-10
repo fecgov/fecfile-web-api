@@ -7,9 +7,6 @@ import datetime
 import dj_database_url
 import requests
 
-import json
-import jwt
-
 from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
@@ -52,7 +49,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 15 * 60 # Inactivity timeout
+SESSION_COOKIE_AGE = 15 * 60  # Inactivity timeout
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
