@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.serializers.ReportCodeLabelSerializer
+=============================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.serializers
+
+.. autoclass:: ReportCodeLabelSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportCodeLabelSerializer.__init__
+      ~ReportCodeLabelSerializer.bind
+      ~ReportCodeLabelSerializer.build_field
+      ~ReportCodeLabelSerializer.build_nested_field
+      ~ReportCodeLabelSerializer.build_property_field
+      ~ReportCodeLabelSerializer.build_relational_field
+      ~ReportCodeLabelSerializer.build_standard_field
+      ~ReportCodeLabelSerializer.build_unknown_field
+      ~ReportCodeLabelSerializer.build_url_field
+      ~ReportCodeLabelSerializer.create
+      ~ReportCodeLabelSerializer.fail
+      ~ReportCodeLabelSerializer.get_attribute
+      ~ReportCodeLabelSerializer.get_default
+      ~ReportCodeLabelSerializer.get_default_field_names
+      ~ReportCodeLabelSerializer.get_extra_kwargs
+      ~ReportCodeLabelSerializer.get_field_names
+      ~ReportCodeLabelSerializer.get_fields
+      ~ReportCodeLabelSerializer.get_initial
+      ~ReportCodeLabelSerializer.get_unique_for_date_validators
+      ~ReportCodeLabelSerializer.get_unique_together_validators
+      ~ReportCodeLabelSerializer.get_uniqueness_extra_kwargs
+      ~ReportCodeLabelSerializer.get_validators
+      ~ReportCodeLabelSerializer.get_value
+      ~ReportCodeLabelSerializer.include_extra_kwargs
+      ~ReportCodeLabelSerializer.is_valid
+      ~ReportCodeLabelSerializer.many_init
+      ~ReportCodeLabelSerializer.run_validation
+      ~ReportCodeLabelSerializer.run_validators
+      ~ReportCodeLabelSerializer.save
+      ~ReportCodeLabelSerializer.to_internal_value
+      ~ReportCodeLabelSerializer.to_representation
+      ~ReportCodeLabelSerializer.update
+      ~ReportCodeLabelSerializer.validate
+      ~ReportCodeLabelSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportCodeLabelSerializer.context
+      ~ReportCodeLabelSerializer.data
+      ~ReportCodeLabelSerializer.default_error_messages
+      ~ReportCodeLabelSerializer.default_validators
+      ~ReportCodeLabelSerializer.errors
+      ~ReportCodeLabelSerializer.fields
+      ~ReportCodeLabelSerializer.initial
+      ~ReportCodeLabelSerializer.root
+      ~ReportCodeLabelSerializer.serializer_field_mapping
+      ~ReportCodeLabelSerializer.url_field_name
+      ~ReportCodeLabelSerializer.validated_data
+      ~ReportCodeLabelSerializer.validators
+   
+   

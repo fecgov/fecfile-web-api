@@ -23,6 +23,7 @@ fecfiler.f3x\_summaries.models
       :template: custom-class-template.rst               
    
       F3XSummary
+      ReportCodeLabel
    
    
 

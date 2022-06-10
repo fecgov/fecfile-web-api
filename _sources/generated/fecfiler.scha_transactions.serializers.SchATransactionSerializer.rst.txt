@@ -36,11 +36,13 @@ fecfiler.scha\_transactions.serializers.SchATransactionSerializer
       ~SchATransactionSerializer.get_extra_kwargs
       ~SchATransactionSerializer.get_field_names
       ~SchATransactionSerializer.get_fields
+      ~SchATransactionSerializer.get_foreign_key_fields
       ~SchATransactionSerializer.get_initial
       ~SchATransactionSerializer.get_schema_name
       ~SchATransactionSerializer.get_unique_for_date_validators
       ~SchATransactionSerializer.get_unique_together_validators
       ~SchATransactionSerializer.get_uniqueness_extra_kwargs
+      ~SchATransactionSerializer.get_validation_candidate
       ~SchATransactionSerializer.get_validators
       ~SchATransactionSerializer.get_value
       ~SchATransactionSerializer.include_extra_kwargs

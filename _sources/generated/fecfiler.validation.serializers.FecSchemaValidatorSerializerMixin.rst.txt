@@ -26,8 +26,10 @@ fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.get_attribute
       ~FecSchemaValidatorSerializerMixin.get_default
       ~FecSchemaValidatorSerializerMixin.get_fields
+      ~FecSchemaValidatorSerializerMixin.get_foreign_key_fields
       ~FecSchemaValidatorSerializerMixin.get_initial
       ~FecSchemaValidatorSerializerMixin.get_schema_name
+      ~FecSchemaValidatorSerializerMixin.get_validation_candidate
       ~FecSchemaValidatorSerializerMixin.get_validators
       ~FecSchemaValidatorSerializerMixin.get_value
       ~FecSchemaValidatorSerializerMixin.is_valid

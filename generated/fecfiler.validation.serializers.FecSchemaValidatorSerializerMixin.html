@@ -89,11 +89,17 @@ match a schema defined in the package</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_fields" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
 <td><p>Returns a dictionary of {field_name: field_instance}.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_foreign_key_fields" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_foreign_key_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_foreign_key_fields</span></code></a>()</p></td>
+<td><p>Returns a dictionary of foreign key fields</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
 <td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_schema_name" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_schema_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schema_name</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_schema_name" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_schema_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schema_name</span></code></a>(data)</p></td>
 <td><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validation_candidate" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validation_candidate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validation_candidate</span></code></a>(data)</p></td>
+<td><p>Returns a copy of data where foreign key fields are replaced with the underlying foreign key field.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validators" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
 <td><p>Returns a list of validator callables.</p></td>
@@ -235,6 +241,12 @@ validated data for this field.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_foreign_key_fields">
+<span class="sig-name descname"><span class="pre">get_foreign_key_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_foreign_key_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of foreign key fields</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial">
 <span class="sig-name descname"><span class="pre">get_initial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_initial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a value to use when the field is being returned as a primitive
@@ -259,6 +271,21 @@ match a schema defined in the package</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validation_candidate">
+<span class="sig-name descname"><span class="pre">get_validation_candidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_validation_candidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of data where foreign key fields are replaced with the
+underlying foreign key field.</p>
+<dl class="simple">
+<dt>Example:  the f3x table is related to the report code label table by the</dt><dd><p>report code field.  DRF gives us the whole
+<a class="reference internal" href="fecfiler.f3x_summaries.models.ReportCodeLabel.html#fecfiler.f3x_summaries.models.ReportCodeLabel" title="fecfiler.f3x_summaries.models.ReportCodeLabel"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.f3x_summaries.models.ReportCodeLabel</span></code></a> object.
+for validating purposes, we just want the report code.  With the
+foreign_key_fields mapping defined in Meta, we replace the foreign-key-
+related object with the key only.</p>
 </dd>
 </dl>
 </dd></dl>

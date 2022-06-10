@@ -36,11 +36,13 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.get_extra_kwargs
       ~ContactSerializer.get_field_names
       ~ContactSerializer.get_fields
+      ~ContactSerializer.get_foreign_key_fields
       ~ContactSerializer.get_initial
       ~ContactSerializer.get_schema_name
       ~ContactSerializer.get_unique_for_date_validators
       ~ContactSerializer.get_unique_together_validators
       ~ContactSerializer.get_uniqueness_extra_kwargs
+      ~ContactSerializer.get_validation_candidate
       ~ContactSerializer.get_validators
       ~ContactSerializer.get_value
       ~ContactSerializer.include_extra_kwargs

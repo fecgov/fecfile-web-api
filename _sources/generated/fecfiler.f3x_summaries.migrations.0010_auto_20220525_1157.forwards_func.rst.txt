@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.migrations.0010\_auto\_20220525\_1157.forwards\_func
+============================================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.migrations.0010_auto_20220525_1157
+
+.. autofunction:: forwards_func

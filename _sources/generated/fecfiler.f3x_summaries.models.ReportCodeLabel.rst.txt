@@ -1,0 +1,54 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.models.ReportCodeLabel
+==============================================
+
+.. currentmodule:: fecfiler.f3x_summaries.models
+
+.. autoclass:: ReportCodeLabel
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportCodeLabel.__init__
+      ~ReportCodeLabel.check
+      ~ReportCodeLabel.clean
+      ~ReportCodeLabel.clean_fields
+      ~ReportCodeLabel.date_error_message
+      ~ReportCodeLabel.delete
+      ~ReportCodeLabel.from_db
+      ~ReportCodeLabel.full_clean
+      ~ReportCodeLabel.get_deferred_fields
+      ~ReportCodeLabel.prepare_database_save
+      ~ReportCodeLabel.refresh_from_db
+      ~ReportCodeLabel.save
+      ~ReportCodeLabel.save_base
+      ~ReportCodeLabel.serializable_value
+      ~ReportCodeLabel.unique_error_message
+      ~ReportCodeLabel.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportCodeLabel.f3xsummary_set
+      ~ReportCodeLabel.id
+      ~ReportCodeLabel.label
+      ~ReportCodeLabel.objects
+      ~ReportCodeLabel.pk
+      ~ReportCodeLabel.report_code
+   
+   

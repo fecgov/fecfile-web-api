@@ -36,11 +36,13 @@ fecfiler.f3x\_summaries.serializers.F3XSummarySerializer
       ~F3XSummarySerializer.get_extra_kwargs
       ~F3XSummarySerializer.get_field_names
       ~F3XSummarySerializer.get_fields
+      ~F3XSummarySerializer.get_foreign_key_fields
       ~F3XSummarySerializer.get_initial
       ~F3XSummarySerializer.get_schema_name
       ~F3XSummarySerializer.get_unique_for_date_validators
       ~F3XSummarySerializer.get_unique_together_validators
       ~F3XSummarySerializer.get_uniqueness_extra_kwargs
+      ~F3XSummarySerializer.get_validation_candidate
       ~F3XSummarySerializer.get_validators
       ~F3XSummarySerializer.get_value
       ~F3XSummarySerializer.include_extra_kwargs
