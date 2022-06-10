@@ -3,7 +3,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_JWT_COOKIE_NAME,
     FFAPI_COMMITTEE_ID_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
@@ -13,9 +12,6 @@ from fecfiler.settings import (
 class LoginDotGovSuccessSpaRedirect(View):
     def get(self, request, *args, **kwargs):
         redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        redirect.set_cookie(FFAPI_JWT_COOKIE_NAME,
-                            self.request.session.get("oidc_id_token"),
-                            domain=FFAPI_COOKIE_DOMAIN)
         redirect.set_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
                             request.user.cmtee_id,
                             domain=FFAPI_COOKIE_DOMAIN)
@@ -27,4 +23,9 @@ class LoginDotGovSuccessSpaRedirect(View):
 
 class LoginDotGovSuccessLogoutSpaRedirect(View):
     def get(self, request, *args, **kwargs):
-        return HttpResponse(status=204)  # no content
+        response = HttpResponse(status=204)  # no content
+        response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
+                               domain=FFAPI_COOKIE_DOMAIN)
+        response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME,
+                               domain=FFAPI_COOKIE_DOMAIN)
+        return response

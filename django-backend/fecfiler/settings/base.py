@@ -3,6 +3,7 @@ Django settings for the FECFile project.
 """
 
 import os
+import datetime
 import dj_database_url
 import requests
 
@@ -50,6 +51,9 @@ AUTH_USER_MODEL = "authentication.Account"
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
+
+SESSION_COOKIE_AGE = 15 * 60 # Inactivity timeout
+SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -131,13 +135,13 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",  # noqa
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -147,7 +151,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 OIDC_CREATE_USER = True
-OIDC_STORE_ID_TOKEN = True
 # Maximum number of concurrent sessions
 OIDC_MAX_STATES = 3
 
@@ -174,7 +177,6 @@ OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
 OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
-FFAPI_JWT_COOKIE_NAME = "ffapi_jwt"
 FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
 FFAPI_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
@@ -189,18 +191,6 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
 # OIDC settings end
-
-# Extra OIDC settings for django start
-OIDC_OP_CERTS_ENDPOINT = (
-    "https://idp.int.identitysandbox.gov/api/openid_connect/certs"
-)
-OIDC_OP_CERTS = requests.get(OIDC_OP_CERTS_ENDPOINT).json()
-for jwk in OIDC_OP_CERTS.get('keys'):
-    login_dot_gov_pk = (
-        jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
-    )
-
-# Extra OIDC settings for django end
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
@@ -231,29 +221,21 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_PAGINATION_CLASS": (
-        "rest_framework.pagination.PageNumberPagination"
-    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
 
 JWT_AUTH = {
-    "JWT_PAYLOAD_GET_USERNAME_HANDLER": (
-        "fecfiler.authentication.token.jwt_get_username_from_payload_handler"
-    ),
-    "JWT_ALGORITHM": "RS256",
-    "JWT_PUBLIC_KEY": login_dot_gov_pk,
-    "JWT_PRIVATE_KEY": login_dot_gov_pk,
-    "JWT_AUDIENCE": os.environ.get('OIDC_RP_CLIENT_ID'),
+    "JWT_ALLOW_REFRESH": True,
+    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
+    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
 }
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "standard": (
-            {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"}
-        ),
+        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
     },
     "handlers": {
         "default": {

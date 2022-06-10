@@ -8,8 +8,7 @@ from .views import (
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path("user/login/authenticate", authenticate_login,
-         name="login_authenticate"),
+    path("user/login/authenticate", authenticate_login, name="login_authenticate"),
     path("user/login/verify", verify_login, name="code-verify-login"),
     path("auth/logout/", LogoutView.as_view(), name="logout"),
     path("auth/login-redirect", LoginDotGovSuccessSpaRedirect.as_view(),
