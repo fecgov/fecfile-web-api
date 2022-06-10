@@ -13,4 +13,3 @@ applications:
   env:
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-    OIDC_RP_CLIENT_ID:
