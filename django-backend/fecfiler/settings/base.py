@@ -149,6 +149,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 OIDC_CREATE_USER = True
+OIDC_STORE_ID_TOKEN = True
 # Maximum number of concurrent sessions
 OIDC_MAX_STATES = 3
 
