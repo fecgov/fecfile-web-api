@@ -144,6 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # OIDC settings start
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
     'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
 )
 
