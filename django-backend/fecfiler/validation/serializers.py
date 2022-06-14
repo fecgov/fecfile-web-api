@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date
 from rest_framework import serializers
 from fecfile_validate import validate
 from rest_framework import exceptions
