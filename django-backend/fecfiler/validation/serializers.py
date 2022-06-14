@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from rest_framework import serializers
 from fecfile_validate import validate
 from rest_framework import exceptions
@@ -50,7 +51,8 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     def get_validation_candidate(self, data):
         """Returns a copy of data where foreign key fields are replaced with the
-        underlying foreign key field.
+        underlying foreign key field. Also dates and datetimes will be replaced
+        with iso8601 strings
 
         Example:  the f3x table is related to the report code label table by the
             report code field.  DRF gives us the whole
@@ -65,6 +67,10 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
                 validation_candidate[foreign_key_field] = getattr(
                     validation_candidate.get(foreign_key_field, {}), actual_key
                 )
+
+        for key, value in validation_candidate.items():
+            if isinstance(value, date):
+                validation_candidate[key] = value.isoformat()
 
         return validation_candidate
 
