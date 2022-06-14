@@ -23,13 +23,15 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
     ).all()
     serializer_class = AccountSerializer
     filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["last_name",
-                      "first_name",
-                      "id",
-                      "email",
-                      "role",
-                      "is_active",
-                      "name"]
+    ordering_fields = [
+      "last_name",
+      "first_name",
+      "id",
+      "email",
+      "role",
+      "is_active",
+      "name"
+    ]
     ordering = ["name"]
 
     def get_queryset(self):
