@@ -18,10 +18,18 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
         of a user object versus other objects.
             (IE - having a "cmtee_id" field instead of "committee_id")
     """
-    queryset = Account.objects.annotate(name=Concat('first_name', Value(', '), 'last_name', output_field=CharField())).all()
+    queryset = Account.objects.annotate(
+			name=Concat('first_name', Value(', '), 'last_name', output_field=CharField())
+		).all()
     serializer_class = AccountSerializer
     filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["last_name", "first_name", "id", "email", "role", "is_active", "name"]
+    ordering_fields = ["last_name", 
+											"first_name", 
+											"id", 
+											"email", 
+											"role", 
+											"is_active", 
+											"name"]
     ordering = ["name"]
 
     def get_queryset(self):
