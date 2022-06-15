@@ -1,9 +1,8 @@
-from .authenticate_login import authenticate_login, LogoutView
-from .verify_login import verify_login
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet
+from .authenticate_login import authenticate_login, LogoutView
+from .verify_login import verify_login
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
