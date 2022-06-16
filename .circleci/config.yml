@@ -88,7 +88,7 @@ jobs:
           command: |
             sudo apt-get update &&
             sudo apt-get install postgresql-client-12 &&
-            psql ${DATABASE_URL} < fec_clean_dev_db_backup-20211227.sql
+            psql ${DATABASE_URL} < e2e-test-db.sql
           working_directory: ~/project/db
 
       - run:
