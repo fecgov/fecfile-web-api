@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.migrations.0009\_auto\_20220515\_2116.convert\_fecfile\_booleans
+========================================================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.migrations.0009_auto_20220515_2116
+
+.. autofunction:: convert_fecfile_booleans

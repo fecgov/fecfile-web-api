@@ -12,6 +12,13 @@ fecfiler.f3x\_summaries.migrations.0009\_auto\_20220515\_2116
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      convert_fecfile_booleans
+   
    
 
    
