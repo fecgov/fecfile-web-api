@@ -12,6 +12,13 @@ fecfiler.scha\_transactions.migrations.0008\_alter\_schatransaction\_memo\_code
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      convert_fecfile_booleans
+   
    
 
    

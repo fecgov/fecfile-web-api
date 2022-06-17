@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0008\_alter\_schatransaction\_memo\_code.convert\_fecfile\_booleans
+==========================================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0008_alter_schatransaction_memo_code
+
+.. autofunction:: convert_fecfile_booleans
