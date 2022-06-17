@@ -7,10 +7,10 @@ from django.db import migrations, models
 def convert_fecfile_booleans(apps, schema_editor):
     for f3x_summary in F3XSummary.objects.all():
         f3x_summary.change_of_address = (
-            "true" if f3x_summary.change_of_address in ["true", "X"] else "false"
+            True if f3x_summary.change_of_address in ["true", "X"] else False
         )
         f3x_summary.qualified_committee = (
-            "true" if f3x_summary.qualified_committee in ["true", "X"] else "false"
+            True if f3x_summary.qualified_committee in ["true", "X"] else False
         )
         f3x_summary.save()
 
