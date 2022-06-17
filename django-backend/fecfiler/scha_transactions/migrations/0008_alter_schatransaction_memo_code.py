@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(convert_fecfile_booleans),
         migrations.AlterField(
             model_name="schatransaction",
             name="memo_code",
