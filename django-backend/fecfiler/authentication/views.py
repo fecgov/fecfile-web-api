@@ -14,10 +14,12 @@ class LoginDotGovSuccessSpaRedirect(View):
         redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
         redirect.set_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
                             request.user.cmtee_id,
-                            domain=FFAPI_COOKIE_DOMAIN)
+                            domain=FFAPI_COOKIE_DOMAIN,
+                            secure=True)
         redirect.set_cookie(FFAPI_EMAIL_COOKIE_NAME,
                             request.user.email,
-                            domain=FFAPI_COOKIE_DOMAIN)
+                            domain=FFAPI_COOKIE_DOMAIN,
+                            secure=True)
         return redirect
 
 
