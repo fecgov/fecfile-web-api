@@ -54,6 +54,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
+    transaction_parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

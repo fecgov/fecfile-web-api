@@ -43,7 +43,7 @@
     "model": "f3x_summaries.reportcodelabel",
     "pk": 6,
     "fields": {
-        "label": "JANUARY 31 (31)",
+        "label": "Mid-Year (MY)",
         "report_code": "MY"
     }
 },
