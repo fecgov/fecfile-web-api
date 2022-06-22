@@ -9,15 +9,7 @@ django-cors-headers==3.11.0
 djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
 drf-spectacular==0.21.2
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-git+https://github.com/fecgov/fecfile-validate@fef97923a88fb325b5934883844c193ab7259efe#egg=fecfile_validate&subdirectory=fecfile_validate_python
-=======
 git+https://github.com/fecgov/fecfile-validate@9f2da0395ec3532b7d7d22568e799bd0bc1e461b#egg=fecfile_validate&subdirectory=fecfile_validate_python
->>>>>>> Stashed changes
-=======
-git+https://github.com/fecgov/fecfile-validate@9f2da0395ec3532b7d7d22568e799bd0bc1e461b#egg=fecfile_validate&subdirectory=fecfile_validate_python
->>>>>>> Stashed changes
 GitPython==3.1.27
 gunicorn==19.10.0
 Jinja2==2.11.3
