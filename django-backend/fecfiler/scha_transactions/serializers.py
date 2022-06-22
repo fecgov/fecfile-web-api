@@ -1,4 +1,5 @@
 from .models import SchATransaction
+from rest_framework.serializers import PrimaryKeyRelatedField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 import logging
@@ -10,6 +11,7 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "SchA"
+    ##transaction_parent = PrimaryKeyRelatedField(many=True, queryset=SchATransaction.objects.all())
 
     class Meta:
         model = SchATransaction
