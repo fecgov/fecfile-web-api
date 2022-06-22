@@ -11,12 +11,16 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "SchA"
-    ##transaction_parent = PrimaryKeyRelatedField(many=True, queryset=SchATransaction.objects.all())
+    parent_transaction = PrimaryKeyRelatedField(
+        many=True,
+        required=False,
+        queryset=SchATransaction.objects.all(),
+    )
 
     class Meta:
         model = SchATransaction
         fields = [
-            f.name for f in SchATransaction._meta.get_fields() if f.name != "deleted"
+            f.name for f in SchATransaction._meta.get_fields() if f.name not in ["deleted", "schatransaction"]
         ]
         read_only_fields = [
             "id",
