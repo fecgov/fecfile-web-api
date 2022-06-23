@@ -20,7 +20,10 @@ class SchATransactionSerializer(
     class Meta:
         model = SchATransaction
         fields = [
-            f.name for f in SchATransaction._meta.get_fields() if f.name not in ["deleted", "schatransaction"]
+            f.name for f in SchATransaction._meta.get_fields() if f.name not in [
+                "deleted", 
+                "schatransaction"
+            ]
         ]
         read_only_fields = [
             "id",
