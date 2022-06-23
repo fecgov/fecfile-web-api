@@ -7,15 +7,13 @@ from django.core.management import call_command
 def forwards_func(apps, schema_editor):
     call_command(
         "loaddata",
-        "fecfiler/committee_accounts/fixtures/test-users-extra.json",
+        "fecfiler/authentication/fixtures/test-users-extra.json",
     )
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('committee_accounts', '0001_initial'),
-    ]
+    dependencies = []
 
     operations = [
         migrations.RunPython(forwards_func),
