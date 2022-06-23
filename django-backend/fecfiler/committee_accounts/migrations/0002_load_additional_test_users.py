@@ -3,11 +3,13 @@
 from django.db import migrations
 from django.core.management import call_command
 
+
 def forwards_func(apps, schema_editor):
     call_command(
         "loaddata",
         "fecfiler/committee_accounts/fixtures/test-users-extra.json",
     )
+
 
 class Migration(migrations.Migration):
 
@@ -18,4 +20,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(forwards_func),
     ]
-
