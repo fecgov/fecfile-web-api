@@ -12,7 +12,7 @@ class SchATransactionSerializer(
 ):
     schema_name = "SchA"
     parent_transaction = PrimaryKeyRelatedField(
-        many=True,
+        many=False,
         required=False,
         queryset=SchATransaction.objects.all(),
     )
