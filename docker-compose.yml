@@ -18,6 +18,8 @@ services:
       - 5432:5432
     extra_hosts:
       - "host.docker.internal:host-gateway"
+ 
+  redis:
 
 
   api:
@@ -34,6 +36,8 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - db
+    depends_on:
+      - 
     environment:
       - DATABASE_URL
       - FECFILE_TEST_DB_NAME

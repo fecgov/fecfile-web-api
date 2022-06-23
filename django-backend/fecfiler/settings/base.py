@@ -189,3 +189,11 @@ LOGGING = {
         "": {"handlers": ["default"], "level": "INFO", "propagate": True},
     },
 }
+
+"""Celery configurations
+"""
+CELERY_BROKER_URL = "redis://practical_noether:6379"
+CELERY_RESULT_BACKEND = "redis://practical_noether:6379"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
