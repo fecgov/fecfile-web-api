@@ -1,8 +1,7 @@
 [
 {
     "model": "authentication.account",
-    "pk": 1,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "a_test@test.com",
@@ -32,8 +31,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 2,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "b_test@test.com",
@@ -63,8 +61,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 3,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "c_test@test.com",
@@ -94,8 +91,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 4,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "d_test@test.com",
@@ -125,8 +121,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 5,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "e_test@test.com",
@@ -156,8 +151,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 6,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "f_test@test.com",
@@ -187,8 +181,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 7,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "g_test@test.com",
@@ -218,8 +211,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 8,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "h_test@test.com",
@@ -249,8 +241,7 @@
 },
 {
     "model": "authentication.account",
-    "pk": 9,
-    "fields": {
+        "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
         "email": "i_test@test.com",
