@@ -36,7 +36,6 @@
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 6,
     "fields": {
         "label": "Mid-Year (MY)",
         "report_code": "MY"
