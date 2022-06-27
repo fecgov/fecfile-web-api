@@ -1,15 +1,15 @@
 [
-    {
-        "model": "f3x_summaries.f3xsummary",
-        "fields": {
-            "form_type": "F3XN",
-            "filer_committee_id_number": "C00000000",
-            "treasurer_last_name": "Lastname",
-            "treasurer_first_name": "Firstname",
-            "date_signed": "20040729",
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "committee_account_id": 1000
-        }
+  {
+    "model": "f3x_summaries.f3xsummary",
+    "fields": {
+      "form_type": "F3XN",
+      "filer_committee_id_number": "C00000000",
+      "treasurer_last_name": "Lastname",
+      "treasurer_first_name": "Firstname",
+      "date_signed": "2004-07-29",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z",
+      "committee_account_id": 1000
     }
+  }
 ]
