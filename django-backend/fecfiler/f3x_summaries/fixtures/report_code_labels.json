@@ -1,40 +1,35 @@
 [
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 1,
-    "fields": {
+        "fields": {
         "label": "APRIL 15 (Q1)",
         "report_code": "Q1"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 2,
-    "fields": {
+        "fields": {
         "label": "JULY 15 (Q2)",
         "report_code": "Q2"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 3,
-    "fields": {
+        "fields": {
         "label": "OCTOBER 15 (Q3)",
         "report_code": "Q3"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 4,
-    "fields": {
+        "fields": {
         "label": "JANUARY 31 (YE)",
         "report_code": "YE"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 5,
-    "fields": {
+        "fields": {
         "label": "TERMINATION (TER)",
         "report_code": "TER"
     }
@@ -49,152 +44,133 @@
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 7,
-    "fields": {
+        "fields": {
         "label": "GENERAL (12G)",
         "report_code": "12G"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 8,
-    "fields": {
+        "fields": {
         "label": "PRIMARY (12P)",
         "report_code": "12P"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 9,
-    "fields": {
+        "fields": {
         "label": "RUNOFF (12R)",
         "report_code": "12R"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 10,
-    "fields": {
+        "fields": {
         "label": "SPECIAL (12S)",
         "report_code": "12S"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 11,
-    "fields": {
+        "fields": {
         "label": "CONVENTION (12C)",
         "report_code": "12C"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 12,
-    "fields": {
+        "fields": {
         "label": "GENERAL (30G)",
         "report_code": "30G"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 13,
-    "fields": {
+        "fields": {
         "label": "RUNOFF (30R)",
         "report_code": "30R"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 14,
-    "fields": {
+        "fields": {
         "label": "SPECIAL (30S)",
         "report_code": "30S"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 15,
-    "fields": {
+        "fields": {
         "label": "FEBRUARY 20 (M2)",
         "report_code": "M2"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 16,
-    "fields": {
+        "fields": {
         "label": "MARCH 30 (M3)",
         "report_code": "M3"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 17,
-    "fields": {
+        "fields": {
         "label": "APRIL 20 (M4)",
         "report_code": "M4"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 18,
-    "fields": {
+        "fields": {
         "label": "MAY 20 (M5)",
         "report_code": "M5"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 19,
-    "fields": {
+        "fields": {
         "label": "JUNE 20 (M6)",
         "report_code": "M6"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 20,
-    "fields": {
+        "fields": {
         "label": "JULY 20 (M7)",
         "report_code": "M7"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 21,
-    "fields": {
+        "fields": {
         "label": "AUGUST 20 (M8)",
         "report_code": "M8"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 22,
-    "fields": {
+        "fields": {
         "label": "SEPTEMBER 20 (M9)",
         "report_code": "M9"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 23,
-    "fields": {
+        "fields": {
         "label": "OCTOBER 20 (M10)",
         "report_code": "M10"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 24,
-    "fields": {
+        "fields": {
         "label": "NOVEMBER 20 (M11)",
         "report_code": "M11"
     }
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-    "pk": 25,
-    "fields": {
+        "fields": {
         "label": "DECEMBER 20 (M12)",
         "report_code": "M12"
     }
