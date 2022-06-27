@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.scha\_transactions.migrations.0009\_alter\_schatransaction\_contribution\_date
+=======================================================================================
+
+.. automodule:: fecfiler.scha_transactions.migrations.0009_alter_schatransaction_contribution_date
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+
