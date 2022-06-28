@@ -12,26 +12,21 @@ class SchATransactionSerializer(
 ):
     schema_name = "SchA"
     parent_transaction = PrimaryKeyRelatedField(
+        default=None,
         many=False,
         required=False,
+        allow_null = True,
         queryset=SchATransaction.objects.all(),
-    )
-
-    ##Annotated Fields
-    parent_organization_name = CharField(
-        allow_blank = True,
-        required = False,
     )
 
     class Meta:
         model = SchATransaction
-        annotated_fields = ["parent_organization_name"]
         fields = [
             f.name for f in SchATransaction._meta.get_fields() if f.name not in [
                 "deleted",
                 "schatransaction"
             ]
-        ] + annotated_fields
+        ]
         
         read_only_fields = [
             "id",

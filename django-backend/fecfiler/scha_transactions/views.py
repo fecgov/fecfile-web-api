@@ -26,8 +26,6 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
                 output_field=TextField(),
             ),
         )
-    ).annotate(
-        parent_organization_name = F("parent_transaction__contributor_organization_name")
     ).all()
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
