@@ -1,11 +1,22 @@
 from django.conf.urls import url, include
 from django.urls import path
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .authentication.authenticate_login import LogoutView
 
 BASE_V1_URL = r"^api/v1/"
+
+
+@api_view(["GET"])
+def test_celery(request):
+    from fecfiler.celery import debug_task
+
+    debug_task.delay()
+    return Response(status=200)
+
 
 urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
@@ -24,4 +35,5 @@ urlpatterns = [
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
     path("api/v1/", include("fecfiler.triage.urls")),
     path("api/v1/", include("fecfiler.authentication.urls")),
+    url(r"^celery-test/", test_celery),
 ]
