@@ -12,6 +12,13 @@ fecfiler.urls
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      test_celery
+   
    
 
    

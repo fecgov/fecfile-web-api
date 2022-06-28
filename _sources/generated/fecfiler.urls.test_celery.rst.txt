@@ -1,0 +1,6 @@
+fecfiler.urls.test\_celery
+==========================
+
+.. currentmodule:: fecfiler.urls
+
+.. autofunction:: test_celery
