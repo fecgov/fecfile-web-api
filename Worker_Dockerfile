@@ -1,0 +1,11 @@
+FROM python:3.8
+ENV PYTHONUNBUFFERED=1
+
+RUN mkdir /opt/nxg_fec
+WORKDIR /opt/nxg_fec
+ADD requirements.txt /opt
+RUN pip3 install -r /opt/requirements.txt
+
+RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
+
+ENTRYPOINT ["/bin/sh", "-c", "celery -A fecfiler worker --loglevel=info"]
