@@ -2,7 +2,7 @@ from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import SchATransaction
 from .serializers import SchATransactionSerializer
-from django.db.models import TextField, Value
+from django.db.models import TextField, Value, F
 from django.db.models.functions import Concat, Coalesce
 
 
@@ -16,7 +16,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = SchATransaction.objects.alias(
+    queryset = SchATransaction.objects.select_related("parent_transaction").alias(
         contributor_name=Coalesce(
             "contributor_organization_name",
             Concat(
@@ -26,6 +26,8 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
                 output_field=TextField(),
             ),
         )
+    ).annotate(
+        parent_organization_name = F("parent_transaction__contributor_organization_name")
     ).all()
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
