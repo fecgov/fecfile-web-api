@@ -18,9 +18,35 @@ services:
       - 5432:5432
     extra_hosts:
       - "host.docker.internal:host-gateway"
- 
-  redis:
 
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - '6379:6379'
+    command: redis-server
+
+  api-worker:
+    build:
+      context: './'
+      dockerfile: './Worker_Dockerfile'
+    image: fecfile-celery-worker
+    container_name: fecfile-celery-worker
+    volumes:
+      - ./django-backend:/opt/nxg_fec
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL:
+      FECFILE_TEST_DB_NAME:
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.local
+      DJANGO_SECRET_KEY:
+      FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
 
   api:
     build:
@@ -36,11 +62,13 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - db
-    depends_on:
-      - 
+      - redis
+    links:
+      - redis
     environment:
-      - DATABASE_URL
-      - FECFILE_TEST_DB_NAME
-      - DJANGO_SETTINGS_MODULE=fecfiler.settings.local
-      - DJANGO_SECRET_KEY
-      - FECFILE_FEC_WEBSITE_API_KEY=DEMO_KEY
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL:
+      FECFILE_TEST_DB_NAME:
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.local
+      DJANGO_SECRET_KEY:
+      FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
