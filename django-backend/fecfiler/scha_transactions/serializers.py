@@ -1,5 +1,5 @@
 from .models import SchATransaction
-from rest_framework.serializers import PrimaryKeyRelatedField, CharField
+from rest_framework.serializers import PrimaryKeyRelatedField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 import logging
@@ -15,7 +15,7 @@ class SchATransactionSerializer(
         default=None,
         many=False,
         required=False,
-        allow_null = True,
+        allow_null=True,
         queryset=SchATransaction.objects.all(),
     )
 
@@ -27,7 +27,7 @@ class SchATransactionSerializer(
                 "schatransaction"
             ]
         ]
-        
+
         read_only_fields = [
             "id",
             "deleted",
