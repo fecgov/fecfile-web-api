@@ -15,7 +15,7 @@ def convert_fecfile_booleans(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0008_schatransaction_parent_transaction'),
+        ('scha_transactions', '0009_alter_schatransaction_contribution_date'),
     ]
 
     operations = [
