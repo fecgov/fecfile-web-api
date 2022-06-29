@@ -1,0 +1,13 @@
+---
+applications:
+  - name: fecfile-web-services
+    instances: 1
+    stack: cflinuxfs3
+    buildpacks:
+      - python_buildpack
+    memory: 128MB
+    disk_quota: 1G
+    no-route: true
+    env:
+      DISABLE_COLLECTSTATIC: 1
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.production
