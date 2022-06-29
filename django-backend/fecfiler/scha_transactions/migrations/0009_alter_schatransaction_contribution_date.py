@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0008_alter_schatransaction_memo_code'),
+        ('scha_transactions', '0008_schatransaction_f3x_summary'),
     ]
 
     operations = [

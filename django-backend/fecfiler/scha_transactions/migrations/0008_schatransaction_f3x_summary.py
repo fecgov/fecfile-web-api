@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0009_alter_schatransaction_contribution_date'),
+        ("scha_transactions", "0007_alter_schatransaction_committee_account"),
     ]
 
     operations = [
