@@ -3,6 +3,18 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
+class ReportCodeLabel(models.Model):
+    label = models.TextField(null=True, blank=True)
+    report_code = models.TextField(null=True, blank=True, unique=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        db_table = "report_code_labels"
+        indexes = [models.Index(fields=["report_code"])]
+
+
 class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
@@ -16,19 +28,26 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
-    report_code = models.TextField(null=True, blank=True)
+    report_code = models.ForeignKey(
+        ReportCodeLabel,
+        models.SET_NULL,
+        null=True,
+        blank=True,
+        to_field="report_code",
+        db_column="report_code",
+    )
     election_code = models.TextField(null=True, blank=True)
-    date_of_election = models.TextField(null=True, blank=True)
+    date_of_election = models.DateField(null=True, blank=True)
     state_of_election = models.TextField(null=True, blank=True)
-    coverage_from_date = models.TextField(null=True, blank=True)
-    coverage_through_date = models.TextField(null=True, blank=True)
+    coverage_from_date = models.DateField(null=True, blank=True)
+    coverage_through_date = models.DateField(null=True, blank=True)
     qualified_committee = models.BooleanField(default=False, null=True, blank=True)
     treasurer_last_name = models.TextField(null=True, blank=True)
     treasurer_first_name = models.TextField(null=True, blank=True)
     treasurer_middle_name = models.TextField(null=True, blank=True)
     treasurer_prefix = models.TextField(null=True, blank=True)
     treasurer_suffix = models.TextField(null=True, blank=True)
-    date_signed = models.TextField(null=True, blank=True)
+    date_signed = models.DateField(null=True, blank=True)
     L6b_cash_on_hand_beginning_period = models.IntegerField(null=True, blank=True)
     L6c_total_receipts_period = models.IntegerField(null=True, blank=True)
     L6d_subtotal_period = models.IntegerField(null=True, blank=True)

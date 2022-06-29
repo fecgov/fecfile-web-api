@@ -111,6 +111,19 @@ git push --set-upstream origin hotfix/my-fix
 * In GitHub, go to `Code -> tags -> releases -> Draft a new release`
 * Publish a new release using tag sprint-#, be sure to Auto-generate release notes
 
+## Technical Environment Plan
+
+The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, and prod). Each cloud.gov fecfile-web-api application has at least two instances running.  Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, and prod).  There are also at least two instances running per cloud.gov fecfile-web-app application.
+ 
+The following events occur for fecfile-web-api and fecfile-web-app independently of each other:
+
+* When a branch is merged into the develop branch, it is deployed to the dev environment on cloud.gov
+	* The Dev environment is used for the bulk of sprint integration and QA testing 
+* When a release is cut (creating a release tag in git), that release is deployed to the stage environment on cloud.gov.
+	* The Stage environment is used for final deployment preparation, integration testing, and final QA testing.  
+* When the release is merged into the main branch, it is deployed to the prod environment on cloud.gov
+	* The Production environment will be used by end users once the application launches.  
+
 
 ## Additional developer notes
 This section covers a few topics we think might help developers after setup.

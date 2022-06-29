@@ -26,7 +26,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     contributor_zip = models.TextField(null=True, blank=True)
     election_code = models.TextField(null=True, blank=True)
     election_other_description = models.TextField(null=True, blank=True)
-    contribution_date = models.TextField(null=True, blank=True)
+    contribution_date = models.DateField(null=True, blank=True)
     contribution_amount = models.IntegerField(null=True, blank=True)
     contribution_aggregate = models.IntegerField(null=True, blank=True)
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
