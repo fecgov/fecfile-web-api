@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0009_alter_schatransaction_contribution_date'),
+        ("scha_transactions", "0009_alter_schatransaction_contribution_date"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schatransaction',
-            name='parent_transaction',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='scha_transactions.schatransaction'),
+            model_name="schatransaction",
+            name="parent_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="scha_transactions.schatransaction",
+            ),
         ),
     ]
