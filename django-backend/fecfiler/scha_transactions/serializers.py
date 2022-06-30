@@ -1,6 +1,8 @@
+from fecfiler.f3x_summaries.models import F3XSummary
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
+from rest_framework.serializers import PrimaryKeyRelatedField
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,6 +12,13 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "SchA"
+
+    f3x_summary = PrimaryKeyRelatedField(
+        many=False,
+        required=True,
+        allow_null=False,
+        queryset=F3XSummary.objects.all()
+    )
 
     class Meta:
         model = SchATransaction

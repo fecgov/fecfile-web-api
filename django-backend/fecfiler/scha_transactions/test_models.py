@@ -22,15 +22,15 @@ class SchATransactionTestCase(TestCase):
         scha_transaction = SchATransaction.objects.get(contributor_last_name="Smith")
         self.assertEquals(scha_transaction.contributor_first_name, "John")
 
-		def test_get_scha_transaction_in_f3x_summary(self):
-				committee = CommitteeAccount()
-				f3x = F3XSummary(
-					committee_account=committee
-				)
-				trans = SchATransaction(
-					committee_account=committee,
-					f3x_summary=f3x
-				)
+    def test_get_scha_transaction_in_f3x_summary(self):
+        committee = CommitteeAccount()
+        f3x = F3XSummary(
+            committee_account=committee
+        )
+        trans = SchATransaction(
+            committee_account=committee,
+            f3x_summary=f3x
+        )
 
     def test_save_and_delete(self):
         self.sa_trans.save()
