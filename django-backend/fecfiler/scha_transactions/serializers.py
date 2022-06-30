@@ -11,7 +11,7 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "SchA"
-    parent_transaction = PrimaryKeyRelatedField(
+    parent_transaction_id = PrimaryKeyRelatedField(
         default=None,
         many=False,
         required=False,
