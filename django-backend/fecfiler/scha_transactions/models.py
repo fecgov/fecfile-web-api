@@ -54,7 +54,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
-    parent_transaction = models.ForeignKey(
+    parent_transaction_id = models.ForeignKey(
         "self",
         null=True,
         blank=True,

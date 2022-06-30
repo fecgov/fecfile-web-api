@@ -4,7 +4,9 @@ from django.db import migrations, models
 
 
 def convert_fecfile_booleans(apps, schema_editor):
+
     SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+
     for transaction in SchATransaction.objects.all():
         transaction.memo_code = (
             True if transaction.memo_code in ["true", "X"] else False
