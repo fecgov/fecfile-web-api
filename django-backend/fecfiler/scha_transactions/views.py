@@ -41,7 +41,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             report_id = self.request.query_params.get("report_id")
 
         queryset = self.queryset
-        if report_id != None and report_id != '':
+        if report_id is not None and report_id != '':
             if isinstance(queryset, QuerySet):
                 queryset = SchATransaction.objects.all().filter(
                     report_id=report_id

@@ -17,16 +17,16 @@ def add_new_report_id(apps, schema_editor):
             continue
         report = reports[0]
 
-        for transaction in sch_a_transaction.objects.filter(filer_committee_id_number=c_id):
-            transaction.report_id = report
-            transaction.save()
+        for trans in sch_a_transaction.objects.filter(filer_committee_id_number=c_id):
+            trans.report_id = report
+            trans.save()
 
 
 def remove_report_id(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction") # noqa
-    for transaction in SchATransaction.objects.all():
-        transaction.report_id = None
-        transaction.save()
+    sch_a_transaction = apps.get_model("scha_transactions", "SchATransaction") # noqa
+    for trans in sch_a_transaction.objects.all():
+        trans.report_id = None
+        trans.save()
 
 
 class Migration(migrations.Migration):
