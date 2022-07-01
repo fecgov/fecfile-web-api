@@ -5,19 +5,19 @@ import django.db.models.deletion
 
 
 def add_new_report_id(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction") # noqa
-    CommitteeAccount = apps.get_model("committee_accounts","CommitteeAccount") # noqa
-    F3XSummary = apps.get_model("f3x_summaries","F3XSummary") # noqa
+    sch_a_transaction = apps.get_model("scha_transactions", "SchATransaction") # noqa
+    committee_account = apps.get_model("committee_accounts","CommitteeAccount") # noqa
+    f3x_summary = apps.get_model("f3x_summaries","F3XSummary") # noqa
 
-    for committee in CommitteeAccount.objects.all():
+    for committee in committee_account.objects.all():
         c_id = committee.committee_id
 
-        reports = F3XSummary.objects.filter(filer_committee_id_number=c_id)
+        reports = f3x_summary.objects.filter(filer_committee_id_number=c_id)
         if len(reports) == 0:
             continue
         report = reports[0]
 
-        for transaction in SchATransaction.objects.filter(filer_committee_id_number=c_id):
+        for transaction in sch_a_transaction.objects.filter(filer_committee_id_number=c_id):
             transaction.report_id = report
             transaction.save()
 
