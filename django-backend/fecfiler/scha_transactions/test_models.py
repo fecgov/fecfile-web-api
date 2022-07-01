@@ -3,6 +3,7 @@ from .models import SchATransaction
 from ..f3x_summaries.models import F3XSummary
 from ..committee_accounts.models import CommitteeAccount
 
+
 class SchATransactionTestCase(TestCase):
     fixtures = ["test_committee_accounts", "test_scha_transactions"]
 
@@ -31,6 +32,7 @@ class SchATransactionTestCase(TestCase):
             committee_account=committee,
             report_id=f3x
         )
+        return trans
 
     def test_save_and_delete(self):
         self.sa_trans.save()

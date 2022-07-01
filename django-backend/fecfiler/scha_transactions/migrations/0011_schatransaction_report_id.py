@@ -21,6 +21,7 @@ def add_new_report_id(apps, schema_editor):
             transaction.report_id = report
             transaction.save()
 
+
 def remove_report_id(apps, schema_editor):
     SchATransaction = apps.get_model("scha_transactions", "SchATransaction") # noqa
     for transaction in SchATransaction.objects.all():
@@ -39,8 +40,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='schatransaction',
             name='report_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='f3x_summaries.f3xsummary'
+            ),
         ),
         migrations.RunPython(add_new_report_id, remove_report_id),
     ]
-

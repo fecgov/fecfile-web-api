@@ -16,13 +16,13 @@ class SchATransactionTestCase(TestCase):
             "contributor_organization_name": "John Smith Co",
             "contributor_first_name": "John",
             "contributor_last_name": "Smith",
-						"report_id": 1,
+            "report_id": 1,
         }
 
         self.invalid_scha_transaction = {
             "form_type": "invalidformtype",
             "contributor_last_name": "Validlastname",
-						"report_id":1
+            "report_id": 1,
         }
 
         self.mock_request = Request(HttpRequest())

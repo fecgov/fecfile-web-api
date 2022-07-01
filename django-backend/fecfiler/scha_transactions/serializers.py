@@ -1,6 +1,5 @@
 from fecfiler.f3x_summaries.models import F3XSummary
 from .models import SchATransaction
-from rest_framework.serializers import PrimaryKeyRelatedField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 from rest_framework.serializers import PrimaryKeyRelatedField
