@@ -99,8 +99,11 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.memo_code
       ~SchATransaction.memo_text_description
       ~SchATransaction.objects
+      ~SchATransaction.parent_transaction_id
+      ~SchATransaction.parent_transaction_id_id
       ~SchATransaction.pk
       ~SchATransaction.reference_to_si_or_sl_system_code_that_identifies_the_account
+      ~SchATransaction.schatransaction_set
       ~SchATransaction.transaction_id
       ~SchATransaction.transaction_type_identifier
       ~SchATransaction.updated
