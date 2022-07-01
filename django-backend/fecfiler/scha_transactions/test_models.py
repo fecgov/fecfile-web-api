@@ -15,7 +15,7 @@ class SchATransactionTestCase(TestCase):
             contributor_organization_name="John Smith & Co.",
             contributor_first_name="First",
             contributor_last_name="Last",
-            committee_account_id=self.committee,
+            committee_account_id=1,
         )
 
     def test_get_scha_transaction(self):
@@ -29,7 +29,7 @@ class SchATransactionTestCase(TestCase):
         )
         trans = SchATransaction(
             committee_account=committee,
-            f3x_summary=f3x
+            report_id=f3x
         )
 
     def test_save_and_delete(self):
