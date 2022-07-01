@@ -36,15 +36,15 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             "or override the `get_queryset()` method." % self.__class__.__name__
         )
 
-        f3x_summary_id = None
+        report_id = None
         if self.request is not None:
-            f3x_summary_id = self.request.query_params.get("f3x_summary_id")
+            report_id = self.request.query_params.get("report_id")
 
         queryset = self.queryset
-        if f3x_summary_id is not None and f3x_summary_id is not '': 
+        if report_id is not None and report_id is not '': 
             if isinstance(queryset, QuerySet):
                 queryset = SchATransaction.objects.all().filter(
-                    f3x_summary__id=f3x_summary_id
+                    report_id=report_id
                 )
         return queryset
 

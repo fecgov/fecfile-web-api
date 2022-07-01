@@ -13,7 +13,7 @@ class SchATransactionSerializer(
 ):
     schema_name = "SchA"
 
-    f3x_summary = PrimaryKeyRelatedField(
+    report_id = PrimaryKeyRelatedField(
         many=False,
         required=True,
         allow_null=False,

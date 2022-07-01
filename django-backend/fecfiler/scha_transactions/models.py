@@ -7,7 +7,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
-    f3x_summary = models.ForeignKey("f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True)
+    report_id = models.ForeignKey("f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True)
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
