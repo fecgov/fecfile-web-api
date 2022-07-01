@@ -36,8 +36,8 @@
 },
 {
     "model": "f3x_summaries.reportcodelabel",
-        "fields": {
-        "label": "JANUARY 31 (31)",
+    "fields": {
+        "label": "Mid-Year (MY)",
         "report_code": "MY"
     }
 },

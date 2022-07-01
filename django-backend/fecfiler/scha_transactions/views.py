@@ -17,7 +17,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = SchATransaction.objects.alias(
+    queryset = SchATransaction.objects.select_related("parent_transaction_id").alias(
         contributor_name=Coalesce(
             "contributor_organization_name",
             Concat(
