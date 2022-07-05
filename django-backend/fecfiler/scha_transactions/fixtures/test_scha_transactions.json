@@ -12,6 +12,470 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": 1000,
+            "report_id":2
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
+            "report_id":1
+        }
+    },
+    {
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "A56123456789-1234",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000,
             "report_id":1
         }
     }
