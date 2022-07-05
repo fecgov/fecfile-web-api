@@ -24,6 +24,7 @@ fecfiler.f3x\_summaries.views.F3XSummaryViewSet
       ~F3XSummaryViewSet.check_object_permissions
       ~F3XSummaryViewSet.check_permissions
       ~F3XSummaryViewSet.check_throttles
+      ~F3XSummaryViewSet.coverage_dates
       ~F3XSummaryViewSet.create
       ~F3XSummaryViewSet.destroy
       ~F3XSummaryViewSet.determine_version
