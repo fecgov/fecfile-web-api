@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0011\_schatransaction\_report\_id.remove\_report\_id
+===========================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0011_schatransaction_report_id
+
+.. autofunction:: remove_report_id
