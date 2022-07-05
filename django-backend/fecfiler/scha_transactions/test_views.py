@@ -28,6 +28,6 @@ class SchATransactionsViewTest(TestCase):
     def test_only_from_one_report(self):
         response_f3x = self.client.get(
             f'/api/v1/sch-a-transactions/?report_id={self.f3x}')
-        response_f3x_2=self.client.get(
+        response_f3x_2 = self.client.get(
             f'/api/v1/sch-a-transactions/?report_id={self.f3x_2}')
         self.assertNotEqual(response_f3x.json()["count"], response_f3x_2.json()["count"])
