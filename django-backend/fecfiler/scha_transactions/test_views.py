@@ -9,22 +9,13 @@ class SchATransactionsViewTest(TestCase):
         self.f3x = 1
         self.f3x_2 = 2
         self.f3x_transaction_count = len(SchATransaction.objects.filter(
-            report_id = self.f3x))
-        self.f3x_2_transaction_count= len(SchATransaction.objects.filter(
-            report_id = self.f3x_2))
+            report_id=self.f3x))
+        self.f3x_2_transaction_count = len(SchATransaction.objects.filter(
+            report_id=self.f3x_2))
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get(f'/api/v1/sch-a-transactions/?report_id={self.f3x}')
         self.assertEqual(response.status_code, 200)
-
-    def test_url_requires_no_report_id(self):
-        response = self.client.get(f'/api/v1/sch-a-transactions/')
-        parsed_response = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            parsed_response["count"],
-            self.f3x_transaction_count+self.f3x_2_transaction_count
-        )
 
     def test_is_paginated(self):
         response = self.client.get(f'/api/v1/sch-a-transactions/?report_id={self.f3x}')
