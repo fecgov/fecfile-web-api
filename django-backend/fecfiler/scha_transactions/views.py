@@ -1,6 +1,7 @@
 from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import SchATransaction
+from django.db.models.query import QuerySet
 from .serializers import SchATransactionSerializer
 from django.db.models import TextField, Value
 from django.db.models.functions import Concat, Coalesce
@@ -28,6 +29,19 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
         )
     ).all()
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
+
+    def get_queryset(self):
+        report_id = None
+        if self.request is not None:
+            report_id = self.request.query_params.get("report_id")
+
+        queryset = super.get_queryset()
+        if report_id is not None and report_id != '':
+            if isinstance(queryset, QuerySet):
+                queryset = SchATransaction.objects.all().filter(
+                    report_id=report_id
+                )
+        return queryset
 
     serializer_class = SchATransactionSerializer
     permission_classes = []

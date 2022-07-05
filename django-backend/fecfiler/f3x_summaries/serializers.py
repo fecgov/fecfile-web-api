@@ -21,7 +21,10 @@ class F3XSummarySerializer(
 
     class Meta:
         model = F3XSummary
-        fields = [f.name for f in F3XSummary._meta.get_fields() if f.name != "deleted"]
+        fields = [f.name for f in F3XSummary._meta.get_fields() if f.name not in [
+            "deleted",
+            "schatransaction"
+        ]]
         read_only_fields = [
             "id",
             "deleted",
