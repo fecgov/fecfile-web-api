@@ -30,9 +30,9 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     @action(detail=False)
     def coverage_dates(self, request):
         data = list(
-            F3XSummary.objects.distinct(
-                "coverage_from_date", "coverage_through_date"
-            ).values("report_code", "coverage_from_date", "coverage_through_date")
+            self.get_queryset()
+            .distinct("coverage_from_date", "coverage_through_date")
+            .values("report_code", "coverage_from_date", "coverage_through_date")
         )
         return JsonResponse(data, safe=False)
 
