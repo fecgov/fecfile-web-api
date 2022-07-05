@@ -20,7 +20,7 @@ class SchATransactionTestCase(TestCase):
         )
 
     def test_get_scha_transaction(self):
-        scha_transaction = SchATransaction.objects.get(contributor_last_name="Smith")
+        scha_transaction = SchATransaction.objects.filter(contributor_last_name="Smith").first()
         self.assertEquals(scha_transaction.contributor_first_name, "John")
 
     def test_get_scha_transaction_in_f3x_summary(self):
