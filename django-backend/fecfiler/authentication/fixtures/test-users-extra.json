@@ -271,7 +271,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 10,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -302,7 +301,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 11,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -333,7 +331,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 12,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -364,7 +361,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 13,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -395,7 +391,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 14,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -426,7 +421,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 15,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -457,7 +451,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 16,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -488,7 +481,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 17,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -519,7 +511,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 18,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -550,7 +541,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 19,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -581,7 +571,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 20,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -612,7 +601,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 21,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -643,7 +631,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 22,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -674,7 +661,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 23,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -705,7 +691,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 24,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
@@ -736,7 +721,6 @@
 },
 {
     "model": "authentication.account",
-    "pk": 25,
     "fields": {
         "password": "fake_password_cannot_login",
         "is_superuser": false,
