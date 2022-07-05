@@ -31,11 +31,6 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
     def get_queryset(self):
-        assert self.queryset is not None, (
-            "'%s' should either include a `queryset` attribute, "
-            "or override the `get_queryset()` method." % self.__class__.__name__
-        )
-
         report_id = None
         if self.request is not None:
             report_id = self.request.query_params.get("report_id")
