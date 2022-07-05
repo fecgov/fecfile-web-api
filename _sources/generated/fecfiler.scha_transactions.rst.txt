@@ -38,6 +38,7 @@ fecfiler.scha\_transactions
    fecfiler.scha_transactions.signals
    fecfiler.scha_transactions.test_models
    fecfiler.scha_transactions.test_serializers
+   fecfiler.scha_transactions.test_views
    fecfiler.scha_transactions.urls
    fecfiler.scha_transactions.views
 

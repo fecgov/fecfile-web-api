@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.scha\_transactions.test\_views.SchATransactionsViewTest
+================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.test_views
+
+.. autoclass:: SchATransactionsViewTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SchATransactionsViewTest.__init__
+      ~SchATransactionsViewTest.addClassCleanup
+      ~SchATransactionsViewTest.addCleanup
+      ~SchATransactionsViewTest.addTypeEqualityFunc
+      ~SchATransactionsViewTest.assertAlmostEqual
+      ~SchATransactionsViewTest.assertAlmostEquals
+      ~SchATransactionsViewTest.assertContains
+      ~SchATransactionsViewTest.assertCountEqual
+      ~SchATransactionsViewTest.assertDictContainsSubset
+      ~SchATransactionsViewTest.assertDictEqual
+      ~SchATransactionsViewTest.assertEqual
+      ~SchATransactionsViewTest.assertEquals
+      ~SchATransactionsViewTest.assertFalse
+      ~SchATransactionsViewTest.assertFieldOutput
+      ~SchATransactionsViewTest.assertFormError
+      ~SchATransactionsViewTest.assertFormsetError
+      ~SchATransactionsViewTest.assertGreater
+      ~SchATransactionsViewTest.assertGreaterEqual
+      ~SchATransactionsViewTest.assertHTMLEqual
+      ~SchATransactionsViewTest.assertHTMLNotEqual
+      ~SchATransactionsViewTest.assertIn
+      ~SchATransactionsViewTest.assertInHTML
+      ~SchATransactionsViewTest.assertIs
+      ~SchATransactionsViewTest.assertIsInstance
+      ~SchATransactionsViewTest.assertIsNone
+      ~SchATransactionsViewTest.assertIsNot
+      ~SchATransactionsViewTest.assertIsNotNone
+      ~SchATransactionsViewTest.assertJSONEqual
+      ~SchATransactionsViewTest.assertJSONNotEqual
+      ~SchATransactionsViewTest.assertLess
+      ~SchATransactionsViewTest.assertLessEqual
+      ~SchATransactionsViewTest.assertListEqual
+      ~SchATransactionsViewTest.assertLogs
+      ~SchATransactionsViewTest.assertMultiLineEqual
+      ~SchATransactionsViewTest.assertNotAlmostEqual
+      ~SchATransactionsViewTest.assertNotAlmostEquals
+      ~SchATransactionsViewTest.assertNotContains
+      ~SchATransactionsViewTest.assertNotEqual
+      ~SchATransactionsViewTest.assertNotEquals
+      ~SchATransactionsViewTest.assertNotIn
+      ~SchATransactionsViewTest.assertNotIsInstance
+      ~SchATransactionsViewTest.assertNotRegex
+      ~SchATransactionsViewTest.assertNotRegexpMatches
+      ~SchATransactionsViewTest.assertNumQueries
+      ~SchATransactionsViewTest.assertQuerysetEqual
+      ~SchATransactionsViewTest.assertRaises
+      ~SchATransactionsViewTest.assertRaisesMessage
+      ~SchATransactionsViewTest.assertRaisesRegex
+      ~SchATransactionsViewTest.assertRaisesRegexp
+      ~SchATransactionsViewTest.assertRedirects
+      ~SchATransactionsViewTest.assertRegex
+      ~SchATransactionsViewTest.assertRegexpMatches
+      ~SchATransactionsViewTest.assertSequenceEqual
+      ~SchATransactionsViewTest.assertSetEqual
+      ~SchATransactionsViewTest.assertTemplateNotUsed
+      ~SchATransactionsViewTest.assertTemplateUsed
+      ~SchATransactionsViewTest.assertTrue
+      ~SchATransactionsViewTest.assertTupleEqual
+      ~SchATransactionsViewTest.assertURLEqual
+      ~SchATransactionsViewTest.assertWarns
+      ~SchATransactionsViewTest.assertWarnsMessage
+      ~SchATransactionsViewTest.assertWarnsRegex
+      ~SchATransactionsViewTest.assertXMLEqual
+      ~SchATransactionsViewTest.assertXMLNotEqual
+      ~SchATransactionsViewTest.assert_
+      ~SchATransactionsViewTest.captureOnCommitCallbacks
+      ~SchATransactionsViewTest.countTestCases
+      ~SchATransactionsViewTest.debug
+      ~SchATransactionsViewTest.defaultTestResult
+      ~SchATransactionsViewTest.doClassCleanups
+      ~SchATransactionsViewTest.doCleanups
+      ~SchATransactionsViewTest.fail
+      ~SchATransactionsViewTest.failIf
+      ~SchATransactionsViewTest.failIfAlmostEqual
+      ~SchATransactionsViewTest.failIfEqual
+      ~SchATransactionsViewTest.failUnless
+      ~SchATransactionsViewTest.failUnlessAlmostEqual
+      ~SchATransactionsViewTest.failUnlessEqual
+      ~SchATransactionsViewTest.failUnlessRaises
+      ~SchATransactionsViewTest.id
+      ~SchATransactionsViewTest.modify_settings
+      ~SchATransactionsViewTest.run
+      ~SchATransactionsViewTest.setUp
+      ~SchATransactionsViewTest.setUpClass
+      ~SchATransactionsViewTest.setUpTestData
+      ~SchATransactionsViewTest.settings
+      ~SchATransactionsViewTest.shortDescription
+      ~SchATransactionsViewTest.skipTest
+      ~SchATransactionsViewTest.subTest
+      ~SchATransactionsViewTest.tearDown
+      ~SchATransactionsViewTest.tearDownClass
+      ~SchATransactionsViewTest.test_is_paginated
+      ~SchATransactionsViewTest.test_only_from_one_report
+      ~SchATransactionsViewTest.test_view_url_exists_at_desired_location
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SchATransactionsViewTest.available_apps
+      ~SchATransactionsViewTest.databases
+      ~SchATransactionsViewTest.fixtures
+      ~SchATransactionsViewTest.longMessage
+      ~SchATransactionsViewTest.maxDiff
+      ~SchATransactionsViewTest.reset_sequences
+      ~SchATransactionsViewTest.serialized_rollback
+   
+   
