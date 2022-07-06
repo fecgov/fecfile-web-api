@@ -1,5 +1,7 @@
 from django.test import TestCase
 from .models import SchATransaction
+from ..f3x_summaries.models import F3XSummary
+from ..committee_accounts.models import CommitteeAccount
 
 
 class SchATransactionTestCase(TestCase):
@@ -14,12 +16,24 @@ class SchATransactionTestCase(TestCase):
             contributor_organization_name="John Smith & Co.",
             contributor_first_name="First",
             contributor_last_name="Last",
-            committee_account_id=1000,
+            committee_account_id=1,
         )
 
     def test_get_scha_transaction(self):
-        scha_transaction = SchATransaction.objects.get(contributor_last_name="Smith")
+        scha_transaction = SchATransaction.objects.filter(
+            contributor_last_name="Smith").first()
         self.assertEquals(scha_transaction.contributor_first_name, "John")
+
+    def test_get_scha_transaction_in_f3x_summary(self):
+        committee = CommitteeAccount()
+        f3x = F3XSummary(
+            committee_account=committee
+        )
+        trans = SchATransaction(
+            committee_account=committee,
+            report_id=f3x
+        )
+        return trans
 
     def test_save_and_delete(self):
         self.sa_trans.save()
