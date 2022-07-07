@@ -18,7 +18,7 @@ class F3XSummaryViewSetTest(TestCase):
 
         response = F3XSummaryViewSet.as_view({"get": "coverage_dates"})(request)
 
-        expectedJson = [
+        expected_json = [
             {
                 "report_code": "MY",
                 "coverage_from_date": "2021-01-20",
@@ -49,5 +49,5 @@ class F3XSummaryViewSetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             str(response.content, encoding='utf8'),
-            expectedJson
+            expected_json
         )
