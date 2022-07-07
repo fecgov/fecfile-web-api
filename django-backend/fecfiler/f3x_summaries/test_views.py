@@ -19,31 +19,31 @@ class F3XSummaryViewSetTest(TestCase):
         response = F3XSummaryViewSet.as_view({"get": "coverage_dates"})(request)
 
         expectedJson = [
-          {
-            "report_code": "MY",
-            "coverage_from_date": "2021-01-20",
-            "coverage_through_date": "2022-05-25"
-          },
-          {
-            "report_code": "M9",
-            "coverage_from_date": "2021-01-21",
-            "coverage_through_date": "2021-09-07"
-          },
-          {
-            "report_code": "MY",
-            "coverage_from_date": "2021-01-21",
-            "coverage_through_date": "2022-01-03"
-          },
-          {
-            "report_code": "M5",
-            "coverage_from_date": "2021-01-21",
-            "coverage_through_date": "2022-02-05"
-          },
-          {
-            "report_code": "M12",
-            "coverage_from_date": "2021-01-21",
-            "coverage_through_date": "2022-11-15"
-          }
+            {
+                "report_code": "MY",
+                "coverage_from_date": "2021-01-20",
+                "coverage_through_date": "2022-05-25"
+            },
+            {
+                "report_code": "M9",
+                "coverage_from_date": "2021-01-21",
+                "coverage_through_date": "2021-09-07"
+            },
+            {
+                "report_code": "MY",
+                "coverage_from_date": "2021-01-21",
+                "coverage_through_date": "2022-01-03"
+            },
+            {
+                "report_code": "M5",
+                "coverage_from_date": "2021-01-21",
+                "coverage_through_date": "2022-02-05"
+            },
+            {
+                "report_code": "M12",
+                "coverage_from_date": "2021-01-21",
+                "coverage_through_date": "2022-11-15"
+            }
         ]
 
         self.assertEqual(response.status_code, 200)
