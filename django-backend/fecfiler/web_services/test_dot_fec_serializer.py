@@ -1,4 +1,3 @@
-from datetime import date
 from django.test import TestCase
 from .dot_fec_serializer import serialize_field, serialize_model_instance
 from ..f3x_summaries.models import F3XSummary
