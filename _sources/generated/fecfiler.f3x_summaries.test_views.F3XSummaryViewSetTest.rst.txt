@@ -1,0 +1,131 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.test\_views.F3XSummaryViewSetTest
+=========================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.test_views
+
+.. autoclass:: F3XSummaryViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSummaryViewSetTest.__init__
+      ~F3XSummaryViewSetTest.addClassCleanup
+      ~F3XSummaryViewSetTest.addCleanup
+      ~F3XSummaryViewSetTest.addTypeEqualityFunc
+      ~F3XSummaryViewSetTest.assertAlmostEqual
+      ~F3XSummaryViewSetTest.assertAlmostEquals
+      ~F3XSummaryViewSetTest.assertContains
+      ~F3XSummaryViewSetTest.assertCountEqual
+      ~F3XSummaryViewSetTest.assertDictContainsSubset
+      ~F3XSummaryViewSetTest.assertDictEqual
+      ~F3XSummaryViewSetTest.assertEqual
+      ~F3XSummaryViewSetTest.assertEquals
+      ~F3XSummaryViewSetTest.assertFalse
+      ~F3XSummaryViewSetTest.assertFieldOutput
+      ~F3XSummaryViewSetTest.assertFormError
+      ~F3XSummaryViewSetTest.assertFormsetError
+      ~F3XSummaryViewSetTest.assertGreater
+      ~F3XSummaryViewSetTest.assertGreaterEqual
+      ~F3XSummaryViewSetTest.assertHTMLEqual
+      ~F3XSummaryViewSetTest.assertHTMLNotEqual
+      ~F3XSummaryViewSetTest.assertIn
+      ~F3XSummaryViewSetTest.assertInHTML
+      ~F3XSummaryViewSetTest.assertIs
+      ~F3XSummaryViewSetTest.assertIsInstance
+      ~F3XSummaryViewSetTest.assertIsNone
+      ~F3XSummaryViewSetTest.assertIsNot
+      ~F3XSummaryViewSetTest.assertIsNotNone
+      ~F3XSummaryViewSetTest.assertJSONEqual
+      ~F3XSummaryViewSetTest.assertJSONNotEqual
+      ~F3XSummaryViewSetTest.assertLess
+      ~F3XSummaryViewSetTest.assertLessEqual
+      ~F3XSummaryViewSetTest.assertListEqual
+      ~F3XSummaryViewSetTest.assertLogs
+      ~F3XSummaryViewSetTest.assertMultiLineEqual
+      ~F3XSummaryViewSetTest.assertNotAlmostEqual
+      ~F3XSummaryViewSetTest.assertNotAlmostEquals
+      ~F3XSummaryViewSetTest.assertNotContains
+      ~F3XSummaryViewSetTest.assertNotEqual
+      ~F3XSummaryViewSetTest.assertNotEquals
+      ~F3XSummaryViewSetTest.assertNotIn
+      ~F3XSummaryViewSetTest.assertNotIsInstance
+      ~F3XSummaryViewSetTest.assertNotRegex
+      ~F3XSummaryViewSetTest.assertNotRegexpMatches
+      ~F3XSummaryViewSetTest.assertNumQueries
+      ~F3XSummaryViewSetTest.assertQuerysetEqual
+      ~F3XSummaryViewSetTest.assertRaises
+      ~F3XSummaryViewSetTest.assertRaisesMessage
+      ~F3XSummaryViewSetTest.assertRaisesRegex
+      ~F3XSummaryViewSetTest.assertRaisesRegexp
+      ~F3XSummaryViewSetTest.assertRedirects
+      ~F3XSummaryViewSetTest.assertRegex
+      ~F3XSummaryViewSetTest.assertRegexpMatches
+      ~F3XSummaryViewSetTest.assertSequenceEqual
+      ~F3XSummaryViewSetTest.assertSetEqual
+      ~F3XSummaryViewSetTest.assertTemplateNotUsed
+      ~F3XSummaryViewSetTest.assertTemplateUsed
+      ~F3XSummaryViewSetTest.assertTrue
+      ~F3XSummaryViewSetTest.assertTupleEqual
+      ~F3XSummaryViewSetTest.assertURLEqual
+      ~F3XSummaryViewSetTest.assertWarns
+      ~F3XSummaryViewSetTest.assertWarnsMessage
+      ~F3XSummaryViewSetTest.assertWarnsRegex
+      ~F3XSummaryViewSetTest.assertXMLEqual
+      ~F3XSummaryViewSetTest.assertXMLNotEqual
+      ~F3XSummaryViewSetTest.assert_
+      ~F3XSummaryViewSetTest.captureOnCommitCallbacks
+      ~F3XSummaryViewSetTest.countTestCases
+      ~F3XSummaryViewSetTest.debug
+      ~F3XSummaryViewSetTest.defaultTestResult
+      ~F3XSummaryViewSetTest.doClassCleanups
+      ~F3XSummaryViewSetTest.doCleanups
+      ~F3XSummaryViewSetTest.fail
+      ~F3XSummaryViewSetTest.failIf
+      ~F3XSummaryViewSetTest.failIfAlmostEqual
+      ~F3XSummaryViewSetTest.failIfEqual
+      ~F3XSummaryViewSetTest.failUnless
+      ~F3XSummaryViewSetTest.failUnlessAlmostEqual
+      ~F3XSummaryViewSetTest.failUnlessEqual
+      ~F3XSummaryViewSetTest.failUnlessRaises
+      ~F3XSummaryViewSetTest.id
+      ~F3XSummaryViewSetTest.modify_settings
+      ~F3XSummaryViewSetTest.run
+      ~F3XSummaryViewSetTest.setUp
+      ~F3XSummaryViewSetTest.setUpClass
+      ~F3XSummaryViewSetTest.setUpTestData
+      ~F3XSummaryViewSetTest.settings
+      ~F3XSummaryViewSetTest.shortDescription
+      ~F3XSummaryViewSetTest.skipTest
+      ~F3XSummaryViewSetTest.subTest
+      ~F3XSummaryViewSetTest.tearDown
+      ~F3XSummaryViewSetTest.tearDownClass
+      ~F3XSummaryViewSetTest.test_coverage_dates_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSummaryViewSetTest.available_apps
+      ~F3XSummaryViewSetTest.databases
+      ~F3XSummaryViewSetTest.fixtures
+      ~F3XSummaryViewSetTest.longMessage
+      ~F3XSummaryViewSetTest.maxDiff
+      ~F3XSummaryViewSetTest.reset_sequences
+      ~F3XSummaryViewSetTest.serialized_rollback
+   
+   

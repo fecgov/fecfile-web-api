@@ -38,6 +38,7 @@ fecfiler.f3x\_summaries
    fecfiler.f3x_summaries.signals
    fecfiler.f3x_summaries.test_models
    fecfiler.f3x_summaries.test_serializers
+   fecfiler.f3x_summaries.test_views
    fecfiler.f3x_summaries.urls
    fecfiler.f3x_summaries.views
 
