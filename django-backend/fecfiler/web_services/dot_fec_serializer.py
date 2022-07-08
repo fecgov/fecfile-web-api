@@ -83,6 +83,8 @@ def serialize_model_instance(schema_name, model, model_instance):
     starting at 1"""
     row = [
         serialize_field(model, model_instance, column_sequences[column_index + 1])
+        if (column_index + 1) in column_sequences
+        else ""
         for column_index in range(0, row_length)
     ]
     return ",".join(row)

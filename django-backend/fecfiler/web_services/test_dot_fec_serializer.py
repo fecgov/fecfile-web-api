@@ -1,13 +1,19 @@
 from django.test import TestCase
 from .dot_fec_serializer import serialize_field, serialize_model_instance
-from ..f3x_summaries.models import F3XSummary
+from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.scha_transactions.models import SchATransaction
 
 
 class DotFECSerializerTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries"]
+    fixtures = [
+        "test_committee_accounts",
+        "test_f3x_summaries",
+        "test_individual_receipt",
+    ]
 
     def setUp(self):
         self.f3x = F3XSummary.objects.filter(id=9999).first()
+        self.schedule_a_transaction = SchATransaction.objects.filter(id=9999).first()
 
     def test_serialize_field(self):
         serialized_text = serialize_field(F3XSummary, self.f3x, "treasurer_last_name")
@@ -50,3 +56,10 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[21], "20040729")
         self.assertEqual(split_row[3], "X")
         self.assertEqual(split_row[122], "381")
+
+    def test_serialize_scha_transaction(self):
+        transaction_row = serialize_model_instance(
+            "INDV_REC", SchATransaction, self.schedule_a_transaction
+        )
+        split_row = transaction_row.split(",")
+        self.assertEqual(split_row[0], "SA11AI")
