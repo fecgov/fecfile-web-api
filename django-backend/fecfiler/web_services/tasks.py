@@ -1,9 +1,7 @@
-from functools import reduce
 from celery import shared_task
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfile_validate import validate
 from django.db import models
-import datetime
 
 import logging
 
@@ -15,9 +13,9 @@ F3X_COLUMNS = {v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in F3X_PRO
 F3X_NUMBER_OF_COLUMNS = max(F3X_COLUMNS.keys())
 SERIALIZERS = {
     models.BooleanField: lambda b, o, fn: "X" if b else "",
-    models.DateField: lambda d, o, fn: d.isoformat() if d else "",
+    models.DateField: lambda d, o, fn: d.strftime("%Y%m%d") if d else "",
     models.ForeignKey: lambda fo, o, fn: getattr(o, fn + "_id", ""),
-    None: lambda v, o, fn: v or "",
+    None: lambda v, o, fn: str(v) if v else "",
 }
 
 
@@ -34,7 +32,7 @@ def serialize_f3x_summary(report_id):
         f3x_summary = f3x_summary_result.first()
         row = [
             serialize_field(f3x_summary, F3X_COLUMNS[column_index], F3XSummary)
-            for column_index in range(1, F3X_NUMBER_OF_COLUMNS)
+            for column_index in range(1, F3X_NUMBER_OF_COLUMNS + 1)
         ]
         return ",".join(row)
     else:
@@ -45,6 +43,6 @@ def serialize_f3x_summary(report_id):
 def create_dot_fec(report_id):
     logger.info(f"creating .FEC for report: {report_id}")
     try:
-        serialize_f3x_summary(report_id)
+        return serialize_f3x_summary(report_id)
     except Exception as error:
         logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
