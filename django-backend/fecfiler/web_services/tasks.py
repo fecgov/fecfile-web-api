@@ -1,5 +1,6 @@
 from celery import shared_task
 from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.scha_transactions.models import SchATransaction
 from .dot_fec_serializer import serialize_model_instance
 
 import logging
@@ -15,6 +16,17 @@ def serialize_f3x_summary(report_id):
         return serialize_model_instance("F3X", F3XSummary, f3x_summary)
     else:
         raise Exception(f"report: {report_id} not found")
+
+
+def serialize_transaction(transaction_id):
+    transaction_result = SchATransaction.objects.filter(id=transaction_id)
+    if transaction_result.exists():
+        logger.info(f"serializing transaction: {transaction_id}")
+        transaction = transaction_result.first()
+        transaction_type = getattr(transaction, "transaction_type_identifier")
+        return serialize_model_instance(transaction_type, SchATransaction, transaction)
+    else:
+        raise Exception(f"transaction: {transaction_id} not found")
 
 
 @shared_task

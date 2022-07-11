@@ -52,7 +52,7 @@
             "memo_code": true,
             "memo_text_description":"test_string_value",
             "reference_to_si_or_sl_system_code_that_identifies_the_account":"test_string_value",
-            "transaction_type_identifier":"test_string_value"
+            "transaction_type_identifier":"INDV_REC"
         }
     }
 ]
