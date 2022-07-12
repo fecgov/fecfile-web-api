@@ -23,7 +23,8 @@ DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
 CSRF_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
-CSRF_TRUSTED_ORIGINS = ["localhost", os.environ.get("FRONTEND_URL", "api")]
+CSRF_TRUSTED_ORIGINS = [os.environ.get("FRONTEND_URL",
+                        "http://localhost:4200")]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
