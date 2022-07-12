@@ -1,0 +1,32 @@
+[
+{
+    "model": "authentication.account",
+        "fields": {
+        "password": "fake_password_cannot_login",
+        "is_superuser": false,
+        "email": "unit_tester@test.com",
+        "username": "C00123456b_test@test.com",
+        "cmtee_id": "C00123456",
+        "contact": "",
+        "first_name": "B",
+        "last_name": "Testson",
+        "role": "C_ADMIN",
+        "tagline": "",
+        "delete_ind": "N",
+        "created_at": "2022-06-23T15:13:20.172Z",
+        "updated_at": "2022-06-23T15:13:20.172Z",
+        "last_login": "2022-06-23T15:13:20.172Z",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-06-23T15:13:20.171Z",
+        "login_code_counter": "0",
+        "register_token": "string",
+        "personal_key": "idunnohowaboutyou",
+        "status": "Registered",
+        "code_generated_counter": "0",
+        "secret_key": "fake_secret_cannot_login",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]

@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "fecfiler.contacts",
     "fecfiler.soft_delete",
     "fecfiler.validation",
+    "fecfiler.web_services",
     "django_otp",
     "django_otp.plugins.otp_totp",
     "fecfiler.triage",
