@@ -102,7 +102,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = ["localhost", os.environ.get("FRONTEND_URL", "api")]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
