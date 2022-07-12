@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.conf.urls import include
 from django.urls import re_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
