@@ -1,4 +1,4 @@
-from django.urls import re_path, include
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import F3XSummaryViewSet, ReportCodeLabelViewSet
 
@@ -12,5 +12,5 @@ router.register(
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    re_path("", include(router.urls)),
+    path("", include(router.urls)),
 ]
