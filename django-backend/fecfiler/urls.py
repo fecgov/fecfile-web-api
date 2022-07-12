@@ -33,8 +33,8 @@ urlpatterns = [
     url(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     url(r"^api/v1/token/obtain$", obtain_jwt_token),
     url(r"^api/v1/token/refresh$", refresh_jwt_token),
-    path("api/v1/", include("fecfiler.triage.urls")),
-    path("api/v1/", include("fecfiler.authentication.urls")),
-    path("api/v1/", include("fecfiler.web_services.urls")),
+    path(BASE_V1_URL, include("fecfiler.triage.urls")),
+    path(BASE_V1_URL, include("fecfiler.authentication.urls")),
+    path(BASE_V1_URL, include("fecfiler.web_services.urls")),
     url(r"^celery-test/", test_celery),
 ]
