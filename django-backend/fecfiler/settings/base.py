@@ -102,8 +102,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:4200",
-                        os.environ.get("FRONTEND_URL", "http://localhost:4200")]
+CORS_ALLOWED_ORIGINS = ["fecfile-web-app-dev.app.cloud.gov"]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
