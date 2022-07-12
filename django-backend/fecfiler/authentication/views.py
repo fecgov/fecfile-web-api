@@ -33,7 +33,7 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
 
     def get_queryset(self):
         queryset = Account.objects.annotate(
-            name=Concat('first_name', Value(', '), 'last_name', output_field=CharField())
+            name=Concat('last_name', Value(', '), 'first_name', output_field=CharField())
         ).filter(cmtee_id=self.request.user.cmtee_id).all()
 
         return queryset

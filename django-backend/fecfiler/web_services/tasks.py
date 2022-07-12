@@ -1,6 +1,7 @@
 from celery import shared_task
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
+from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_model_instance
 
 import logging
@@ -15,7 +16,7 @@ def serialize_f3x_summary(report_id):
         f3x_summary = f3x_summary_result.first()
         return serialize_model_instance("F3X", F3XSummary, f3x_summary)
     else:
-        raise Exception(f"report: {report_id} not found")
+        raise ObjectDoesNotExist(f"report: {report_id} not found")
 
 
 def serialize_transaction(transaction_id):
