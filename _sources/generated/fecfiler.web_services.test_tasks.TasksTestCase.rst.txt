@@ -1,0 +1,131 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.test\_tasks.TasksTestCase
+================================================
+
+.. currentmodule:: fecfiler.web_services.test_tasks
+
+.. autoclass:: TasksTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TasksTestCase.__init__
+      ~TasksTestCase.addClassCleanup
+      ~TasksTestCase.addCleanup
+      ~TasksTestCase.addTypeEqualityFunc
+      ~TasksTestCase.assertAlmostEqual
+      ~TasksTestCase.assertAlmostEquals
+      ~TasksTestCase.assertContains
+      ~TasksTestCase.assertCountEqual
+      ~TasksTestCase.assertDictContainsSubset
+      ~TasksTestCase.assertDictEqual
+      ~TasksTestCase.assertEqual
+      ~TasksTestCase.assertEquals
+      ~TasksTestCase.assertFalse
+      ~TasksTestCase.assertFieldOutput
+      ~TasksTestCase.assertFormError
+      ~TasksTestCase.assertFormsetError
+      ~TasksTestCase.assertGreater
+      ~TasksTestCase.assertGreaterEqual
+      ~TasksTestCase.assertHTMLEqual
+      ~TasksTestCase.assertHTMLNotEqual
+      ~TasksTestCase.assertIn
+      ~TasksTestCase.assertInHTML
+      ~TasksTestCase.assertIs
+      ~TasksTestCase.assertIsInstance
+      ~TasksTestCase.assertIsNone
+      ~TasksTestCase.assertIsNot
+      ~TasksTestCase.assertIsNotNone
+      ~TasksTestCase.assertJSONEqual
+      ~TasksTestCase.assertJSONNotEqual
+      ~TasksTestCase.assertLess
+      ~TasksTestCase.assertLessEqual
+      ~TasksTestCase.assertListEqual
+      ~TasksTestCase.assertLogs
+      ~TasksTestCase.assertMultiLineEqual
+      ~TasksTestCase.assertNotAlmostEqual
+      ~TasksTestCase.assertNotAlmostEquals
+      ~TasksTestCase.assertNotContains
+      ~TasksTestCase.assertNotEqual
+      ~TasksTestCase.assertNotEquals
+      ~TasksTestCase.assertNotIn
+      ~TasksTestCase.assertNotIsInstance
+      ~TasksTestCase.assertNotRegex
+      ~TasksTestCase.assertNotRegexpMatches
+      ~TasksTestCase.assertNumQueries
+      ~TasksTestCase.assertQuerysetEqual
+      ~TasksTestCase.assertRaises
+      ~TasksTestCase.assertRaisesMessage
+      ~TasksTestCase.assertRaisesRegex
+      ~TasksTestCase.assertRaisesRegexp
+      ~TasksTestCase.assertRedirects
+      ~TasksTestCase.assertRegex
+      ~TasksTestCase.assertRegexpMatches
+      ~TasksTestCase.assertSequenceEqual
+      ~TasksTestCase.assertSetEqual
+      ~TasksTestCase.assertTemplateNotUsed
+      ~TasksTestCase.assertTemplateUsed
+      ~TasksTestCase.assertTrue
+      ~TasksTestCase.assertTupleEqual
+      ~TasksTestCase.assertURLEqual
+      ~TasksTestCase.assertWarns
+      ~TasksTestCase.assertWarnsMessage
+      ~TasksTestCase.assertWarnsRegex
+      ~TasksTestCase.assertXMLEqual
+      ~TasksTestCase.assertXMLNotEqual
+      ~TasksTestCase.assert_
+      ~TasksTestCase.captureOnCommitCallbacks
+      ~TasksTestCase.countTestCases
+      ~TasksTestCase.debug
+      ~TasksTestCase.defaultTestResult
+      ~TasksTestCase.doClassCleanups
+      ~TasksTestCase.doCleanups
+      ~TasksTestCase.fail
+      ~TasksTestCase.failIf
+      ~TasksTestCase.failIfAlmostEqual
+      ~TasksTestCase.failIfEqual
+      ~TasksTestCase.failUnless
+      ~TasksTestCase.failUnlessAlmostEqual
+      ~TasksTestCase.failUnlessEqual
+      ~TasksTestCase.failUnlessRaises
+      ~TasksTestCase.id
+      ~TasksTestCase.modify_settings
+      ~TasksTestCase.run
+      ~TasksTestCase.setUp
+      ~TasksTestCase.setUpClass
+      ~TasksTestCase.setUpTestData
+      ~TasksTestCase.settings
+      ~TasksTestCase.shortDescription
+      ~TasksTestCase.skipTest
+      ~TasksTestCase.subTest
+      ~TasksTestCase.tearDown
+      ~TasksTestCase.tearDownClass
+      ~TasksTestCase.test_serialize_f3x_summary
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TasksTestCase.available_apps
+      ~TasksTestCase.databases
+      ~TasksTestCase.fixtures
+      ~TasksTestCase.longMessage
+      ~TasksTestCase.maxDiff
+      ~TasksTestCase.reset_sequences
+      ~TasksTestCase.serialized_rollback
+   
+   

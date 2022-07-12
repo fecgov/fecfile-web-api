@@ -1,0 +1,85 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.views.WebServicesViewSet
+===============================================
+
+.. currentmodule:: fecfiler.web_services.views
+
+.. autoclass:: WebServicesViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebServicesViewSet.__init__
+      ~WebServicesViewSet.as_view
+      ~WebServicesViewSet.check_object_permissions
+      ~WebServicesViewSet.check_permissions
+      ~WebServicesViewSet.check_throttles
+      ~WebServicesViewSet.create_dot_fec
+      ~WebServicesViewSet.determine_version
+      ~WebServicesViewSet.dispatch
+      ~WebServicesViewSet.finalize_response
+      ~WebServicesViewSet.get_authenticate_header
+      ~WebServicesViewSet.get_authenticators
+      ~WebServicesViewSet.get_content_negotiator
+      ~WebServicesViewSet.get_exception_handler
+      ~WebServicesViewSet.get_exception_handler_context
+      ~WebServicesViewSet.get_extra_action_url_map
+      ~WebServicesViewSet.get_extra_actions
+      ~WebServicesViewSet.get_format_suffix
+      ~WebServicesViewSet.get_parser_context
+      ~WebServicesViewSet.get_parsers
+      ~WebServicesViewSet.get_permissions
+      ~WebServicesViewSet.get_renderer_context
+      ~WebServicesViewSet.get_renderers
+      ~WebServicesViewSet.get_throttles
+      ~WebServicesViewSet.get_view_description
+      ~WebServicesViewSet.get_view_name
+      ~WebServicesViewSet.handle_exception
+      ~WebServicesViewSet.http_method_not_allowed
+      ~WebServicesViewSet.initial
+      ~WebServicesViewSet.initialize_request
+      ~WebServicesViewSet.options
+      ~WebServicesViewSet.perform_authentication
+      ~WebServicesViewSet.perform_content_negotiation
+      ~WebServicesViewSet.permission_denied
+      ~WebServicesViewSet.raise_uncaught_exception
+      ~WebServicesViewSet.reverse_action
+      ~WebServicesViewSet.setup
+      ~WebServicesViewSet.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebServicesViewSet.allowed_methods
+      ~WebServicesViewSet.authentication_classes
+      ~WebServicesViewSet.basename
+      ~WebServicesViewSet.default_response_headers
+      ~WebServicesViewSet.description
+      ~WebServicesViewSet.detail
+      ~WebServicesViewSet.http_method_names
+      ~WebServicesViewSet.name
+      ~WebServicesViewSet.parser_classes
+      ~WebServicesViewSet.permission_classes
+      ~WebServicesViewSet.renderer_classes
+      ~WebServicesViewSet.schema
+      ~WebServicesViewSet.settings
+      ~WebServicesViewSet.suffix
+      ~WebServicesViewSet.throttle_classes
+      ~WebServicesViewSet.versioning_class
+   
+   

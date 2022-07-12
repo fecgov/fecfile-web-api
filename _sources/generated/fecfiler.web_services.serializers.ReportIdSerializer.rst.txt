@@ -1,0 +1,62 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.serializers.ReportIdSerializer
+=====================================================
+
+.. currentmodule:: fecfiler.web_services.serializers
+
+.. autoclass:: ReportIdSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportIdSerializer.__init__
+      ~ReportIdSerializer.bind
+      ~ReportIdSerializer.create
+      ~ReportIdSerializer.fail
+      ~ReportIdSerializer.get_attribute
+      ~ReportIdSerializer.get_default
+      ~ReportIdSerializer.get_fields
+      ~ReportIdSerializer.get_initial
+      ~ReportIdSerializer.get_validators
+      ~ReportIdSerializer.get_value
+      ~ReportIdSerializer.is_valid
+      ~ReportIdSerializer.many_init
+      ~ReportIdSerializer.run_validation
+      ~ReportIdSerializer.run_validators
+      ~ReportIdSerializer.save
+      ~ReportIdSerializer.to_internal_value
+      ~ReportIdSerializer.to_representation
+      ~ReportIdSerializer.update
+      ~ReportIdSerializer.validate
+      ~ReportIdSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportIdSerializer.context
+      ~ReportIdSerializer.data
+      ~ReportIdSerializer.default_error_messages
+      ~ReportIdSerializer.default_validators
+      ~ReportIdSerializer.errors
+      ~ReportIdSerializer.fields
+      ~ReportIdSerializer.initial
+      ~ReportIdSerializer.root
+      ~ReportIdSerializer.validated_data
+      ~ReportIdSerializer.validators
+   
+   

@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>fecfiler.web_services.views.WebServicesViewSet &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.wsgi" href="fecfiler.wsgi.html" />
+    <link rel="prev" title="fecfiler.web_services.views" href="fecfiler.web_services.views.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-web-services-views-webservicesviewset">
+<h1>fecfiler.web_services.views.WebServicesViewSet<a class="headerlink" href="#fecfiler-web-services-views-webservicesviewset" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.views.</span></span><span class="sig-name descname"><span class="pre">WebServicesViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.viewsets.ViewSet</span></code></p>
+<p>A viewset that provides actions to start web service tasks and
+retrieve thier statuses and results</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.__init__" title="fecfiler.web_services.views.WebServicesViewSet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**kwargs)</p></td>
+<td><p>Constructor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.as_view" title="fecfiler.web_services.views.WebServicesViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
+<td><p>Because of the way class based views create a closure around the instantiated view, we need to totally reimplement <cite>.as_view</cite>, and slightly modify the view function that is created and returned.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.check_object_permissions" title="fecfiler.web_services.views.WebServicesViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
+<td><p>Check if the request should be permitted for a given object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.check_permissions" title="fecfiler.web_services.views.WebServicesViewSet.check_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_permissions</span></code></a>(request)</p></td>
+<td><p>Check if the request should be permitted.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.check_throttles" title="fecfiler.web_services.views.WebServicesViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
+<td><p>Check if request should be throttled.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dot_fec</span></code>(request)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.determine_version" title="fecfiler.web_services.views.WebServicesViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.dispatch" title="fecfiler.web_services.views.WebServicesViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.finalize_response" title="fecfiler.web_services.views.WebServicesViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<td><p>Returns the final response object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_authenticate_header" title="fecfiler.web_services.views.WebServicesViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_authenticators" title="fecfiler.web_services.views.WebServicesViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator" title="fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
+<td><p>Instantiate and return the content negotiation class to use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_exception_handler" title="fecfiler.web_services.views.WebServicesViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
+<td><p>Returns the exception handler that this view uses.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_exception_handler_context" title="fecfiler.web_services.views.WebServicesViewSet.get_exception_handler_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler_context</span></code></a>()</p></td>
+<td><p>Returns a dict that is passed through to EXCEPTION_HANDLER, as the <cite>context</cite> argument.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_extra_action_url_map" title="fecfiler.web_services.views.WebServicesViewSet.get_extra_action_url_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_action_url_map</span></code></a>()</p></td>
+<td><p>Build a map of {names: urls} for the extra actions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_extra_actions" title="fecfiler.web_services.views.WebServicesViewSet.get_extra_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_actions</span></code></a>()</p></td>
+<td><p>Get the methods that are marked as an extra ViewSet <cite>&#64;action</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_format_suffix" title="fecfiler.web_services.views.WebServicesViewSet.get_format_suffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_format_suffix</span></code></a>(**kwargs)</p></td>
+<td><p>Determine if the request includes a '.json' style format suffix</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_parser_context" title="fecfiler.web_services.views.WebServicesViewSet.get_parser_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser_context</span></code></a>(http_request)</p></td>
+<td><p>Returns a dict that is passed through to Parser.parse(), as the <cite>parser_context</cite> keyword argument.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_parsers" title="fecfiler.web_services.views.WebServicesViewSet.get_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parsers</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of parsers that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_permissions" title="fecfiler.web_services.views.WebServicesViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of permissions that this view requires.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_renderer_context" title="fecfiler.web_services.views.WebServicesViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
+<td><p>Returns a dict that is passed through to Renderer.render(), as the <cite>renderer_context</cite> keyword argument.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_renderers" title="fecfiler.web_services.views.WebServicesViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of renderers that this view can use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_throttles" title="fecfiler.web_services.views.WebServicesViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_description" title="fecfiler.web_services.views.WebServicesViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_name" title="fecfiler.web_services.views.WebServicesViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.handle_exception" title="fecfiler.web_services.views.WebServicesViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed" title="fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initial" title="fecfiler.web_services.views.WebServicesViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initialize_request" title="fecfiler.web_services.views.WebServicesViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.options" title="fecfiler.web_services.views.WebServicesViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_authentication" title="fecfiler.web_services.views.WebServicesViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
+<td><p>Perform authentication on the incoming request.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation" title="fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
+<td><p>Determine which renderer and media type to use render the response.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.permission_denied" title="fecfiler.web_services.views.WebServicesViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
+<td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.reverse_action" title="fecfiler.web_services.views.WebServicesViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.setup" title="fecfiler.web_services.views.WebServicesViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Initialize attributes shared by all view methods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<td><p>If request is throttled, determine what kind of exception to raise.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.allowed_methods" title="fecfiler.web_services.views.WebServicesViewSet.allowed_methods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">allowed_methods</span></code></a></p></td>
+<td><p>Wrap Django's private <cite>_allowed_methods</cite> interface in a public property.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">authentication_classes</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">basename</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_response_headers</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detail</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_names</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser_classes</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renderer_classes</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">suffix</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttle_classes</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">versioning_class</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.allowed_methods">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">allowed_methods</span></span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.allowed_methods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap Django’s private <cite>_allowed_methods</cite> interface in a public property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.as_view">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Because of the way class based views create a closure around the
+instantiated view, we need to totally reimplement <cite>.as_view</cite>,
+and slightly modify the view function that is created and returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.check_object_permissions">
+<span class="sig-name descname"><span class="pre">check_object_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.check_object_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the request should be permitted for a given object.
+Raises an appropriate exception if the request is not permitted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.check_permissions">
+<span class="sig-name descname"><span class="pre">check_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.check_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the request should be permitted.
+Raises an appropriate exception if the request is not permitted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.check_throttles">
+<span class="sig-name descname"><span class="pre">check_throttles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.check_throttles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if request should be throttled.
+Raises an appropriate exception if the request is throttled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.determine_version">
+<span class="sig-name descname"><span class="pre">determine_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.determine_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>If versioning is being used, then determine any API version for the
+incoming request. Returns a two-tuple of (version, versioning_scheme)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>.dispatch()</cite> is pretty much the same as Django’s regular dispatch,
+but with extra hooks for startup, finalize, and exception handling.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.finalize_response">
+<span class="sig-name descname"><span class="pre">finalize_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.finalize_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the final response object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_authenticate_header">
+<span class="sig-name descname"><span class="pre">get_authenticate_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_authenticate_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a request is unauthenticated, determine the WWW-Authenticate
+header to use for 401 responses, if any.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_authenticators">
+<span class="sig-name descname"><span class="pre">get_authenticators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_authenticators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and returns the list of authenticators that this view can use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator">
+<span class="sig-name descname"><span class="pre">get_content_negotiator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate and return the content negotiation class to use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_exception_handler">
+<span class="sig-name descname"><span class="pre">get_exception_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_exception_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the exception handler that this view uses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_exception_handler_context">
+<span class="sig-name descname"><span class="pre">get_exception_handler_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_exception_handler_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict that is passed through to EXCEPTION_HANDLER,
+as the <cite>context</cite> argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_extra_action_url_map">
+<span class="sig-name descname"><span class="pre">get_extra_action_url_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_extra_action_url_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a map of {names: urls} for the extra actions.</p>
+<p>This method will noop if <cite>detail</cite> was not provided as a view initkwarg.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_extra_actions">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_extra_actions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_extra_actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the methods that are marked as an extra ViewSet <cite>&#64;action</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_format_suffix">
+<span class="sig-name descname"><span class="pre">get_format_suffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_format_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the request includes a ‘.json’ style format suffix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_parser_context">
+<span class="sig-name descname"><span class="pre">get_parser_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">http_request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_parser_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict that is passed through to Parser.parse(),
+as the <cite>parser_context</cite> keyword argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_parsers">
+<span class="sig-name descname"><span class="pre">get_parsers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_parsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and returns the list of parsers that this view can use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_permissions">
+<span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and returns the list of permissions that this view requires.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_renderer_context">
+<span class="sig-name descname"><span class="pre">get_renderer_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_renderer_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict that is passed through to Renderer.render(),
+as the <cite>renderer_context</cite> keyword argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_renderers">
+<span class="sig-name descname"><span class="pre">get_renderers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_renderers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and returns the list of renderers that this view can use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_throttles">
+<span class="sig-name descname"><span class="pre">get_throttles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_throttles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and returns the list of throttles that this view uses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_view_description">
+<span class="sig-name descname"><span class="pre">get_view_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return some descriptive text for the view, as used in OPTIONS responses
+and in the browsable API.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_view_name">
+<span class="sig-name descname"><span class="pre">get_view_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the view name, as used in OPTIONS responses and in the
+browsable API.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.handle_exception">
+<span class="sig-name descname"><span class="pre">handle_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.handle_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle any exception that occurs, by returning an appropriate response,
+or re-raising the error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed">
+<span class="sig-name descname"><span class="pre">http_method_not_allowed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <cite>request.method</cite> does not correspond to a handler method,
+determine what kind of exception to raise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.initial">
+<span class="sig-name descname"><span class="pre">initial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs anything that needs to occur prior to calling the method handler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.initialize_request">
+<span class="sig-name descname"><span class="pre">initialize_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.initialize_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.metadata_class">
+<span class="sig-name descname"><span class="pre">metadata_class</span></span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.metadata_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.metadata.SimpleMetadata</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.options">
+<span class="sig-name descname"><span class="pre">options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler method for HTTP ‘OPTIONS’ request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.perform_authentication">
+<span class="sig-name descname"><span class="pre">perform_authentication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.perform_authentication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform authentication on the incoming request.</p>
+<p>Note that if you override this and simply ‘pass’, then authentication
+will instead be performed lazily, the first time either
+<cite>request.user</cite> or <cite>request.auth</cite> is accessed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation">
+<span class="sig-name descname"><span class="pre">perform_content_negotiation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine which renderer and media type to use render the response.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.permission_denied">
+<span class="sig-name descname"><span class="pre">permission_denied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.permission_denied" title="Permalink to this definition">¶</a></dt>
+<dd><p>If request is not permitted, determine what kind of exception to raise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.reverse_action">
+<span class="sig-name descname"><span class="pre">reverse_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.reverse_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverse the action for the given <cite>url_name</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize attributes shared by all view methods.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.throttled">
+<span class="sig-name descname"><span class="pre">throttled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="Permalink to this definition">¶</a></dt>
+<dd><p>If request is throttled, determine what kind of exception to raise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.dot_fec_serializer.html">fecfiler.web_services.dot_fec_serializer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.serializers.html">fecfiler.web_services.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_dot_fec_serializer.html">fecfiler.web_services.test_dot_fec_serializer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_tasks.html">fecfiler.web_services.test_tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.urls.html">fecfiler.web_services.urls</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.web_services.views.html">fecfiler.web_services.views</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.web_services.views.WebServicesViewSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.web_services.html">fecfiler.web_services</a><ul>
+  <li><a href="fecfiler.web_services.views.html">fecfiler.web_services.views</a><ul>
+      <li>Previous: <a href="fecfiler.web_services.views.html" title="previous chapter">fecfiler.web_services.views</a></li>
+      <li>Next: <a href="fecfiler.wsgi.html" title="next chapter">fecfiler.wsgi</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.web_services.views.WebServicesViewSet.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

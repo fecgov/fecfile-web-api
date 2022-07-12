@@ -40,5 +40,6 @@ fecfiler
    fecfiler.triage
    fecfiler.urls
    fecfiler.validation
+   fecfiler.web_services
    fecfiler.wsgi
 
