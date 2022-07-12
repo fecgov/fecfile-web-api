@@ -11,7 +11,7 @@ class F3XTestCase(TestCase):
             filer_committee_id_number="C00123456",
             treasurer_last_name="Validlastname",
             treasurer_first_name="Validfirstname",
-            date_signed="20220101",
+            date_signed="2022-01-01",
             committee_account_id=1000,
         )
 
