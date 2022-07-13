@@ -42,4 +42,5 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0009_alter_schatransaction_contribution_date
    fecfiler.scha_transactions.migrations.0010_schatransaction_parent_transaction_id
    fecfiler.scha_transactions.migrations.0011_schatransaction_report_id
+   fecfiler.scha_transactions.migrations.0012_auto_20220713_1219
 
