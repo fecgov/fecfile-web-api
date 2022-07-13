@@ -44,7 +44,8 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _,
+     branch: branch == "defect/365-istrusted-logindotgov-code-error"),
 )
 
 
