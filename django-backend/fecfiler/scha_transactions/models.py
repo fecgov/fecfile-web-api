@@ -32,8 +32,16 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     election_code = models.TextField(null=True, blank=True)
     election_other_description = models.TextField(null=True, blank=True)
     contribution_date = models.DateField(null=True, blank=True)
-    contribution_amount = models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=2)
-    contribution_aggregate = models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=2)
+    contribution_amount = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=11,
+        decimal_places=2)
+    contribution_aggregate = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=11,
+        decimal_places=2)
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
     contributor_employer = models.TextField(null=True, blank=True)
     contributor_occupation = models.TextField(null=True, blank=True)
