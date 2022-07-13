@@ -24,3 +24,4 @@ pytz==2021.3
 retry==0.9.2
 static3==0.6.1
 django-otp==0.9.3
+git+https://github.com/fecgov/mozilla-django-oidc.git@main#egg=mozilla_django_oidc
