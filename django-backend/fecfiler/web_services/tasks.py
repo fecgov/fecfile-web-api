@@ -19,21 +19,30 @@ def serialize_f3x_summary(report_id):
         raise ObjectDoesNotExist(f"report: {report_id} not found")
 
 
-def serialize_transaction(transaction_id):
-    transaction_result = SchATransaction.objects.filter(id=transaction_id)
-    if transaction_result.exists():
-        logger.info(f"serializing transaction: {transaction_id}")
-        transaction = transaction_result.first()
-        transaction_type = getattr(transaction, "transaction_type_identifier")
-        return serialize_model_instance(transaction_type, SchATransaction, transaction)
-    else:
-        raise Exception(f"transaction: {transaction_id} not found")
+def serialize_transaction(transaction):
+    if not isinstance(transaction, SchATransaction):
+        raise TypeError(f"{type(transaction)} is not a transaction")
+    logger.info(f"serializing transaction: {transaction.id}")
+    transaction_type = getattr(transaction, "transaction_type_identifier")
+    return serialize_model_instance(transaction_type, SchATransaction, transaction)
+
+
+def serialize_transactions(transactions):
+    if transactions.exists():
+        return [serialize_transaction(transaction) for transaction in transactions]
+    return []
 
 
 @shared_task
 def create_dot_fec(report_id):
     logger.info(f"creating .FEC for report: {report_id}")
     try:
-        return serialize_f3x_summary(report_id)
+        f3x_summary_row = serialize_f3x_summary(report_id)
+        transactions = SchATransaction.objects.filter(report_id_id=report_id)
+        transaction_rows = serialize_transactions(transactions)
+        logger.info("Serialized Report:")
+        logger.info(f3x_summary_row)
+        for transaction in transaction_rows:
+            logger.info(transaction)
     except Exception as error:
         logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
