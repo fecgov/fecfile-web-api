@@ -178,6 +178,8 @@ OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
 OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
 OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
+OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
+ALLOW_LOGOUT_GET_METHOD = True
 
 FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
@@ -190,6 +192,8 @@ LOGOUT_REDIRECT_URL = os.environ.get('LOGOUT_REDIRECT_URL')
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
 }
+
+OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.token.login_dot_gov_logout"
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
 # OIDC settings end
