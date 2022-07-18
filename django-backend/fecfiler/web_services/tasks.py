@@ -1,4 +1,6 @@
 from celery import shared_task
+from io import BytesIO
+from django.core.files.storage import default_storage
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from django.core.exceptions import ObjectDoesNotExist
@@ -42,7 +44,14 @@ def create_dot_fec(report_id):
         transaction_rows = serialize_transactions(transactions)
         logger.info("Serialized Report:")
         logger.info(f3x_summary_row)
+        file_content = str(f3x_summary_row).encode()
         for transaction in transaction_rows:
             logger.info(transaction)
+            file_content += str(transaction).encode()
+
+        file_name = f"{report_id}.fec"
+        file_content_io = BytesIO(file_content)
+
+        default_storage.save(file_name, file_content_io)
     except Exception as error:
         logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
