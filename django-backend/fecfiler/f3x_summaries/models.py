@@ -25,7 +25,8 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
-
+    confirmation_email_1 = models.EmailField(max_length=44, null=True, blank=True, default=None)
+    confirmation_email_2 = models.EmailField(max_length=44, null=True, blank=True, default=None)
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     report_code = models.ForeignKey(
