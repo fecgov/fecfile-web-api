@@ -23,12 +23,14 @@ class F3XSummarySerializer(
         min_length=None,
         allow_blank=True,
         allow_null=True,
+        required=False,
     )
     confirmation_email_2 = EmailField(
         max_length=44,
         min_length=None,
         allow_blank=True,
         allow_null=True,
+        required=False,
     )
 
     class Meta:
