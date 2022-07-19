@@ -3,7 +3,6 @@
 from django.db import migrations, models
 from django.core import serializers
 import django.db.models.deletion
-from django.core.management import call_command
 
 
 def forwards_func(apps, schema_editor):

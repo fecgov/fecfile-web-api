@@ -1,7 +1,6 @@
 import django.core.validators
 from django.core import serializers
 from django.db import migrations, models
-from django.core.management import call_command
 
 
 def forwards_func(apps, schema_editor):
