@@ -39,7 +39,6 @@ class F3XSummarySerializer(
             "deleted",
             "schatransaction"
         ]]
-        print(fields)
         read_only_fields = [
             "id",
             "deleted",
