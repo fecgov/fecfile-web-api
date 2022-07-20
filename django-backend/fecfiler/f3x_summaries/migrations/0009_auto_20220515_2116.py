@@ -4,9 +4,9 @@ from django.db import migrations, models
 
 
 def convert_fecfile_booleans(apps, schema_editor):
-    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
+    retrieved_f3x_summary_class = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
 
-    for f3x_summary in F3XSummary.objects.all():
+    for f3x_summary in retrieved_f3x_summary_class.objects.all():
         f3x_summary.change_of_address = (
             True if f3x_summary.change_of_address in ["true", "X"] else False
         )
