@@ -42,4 +42,5 @@ fecfiler.f3x\_summaries.migrations
    fecfiler.f3x_summaries.migrations.0009_auto_20220515_2116
    fecfiler.f3x_summaries.migrations.0010_auto_20220525_1157
    fecfiler.f3x_summaries.migrations.0011_auto_20220609_1730
+   fecfiler.f3x_summaries.migrations.0012_auto_20220718_1337
 

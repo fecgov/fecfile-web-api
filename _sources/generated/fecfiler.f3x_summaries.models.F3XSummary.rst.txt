@@ -156,6 +156,8 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.committee_account
       ~F3XSummary.committee_account_id
       ~F3XSummary.committee_name
+      ~F3XSummary.confirmation_email_1
+      ~F3XSummary.confirmation_email_2
       ~F3XSummary.coverage_from_date
       ~F3XSummary.coverage_through_date
       ~F3XSummary.created
