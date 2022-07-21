@@ -5,10 +5,21 @@ from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_model_instance
+import boto3
+from django.conf import settings
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+session = boto3.session.Session()
+s3 = session.resource(
+    "s3",
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_REGION,
+)
 
 
 def serialize_f3x_summary(report_id):
@@ -52,6 +63,10 @@ def create_dot_fec(report_id):
         file_name = f"{report_id}.fec"
         file_content_io = BytesIO(file_content)
 
-        default_storage.save(file_name, file_content_io)
+        logger.info(f"uploading .FEC to s3 for report: {report_id}")
+        s3_object = s3.Object(settings.AWS_STORAGE_BUCKET_NAME, file_name)
+        s3_object.put(Body=file_content_io)
+        logger.info(f"SUCCESS .FEC was uploaded s3 for report: {report_id}")
+
     except Exception as error:
         logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
