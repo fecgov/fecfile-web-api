@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import datetime
 import dj_database_url
+import requests
 
 from .env import env
 from corsheaders.defaults import default_headers
@@ -21,7 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
-CSRF_TRUSTED_ORIGINS = ["localhost", os.environ.get("FRONTEND_URL", "api")]
+CSRF_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
+CSRF_TRUSTED_ORIGINS = [os.environ.get("CSRF_TRUSTED_ORIGINS",
+                        "http://localhost:4200")]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -47,9 +50,13 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
+SESSION_COOKIE_AGE = 15 * 60  # Inactivity timeout
+SESSION_SAVE_EVERY_REQUEST = True
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
+    "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -64,6 +71,7 @@ INSTALLED_APPS = [
     "fecfiler.contacts",
     "fecfiler.soft_delete",
     "fecfiler.validation",
+    "fecfiler.web_services",
     "django_otp",
     "django_otp.plugins.otp_totp",
     "fecfiler.triage",
@@ -96,8 +104,11 @@ TEMPLATES = [
     },
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [os.environ.get("CORS_ALLOWED_ORIGINS",
+                        "http://localhost:4200")]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Database
 DATABASES = {
@@ -133,6 +144,55 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+# OIDC settings start
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+)
+
+OIDC_CREATE_USER = True
+OIDC_STORE_ID_TOKEN = True
+# Maximum number of concurrent sessions
+OIDC_MAX_STATES = 3
+
+OIDC_RP_SIGN_ALGO = "RS256"
+OIDC_RP_CLIENT_ID = os.environ.get('OIDC_RP_CLIENT_ID')
+OIDC_RP_CLIENT_SECRET = os.environ.get('OIDC_RP_CLIENT_SECRET')
+
+# The Django field used to identify users - default is email
+OIDC_RP_UNIQUE_IDENTIFIER = "username"
+
+# Sometimes the OP (IDP - login.gov)has a different label for the unique ID
+OIDC_OP_UNIQUE_IDENTIFIER = "sub"
+
+# Default implicit_flow is considered vulnerable
+OIDC_OP_CLIENT_AUTH_METHOD = "private_key_jwt"
+
+OIDC_OP_AUTODISCOVER_ENDPOINT = (
+    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+)
+OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
+
+OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
+OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
+OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
+OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
+
+FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
+FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
+FFAPI_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
+
+LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_SERVER_URL')
+LOGIN_REDIRECT_CLIENT_URL = os.environ.get('LOGIN_REDIRECT_CLIENT_URL')
+LOGOUT_REDIRECT_URL = os.environ.get('LOGOUT_REDIRECT_URL')
+
+OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
+    "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
+}
+
+OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
+# OIDC settings end
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"

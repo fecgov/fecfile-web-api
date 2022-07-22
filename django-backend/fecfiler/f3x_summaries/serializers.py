@@ -1,5 +1,5 @@
 from .models import F3XSummary, ReportCodeLabel
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
+from rest_framework.serializers import ModelSerializer, SlugRelatedField, EmailField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 import logging
@@ -18,10 +18,27 @@ class F3XSummarySerializer(
         slug_field="report_code",
         queryset=ReportCodeLabel.objects.all(),
     )
+    confirmation_email_1 = EmailField(
+        max_length=44,
+        min_length=None,
+        allow_blank=True,
+        allow_null=True,
+        required=False,
+    )
+    confirmation_email_2 = EmailField(
+        max_length=44,
+        min_length=None,
+        allow_blank=True,
+        allow_null=True,
+        required=False,
+    )
 
     class Meta:
         model = F3XSummary
-        fields = [f.name for f in F3XSummary._meta.get_fields() if f.name != "deleted"]
+        fields = [f.name for f in F3XSummary._meta.get_fields() if f.name not in [
+            "deleted",
+            "schatransaction"
+        ]]
         read_only_fields = [
             "id",
             "deleted",
