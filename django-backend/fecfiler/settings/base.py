@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
+    "storages",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
@@ -74,7 +75,6 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_totp",
     "fecfiler.triage",
-    "storages",
 ]
 
 MIDDLEWARE = [
@@ -264,7 +264,7 @@ class CELERY_STORAGE_TYPE(Enum):
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
-CELERY_WORKER_STORAGE = CELERY_STORAGE_TYPE.AWS
+CELERY_WORKER_STORAGE = os.environ.get("CELERY_WORKER_STORAGE", CELERY_STORAGE_TYPE.AWS)
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
