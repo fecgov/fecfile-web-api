@@ -1,4 +1,6 @@
+from datetime import datetime
 import os
+import math
 from celery import shared_task
 from io import BytesIO
 from django.core.files.storage import default_storage
@@ -7,7 +9,9 @@ from fecfiler.scha_transactions.models import SchATransaction
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import add_row_to_fec, serialize_model_instance
 from django.conf import settings
-from fecfiler import S3_SESSION
+
+if settings.CELERY_WORKER_STORAGE == settings.CELERY_STORAGE_TYPE.AWS:
+    from fecfiler import S3_SESSION
 
 import logging
 
@@ -52,7 +56,7 @@ def create_dot_fec(report_id):
             logger.info(transaction)
             file_content = add_row_to_fec(file_content, transaction)
 
-        file_name = f"{report_id}.fec"
+        file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
         if S3_SESSION:
             logger.info(f"uploading .FEC to s3 for report: {report_id}")
