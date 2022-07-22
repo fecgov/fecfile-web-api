@@ -1,5 +1,6 @@
 from django.db import models
 from fecfile_validate import validate
+from curses import ascii
 
 import logging
 
@@ -87,4 +88,13 @@ def serialize_model_instance(schema_name, model, model_instance):
         else ""
         for column_index in range(0, row_length)
     ]
-    return ",".join(row)
+    return chr(ascii.FS).join(row)
+
+
+def add_row_to_fec(dot_fec, row):
+    """Returns new bytes with `row` appended to `dot_fec` bytes and adds .FEC line breaks
+    Args:
+        dot_fec (bytes): .FEC binary content to add row to
+        row (str): Row that will be appended as bytes to `dot_fec`
+    """
+    return (dot_fec or b"") + str(row).encode() + bytes([ascii.CR, ascii.LF])

@@ -1,25 +1,17 @@
+import os
 from celery import shared_task
 from io import BytesIO
 from django.core.files.storage import default_storage
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from django.core.exceptions import ObjectDoesNotExist
-from .dot_fec_serializer import serialize_model_instance
-import boto3
+from .dot_fec_serializer import add_row_to_fec, serialize_model_instance
 from django.conf import settings
+from fecfiler import S3_SESSION
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-session = boto3.session.Session()
-s3 = session.resource(
-    "s3",
-    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    region_name=settings.AWS_REGION,
-)
 
 
 def serialize_f3x_summary(report_id):
@@ -55,18 +47,25 @@ def create_dot_fec(report_id):
         transaction_rows = serialize_transactions(transactions)
         logger.info("Serialized Report:")
         logger.info(f3x_summary_row)
-        file_content = str(f3x_summary_row).encode()
+        file_content = add_row_to_fec(None, f3x_summary_row)
         for transaction in transaction_rows:
             logger.info(transaction)
-            file_content += str(transaction).encode()
+            file_content = add_row_to_fec(file_content, transaction)
 
         file_name = f"{report_id}.fec"
-        file_content_io = BytesIO(file_content)
 
-        logger.info(f"uploading .FEC to s3 for report: {report_id}")
-        s3_object = s3.Object(settings.AWS_STORAGE_BUCKET_NAME, file_name)
-        s3_object.put(Body=file_content_io)
-        logger.info(f"SUCCESS .FEC was uploaded s3 for report: {report_id}")
+        if S3_SESSION:
+            logger.info(f"uploading .FEC to s3 for report: {report_id}")
+            s3_object = S3_SESSION.Object(settings.AWS_STORAGE_BUCKET_NAME, file_name)
+            s3_object.put(Body=BytesIO(file_content))
+            logger.info(f"SUCCESS .FEC was uploaded s3 for report: {report_id}")
+        else:
+            with open(
+                os.path.join(settings.CELERY_LOCAL_STORAGE_DIRECTORY, file_name),
+                "w",
+                encoding="utf-8",
+            ) as file:
+                file.write(file_content.decode("utf-8"))
 
     except Exception as error:
         logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
