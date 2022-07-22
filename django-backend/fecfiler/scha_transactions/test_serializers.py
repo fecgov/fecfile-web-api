@@ -68,7 +68,6 @@ class SchATransactionTestCase(TestCase):
             context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
-        print(f" ERRRRRROR: {missing_type_serializer.errors}")
         self.assertIsNotNone(
             missing_type_serializer.errors["transaction_type_identifier"]
         )

@@ -3,15 +3,12 @@ import os
 import math
 from celery import shared_task
 from io import BytesIO
-from django.core.files.storage import default_storage
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import add_row_to_fec, serialize_model_instance
 from django.conf import settings
-
-if settings.CELERY_WORKER_STORAGE == settings.CELERY_STORAGE_TYPE.AWS:
-    from fecfiler import S3_SESSION
+from fecfiler import S3_SESSION
 
 import logging
 

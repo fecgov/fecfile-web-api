@@ -258,13 +258,13 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 
-class CELERY_STORAGE_TYPE(Enum):
+class CeleryStorageType(Enum):
     AWS = "aws"
     LOCAL = "local"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
-CELERY_WORKER_STORAGE = os.environ.get("CELERY_WORKER_STORAGE", CELERY_STORAGE_TYPE.AWS)
+CELERY_WORKER_STORAGE = os.environ.get("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
