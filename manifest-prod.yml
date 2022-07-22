@@ -10,6 +10,7 @@ applications:
   memory: 1G
   services:
     - fecfile-api-rds
+    - fecfile-api-creds-prod
   env:
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
