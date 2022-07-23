@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.f3x_summaries.urls")),
     re_path(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.memo_text.urls")),
     re_path(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
     re_path(r"^api/v1/token/obtain$", obtain_jwt_token),
     re_path(r"^api/v1/token/refresh$", refresh_jwt_token),

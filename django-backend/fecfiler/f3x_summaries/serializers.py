@@ -23,7 +23,8 @@ class F3XSummarySerializer(
         model = F3XSummary
         fields = [f.name for f in F3XSummary._meta.get_fields() if f.name not in [
             "deleted",
-            "schatransaction"
+            "schatransaction",
+            "memotext"
         ]]
         read_only_fields = [
             "id",
