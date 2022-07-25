@@ -100,7 +100,7 @@ def _do_deploy(ctx, space):
 
 
 def _deploy_web_services(ctx):
-    manifest_filename = f"manifest-web-services.yml"
+    manifest_filename = "manifest-web-services.yml"
     existing_deploy = ctx.run(f"cf app {WEB_SERVICES_NAME}", echo=True, warn=True)
     print("\n")
 
