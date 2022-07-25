@@ -9,19 +9,33 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('f3x_summaries', '0011_auto_20220609_1730'),
+        ("f3x_summaries", "0011_auto_20220609_1730"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DotFEC',
+            name="DotFEC",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file_name', models.TextField()),
-                ('report', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file_name", models.TextField()),
+                (
+                    "report",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="f3x_summaries.f3xsummary",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'dot_fecs',
+                "db_table": "dot_fecs",
             },
         ),
     ]
