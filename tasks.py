@@ -106,7 +106,7 @@ def _deploy_web_services(ctx):
 
     cmd = "push --strategy rolling" if existing_deploy.ok else "push"
     new_deploy = ctx.run(
-        f"cf {cmd} {APP_NAME} -f {manifest_filename}",
+        f"cf {cmd} {WEB_SERVICES_NAME} -f {manifest_filename}",
         echo=True,
         warn=True,
     )
