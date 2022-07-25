@@ -1,8 +1,17 @@
 from django.test import TestCase
-from .tasks import serialize_f3x_summary, serialize_transaction, serialize_transactions
+from .tasks import (
+    create_dot_fec_content,
+    create_dot_fec,
+    serialize_f3x_summary,
+    serialize_transaction,
+    serialize_transactions,
+)
+from .dot_fec_serializer import CRLF_STR
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from curses import ascii
+from pathlib import Path
+from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
 
 
 class TasksTestCase(TestCase):
@@ -50,3 +59,20 @@ class TasksTestCase(TestCase):
         no_transactions = SchATransaction.objects.filter(id=100000000)
         no_transaction_rows = serialize_transactions(no_transactions)
         self.assertEqual(no_transaction_rows, [])
+
+    def test_create_dot_fec_content(self):
+        file_content, file_name = create_dot_fec_content(9999)
+        self.assertEqual(file_content.count(CRLF_STR), 2)
+        self.assertEqual(file_name.split("_")[0], "9999")
+
+    def test_create_dot_fec(self):
+        file_name = create_dot_fec(9999, True)
+        result_dot_fec = Path(CELERY_LOCAL_STORAGE_DIRECTORY).joinpath(file_name)
+        try:
+            with open(result_dot_fec, encoding="utf-8") as f:
+                lines = f.readlines()
+                self.assertEqual(lines[0][:5], "F3XN" + chr(ascii.FS))
+                self.assertEqual(lines[1][:7], "SA11AI" + chr(ascii.FS))
+        finally:
+            if result_dot_fec.exists():
+                result_dot_fec.unlink()

@@ -8,9 +8,9 @@ import dj_database_url
 import requests
 
 from .env import env
-from enum import Enum
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
+from fecfiler.web_services.web_service_storage import CeleryStorageType
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -256,11 +256,6 @@ CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
-
-
-class CeleryStorageType(Enum):
-    AWS = "aws"
-    LOCAL = "local"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")

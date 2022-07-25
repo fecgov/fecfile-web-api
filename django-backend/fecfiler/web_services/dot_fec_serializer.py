@@ -6,6 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
+
 
 def boolean_serializer(model_instance, field_name):
     return "X" if getattr(model_instance, field_name, None) else ""
@@ -91,10 +93,10 @@ def serialize_model_instance(schema_name, model, model_instance):
     return chr(ascii.FS).join(row)
 
 
-def add_row_to_fec(dot_fec, row):
-    """Returns new bytes with `row` appended to `dot_fec` bytes and adds .FEC line breaks
+def add_row_to_fec_str(dot_fec_str, row):
+    """Returns new string with `row` appended to `dot_fec_str` and adds .FEC line breaks
     Args:
-        dot_fec (bytes): .FEC binary content to add row to
-        row (str): Row that will be appended as bytes to `dot_fec`
+        dot_fec_str (string): .FEC content to add row to
+        row (string): Row that will be appended to `dot_fec_str`
     """
-    return (dot_fec or b"") + str(row).encode() + bytes([ascii.CR, ascii.LF])
+    return (dot_fec_str or "") + str(row) + CRLF_STR
