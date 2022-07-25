@@ -35,8 +35,8 @@ class WebServicesViewSet(viewsets.ViewSet):
             f"Create .FEC starting celery task: {CELERY_BROKER_URL} {report_id}"
         )
         task = create_dot_fec.apply_async((report_id), retry=False)
-        status = task.status()
-        logger.info(f" celery task started: {status}")
+        task_status = task.status()
+        logger.info(f" celery task started: {task_status}")
         return Response({"status": ".FEC task created"})
 
     @action(
