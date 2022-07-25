@@ -10,6 +10,7 @@ import requests
 from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
+from fecfiler.celery import CeleryStorageType
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -22,10 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
-CSRF_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
-CSRF_TRUSTED_ORIGINS = [os.environ.get("CSRF_TRUSTED_ORIGINS",
-                        "http://localhost:4200")]
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CSRF_COOKIE_DOMAIN = os.environ.get("FFAPI_COOKIE_DOMAIN")
+CSRF_TRUSTED_ORIGINS = [os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")]
 
 
 LOGIN_TIMEOUT_TIME = 15
@@ -64,6 +63,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
+    "storages",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
@@ -104,8 +104,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [os.environ.get("CORS_ALLOWED_ORIGINS",
-                        "http://localhost:4200")]
+CORS_ALLOWED_ORIGINS = [os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:4200")]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
@@ -147,8 +146,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # OIDC settings start
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
 )
 
 OIDC_CREATE_USER = True
@@ -157,8 +156,8 @@ OIDC_STORE_ID_TOKEN = True
 OIDC_MAX_STATES = 3
 
 OIDC_RP_SIGN_ALGO = "RS256"
-OIDC_RP_CLIENT_ID = os.environ.get('OIDC_RP_CLIENT_ID')
-OIDC_RP_CLIENT_SECRET = os.environ.get('OIDC_RP_CLIENT_SECRET')
+OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET = os.environ.get("OIDC_RP_CLIENT_SECRET")
 
 # The Django field used to identify users - default is email
 OIDC_RP_UNIQUE_IDENTIFIER = "username"
@@ -181,11 +180,11 @@ OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
 FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
-FFAPI_COOKIE_DOMAIN = os.environ.get('FFAPI_COOKIE_DOMAIN')
+FFAPI_COOKIE_DOMAIN = os.environ.get("FFAPI_COOKIE_DOMAIN")
 
-LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_SERVER_URL')
-LOGIN_REDIRECT_CLIENT_URL = os.environ.get('LOGIN_REDIRECT_CLIENT_URL')
-LOGOUT_REDIRECT_URL = os.environ.get('LOGOUT_REDIRECT_URL')
+LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_SERVER_URL")
+LOGIN_REDIRECT_CLIENT_URL = os.environ.get("LOGIN_REDIRECT_CLIENT_URL")
+LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL")
 
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
@@ -257,3 +256,12 @@ CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+
+
+CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
+CELERY_WORKER_STORAGE = os.environ.get("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_REGION = os.environ.get("AWS_REGION")

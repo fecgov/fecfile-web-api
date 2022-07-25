@@ -1,9 +1,12 @@
 from django.db import models
 from fecfile_validate import validate
+from curses import ascii
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
 
 
 def boolean_serializer(model_instance, field_name):
@@ -83,6 +86,17 @@ def serialize_model_instance(schema_name, model, model_instance):
     starting at 1"""
     row = [
         serialize_field(model, model_instance, column_sequences[column_index + 1])
+        if (column_index + 1) in column_sequences
+        else ""
         for column_index in range(0, row_length)
     ]
-    return ",".join(row)
+    return chr(ascii.FS).join(row)
+
+
+def add_row_to_fec_str(dot_fec_str, row):
+    """Returns new string with `row` appended to `dot_fec_str` and adds .FEC line breaks
+    Args:
+        dot_fec_str (string): .FEC content to add row to
+        row (string): Row that will be appended to `dot_fec_str`
+    """
+    return (dot_fec_str or "") + str(row) + CRLF_STR
