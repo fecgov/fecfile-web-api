@@ -16,15 +16,15 @@ from fecfiler.celery import CeleryStorageType
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
-CSRF_COOKIE_DOMAIN = os.environ.get("FFAPI_COOKIE_DOMAIN")
-CSRF_TRUSTED_ORIGINS = [os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")]
+CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
+
+CSRF_TRUSTED_ORIGINS = [
+    env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
+]
 
 
 LOGIN_TIMEOUT_TIME = 15
@@ -104,7 +104,9 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:4200")]
+CORS_ALLOWED_ORIGINS = [
+    env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
+]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
@@ -156,8 +158,8 @@ OIDC_STORE_ID_TOKEN = True
 OIDC_MAX_STATES = 3
 
 OIDC_RP_SIGN_ALGO = "RS256"
-OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID")
-OIDC_RP_CLIENT_SECRET = os.environ.get("OIDC_RP_CLIENT_SECRET")
+OIDC_RP_CLIENT_ID = env.get_credential("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET = env.get_credential("OIDC_RP_CLIENT_SECRET")
 
 # The Django field used to identify users - default is email
 OIDC_RP_UNIQUE_IDENTIFIER = "username"
@@ -178,13 +180,14 @@ OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
 OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 
+# TODO: Env vars?
 FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
-FFAPI_COOKIE_DOMAIN = os.environ.get("FFAPI_COOKIE_DOMAIN")
+FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 
-LOGIN_REDIRECT_URL = os.environ.get("LOGIN_REDIRECT_SERVER_URL")
-LOGIN_REDIRECT_CLIENT_URL = os.environ.get("LOGIN_REDIRECT_CLIENT_URL")
-LOGOUT_REDIRECT_URL = os.environ.get("LOGOUT_REDIRECT_URL")
+LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
+LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
+LOGOUT_REDIRECT_URL = env.get_credential("LOGOUT_REDIRECT_URL")
 
 OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"

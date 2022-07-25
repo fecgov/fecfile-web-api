@@ -13,6 +13,14 @@ applications:
       - fecfile-api-rds
       - fecfile-api-s3
       - fecfile-api-redis
+      - fecfile-api-creds-dev
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      CORS_ALLOWED_ORIGINS: https://fecfile-web-app-dev.app.cloud.gov
+      CSRF_TRUSTED_ORIGINS: fecfile-web-app-dev.app.cloud.gov
+      FFAPI_COOKIE_DOMAIN: app.cloud.gov
+      FRONTEND_URL: fecfile-web-app-dev.app.cloud.gov
+      LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-dev.app.cloud.gov
+      LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/login-redirect
+      LOGOUT_REDIRECT_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/logout-redirect
