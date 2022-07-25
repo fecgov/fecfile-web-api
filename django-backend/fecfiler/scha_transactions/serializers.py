@@ -1,8 +1,7 @@
-from fecfiler.f3x_summaries.models import F3XSummary
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import PrimaryKeyRelatedField
+from rest_framework.serializers import IntegerField
 from rest_framework.exceptions import ValidationError
 import logging
 
@@ -12,17 +11,9 @@ logger = logging.getLogger(__name__)
 class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
-    parent_transaction_id = PrimaryKeyRelatedField(
-        default=None,
-        many=False,
-        required=False,
-        allow_null=True,
-        queryset=SchATransaction.objects.all(),
-    )
+    parent_transaction_id = IntegerField(required=False, allow_null=True)
 
-    report_id = PrimaryKeyRelatedField(
-        many=False, required=True, allow_null=False, queryset=F3XSummary.objects.all()
-    )
+    report_id = IntegerField(required=True, allow_null=False)
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
@@ -42,7 +33,7 @@ class SchATransactionSerializer(
             f.name
             for f in SchATransaction._meta.get_fields()
             if f.name not in ["deleted", "schatransaction"]
-        ]
+        ] + ["parent_transaction_id", "report_id"]
 
         read_only_fields = [
             "id",
