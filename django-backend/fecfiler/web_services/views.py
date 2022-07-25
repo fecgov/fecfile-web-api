@@ -30,11 +30,13 @@ class WebServicesViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             logger.error(f"Create .FEC: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        logger.info(f"Create .FEC starting celery task: {CELERY_BROKER_URL}")
-        task = create_dot_fec.delay(serializer.validated_data["report_id"], retry=False)
-        task.get()
-        logger.info(f" celery task started: {CELERY_BROKER_URL}")
+        report_id = serializer.validated_data["report_id"]
+        logger.info(
+            f"Create .FEC starting celery task: {CELERY_BROKER_URL} {report_id}"
+        )
+        task = create_dot_fec.apply_async((report_id), retry=False)
+        status = task.status()
+        logger.info(f" celery task started: {status}")
         return Response({"status": ".FEC task created"})
 
     @action(
