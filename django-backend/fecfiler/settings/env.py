@@ -7,7 +7,7 @@ redis = env.get_service(name="fecfile-api-redis")
 s3 = env.get_service(name="fecfile-api-s3")
 
 if redis:
-    os.environ["REDIS_URL"] = redis.get_url(url="uri")
+    os.environ["REDIS_URL"] = redis.credentials.get("uri")
 
 if s3:
     os.environ["AWS_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
