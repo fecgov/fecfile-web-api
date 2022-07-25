@@ -33,7 +33,8 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         logger.info(f"Create .FEC starting celery task: {CELERY_BROKER_URL}")
         task = create_dot_fec.delay(serializer.validated_data["report_id"], retry=False)
-
+        task.get()
+        logger.info(f" celery task started: {CELERY_BROKER_URL}")
         return Response({"status": ".FEC task created"})
 
     @action(
