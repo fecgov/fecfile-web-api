@@ -1,23 +1,26 @@
 ---
 applications:
-- name: fecfile-web-api
-  instances: 2
-  routes:
-  - route: fecfile-web-api-stage.app.cloud.gov
-  stack: cflinuxfs3
-  buildpacks:
-    - python_buildpack
-  memory: 1G
-  services:
-    - fecfile-api-rds
-    - fecfile-api-creds-stage
-  env:
-    CORS_ALLOWED_ORIGINS: https://fecfile-web-app-stage.app.cloud.gov
-    CSRF_TRUSTED_ORIGINS: fecfile-web-app-stage.app.cloud.gov
-    DISABLE_COLLECTSTATIC: 1
-    DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-    FFAPI_COOKIE_DOMAIN: app.cloud.gov
-    FRONTEND_URL: fecfile-web-app-stage.app.cloud.gov
-    LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-stage.app.cloud.gov
-    LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-stage.app.cloud.gov/api/v1/auth/login-redirect
-    LOGOUT_REDIRECT_URL: https://fecfile-web-api-stage.app.cloud.gov/api/v1/auth/logout-redirect
+  - name: fecfile-web-api
+    instances: 2
+    routes:
+      - route: fecfile-web-api-stage.app.cloud.gov
+    stack: cflinuxfs3
+    buildpacks:
+      - python_buildpack
+    command: bin/run-api.sh
+    memory: 1G
+    services:
+      - fecfile-api-rds
+      - fecfile-api-s3
+      - fecfile-api-redis
+      - fecfile-api-creds-stage
+    env:
+      CORS_ALLOWED_ORIGINS: https://fecfile-web-app-stage.app.cloud.gov
+      CSRF_TRUSTED_ORIGINS: fecfile-web-app-stage.app.cloud.gov
+      DISABLE_COLLECTSTATIC: 1
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      FFAPI_COOKIE_DOMAIN: app.cloud.gov
+      FRONTEND_URL: fecfile-web-app-stage.app.cloud.gov
+      LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-stage.app.cloud.gov
+      LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-stage.app.cloud.gov/api/v1/auth/login-redirect
+      LOGOUT_REDIRECT_URL: https://fecfile-web-api-stage.app.cloud.gov/api/v1/auth/logout-redirect

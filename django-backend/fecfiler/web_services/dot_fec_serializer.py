@@ -25,7 +25,7 @@ def foreign_key_serializer(model_instance, field_name):
     Because we just want to write the key ("Q1" or something) we have to add "_id"
     to the field name.
     """
-    return getattr(model_instance, field_name + "_id", "")
+    return getattr(model_instance, field_name + "_id") or ""
 
 
 def default_serializer(model_instance, field_name):

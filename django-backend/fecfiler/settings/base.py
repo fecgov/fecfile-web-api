@@ -254,18 +254,19 @@ LOGGING = {
 
 """Celery configurations
 """
-# When we move to cloud.gov we'll need `env.get_service()`
-CELERY_BROKER_URL = os.environ.get("REDIS_URL")
-CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
+CELERY_BROKER_URL = env.get_credential("REDIS_URL")
+CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
-CELERY_WORKER_STORAGE = os.environ.get("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
+CELERY_WORKER_STORAGE = env.get_credential(
+    "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
+)
 
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
-AWS_REGION = os.environ.get("AWS_REGION")
+AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
+AWS_REGION = env.get_credential("AWS_REGION")
