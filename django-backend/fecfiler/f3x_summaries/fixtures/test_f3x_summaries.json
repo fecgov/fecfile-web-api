@@ -15,7 +15,7 @@
 
     "state" : "test_string_value",
     "zip" : "test_string_value",
-    "report_code_id" : "Q1",
+    "report_code" : "Q1",
     "election_code" : "test_string_value",
     "date_of_election" : "2005-01-30",
     "state_of_election" : "test_string_value",

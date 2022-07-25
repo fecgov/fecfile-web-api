@@ -18,16 +18,6 @@ def date_serializer(model_instance, field_name):
     return date.strftime("%Y%m%d") if date else ""
 
 
-def foreign_key_serializer(model_instance, field_name):
-    """returns value of foreign key rather than the object it points to
-    For example: we have a foreign key for `report_code`.  django stores the key
-    in `report_code_id` and joins the `report_code_label` row into `report_code`.
-    Because we just want to write the key ("Q1" or something) we have to add "_id"
-    to the field name.
-    """
-    return getattr(model_instance, field_name + "_id", "")
-
-
 def default_serializer(model_instance, field_name):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
@@ -44,7 +34,6 @@ get a string representation in the FEC standard
 FIELD_SERIALIZERS = {
     models.BooleanField: boolean_serializer,
     models.DateField: date_serializer,
-    models.ForeignKey: foreign_key_serializer,
     None: default_serializer,
 }
 
