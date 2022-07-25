@@ -37,11 +37,12 @@ class WebServicesViewSet(viewsets.ViewSet):
         committee_id = request.user.cmtee_id
         dot_fec_record = DotFEC.objects.filter(
             report__id=report_id, report__committee_account__committee_id=committee_id
-        )
+        ).order_by("-file_name")
         if not dot_fec_record.exists():
             return Response(
                 f"No .FEC was found for report id: {report_id}",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        file = get_file(dot_fec_record.first().file_name)
+        file_name = dot_fec_record.first().file_name
+        file = get_file(file_name)
         return Response(FileWrapper(file))
