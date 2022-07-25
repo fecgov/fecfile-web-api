@@ -1,1 +1,1 @@
-web: bin/run-celery-worker.sh
+web: bin/run.sh

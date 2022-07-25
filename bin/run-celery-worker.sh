@@ -1,3 +1,3 @@
-cd django_backend
+cd django-backend
 
 celery -A fecfiler worker --loglevel=info   

@@ -5,9 +5,13 @@ applications:
     stack: cflinuxfs3
     buildpacks:
       - python_buildpack
-    memory: 128MB
-    disk_quota: 1G
+    command: bin/run-celery-worker.sh
+    memory: 1G
     no-route: true
+    services:
+      - fecfile-api-rds
+      - fecfile-api-s3
+      - fecfile-api-redis
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
