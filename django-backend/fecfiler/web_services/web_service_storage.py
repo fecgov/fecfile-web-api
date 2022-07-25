@@ -19,9 +19,11 @@ def store_file(file_content, file_name, force_write_to_disk=False):
         s3_object.put(Body=file_content.encode("utf-8"))
         logger.info(f"SUCCESS file was uploaded s3: {file_name}")
     else:
-        path = Path.joinpath(CELERY_LOCAL_STORAGE_DIRECTORY, file_name)
+        logger.info(f"writing file to disk: {file_name}")
+        path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / file_name
         with open(path, "w", encoding="utf-8") as file:
             file.write(file_content)
+            logger.info(f"SUCCESS file was written to disk: {file_name}")
 
 
 def get_file(file_name, force_read_from_disk=False):
@@ -31,6 +33,8 @@ def get_file(file_name, force_read_from_disk=False):
         file = s3_object.get()["Body"]
         logger.info(f"SUCCESS file was retrieved s3: {file_name}")
     else:
+        logger.info(f"retrieving file from disk: {file_name}")
         path = Path.joinpath(CELERY_LOCAL_STORAGE_DIRECTORY, file_name)
         file = open(path, encoding="utf-8")
+        logger.info(f"SUCCESS file was retrieved disk: {file_name}")
     return file

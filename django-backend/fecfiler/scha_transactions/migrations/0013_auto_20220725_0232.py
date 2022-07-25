@@ -6,28 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0012_auto_20220713_1219'),
+        ("scha_transactions", "0012_auto_20220713_1219"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='schatransaction',
-            old_name='parent_transaction_id',
-            new_name='parent_transaction',
+            model_name="schatransaction",
+            old_name="parent_transaction_id",
+            new_name="parent_transaction",
         ),
         migrations.RenameField(
-            model_name='schatransaction',
-            old_name='report_id',
-            new_name='report',
-        ),
-        migrations.AlterField(
-            model_name='schatransaction',
-            name='contribution_aggregate',
-            field=models.IntegerField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='schatransaction',
-            name='contribution_amount',
-            field=models.IntegerField(blank=True, null=True),
+            model_name="schatransaction",
+            old_name="report_id",
+            new_name="report",
         ),
     ]

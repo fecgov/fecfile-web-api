@@ -22,20 +22,35 @@ class DotFECSerializerTestCase(TestCase):
         self.transaction = SchATransaction.objects.filter(id=9999).first()
 
     def test_serialize_field(self):
+        # TEXT
         serialized_text = serialize_field(F3XSummary, self.f3x, "treasurer_last_name")
         self.assertEquals(serialized_text, "Lastname")
         serialized_text_undefined = serialize_field(
             F3XSummary, F3XSummary(), "treasurer_last_name"
         )
         self.assertEquals(serialized_text_undefined, "")
-        serialized_amount = serialize_field(
+
+        # INTEGER
+        serialized_integer = serialize_field(
             F3XSummary, self.f3x, "L6b_cash_on_hand_beginning_period"
         )
-        self.assertEqual(serialized_amount, "6")
-        serialized_amount_undefined = serialize_field(
+        self.assertEqual(serialized_integer, "6")
+        serialized_integer_undefined = serialize_field(
             F3XSummary, F3XSummary(), "L6b_cash_on_hand_beginning_period"
         )
-        self.assertEqual(serialized_amount_undefined, "")
+        self.assertEqual(serialized_integer_undefined, "")
+
+        # DECIMAL
+        serialized_decimal = serialize_field(
+            SchATransaction, self.transaction, "contribution_amount"
+        )
+        self.assertEqual(serialized_decimal, "1234.56")
+        serialized_decimal_undefined = serialize_field(
+            SchATransaction, SchATransaction(), "contribution_amount"
+        )
+        self.assertEqual(serialized_decimal_undefined, "")
+
+        # DATE
         serialzed_date = serialize_field(F3XSummary, self.f3x, "date_signed")
         self.assertEqual(serialzed_date, "20040729")
         serialzed_date_undefined = serialize_field(
@@ -45,6 +60,8 @@ class DotFECSerializerTestCase(TestCase):
         serialized_boolean_true = serialize_field(
             F3XSummary, self.f3x, "change_of_address"
         )
+
+        # BOOLEAN
         self.assertEqual(serialized_boolean_true, "X")
         serialized_boolean_false = serialize_field(
             F3XSummary, self.f3x, "qualified_committee"

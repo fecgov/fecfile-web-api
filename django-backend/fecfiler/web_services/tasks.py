@@ -41,7 +41,7 @@ def create_dot_fec_content(report_id):
     logger.info(f"creating .FEC for report: {report_id}")
     try:
         f3x_summary_row = serialize_f3x_summary(report_id)
-        transactions = SchATransaction.objects.filter(report_id_id=report_id)
+        transactions = SchATransaction.objects.filter(report_id=report_id)
         transaction_rows = serialize_transactions(transactions)
         logger.info("Serialized Report:")
         logger.info(f3x_summary_row)
