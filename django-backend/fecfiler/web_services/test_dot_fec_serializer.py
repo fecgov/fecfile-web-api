@@ -56,7 +56,7 @@ class DotFECSerializerTestCase(TestCase):
         serialzed_date_undefined = serialize_field(
             F3XSummary, F3XSummary(), "date_signed"
         )
-        self.assertEqual(serialzed_date_undefined, "")]
+        self.assertEqual(serialzed_date_undefined, "")
 
         # BOOLEAN
         serialized_boolean_true = serialize_field(
@@ -73,9 +73,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(serialized_boolean_undefined, "")
 
         # FOREIGN KEY
-        serialized_foreign_key = serialize_field(
-            F3XSummary, self.f3x, "report_code"
-        )
+        serialized_foreign_key = serialize_field(F3XSummary, self.f3x, "report_code")
         self.assertEqual(serialized_foreign_key, "Q1")
         serialized_foreign_key_undefined = serialize_field(
             F3XSummary, F3XSummary(), "report_code"
