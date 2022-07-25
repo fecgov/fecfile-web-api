@@ -9,6 +9,7 @@ from invoke import task
 env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
+WEB_SERVICES_NAME = "fecfile-web-services"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 
@@ -87,6 +88,20 @@ def _do_deploy(ctx, space):
 
     manifest_filename = f"manifest-{space}.yml"
     existing_deploy = ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
+    print("\n")
+
+    cmd = "push --strategy rolling" if existing_deploy.ok else "push"
+    new_deploy = ctx.run(
+        f"cf {cmd} {APP_NAME} -f {manifest_filename}",
+        echo=True,
+        warn=True,
+    )
+    return new_deploy
+
+
+def _deploy_web_services(ctx):
+    manifest_filename = f"manifest-web-services.yml"
+    existing_deploy = ctx.run(f"cf app {WEB_SERVICES_NAME}", echo=True, warn=True)
     print("\n")
 
     cmd = "push --strategy rolling" if existing_deploy.ok else "push"
@@ -189,6 +204,12 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     new_deploy = _do_deploy(ctx, space)
 
     if not new_deploy.ok:
+        _rollback(ctx)
+        return sys.exit(1)
+
+    new_webservices_deploy = _deploy_web_services(ctx)
+
+    if not new_webservices_deploy.ok:
         _rollback(ctx)
         return sys.exit(1)
 
