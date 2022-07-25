@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec\_serializer.add\_row\_to\_fec\_str
+==================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec_serializer
+
+.. autofunction:: add_row_to_fec_str

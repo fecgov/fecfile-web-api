@@ -17,6 +17,7 @@ fecfiler.web\_services.dot\_fec\_serializer
    .. autosummary::
       :toctree:                                          
    
+      add_row_to_fec_str
       boolean_serializer
       date_serializer
       default_serializer

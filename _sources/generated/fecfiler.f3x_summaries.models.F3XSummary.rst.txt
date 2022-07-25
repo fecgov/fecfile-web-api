@@ -164,6 +164,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.date_of_election
       ~F3XSummary.date_signed
       ~F3XSummary.deleted
+      ~F3XSummary.dotfec_set
       ~F3XSummary.election_code
       ~F3XSummary.filer_committee_id_number
       ~F3XSummary.form_type

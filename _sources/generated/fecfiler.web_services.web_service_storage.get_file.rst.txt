@@ -1,0 +1,6 @@
+fecfiler.web\_services.web\_service\_storage.get\_file
+======================================================
+
+.. currentmodule:: fecfiler.web_services.web_service_storage
+
+.. autofunction:: get_file

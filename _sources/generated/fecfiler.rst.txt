@@ -34,7 +34,9 @@ fecfiler
    fecfiler.celery
    fecfiler.committee_accounts
    fecfiler.contacts
+   fecfiler.dot_fecs
    fecfiler.f3x_summaries
+   fecfiler.s3
    fecfiler.scha_transactions
    fecfiler.settings
    fecfiler.triage

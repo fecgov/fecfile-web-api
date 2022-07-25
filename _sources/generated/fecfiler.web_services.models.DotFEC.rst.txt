@@ -1,0 +1,54 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.models.DotFEC
+====================================
+
+.. currentmodule:: fecfiler.web_services.models
+
+.. autoclass:: DotFEC
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFEC.__init__
+      ~DotFEC.check
+      ~DotFEC.clean
+      ~DotFEC.clean_fields
+      ~DotFEC.date_error_message
+      ~DotFEC.delete
+      ~DotFEC.from_db
+      ~DotFEC.full_clean
+      ~DotFEC.get_deferred_fields
+      ~DotFEC.prepare_database_save
+      ~DotFEC.refresh_from_db
+      ~DotFEC.save
+      ~DotFEC.save_base
+      ~DotFEC.serializable_value
+      ~DotFEC.unique_error_message
+      ~DotFEC.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFEC.file_name
+      ~DotFEC.id
+      ~DotFEC.objects
+      ~DotFEC.pk
+      ~DotFEC.report
+      ~DotFEC.report_id
+   
+   

@@ -110,6 +110,7 @@ fecfiler.scha\_transactions.test\_serializers.SchATransactionTestCase
       ~SchATransactionTestCase.subTest
       ~SchATransactionTestCase.tearDown
       ~SchATransactionTestCase.tearDownClass
+      ~SchATransactionTestCase.test_no_transaction_type_identifier
       ~SchATransactionTestCase.test_serializer_validate
    
    

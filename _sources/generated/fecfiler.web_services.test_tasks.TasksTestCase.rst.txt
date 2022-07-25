@@ -110,7 +110,11 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.subTest
       ~TasksTestCase.tearDown
       ~TasksTestCase.tearDownClass
+      ~TasksTestCase.test_create_dot_fec
+      ~TasksTestCase.test_create_dot_fec_content
       ~TasksTestCase.test_serialize_f3x_summary
+      ~TasksTestCase.test_serialize_transaction
+      ~TasksTestCase.test_serialize_transactions
    
    
 

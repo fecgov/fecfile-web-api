@@ -31,6 +31,7 @@ fecfiler.web\_services.views.WebServicesViewSet
       ~WebServicesViewSet.get_authenticate_header
       ~WebServicesViewSet.get_authenticators
       ~WebServicesViewSet.get_content_negotiator
+      ~WebServicesViewSet.get_dot_fec
       ~WebServicesViewSet.get_exception_handler
       ~WebServicesViewSet.get_exception_handler_context
       ~WebServicesViewSet.get_extra_action_url_map
