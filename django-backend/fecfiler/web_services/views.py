@@ -32,7 +32,8 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         logger.info(f"Create .FEC starting celery task: {CELERY_BROKER_URL}")
-        create_dot_fec.delay(serializer.validated_data["report_id"])
+        task = create_dot_fec.delay(serializer.validated_data["report_id"], retry=False)
+
         return Response({"status": ".FEC task created"})
 
     @action(
