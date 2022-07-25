@@ -10,7 +10,7 @@ import requests
 from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
-from fecfiler.web_services.web_service_storage import CeleryStorageType
+from fecfiler.celery import CeleryStorageType
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
