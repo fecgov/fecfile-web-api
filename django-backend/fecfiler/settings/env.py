@@ -8,10 +8,7 @@ redis = env.get_service(name="fecfile-api-redis")
 s3 = env.get_service(name="fecfile-api-s3")
 
 if redis:
-    password = redis.credentials.get("password")
-    hostname = redis.credentials.get("hostname")
-    port = redis.credentials.get("port")
-    os.environ["REDIS_URL"] = f"redis://:{password}@{hostname}:{port}"
+    os.environ["REDIS_URL"] = redis.credentials.get("uri")
     os.environ["CELERY_BROKER_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
     os.environ["CELERY_REDIS_BACKEND_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
 
