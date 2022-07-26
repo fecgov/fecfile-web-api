@@ -15,7 +15,7 @@ class MemoTextViewSetTest(TestCase):
         client = APIClient()
         client.force_authenticate(user=Account.objects.get(cmtee_id="C00123456"))
         data = {
-            "report_id": 1473,
+            "report_id": 3,
             "rec_type": "TEXT",
             "filer_committee_id_number": "C00601211",
             "back_reference_sched_form_name": "F3XN",
@@ -32,7 +32,7 @@ class MemoTextViewSetTest(TestCase):
         client = APIClient()
         client.force_authenticate(user=Account.objects.get(cmtee_id="C00123456"))
         data = {
-            "report_id": 1472,
+            "report_id": 2,
             "rec_type": "TEXT",
             "filer_committee_id_number": "C00601211",
             "back_reference_sched_form_name": "F3XN",
