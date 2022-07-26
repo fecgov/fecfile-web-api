@@ -257,8 +257,6 @@ LOGGING = {
 CELERY_BROKER_URL = env.get_credential("REDIS_URL")
 print(f"broker url: {env.get_credential('REDIS_URL')}")
 CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
-CELERY_BROKER_USE_SSL = env.get_credential("CELERY_BROKER_USE_SSL")
-CELERY_REDIS_BACKEND_USE_SSL = env.get_credential("CELERY_REDIS_BACKEND_USE_SSL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"

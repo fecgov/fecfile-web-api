@@ -9,8 +9,6 @@ s3 = env.get_service(name="fecfile-api-s3")
 
 if redis:
     os.environ["REDIS_URL"] = redis.credentials.get("uri")
-    os.environ["CELERY_BROKER_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
-    os.environ["CELERY_REDIS_BACKEND_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 if s3:
     os.environ["AWS_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
