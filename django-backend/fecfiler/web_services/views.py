@@ -7,7 +7,6 @@ from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC
-from fecfiler.celery import app
 
 import logging
 
