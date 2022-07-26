@@ -1,6 +1,5 @@
 import cfenv
 import os
-import ssl
 
 env = cfenv.AppEnv()
 
