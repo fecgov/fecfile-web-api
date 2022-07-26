@@ -38,7 +38,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             logger.info(f"ERROR CONNECTING: {exc}")
 
         connected = app.connection().ensure_connection(
-            max_retries=0, errback=err, timeout=2
+            max_retries=0, errback=err, timeout=1
         )
         logger.info(f"connected {connected}, app.tasks: {app.tasks}")
         task = create_dot_fec.apply_async((report_id, False), retry=False)
