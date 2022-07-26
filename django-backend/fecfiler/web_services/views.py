@@ -7,6 +7,7 @@ from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC
+from fecfiler.celery import app
 
 import logging
 
@@ -31,6 +32,8 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.info(f"Firing off create_dot_fec for report :{report_id}")
+        logger.info(f"celery app: {app.connection} {app.connection()}")
+        app.connection().connect()
         task = create_dot_fec.apply_async((report_id, False), retry=False)
         logger.info(f"Status for report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
