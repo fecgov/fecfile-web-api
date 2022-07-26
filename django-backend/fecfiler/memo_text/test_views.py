@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
 from ..authentication.models import Account
 from rest_framework.test import APIClient
+from .views import MemoTextViewSet
 
 
 class MemoTextViewSetTest(TestCase):
@@ -10,6 +11,12 @@ class MemoTextViewSetTest(TestCase):
     def setUp(self):
         self.user = Account.objects.get(cmtee_id="C00123456")
         self.factory = RequestFactory()
+
+    def test_get_memo_texts_for_report_id(self):
+        request = self.factory.get(f'/api/v1/memo-text/?report_id=1')
+        request.user = self.user
+        response = MemoTextViewSet.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 200)
 
     def test_create_new_report_memo_text(self):
         client = APIClient()
