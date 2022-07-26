@@ -13,7 +13,7 @@ class MemoTextViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     def test_get_memo_texts_for_report_id(self):
-        request = self.factory.get(f'/api/v1/memo-text/?report_id=1')
+        request = self.factory.get('/api/v1/memo-text/?report_id=1')
         request.user = self.user
         response = MemoTextViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
