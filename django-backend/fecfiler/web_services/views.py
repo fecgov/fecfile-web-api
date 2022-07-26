@@ -7,7 +7,6 @@ from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC
-from fecfiler.settings import CELERY_BROKER_URL
 
 import logging
 
@@ -31,12 +30,9 @@ class WebServicesViewSet(viewsets.ViewSet):
             logger.error(f"Create .FEC: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        logger.info(
-            f"Create .FEC starting celery task: {CELERY_BROKER_URL} {report_id}"
-        )
-        task = create_dot_fec.apply_async((report_id), retry=False)
-        task_status = task.status()
-        logger.info(f" celery task started: {task_status}")
+        logger.info(f"Firing off create_dot_fec for report :{report_id}")
+        task = create_dot_fec.apply_async((report_id, False), retry=False)
+        logger.info(f"Status for report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
     @action(
@@ -51,12 +47,10 @@ class WebServicesViewSet(viewsets.ViewSet):
             report__id=report_id, report__committee_account__committee_id=committee_id
         ).order_by("-file_name")
         if not dot_fec_record.exists():
-            logger.error(f"No .FEC was found for report id: {report_id}")
-            return Response(
-                f"No .FEC was found for report id: {report_id}",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            not_found_msg = f"No .FEC was found for report id: {report_id}"
+            logger.error(not_found_msg)
+            return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
-        logger.info(f".FEC was found for report id: {report_id}")
         file = get_file(file_name)
+        logger.info(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
