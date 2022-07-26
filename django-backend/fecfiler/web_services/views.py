@@ -33,7 +33,13 @@ class WebServicesViewSet(viewsets.ViewSet):
         report_id = serializer.validated_data["report_id"]
         logger.info(f"Firing off create_dot_fec for report :{report_id}")
         logger.info(f"celery app: {app.connection} {app.connection()}")
-        connected = app.connection().connect()
+
+        def err(exc, interval):
+            logger.info(f"ERROR CONNECTING: {exc}")
+
+        connected = app.connection().ensure_connection(
+            max_retries=0, errback=err, timeout=2
+        )
         logger.info(f"connected {connected}, app.tasks: {app.tasks}")
         task = create_dot_fec.apply_async((report_id, False), retry=False)
         logger.info(f"Status for report {report_id}: {task.status}")
