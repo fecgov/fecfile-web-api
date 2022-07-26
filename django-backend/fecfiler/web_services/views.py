@@ -28,19 +28,9 @@ class WebServicesViewSet(viewsets.ViewSet):
     def create_dot_fec(self, request):
         serializer = ReportIdSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
-            logger.error(f"Create .FEC: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.info(f"Firing off create_dot_fec for report :{report_id}")
-        logger.info(f"celery app: {app.connection} {app.connection()}")
-
-        def err(exc, interval):
-            logger.info(f"ERROR CONNECTING: {exc}")
-
-        connected = app.connection().ensure_connection(
-            max_retries=0, errback=err, timeout=1
-        )
-        logger.info(f"connected {connected}, app.tasks: {app.tasks}")
         task = create_dot_fec.apply_async((report_id, False), retry=False)
         logger.info(f"Status for report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
