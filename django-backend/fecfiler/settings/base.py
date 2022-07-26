@@ -255,6 +255,7 @@ LOGGING = {
 """Celery configurations
 """
 CELERY_BROKER_URL = env.get_credential("REDIS_URL")
+print(env.get_credential("REDIS_URL"))
 CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
