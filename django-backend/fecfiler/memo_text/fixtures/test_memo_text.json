@@ -7,7 +7,7 @@
          "filer_committee_id_number" : "C00601211",
          "id" : 25,
          "rec_type" : "TEXT",
-         "report_id" : 1471,
+         "report_id" : 1,
          "text4000" : "dahtest2",
          "transaction_id_number" : "REPORT_MEMO_TEXT_1"
       }
@@ -20,7 +20,7 @@
          "filer_committee_id_number" : "C00601211",
          "id" : 9,
          "rec_type" : "TEXT",
-         "report_id" : 1472,
+         "report_id" : 2,
          "text4000" : "testtest2",
          "transaction_id_number" : "REPORT_MEMO_TEXT_2"
       }
@@ -33,7 +33,7 @@
          "filer_committee_id_number" : "C00601211",
          "id" : 8,
          "rec_type" : "TEXT",
-         "report_id" : 1472,
+         "report_id" : 2,
          "text4000" : "testtest",
          "transaction_id_number" : "REPORT_MEMO_TEXT_1"
       }
