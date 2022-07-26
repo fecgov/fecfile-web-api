@@ -17,17 +17,21 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = SchATransaction.objects.select_related("parent_transaction_id").alias(
-        contributor_name=Coalesce(
-            "contributor_organization_name",
-            Concat(
-                "contributor_last_name",
-                Value(", "),
-                "contributor_first_name",
-                output_field=TextField(),
-            ),
+    queryset = (
+        SchATransaction.objects.select_related("parent_transaction")
+        .alias(
+            contributor_name=Coalesce(
+                "contributor_organization_name",
+                Concat(
+                    "contributor_last_name",
+                    Value(", "),
+                    "contributor_first_name",
+                    output_field=TextField(),
+                ),
+            )
         )
-    ).all()
+        .all()
+    )
     """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
     def get_queryset(self):
@@ -36,11 +40,9 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             report_id = self.request.query_params.get("report_id")
 
         queryset = super().get_queryset()
-        if report_id is not None and report_id != '':
+        if report_id is not None and report_id != "":
             if isinstance(queryset, QuerySet):
-                queryset = SchATransaction.objects.all().filter(
-                    report_id=report_id
-                )
+                queryset = SchATransaction.objects.all().filter(report_id=report_id)
         return queryset
 
     serializer_class = SchATransactionSerializer

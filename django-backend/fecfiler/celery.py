@@ -1,4 +1,6 @@
+from enum import Enum
 import os
+import ssl
 
 from celery import Celery
 
@@ -12,9 +14,16 @@ app = Celery("fecfiler")
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
 app.config_from_object("django.conf:settings", namespace="CELERY")
+app.conf["broker_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
+app.conf["redis_backend_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+
+
+class CeleryStorageType(Enum):
+    AWS = "aws"
+    LOCAL = "local"
 
 
 @app.task(bind=True)
