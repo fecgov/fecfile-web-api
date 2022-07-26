@@ -19,13 +19,13 @@ class MemoTextViewSet(viewsets.ModelViewSet):
         memo_text_xid_dict = MemoText.objects.filter(
             report_id=report_id).values(
             transaction_id_number_field_name).order_by('-id').first()
-        if (memo_text_xid_dict is None or
-                memo_text_xid_dict[transaction_id_number_field_name] is None):
+        if (memo_text_xid_dict is None or memo_text_xid_dict[
+                transaction_id_number_field_name] is None):
             return memo_text_tid_base + '1'
         else:
             tokens = memo_text_xid_dict[
                 transaction_id_number_field_name].split('_')
-            memo_counter = tokens[len(tokens)-1]
+            memo_counter = tokens[len(tokens) - 1]
             return memo_text_tid_base + str(int(memo_counter) + 1)
 
     """

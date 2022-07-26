@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                     primary_key=True,
                     serialize=False,
                     verbose_name='ID'
-                    )),
+                )),
                 ('rec_type', models.TextField(blank=True, null=True)),
                 ('filer_committee_id_number', models.TextField(
                     blank=True,
