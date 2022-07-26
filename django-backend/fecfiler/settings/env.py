@@ -1,5 +1,6 @@
 import cfenv
 import os
+import ssl
 
 env = cfenv.AppEnv()
 
@@ -11,6 +12,11 @@ if redis:
     hostname = redis.credentials.get("hostname")
     port = redis.credentials.get("port")
     os.environ["REDIS_URL"] = f"redis://:{password}@{hostname}:{port}"
+    os.environ["CELERY_BROKER_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
+    os.environ["CELERY_REDIS_BACKEND_USE_SSL"] = {"ssl_cert_reqs": ssl.CERT_NONE}
+else:
+    os.environ["CELERY_BROKER_USE_SSL"] = False
+    os.environ["CELERY_REDIS_BACKEND_USE_SSL"] = False
 
 if s3:
     os.environ["AWS_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
