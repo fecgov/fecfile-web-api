@@ -7,7 +7,7 @@ redis = env.get_service(name="fecfile-api-redis")
 s3 = env.get_service(name="fecfile-api-s3")
 
 if redis:
-    os.environ["REDIS_URL"] = redis.get_url(
+    os.environ["REDIS_URL"] = "redis:" + redis.get_url(
         host="hostname", password="password", port="port"
     )
 
