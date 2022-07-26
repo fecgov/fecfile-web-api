@@ -1,5 +1,6 @@
 import cfenv
 import os
+import ssl
 
 env = cfenv.AppEnv()
 
@@ -7,7 +8,10 @@ redis = env.get_service(name="fecfile-api-redis")
 s3 = env.get_service(name="fecfile-api-s3")
 
 if redis:
-    os.environ["REDIS_URL"] = redis.credentials.get("uri")
+    password = redis.credentials.get("password")
+    hostname = redis.credentials.get("hostname")
+    port = redis.credentials.get("port")
+    os.environ["REDIS_URL"] = f"rediss://:{password}@{hostname}:{port}"
 
 if s3:
     os.environ["AWS_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
