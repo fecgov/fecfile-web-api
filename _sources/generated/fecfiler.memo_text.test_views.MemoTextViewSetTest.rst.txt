@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.test\_views.MemoTextViewSetTest
+===================================================
+
+.. currentmodule:: fecfiler.memo_text.test_views
+
+.. autoclass:: MemoTextViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoTextViewSetTest.__init__
+      ~MemoTextViewSetTest.addClassCleanup
+      ~MemoTextViewSetTest.addCleanup
+      ~MemoTextViewSetTest.addTypeEqualityFunc
+      ~MemoTextViewSetTest.assertAlmostEqual
+      ~MemoTextViewSetTest.assertAlmostEquals
+      ~MemoTextViewSetTest.assertContains
+      ~MemoTextViewSetTest.assertCountEqual
+      ~MemoTextViewSetTest.assertDictContainsSubset
+      ~MemoTextViewSetTest.assertDictEqual
+      ~MemoTextViewSetTest.assertEqual
+      ~MemoTextViewSetTest.assertEquals
+      ~MemoTextViewSetTest.assertFalse
+      ~MemoTextViewSetTest.assertFieldOutput
+      ~MemoTextViewSetTest.assertFormError
+      ~MemoTextViewSetTest.assertFormsetError
+      ~MemoTextViewSetTest.assertGreater
+      ~MemoTextViewSetTest.assertGreaterEqual
+      ~MemoTextViewSetTest.assertHTMLEqual
+      ~MemoTextViewSetTest.assertHTMLNotEqual
+      ~MemoTextViewSetTest.assertIn
+      ~MemoTextViewSetTest.assertInHTML
+      ~MemoTextViewSetTest.assertIs
+      ~MemoTextViewSetTest.assertIsInstance
+      ~MemoTextViewSetTest.assertIsNone
+      ~MemoTextViewSetTest.assertIsNot
+      ~MemoTextViewSetTest.assertIsNotNone
+      ~MemoTextViewSetTest.assertJSONEqual
+      ~MemoTextViewSetTest.assertJSONNotEqual
+      ~MemoTextViewSetTest.assertLess
+      ~MemoTextViewSetTest.assertLessEqual
+      ~MemoTextViewSetTest.assertListEqual
+      ~MemoTextViewSetTest.assertLogs
+      ~MemoTextViewSetTest.assertMultiLineEqual
+      ~MemoTextViewSetTest.assertNotAlmostEqual
+      ~MemoTextViewSetTest.assertNotAlmostEquals
+      ~MemoTextViewSetTest.assertNotContains
+      ~MemoTextViewSetTest.assertNotEqual
+      ~MemoTextViewSetTest.assertNotEquals
+      ~MemoTextViewSetTest.assertNotIn
+      ~MemoTextViewSetTest.assertNotIsInstance
+      ~MemoTextViewSetTest.assertNotRegex
+      ~MemoTextViewSetTest.assertNotRegexpMatches
+      ~MemoTextViewSetTest.assertNumQueries
+      ~MemoTextViewSetTest.assertQuerysetEqual
+      ~MemoTextViewSetTest.assertRaises
+      ~MemoTextViewSetTest.assertRaisesMessage
+      ~MemoTextViewSetTest.assertRaisesRegex
+      ~MemoTextViewSetTest.assertRaisesRegexp
+      ~MemoTextViewSetTest.assertRedirects
+      ~MemoTextViewSetTest.assertRegex
+      ~MemoTextViewSetTest.assertRegexpMatches
+      ~MemoTextViewSetTest.assertSequenceEqual
+      ~MemoTextViewSetTest.assertSetEqual
+      ~MemoTextViewSetTest.assertTemplateNotUsed
+      ~MemoTextViewSetTest.assertTemplateUsed
+      ~MemoTextViewSetTest.assertTrue
+      ~MemoTextViewSetTest.assertTupleEqual
+      ~MemoTextViewSetTest.assertURLEqual
+      ~MemoTextViewSetTest.assertWarns
+      ~MemoTextViewSetTest.assertWarnsMessage
+      ~MemoTextViewSetTest.assertWarnsRegex
+      ~MemoTextViewSetTest.assertXMLEqual
+      ~MemoTextViewSetTest.assertXMLNotEqual
+      ~MemoTextViewSetTest.assert_
+      ~MemoTextViewSetTest.captureOnCommitCallbacks
+      ~MemoTextViewSetTest.countTestCases
+      ~MemoTextViewSetTest.debug
+      ~MemoTextViewSetTest.defaultTestResult
+      ~MemoTextViewSetTest.doClassCleanups
+      ~MemoTextViewSetTest.doCleanups
+      ~MemoTextViewSetTest.fail
+      ~MemoTextViewSetTest.failIf
+      ~MemoTextViewSetTest.failIfAlmostEqual
+      ~MemoTextViewSetTest.failIfEqual
+      ~MemoTextViewSetTest.failUnless
+      ~MemoTextViewSetTest.failUnlessAlmostEqual
+      ~MemoTextViewSetTest.failUnlessEqual
+      ~MemoTextViewSetTest.failUnlessRaises
+      ~MemoTextViewSetTest.id
+      ~MemoTextViewSetTest.modify_settings
+      ~MemoTextViewSetTest.run
+      ~MemoTextViewSetTest.setUp
+      ~MemoTextViewSetTest.setUpClass
+      ~MemoTextViewSetTest.setUpTestData
+      ~MemoTextViewSetTest.settings
+      ~MemoTextViewSetTest.shortDescription
+      ~MemoTextViewSetTest.skipTest
+      ~MemoTextViewSetTest.subTest
+      ~MemoTextViewSetTest.tearDown
+      ~MemoTextViewSetTest.tearDownClass
+      ~MemoTextViewSetTest.test_create_existing_report_memo_text
+      ~MemoTextViewSetTest.test_create_new_report_memo_text
+      ~MemoTextViewSetTest.test_get_memo_texts_for_report_id
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoTextViewSetTest.available_apps
+      ~MemoTextViewSetTest.databases
+      ~MemoTextViewSetTest.fixtures
+      ~MemoTextViewSetTest.longMessage
+      ~MemoTextViewSetTest.maxDiff
+      ~MemoTextViewSetTest.reset_sequences
+      ~MemoTextViewSetTest.serialized_rollback
+   
+   

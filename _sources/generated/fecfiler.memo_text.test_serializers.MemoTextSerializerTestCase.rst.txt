@@ -1,0 +1,131 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
+================================================================
+
+.. currentmodule:: fecfiler.memo_text.test_serializers
+
+.. autoclass:: MemoTextSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoTextSerializerTestCase.__init__
+      ~MemoTextSerializerTestCase.addClassCleanup
+      ~MemoTextSerializerTestCase.addCleanup
+      ~MemoTextSerializerTestCase.addTypeEqualityFunc
+      ~MemoTextSerializerTestCase.assertAlmostEqual
+      ~MemoTextSerializerTestCase.assertAlmostEquals
+      ~MemoTextSerializerTestCase.assertContains
+      ~MemoTextSerializerTestCase.assertCountEqual
+      ~MemoTextSerializerTestCase.assertDictContainsSubset
+      ~MemoTextSerializerTestCase.assertDictEqual
+      ~MemoTextSerializerTestCase.assertEqual
+      ~MemoTextSerializerTestCase.assertEquals
+      ~MemoTextSerializerTestCase.assertFalse
+      ~MemoTextSerializerTestCase.assertFieldOutput
+      ~MemoTextSerializerTestCase.assertFormError
+      ~MemoTextSerializerTestCase.assertFormsetError
+      ~MemoTextSerializerTestCase.assertGreater
+      ~MemoTextSerializerTestCase.assertGreaterEqual
+      ~MemoTextSerializerTestCase.assertHTMLEqual
+      ~MemoTextSerializerTestCase.assertHTMLNotEqual
+      ~MemoTextSerializerTestCase.assertIn
+      ~MemoTextSerializerTestCase.assertInHTML
+      ~MemoTextSerializerTestCase.assertIs
+      ~MemoTextSerializerTestCase.assertIsInstance
+      ~MemoTextSerializerTestCase.assertIsNone
+      ~MemoTextSerializerTestCase.assertIsNot
+      ~MemoTextSerializerTestCase.assertIsNotNone
+      ~MemoTextSerializerTestCase.assertJSONEqual
+      ~MemoTextSerializerTestCase.assertJSONNotEqual
+      ~MemoTextSerializerTestCase.assertLess
+      ~MemoTextSerializerTestCase.assertLessEqual
+      ~MemoTextSerializerTestCase.assertListEqual
+      ~MemoTextSerializerTestCase.assertLogs
+      ~MemoTextSerializerTestCase.assertMultiLineEqual
+      ~MemoTextSerializerTestCase.assertNotAlmostEqual
+      ~MemoTextSerializerTestCase.assertNotAlmostEquals
+      ~MemoTextSerializerTestCase.assertNotContains
+      ~MemoTextSerializerTestCase.assertNotEqual
+      ~MemoTextSerializerTestCase.assertNotEquals
+      ~MemoTextSerializerTestCase.assertNotIn
+      ~MemoTextSerializerTestCase.assertNotIsInstance
+      ~MemoTextSerializerTestCase.assertNotRegex
+      ~MemoTextSerializerTestCase.assertNotRegexpMatches
+      ~MemoTextSerializerTestCase.assertNumQueries
+      ~MemoTextSerializerTestCase.assertQuerysetEqual
+      ~MemoTextSerializerTestCase.assertRaises
+      ~MemoTextSerializerTestCase.assertRaisesMessage
+      ~MemoTextSerializerTestCase.assertRaisesRegex
+      ~MemoTextSerializerTestCase.assertRaisesRegexp
+      ~MemoTextSerializerTestCase.assertRedirects
+      ~MemoTextSerializerTestCase.assertRegex
+      ~MemoTextSerializerTestCase.assertRegexpMatches
+      ~MemoTextSerializerTestCase.assertSequenceEqual
+      ~MemoTextSerializerTestCase.assertSetEqual
+      ~MemoTextSerializerTestCase.assertTemplateNotUsed
+      ~MemoTextSerializerTestCase.assertTemplateUsed
+      ~MemoTextSerializerTestCase.assertTrue
+      ~MemoTextSerializerTestCase.assertTupleEqual
+      ~MemoTextSerializerTestCase.assertURLEqual
+      ~MemoTextSerializerTestCase.assertWarns
+      ~MemoTextSerializerTestCase.assertWarnsMessage
+      ~MemoTextSerializerTestCase.assertWarnsRegex
+      ~MemoTextSerializerTestCase.assertXMLEqual
+      ~MemoTextSerializerTestCase.assertXMLNotEqual
+      ~MemoTextSerializerTestCase.assert_
+      ~MemoTextSerializerTestCase.captureOnCommitCallbacks
+      ~MemoTextSerializerTestCase.countTestCases
+      ~MemoTextSerializerTestCase.debug
+      ~MemoTextSerializerTestCase.defaultTestResult
+      ~MemoTextSerializerTestCase.doClassCleanups
+      ~MemoTextSerializerTestCase.doCleanups
+      ~MemoTextSerializerTestCase.fail
+      ~MemoTextSerializerTestCase.failIf
+      ~MemoTextSerializerTestCase.failIfAlmostEqual
+      ~MemoTextSerializerTestCase.failIfEqual
+      ~MemoTextSerializerTestCase.failUnless
+      ~MemoTextSerializerTestCase.failUnlessAlmostEqual
+      ~MemoTextSerializerTestCase.failUnlessEqual
+      ~MemoTextSerializerTestCase.failUnlessRaises
+      ~MemoTextSerializerTestCase.id
+      ~MemoTextSerializerTestCase.modify_settings
+      ~MemoTextSerializerTestCase.run
+      ~MemoTextSerializerTestCase.setUp
+      ~MemoTextSerializerTestCase.setUpClass
+      ~MemoTextSerializerTestCase.setUpTestData
+      ~MemoTextSerializerTestCase.settings
+      ~MemoTextSerializerTestCase.shortDescription
+      ~MemoTextSerializerTestCase.skipTest
+      ~MemoTextSerializerTestCase.subTest
+      ~MemoTextSerializerTestCase.tearDown
+      ~MemoTextSerializerTestCase.tearDownClass
+      ~MemoTextSerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoTextSerializerTestCase.available_apps
+      ~MemoTextSerializerTestCase.databases
+      ~MemoTextSerializerTestCase.fixtures
+      ~MemoTextSerializerTestCase.longMessage
+      ~MemoTextSerializerTestCase.maxDiff
+      ~MemoTextSerializerTestCase.reset_sequences
+      ~MemoTextSerializerTestCase.serialized_rollback
+   
+   

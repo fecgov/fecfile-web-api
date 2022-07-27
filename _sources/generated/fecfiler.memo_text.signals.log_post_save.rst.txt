@@ -1,0 +1,6 @@
+fecfiler.memo\_text.signals.log\_post\_save
+===========================================
+
+.. currentmodule:: fecfiler.memo_text.signals
+
+.. autofunction:: log_post_save

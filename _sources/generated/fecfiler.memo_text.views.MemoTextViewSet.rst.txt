@@ -1,0 +1,109 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.views.MemoTextViewSet
+=========================================
+
+.. currentmodule:: fecfiler.memo_text.views
+
+.. autoclass:: MemoTextViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoTextViewSet.__init__
+      ~MemoTextViewSet.as_view
+      ~MemoTextViewSet.check_object_permissions
+      ~MemoTextViewSet.check_permissions
+      ~MemoTextViewSet.check_throttles
+      ~MemoTextViewSet.create
+      ~MemoTextViewSet.destroy
+      ~MemoTextViewSet.determine_version
+      ~MemoTextViewSet.dispatch
+      ~MemoTextViewSet.filter_queryset
+      ~MemoTextViewSet.finalize_response
+      ~MemoTextViewSet.get_authenticate_header
+      ~MemoTextViewSet.get_authenticators
+      ~MemoTextViewSet.get_content_negotiator
+      ~MemoTextViewSet.get_exception_handler
+      ~MemoTextViewSet.get_exception_handler_context
+      ~MemoTextViewSet.get_extra_action_url_map
+      ~MemoTextViewSet.get_extra_actions
+      ~MemoTextViewSet.get_format_suffix
+      ~MemoTextViewSet.get_next_transaction_id_number
+      ~MemoTextViewSet.get_object
+      ~MemoTextViewSet.get_paginated_response
+      ~MemoTextViewSet.get_parser_context
+      ~MemoTextViewSet.get_parsers
+      ~MemoTextViewSet.get_permissions
+      ~MemoTextViewSet.get_queryset
+      ~MemoTextViewSet.get_renderer_context
+      ~MemoTextViewSet.get_renderers
+      ~MemoTextViewSet.get_serializer
+      ~MemoTextViewSet.get_serializer_class
+      ~MemoTextViewSet.get_serializer_context
+      ~MemoTextViewSet.get_success_headers
+      ~MemoTextViewSet.get_throttles
+      ~MemoTextViewSet.get_view_description
+      ~MemoTextViewSet.get_view_name
+      ~MemoTextViewSet.handle_exception
+      ~MemoTextViewSet.http_method_not_allowed
+      ~MemoTextViewSet.initial
+      ~MemoTextViewSet.initialize_request
+      ~MemoTextViewSet.list
+      ~MemoTextViewSet.options
+      ~MemoTextViewSet.paginate_queryset
+      ~MemoTextViewSet.partial_update
+      ~MemoTextViewSet.perform_authentication
+      ~MemoTextViewSet.perform_content_negotiation
+      ~MemoTextViewSet.perform_create
+      ~MemoTextViewSet.perform_destroy
+      ~MemoTextViewSet.perform_update
+      ~MemoTextViewSet.permission_denied
+      ~MemoTextViewSet.raise_uncaught_exception
+      ~MemoTextViewSet.retrieve
+      ~MemoTextViewSet.reverse_action
+      ~MemoTextViewSet.setup
+      ~MemoTextViewSet.throttled
+      ~MemoTextViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoTextViewSet.allowed_methods
+      ~MemoTextViewSet.authentication_classes
+      ~MemoTextViewSet.basename
+      ~MemoTextViewSet.default_response_headers
+      ~MemoTextViewSet.description
+      ~MemoTextViewSet.detail
+      ~MemoTextViewSet.filter_backends
+      ~MemoTextViewSet.http_method_names
+      ~MemoTextViewSet.lookup_field
+      ~MemoTextViewSet.lookup_url_kwarg
+      ~MemoTextViewSet.name
+      ~MemoTextViewSet.pagination_class
+      ~MemoTextViewSet.paginator
+      ~MemoTextViewSet.parser_classes
+      ~MemoTextViewSet.permission_classes
+      ~MemoTextViewSet.queryset
+      ~MemoTextViewSet.renderer_classes
+      ~MemoTextViewSet.schema
+      ~MemoTextViewSet.settings
+      ~MemoTextViewSet.suffix
+      ~MemoTextViewSet.throttle_classes
+      ~MemoTextViewSet.versioning_class
+   
+   

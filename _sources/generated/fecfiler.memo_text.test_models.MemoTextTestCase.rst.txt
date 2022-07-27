@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.test\_models.MemoTextTestCase
+=================================================
+
+.. currentmodule:: fecfiler.memo_text.test_models
+
+.. autoclass:: MemoTextTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoTextTestCase.__init__
+      ~MemoTextTestCase.addClassCleanup
+      ~MemoTextTestCase.addCleanup
+      ~MemoTextTestCase.addTypeEqualityFunc
+      ~MemoTextTestCase.assertAlmostEqual
+      ~MemoTextTestCase.assertAlmostEquals
+      ~MemoTextTestCase.assertContains
+      ~MemoTextTestCase.assertCountEqual
+      ~MemoTextTestCase.assertDictContainsSubset
+      ~MemoTextTestCase.assertDictEqual
+      ~MemoTextTestCase.assertEqual
+      ~MemoTextTestCase.assertEquals
+      ~MemoTextTestCase.assertFalse
+      ~MemoTextTestCase.assertFieldOutput
+      ~MemoTextTestCase.assertFormError
+      ~MemoTextTestCase.assertFormsetError
+      ~MemoTextTestCase.assertGreater
+      ~MemoTextTestCase.assertGreaterEqual
+      ~MemoTextTestCase.assertHTMLEqual
+      ~MemoTextTestCase.assertHTMLNotEqual
+      ~MemoTextTestCase.assertIn
+      ~MemoTextTestCase.assertInHTML
+      ~MemoTextTestCase.assertIs
+      ~MemoTextTestCase.assertIsInstance
+      ~MemoTextTestCase.assertIsNone
+      ~MemoTextTestCase.assertIsNot
+      ~MemoTextTestCase.assertIsNotNone
+      ~MemoTextTestCase.assertJSONEqual
+      ~MemoTextTestCase.assertJSONNotEqual
+      ~MemoTextTestCase.assertLess
+      ~MemoTextTestCase.assertLessEqual
+      ~MemoTextTestCase.assertListEqual
+      ~MemoTextTestCase.assertLogs
+      ~MemoTextTestCase.assertMultiLineEqual
+      ~MemoTextTestCase.assertNotAlmostEqual
+      ~MemoTextTestCase.assertNotAlmostEquals
+      ~MemoTextTestCase.assertNotContains
+      ~MemoTextTestCase.assertNotEqual
+      ~MemoTextTestCase.assertNotEquals
+      ~MemoTextTestCase.assertNotIn
+      ~MemoTextTestCase.assertNotIsInstance
+      ~MemoTextTestCase.assertNotRegex
+      ~MemoTextTestCase.assertNotRegexpMatches
+      ~MemoTextTestCase.assertNumQueries
+      ~MemoTextTestCase.assertQuerysetEqual
+      ~MemoTextTestCase.assertRaises
+      ~MemoTextTestCase.assertRaisesMessage
+      ~MemoTextTestCase.assertRaisesRegex
+      ~MemoTextTestCase.assertRaisesRegexp
+      ~MemoTextTestCase.assertRedirects
+      ~MemoTextTestCase.assertRegex
+      ~MemoTextTestCase.assertRegexpMatches
+      ~MemoTextTestCase.assertSequenceEqual
+      ~MemoTextTestCase.assertSetEqual
+      ~MemoTextTestCase.assertTemplateNotUsed
+      ~MemoTextTestCase.assertTemplateUsed
+      ~MemoTextTestCase.assertTrue
+      ~MemoTextTestCase.assertTupleEqual
+      ~MemoTextTestCase.assertURLEqual
+      ~MemoTextTestCase.assertWarns
+      ~MemoTextTestCase.assertWarnsMessage
+      ~MemoTextTestCase.assertWarnsRegex
+      ~MemoTextTestCase.assertXMLEqual
+      ~MemoTextTestCase.assertXMLNotEqual
+      ~MemoTextTestCase.assert_
+      ~MemoTextTestCase.captureOnCommitCallbacks
+      ~MemoTextTestCase.countTestCases
+      ~MemoTextTestCase.debug
+      ~MemoTextTestCase.defaultTestResult
+      ~MemoTextTestCase.doClassCleanups
+      ~MemoTextTestCase.doCleanups
+      ~MemoTextTestCase.fail
+      ~MemoTextTestCase.failIf
+      ~MemoTextTestCase.failIfAlmostEqual
+      ~MemoTextTestCase.failIfEqual
+      ~MemoTextTestCase.failUnless
+      ~MemoTextTestCase.failUnlessAlmostEqual
+      ~MemoTextTestCase.failUnlessEqual
+      ~MemoTextTestCase.failUnlessRaises
+      ~MemoTextTestCase.id
+      ~MemoTextTestCase.modify_settings
+      ~MemoTextTestCase.run
+      ~MemoTextTestCase.setUp
+      ~MemoTextTestCase.setUpClass
+      ~MemoTextTestCase.setUpTestData
+      ~MemoTextTestCase.settings
+      ~MemoTextTestCase.shortDescription
+      ~MemoTextTestCase.skipTest
+      ~MemoTextTestCase.subTest
+      ~MemoTextTestCase.tearDown
+      ~MemoTextTestCase.tearDownClass
+      ~MemoTextTestCase.test_get_memo_text
+      ~MemoTextTestCase.test_save_and_delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoTextTestCase.available_apps
+      ~MemoTextTestCase.databases
+      ~MemoTextTestCase.fixtures
+      ~MemoTextTestCase.longMessage
+      ~MemoTextTestCase.maxDiff
+      ~MemoTextTestCase.reset_sequences
+      ~MemoTextTestCase.serialized_rollback
+   
+   

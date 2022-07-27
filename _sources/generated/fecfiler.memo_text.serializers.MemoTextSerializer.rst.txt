@@ -1,0 +1,82 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.serializers.MemoTextSerializer
+==================================================
+
+.. currentmodule:: fecfiler.memo_text.serializers
+
+.. autoclass:: MemoTextSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoTextSerializer.__init__
+      ~MemoTextSerializer.bind
+      ~MemoTextSerializer.build_field
+      ~MemoTextSerializer.build_nested_field
+      ~MemoTextSerializer.build_property_field
+      ~MemoTextSerializer.build_relational_field
+      ~MemoTextSerializer.build_standard_field
+      ~MemoTextSerializer.build_unknown_field
+      ~MemoTextSerializer.build_url_field
+      ~MemoTextSerializer.create
+      ~MemoTextSerializer.fail
+      ~MemoTextSerializer.get_attribute
+      ~MemoTextSerializer.get_default
+      ~MemoTextSerializer.get_default_field_names
+      ~MemoTextSerializer.get_extra_kwargs
+      ~MemoTextSerializer.get_field_names
+      ~MemoTextSerializer.get_fields
+      ~MemoTextSerializer.get_foreign_key_fields
+      ~MemoTextSerializer.get_initial
+      ~MemoTextSerializer.get_schema_name
+      ~MemoTextSerializer.get_unique_for_date_validators
+      ~MemoTextSerializer.get_unique_together_validators
+      ~MemoTextSerializer.get_uniqueness_extra_kwargs
+      ~MemoTextSerializer.get_validation_candidate
+      ~MemoTextSerializer.get_validators
+      ~MemoTextSerializer.get_value
+      ~MemoTextSerializer.include_extra_kwargs
+      ~MemoTextSerializer.is_valid
+      ~MemoTextSerializer.many_init
+      ~MemoTextSerializer.run_validation
+      ~MemoTextSerializer.run_validators
+      ~MemoTextSerializer.save
+      ~MemoTextSerializer.to_internal_value
+      ~MemoTextSerializer.to_representation
+      ~MemoTextSerializer.update
+      ~MemoTextSerializer.validate
+      ~MemoTextSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoTextSerializer.context
+      ~MemoTextSerializer.data
+      ~MemoTextSerializer.default_error_messages
+      ~MemoTextSerializer.default_validators
+      ~MemoTextSerializer.errors
+      ~MemoTextSerializer.fields
+      ~MemoTextSerializer.initial
+      ~MemoTextSerializer.root
+      ~MemoTextSerializer.schema_name
+      ~MemoTextSerializer.serializer_field_mapping
+      ~MemoTextSerializer.url_field_name
+      ~MemoTextSerializer.validated_data
+      ~MemoTextSerializer.validators
+   
+   

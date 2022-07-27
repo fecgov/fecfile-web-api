@@ -1,0 +1,59 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.models.MemoText
+===================================
+
+.. currentmodule:: fecfiler.memo_text.models
+
+.. autoclass:: MemoText
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MemoText.__init__
+      ~MemoText.check
+      ~MemoText.clean
+      ~MemoText.clean_fields
+      ~MemoText.date_error_message
+      ~MemoText.delete
+      ~MemoText.from_db
+      ~MemoText.full_clean
+      ~MemoText.get_deferred_fields
+      ~MemoText.prepare_database_save
+      ~MemoText.refresh_from_db
+      ~MemoText.save
+      ~MemoText.save_base
+      ~MemoText.serializable_value
+      ~MemoText.unique_error_message
+      ~MemoText.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MemoText.back_reference_sched_form_name
+      ~MemoText.back_reference_tran_id_number
+      ~MemoText.filer_committee_id_number
+      ~MemoText.id
+      ~MemoText.objects
+      ~MemoText.pk
+      ~MemoText.rec_type
+      ~MemoText.report_id
+      ~MemoText.report_id_id
+      ~MemoText.text4000
+      ~MemoText.transaction_id_number
+   
+   

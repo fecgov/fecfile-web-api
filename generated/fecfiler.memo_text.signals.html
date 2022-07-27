@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>fecfiler.memo_text.signals &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.memo_text.signals.log_post_delete" href="fecfiler.memo_text.signals.log_post_delete.html" />
+    <link rel="prev" title="fecfiler.memo_text.serializers.MemoTextSerializer" href="fecfiler.memo_text.serializers.MemoTextSerializer.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-fecfiler.memo_text.signals">
+<span id="fecfiler-memo-text-signals"></span><h1>fecfiler.memo_text.signals<a class="headerlink" href="#module-fecfiler.memo_text.signals" title="Permalink to this headline">¶</a></h1>
+<p>Logs Memo Text events</p>
+<p>We use signals to log deletes rather than overwriting delete()
+to handle bulk delete cases
+<a class="reference external" href="https://docs.djangoproject.com/en/dev/topics/db/models/#overriding-predefined-model-methods">https://docs.djangoproject.com/en/dev/topics/db/models/#overriding-predefined-model-methods</a></p>
+<p>We use signals to log saves to be consistent with delete logging</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.memo_text.signals.log_post_delete.html#fecfiler.memo_text.signals.log_post_delete" title="fecfiler.memo_text.signals.log_post_delete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_post_delete</span></code></a>(sender, instance, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.memo_text.signals.log_post_save.html#fecfiler.memo_text.signals.log_post_save" title="fecfiler.memo_text.signals.log_post_save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_post_save</span></code></a>(sender, instance, created, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.dot_fecs.html">fecfiler.dot_fecs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.apps.html">fecfiler.memo_text.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.migrations.html">fecfiler.memo_text.migrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.models.html">fecfiler.memo_text.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.serializers.html">fecfiler.memo_text.serializers</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.memo_text.signals</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.memo_text.signals.log_post_delete.html">fecfiler.memo_text.signals.log_post_delete</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.memo_text.signals.log_post_save.html">fecfiler.memo_text.signals.log_post_save</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.test_models.html">fecfiler.memo_text.test_models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.test_serializers.html">fecfiler.memo_text.test_serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.test_views.html">fecfiler.memo_text.test_views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.urls.html">fecfiler.memo_text.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.memo_text.views.html">fecfiler.memo_text.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.memo_text.html">fecfiler.memo_text</a><ul>
+      <li>Previous: <a href="fecfiler.memo_text.serializers.MemoTextSerializer.html" title="previous chapter">fecfiler.memo_text.serializers.MemoTextSerializer</a></li>
+      <li>Next: <a href="fecfiler.memo_text.signals.log_post_delete.html" title="next chapter">fecfiler.memo_text.signals.log_post_delete</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.memo_text.signals.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

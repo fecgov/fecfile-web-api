@@ -169,6 +169,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.filer_committee_id_number
       ~F3XSummary.form_type
       ~F3XSummary.id
+      ~F3XSummary.memotext_set
       ~F3XSummary.objects
       ~F3XSummary.pk
       ~F3XSummary.qualified_committee
