@@ -1,3 +1,4 @@
+boto3==1.24.34
 celery[redis]==5.2.7
 cfenv==0.5.2
 coreapi==2.3.3
@@ -7,10 +8,11 @@ dj-database-url==0.3.0
 dj-static==0.0.6
 Django==3.2.12
 django-cors-headers==3.11.0
+django-storages==1.12.3
 djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
 drf-spectacular==0.21.2
-git+https://github.com/fecgov/fecfile-validate@f63fe291d2b27c04822bab13c1636b9b7e2317af#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@38542f53467786340e85d70a8b6f90876eb51e1e#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.27
 gunicorn==19.10.0
 Jinja2==2.11.3
@@ -24,3 +26,4 @@ pytz==2021.3
 retry==0.9.2
 static3==0.6.1
 django-otp==0.9.3
+git+https://github.com/fecgov/mozilla-django-oidc.git@main#egg=mozilla_django_oidc
