@@ -90,7 +90,7 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_serialize_scha_transaction(self):
         transaction_row = serialize_model_instance(
-            "INDV_REC", SchATransaction, self.transaction
+            "SchA", SchATransaction, self.transaction
         )
         split_row = transaction_row.split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
