@@ -40,9 +40,9 @@ class TasksTestCase(TestCase):
         transaction_row = serialize_transaction(self.transaction)
         split_row = transaction_row.split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
-        self.assertEqual(split_row[20], "20200419")
+        self.assertEqual(split_row[19], "20200419")
         self.assertEqual(split_row[42], "X")
-        self.assertEqual(split_row[21], "1234.56")
+        self.assertEqual(split_row[20], "1234.56")
 
         with self.assertRaisesMessage(Exception, "<class 'int'> is not a transaction"):
             serialize_transaction(123)
@@ -52,9 +52,9 @@ class TasksTestCase(TestCase):
         transaction_rows = serialize_transactions(transactions)
         split_row = transaction_rows[0].split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
-        self.assertEqual(split_row[20], "20200419")
+        self.assertEqual(split_row[19], "20200419")
         self.assertEqual(split_row[42], "X")
-        self.assertEqual(split_row[21], "1234.56")
+        self.assertEqual(split_row[20], "1234.56")
 
         no_transactions = SchATransaction.objects.filter(id=100000000)
         no_transaction_rows = serialize_transactions(no_transactions)
