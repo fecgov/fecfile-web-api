@@ -12,7 +12,7 @@ django-storages==1.12.3
 djangorestframework==3.13.1
 djangorestframework-jwt==1.11.0
 drf-spectacular==0.21.2
-git+https://github.com/fecgov/fecfile-validate@38542f53467786340e85d70a8b6f90876eb51e1e#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@a7d7568e5942c6177b1c5ccf6edbe2e74e6aa245#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.27
 gunicorn==19.10.0
 Jinja2==2.11.3
