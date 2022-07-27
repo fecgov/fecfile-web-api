@@ -27,8 +27,7 @@ def serialize_transaction(transaction):
     if not isinstance(transaction, SchATransaction):
         raise TypeError(f"{type(transaction)} is not a transaction")
     logger.info(f"serializing transaction: {transaction.id}")
-    transaction_type = getattr(transaction, "transaction_type_identifier")
-    return serialize_model_instance(transaction_type, SchATransaction, transaction)
+    return serialize_model_instance("SchA", SchATransaction, transaction)
 
 
 def serialize_transactions(transactions):
