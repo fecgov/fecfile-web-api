@@ -9,27 +9,55 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('committee_accounts', '0001_initial'),
-        ('f3x_summaries', '0012_auto_20220718_1337'),
+        ("committee_accounts", "0001_initial"),
+        ("f3x_summaries", "0012_auto_20220718_1337"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MemoText',
+            name="MemoText",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('rec_type', models.TextField(blank=True, null=True)),
-                ('filer_committee_id_number', models.TextField(blank=True, null=True)),
-                ('transaction_id_number', models.TextField(blank=True, null=True)),
-                ('back_reference_tran_id_number', models.TextField(blank=True, null=True)),
-                ('back_reference_sched_form_name', models.TextField(blank=True, null=True)),
-                ('text4000', models.TextField(blank=True, null=True)),
-                ('committee_account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount')),
-                ('report', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                ("rec_type", models.TextField(blank=True, null=True)),
+                ("filer_committee_id_number", models.TextField(blank=True, null=True)),
+                ("transaction_id_number", models.TextField(blank=True, null=True)),
+                (
+                    "back_reference_tran_id_number",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "back_reference_sched_form_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("text4000", models.TextField(blank=True, null=True)),
+                (
+                    "committee_account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="committee_accounts.committeeaccount",
+                    ),
+                ),
+                (
+                    "report",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="f3x_summaries.f3xsummary",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'memo_text',
+                "db_table": "memo_text",
             },
         ),
     ]
