@@ -2,11 +2,8 @@ from django.db import models
 
 
 class MemoText(models.Model):
-    report_id = models.ForeignKey(
-        "f3x_summaries.F3XSummary",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+    report = models.ForeignKey(
+        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
     rec_type = models.TextField(null=True, blank=True)
     filer_committee_id_number = models.TextField(null=True, blank=True)
