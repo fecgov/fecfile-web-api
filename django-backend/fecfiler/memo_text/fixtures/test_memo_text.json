@@ -2,14 +2,15 @@
    {
       "model": "memo_text.memotext",
       "fields": {
+         "id":25,
          "back_reference_sched_form_name" : "F3XN",
          "back_reference_tran_id_number" : null,
          "filer_committee_id_number" : "C00601211",
-         "id" : 25,
          "rec_type" : "TEXT",
-         "report_id" : 1,
+         "report_id" : 9999,
          "text4000" : "dahtest2",
-         "transaction_id_number" : "REPORT_MEMO_TEXT_1"
+         "transaction_id_number" : "REPORT_MEMO_TEXT_1",
+         "committee_account_id": 1000
       }
    },
    {
@@ -18,11 +19,11 @@
          "back_reference_sched_form_name" : "F3XN",
          "back_reference_tran_id_number" : null,
          "filer_committee_id_number" : "C00601211",
-         "id" : 9,
          "rec_type" : "TEXT",
-         "report_id" : 2,
+         "report_id" : 10000,
          "text4000" : "testtest2",
-         "transaction_id_number" : "REPORT_MEMO_TEXT_2"
+         "transaction_id_number" : "REPORT_MEMO_TEXT_2",
+         "committee_account_id": 1000
       }
    },
    {
@@ -31,11 +32,11 @@
          "back_reference_sched_form_name" : "F3XN",
          "back_reference_tran_id_number" : null,
          "filer_committee_id_number" : "C00601211",
-         "id" : 8,
          "rec_type" : "TEXT",
-         "report_id" : 2,
+         "report_id" : 10000,
          "text4000" : "testtest",
-         "transaction_id_number" : "REPORT_MEMO_TEXT_1"
+         "transaction_id_number" : "REPORT_MEMO_TEXT_1",
+         "committee_account_id": 1000
       }
    }
 ]
