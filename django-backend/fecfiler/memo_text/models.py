@@ -1,12 +1,11 @@
+from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from django.db import models
 
 
-class MemoText(models.Model):
-    report_id = models.ForeignKey(
-        "f3x_summaries.F3XSummary",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+class MemoText(SoftDeleteModel, CommitteeOwnedModel):
+    report = models.ForeignKey(
+        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
     rec_type = models.TextField(null=True, blank=True)
     filer_committee_id_number = models.TextField(null=True, blank=True)

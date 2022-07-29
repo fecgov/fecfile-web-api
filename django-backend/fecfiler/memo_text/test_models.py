@@ -3,7 +3,7 @@ from .models import MemoText
 
 
 class MemoTextTestCase(TestCase):
-    fixtures = ["test_memo_text"]
+    fixtures = ["test_f3x_summaries", "test_memo_text", "test_committee_accounts"]
 
     def setUp(self):
         self.valid_memo_text = MemoText(
@@ -12,7 +12,9 @@ class MemoTextTestCase(TestCase):
             id=30,
             rec_type="TEXT",
             text4000="tessst4",
-            transaction_id_number="REPORT_MEMO_TEXT_3"
+            transaction_id_number="REPORT_MEMO_TEXT_3",
+            committee_account_id=1000,
+            report_id=9999,
         )
 
     def test_get_memo_text(self):
@@ -21,9 +23,7 @@ class MemoTextTestCase(TestCase):
 
     def test_save_and_delete(self):
         self.valid_memo_text.save()
-        memo_text_from_db = MemoText.objects.get(
-            id=30
-        )
+        memo_text_from_db = MemoText.objects.get(id=30)
         self.assertIsInstance(memo_text_from_db, MemoText)
         self.assertEquals(memo_text_from_db.id, 30)
         self.assertEquals(memo_text_from_db.text4000, "tessst4")

@@ -16,7 +16,7 @@ class F3XTestCase(TestCase):
         )
 
     def test_get_f3x_summary(self):
-        f3x_summary = F3XSummary.objects.get(treasurer_last_name="Lastname")
+        f3x_summary = F3XSummary.objects.get(L6a_year_for_above_ytd="2005")
         self.assertEquals(f3x_summary.form_type, "F3XN")
 
     def test_save_and_delete(self):

@@ -1,26 +1,20 @@
-from fecfiler.f3x_summaries.models import F3XSummary
 from .models import MemoText
 from fecfiler.validation import serializers
-from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import PrimaryKeyRelatedField
+from rest_framework.serializers import IntegerField
+from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class MemoTextSerializer(
-    ModelSerializer,
-    serializers.FecSchemaValidatorSerializerMixin
+    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "Text"
-    report_id = PrimaryKeyRelatedField(
-        many=False,
-        required=True,
-        allow_null=False,
-        queryset=F3XSummary.objects.all()
-    )
+    report_id = IntegerField(required=True, allow_null=False)
 
     class Meta:
         model = MemoText
-        fields = [f.name for f in MemoText._meta.get_fields() if f.name not in [
-        ]]
+        fields = [
+            f.name for f in MemoText._meta.get_fields() if f.name not in ["report"]
+        ] + ["report_id"]

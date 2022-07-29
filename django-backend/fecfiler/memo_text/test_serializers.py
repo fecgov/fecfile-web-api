@@ -5,8 +5,7 @@ from rest_framework.request import Request, HttpRequest
 
 
 class MemoTextSerializerTestCase(TestCase):
-    fixtures = ["test_memo_text", "test_committee_accounts",
-                "test_f3x_summaries"]
+    fixtures = ["test_memo_text", "test_committee_accounts", "test_f3x_summaries"]
 
     def setUp(self):
         self.valid_memo_text = {
@@ -15,7 +14,8 @@ class MemoTextSerializerTestCase(TestCase):
             "rec_type": "TEXT",
             "report_id": 1,
             "text4000": "tessst4",
-            "transaction_id_number": "REPORT_MEMO_TEXT_3"
+            "transaction_id_number": "REPORT_MEMO_TEXT_3",
+            "committee_account": 1000,
         }
 
         self.invalid_memo_text = {
@@ -24,7 +24,8 @@ class MemoTextSerializerTestCase(TestCase):
             "rec_type": "Invalid_rec_type",
             "report_id": 1,
             "text4000": "tessst4",
-            "transaction_id_number": "REPORT_MEMO_TEXT_3"
+            "transaction_id_number": "REPORT_MEMO_TEXT_3",
+            "committee_account": 1000,
         }
 
         self.mock_request = Request(HttpRequest())
