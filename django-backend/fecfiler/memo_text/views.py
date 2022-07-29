@@ -1,6 +1,5 @@
 from .models import MemoText
 from .serializers import MemoTextSerializer
-from django.db.models.query import QuerySet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 
 TRANSACTION_ID_NUMBER_FIELD = "transaction_id_number"
