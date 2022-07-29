@@ -37,8 +37,8 @@
 <h1>fecfiler.memo_text.models.MemoText<a class="headerlink" href="#fecfiler-memo-text-models-memotext" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.memo_text.models.MemoText">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.memo_text.models.</span></span><span class="sig-name descname"><span class="pre">MemoText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filer_committee_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_tran_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_sched_form_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text4000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.models.MemoText" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.memo_text.models.</span></span><span class="sig-name descname"><span class="pre">MemoText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deleted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee_account</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filer_committee_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_tran_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_sched_form_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text4000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.models.MemoText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.soft_delete.models.SoftDeleteModel</span></code>, <a class="reference internal" href="fecfiler.committee_accounts.models.CommitteeOwnedModel.html#fecfiler.committee_accounts.models.CommitteeOwnedModel" title="fecfiler.committee_accounts.models.CommitteeOwnedModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.models.CommitteeOwnedModel</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.memo_text.models.MemoText.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.models.MemoText.__init__" title="Permalink to this definition">¶</a></dt>
@@ -66,7 +66,7 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">date_error_message</span></code>(lookup_type, field_name, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete</span></code>([using, keep_parents])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_db</span></code>(db, field_names, values)</p></td>
@@ -78,25 +78,28 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.get_deferred_fields" title="fecfiler.memo_text.models.MemoText.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
 <td><p>Return a set containing names of deferred fields for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.refresh_from_db" title="fecfiler.memo_text.models.MemoText.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.refresh_from_db" title="fecfiler.memo_text.models.MemoText.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.save" title="fecfiler.memo_text.models.MemoText.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.save" title="fecfiler.memo_text.models.MemoText.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.save_base" title="fecfiler.memo_text.models.MemoText.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.save_base" title="fecfiler.memo_text.models.MemoText.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
 <td><p>Handle the parts of saving which should be done only once per save, yet need to be done in raw saves, too.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.serializable_value" title="fecfiler.memo_text.models.MemoText.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.serializable_value" title="fecfiler.memo_text.models.MemoText.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
 <td><p>Return the value of the field name for this instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.validate_unique" title="fecfiler.memo_text.models.MemoText.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.models.MemoText.validate_unique" title="fecfiler.memo_text.models.MemoText.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
 <td><p>Check unique constraints on the model and raise ValidationError if any failed.</p></td>
 </tr>
 </tbody>
@@ -108,10 +111,22 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_sched_form_name</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_objects</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_sched_form_name</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_tran_id_number</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_tran_id_number</span></code></p></td>
+<td><p>A wrapper for a deferred-loading field.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">committee_account</span></code></p></td>
+<td><p>Accessor to the related object on the forward side of a many-to-one or one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">committee_account_id</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleted</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filer_committee_id_number</span></code></p></td>
@@ -129,10 +144,10 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rec_type</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_id</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></p></td>
 <td><p>Accessor to the related object on the forward side of a many-to-one or one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_id_id</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_id</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">text4000</span></code></p></td>

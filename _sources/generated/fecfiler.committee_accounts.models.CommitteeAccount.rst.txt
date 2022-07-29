@@ -56,6 +56,7 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.deleted
       ~CommitteeAccount.f3xsummary_set
       ~CommitteeAccount.id
+      ~CommitteeAccount.memotext_set
       ~CommitteeAccount.objects
       ~CommitteeAccount.pk
       ~CommitteeAccount.schatransaction_set

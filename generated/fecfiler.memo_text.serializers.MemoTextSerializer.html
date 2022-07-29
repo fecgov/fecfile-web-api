@@ -38,7 +38,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.memo_text.serializers.MemoTextSerializer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.memo_text.serializers.</span></span><span class="sig-name descname"><span class="pre">MemoTextSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.serializers.MemoTextSerializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.serializers.ModelSerializer</span></code>, <a class="reference internal" href="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.html#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer.html#fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer" title="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer</span></code></a>, <a class="reference internal" href="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.html#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.memo_text.serializers.MemoTextSerializer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.serializers.MemoTextSerializer.__init__" title="Permalink to this definition">¶</a></dt>
@@ -148,7 +148,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.memo_text.serializers.MemoTextSerializer.to_internal_value" title="fecfiler.memo_text.serializers.MemoTextSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
-<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
+<td><p>Extract committee_id from request to assign the corresponding CommitteeAccount as the owner of the object</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.memo_text.serializers.MemoTextSerializer.to_representation" title="fecfiler.memo_text.serializers.MemoTextSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
@@ -510,7 +510,8 @@ be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.memo_text.serializers.MemoTextSerializer.to_internal_value">
 <span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.serializers.MemoTextSerializer.to_internal_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
+<dd><p>Extract committee_id from request to assign the corresponding
+CommitteeAccount as the owner of the object</p>
 </dd></dl>
 
 <dl class="py method">

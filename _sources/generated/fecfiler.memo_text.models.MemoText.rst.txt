@@ -28,6 +28,7 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.from_db
       ~MemoText.full_clean
       ~MemoText.get_deferred_fields
+      ~MemoText.hard_delete
       ~MemoText.prepare_database_save
       ~MemoText.refresh_from_db
       ~MemoText.save
@@ -44,15 +45,19 @@ fecfiler.memo\_text.models.MemoText
 
    .. autosummary::
    
+      ~MemoText.all_objects
       ~MemoText.back_reference_sched_form_name
       ~MemoText.back_reference_tran_id_number
+      ~MemoText.committee_account
+      ~MemoText.committee_account_id
+      ~MemoText.deleted
       ~MemoText.filer_committee_id_number
       ~MemoText.id
       ~MemoText.objects
       ~MemoText.pk
       ~MemoText.rec_type
+      ~MemoText.report
       ~MemoText.report_id
-      ~MemoText.report_id_id
       ~MemoText.text4000
       ~MemoText.transaction_id_number
    
