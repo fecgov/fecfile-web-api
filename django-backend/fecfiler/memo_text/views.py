@@ -8,20 +8,15 @@ TRANSACTION_ID_NUMBER_FIELD = "transaction_id_number"
 
 class MemoTextViewSet(CommitteeOwnedViewSet):
     def create(self, request, *args, **kwargs):
-        request_report_id = request.data["report_id"]
-        next_transaction_id_number = self.get_next_transaction_id_number(
-            request_report_id
-        )
-        request.data[TRANSACTION_ID_NUMBER_FIELD] = next_transaction_id_number
+        request.data[
+            TRANSACTION_ID_NUMBER_FIELD
+        ] = self.get_next_transaction_id_number()
         return super().create(request, args, kwargs)
 
-    def get_next_transaction_id_number(self, report_id):
+    def get_next_transaction_id_number(self):
         memo_text_tid_base = "REPORT_MEMO_TEXT_"
         memo_text_xid_dict = (
-            MemoText.objects.filter(report_id=report_id)
-            .values(TRANSACTION_ID_NUMBER_FIELD)
-            .order_by(f"-{TRANSACTION_ID_NUMBER_FIELD}")
-            .first()
+            self.get_queryset().values(TRANSACTION_ID_NUMBER_FIELD).first()
         )
         if (
             memo_text_xid_dict is None
@@ -37,18 +32,21 @@ class MemoTextViewSet(CommitteeOwnedViewSet):
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
-    queryset = MemoText.objects.all().order_by("-id")
+    queryset = MemoText.objects.all()
 
     def get_queryset(self):
         report_id = None
         if self.request is not None:
-            report_id = self.request.query_params.get("report_id")
-
-        queryset = MemoText.objects.all().order_by(f"-{TRANSACTION_ID_NUMBER_FIELD}")
-        if isinstance(queryset, QuerySet):
-            queryset = (
-                MemoText.objects.all().filter(report_id=report_id).order_by("-id")
+            report_id = (
+                self.request.query_params.get("report_id")
+                or self.request.data["report_id"]
             )
+        queryset = (
+            super()
+            .get_queryset()
+            .filter(report_id=report_id)
+            .order_by(f"-{TRANSACTION_ID_NUMBER_FIELD}")
+        )
         return queryset
 
     serializer_class = MemoTextSerializer
