@@ -26,9 +26,11 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
     confirmation_email_1 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None)
+        max_length=44, null=True, blank=True, default=None
+    )
     confirmation_email_2 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None)
+        max_length=44, null=True, blank=True, default=None
+    )
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     report_code = models.ForeignKey(
@@ -231,3 +233,18 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         db_table = "f3x_summaries"
+
+
+class ReportMixin(models.Model):
+    """Abstract model for tracking f3x reports
+
+    Inherit this model to add an F3X Report foreign key, attributing
+    a model instance to an F3X Report
+    """
+
+    report = models.ForeignKey(
+        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    class Meta:
+        abstract = True

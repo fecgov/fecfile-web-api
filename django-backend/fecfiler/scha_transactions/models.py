@@ -1,15 +1,13 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+from fecfiler.f3x_summaries.models import ReportMixin
 
 
-class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
+class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
-    report = models.ForeignKey(
-        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
-    )
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)

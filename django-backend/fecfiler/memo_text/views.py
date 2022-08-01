@@ -1,11 +1,12 @@
 from .models import MemoText
 from .serializers import MemoTextSerializer
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from fecfiler.f3x_summaries.views import ReportViewMixin
 
 TRANSACTION_ID_NUMBER_FIELD = "transaction_id_number"
 
 
-class MemoTextViewSet(CommitteeOwnedViewSet):
+class MemoTextViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def create(self, request, *args, **kwargs):
         request.data[
             TRANSACTION_ID_NUMBER_FIELD
@@ -32,21 +33,6 @@ class MemoTextViewSet(CommitteeOwnedViewSet):
     `update` and `destroy` actions.
     """
     queryset = MemoText.objects.all()
-
-    def get_queryset(self):
-        report_id = None
-        if self.request is not None:
-            report_id = (
-                self.request.query_params.get("report_id")
-                or self.request.data["report_id"]
-            )
-        queryset = (
-            super()
-            .get_queryset()
-            .filter(report_id=report_id)
-            .order_by(f"-{TRANSACTION_ID_NUMBER_FIELD}")
-        )
-        return queryset
 
     serializer_class = MemoTextSerializer
     pagination_class = None
