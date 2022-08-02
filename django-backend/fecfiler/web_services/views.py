@@ -2,7 +2,7 @@ from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.web_services.tasks import create_dot_fec
+from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
 from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
@@ -29,9 +29,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        logger.info(f"Firing off create_dot_fec for report :{report_id}")
+        logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
         task = create_dot_fec.apply_async((report_id, False), retry=False)
-        logger.info(f"Status for report {report_id}: {task.status}")
+        logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
     @action(
@@ -51,5 +51,20 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
         file = get_file(file_name)
-        logger.info(f"Retrieved .FEC: {file_name}")
+        logger.debug(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="submit-to-fec",
+    )
+    def submit_to_fec(self, request):
+        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        report_id = serializer.validated_data["report_id"]
+        logger.debug(f"Starting Celery Task submit_to_fec for report :{report_id}")
+        task = submit_to_fec.apply_async((report_id, False), retry=False)
+        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        return Response({"status": ".FEC task created"})

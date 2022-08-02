@@ -262,7 +262,7 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 
-CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
+CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
 CELERY_WORKER_STORAGE = env.get_credential(
     "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
 )

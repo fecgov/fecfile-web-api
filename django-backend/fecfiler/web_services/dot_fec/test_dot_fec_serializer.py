@@ -1,7 +1,6 @@
 from django.test import TestCase
 from .dot_fec_serializer import (
     CRLF_STR,
-    add_row_to_fec_str,
     serialize_field,
     serialize_model_instance,
 )
@@ -94,16 +93,3 @@ class DotFECSerializerTestCase(TestCase):
         )
         split_row = transaction_row.split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
-
-    def test_add_row_to_fec_str(self):
-        summary_row = serialize_model_instance("F3X", F3XSummary, self.f3x)
-        dot_fec_str = add_row_to_fec_str(None, summary_row)
-        self.assertEqual(dot_fec_str[-2:], CRLF_STR)
-        transaction_row = serialize_model_instance(
-            "INDV_REC", SchATransaction, self.transaction
-        )
-        dot_fec_str = add_row_to_fec_str(dot_fec_str, transaction_row)
-        self.assertEqual(dot_fec_str[-2:], CRLF_STR)
-        split_dot_fec_str = dot_fec_str.split(CRLF_STR)
-        self.assertEqual(split_dot_fec_str[0].split(chr(ascii.FS))[-1], "381")
-        self.assertEqual(split_dot_fec_str[1].split(chr(ascii.FS))[0], "SA11AI")
