@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.web_services.tasks import create_dot_fec
+from django.http import JsonResponse
 from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class WebServicesViewSet(viewsets.ViewSet):
     """
     A viewset that provides actions to start web service tasks and
-    retrieve thier statuses and results
+    retrieve their statuses and results
     """
 
     @action(
@@ -53,3 +54,29 @@ class WebServicesViewSet(viewsets.ViewSet):
         file = get_file(file_name)
         logger.info(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="web-print/(?P<report_id>[a-z0-9]+)"
+    )
+    def web_print_status(self, request, report_id):
+        ##committee_id = request.user.cmtee_id
+        ##status_codes = [None,"in-progress","success","failure"]
+        response = {
+            "status": None,
+            "result": None,
+        }
+        return JsonResponse(response)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="web-print",
+    )
+    def web_print_submit(self, request):
+        response = {
+            "status": "in-progress",
+            "result": None,
+        }
+        return JsonResponse(response)
