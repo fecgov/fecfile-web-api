@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db.models.query import QuerySet
 from rest_framework import filters
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
@@ -53,6 +54,5 @@ class ReportViewMixin(GenericViewSet):
             if self.request
             else None
         )
-
-        queryset = super().get_queryset().filter(report_id=report_id)
-        return queryset
+        queryset = super().get_queryset()
+        return queryset.filter(report_id=report_id)
