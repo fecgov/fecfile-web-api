@@ -20,13 +20,13 @@ def create_dot_fec(report_id, force_write_to_disk=False):
     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
     dot_fec_record.save()
 
-    return file_name
+    return dot_fec_record.id
 
 
 @shared_task
-def submit_to_fec(dot_fec_id, force_write_to_disk=False):
-    dot_fec_record = DotFEC.objects.get(dot_fec_record)
-    file_name = dot_fec_record.first().file_name
+def submit_to_fec(dot_fec_id):
+    dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+    file_name = dot_fec_record.file_name
     file = get_file(file_name)
     logger.debug(f"Retrieved .FEC: {file_name}")
     logger.debug(f"do something with {file}")
