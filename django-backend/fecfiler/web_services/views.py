@@ -65,7 +65,8 @@ class WebServicesViewSet(viewsets.ViewSet):
         ##status_codes = [None,"in-progress","success","failure"]
         response = {
             "status": None,
-            "result": None,
+            "result": "Your URL is just the worst",
+            "submitted":"12/12/2022", ##Anything that a Javascript Date object will accept!
         }
         return JsonResponse(response)
 
@@ -76,7 +77,8 @@ class WebServicesViewSet(viewsets.ViewSet):
     )
     def web_print_submit(self, request):
         response = {
-            "status": "in-progress",
-            "result": None,
+            "status": "success",
+            "result": "http://google.com",
+            "submitted":"12/25/2022",
         }
         return JsonResponse(response)
