@@ -1,6 +1,7 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+import uuid
 
 
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
@@ -10,6 +11,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     report = models.ForeignKey(
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
