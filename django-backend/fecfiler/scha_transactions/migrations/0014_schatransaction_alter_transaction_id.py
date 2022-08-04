@@ -7,7 +7,7 @@ import uuid
 def check_for_uid_conflicts(apps, uid):
     SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
     for transaction in SchATransaction.objects.all():
-        if transaction.unique_id == uid:
+        if transaction.transaction_id == uid:
             return True
     return False   
 
@@ -25,7 +25,7 @@ def generate_uids(apps, schema_editor):
                 print("Unique ID generation failed: Over 5 conflicts in a row")
                 return
 
-        transaction.unique_id = unique_id
+        transaction.transaction_id = unique_id
         transaction.save()
 
 
@@ -36,15 +36,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='schatransaction',
-            name='unique_id',
-            field=models.TextField(blank=True, max_length=20, null=True),
+            name='transaction_id',
+            field=models.TextField(blank=True, null=True),
         ),
         migrations.RunPython(code=generate_uids, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
             model_name='schatransaction',
-            name='unique_id',
+            name='transaction_id',
             field=models.TextField(editable=False, max_length=20),
         ),
     ]
