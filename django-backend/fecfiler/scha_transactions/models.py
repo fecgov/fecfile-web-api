@@ -11,7 +11,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     report = models.ForeignKey(
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
-    ##unique_id = models.TextField(editable= False, null=False, blank=False, max_length=20);
+    unique_id = models.TextField(editable=False, null=False, blank=False, max_length=20);
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
@@ -71,3 +71,24 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         db_table = "scha_transactions"
+
+    def check_for_uid_conflicts(uid):
+        for transaction in SchATransaction.objects.all():
+            if transaction.unique_id == uid:
+                return True
+        return False  
+
+    def save(self, *args, **kwargs):
+        u = uuid.uuid4()
+        unique_id = str(u.hex)[-20:]
+
+        attempts = 0
+        while SchATransaction.check_for_uid_conflicts(unique_id):
+            unique_id = str(u.hex)[-20:]
+            attempts+=1
+            if (attempts > 5):
+                print("Unique ID generation failed: Over 5 conflicts in a row")
+                return
+        
+        self.unique_id = unique_id
+        super(SchATransaction, self).save(*args, **kwargs)
