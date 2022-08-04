@@ -22,14 +22,14 @@ class DotFECSerializerTestCase(TestCase):
             compose_dot_fec(100000000)
 
         file_content = compose_dot_fec(9999)
-        self.assertEqual(file_content.count(CRLF_STR), 2)
+        self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):
         summary_row = serialize_model_instance("F3X", F3XSummary, self.f3x)
         dot_fec_str = add_row_to_content(None, summary_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
         transaction_row = serialize_model_instance(
-            "INDV_REC", SchATransaction, self.transaction
+            "SchA", SchATransaction, self.transaction
         )
         dot_fec_str = add_row_to_content(dot_fec_str, transaction_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)

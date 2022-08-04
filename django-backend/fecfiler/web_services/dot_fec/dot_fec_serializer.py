@@ -75,18 +75,34 @@ def serialize_model_instance(schema_name, model, model_instance):
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.
     """
+    column_sequences, row_length = extract_row_config(schema_name)
+    """NOTE: column_index + 1 because FEC schemas define column sequences
+    starting at 1"""
+    row = [
+        serialize_field(model, model_instance, column_sequences[column_index + 1])
+        if (column_index + 1) in column_sequences
+        else ""
+        for column_index in range(0, row_length)
+    ]
+    return chr(ascii.FS).join(row)
+
+
+def extract_row_config(schema_name):
     schema = validate.get_schema(schema_name)
     schema_properties = schema.get("properties", {}).items()
     column_sequences = {
         v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties
     }
     row_length = max(column_sequences.keys())
+    return column_sequences, row_length
 
-    """NOTE: column_index + 1 because FEC schemas define column sequences
-    starting at 1"""
+
+def serialize_header(header):
+    column_sequences, row_length = extract_row_config("HDR")
     row = [
-        serialize_field(model, model_instance, column_sequences[column_index + 1])
+        str(header[column_sequences[column_index + 1]])
         if (column_index + 1) in column_sequences
+        and header[column_sequences[column_index + 1]]
         else ""
         for column_index in range(0, row_length)
     ]
