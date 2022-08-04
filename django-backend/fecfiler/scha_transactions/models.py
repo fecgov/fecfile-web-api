@@ -7,11 +7,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
-    report_id = models.ForeignKey(
-        "f3x_summaries.F3XSummary",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+    report = models.ForeignKey(
+        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
@@ -32,8 +29,12 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     election_code = models.TextField(null=True, blank=True)
     election_other_description = models.TextField(null=True, blank=True)
     contribution_date = models.DateField(null=True, blank=True)
-    contribution_amount = models.IntegerField(null=True, blank=True)
-    contribution_aggregate = models.IntegerField(null=True, blank=True)
+    contribution_amount = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    contribution_aggregate = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
     contributor_employer = models.TextField(null=True, blank=True)
     contributor_occupation = models.TextField(null=True, blank=True)
@@ -60,12 +61,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
-    parent_transaction_id = models.ForeignKey(
-        "self",
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.CASCADE
+    parent_transaction = models.ForeignKey(
+        "self", null=True, blank=True, default=None, on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
