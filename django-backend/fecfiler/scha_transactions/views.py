@@ -40,8 +40,9 @@ class SchATransactionViewSet(CommitteeOwnedViewSet):
             report_id = self.request.query_params.get("report_id")
 
         queryset = super().get_queryset()
-        if isinstance(queryset, QuerySet):
-            queryset = SchATransaction.objects.all().filter(report_id=report_id)
+        if report_id is not None and report_id != "":
+            if isinstance(queryset, QuerySet):
+                queryset = SchATransaction.objects.all().filter(report_id=report_id)
         return queryset
 
     serializer_class = SchATransactionSerializer
