@@ -1,7 +1,7 @@
 ## Summary
 
-- Issue api#<number> and/or app#<number>
-  
+- Issue number #issue_number
+
 (Include a summary of proposed changes)
 
 ## How to test

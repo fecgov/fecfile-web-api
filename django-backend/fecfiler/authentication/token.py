@@ -10,10 +10,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def generate_username(uuid):
-    return uuid
-
-
 def jwt_payload_handler(user):
     username_field = get_username_field()
     username = get_username(user)

@@ -1,18 +1,13 @@
 import django.core.validators
-from django.core import serializers
 from django.db import migrations, models
+from django.core.management import call_command
 
 
 def forwards_func(apps, schema_editor):
-    original_apps = serializers.python.apps
-    serializers.python.apps = apps
-    fixture_file = "fecfiler/committee_accounts/fixtures/test_db_committee_accounts.json"
-    fixture = open(fixture_file)
-    objects = serializers.deserialize('json', fixture)
-    for obj in objects:
-        obj.save()
-    fixture.close()
-    serializers.python.apps = original_apps
+    call_command(
+        "loaddata",
+        "fecfiler/committee_accounts/fixtures/test_db_committee_accounts.json",
+    )
 
 
 class Migration(migrations.Migration):
