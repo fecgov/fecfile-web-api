@@ -11,7 +11,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     report = models.ForeignKey(
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    ##unique_id = models.TextField(editable= False, null=False, blank=False, max_length=20);
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(null=True, blank=True)
     back_reference_tran_id_number = models.TextField(null=True, blank=True)
