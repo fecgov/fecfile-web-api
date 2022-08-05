@@ -35,6 +35,24 @@ class SchATransactionTestCase(TestCase):
         )
         return trans
 
+    def test_generate_uid(self):
+        committee = CommitteeAccount()
+        f3x = F3XSummary(
+            committee_account=committee
+        )
+        trans = SchATransaction(
+            committee_account=committee,
+            report_id=f3x
+        )
+        self.assertFalse(trans.transaction_id)
+        trans.generate_unique_transaction_id()
+        self.assertTrue(trans.transaction_id)
+
+    def test_catches_uid_conflict(self):
+        trans = SchATransaction.objects.all()[0]
+        existing_uid = trans.transaction_id
+        self.assertTrue(SchATransaction.check_for_uid_conflicts(existing_uid))
+
     def test_save_and_delete(self):
         self.sa_trans.save()
         transaction_from_db = SchATransaction.objects.get(contributor_last_name="Last")
