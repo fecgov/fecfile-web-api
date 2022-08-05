@@ -32,12 +32,14 @@ class SchATransactionTestCase(TestCase):
         self.invalid_scha_transaction = {
             "form_type": "invalidformtype",
             "contributor_last_name": "Validlastname",
+            "transaction_id": "ABCDEF0123456789",
             "transaction_type_identifier": "INDV_REC",
             "report_id": 1,
         }
 
         self.missing_type_transaction = {
             "form_type": "invalidformtype",
+            "transaction_id": "ABCDEF0123456789",
             "contributor_last_name": "Validlastname",
             "report_id": 1,
         }
@@ -52,7 +54,7 @@ class SchATransactionTestCase(TestCase):
             data=self.valid_scha_transaction,
             context={"request": self.mock_request},
         )
-        ##self.assertTrue(valid_serializer.is_valid(raise_exception=True))
+        self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = SchATransactionSerializer(
             data=self.invalid_scha_transaction,
             context={"request": self.mock_request},
