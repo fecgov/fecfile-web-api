@@ -35,6 +35,13 @@ class SchATransactionTestCase(TestCase):
         )
         return trans
 
+    def test_parent_related_values(self):
+        t1, t2 = SchATransaction.objects.all()[:2]
+        t1.parent_transaction = t2
+        t1.update_parent_related_values(t2)
+        self.assertEqual(t1.back_reference_tran_id_number, t2.transaction_id)
+        self.assertEqual(t1.back_reference_sched_name, t2.form_type)
+
     def test_generate_uid(self):
         committee = CommitteeAccount()
         f3x = F3XSummary(
