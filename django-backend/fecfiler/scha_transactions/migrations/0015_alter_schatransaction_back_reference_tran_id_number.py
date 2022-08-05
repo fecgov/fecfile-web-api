@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+
 def update_back_reference_ids(apps, schema_editor):
     SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
     for transaction in SchATransaction.objects.all():
@@ -10,12 +11,13 @@ def update_back_reference_ids(apps, schema_editor):
             transaction.back_reference_tran_id_number = p_id
             transaction.save()
 
+
 def remove_back_reference_ids(apps, schema_editor):
     SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
     for transaction in SchATransaction.objects.all():
         transaction.back_reference_tran_id_number = ""
         transaction.save()
-   
+
 
 class Migration(migrations.Migration):
 
@@ -29,5 +31,8 @@ class Migration(migrations.Migration):
             name='back_reference_tran_id_number',
             field=models.TextField(blank=True, max_length=20, null=True),
         ),
-        migrations.RunPython(code=update_back_reference_ids, reverse_code=remove_back_reference_ids)
+        migrations.RunPython(
+            code=update_back_reference_ids,
+            reverse_code=remove_back_reference_ids
+        )
     ]

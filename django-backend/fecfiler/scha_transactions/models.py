@@ -4,6 +4,7 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 import uuid
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
@@ -14,7 +15,12 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
     filer_committee_id_number = models.TextField(null=True, blank=True)
-    transaction_id = models.TextField(editable=False, null=False, blank=False, max_length=20)
+    transaction_id = models.TextField(
+        editable=False,
+        null=False,
+        blank=False,
+        max_length=20
+    )
     back_reference_tran_id_number = models.TextField(null=True, blank=True, max_length=20)
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
@@ -76,7 +82,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
             models.Index(fields=['transaction_id'])
         ]
 
-    def check_for_uid_conflicts(uid):
+    ## This is intended to be useable without instantiating a transaction object
+    def check_for_uid_conflicts(uid): # noqa
         return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
 
     def generate_unique_transaction_id(self):
@@ -86,7 +93,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         attempts = 0
         while SchATransaction.check_for_uid_conflicts(unique_id):
             unique_id = str(u.hex).upper()[-20:]
-            attempts+=1
+            attempts += 1
             if (attempts > 5):
                 logger.info("Unique ID generation failed: Over 5 conflicts in a row")
                 return
