@@ -4,8 +4,8 @@ from django.db import migrations, models
 
 
 def update_back_reference_ids(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
-    for transaction in SchATransaction.objects.all():
+    scha_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+    for transaction in scha_transaction.objects.all():
         if transaction.parent_transaction:
             p_id = transaction.parent_transaction.transaction_id
             transaction.back_reference_tran_id_number = p_id
@@ -13,8 +13,8 @@ def update_back_reference_ids(apps, schema_editor):
 
 
 def remove_back_reference_ids(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
-    for transaction in SchATransaction.objects.all():
+    scha_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+    for transaction in scha_transaction.objects.all():
         transaction.back_reference_tran_id_number = ""
         transaction.save()
 

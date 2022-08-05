@@ -84,6 +84,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         ]
 
     # This is intended to be useable without instantiating a transaction object
+    @staticmethod
     def check_for_uid_conflicts(uid): # noqa
         return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
 

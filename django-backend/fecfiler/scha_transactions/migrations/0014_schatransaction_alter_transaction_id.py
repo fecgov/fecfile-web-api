@@ -5,13 +5,13 @@ import uuid
 
 
 def check_for_uid_conflicts(apps, uid):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
-    return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
+    scha_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+    return len(scha_transaction.objects.filter(transaction_id=uid)) > 0
 
 
 def generate_uids(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
-    for transaction in SchATransaction.objects.all():
+    scha_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+    for transaction in scha_transaction.objects.all():
         u = uuid.uuid4()
         unique_id = str(u.hex).upper()[-20:]
 
