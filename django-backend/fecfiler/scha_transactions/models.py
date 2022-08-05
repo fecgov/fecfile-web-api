@@ -2,7 +2,9 @@ from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 import uuid
+import logging
 
+logger = logging.getLogger(__name__)
 
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
@@ -12,8 +14,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
     filer_committee_id_number = models.TextField(null=True, blank=True)
-    transaction_id = models.TextField(editable=False, null=False, blank=False, max_length=20);
-    back_reference_tran_id_number = models.TextField(null=True, blank=True)
+    transaction_id = models.TextField(editable=False, null=False, blank=False, max_length=20)
+    back_reference_tran_id_number = models.TextField(null=True, blank=True, max_length=20)
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     contributor_organization_name = models.TextField(null=True, blank=True)
@@ -70,25 +72,34 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         db_table = "scha_transactions"
+        indexes = [
+            models.Index(fields=['transaction_id'])
+        ]
 
     def check_for_uid_conflicts(uid):
-        for transaction in SchATransaction.objects.all():
-            if transaction.transaction_id == uid:
-                return True
-        return False  
+        return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
+
+    def generate_unique_transaction_id(self):
+        u = uuid.uuid4()
+        unique_id = str(u.hex).upper()[-20:]
+
+        attempts = 0
+        while SchATransaction.check_for_uid_conflicts(unique_id):
+            unique_id = str(u.hex).upper()[-20:]
+            attempts+=1
+            if (attempts > 5):
+                logger.info("Unique ID generation failed: Over 5 conflicts in a row")
+                return
+        self.transaction_id = unique_id
+
+    def update_parent_related_values(self, parent):
+        self.back_reference_tran_id_number = parent.transaction_id
+        self.back_reference_sched_name = parent.form_type
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:
-            u = uuid.uuid4()
-            unique_id = str(u.hex)[-20:]
-
-            attempts = 0
-            while SchATransaction.check_for_uid_conflicts(unique_id):
-                unique_id = str(u.hex)[-20:]
-                attempts+=1
-                if (attempts > 5):
-                    print("Unique ID generation failed: Over 5 conflicts in a row")
-                    return
-            self.transaction_id = unique_id
+            self.generate_unique_transaction_id()
+        if not self.back_reference_tran_id_number and self.parent_transaction:
+            self.update_parent_related_values(self.parent_transaction)
 
         super(SchATransaction, self).save(*args, **kwargs)
