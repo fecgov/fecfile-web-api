@@ -6,513 +6,713 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', '0012_auto_20220718_1337'),
+        ("f3x_summaries", "0012_auto_20220718_1337"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='f3xsummary',
-            name='cash_on_hand_date',
+            model_name="f3xsummary",
+            name="cash_on_hand_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L10_debts_by_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L10_debts_by_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11ai_itemized_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11ai_itemized_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11ai_itemized_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11ai_itemized_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11aii_unitemized_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11aii_unitemized_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11aii_unitemized_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11aii_unitemized_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11aiii_total_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11aiii_total_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11aiii_total_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11aiii_total_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11b_political_party_committees_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11b_political_party_committees_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11b_political_party_committees_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11b_political_party_committees_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11c_other_political_committees_pacs_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11c_other_political_committees_pacs_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11c_other_political_committees_pacs_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11c_other_political_committees_pacs_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11d_total_contributions_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11d_total_contributions_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L11d_total_contributions_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L11d_total_contributions_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L12_transfers_from_affiliated_other_party_cmtes_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L12_transfers_from_affiliated_other_party_cmtes_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L12_transfers_from_affiliated_other_party_cmtes_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L12_transfers_from_affiliated_other_party_cmtes_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L13_all_loans_received_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L13_all_loans_received_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L13_all_loans_received_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L13_all_loans_received_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L14_loan_repayments_received_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L14_loan_repayments_received_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L14_loan_repayments_received_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L14_loan_repayments_received_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L15_offsets_to_operating_expenditures_refunds_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L15_offsets_to_operating_expenditures_refunds_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L15_offsets_to_operating_expenditures_refunds_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L15_offsets_to_operating_expenditures_refunds_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L16_refunds_of_federal_contributions_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L16_refunds_of_federal_contributions_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L16_refunds_of_federal_contributions_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L16_refunds_of_federal_contributions_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L17_other_federal_receipts_dividends_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L17_other_federal_receipts_dividends_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L17_other_federal_receipts_dividends_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L17_other_federal_receipts_dividends_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18a_transfers_from_nonfederal_account_h3_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18a_transfers_from_nonfederal_account_h3_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18a_transfers_from_nonfederal_account_h3_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18a_transfers_from_nonfederal_account_h3_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18b_transfers_from_nonfederal_levin_h5_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18b_transfers_from_nonfederal_levin_h5_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18b_transfers_from_nonfederal_levin_h5_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18b_transfers_from_nonfederal_levin_h5_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18c_total_nonfederal_transfers_18a_18b_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18c_total_nonfederal_transfers_18a_18b_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L18c_total_nonfederal_transfers_18a_18b_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L18c_total_nonfederal_transfers_18a_18b_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L19_total_receipts_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L19_total_receipts_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L19_total_receipts_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L19_total_receipts_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L20_total_federal_receipts_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L20_total_federal_receipts_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L20_total_federal_receipts_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L20_total_federal_receipts_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21ai_federal_share_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21ai_federal_share_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21ai_federal_share_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21ai_federal_share_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21aii_nonfederal_share_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21aii_nonfederal_share_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21aii_nonfederal_share_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21aii_nonfederal_share_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21b_other_federal_operating_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21b_other_federal_operating_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21b_other_federal_operating_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21b_other_federal_operating_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21c_total_operating_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21c_total_operating_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L21c_total_operating_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L21c_total_operating_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L22_transfers_to_affiliated_other_party_cmtes_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L22_transfers_to_affiliated_other_party_cmtes_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L22_transfers_to_affiliated_other_party_cmtes_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L22_transfers_to_affiliated_other_party_cmtes_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L23_contributions_to_federal_candidates_cmtes_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L23_contributions_to_federal_candidates_cmtes_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L23_contributions_to_federal_candidates_cmtes_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L23_contributions_to_federal_candidates_cmtes_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L24_independent_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L24_independent_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L24_independent_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L24_independent_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L25_coordinated_expend_made_by_party_cmtes_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L25_coordinated_expend_made_by_party_cmtes_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L25_coordinated_expend_made_by_party_cmtes_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L25_coordinated_expend_made_by_party_cmtes_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L26_loan_repayments_made_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L26_loan_repayments_made_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L26_loan_repayments_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L26_loan_repayments_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L27_loans_made_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L27_loans_made_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L27_loans_made_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L27_loans_made_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28a_individuals_persons_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28a_individuals_persons_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28a_individuals_persons_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28a_individuals_persons_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28b_political_party_committees_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28b_political_party_committees_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28b_political_party_committees_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28b_political_party_committees_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28c_other_political_committees_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28c_other_political_committees_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28c_other_political_committees_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28c_other_political_committees_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28d_total_contributions_refunds_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28d_total_contributions_refunds_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L28d_total_contributions_refunds_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L28d_total_contributions_refunds_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L29_other_disbursements_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L29_other_disbursements_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L29_other_disbursements_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L29_other_disbursements_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30ai_shared_federal_activity_h6_fed_share_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30ai_shared_federal_activity_h6_fed_share_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30ai_shared_federal_activity_h6_fed_share_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30ai_shared_federal_activity_h6_fed_share_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30aii_shared_federal_activity_h6_nonfed_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30aii_shared_federal_activity_h6_nonfed_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30aii_shared_federal_activity_h6_nonfed_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30aii_shared_federal_activity_h6_nonfed_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30b_nonallocable_fed_election_activity_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30b_nonallocable_fed_election_activity_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30b_nonallocable_fed_election_activity_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30b_nonallocable_fed_election_activity_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30c_total_federal_election_activity_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30c_total_federal_election_activity_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L30c_total_federal_election_activity_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L30c_total_federal_election_activity_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L31_total_disbursements_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L31_total_disbursements_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L31_total_disbursements_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L31_total_disbursements_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L32_total_federal_disbursements_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L32_total_federal_disbursements_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L32_total_federal_disbursements_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L32_total_federal_disbursements_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L33_total_contributions_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L33_total_contributions_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L33_total_contributions_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L33_total_contributions_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L34_total_contribution_refunds_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L34_total_contribution_refunds_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L34_total_contribution_refunds_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L34_total_contribution_refunds_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L35_net_contributions_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L35_net_contributions_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L35_net_contributions_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L35_net_contributions_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L36_total_federal_operating_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L36_total_federal_operating_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L36_total_federal_operating_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L36_total_federal_operating_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L37_offsets_to_operating_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L37_offsets_to_operating_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L37_offsets_to_operating_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L37_offsets_to_operating_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L38_net_operating_expenditures_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L38_net_operating_expenditures_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L38_net_operating_expenditures_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L38_net_operating_expenditures_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6a_cash_on_hand_jan_1_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6a_cash_on_hand_jan_1_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6b_cash_on_hand_beginning_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6b_cash_on_hand_beginning_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6c_total_receipts_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6c_total_receipts_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6c_total_receipts_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6c_total_receipts_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6d_subtotal_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6d_subtotal_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L6d_subtotal_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L6d_subtotal_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L7_total_disbursements_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L7_total_disbursements_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L7_total_disbursements_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L7_total_disbursements_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L8_cash_on_hand_at_close_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L8_cash_on_hand_at_close_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L8_cash_on_hand_close_ytd',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L8_cash_on_hand_close_ytd",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='L9_debts_to_period',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            model_name="f3xsummary",
+            name="L9_debts_to_period",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=11, null=True
+            ),
         ),
     ]
