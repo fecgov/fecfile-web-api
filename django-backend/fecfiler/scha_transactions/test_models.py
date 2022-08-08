@@ -49,11 +49,17 @@ class SchATransactionTestCase(TestCase):
         )
         trans = SchATransaction(
             committee_account=committee,
-            report_id=f3x
+            report=f3x
         )
         self.assertFalse(trans.transaction_id)
         trans.generate_unique_transaction_id()
         self.assertTrue(trans.transaction_id)
+        committee.save()
+        f3x.save()
+        trans.save()
+        saved_trans = SchATransaction.objects.get(id=trans.id)
+        self.assertEquals(trans.id, saved_trans.id)
+
 
     def test_catches_uid_conflict(self):
         trans = SchATransaction.objects.all()[0]
