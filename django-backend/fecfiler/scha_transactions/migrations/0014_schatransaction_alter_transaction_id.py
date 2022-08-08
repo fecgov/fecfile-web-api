@@ -43,7 +43,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='schatransaction',
             name='transaction_id',
-            field=models.TextField(editable=False, max_length=20),
+            field=models.TextField(
+                editable=False,
+                blank=False,
+                null=True,
+                max_length=20
+            ),
         ),
         migrations.AddIndex(
             model_name='schatransaction',

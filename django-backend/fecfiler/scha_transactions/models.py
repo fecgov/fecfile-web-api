@@ -18,7 +18,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(
         editable=False,
-        null=False,
+        null=True,
         blank=False,
         max_length=20
     )
