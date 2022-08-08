@@ -6,7 +6,7 @@ from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
 from .serializers import ReportIdSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC
+from .models import DotFEC, UploadSubmission
 
 import logging
 
@@ -64,9 +64,11 @@ class WebServicesViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
+        upload_submission_record = UploadSubmission(report_id=report_id).save()
         logger.debug(f"Starting Celery Task submit_to_fec for report :{report_id}")
-        task = (create_dot_fec.s(report_id, False) | submit_to_fec.s()).apply_async(
-            retry=False
-        )
+        task = (
+            create_dot_fec.s(report_id, False)
+            | submit_to_fec.s(upload_submission_record.id)
+        ).apply_async(retry=False)
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
-        return Response({"status": ".FEC task created"})
+        return Response({"status": "Submit .FEC task created"})
