@@ -12,8 +12,7 @@ def check_for_uid_conflicts(apps, uid):
 def generate_uid():
     unique_id = uuid.uuid4()
     hex_id = unique_id.hex.upper()
-    return hex_id[-21]+hex_id[-19:]
-
+    return hex_id[-21] + hex_id[-19:]
 
 
 def generate_uids(apps, schema_editor):
