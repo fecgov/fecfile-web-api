@@ -8,7 +8,9 @@ def update_back_reference_ids(apps, schema_editor):
     for transaction in scha_transaction.objects.all():
         if transaction.parent_transaction:
             p_id = transaction.parent_transaction.transaction_id
+            form_type = transaction.parent_transaction.form_type
             transaction.back_reference_tran_id_number = p_id
+            transaction.back_reference_sched_name = form_type
             transaction.save()
 
 

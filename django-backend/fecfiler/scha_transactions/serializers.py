@@ -13,7 +13,7 @@ class SchATransactionSerializer(
 ):
     parent_transaction_id = IntegerField(required=False, allow_null=True)
     transaction_id = CharField(
-        required=True,
+        read_only=True,
         max_length=20,
         allow_blank=False,
         allow_null=False
