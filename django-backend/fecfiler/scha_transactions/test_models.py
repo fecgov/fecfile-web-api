@@ -58,7 +58,10 @@ class SchATransactionTestCase(TestCase):
         f3x.save()
         trans.save()
         saved_trans = SchATransaction.objects.get(id=trans.id)
-        self.assertEquals(trans.id, saved_trans.id)
+        self.assertEquals(trans.transaction_id, saved_trans.transaction_id)
+        self.assertNotEqual(trans.transaction_id, None)
+        self.assertNotEqual(trans.transaction_id, "")
+        self.assertEquals(len(trans.transaction_id), 20)
 
     def test_catches_uid_conflict(self):
         trans = SchATransaction.objects.all()[0]
