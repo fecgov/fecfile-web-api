@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def patch_report_code_label(apps, schema_editor):
     report_code_label_model = apps.get_model("f3x_summaries", "ReportCodeLabel")  # noqa
     errant_object = report_code_label_model.objects.get(report_code="MY")
