@@ -12,12 +12,6 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     parent_transaction_id = IntegerField(required=False, allow_null=True)
-    transaction_id = CharField(
-        read_only=True,
-        max_length=20,
-        allow_blank=False,
-        allow_null=False
-    )
 
     report_id = IntegerField(required=True, allow_null=False)
 
