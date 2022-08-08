@@ -105,8 +105,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
             logger.info("Transaction unique ID generation: collision detected")
             if (attempts > 5):
                 logger.info("Unique ID generation failed: Over 5 conflicts in a row")
-                return
-        self.transaction_id = unique_id
+                return ""
+        return unique_id
 
     def update_parent_related_values(self, parent):
         self.back_reference_tran_id_number = parent.transaction_id
@@ -114,7 +114,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:
-            self.generate_unique_transaction_id()
+            self.transaction_id = self.generate_unique_transaction_id()
         if not self.back_reference_tran_id_number and self.parent_transaction:
             self.update_parent_related_values(self.parent_transaction)
 

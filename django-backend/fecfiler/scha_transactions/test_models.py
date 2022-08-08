@@ -11,7 +11,6 @@ class SchATransactionTestCase(TestCase):
         self.sa_trans = SchATransaction(
             form_type="SA11AI",
             filer_committee_id_number="C00123456",
-            transaction_id="A56123456789-1234",
             entity_type="IND",
             contributor_organization_name="John Smith & Co.",
             contributor_first_name="First",
@@ -52,8 +51,8 @@ class SchATransactionTestCase(TestCase):
             report=f3x
         )
         self.assertFalse(trans.transaction_id)
-        trans.generate_unique_transaction_id()
-        self.assertTrue(trans.transaction_id)
+        unique_id = trans.generate_unique_transaction_id()
+        self.assertTrue(unique_id)
         committee.save()
         f3x.save()
         trans.save()
@@ -70,6 +69,7 @@ class SchATransactionTestCase(TestCase):
 
     def test_save_and_delete(self):
         self.sa_trans.save()
+        self.assertEquals(len(self.sa_trans.transaction_id), 20)
         transaction_from_db = SchATransaction.objects.get(contributor_last_name="Last")
         self.assertIsInstance(transaction_from_db, SchATransaction)
         self.assertEquals(transaction_from_db.contributor_first_name, "First")
