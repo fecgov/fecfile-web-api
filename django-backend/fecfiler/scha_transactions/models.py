@@ -88,17 +88,21 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     def check_for_uid_conflicts(uid): # noqa
         return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
 
-    def generate_unique_transaction_id(self):
-        u = uuid.uuid4()
-        hex_id = u.hex.upper()
+    def generate_uid(self):
+        unique_id = uuid.uuid4()
+        hex_id = unique_id.hex.upper()
         # Take 20 characters from the end, skipping over the 20th char from the right,
         # which is the version number (uuid4 -> "4")
-        unique_id = hex_id[-21] + hex_id[-19:]
+        return hex_id[-21] + hex_id[-19:]
+
+    def generate_unique_transaction_id(self):
+        unique_id = self.generate_uid()
 
         attempts = 0
         while SchATransaction.check_for_uid_conflicts(unique_id):
-            unique_id = str(u.hex).upper()[-20:]
+            unique_id = self.generate_uid()
             attempts += 1
+            logger.info("Transaction unique ID generation: collision detected")
             if (attempts > 5):
                 logger.info("Unique ID generation failed: Over 5 conflicts in a row")
                 return
