@@ -30,15 +30,15 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.assertEquals(serialized_text_undefined, "")
 
-        # INTEGER
-        serialized_integer = serialize_field(
+        # NUMERIC
+        serialized_numeric = serialize_field(
             F3XSummary, self.f3x, "L6b_cash_on_hand_beginning_period"
         )
-        self.assertEqual(serialized_integer, "6")
-        serialized_integer_undefined = serialize_field(
+        self.assertEqual(serialized_numeric, "6.00")
+        serialized_numeric_undefined = serialize_field(
             F3XSummary, F3XSummary(), "L6b_cash_on_hand_beginning_period"
         )
-        self.assertEqual(serialized_integer_undefined, "")
+        self.assertEqual(serialized_numeric_undefined, "")
 
         # DECIMAL
         serialized_decimal = serialize_field(
@@ -86,7 +86,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[0], "F3XN")
         self.assertEqual(split_row[21], "20040729")
         self.assertEqual(split_row[3], "X")
-        self.assertEqual(split_row[122], "381")
+        self.assertEqual(split_row[122], "381.00")
 
     def test_serialize_scha_transaction(self):
         transaction_row = serialize_model_instance(
@@ -100,10 +100,10 @@ class DotFECSerializerTestCase(TestCase):
         dot_fec_str = add_row_to_fec_str(None, summary_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
         transaction_row = serialize_model_instance(
-            "INDV_REC", SchATransaction, self.transaction
+            "SchA", SchATransaction, self.transaction
         )
         dot_fec_str = add_row_to_fec_str(dot_fec_str, transaction_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
         split_dot_fec_str = dot_fec_str.split(CRLF_STR)
-        self.assertEqual(split_dot_fec_str[0].split(chr(ascii.FS))[-1], "381")
+        self.assertEqual(split_dot_fec_str[0].split(chr(ascii.FS))[-1], "381.00")
         self.assertEqual(split_dot_fec_str[1].split(chr(ascii.FS))[0], "SA11AI")

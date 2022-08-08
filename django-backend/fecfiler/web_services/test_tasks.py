@@ -31,7 +31,7 @@ class TasksTestCase(TestCase):
         self.assertEqual(split_row[0], "F3XN")
         self.assertEqual(split_row[21], "20040729")
         self.assertEqual(split_row[3], "X")
-        self.assertEqual(split_row[122], "381")
+        self.assertEqual(split_row[122], "381.00")
 
         with self.assertRaisesMessage(Exception, "report: 100000000 not found"):
             serialize_f3x_summary(100000000)
