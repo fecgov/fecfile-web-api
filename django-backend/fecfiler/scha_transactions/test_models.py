@@ -60,7 +60,6 @@ class SchATransactionTestCase(TestCase):
         saved_trans = SchATransaction.objects.get(id=trans.id)
         self.assertEquals(trans.id, saved_trans.id)
 
-
     def test_catches_uid_conflict(self):
         trans = SchATransaction.objects.all()[0]
         existing_uid = trans.transaction_id
