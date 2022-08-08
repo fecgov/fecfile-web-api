@@ -90,7 +90,9 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def generate_unique_transaction_id(self):
         u = uuid.uuid4()
-        unique_id = str(u.hex).upper()[-20:]
+        hex_id = u.hex.upper()
+        # Take 20 characters from the end, skipping over the 20th char from the right, which is the version number
+        unique_id = hex_id[-21]+hex_id[-19:]
 
         attempts = 0
         while SchATransaction.check_for_uid_conflicts(unique_id):

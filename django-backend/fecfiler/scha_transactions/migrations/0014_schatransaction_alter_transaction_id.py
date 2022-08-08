@@ -9,15 +9,21 @@ def check_for_uid_conflicts(apps, uid):
     return len(scha_transaction.objects.filter(transaction_id=uid)) > 0
 
 
+def generate_uid():
+    unique_id = uuid.uuid4()
+    hex_id = unique_id.hex.upper()
+    return hex_id[-21]+hex_id[-19:]
+
+
+
 def generate_uids(apps, schema_editor):
     scha_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
     for transaction in scha_transaction.objects.all():
-        u = uuid.uuid4()
-        unique_id = str(u.hex).upper()[-20:]
+        unique_id = generate_uid()
 
         attempts = 0
         while check_for_uid_conflicts(apps, unique_id):
-            unique_id = str(u.hex).upper()[-20:]
+            unique_id = generate_uid()
             attempts += 1
             if (attempts > 5):
                 print("Unique ID generation failed: Over 5 conflicts in a row")
