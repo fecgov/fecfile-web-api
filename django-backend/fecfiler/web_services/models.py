@@ -18,9 +18,18 @@ class UploadSubmission(models.Model):
     """Model tracking submissions to FEC Webload"""
 
     report = models.ForeignKey("f3x_summaries.F3XSummary", on_delete=models.CASCADE)
-    submission_id = models.CharField(max_length=255)
-    api = models.CharField(max_length=255)
-    status = models.CharField(
+    """state of internal fecfile submission task"""
+    fecfile_task_state = models.CharField(
+        choices=(
+            ("CREATING_FILE", "CREATING_FILE"),
+            ("SUBMITTING", "SUBMITTING"),
+            ("SUCCEEDED", "SUCCEEDED"),
+            ("FAILED", "FAILED"),
+        ),
+        max_length=255,
+    )
+    fec_submission_id = models.CharField(max_length=255)
+    fec_status = models.CharField(
         choices=(
             ("ACCEPTED", "ACCEPTED"),
             ("PROCESSING", "PROCESSING"),
@@ -30,7 +39,7 @@ class UploadSubmission(models.Model):
     )
     # different from internal report id
     fec_report_id = models.CharField(max_length=255)
-    message = models.TextField()
+    fec_message = models.TextField()
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

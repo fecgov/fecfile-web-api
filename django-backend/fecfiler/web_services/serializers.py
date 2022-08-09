@@ -15,4 +15,8 @@ class ReportIdSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f"No f3x summary found with report id: {data['report_id']}"
             )
-        return data
+        return super().validate(data)
+
+
+class SubmissionSerializer(ReportIdSerializer):
+    e_filing_password = serializers.CharField(allow_blank=False)

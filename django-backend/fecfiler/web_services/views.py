@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
-from .serializers import ReportIdSerializer
+from .serializers import ReportIdSerializer, SubmissionSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission
@@ -60,17 +60,22 @@ class WebServicesViewSet(viewsets.ViewSet):
         url_path="submit-to-fec",
     )
     def submit_to_fec(self, request):
-        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        serializer = SubmissionSerializer(
+            data=request.data, context={"request": request}
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        upload_submission_record = UploadSubmission(report_id=report_id).save()
+        e_filing_password = serializer.validated_data["e_filing_password"]
+        upload_submission_record = UploadSubmission(
+            report_id=report_id, fecfile_task_state="CREATING_FILE"
+        ).save()
         logger.debug(
             f"Starting Celery Task submit_to_fec for report :{report_id} {upload_submission_record.id}"
         )
         task = (
             create_dot_fec.s(report_id, False)
-            | submit_to_fec.s(upload_submission_record.id)
+            | submit_to_fec.s(upload_submission_record.id, e_filing_password)
         ).apply_async(retry=False)
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
