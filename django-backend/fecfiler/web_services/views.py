@@ -65,7 +65,9 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         upload_submission_record = UploadSubmission(report_id=report_id).save()
-        logger.debug(f"Starting Celery Task submit_to_fec for report :{report_id}")
+        logger.debug(
+            f"Starting Celery Task submit_to_fec for report :{report_id} {upload_submission_record.id}"
+        )
         task = (
             create_dot_fec.s(report_id, False)
             | submit_to_fec.s(upload_submission_record.id)
