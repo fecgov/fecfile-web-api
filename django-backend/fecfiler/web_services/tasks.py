@@ -39,42 +39,47 @@ def submit_to_fec(dot_fec_id, upload_submission_record_id):
         logger.debug(f"Retrieved .FEC: {file_name}")
         file_bytes = bytearray(file.read(), "utf-8")
         file.close()
-        upload_string = json.dumps(
-            {
-                "committee_id": "C00020057",
-                "password": "T3stUpl@ad",
-                "api_key": "4ac854dd46c804b96f8fba61c21bfc5a07calHnZ",
-                "email_1": "mbasupally.ctr@fec.gov",
-                "email_2": "mbasupally.ctr@fec.gov",
-                "agency_id": "FEC",
-                "wait": False,
-            }
-        )
-        logger.debug(f"uploading {file_name} to FEC {file_bytes}")
-        upload_response_string = test_fec_upload_client.service.upload(
-            upload_string, file_bytes
-        )
-        upload_response = json.loads(upload_response_string)
-        submission_record = update_submission_status(
-            upload_submission_record_id, upload_response
-        )
-
-        while submission_record.status not in ["ACCEPTED", "REJECTED"]:
-            time.sleep(2)
-            status_response_string = test_fec_upload_client.status(
-                submission_record.submission_id
-            )
-            status_response = json.loads(status_response_string)
-            submission_record = update_submission_status(
-                upload_submission_record_id, status_response
-            )
-            logger.debug(
-                f"Polling status for {submission_record.submission_id}. Status: {submission_record.status}"
-            )
-
     except:
         file.close()
+
+    logger.debug(f"uploading {file_name} to FEC {file_bytes}")
+    submission_json = generate_submission_json(dot_fec_record.report, "T3stUpl@ad")
+    upload_response_string = test_fec_upload_client.service.upload(
+        submission_json, file_bytes
+    )
+    upload_response = json.loads(upload_response_string)
+    submission_record = update_submission_status(
+        upload_submission_record_id, upload_response
+    )
+
+    while submission_record.status not in ["ACCEPTED", "REJECTED"]:
+        time.sleep(2)
+        status_response_string = test_fec_upload_client.status(
+            submission_record.submission_id
+        )
+        status_response = json.loads(status_response_string)
+        submission_record = update_submission_status(
+            upload_submission_record_id, status_response
+        )
+        logger.debug(
+            f"Polling status for {submission_record.submission_id}. Status: {submission_record.status}"
+        )
+
     return file_name
+
+
+def generate_submission_json(report, e_filing_password):
+    return json.dumps(
+        {
+            "committee_id": report.committee_account.committee_id,
+            "password": e_filing_password,
+            "api_key": "4ac854dd46c804b96f8fba61c21bfc5a07calHnZ",
+            "email_1": report.confirmation_email_1,
+            "email_2": report.confirmation_email_2,
+            "agency_id": "FEC",
+            "wait": False,
+        }
+    )
 
 
 def update_submission_status(upload_submission_record_id, response_json):
