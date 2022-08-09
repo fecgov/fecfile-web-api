@@ -13,7 +13,7 @@ def patch_report_code_label(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', 'fecfiler/f3x_summaries/migrations/0013_auto_20220807_0743.py'),
+        ('f3x_summaries', '0013_auto_20220807_0743'),
     ]
 
     operations = [
