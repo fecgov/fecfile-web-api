@@ -55,4 +55,4 @@ class ReportViewMixin(GenericViewSet):
             else None
         )
         queryset = super().get_queryset()
-        return queryset.filter(report_id=report_id)
+        return queryset.filter(report_id=report_id) if report_id else queryset
