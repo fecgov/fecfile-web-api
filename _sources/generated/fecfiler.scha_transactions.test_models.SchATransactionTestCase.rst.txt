@@ -110,8 +110,11 @@ fecfiler.scha\_transactions.test\_models.SchATransactionTestCase
       ~SchATransactionTestCase.subTest
       ~SchATransactionTestCase.tearDown
       ~SchATransactionTestCase.tearDownClass
+      ~SchATransactionTestCase.test_catches_uid_conflict
+      ~SchATransactionTestCase.test_generate_uid
       ~SchATransactionTestCase.test_get_scha_transaction
       ~SchATransactionTestCase.test_get_scha_transaction_in_f3x_summary
+      ~SchATransactionTestCase.test_parent_related_values
       ~SchATransactionTestCase.test_save_and_delete
    
    

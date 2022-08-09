@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0014\_schatransaction\_alter\_transaction\_id.check\_for\_uid\_conflicts
+===============================================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0014_schatransaction_alter_transaction_id
+
+.. autofunction:: check_for_uid_conflicts

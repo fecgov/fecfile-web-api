@@ -151,6 +151,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.L8_cash_on_hand_close_ytd
       ~F3XSummary.L9_debts_to_period
       ~F3XSummary.all_objects
+      ~F3XSummary.cash_on_hand_date
       ~F3XSummary.change_of_address
       ~F3XSummary.city
       ~F3XSummary.committee_account

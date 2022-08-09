@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.migrations.0014\_patch\_report\_code\_label\_MY\_20220808\_1122.patch\_report\_code\_label
+==================================================================================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.migrations.0014_patch_report_code_label_MY_20220808_1122
+
+.. autofunction:: patch_report_code_label

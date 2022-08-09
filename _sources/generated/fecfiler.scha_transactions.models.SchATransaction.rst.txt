@@ -21,12 +21,15 @@ fecfiler.scha\_transactions.models.SchATransaction
    
       ~SchATransaction.__init__
       ~SchATransaction.check
+      ~SchATransaction.check_for_uid_conflicts
       ~SchATransaction.clean
       ~SchATransaction.clean_fields
       ~SchATransaction.date_error_message
       ~SchATransaction.delete
       ~SchATransaction.from_db
       ~SchATransaction.full_clean
+      ~SchATransaction.generate_uid
+      ~SchATransaction.generate_unique_transaction_id
       ~SchATransaction.get_deferred_fields
       ~SchATransaction.get_next_by_created
       ~SchATransaction.get_next_by_updated
@@ -39,6 +42,7 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.save_base
       ~SchATransaction.serializable_value
       ~SchATransaction.unique_error_message
+      ~SchATransaction.update_parent_related_values
       ~SchATransaction.validate_unique
    
    
