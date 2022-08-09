@@ -1,7 +1,7 @@
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import IntegerField
+from rest_framework.serializers import IntegerField, CharField
 from rest_framework.exceptions import ValidationError
 import logging
 
@@ -12,6 +12,12 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     parent_transaction_id = IntegerField(required=False, allow_null=True)
+    transaction_id = CharField(
+        required=True,
+        max_length=20,
+        allow_blank=False,
+        allow_null=True
+    )
 
     report_id = IntegerField(required=True, allow_null=False)
 
