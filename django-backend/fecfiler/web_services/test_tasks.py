@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.test import TestCase
 from .tasks import create_dot_fec
 from fecfiler.f3x_summaries.models import F3XSummary
@@ -20,7 +21,7 @@ class TasksTestCase(TestCase):
         self.transaction = SchATransaction.objects.filter(id=9999).first()
 
     def test_create_dot_fec(self):
-        dot_fec_id = create_dot_fec(9999, True)
+        dot_fec_id = create_dot_fec(9999, None, True)
         dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
         result_dot_fec = Path(CELERY_LOCAL_STORAGE_DIRECTORY).joinpath(
             dot_fec_record.file_name

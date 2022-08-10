@@ -19,9 +19,9 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_compose_dot_fec(self):
         with self.assertRaisesMessage(Exception, "report: 100000000 not found"):
-            compose_dot_fec(100000000)
+            compose_dot_fec(100000000, None)
 
-        file_content = compose_dot_fec(9999)
+        file_content = compose_dot_fec(9999, None)
         self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):

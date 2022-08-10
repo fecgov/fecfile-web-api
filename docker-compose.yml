@@ -52,6 +52,10 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
+      FEC_FILING_API: https://test-efoservices.fec.gov
+      FEC_FILING_API_KEY:
+      FILE_AS_TEST_COMMITTEE:
+      TEST_COMMITTEE_PASSWORD:
 
 
   api:
@@ -88,3 +92,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
+      FEC_FILING_API: https://test-efoservices.fec.gov
+      FEC_FILING_API_KEY:
+      FILE_AS_TEST_COMMITTEE:
+      TEST_COMMITTEE_PASSWORD:

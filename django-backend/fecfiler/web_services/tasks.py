@@ -22,8 +22,8 @@ test_fec_upload_client = Client(f"{FEC_FILING_API}/webload/services/upload?wsdl"
 
 
 @shared_task
-def create_dot_fec(report_id, force_write_to_disk=False):
-    file_content = compose_dot_fec(report_id)
+def create_dot_fec(report_id, upload_submission_record_id, force_write_to_disk=False):
+    file_content = compose_dot_fec(report_id, upload_submission_record_id)
     file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
     if not file_content or not file_name:
         return None
@@ -44,8 +44,11 @@ def submit_to_fec(dot_fec_id, upload_submission_record_id, e_filing_password):
         dot_fec_record.save()
         return
 
-    dot_fec_record.fecfile_task_state = "SUBMITTING"
-    dot_fec_record.save()
+    upload_submission_record = UploadSubmission.objects.get(
+        id=upload_submission_record_id
+    )
+    upload_submission_record.fecfile_task_state = "SUBMITTING"
+    upload_submission_record.save()
 
     file_name = dot_fec_record.file_name
     try:
@@ -84,11 +87,11 @@ def submit_to_fec(dot_fec_id, upload_submission_record_id, e_filing_password):
             upload_submission_record_id, status_response
         )
         logger.info(
-            f"Polling status for {submission_record.fec_submission_id}. Status: {submission_record.fec_status}"
+            f"Polling status for {submission_record.fec_submission_id}. Status: {submission_record.fec_status}, Message: {submission_record.fec_message}"
         )
 
     submission_record.fecfile_task_state = (
-        "SUCCEEDED" if dot_fec_record.fec_status == "ACCEPTED" else "FAILED"
+        "SUCCEEDED" if submission_record.fec_status == "ACCEPTED" else "FAILED"
     )
     submission_record.save()
     return file_name

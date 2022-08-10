@@ -30,7 +30,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
-        task = create_dot_fec.apply_async((report_id, False), retry=False)
+        task = create_dot_fec.apply_async((report_id, None), retry=False)
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
@@ -75,7 +75,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             f"Starting Celery Task submit_to_fec for report :{report_id} {upload_submission_record.id}"
         )
         task = (
-            create_dot_fec.s(report_id, False)
+            create_dot_fec.s(report_id, upload_submission_record.id)
             | submit_to_fec.s(upload_submission_record.id, e_filing_password)
         ).apply_async(retry=False)
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")

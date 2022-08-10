@@ -13,13 +13,16 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
+    # TODO get rid of this field.  It is redundant with the related Committee_Account
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(
         editable=False, null=True, blank=False, max_length=20
     )
+    # TODO get rid of this field.  It is redundant with the related Parent Transaction
     back_reference_tran_id_number = models.TextField(
         null=True, blank=True, max_length=20
     )
+    # TODO get rid of this field.  It is redundant with the related Parent Transaction
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     contributor_organization_name = models.TextField(null=True, blank=True)
