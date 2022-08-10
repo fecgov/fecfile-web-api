@@ -66,10 +66,11 @@ class WebServicesViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        e_filing_password = serializer.validated_data["e_filing_password"]
+        e_filing_password = serializer.validated_data["password"]
         upload_submission_record = UploadSubmission(
             report_id=report_id, fecfile_task_state="CREATING_FILE"
-        ).save()
+        )
+        upload_submission_record.save()
         logger.debug(
             f"Starting Celery Task submit_to_fec for report :{report_id} {upload_submission_record.id}"
         )

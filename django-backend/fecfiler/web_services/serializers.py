@@ -19,4 +19,4 @@ class ReportIdSerializer(serializers.Serializer):
 
 
 class SubmissionSerializer(ReportIdSerializer):
-    e_filing_password = serializers.CharField(allow_blank=False)
+    password = serializers.CharField(allow_blank=False)
