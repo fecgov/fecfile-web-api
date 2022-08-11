@@ -41,3 +41,17 @@ class ReportCodeLabelViewSet(GenericViewSet, ListModelMixin):
     queryset = ReportCodeLabel.objects.all()
     serializer_class = ReportCodeLabelSerializer
     pagination_class = None
+
+
+class ReportViewMixin(GenericViewSet):
+    def get_queryset(self):
+        report_id = (
+            (
+                self.request.query_params.get("report_id")
+                or self.request.data["report_id"]
+            )
+            if self.request
+            else None
+        )
+        queryset = super().get_queryset()
+        return queryset.filter(report_id=report_id) if report_id else queryset

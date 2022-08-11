@@ -2,11 +2,12 @@ from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.web_services.tasks import create_dot_fec
-from .serializers import ReportIdSerializer
+from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
+from fecfiler.settings import FEC_FILING_API
+from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC
+from .models import DotFEC, UploadSubmission
 
 import logging
 
@@ -25,13 +26,16 @@ class WebServicesViewSet(viewsets.ViewSet):
         url_path="dot-fec",
     )
     def create_dot_fec(self, request):
+        """Create a .FEC file and store it
+        Currently only useful for testing purposes
+        """
         serializer = ReportIdSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        logger.info(f"Firing off create_dot_fec for report :{report_id}")
-        task = create_dot_fec.apply_async((report_id, False), retry=False)
-        logger.info(f"Status for report {report_id}: {task.status}")
+        logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
+        task = create_dot_fec.apply_async((report_id, None), retry=False)
+        logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
     @action(
@@ -41,6 +45,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         renderer_classes=(DotFECRenderer,),
     )
     def get_dot_fec(self, request, report_id):
+        """Download the most recent .FEC created for a report
+        Currently only useful for testing purposes
+        """
         committee_id = request.user.cmtee_id
         dot_fec_record = DotFEC.objects.filter(
             report__id=report_id, report__committee_account__committee_id=committee_id
@@ -51,5 +58,34 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
         file = get_file(file_name)
-        logger.info(f"Retrieved .FEC: {file_name}")
+        logger.debug(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="submit-to-fec",
+    )
+    def submit_to_fec(self, request):
+        """Create a signed .FEC, store it, and submit it to FEC Webload"""
+        serializer = SubmissionRequestSerializer(
+            data=request.data, context={"request": request}
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        """Retrieve parameters"""
+        report_id = serializer.validated_data["report_id"]
+        e_filing_password = serializer.validated_data["password"]
+
+        """Start tracking submission"""
+        upload_submission = UploadSubmission.objects.initiate_submission(report_id)
+
+        """Start Celery tasks in chain"""
+        task = (
+            create_dot_fec.s(report_id, upload_submission.id)
+            | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
+        ).apply_async(retry=False)
+
+        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        return Response({"status": "Submit .FEC task created"})

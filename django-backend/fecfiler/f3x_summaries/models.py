@@ -19,16 +19,20 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
+    # TODO get rid of this field.  It is redundant with the related Committee_Account
     filer_committee_id_number = models.TextField(null=True, blank=True)
+    # TODO get rid of this field.  It is redundant with the related Committee_Account
     committee_name = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
     confirmation_email_1 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None)
+        max_length=44, null=True, blank=True, default=None
+    )
     confirmation_email_2 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None)
+        max_length=44, null=True, blank=True, default=None
+    )
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     report_code = models.ForeignKey(
@@ -353,8 +357,30 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     L38_net_operating_expenditures_ytd = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+
+    upload_submission = models.ForeignKey(
+        "web_services.UploadSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "f3x_summaries"
+
+
+class ReportMixin(models.Model):
+    """Abstract model for tracking f3x reports
+
+    Inherit this model to add an F3X Report foreign key, attributing
+    a model instance to an F3X Report
+    """
+
+    report = models.ForeignKey(
+        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    class Meta:
+        abstract = True

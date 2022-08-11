@@ -13,26 +13,30 @@ class SchATransactionsViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = 1
-        self.f3x_2 = 2
+        self.f3x_id = 9999
+        self.f3x_2_id = 10000
         self.f3x_transaction_count = len(
-            SchATransaction.objects.filter(report_id=self.f3x)
+            SchATransaction.objects.filter(report_id=self.f3x_id)
         )
         self.f3x_2_transaction_count = len(
-            SchATransaction.objects.filter(report_id=self.f3x_2)
+            SchATransaction.objects.filter(report_id=self.f3x_2_id)
         )
 
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
 
     def test_view_url_exists_at_desired_location(self):
-        request = self.factory.get(f"/api/v1/sch-a-transactions/?report_id={self.f3x}")
+        request = self.factory.get(
+            f"/api/v1/sch-a-transactions/?report_id={self.f3x_id}"
+        )
         request.user = self.user
         response = SchATransactionViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
 
     def test_is_paginated(self):
-        request = self.factory.get(f"/api/v1/sch-a-transactions/?report_id={self.f3x}")
+        request = self.factory.get(
+            f"/api/v1/sch-a-transactions/?report_id={self.f3x_id}"
+        )
         request.user = self.user
         response = SchATransactionViewSet.as_view({"get": "list"})(request)
 
@@ -46,8 +50,8 @@ class SchATransactionsViewTest(TestCase):
     def test_only_from_one_report(self):
         responses = []
         for url in [
-            f"/api/v1/sch-a-transactions/?report_id={self.f3x}",
-            f"/api/v1/sch-a-transactions/?report_id={self.f3x_2}",
+            f"/api/v1/sch-a-transactions/?report_id={self.f3x_id}",
+            f"/api/v1/sch-a-transactions/?report_id={self.f3x_2_id}",
         ]:
             request = self.factory.get(url)
             request.user = self.user

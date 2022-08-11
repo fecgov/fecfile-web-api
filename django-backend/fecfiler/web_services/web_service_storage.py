@@ -33,7 +33,18 @@ def get_file(file_name, force_read_from_disk=False):
         logger.info(f"SUCCESS file was retrieved s3: {file_name}")
     else:
         logger.info(f"retrieving file from disk: {file_name}")
-        path = Path.joinpath(CELERY_LOCAL_STORAGE_DIRECTORY, file_name)
-        file = open(path, encoding="utf-8")
+        path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / file_name
+        file = open(path)
         logger.info(f"SUCCESS file was retrieved disk: {file_name}")
     return file
+
+
+def get_file_bytes(file_name, force_read_from_disk=False):
+    try:
+        file = get_file(file_name, force_read_from_disk)
+        file_bytes = bytearray(file.read())
+        file.close()
+        return file_bytes
+    except Exception:
+        file.close()
+        raise Exception(f"Failed to get bytes for {file_name}")

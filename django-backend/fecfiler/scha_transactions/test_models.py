@@ -5,7 +5,11 @@ from ..committee_accounts.models import CommitteeAccount
 
 
 class SchATransactionTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_scha_transactions"]
+    fixtures = [
+        "test_committee_accounts",
+        "test_scha_transactions",
+        "test_f3x_summaries",
+    ]
 
     def setUp(self):
         self.sa_trans = SchATransaction(
@@ -20,18 +24,14 @@ class SchATransactionTestCase(TestCase):
 
     def test_get_scha_transaction(self):
         scha_transaction = SchATransaction.objects.filter(
-            contributor_last_name="Smith").first()
+            contributor_last_name="Smith"
+        ).first()
         self.assertEquals(scha_transaction.contributor_first_name, "John")
 
     def test_get_scha_transaction_in_f3x_summary(self):
         committee = CommitteeAccount()
-        f3x = F3XSummary(
-            committee_account=committee
-        )
-        trans = SchATransaction(
-            committee_account=committee,
-            report_id=f3x
-        )
+        f3x = F3XSummary(committee_account=committee)
+        trans = SchATransaction(committee_account=committee, report=f3x)
         return trans
 
     def test_parent_related_values(self):

@@ -16,5 +16,13 @@ class MemoTextSerializer(
     class Meta:
         model = MemoText
         fields = [
-            f.name for f in MemoText._meta.get_fields() if f.name not in ["report"]
+            f.name
+            for f in MemoText._meta.get_fields()
+            if f.name not in ["report", "deleted"]
         ] + ["report_id"]
+        read_only_fields = [
+            "id",
+            "deleted",
+            "created",
+            "updated",
+        ]
