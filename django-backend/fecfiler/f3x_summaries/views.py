@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.db.models.query import QuerySet
 from rest_framework import filters
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin

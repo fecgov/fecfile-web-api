@@ -7,33 +7,37 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0002_uploadsubmission'),
+        ("web_services", "0002_uploadsubmission"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='uploadsubmission',
-            name='dot_fec',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='web_services.dotfec'),
+            model_name="uploadsubmission",
+            name="dot_fec",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="web_services.dotfec",
+            ),
         ),
         migrations.AddField(
-            model_name='uploadsubmission',
-            name='fecfile_error',
+            model_name="uploadsubmission",
+            name="fecfile_error",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='uploadsubmission',
-            name='fec_message',
+            model_name="uploadsubmission",
+            name="fec_message",
             field=models.TextField(null=True),
         ),
         migrations.AlterField(
-            model_name='uploadsubmission',
-            name='fec_status',
+            model_name="uploadsubmission",
+            name="fec_status",
             field=models.CharField(max_length=255),
         ),
         migrations.AlterField(
-            model_name='uploadsubmission',
-            name='fecfile_task_state',
+            model_name="uploadsubmission",
+            name="fecfile_task_state",
             field=models.CharField(max_length=255),
         ),
     ]

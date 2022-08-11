@@ -45,6 +45,6 @@ def get_file_bytes(file_name, force_read_from_disk=False):
         file_bytes = bytearray(file.read())
         file.close()
         return file_bytes
-    except:
+    except Exception:
         file.close()
         raise Exception(f"Failed to get bytes for {file_name}")

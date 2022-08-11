@@ -7,26 +7,61 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', '0014_patch_report_code_label_MY_20220808_1122'),
-        ('web_services', '0001_initial'),
+        ("f3x_summaries", "0014_patch_report_code_label_MY_20220808_1122"),
+        ("web_services", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UploadSubmission',
+            name="UploadSubmission",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('fecfile_task_state', models.CharField(choices=[('CREATING_FILE', 'CREATING_FILE'), ('SUBMITTING', 'SUBMITTING'), ('SUCCEEDED', 'SUCCEEDED'), ('FAILED', 'FAILED')], max_length=255)),
-                ('fec_submission_id', models.CharField(max_length=255)),
-                ('fec_status', models.CharField(choices=[('ACCEPTED', 'ACCEPTED'), ('PROCESSING', 'PROCESSING'), ('REJECTED', 'REJECTED')], max_length=255)),
-                ('fec_report_id', models.CharField(max_length=255)),
-                ('fec_message', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('report', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "fecfile_task_state",
+                    models.CharField(
+                        choices=[
+                            ("CREATING_FILE", "CREATING_FILE"),
+                            ("SUBMITTING", "SUBMITTING"),
+                            ("SUCCEEDED", "SUCCEEDED"),
+                            ("FAILED", "FAILED"),
+                        ],
+                        max_length=255,
+                    ),
+                ),
+                ("fec_submission_id", models.CharField(max_length=255)),
+                (
+                    "fec_status",
+                    models.CharField(
+                        choices=[
+                            ("ACCEPTED", "ACCEPTED"),
+                            ("PROCESSING", "PROCESSING"),
+                            ("REJECTED", "REJECTED"),
+                        ],
+                        max_length=255,
+                    ),
+                ),
+                ("fec_report_id", models.CharField(max_length=255)),
+                ("fec_message", models.TextField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "report",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="f3x_summaries.f3xsummary",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'upload_submissions',
+                "db_table": "upload_submissions",
             },
         ),
     ]

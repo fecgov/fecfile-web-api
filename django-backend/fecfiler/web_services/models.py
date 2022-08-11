@@ -50,7 +50,8 @@ class UploadSubmissionManager(models.Manager):
         F3XSummary.objects.filter(id=report_id).update(upload_submission=submission)
 
         logger.info(
-            f"Submission to Webload has been initialized for report :{report_id} (track submission with {submission.id})"
+            f"""Submission to Webload has been initialized for report :{report_id}
+            (track submission with {submission.id})"""
         )
         return submission
 

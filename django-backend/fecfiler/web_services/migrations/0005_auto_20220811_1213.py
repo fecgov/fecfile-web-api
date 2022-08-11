@@ -7,17 +7,21 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0004_auto_20220811_1040'),
+        ("web_services", "0004_auto_20220811_1040"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='uploadsubmission',
-            name='report',
+            model_name="uploadsubmission",
+            name="report",
         ),
         migrations.AlterField(
-            model_name='uploadsubmission',
-            name='dot_fec',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.dotfec'),
+            model_name="uploadsubmission",
+            name="dot_fec",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.dotfec",
+            ),
         ),
     ]

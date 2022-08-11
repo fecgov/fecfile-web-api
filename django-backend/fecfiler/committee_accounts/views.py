@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from django.db.models.query import QuerySet
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.test import TestCase
 from .tasks import create_dot_fec
 from fecfiler.f3x_summaries.models import F3XSummary

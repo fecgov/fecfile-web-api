@@ -1,8 +1,6 @@
 import json
-from urllib import response
 from zeep import Client
 from fecfiler.settings import (
-    FEC_FILING_API,
     FEC_FILING_API_KEY,
     FILE_AS_TEST_COMMITTEE,
     TEST_COMMITTEE_PASSWORD,
@@ -37,6 +35,7 @@ class DotFECSubmitter:
         )
 
     def submit(self, dot_fec_bytes, json_payload):
+        response = ""
         if self.fec_soap_client:
             response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         else:
@@ -45,6 +44,7 @@ class DotFECSubmitter:
         return response
 
     def poll_status(self, submission_id):
+        response = ""
         if self.fec_soap_client:
             response = self.fec_soap_client.service.status(submission_id)
         else:

@@ -50,7 +50,7 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
     file_name = dot_fec_record.file_name
     try:
         dot_fec_bytes = get_file_bytes(file_name)
-    except:
+    except Exception:
         submission.save_error("Could not retrieve .FEC bytes")
         return
 
@@ -64,8 +64,9 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
     """Poll FEC for status of submission"""
     # TODO: add timeout?
     while submission.fec_status not in ["ACCEPTED", "REJECTED"]:
+        logger.info(f"Polling status for {submission.fec_submission_id}.")
         logger.info(
-            f"Polling status for {submission.fec_submission_id}. Status: {submission.fec_status}, Message: {submission.fec_message}"
+            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
         )
         time.sleep(2)
         status_response_string = submitter.poll_status(submission.fec_submission_id)

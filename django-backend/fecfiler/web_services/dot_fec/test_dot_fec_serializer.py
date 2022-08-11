@@ -1,6 +1,5 @@
 from django.test import TestCase
 from .dot_fec_serializer import (
-    CRLF_STR,
     serialize_field,
     serialize_model_instance,
 )
