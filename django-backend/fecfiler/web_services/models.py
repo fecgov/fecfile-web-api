@@ -20,8 +20,9 @@ class DotFEC(models.Model):
         db_table = "dot_fecs"
 
 
-class UploadSubmissionState(Enum):
-    """States of upload submission"""
+class FECSubmissionState(Enum):
+    """States of submission to FEC
+    Can be used for Webload and WebPrint"""
 
     INITIALIZING = "INITIALIZING"
     CREATING_FILE = "CREATING_FILE"
@@ -34,7 +35,8 @@ class UploadSubmissionState(Enum):
 
 
 class FECStatus(Enum):
-    ACCEPTED = "ACCEPTED"
+    ACCEPTED = "ACCEPTED"  # Webload
+    COMPLETED = "COMPLETED"  # WebPrint
     PROCESSING = "PROCESSING"
     REJECTED = "REJECTED"
 
@@ -44,7 +46,7 @@ class FECStatus(Enum):
 
 class UploadSubmissionManager(models.Manager):
     def initiate_submission(self, report_id):
-        submission = self.create(fecfile_task_state=UploadSubmissionState.INITIALIZING)
+        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING)
         submission.save()
 
         F3XSummary.objects.filter(id=report_id).update(upload_submission=submission)
@@ -56,37 +58,47 @@ class UploadSubmissionManager(models.Manager):
         return submission
 
 
-class UploadSubmission(models.Model):
-    """Model tracking submissions to FEC Webload"""
+class WebPrintSubmissionManager(models.Manager):
+    def initiate_submission(self, report_id):
+        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING)
+        submission.save()
+
+        F3XSummary.objects.filter(id=report_id).update(webprint_submission=submission)
+
+        logger.info(
+            f"""Submission to WebPrint has been initialized for report :{report_id}
+            (track submission with {submission.id})"""
+        )
+        return submission
+
+
+class BaseSubmission(models.Model):
+    """Base Model tracking submissions to FEC"""
 
     dot_fec = models.ForeignKey(DotFEC, on_delete=models.SET_NULL, null=True)
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
     fecfile_error = models.TextField(null=True)
 
+    """FEC response fields"""
     fec_submission_id = models.CharField(max_length=255, null=True)
     fec_status = models.CharField(max_length=255, null=True)
-    # different from internal report id
-    fec_report_id = models.CharField(max_length=255, null=True)
     fec_message = models.TextField(null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    objects = UploadSubmissionManager()
-
     def save_fec_response(self, response_string):
-        logger.debug(f"FEC upload response: {response_string}")
+        logger.debug(f"FEC response: {response_string}")
         fec_response_json = json.loads(response_string)
         self.fec_submission_id = fec_response_json.get("submission_id")
         self.fec_status = fec_response_json.get("status")
         self.fec_message = fec_response_json.get("message")
-        self.fec_report_id = fec_response_json.get("report_id")
 
         self.save()
 
     def save_error(self, error):
-        self.fecfile_task_state = UploadSubmissionState.FAILED
+        self.fecfile_task_state = FECSubmissionState.FAILED
         self.fecfile_error = error
         logger.error(f"Submission {self.id} FAILED {self.fecfile_error}")
         self.save()
@@ -95,6 +107,39 @@ class UploadSubmission(models.Model):
         self.fecfile_task_state = new_state
         logger.info(f"Submission {self.id} is {self.fecfile_task_state}")
         self.save()
+
+    class Meta:
+        abstract = True
+
+
+class UploadSubmission(BaseSubmission):
+    """Model tracking submissions to FEC Webload"""
+
+    # different from internal report id
+    fec_report_id = models.CharField(max_length=255, null=True)
+
+    objects = UploadSubmissionManager()
+
+    def save_fec_response(self, response_string):
+        fec_response_json = json.loads(response_string)
+        self.fec_report_id = fec_response_json.get("report_id")
+        super().save_fec_response(response_string)
+
+    class Meta:
+        db_table = "upload_submissions"
+
+
+class WebPrintSubmission(BaseSubmission):
+    """Model tracking submissions to FEC WebPrint"""
+
+    fec_batch_id = models.CharField(max_length=255, null=True)
+
+    objects = WebPrintSubmissionManager()
+
+    def save_fec_response(self, response_string):
+        fec_response_json = json.loads(response_string)
+        self.fec_batch_id = fec_response_json.get("batch_id")
+        return super().save_fec_response(response_string)
 
     class Meta:
         db_table = "upload_submissions"

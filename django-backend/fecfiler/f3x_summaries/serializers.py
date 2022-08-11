@@ -1,7 +1,10 @@
 from .models import F3XSummary, ReportCodeLabel
 from rest_framework.serializers import ModelSerializer, SlugRelatedField, EmailField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.web_services.serializers import UploadSubmissionSerializer
+from fecfiler.web_services.serializers import (
+    UploadSubmissionSerializer,
+    WebPrintSubmissionSerializer,
+)
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 import logging
 
@@ -34,6 +37,9 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
     upload_submission = UploadSubmissionSerializer(
         read_only=True,
     )
+    webprint_submission = WebPrintSubmissionSerializer(
+        read_only=True,
+    )
 
     class Meta:
         model = F3XSummary
@@ -47,6 +53,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "dotfec",
                 "memotext",
                 "uploadsubmission",
+                "webprintsubmission",
             ]
         ]
         read_only_fields = [

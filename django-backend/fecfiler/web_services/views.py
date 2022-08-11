@@ -89,3 +89,29 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="submit-to-webprint",
+    )
+    def submit_to_fec(self, request):
+        """Create a signed .FEC, store it, and submit it to FEC Webload"""
+        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        """Retrieve parameters"""
+        report_id = serializer.validated_data["report_id"]
+
+        """Start tracking submission"""
+        upload_submission = UploadSubmission.objects.initiate_submission(report_id)
+
+        """Start Celery tasks in chain"""
+        task = (
+            create_dot_fec.s(report_id, upload_submission.id)
+            | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
+        ).apply_async(retry=False)
+
+        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        return Response({"status": "Submit .FEC task created"})

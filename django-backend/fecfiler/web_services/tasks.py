@@ -5,7 +5,7 @@ from celery import shared_task
 from fecfiler.web_services.models import (
     DotFEC,
     UploadSubmission,
-    UploadSubmissionState,
+    FECSubmissionState,
     FECStatus,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
     if submission_record_id:
         submission = UploadSubmission.objects.get(id=submission_record_id)
-        submission.save_state(UploadSubmissionState.CREATING_FILE)
+        submission.save_state(FECSubmissionState.CREATING_FILE)
     file_content = compose_dot_fec(report_id, submission_record_id)
     file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
     if not file_content or not file_name:
@@ -38,7 +38,7 @@ def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
 @shared_task
 def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None):
     submission = UploadSubmission.objects.get(id=submission_record_id)
-    submission.save_state(UploadSubmissionState.SUBMITTING)
+    submission.save_state(FECSubmissionState.SUBMITTING)
 
     """Get Password"""
     if not e_filing_password:
@@ -73,9 +73,9 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
         submission.save_fec_response(status_response_string)
 
     new_state = (
-        UploadSubmissionState.SUCCEEDED
+        FECSubmissionState.SUCCEEDED
         if submission.fec_status == FECStatus.ACCEPTED.value
-        else UploadSubmissionState.FAILED
+        else FECSubmissionState.FAILED
     )
     submission.save_state(new_state)
     return submission.id
