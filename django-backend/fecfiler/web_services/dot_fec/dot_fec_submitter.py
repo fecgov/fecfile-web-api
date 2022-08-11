@@ -1,5 +1,6 @@
 import json
 from zeep import Client
+from fecfiler.web_services.models import FECStatus
 from fecfiler.settings import (
     FEC_FILING_API_KEY,
     FILE_AS_TEST_COMMITTEE,
@@ -12,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class DotFECSubmitter:
+    fec_soap_client = None
+
     def __init__(self, api):
         if api:
             self.fec_soap_client = Client(f"{api}/webload/services/upload?wsdl")
@@ -39,7 +42,15 @@ class DotFECSubmitter:
         if self.fec_soap_client:
             response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         else:
-            response = "{}"
+            """return an accepted message without reaching out to api"""
+            response = json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "We didn't really send anything to FEC",
+                    "report_id": "1234",
+                }
+            )
         logger.debug("FEC upload response: {response}")
         return response
 
@@ -48,6 +59,14 @@ class DotFECSubmitter:
         if self.fec_soap_client:
             response = self.fec_soap_client.service.status(submission_id)
         else:
-            response = "{}"
+            """return an accepted message without reaching out to api"""
+            response = json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "We didn't really send anything to FEC",
+                    "report_id": "1234",
+                }
+            )
         logger.debug(f"FEC polling response: {response}")
         return response
