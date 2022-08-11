@@ -2,7 +2,11 @@ from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
+from fecfiler.web_services.tasks import (
+    create_dot_fec,
+    submit_to_fec,
+    submit_to_webprint,
+)
 from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
@@ -113,7 +117,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """
         task = (
             create_dot_fec.s(report_id, None)  # Don't send submission_id
-            | submit_to_fec.s(webprint_submission.id, FEC_FILING_API)
+            | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API)
         ).apply_async(retry=False)
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")

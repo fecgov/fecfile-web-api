@@ -14,13 +14,13 @@ class WebPrintSubmitter:
 
     def __init__(self, api):
         if api:
-            self.fec_soap_client = Client(f"{api}/webload/services/print?wsdl")
+            self.fec_soap_client = Client(f"{api}/webprint/services/print?wsdl")
 
-    def submit(self, dot_fec_bytes):
+    def submit(self, email, dot_fec_bytes):
         response = ""
         if self.fec_soap_client:
             response = self.fec_soap_client.service.print(
-                FEC_FILING_API_KEY, "", dot_fec_bytes
+                FEC_FILING_API_KEY, email, dot_fec_bytes
             )
         else:
             """return an accepted message without reaching out to api"""

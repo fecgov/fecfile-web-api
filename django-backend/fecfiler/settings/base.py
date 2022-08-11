@@ -273,6 +273,7 @@ FEC_FILING_API = env.get_credential("FEC_FILING_API")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
 TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
+WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")

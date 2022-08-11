@@ -144,14 +144,18 @@ class UploadSubmission(BaseSubmission):
 class WebPrintSubmission(BaseSubmission):
     """Model tracking submissions to FEC WebPrint"""
 
+    fec_image_url = models.CharField(max_length=255, null=True)
     fec_batch_id = models.CharField(max_length=255, null=True)
+    fec_email = models.CharField(max_length=255, null=True)
 
     objects = WebPrintSubmissionManager()
 
     def save_fec_response(self, response_string):
         fec_response_json = json.loads(response_string)
+        self.fec_image_url = fec_response_json.get("image_url")
         self.fec_batch_id = fec_response_json.get("batch_id")
+        self.fec_email = fec_response_json.get("email")
         return super().save_fec_response(response_string)
 
     class Meta:
-        db_table = "upload_submissions"
+        db_table = "webprint_submissions"
