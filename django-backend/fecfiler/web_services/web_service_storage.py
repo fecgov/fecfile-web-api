@@ -37,3 +37,14 @@ def get_file(file_name, force_read_from_disk=False):
         file = open(path, encoding="utf-8")
         logger.info(f"SUCCESS file was retrieved disk: {file_name}")
     return file
+
+
+def get_file_bytes(file_name, force_read_from_disk=False):
+    try:
+        file = get_file(file_name, force_read_from_disk)
+        file_bytes = bytearray(file.read(), "utf-8")
+        file.close()
+        return file_bytes
+    except:
+        file.close()
+        raise Exception(f"Failed to get bytes for {file_name}")

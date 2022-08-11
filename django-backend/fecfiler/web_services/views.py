@@ -25,6 +25,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         url_path="dot-fec",
     )
     def create_dot_fec(self, request):
+        """Create a .FEC file and store it
+        Currently only useful for testing purposes
+        """
         serializer = ReportIdSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -41,6 +44,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         renderer_classes=(DotFECRenderer,),
     )
     def get_dot_fec(self, request, report_id):
+        """Download the most recent .FEC created for a report
+        Currently only useful for testing purposes
+        """
         committee_id = request.user.cmtee_id
         dot_fec_record = DotFEC.objects.filter(
             report__id=report_id, report__committee_account__committee_id=committee_id
@@ -60,23 +66,25 @@ class WebServicesViewSet(viewsets.ViewSet):
         url_path="submit-to-fec",
     )
     def submit_to_fec(self, request):
+        """Create a signed .FEC, store it, and submit it to FEC Webload"""
         serializer = SubmissionSerializer(
             data=request.data, context={"request": request}
         )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        """Retrieve parameters"""
         report_id = serializer.validated_data["report_id"]
         e_filing_password = serializer.validated_data["password"]
-        upload_submission_record = UploadSubmission(
-            report_id=report_id, fecfile_task_state="CREATING_FILE"
-        )
-        upload_submission_record.save()
-        logger.debug(
-            f"Starting Celery Task submit_to_fec for report :{report_id} {upload_submission_record.id}"
-        )
+
+        """Start tracking submission"""
+        upload_submission = UploadSubmission.objects.initiate_submission(report_id)
+
+        """Start Celery tasks in chain"""
         task = (
-            create_dot_fec.s(report_id, upload_submission_record.id)
-            | submit_to_fec.s(upload_submission_record.id, e_filing_password)
+            create_dot_fec.s(report_id, upload_submission.id)
+            | submit_to_fec.s(upload_submission.id, e_filing_password)
         ).apply_async(retry=False)
+
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
