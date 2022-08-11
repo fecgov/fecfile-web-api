@@ -38,10 +38,22 @@ class FECStatus(Enum):
     ACCEPTED = "ACCEPTED"  # Webload
     COMPLETED = "COMPLETED"  # WebPrint
     PROCESSING = "PROCESSING"
-    REJECTED = "REJECTED"
+    REJECTED = "REJECTED"  # Webload
+    FAILED = "FAILED"  # WebPrint
 
     def __str__(self):
         return str(self.value)
+
+    def get_terminal_statuses():
+        return [
+            FECStatus.ACCEPTED,
+            FECStatus.COMPLETED,
+            FECStatus.FAILED,
+            FECStatus.REJECTED,
+        ]
+
+    def get_terminal_statuses_strings():
+        return [status.value for status in FECStatus.get_terminal_statuses()]
 
 
 class UploadSubmissionManager(models.Manager):

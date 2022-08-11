@@ -7,7 +7,7 @@ from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC, UploadSubmission
+from .models import DotFEC, UploadSubmission, WebPrintSubmission
 
 import logging
 
@@ -87,7 +87,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
         ).apply_async(retry=False)
 
-        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        logger.debug(f"submit_to_fec report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
 
     @action(
@@ -95,8 +95,8 @@ class WebServicesViewSet(viewsets.ViewSet):
         methods=["post"],
         url_path="submit-to-webprint",
     )
-    def submit_to_fec(self, request):
-        """Create a signed .FEC, store it, and submit it to FEC Webload"""
+    def submit_to_webprint(self, request):
+        """Create an unsigned .FEC, store it, and submit it to FEC WebPrint"""
         serializer = ReportIdSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -105,13 +105,16 @@ class WebServicesViewSet(viewsets.ViewSet):
         report_id = serializer.validated_data["report_id"]
 
         """Start tracking submission"""
-        upload_submission = UploadSubmission.objects.initiate_submission(report_id)
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(report_id)
 
-        """Start Celery tasks in chain"""
+        """Start Celery tasks in chain
+        Notice that we don't send the submission id to `create_dot_fec`
+        We don't want the .FEC to be signed for WebPrint
+        """
         task = (
-            create_dot_fec.s(report_id, upload_submission.id)
-            | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
+            create_dot_fec.s(report_id, None)  # Don't send submission_id
+            | submit_to_fec.s(webprint_submission.id, FEC_FILING_API)
         ).apply_async(retry=False)
 
-        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})

@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4 as uuid
 from zeep import Client
 from fecfiler.web_services.models import FECStatus
 from fecfiler.settings import (
@@ -48,7 +49,7 @@ class DotFECSubmitter:
                     "submission_id": "fake_submission_id",
                     "status": FECStatus.ACCEPTED.value,
                     "message": "We didn't really send anything to FEC",
-                    "report_id": "1234",
+                    "report_id": str(uuid()),
                 }
             )
         logger.debug("FEC upload response: {response}")
@@ -65,7 +66,7 @@ class DotFECSubmitter:
                     "submission_id": "fake_submission_id",
                     "status": FECStatus.ACCEPTED.value,
                     "message": "We didn't really send anything to FEC",
-                    "report_id": "1234",
+                    "report_id": str(uuid()),
                 }
             )
         logger.debug(f"FEC polling response: {response}")
