@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
+from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
@@ -83,7 +84,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Start Celery tasks in chain"""
         task = (
             create_dot_fec.s(report_id, upload_submission.id)
-            | submit_to_fec.s(upload_submission.id, e_filing_password)
+            | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
         ).apply_async(retry=False)
 
         logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")

@@ -28,11 +28,17 @@ class UploadSubmissionState(Enum):
     SUCCEEDED = "SUCCEEDED"
     FAILED = "FAILED"
 
+    def __str__(self):
+        return str(self.value)
+
 
 class FECStatus(Enum):
     ACCEPTED = "ACCEPTED"
     PROCESSING = "PROCESSING"
     REJECTED = "REJECTED"
+
+    def __str__(self):
+        return str(self.value)
 
 
 class UploadSubmissionManager(models.Manager):
@@ -52,16 +58,18 @@ class UploadSubmission(models.Model):
     """Model tracking submissions to FEC Webload"""
 
     report = models.ForeignKey("f3x_summaries.F3XSummary", on_delete=models.CASCADE)
-    dot_fec = models.ForeignKey("web_services.DotFEC", on_delete=models.DO_NOTHING)
+    dot_fec = models.ForeignKey(
+        "web_services.DotFEC", on_delete=models.DO_NOTHING, null=True
+    )
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
-    fecfile_error = models.TextField()
+    fecfile_error = models.TextField(null=True)
 
-    fec_submission_id = models.CharField(max_length=255)
-    fec_status = models.CharField(max_length=255)
+    fec_submission_id = models.CharField(max_length=255, null=True)
+    fec_status = models.CharField(max_length=255, null=True)
     # different from internal report id
-    fec_report_id = models.CharField(max_length=255)
-    fec_message = models.TextField()
+    fec_report_id = models.CharField(max_length=255, null=True)
+    fec_message = models.TextField(null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -71,17 +79,19 @@ class UploadSubmission(models.Model):
     def save_fec_response(self, response_string):
         logger.debug(f"FEC upload response: {response_string}")
         fec_response_json = json.loads(response_string)
-        self.fec_submission_id = fec_response_json["submission_id"]
-        self.fec_status = fec_response_json["status"]
-        self.fec_message = fec_response_json["message"]
-        self.fec_report_id = fec_response_json["report_id"]
+        self.fec_submission_id = fec_response_json.get("submission_id")
+        self.fec_status = fec_response_json.get("status")
+        self.fec_message = fec_response_json.get("message")
+        self.fec_report_id = fec_response_json.get("report_id")
 
         self.save()
 
     def save_error(self, error):
         self.fecfile_task_state = UploadSubmissionState.FAILED
         self.fecfile_error = error
-        logger.error(f"Submission for report {self.report_id} FAILED {self.error}")
+        logger.error(
+            f"Submission for report {self.report_id} FAILED {self.fecfile_error}"
+        )
         self.save()
 
     def save_state(self, new_state):

@@ -1,4 +1,5 @@
 import json
+from urllib import response
 from zeep import Client
 from fecfiler.settings import (
     FEC_FILING_API,
@@ -11,11 +12,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-fec_soap_client = Client(f"{FEC_FILING_API}/webload/services/upload?wsdl")
 
+class DotFECSubmitter:
+    def __init__(self, api):
+        if api:
+            self.fec_soap_client = Client(f"{api}/webload/services/upload?wsdl")
 
-class BaseSubmitter:
-    def get_submission_json(dot_fec_record, e_filing_password):
+    def get_submission_json(self, dot_fec_record, e_filing_password):
         return json.dumps(
             {
                 "committee_id": FILE_AS_TEST_COMMITTEE
@@ -34,15 +37,17 @@ class BaseSubmitter:
         )
 
     def submit(self, dot_fec_bytes, json_payload):
-        return "{}"
+        if self.fec_soap_client:
+            response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
+        else:
+            response = "{}"
+        logger.debug("FEC upload response: {response}")
+        return response
 
     def poll_status(self, submission_id):
-        return "{}"
-
-
-class DotFECSubmitter(BaseSubmitter):
-    def submit(self, dot_fec_bytes, json_payload):
-        return self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
-
-    def poll_status(self, submission_id):
-        return self.fec_soap_client.service.status(submission_id)
+        if self.fec_soap_client:
+            response = self.fec_soap_client.service.status(submission_id)
+        else:
+            response = "{}"
+        logger.debug(f"FEC polling response: {response}")
+        return response

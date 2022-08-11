@@ -9,7 +9,7 @@ from fecfiler.web_services.models import (
     FECStatus,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
-from fecfiler.web_services.dot_fec.dot_fec_submitter import BaseSubmitter
+from fecfiler.web_services.dot_fec.dot_fec_submitter import DotFECSubmitter
 from .web_service_storage import get_file_bytes, store_file
 
 import logging
@@ -19,12 +19,14 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
-    submission = UploadSubmission.objects.get(id=submission_record_id)
-    submission.save_state(UploadSubmissionState.CREATING_FILE)
-    file_content = compose_dot_fec(report_id, upload_submission_record_id)
+    if submission_record_id:
+        submission = UploadSubmission.objects.get(id=submission_record_id)
+        submission.save_state(UploadSubmissionState.CREATING_FILE)
+    file_content = compose_dot_fec(report_id, submission_record_id)
     file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
     if not file_content or not file_name:
-        submission.save_error("Creating .FEC failed")
+        if submission:
+            submission.save_error("Creating .FEC failed")
         return None
     store_file(file_content, file_name, force_write_to_disk)
     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
@@ -34,7 +36,7 @@ def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
 
 
 @shared_task
-def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, submitter=None):
+def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None):
     submission = UploadSubmission.objects.get(id=submission_record_id)
     submission.save_state(UploadSubmissionState.SUBMITTING)
 
@@ -53,8 +55,7 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, submitter
         return
 
     """Submit to FEC"""
-    if not submitter:
-        submitter = BaseSubmitter()
+    submitter = DotFECSubmitter(api)
     logger.info(f"Uploading {file_name} to FEC")
     submission_json = submitter.get_submission_json(dot_fec_record, e_filing_password)
     submission_response_string = submitter.submit(dot_fec_bytes, submission_json)
