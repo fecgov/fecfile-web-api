@@ -6,16 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0015_alter_schatransaction_back_reference_tran_id_number'),
+        (
+            "scha_transactions",
+            "0015_alter_schatransaction_back_reference_tran_id_number",
+        ),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='schatransaction',
-            name='scha_trans_transaction_id',
+            model_name="schatransaction",
+            name="scha_trans_transaction_id",
         ),
         migrations.AddIndex(
-            model_name='schatransaction',
-            index=models.Index(fields=['transaction_id'], name='scha_transa_transac_2cc8fa_idx'),
+            model_name="schatransaction",
+            index=models.Index(
+                fields=["transaction_id"], name="scha_transa_transac_2cc8fa_idx"
+            ),
         ),
     ]

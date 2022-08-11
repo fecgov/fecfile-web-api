@@ -2,7 +2,6 @@ from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from .models import SchATransaction
-from django.db.models.query import QuerySet
 from .serializers import SchATransactionSerializer
 from django.db.models import TextField, Value
 from django.db.models.functions import Concat, Coalesce
