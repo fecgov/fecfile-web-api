@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
 from fecfiler.settings import FEC_FILING_API
-from .serializers import ReportIdSerializer, SubmissionSerializer
+from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission
@@ -68,7 +68,7 @@ class WebServicesViewSet(viewsets.ViewSet):
     )
     def submit_to_fec(self, request):
         """Create a signed .FEC, store it, and submit it to FEC Webload"""
-        serializer = SubmissionSerializer(
+        serializer = SubmissionRequestSerializer(
             data=request.data, context={"request": request}
         )
         if not serializer.is_valid():

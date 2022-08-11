@@ -73,7 +73,7 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
 
     new_state = (
         UploadSubmissionState.SUCCEEDED
-        if submission.fec_status == FECStatus.ACCEPTED
+        if submission.fec_status == FECStatus.ACCEPTED.value
         else UploadSubmissionState.FAILED
     )
     submission.save_state(new_state)

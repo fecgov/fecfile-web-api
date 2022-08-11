@@ -357,6 +357,13 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     L38_net_operating_expenditures_ytd = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+
+    upload_submission = models.ForeignKey(
+        "web_services.UploadSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
