@@ -2,6 +2,7 @@ from .models import F3XSummary, ReportCodeLabel
 from rest_framework.serializers import ModelSerializer, SlugRelatedField, EmailField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import UploadSubmissionSerializer
+from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 import logging
 
 logger = logging.getLogger(__name__)
