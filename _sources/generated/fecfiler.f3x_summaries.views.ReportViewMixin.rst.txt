@@ -1,0 +1,93 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_summaries.views.ReportViewMixin
+=============================================
+
+.. currentmodule:: fecfiler.f3x_summaries.views
+
+.. autoclass:: ReportViewMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportViewMixin.__init__
+      ~ReportViewMixin.as_view
+      ~ReportViewMixin.check_object_permissions
+      ~ReportViewMixin.check_permissions
+      ~ReportViewMixin.check_throttles
+      ~ReportViewMixin.determine_version
+      ~ReportViewMixin.dispatch
+      ~ReportViewMixin.filter_queryset
+      ~ReportViewMixin.finalize_response
+      ~ReportViewMixin.get_authenticate_header
+      ~ReportViewMixin.get_authenticators
+      ~ReportViewMixin.get_content_negotiator
+      ~ReportViewMixin.get_exception_handler
+      ~ReportViewMixin.get_exception_handler_context
+      ~ReportViewMixin.get_extra_action_url_map
+      ~ReportViewMixin.get_extra_actions
+      ~ReportViewMixin.get_format_suffix
+      ~ReportViewMixin.get_object
+      ~ReportViewMixin.get_paginated_response
+      ~ReportViewMixin.get_parser_context
+      ~ReportViewMixin.get_parsers
+      ~ReportViewMixin.get_permissions
+      ~ReportViewMixin.get_queryset
+      ~ReportViewMixin.get_renderer_context
+      ~ReportViewMixin.get_renderers
+      ~ReportViewMixin.get_serializer
+      ~ReportViewMixin.get_serializer_class
+      ~ReportViewMixin.get_serializer_context
+      ~ReportViewMixin.get_throttles
+      ~ReportViewMixin.get_view_description
+      ~ReportViewMixin.get_view_name
+      ~ReportViewMixin.handle_exception
+      ~ReportViewMixin.http_method_not_allowed
+      ~ReportViewMixin.initial
+      ~ReportViewMixin.initialize_request
+      ~ReportViewMixin.options
+      ~ReportViewMixin.paginate_queryset
+      ~ReportViewMixin.perform_authentication
+      ~ReportViewMixin.perform_content_negotiation
+      ~ReportViewMixin.permission_denied
+      ~ReportViewMixin.raise_uncaught_exception
+      ~ReportViewMixin.reverse_action
+      ~ReportViewMixin.setup
+      ~ReportViewMixin.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportViewMixin.allowed_methods
+      ~ReportViewMixin.authentication_classes
+      ~ReportViewMixin.default_response_headers
+      ~ReportViewMixin.filter_backends
+      ~ReportViewMixin.http_method_names
+      ~ReportViewMixin.lookup_field
+      ~ReportViewMixin.lookup_url_kwarg
+      ~ReportViewMixin.paginator
+      ~ReportViewMixin.parser_classes
+      ~ReportViewMixin.permission_classes
+      ~ReportViewMixin.queryset
+      ~ReportViewMixin.renderer_classes
+      ~ReportViewMixin.schema
+      ~ReportViewMixin.serializer_class
+      ~ReportViewMixin.settings
+      ~ReportViewMixin.throttle_classes
+      ~ReportViewMixin.versioning_class
+   
+   

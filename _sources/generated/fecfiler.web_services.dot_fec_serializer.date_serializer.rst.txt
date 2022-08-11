@@ -1,6 +1,0 @@
-fecfiler.web\_services.dot\_fec\_serializer.date\_serializer
-============================================================
-
-.. currentmodule:: fecfiler.web_services.dot_fec_serializer
-
-.. autofunction:: date_serializer

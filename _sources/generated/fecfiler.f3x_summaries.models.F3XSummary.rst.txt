@@ -187,6 +187,8 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.treasurer_prefix
       ~F3XSummary.treasurer_suffix
       ~F3XSummary.updated
+      ~F3XSummary.upload_submission
+      ~F3XSummary.upload_submission_id
       ~F3XSummary.zip
    
    

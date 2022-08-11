@@ -1,0 +1,86 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.models.UploadSubmissionManager
+=====================================================
+
+.. currentmodule:: fecfiler.web_services.models
+
+.. autoclass:: UploadSubmissionManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UploadSubmissionManager.__init__
+      ~UploadSubmissionManager.aggregate
+      ~UploadSubmissionManager.alias
+      ~UploadSubmissionManager.all
+      ~UploadSubmissionManager.annotate
+      ~UploadSubmissionManager.bulk_create
+      ~UploadSubmissionManager.bulk_update
+      ~UploadSubmissionManager.check
+      ~UploadSubmissionManager.complex_filter
+      ~UploadSubmissionManager.contribute_to_class
+      ~UploadSubmissionManager.count
+      ~UploadSubmissionManager.create
+      ~UploadSubmissionManager.dates
+      ~UploadSubmissionManager.datetimes
+      ~UploadSubmissionManager.db_manager
+      ~UploadSubmissionManager.deconstruct
+      ~UploadSubmissionManager.defer
+      ~UploadSubmissionManager.difference
+      ~UploadSubmissionManager.distinct
+      ~UploadSubmissionManager.earliest
+      ~UploadSubmissionManager.exclude
+      ~UploadSubmissionManager.exists
+      ~UploadSubmissionManager.explain
+      ~UploadSubmissionManager.extra
+      ~UploadSubmissionManager.filter
+      ~UploadSubmissionManager.first
+      ~UploadSubmissionManager.from_queryset
+      ~UploadSubmissionManager.get
+      ~UploadSubmissionManager.get_or_create
+      ~UploadSubmissionManager.get_queryset
+      ~UploadSubmissionManager.in_bulk
+      ~UploadSubmissionManager.initiate_submission
+      ~UploadSubmissionManager.intersection
+      ~UploadSubmissionManager.iterator
+      ~UploadSubmissionManager.last
+      ~UploadSubmissionManager.latest
+      ~UploadSubmissionManager.none
+      ~UploadSubmissionManager.only
+      ~UploadSubmissionManager.order_by
+      ~UploadSubmissionManager.prefetch_related
+      ~UploadSubmissionManager.raw
+      ~UploadSubmissionManager.reverse
+      ~UploadSubmissionManager.select_for_update
+      ~UploadSubmissionManager.select_related
+      ~UploadSubmissionManager.union
+      ~UploadSubmissionManager.update
+      ~UploadSubmissionManager.update_or_create
+      ~UploadSubmissionManager.using
+      ~UploadSubmissionManager.values
+      ~UploadSubmissionManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UploadSubmissionManager.auto_created
+      ~UploadSubmissionManager.creation_counter
+      ~UploadSubmissionManager.db
+      ~UploadSubmissionManager.use_in_migrations
+   
+   

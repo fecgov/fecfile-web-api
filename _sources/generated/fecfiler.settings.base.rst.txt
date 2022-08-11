@@ -14,6 +14,7 @@ fecfiler.settings.base
       :toctree:                                          
    
       LOGGING
+      CELERY_WORKER_STORAGE
    
    
 

@@ -23,6 +23,8 @@ fecfiler.web\_services.serializers
       :template: custom-class-template.rst               
    
       ReportIdSerializer
+      SubmissionRequestSerializer
+      UploadSubmissionSerializer
    
    
 

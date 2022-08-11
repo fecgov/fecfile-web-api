@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_composer.add\_row\_to\_content
+========================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_composer
+
+.. autofunction:: add_row_to_content

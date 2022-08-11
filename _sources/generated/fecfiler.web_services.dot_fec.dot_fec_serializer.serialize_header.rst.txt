@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_serializer.serialize\_header
+======================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_serializer
+
+.. autofunction:: serialize_header

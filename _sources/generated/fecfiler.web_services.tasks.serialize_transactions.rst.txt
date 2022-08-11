@@ -1,6 +1,0 @@
-fecfiler.web\_services.tasks.serialize\_transactions
-====================================================
-
-.. currentmodule:: fecfiler.web_services.tasks
-
-.. autofunction:: serialize_transactions

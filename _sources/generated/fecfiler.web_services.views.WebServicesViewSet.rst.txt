@@ -56,6 +56,7 @@ fecfiler.web\_services.views.WebServicesViewSet
       ~WebServicesViewSet.raise_uncaught_exception
       ~WebServicesViewSet.reverse_action
       ~WebServicesViewSet.setup
+      ~WebServicesViewSet.submit_to_fec
       ~WebServicesViewSet.throttled
    
    

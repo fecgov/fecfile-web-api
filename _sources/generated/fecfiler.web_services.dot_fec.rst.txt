@@ -1,0 +1,40 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.web\_services.dot\_fec
+===============================
+
+.. automodule:: fecfiler.web_services.dot_fec
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.web_services.dot_fec.dot_fec_composer
+   fecfiler.web_services.dot_fec.dot_fec_serializer
+   fecfiler.web_services.dot_fec.dot_fec_submitter
+   fecfiler.web_services.dot_fec.output
+   fecfiler.web_services.dot_fec.test_dot_fec_composer
+   fecfiler.web_services.dot_fec.test_dot_fec_serializer
+

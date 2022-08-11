@@ -24,6 +24,7 @@ fecfiler.f3x\_summaries.models
    
       F3XSummary
       ReportCodeLabel
+      ReportMixin
    
    
 

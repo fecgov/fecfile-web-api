@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_serializer.extract\_row\_config
+=========================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_serializer
+
+.. autofunction:: extract_row_config

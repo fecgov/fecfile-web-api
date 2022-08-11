@@ -32,4 +32,8 @@ fecfiler.web\_services.migrations
    :recursive:
 
    fecfiler.web_services.migrations.0001_initial
+   fecfiler.web_services.migrations.0002_uploadsubmission
+   fecfiler.web_services.migrations.0003_auto_20220811_0905
+   fecfiler.web_services.migrations.0004_auto_20220811_1040
+   fecfiler.web_services.migrations.0005_auto_20220811_1213
 

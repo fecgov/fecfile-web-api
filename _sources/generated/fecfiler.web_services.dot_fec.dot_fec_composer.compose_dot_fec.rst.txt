@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_composer.compose\_dot\_fec
+====================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_composer
+
+.. autofunction:: compose_dot_fec

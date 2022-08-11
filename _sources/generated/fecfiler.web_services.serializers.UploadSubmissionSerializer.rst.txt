@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.serializers.UploadSubmissionSerializer
+=============================================================
+
+.. currentmodule:: fecfiler.web_services.serializers
+
+.. autoclass:: UploadSubmissionSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UploadSubmissionSerializer.__init__
+      ~UploadSubmissionSerializer.bind
+      ~UploadSubmissionSerializer.build_field
+      ~UploadSubmissionSerializer.build_nested_field
+      ~UploadSubmissionSerializer.build_property_field
+      ~UploadSubmissionSerializer.build_relational_field
+      ~UploadSubmissionSerializer.build_standard_field
+      ~UploadSubmissionSerializer.build_unknown_field
+      ~UploadSubmissionSerializer.build_url_field
+      ~UploadSubmissionSerializer.create
+      ~UploadSubmissionSerializer.fail
+      ~UploadSubmissionSerializer.get_attribute
+      ~UploadSubmissionSerializer.get_default
+      ~UploadSubmissionSerializer.get_default_field_names
+      ~UploadSubmissionSerializer.get_extra_kwargs
+      ~UploadSubmissionSerializer.get_field_names
+      ~UploadSubmissionSerializer.get_fields
+      ~UploadSubmissionSerializer.get_initial
+      ~UploadSubmissionSerializer.get_unique_for_date_validators
+      ~UploadSubmissionSerializer.get_unique_together_validators
+      ~UploadSubmissionSerializer.get_uniqueness_extra_kwargs
+      ~UploadSubmissionSerializer.get_validators
+      ~UploadSubmissionSerializer.get_value
+      ~UploadSubmissionSerializer.include_extra_kwargs
+      ~UploadSubmissionSerializer.is_valid
+      ~UploadSubmissionSerializer.many_init
+      ~UploadSubmissionSerializer.run_validation
+      ~UploadSubmissionSerializer.run_validators
+      ~UploadSubmissionSerializer.save
+      ~UploadSubmissionSerializer.to_internal_value
+      ~UploadSubmissionSerializer.to_representation
+      ~UploadSubmissionSerializer.update
+      ~UploadSubmissionSerializer.validate
+      ~UploadSubmissionSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UploadSubmissionSerializer.context
+      ~UploadSubmissionSerializer.data
+      ~UploadSubmissionSerializer.default_error_messages
+      ~UploadSubmissionSerializer.default_validators
+      ~UploadSubmissionSerializer.errors
+      ~UploadSubmissionSerializer.fields
+      ~UploadSubmissionSerializer.initial
+      ~UploadSubmissionSerializer.root
+      ~UploadSubmissionSerializer.serializer_field_mapping
+      ~UploadSubmissionSerializer.url_field_name
+      ~UploadSubmissionSerializer.validated_data
+      ~UploadSubmissionSerializer.validators
+   
+   

@@ -24,6 +24,7 @@ fecfiler.f3x\_summaries.views
    
       F3XSummaryViewSet
       ReportCodeLabelViewSet
+      ReportViewMixin
    
    
 

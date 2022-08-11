@@ -1,6 +1,0 @@
-fecfiler.web\_services.dot\_fec\_serializer.serialize\_model\_instance
-======================================================================
-
-.. currentmodule:: fecfiler.web_services.dot_fec_serializer
-
-.. autofunction:: serialize_model_instance

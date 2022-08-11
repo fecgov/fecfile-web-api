@@ -18,6 +18,7 @@ fecfiler.web\_services.web\_service\_storage
       :toctree:                                          
    
       get_file
+      get_file_bytes
       store_file
    
    

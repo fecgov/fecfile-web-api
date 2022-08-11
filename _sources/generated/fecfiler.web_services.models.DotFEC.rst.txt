@@ -50,5 +50,6 @@ fecfiler.web\_services.models.DotFEC
       ~DotFEC.pk
       ~DotFEC.report
       ~DotFEC.report_id
+      ~DotFEC.uploadsubmission_set
    
    

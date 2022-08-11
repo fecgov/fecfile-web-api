@@ -1,6 +1,0 @@
-fecfiler.web\_services.tasks.create\_dot\_fec\_content
-======================================================
-
-.. currentmodule:: fecfiler.web_services.tasks
-
-.. autofunction:: create_dot_fec_content

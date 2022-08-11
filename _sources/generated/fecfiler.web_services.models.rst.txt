@@ -23,6 +23,10 @@ fecfiler.web\_services.models
       :template: custom-class-template.rst               
    
       DotFEC
+      FECStatus
+      UploadSubmission
+      UploadSubmissionManager
+      UploadSubmissionState
    
    
 

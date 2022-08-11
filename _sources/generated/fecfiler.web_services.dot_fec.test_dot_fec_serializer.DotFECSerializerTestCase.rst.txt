@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestCase
+===================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.test_dot_fec_serializer
+
+.. autoclass:: DotFECSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECSerializerTestCase.__init__
+      ~DotFECSerializerTestCase.addClassCleanup
+      ~DotFECSerializerTestCase.addCleanup
+      ~DotFECSerializerTestCase.addTypeEqualityFunc
+      ~DotFECSerializerTestCase.assertAlmostEqual
+      ~DotFECSerializerTestCase.assertAlmostEquals
+      ~DotFECSerializerTestCase.assertContains
+      ~DotFECSerializerTestCase.assertCountEqual
+      ~DotFECSerializerTestCase.assertDictContainsSubset
+      ~DotFECSerializerTestCase.assertDictEqual
+      ~DotFECSerializerTestCase.assertEqual
+      ~DotFECSerializerTestCase.assertEquals
+      ~DotFECSerializerTestCase.assertFalse
+      ~DotFECSerializerTestCase.assertFieldOutput
+      ~DotFECSerializerTestCase.assertFormError
+      ~DotFECSerializerTestCase.assertFormsetError
+      ~DotFECSerializerTestCase.assertGreater
+      ~DotFECSerializerTestCase.assertGreaterEqual
+      ~DotFECSerializerTestCase.assertHTMLEqual
+      ~DotFECSerializerTestCase.assertHTMLNotEqual
+      ~DotFECSerializerTestCase.assertIn
+      ~DotFECSerializerTestCase.assertInHTML
+      ~DotFECSerializerTestCase.assertIs
+      ~DotFECSerializerTestCase.assertIsInstance
+      ~DotFECSerializerTestCase.assertIsNone
+      ~DotFECSerializerTestCase.assertIsNot
+      ~DotFECSerializerTestCase.assertIsNotNone
+      ~DotFECSerializerTestCase.assertJSONEqual
+      ~DotFECSerializerTestCase.assertJSONNotEqual
+      ~DotFECSerializerTestCase.assertLess
+      ~DotFECSerializerTestCase.assertLessEqual
+      ~DotFECSerializerTestCase.assertListEqual
+      ~DotFECSerializerTestCase.assertLogs
+      ~DotFECSerializerTestCase.assertMultiLineEqual
+      ~DotFECSerializerTestCase.assertNotAlmostEqual
+      ~DotFECSerializerTestCase.assertNotAlmostEquals
+      ~DotFECSerializerTestCase.assertNotContains
+      ~DotFECSerializerTestCase.assertNotEqual
+      ~DotFECSerializerTestCase.assertNotEquals
+      ~DotFECSerializerTestCase.assertNotIn
+      ~DotFECSerializerTestCase.assertNotIsInstance
+      ~DotFECSerializerTestCase.assertNotRegex
+      ~DotFECSerializerTestCase.assertNotRegexpMatches
+      ~DotFECSerializerTestCase.assertNumQueries
+      ~DotFECSerializerTestCase.assertQuerysetEqual
+      ~DotFECSerializerTestCase.assertRaises
+      ~DotFECSerializerTestCase.assertRaisesMessage
+      ~DotFECSerializerTestCase.assertRaisesRegex
+      ~DotFECSerializerTestCase.assertRaisesRegexp
+      ~DotFECSerializerTestCase.assertRedirects
+      ~DotFECSerializerTestCase.assertRegex
+      ~DotFECSerializerTestCase.assertRegexpMatches
+      ~DotFECSerializerTestCase.assertSequenceEqual
+      ~DotFECSerializerTestCase.assertSetEqual
+      ~DotFECSerializerTestCase.assertTemplateNotUsed
+      ~DotFECSerializerTestCase.assertTemplateUsed
+      ~DotFECSerializerTestCase.assertTrue
+      ~DotFECSerializerTestCase.assertTupleEqual
+      ~DotFECSerializerTestCase.assertURLEqual
+      ~DotFECSerializerTestCase.assertWarns
+      ~DotFECSerializerTestCase.assertWarnsMessage
+      ~DotFECSerializerTestCase.assertWarnsRegex
+      ~DotFECSerializerTestCase.assertXMLEqual
+      ~DotFECSerializerTestCase.assertXMLNotEqual
+      ~DotFECSerializerTestCase.assert_
+      ~DotFECSerializerTestCase.captureOnCommitCallbacks
+      ~DotFECSerializerTestCase.countTestCases
+      ~DotFECSerializerTestCase.debug
+      ~DotFECSerializerTestCase.defaultTestResult
+      ~DotFECSerializerTestCase.doClassCleanups
+      ~DotFECSerializerTestCase.doCleanups
+      ~DotFECSerializerTestCase.fail
+      ~DotFECSerializerTestCase.failIf
+      ~DotFECSerializerTestCase.failIfAlmostEqual
+      ~DotFECSerializerTestCase.failIfEqual
+      ~DotFECSerializerTestCase.failUnless
+      ~DotFECSerializerTestCase.failUnlessAlmostEqual
+      ~DotFECSerializerTestCase.failUnlessEqual
+      ~DotFECSerializerTestCase.failUnlessRaises
+      ~DotFECSerializerTestCase.id
+      ~DotFECSerializerTestCase.modify_settings
+      ~DotFECSerializerTestCase.run
+      ~DotFECSerializerTestCase.setUp
+      ~DotFECSerializerTestCase.setUpClass
+      ~DotFECSerializerTestCase.setUpTestData
+      ~DotFECSerializerTestCase.settings
+      ~DotFECSerializerTestCase.shortDescription
+      ~DotFECSerializerTestCase.skipTest
+      ~DotFECSerializerTestCase.subTest
+      ~DotFECSerializerTestCase.tearDown
+      ~DotFECSerializerTestCase.tearDownClass
+      ~DotFECSerializerTestCase.test_serialize_f3x_summary
+      ~DotFECSerializerTestCase.test_serialize_field
+      ~DotFECSerializerTestCase.test_serialize_scha_transaction
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECSerializerTestCase.available_apps
+      ~DotFECSerializerTestCase.databases
+      ~DotFECSerializerTestCase.fixtures
+      ~DotFECSerializerTestCase.longMessage
+      ~DotFECSerializerTestCase.maxDiff
+      ~DotFECSerializerTestCase.reset_sequences
+      ~DotFECSerializerTestCase.serialized_rollback
+   
+   

@@ -1,0 +1,6 @@
+fecfiler.web\_services.web\_service\_storage.get\_file\_bytes
+=============================================================
+
+.. currentmodule:: fecfiler.web_services.web_service_storage
+
+.. autofunction:: get_file_bytes

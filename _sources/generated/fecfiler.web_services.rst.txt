@@ -31,13 +31,12 @@ fecfiler.web\_services
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.web_services.dot_fec_serializer
+   fecfiler.web_services.dot_fec
    fecfiler.web_services.migrations
    fecfiler.web_services.models
    fecfiler.web_services.renderers
    fecfiler.web_services.serializers
    fecfiler.web_services.tasks
-   fecfiler.web_services.test_dot_fec_serializer
    fecfiler.web_services.test_tasks
    fecfiler.web_services.urls
    fecfiler.web_services.views

@@ -1,0 +1,30 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.models.FECStatus
+=======================================
+
+.. currentmodule:: fecfiler.web_services.models
+
+.. autoclass:: FECStatus
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FECStatus.ACCEPTED
+      ~FECStatus.PROCESSING
+      ~FECStatus.REJECTED
+   
+   

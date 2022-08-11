@@ -139,7 +139,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="generated/fecfiler.dot_fecs.html">fecfiler.dot_fecs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.f3x_summaries.apps.html">fecfiler.f3x_summaries.apps</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.apps.F3XSummariesConfig.html">fecfiler.f3x_summaries.apps.F3XSummariesConfig</a></li>
@@ -206,11 +205,16 @@
 <li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.f3x_summaries.migrations.0014_patch_report_code_label_MY_20220808_1122.Migration.html">fecfiler.f3x_summaries.migrations.0014_patch_report_code_label_MY_20220808_1122.Migration</a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.migrations.0015_f3xsummary_upload_submission.html">fecfiler.f3x_summaries.migrations.0015_f3xsummary_upload_submission</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.f3x_summaries.migrations.0015_f3xsummary_upload_submission.Migration.html">fecfiler.f3x_summaries.migrations.0015_f3xsummary_upload_submission.Migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.f3x_summaries.models.html">fecfiler.f3x_summaries.models</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.models.F3XSummary.html">fecfiler.f3x_summaries.models.F3XSummary</a></li>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.models.ReportCodeLabel.html">fecfiler.f3x_summaries.models.ReportCodeLabel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.models.ReportMixin.html">fecfiler.f3x_summaries.models.ReportMixin</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.f3x_summaries.serializers.html">fecfiler.f3x_summaries.serializers</a><ul>
@@ -239,6 +243,7 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.f3x_summaries.views.html">fecfiler.f3x_summaries.views</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.views.F3XSummaryViewSet.html">fecfiler.f3x_summaries.views.F3XSummaryViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.views.ReportCodeLabelViewSet.html">fecfiler.f3x_summaries.views.ReportCodeLabelViewSet</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.f3x_summaries.views.ReportViewMixin.html">fecfiler.f3x_summaries.views.ReportViewMixin</a></li>
 </ul>
 </li>
 </ul>
@@ -362,6 +367,10 @@
 <li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.scha_transactions.migrations.0015_alter_schatransaction_back_reference_tran_id_number.Migration.html">fecfiler.scha_transactions.migrations.0015_alter_schatransaction_back_reference_tran_id_number.Migration</a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.scha_transactions.migrations.0016_auto_20220810_0938.html">fecfiler.scha_transactions.migrations.0016_auto_20220810_0938</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.scha_transactions.migrations.0016_auto_20220810_0938.Migration.html">fecfiler.scha_transactions.migrations.0016_auto_20220810_0938.Migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.scha_transactions.models.html">fecfiler.scha_transactions.models</a><ul>
@@ -399,6 +408,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/fecfiler.settings.html">fecfiler.settings</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.settings.base.html">fecfiler.settings.base</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.settings.base.LOGGING.html">fecfiler.settings.base.LOGGING</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.settings.base.CELERY_WORKER_STORAGE.html">fecfiler.settings.base.CELERY_WORKER_STORAGE</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.settings.env.html">fecfiler.settings.env</a></li>
@@ -433,14 +443,39 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="generated/fecfiler.web_services.html">fecfiler.web_services</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.html">fecfiler.web_services.dot_fec_serializer</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.add_row_to_fec_str.html">fecfiler.web_services.dot_fec_serializer.add_row_to_fec_str</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.boolean_serializer.html">fecfiler.web_services.dot_fec_serializer.boolean_serializer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.date_serializer.html">fecfiler.web_services.dot_fec_serializer.date_serializer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.default_serializer.html">fecfiler.web_services.dot_fec_serializer.default_serializer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.foreign_key_serializer.html">fecfiler.web_services.dot_fec_serializer.foreign_key_serializer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.serialize_field.html">fecfiler.web_services.dot_fec_serializer.serialize_field</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec_serializer.serialize_model_instance.html">fecfiler.web_services.dot_fec_serializer.serialize_model_instance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.html">fecfiler.web_services.dot_fec.dot_fec_composer</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.add_row_to_content.html">fecfiler.web_services.dot_fec.dot_fec_composer.add_row_to_content</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.compose_dot_fec.html">fecfiler.web_services.dot_fec.dot_fec_composer.compose_dot_fec</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.compose_f3x_summary.html">fecfiler.web_services.dot_fec.dot_fec_composer.compose_f3x_summary</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.compose_header.html">fecfiler.web_services.dot_fec.dot_fec_composer.compose_header</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_composer.compose_transactions.html">fecfiler.web_services.dot_fec.dot_fec_composer.compose_transactions</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.boolean_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.boolean_serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.date_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.date_serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.default_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.default_serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config.html">fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header</a></li>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_model_instance.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_model_instance</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_submitter.html">fecfiler.web_services.dot_fec.dot_fec_submitter</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.dot_fec_submitter.DotFECSubmitter.html">fecfiler.web_services.dot_fec.dot_fec_submitter.DotFECSubmitter</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.output.html">fecfiler.web_services.dot_fec.output</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.test_dot_fec_composer.html">fecfiler.web_services.dot_fec.test_dot_fec_composer</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.test_dot_fec_composer.DotFECSerializerTestCase.html">fecfiler.web_services.dot_fec.test_dot_fec_composer.DotFECSerializerTestCase</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.test_dot_fec_serializer.html">fecfiler.web_services.dot_fec.test_dot_fec_serializer</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.dot_fec.test_dot_fec_serializer.DotFECSerializerTestCase.html">fecfiler.web_services.dot_fec.test_dot_fec_serializer.DotFECSerializerTestCase</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.migrations.html">fecfiler.web_services.migrations</a><ul>
@@ -448,10 +483,30 @@
 <li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0001_initial.Migration.html">fecfiler.web_services.migrations.0001_initial.Migration</a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0002_uploadsubmission.html">fecfiler.web_services.migrations.0002_uploadsubmission</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0002_uploadsubmission.Migration.html">fecfiler.web_services.migrations.0002_uploadsubmission.Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0003_auto_20220811_0905.html">fecfiler.web_services.migrations.0003_auto_20220811_0905</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0003_auto_20220811_0905.Migration.html">fecfiler.web_services.migrations.0003_auto_20220811_0905.Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0004_auto_20220811_1040.html">fecfiler.web_services.migrations.0004_auto_20220811_1040</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0004_auto_20220811_1040.Migration.html">fecfiler.web_services.migrations.0004_auto_20220811_1040.Migration</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0005_auto_20220811_1213.html">fecfiler.web_services.migrations.0005_auto_20220811_1213</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="generated/fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration.html">fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.models.html">fecfiler.web_services.models</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.models.DotFEC.html">fecfiler.web_services.models.DotFEC</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.models.FECStatus.html">fecfiler.web_services.models.FECStatus</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.models.UploadSubmission.html">fecfiler.web_services.models.UploadSubmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.models.UploadSubmissionManager.html">fecfiler.web_services.models.UploadSubmissionManager</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.models.UploadSubmissionState.html">fecfiler.web_services.models.UploadSubmissionState</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.renderers.html">fecfiler.web_services.renderers</a><ul>
@@ -460,19 +515,11 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.serializers.html">fecfiler.web_services.serializers</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.serializers.ReportIdSerializer.html">fecfiler.web_services.serializers.ReportIdSerializer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.serializers.SubmissionRequestSerializer.html">fecfiler.web_services.serializers.SubmissionRequestSerializer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.serializers.UploadSubmissionSerializer.html">fecfiler.web_services.serializers.UploadSubmissionSerializer</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.tasks.create_dot_fec_content.html">fecfiler.web_services.tasks.create_dot_fec_content</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.tasks.serialize_f3x_summary.html">fecfiler.web_services.tasks.serialize_f3x_summary</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.tasks.serialize_transaction.html">fecfiler.web_services.tasks.serialize_transaction</a></li>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.tasks.serialize_transactions.html">fecfiler.web_services.tasks.serialize_transactions</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.test_dot_fec_serializer.html">fecfiler.web_services.test_dot_fec_serializer</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.test_dot_fec_serializer.DotFECSerializerTestCase.html">fecfiler.web_services.test_dot_fec_serializer.DotFECSerializerTestCase</a></li>
-</ul>
-</li>
+<li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.test_tasks.html">fecfiler.web_services.test_tasks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.test_tasks.TasksTestCase.html">fecfiler.web_services.test_tasks.TasksTestCase</a></li>
 </ul>
@@ -484,6 +531,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="generated/fecfiler.web_services.web_service_storage.html">fecfiler.web_services.web_service_storage</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.web_service_storage.get_file.html">fecfiler.web_services.web_service_storage.get_file</a></li>
+<li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.web_service_storage.get_file_bytes.html">fecfiler.web_services.web_service_storage.get_file_bytes</a></li>
 <li class="toctree-l5"><a class="reference internal" href="generated/fecfiler.web_services.web_service_storage.store_file.html">fecfiler.web_services.web_service_storage.store_file</a></li>
 </ul>
 </li>

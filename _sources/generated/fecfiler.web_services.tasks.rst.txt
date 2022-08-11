@@ -12,16 +12,6 @@ fecfiler.web\_services.tasks
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      create_dot_fec_content
-      serialize_f3x_summary
-      serialize_transaction
-      serialize_transactions
-   
    
 
    

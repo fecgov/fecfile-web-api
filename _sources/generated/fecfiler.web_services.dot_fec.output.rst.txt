@@ -1,0 +1,26 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.web\_services.dot\_fec.output
+======================================
+
+.. automodule:: fecfiler.web_services.dot_fec.output
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

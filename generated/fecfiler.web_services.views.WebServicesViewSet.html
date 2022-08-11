@@ -70,8 +70,8 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.check_throttles" title="fecfiler.web_services.views.WebServicesViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dot_fec</span></code>(request)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.create_dot_fec" title="fecfiler.web_services.views.WebServicesViewSet.create_dot_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dot_fec</span></code></a>(request)</p></td>
+<td><p>Create a .FEC file and store it Currently only useful for testing purposes</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.determine_version" title="fecfiler.web_services.views.WebServicesViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
@@ -91,8 +91,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator" title="fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dot_fec</span></code>(request, report_id)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_dot_fec" title="fecfiler.web_services.views.WebServicesViewSet.get_dot_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dot_fec</span></code></a>(request, report_id)</p></td>
+<td><p>Download the most recent .FEC created for a report Currently only useful for testing purposes</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_exception_handler" title="fecfiler.web_services.views.WebServicesViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
 <td><p>Returns the exception handler that this view uses.</p></td>
@@ -166,7 +166,10 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.setup" title="fecfiler.web_services.views.WebServicesViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_fec" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_fec</span></code></a>(request)</p></td>
+<td><p>Create a signed .FEC, store it, and submit it to FEC Webload</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
 </tbody>
@@ -264,6 +267,13 @@ Raises an appropriate exception if the request is throttled.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.create_dot_fec">
+<span class="sig-name descname"><span class="pre">create_dot_fec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.create_dot_fec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a .FEC file and store it
+Currently only useful for testing purposes</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.determine_version">
 <span class="sig-name descname"><span class="pre">determine_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.determine_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>If versioning is being used, then determine any API version for the
@@ -300,6 +310,13 @@ header to use for 401 responses, if any.</p>
 <dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator">
 <span class="sig-name descname"><span class="pre">get_content_negotiator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_content_negotiator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate and return the content negotiation class to use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.get_dot_fec">
+<span class="sig-name descname"><span class="pre">get_dot_fec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.get_dot_fec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the most recent .FEC created for a report
+Currently only useful for testing purposes</p>
 </dd></dl>
 
 <dl class="py method">
@@ -458,6 +475,12 @@ will instead be performed lazily, the first time either
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.submit_to_fec">
+<span class="sig-name descname"><span class="pre">submit_to_fec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_fec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a signed .FEC, store it, and submit it to FEC Webload</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.throttled">
 <span class="sig-name descname"><span class="pre">throttled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="Permalink to this definition">¶</a></dt>
 <dd><p>If request is throttled, determine what kind of exception to raise.</p>
@@ -490,7 +513,6 @@ will instead be performed lazily, the first time either
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.dot_fecs.html">fecfiler.dot_fecs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
@@ -500,13 +522,12 @@ will instead be performed lazily, the first time either
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.dot_fec_serializer.html">fecfiler.web_services.dot_fec_serializer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.migrations.html">fecfiler.web_services.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.models.html">fecfiler.web_services.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.renderers.html">fecfiler.web_services.renderers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.serializers.html">fecfiler.web_services.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_dot_fec_serializer.html">fecfiler.web_services.test_dot_fec_serializer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_tasks.html">fecfiler.web_services.test_tasks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.urls.html">fecfiler.web_services.urls</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.web_services.views.html">fecfiler.web_services.views</a><ul class="current">
