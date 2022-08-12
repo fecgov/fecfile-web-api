@@ -60,7 +60,9 @@ class FECStatus(Enum):
 
 class UploadSubmissionManager(models.Manager):
     def initiate_submission(self, report_id):
-        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING)
+        submission = self.create(
+            fecfile_task_state=FECSubmissionState.INITIALIZING.value
+        )
         submission.save()
 
         F3XSummary.objects.filter(id=report_id).update(upload_submission=submission)
@@ -74,7 +76,9 @@ class UploadSubmissionManager(models.Manager):
 
 class WebPrintSubmissionManager(models.Manager):
     def initiate_submission(self, report_id):
-        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING)
+        submission = self.create(
+            fecfile_task_state=FECSubmissionState.INITIALIZING.value
+        )
         submission.save()
 
         F3XSummary.objects.filter(id=report_id).update(webprint_submission=submission)

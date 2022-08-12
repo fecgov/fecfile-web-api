@@ -38,7 +38,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
-        task = create_dot_fec.apply_async((report_id, None), retry=False)
+        task = create_dot_fec.apply_async((report_id, None, None), retry=False)
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
@@ -87,7 +87,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Start Celery tasks in chain"""
         task = (
-            create_dot_fec.s(report_id, upload_submission.id)
+            create_dot_fec.s(report_id, upload_submission_id=upload_submission.id)
             | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
         ).apply_async(retry=False)
 
@@ -116,7 +116,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         We don't want the .FEC to be signed for WebPrint
         """
         task = (
-            create_dot_fec.s(report_id, None)  # Don't send submission_id
+            create_dot_fec.s(report_id, webprint_submission_id=webprint_submission.id)
             | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API)
         ).apply_async(retry=False)
 

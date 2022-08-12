@@ -21,11 +21,19 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
-    if submission_record_id:
-        submission = UploadSubmission.objects.get(id=submission_record_id)
+def create_dot_fec(
+    report_id,
+    upload_submission_id=None,
+    webprint_submission_id=None,
+    force_write_to_disk=False,
+):
+    if upload_submission_id:
+        submission = UploadSubmission.objects.get(id=upload_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
-    file_content = compose_dot_fec(report_id, submission_record_id)
+    if webprint_submission_id:
+        submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
+        submission.save_state(FECSubmissionState.CREATING_FILE)
+    file_content = compose_dot_fec(report_id, upload_submission_id)
     file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
     if not file_content or not file_name:
         if submission:
@@ -34,8 +42,12 @@ def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
     store_file(file_content, file_name, force_write_to_disk)
     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
     dot_fec_record.save()
-    if submission_record_id:
-        UploadSubmission.objects.filter(id=submission_record_id).update(
+    if upload_submission_id:
+        UploadSubmission.objects.filter(id=upload_submission_id).update(
+            dot_fec=dot_fec_record
+        )
+    if webprint_submission_id:
+        WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
             dot_fec=dot_fec_record
         )
 
