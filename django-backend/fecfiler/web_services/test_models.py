@@ -41,7 +41,7 @@ class UploadSubmissionTestCase(TestCase):
                 {
                     "submission_id": "fake_submission_id",
                     "status": FECStatus.ACCEPTED.value,
-                    "message": "We didn't really send anything to FEC",
+                    "message": "Test Save Response",
                     "report_id": "1234",
                 }
             )
@@ -49,7 +49,7 @@ class UploadSubmissionTestCase(TestCase):
         from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
         self.assertEqual(from_db.fec_submission_id, "fake_submission_id")
         self.assertEqual(from_db.fec_status, "ACCEPTED")
-        self.assertEqual(from_db.fec_message, "We didn't really send anything to FEC")
+        self.assertEqual(from_db.fec_message, "Test Save Response")
         self.assertEqual(from_db.fec_report_id, "1234")
 
     def test_save_error(self):
@@ -81,7 +81,7 @@ class UploadSubmissionTestCase(TestCase):
                     "image_url": "google.com",
                     "submission_id": "fake_submission_id",
                     "status": FECStatus.COMPLETED.value,
-                    "message": "We didn't really send anything to FEC",
+                    "message": "Test Webprint Response",
                     "batch_id": 123,
                 }
             )
@@ -90,5 +90,5 @@ class UploadSubmissionTestCase(TestCase):
         self.assertEqual(from_db.fec_image_url, "google.com")
         self.assertEqual(from_db.fec_submission_id, "fake_submission_id")
         self.assertEqual(from_db.fec_status, "COMPLETED")
-        self.assertEqual(from_db.fec_message, "We didn't really send anything to FEC")
+        self.assertEqual(from_db.fec_message, "Test Webprint Response")
         self.assertEqual(from_db.fec_batch_id, "123")

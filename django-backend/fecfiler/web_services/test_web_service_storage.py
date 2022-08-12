@@ -16,17 +16,17 @@ class WebServiceStorageTestCase(TestCase):
         self.transaction = SchATransaction.objects.filter(id=9999).first()
 
     def test_store_file(self):
-        store_file("Test Content", "test.txt", True)
-        path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / "test.txt"
+        store_file("Store Test Content", "store_test.txt", True)
+        path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / "store_test.txt"
         self.assertTrue(path.exists())
 
     def test_get_file(self):
-        store_file("Test Content", "test.txt", True)
-        with get_file("test.txt", True) as file:
+        store_file("Get Test Content", "get_test.txt", True)
+        with get_file("get_test.txt", True) as file:
             file_bytes = bytearray(file.read())
-            self.assertEqual(b"Test Content", file_bytes)
+            self.assertEqual(b"Get Test Content", file_bytes)
 
     def test_get_file_bytes(self):
         store_file("Test Content", "test.txt", True)
-        bytes = get_file_bytes("test.txt", True)
-        self.assertEqual(b"Test Content", bytes)
+        file_bytes = get_file_bytes("test.txt", True)
+        self.assertEqual(b"Test Content", file_bytes)

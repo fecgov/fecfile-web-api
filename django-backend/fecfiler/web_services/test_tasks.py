@@ -56,7 +56,7 @@ class TasksTestCase(TestCase):
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
-        id = submit_to_fec(
+        upload_id = submit_to_fec(
             dot_fec_id,
             upload_submission.id,
             "test_password",
@@ -64,7 +64,7 @@ class TasksTestCase(TestCase):
             True,
         )
         upload_submission.refresh_from_db()
-        self.assertEqual(id, upload_submission.id)
+        self.assertEqual(upload_id, upload_submission.id)
         self.assertEqual(upload_submission.dot_fec_id, dot_fec_id)
         self.assertEqual(
             upload_submission.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
@@ -123,9 +123,9 @@ class TasksTestCase(TestCase):
             webprint_submission_id=webprint_submission.id,
             force_write_to_disk=True,
         )
-        id = submit_to_webprint(dot_fec_id, webprint_submission.id, None, True)
+        webprint_id = submit_to_webprint(dot_fec_id, webprint_submission.id, None, True)
         webprint_submission.refresh_from_db()
-        self.assertEqual(id, webprint_submission.id)
+        self.assertEqual(webprint_id, webprint_submission.id)
         self.assertEqual(webprint_submission.dot_fec_id, dot_fec_id)
         self.assertEqual(
             webprint_submission.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
