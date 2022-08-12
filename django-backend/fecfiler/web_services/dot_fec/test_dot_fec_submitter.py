@@ -4,7 +4,6 @@ from .dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.f3x_summaries.models import F3XSummary
-from fecfiler.scha_transactions.models import SchATransaction
 
 
 class DotFECSubmitterTestCase(TestCase):
