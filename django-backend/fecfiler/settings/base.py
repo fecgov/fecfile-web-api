@@ -271,6 +271,7 @@ CELERY_WORKER_STORAGE = env.get_credential(
 """
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
+FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
 TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")

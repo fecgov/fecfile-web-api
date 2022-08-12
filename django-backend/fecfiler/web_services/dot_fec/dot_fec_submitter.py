@@ -6,6 +6,7 @@ from fecfiler.settings import (
     FEC_FILING_API_KEY,
     FILE_AS_TEST_COMMITTEE,
     TEST_COMMITTEE_PASSWORD,
+    FEC_AGENCY_ID,
 )
 
 import logging
@@ -33,7 +34,7 @@ class DotFECSubmitter:
                 "api_key": FEC_FILING_API_KEY,
                 "email_1": dot_fec_record.report.confirmation_email_1,
                 "email_2": dot_fec_record.report.confirmation_email_2,
-                "agency_id": "FEC",
+                "agency_id": FEC_AGENCY_ID,
                 "wait": False,
             }
         )
