@@ -34,12 +34,22 @@ def create_dot_fec(report_id, submission_record_id, force_write_to_disk=False):
     store_file(file_content, file_name, force_write_to_disk)
     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
     dot_fec_record.save()
+    if submission_record_id:
+        UploadSubmission.objects.filter(id=submission_record_id).update(
+            dot_fec=dot_fec_record
+        )
 
     return dot_fec_record.id
 
 
 @shared_task
-def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None):
+def submit_to_fec(
+    dot_fec_id,
+    submission_record_id,
+    e_filing_password,
+    api=None,
+    force_read_from_disk=False,
+):
     submission = UploadSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
@@ -52,7 +62,7 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
     dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
     file_name = dot_fec_record.file_name
     try:
-        dot_fec_bytes = get_file_bytes(file_name)
+        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
     except Exception:
         submission.save_error("Could not retrieve .FEC bytes")
         return
@@ -85,7 +95,12 @@ def submit_to_fec(dot_fec_id, submission_record_id, e_filing_password, api=None)
 
 
 @shared_task
-def submit_to_webprint(dot_fec_id, submission_record_id, api=None):
+def submit_to_webprint(
+    dot_fec_id,
+    submission_record_id,
+    api=None,
+    force_read_from_disk=False,
+):
     submission = WebPrintSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
@@ -93,7 +108,7 @@ def submit_to_webprint(dot_fec_id, submission_record_id, api=None):
     dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
     file_name = dot_fec_record.file_name
     try:
-        dot_fec_bytes = get_file_bytes(file_name)
+        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
     except Exception:
         submission.save_error("Could not retrieve .FEC bytes")
         return

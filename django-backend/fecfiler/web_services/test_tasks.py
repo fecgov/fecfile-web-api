@@ -1,8 +1,8 @@
 from django.test import TestCase
-from .tasks import create_dot_fec
+from .tasks import create_dot_fec, submit_to_fec
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
-from .models import DotFEC
+from .models import DotFEC, FECStatus, FECSubmissionState, UploadSubmission
 from curses import ascii
 from pathlib import Path
 from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
@@ -34,3 +34,50 @@ class TasksTestCase(TestCase):
         finally:
             if result_dot_fec.exists():
                 result_dot_fec.unlink()
+
+    def test_submit_to_fec(self):
+        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        dot_fec_id = create_dot_fec(9999, upload_submission.id, True)
+        id = submit_to_fec(
+            dot_fec_id, upload_submission.id, "test_password", None, True
+        )
+        upload_submission.refresh_from_db()
+        self.assertEqual(id, upload_submission.id)
+        self.assertEqual(upload_submission.dot_fec_id, dot_fec_id)
+        self.assertEqual(
+            upload_submission.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
+        )
+        self.assertIsNone(upload_submission.fecfile_error)
+        self.assertEqual(upload_submission.fec_submission_id, "fake_submission_id")
+        self.assertEqual(upload_submission.fec_status, FECStatus.ACCEPTED.value)
+        self.assertEqual(
+            upload_submission.fec_message, "We didn't really send anything to FEC"
+        )
+        self.assertEqual(len(upload_submission.fec_report_id), 36)
+
+    def test_submit_no_password(self):
+        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        dot_fec_id = create_dot_fec(9999, upload_submission.id, True)
+        submit_to_fec(dot_fec_id, upload_submission.id, None, None, True)
+        upload_submission.refresh_from_db()
+        self.assertEqual(
+            upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
+        )
+        self.assertEqual(
+            upload_submission.fecfile_error, "No E-Filing Password provided"
+        )
+
+    def test_submit_missing_file(self):
+        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        dot_fec_id = create_dot_fec(9999, upload_submission.id, True)
+        dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+        path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / dot_fec_record.file_name
+        path.unlink()
+        submit_to_fec(dot_fec_id, upload_submission.id, "test_password", None, True)
+        upload_submission.refresh_from_db()
+        self.assertEqual(
+            upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
+        )
+        self.assertEqual(
+            upload_submission.fecfile_error, "Could not retrieve .FEC bytes"
+        )

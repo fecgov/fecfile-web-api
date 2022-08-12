@@ -7,26 +7,41 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0005_auto_20220811_1213'),
+        ("web_services", "0005_auto_20220811_1213"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WebPrintSubmission',
+            name="WebPrintSubmission",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('fecfile_task_state', models.CharField(max_length=255)),
-                ('fecfile_error', models.TextField(null=True)),
-                ('fec_submission_id', models.CharField(max_length=255, null=True)),
-                ('fec_status', models.CharField(max_length=255, null=True)),
-                ('fec_message', models.TextField(null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('fec_batch_id', models.CharField(max_length=255, null=True)),
-                ('dot_fec', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.dotfec')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecfile_task_state", models.CharField(max_length=255)),
+                ("fecfile_error", models.TextField(null=True)),
+                ("fec_submission_id", models.CharField(max_length=255, null=True)),
+                ("fec_status", models.CharField(max_length=255, null=True)),
+                ("fec_message", models.TextField(null=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("fec_batch_id", models.CharField(max_length=255, null=True)),
+                (
+                    "dot_fec",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="web_services.dotfec",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'webprint_submissions',
+                "db_table": "webprint_submissions",
             },
         ),
     ]

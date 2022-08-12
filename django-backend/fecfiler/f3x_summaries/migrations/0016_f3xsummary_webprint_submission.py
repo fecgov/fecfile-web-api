@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0006_webprintsubmission'),
-        ('f3x_summaries', '0015_f3xsummary_upload_submission'),
+        ("web_services", "0006_webprintsubmission"),
+        ("f3x_summaries", "0015_f3xsummary_upload_submission"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='f3xsummary',
-            name='webprint_submission',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.webprintsubmission'),
+            model_name="f3xsummary",
+            name="webprint_submission",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.webprintsubmission",
+            ),
         ),
     ]

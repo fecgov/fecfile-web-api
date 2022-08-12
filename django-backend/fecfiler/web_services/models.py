@@ -44,7 +44,8 @@ class FECStatus(Enum):
     def __str__(self):
         return str(self.value)
 
-    def get_terminal_statuses():
+    @classmethod
+    def get_terminal_statuses(cls):
         return [
             FECStatus.ACCEPTED,
             FECStatus.COMPLETED,
@@ -52,7 +53,8 @@ class FECStatus(Enum):
             FECStatus.REJECTED,
         ]
 
-    def get_terminal_statuses_strings():
+    @classmethod
+    def get_terminal_statuses_strings(cls):
         return [status.value for status in FECStatus.get_terminal_statuses()]
 
 
