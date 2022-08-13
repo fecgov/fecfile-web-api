@@ -2,12 +2,16 @@ from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.web_services.tasks import create_dot_fec, submit_to_fec
+from fecfiler.web_services.tasks import (
+    create_dot_fec,
+    submit_to_fec,
+    submit_to_webprint,
+)
 from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC, UploadSubmission
+from .models import DotFEC, UploadSubmission, WebPrintSubmission
 
 import logging
 
@@ -34,7 +38,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
-        task = create_dot_fec.apply_async((report_id, None), retry=False)
+        task = create_dot_fec.apply_async((report_id, None, None), retry=False)
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
@@ -83,9 +87,38 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Start Celery tasks in chain"""
         task = (
-            create_dot_fec.s(report_id, upload_submission.id)
+            create_dot_fec.s(report_id, upload_submission_id=upload_submission.id)
             | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
         ).apply_async(retry=False)
 
-        logger.debug(f"Status from submit_to_fec report {report_id}: {task.status}")
+        logger.debug(f"submit_to_fec report {report_id}: {task.status}")
+        return Response({"status": "Submit .FEC task created"})
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="submit-to-webprint",
+    )
+    def submit_to_webprint(self, request):
+        """Create an unsigned .FEC, store it, and submit it to FEC WebPrint"""
+        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        """Retrieve parameters"""
+        report_id = serializer.validated_data["report_id"]
+
+        """Start tracking submission"""
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(report_id)
+
+        """Start Celery tasks in chain
+        Notice that we don't send the submission id to `create_dot_fec`
+        We don't want the .FEC to be signed for WebPrint
+        """
+        task = (
+            create_dot_fec.s(report_id, webprint_submission_id=webprint_submission.id)
+            | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API)
+        ).apply_async(retry=False)
+
+        logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})

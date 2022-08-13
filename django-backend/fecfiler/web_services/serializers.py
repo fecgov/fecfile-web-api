@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from fecfiler.web_services.models import UploadSubmission
+from fecfiler.web_services.models import UploadSubmission, WebPrintSubmission
 from fecfiler.f3x_summaries.models import F3XSummary
 
 
@@ -29,5 +29,15 @@ class UploadSubmissionSerializer(serializers.ModelSerializer):
         fields = [
             f.name
             for f in UploadSubmission._meta.get_fields()
+            if f.name not in ["dot_fec", "f3xsummary"]
+        ]
+
+
+class WebPrintSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WebPrintSubmission
+        fields = [
+            f.name
+            for f in WebPrintSubmission._meta.get_fields()
             if f.name not in ["dot_fec", "f3xsummary"]
         ]

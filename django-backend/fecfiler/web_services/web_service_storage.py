@@ -34,7 +34,7 @@ def get_file(file_name, force_read_from_disk=False):
     else:
         logger.info(f"retrieving file from disk: {file_name}")
         path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / file_name
-        file = open(path)
+        file = open(path, "rb")
         logger.info(f"SUCCESS file was retrieved disk: {file_name}")
     return file
 
