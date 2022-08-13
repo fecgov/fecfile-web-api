@@ -22,11 +22,14 @@ fecfiler.web\_services.models
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      BaseSubmission
       DotFEC
       FECStatus
+      FECSubmissionState
       UploadSubmission
       UploadSubmissionManager
-      UploadSubmissionState
+      WebPrintSubmission
+      WebPrintSubmissionManager
    
    
 

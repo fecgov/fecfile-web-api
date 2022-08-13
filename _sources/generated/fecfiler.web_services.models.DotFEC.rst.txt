@@ -51,5 +51,6 @@ fecfiler.web\_services.models.DotFEC
       ~DotFEC.report
       ~DotFEC.report_id
       ~DotFEC.uploadsubmission_set
+      ~DotFEC.webprintsubmission_set
    
    

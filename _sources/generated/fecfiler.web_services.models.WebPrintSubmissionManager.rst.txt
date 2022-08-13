@@ -1,0 +1,86 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.models.WebPrintSubmissionManager
+=======================================================
+
+.. currentmodule:: fecfiler.web_services.models
+
+.. autoclass:: WebPrintSubmissionManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebPrintSubmissionManager.__init__
+      ~WebPrintSubmissionManager.aggregate
+      ~WebPrintSubmissionManager.alias
+      ~WebPrintSubmissionManager.all
+      ~WebPrintSubmissionManager.annotate
+      ~WebPrintSubmissionManager.bulk_create
+      ~WebPrintSubmissionManager.bulk_update
+      ~WebPrintSubmissionManager.check
+      ~WebPrintSubmissionManager.complex_filter
+      ~WebPrintSubmissionManager.contribute_to_class
+      ~WebPrintSubmissionManager.count
+      ~WebPrintSubmissionManager.create
+      ~WebPrintSubmissionManager.dates
+      ~WebPrintSubmissionManager.datetimes
+      ~WebPrintSubmissionManager.db_manager
+      ~WebPrintSubmissionManager.deconstruct
+      ~WebPrintSubmissionManager.defer
+      ~WebPrintSubmissionManager.difference
+      ~WebPrintSubmissionManager.distinct
+      ~WebPrintSubmissionManager.earliest
+      ~WebPrintSubmissionManager.exclude
+      ~WebPrintSubmissionManager.exists
+      ~WebPrintSubmissionManager.explain
+      ~WebPrintSubmissionManager.extra
+      ~WebPrintSubmissionManager.filter
+      ~WebPrintSubmissionManager.first
+      ~WebPrintSubmissionManager.from_queryset
+      ~WebPrintSubmissionManager.get
+      ~WebPrintSubmissionManager.get_or_create
+      ~WebPrintSubmissionManager.get_queryset
+      ~WebPrintSubmissionManager.in_bulk
+      ~WebPrintSubmissionManager.initiate_submission
+      ~WebPrintSubmissionManager.intersection
+      ~WebPrintSubmissionManager.iterator
+      ~WebPrintSubmissionManager.last
+      ~WebPrintSubmissionManager.latest
+      ~WebPrintSubmissionManager.none
+      ~WebPrintSubmissionManager.only
+      ~WebPrintSubmissionManager.order_by
+      ~WebPrintSubmissionManager.prefetch_related
+      ~WebPrintSubmissionManager.raw
+      ~WebPrintSubmissionManager.reverse
+      ~WebPrintSubmissionManager.select_for_update
+      ~WebPrintSubmissionManager.select_related
+      ~WebPrintSubmissionManager.union
+      ~WebPrintSubmissionManager.update
+      ~WebPrintSubmissionManager.update_or_create
+      ~WebPrintSubmissionManager.using
+      ~WebPrintSubmissionManager.values
+      ~WebPrintSubmissionManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebPrintSubmissionManager.auto_created
+      ~WebPrintSubmissionManager.creation_counter
+      ~WebPrintSubmissionManager.db
+      ~WebPrintSubmissionManager.use_in_migrations
+   
+   

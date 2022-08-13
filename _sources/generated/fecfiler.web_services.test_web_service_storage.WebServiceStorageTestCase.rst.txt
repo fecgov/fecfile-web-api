@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
+============================================================================
+
+.. currentmodule:: fecfiler.web_services.test_web_service_storage
+
+.. autoclass:: WebServiceStorageTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebServiceStorageTestCase.__init__
+      ~WebServiceStorageTestCase.addClassCleanup
+      ~WebServiceStorageTestCase.addCleanup
+      ~WebServiceStorageTestCase.addTypeEqualityFunc
+      ~WebServiceStorageTestCase.assertAlmostEqual
+      ~WebServiceStorageTestCase.assertAlmostEquals
+      ~WebServiceStorageTestCase.assertContains
+      ~WebServiceStorageTestCase.assertCountEqual
+      ~WebServiceStorageTestCase.assertDictContainsSubset
+      ~WebServiceStorageTestCase.assertDictEqual
+      ~WebServiceStorageTestCase.assertEqual
+      ~WebServiceStorageTestCase.assertEquals
+      ~WebServiceStorageTestCase.assertFalse
+      ~WebServiceStorageTestCase.assertFieldOutput
+      ~WebServiceStorageTestCase.assertFormError
+      ~WebServiceStorageTestCase.assertFormsetError
+      ~WebServiceStorageTestCase.assertGreater
+      ~WebServiceStorageTestCase.assertGreaterEqual
+      ~WebServiceStorageTestCase.assertHTMLEqual
+      ~WebServiceStorageTestCase.assertHTMLNotEqual
+      ~WebServiceStorageTestCase.assertIn
+      ~WebServiceStorageTestCase.assertInHTML
+      ~WebServiceStorageTestCase.assertIs
+      ~WebServiceStorageTestCase.assertIsInstance
+      ~WebServiceStorageTestCase.assertIsNone
+      ~WebServiceStorageTestCase.assertIsNot
+      ~WebServiceStorageTestCase.assertIsNotNone
+      ~WebServiceStorageTestCase.assertJSONEqual
+      ~WebServiceStorageTestCase.assertJSONNotEqual
+      ~WebServiceStorageTestCase.assertLess
+      ~WebServiceStorageTestCase.assertLessEqual
+      ~WebServiceStorageTestCase.assertListEqual
+      ~WebServiceStorageTestCase.assertLogs
+      ~WebServiceStorageTestCase.assertMultiLineEqual
+      ~WebServiceStorageTestCase.assertNotAlmostEqual
+      ~WebServiceStorageTestCase.assertNotAlmostEquals
+      ~WebServiceStorageTestCase.assertNotContains
+      ~WebServiceStorageTestCase.assertNotEqual
+      ~WebServiceStorageTestCase.assertNotEquals
+      ~WebServiceStorageTestCase.assertNotIn
+      ~WebServiceStorageTestCase.assertNotIsInstance
+      ~WebServiceStorageTestCase.assertNotRegex
+      ~WebServiceStorageTestCase.assertNotRegexpMatches
+      ~WebServiceStorageTestCase.assertNumQueries
+      ~WebServiceStorageTestCase.assertQuerysetEqual
+      ~WebServiceStorageTestCase.assertRaises
+      ~WebServiceStorageTestCase.assertRaisesMessage
+      ~WebServiceStorageTestCase.assertRaisesRegex
+      ~WebServiceStorageTestCase.assertRaisesRegexp
+      ~WebServiceStorageTestCase.assertRedirects
+      ~WebServiceStorageTestCase.assertRegex
+      ~WebServiceStorageTestCase.assertRegexpMatches
+      ~WebServiceStorageTestCase.assertSequenceEqual
+      ~WebServiceStorageTestCase.assertSetEqual
+      ~WebServiceStorageTestCase.assertTemplateNotUsed
+      ~WebServiceStorageTestCase.assertTemplateUsed
+      ~WebServiceStorageTestCase.assertTrue
+      ~WebServiceStorageTestCase.assertTupleEqual
+      ~WebServiceStorageTestCase.assertURLEqual
+      ~WebServiceStorageTestCase.assertWarns
+      ~WebServiceStorageTestCase.assertWarnsMessage
+      ~WebServiceStorageTestCase.assertWarnsRegex
+      ~WebServiceStorageTestCase.assertXMLEqual
+      ~WebServiceStorageTestCase.assertXMLNotEqual
+      ~WebServiceStorageTestCase.assert_
+      ~WebServiceStorageTestCase.captureOnCommitCallbacks
+      ~WebServiceStorageTestCase.countTestCases
+      ~WebServiceStorageTestCase.debug
+      ~WebServiceStorageTestCase.defaultTestResult
+      ~WebServiceStorageTestCase.doClassCleanups
+      ~WebServiceStorageTestCase.doCleanups
+      ~WebServiceStorageTestCase.fail
+      ~WebServiceStorageTestCase.failIf
+      ~WebServiceStorageTestCase.failIfAlmostEqual
+      ~WebServiceStorageTestCase.failIfEqual
+      ~WebServiceStorageTestCase.failUnless
+      ~WebServiceStorageTestCase.failUnlessAlmostEqual
+      ~WebServiceStorageTestCase.failUnlessEqual
+      ~WebServiceStorageTestCase.failUnlessRaises
+      ~WebServiceStorageTestCase.id
+      ~WebServiceStorageTestCase.modify_settings
+      ~WebServiceStorageTestCase.run
+      ~WebServiceStorageTestCase.setUp
+      ~WebServiceStorageTestCase.setUpClass
+      ~WebServiceStorageTestCase.setUpTestData
+      ~WebServiceStorageTestCase.settings
+      ~WebServiceStorageTestCase.shortDescription
+      ~WebServiceStorageTestCase.skipTest
+      ~WebServiceStorageTestCase.subTest
+      ~WebServiceStorageTestCase.tearDown
+      ~WebServiceStorageTestCase.tearDownClass
+      ~WebServiceStorageTestCase.test_get_file
+      ~WebServiceStorageTestCase.test_get_file_bytes
+      ~WebServiceStorageTestCase.test_store_file
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebServiceStorageTestCase.available_apps
+      ~WebServiceStorageTestCase.databases
+      ~WebServiceStorageTestCase.fixtures
+      ~WebServiceStorageTestCase.longMessage
+      ~WebServiceStorageTestCase.maxDiff
+      ~WebServiceStorageTestCase.reset_sequences
+      ~WebServiceStorageTestCase.serialized_rollback
+   
+   

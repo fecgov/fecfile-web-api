@@ -15,8 +15,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.web_services.models.DotFEC" href="fecfiler.web_services.models.DotFEC.html" />
-    <link rel="prev" title="fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration" href="fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration.html" />
+    <link rel="next" title="fecfiler.web_services.models.BaseSubmission" href="fecfiler.web_services.models.BaseSubmission.html" />
+    <link rel="prev" title="fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url.Migration" href="fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url.Migration.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -42,11 +42,17 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.DotFEC.html#fecfiler.web_services.models.DotFEC" title="fecfiler.web_services.models.DotFEC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DotFEC</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.BaseSubmission.html#fecfiler.web_services.models.BaseSubmission" title="fecfiler.web_services.models.BaseSubmission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseSubmission</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Base Model tracking submissions to FEC</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.web_services.models.DotFEC.html#fecfiler.web_services.models.DotFEC" title="fecfiler.web_services.models.DotFEC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DotFEC</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Model storing .FEC file locations</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.web_services.models.FECStatus.html#fecfiler.web_services.models.FECStatus" title="fecfiler.web_services.models.FECStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FECStatus</span></code></a>(value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.FECStatus.html#fecfiler.web_services.models.FECStatus" title="fecfiler.web_services.models.FECStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FECStatus</span></code></a>(value)</p></td>
 <td><p>An enumeration.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.web_services.models.FECSubmissionState.html#fecfiler.web_services.models.FECSubmissionState" title="fecfiler.web_services.models.FECSubmissionState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FECSubmissionState</span></code></a>(value)</p></td>
+<td><p>States of submission to FEC Can be used for Webload and WebPrint</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.UploadSubmission.html#fecfiler.web_services.models.UploadSubmission" title="fecfiler.web_services.models.UploadSubmission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UploadSubmission</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Model tracking submissions to FEC Webload</p></td>
@@ -54,8 +60,11 @@
 <tr class="row-even"><td><p><a class="reference internal" href="fecfiler.web_services.models.UploadSubmissionManager.html#fecfiler.web_services.models.UploadSubmissionManager" title="fecfiler.web_services.models.UploadSubmissionManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UploadSubmissionManager</span></code></a>(*args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.UploadSubmissionState.html#fecfiler.web_services.models.UploadSubmissionState" title="fecfiler.web_services.models.UploadSubmissionState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UploadSubmissionState</span></code></a>(value)</p></td>
-<td><p>States of upload submission</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.web_services.models.WebPrintSubmission.html#fecfiler.web_services.models.WebPrintSubmission" title="fecfiler.web_services.models.WebPrintSubmission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WebPrintSubmission</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Model tracking submissions to FEC WebPrint</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.web_services.models.WebPrintSubmissionManager.html#fecfiler.web_services.models.WebPrintSubmissionManager" title="fecfiler.web_services.models.WebPrintSubmissionManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WebPrintSubmissionManager</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -96,17 +105,22 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.migrations.html">fecfiler.web_services.migrations</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.web_services.models</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.BaseSubmission.html">fecfiler.web_services.models.BaseSubmission</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.DotFEC.html">fecfiler.web_services.models.DotFEC</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.FECStatus.html">fecfiler.web_services.models.FECStatus</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.FECSubmissionState.html">fecfiler.web_services.models.FECSubmissionState</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.UploadSubmission.html">fecfiler.web_services.models.UploadSubmission</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.UploadSubmissionManager.html">fecfiler.web_services.models.UploadSubmissionManager</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.UploadSubmissionState.html">fecfiler.web_services.models.UploadSubmissionState</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.WebPrintSubmission.html">fecfiler.web_services.models.WebPrintSubmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.models.WebPrintSubmissionManager.html">fecfiler.web_services.models.WebPrintSubmissionManager</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.renderers.html">fecfiler.web_services.renderers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.serializers.html">fecfiler.web_services.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_models.html">fecfiler.web_services.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_tasks.html">fecfiler.web_services.test_tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_web_service_storage.html">fecfiler.web_services.test_web_service_storage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.urls.html">fecfiler.web_services.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.views.html">fecfiler.web_services.views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.web_service_storage.html">fecfiler.web_services.web_service_storage</a></li>
@@ -126,8 +140,8 @@
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.web_services.html">fecfiler.web_services</a><ul>
-      <li>Previous: <a href="fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration.html" title="previous chapter">fecfiler.web_services.migrations.0005_auto_20220811_1213.Migration</a></li>
-      <li>Next: <a href="fecfiler.web_services.models.DotFEC.html" title="next chapter">fecfiler.web_services.models.DotFEC</a></li>
+      <li>Previous: <a href="fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url.Migration.html" title="previous chapter">fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url.Migration</a></li>
+      <li>Next: <a href="fecfiler.web_services.models.BaseSubmission.html" title="next chapter">fecfiler.web_services.models.BaseSubmission</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

@@ -1,12 +1,12 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.web\_services.models.UploadSubmissionState
-===================================================
+fecfiler.web\_services.models.FECSubmissionState
+================================================
 
 .. currentmodule:: fecfiler.web_services.models
 
-.. autoclass:: UploadSubmissionState
+.. autoclass:: FECSubmissionState
    :members:                                    
    :show-inheritance:                           
    :inherited-members:                          
@@ -23,10 +23,10 @@ fecfiler.web\_services.models.UploadSubmissionState
 
    .. autosummary::
    
-      ~UploadSubmissionState.INITIALIZING
-      ~UploadSubmissionState.CREATING_FILE
-      ~UploadSubmissionState.SUBMITTING
-      ~UploadSubmissionState.SUCCEEDED
-      ~UploadSubmissionState.FAILED
+      ~FECSubmissionState.INITIALIZING
+      ~FECSubmissionState.CREATING_FILE
+      ~FECSubmissionState.SUBMITTING
+      ~FECSubmissionState.SUCCEEDED
+      ~FECSubmissionState.FAILED
    
    

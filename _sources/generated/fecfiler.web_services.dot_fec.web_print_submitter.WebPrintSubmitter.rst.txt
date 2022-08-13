@@ -1,0 +1,36 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.web\_print\_submitter.WebPrintSubmitter
+=======================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.web_print_submitter
+
+.. autoclass:: WebPrintSubmitter
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebPrintSubmitter.__init__
+      ~WebPrintSubmitter.poll_status
+      ~WebPrintSubmitter.submit
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebPrintSubmitter.fec_soap_client
+   
+   

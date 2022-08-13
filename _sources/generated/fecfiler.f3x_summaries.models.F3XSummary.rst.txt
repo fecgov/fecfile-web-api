@@ -189,6 +189,8 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.updated
       ~F3XSummary.upload_submission
       ~F3XSummary.upload_submission_id
+      ~F3XSummary.webprint_submission
+      ~F3XSummary.webprint_submission_id
       ~F3XSummary.zip
    
    

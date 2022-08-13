@@ -15,6 +15,13 @@ fecfiler.web\_services.models.FECStatus
    .. automethod:: __init__
 
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FECStatus.get_terminal_statuses
+      ~FECStatus.get_terminal_statuses_strings
+   
    
 
    
@@ -24,7 +31,9 @@ fecfiler.web\_services.models.FECStatus
    .. autosummary::
    
       ~FECStatus.ACCEPTED
+      ~FECStatus.COMPLETED
       ~FECStatus.PROCESSING
       ~FECStatus.REJECTED
+      ~FECStatus.FAILED
    
    

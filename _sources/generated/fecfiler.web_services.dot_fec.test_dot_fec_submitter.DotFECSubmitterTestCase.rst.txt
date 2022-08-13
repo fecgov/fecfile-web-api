@@ -1,0 +1,131 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCase
+=================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.test_dot_fec_submitter
+
+.. autoclass:: DotFECSubmitterTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECSubmitterTestCase.__init__
+      ~DotFECSubmitterTestCase.addClassCleanup
+      ~DotFECSubmitterTestCase.addCleanup
+      ~DotFECSubmitterTestCase.addTypeEqualityFunc
+      ~DotFECSubmitterTestCase.assertAlmostEqual
+      ~DotFECSubmitterTestCase.assertAlmostEquals
+      ~DotFECSubmitterTestCase.assertContains
+      ~DotFECSubmitterTestCase.assertCountEqual
+      ~DotFECSubmitterTestCase.assertDictContainsSubset
+      ~DotFECSubmitterTestCase.assertDictEqual
+      ~DotFECSubmitterTestCase.assertEqual
+      ~DotFECSubmitterTestCase.assertEquals
+      ~DotFECSubmitterTestCase.assertFalse
+      ~DotFECSubmitterTestCase.assertFieldOutput
+      ~DotFECSubmitterTestCase.assertFormError
+      ~DotFECSubmitterTestCase.assertFormsetError
+      ~DotFECSubmitterTestCase.assertGreater
+      ~DotFECSubmitterTestCase.assertGreaterEqual
+      ~DotFECSubmitterTestCase.assertHTMLEqual
+      ~DotFECSubmitterTestCase.assertHTMLNotEqual
+      ~DotFECSubmitterTestCase.assertIn
+      ~DotFECSubmitterTestCase.assertInHTML
+      ~DotFECSubmitterTestCase.assertIs
+      ~DotFECSubmitterTestCase.assertIsInstance
+      ~DotFECSubmitterTestCase.assertIsNone
+      ~DotFECSubmitterTestCase.assertIsNot
+      ~DotFECSubmitterTestCase.assertIsNotNone
+      ~DotFECSubmitterTestCase.assertJSONEqual
+      ~DotFECSubmitterTestCase.assertJSONNotEqual
+      ~DotFECSubmitterTestCase.assertLess
+      ~DotFECSubmitterTestCase.assertLessEqual
+      ~DotFECSubmitterTestCase.assertListEqual
+      ~DotFECSubmitterTestCase.assertLogs
+      ~DotFECSubmitterTestCase.assertMultiLineEqual
+      ~DotFECSubmitterTestCase.assertNotAlmostEqual
+      ~DotFECSubmitterTestCase.assertNotAlmostEquals
+      ~DotFECSubmitterTestCase.assertNotContains
+      ~DotFECSubmitterTestCase.assertNotEqual
+      ~DotFECSubmitterTestCase.assertNotEquals
+      ~DotFECSubmitterTestCase.assertNotIn
+      ~DotFECSubmitterTestCase.assertNotIsInstance
+      ~DotFECSubmitterTestCase.assertNotRegex
+      ~DotFECSubmitterTestCase.assertNotRegexpMatches
+      ~DotFECSubmitterTestCase.assertNumQueries
+      ~DotFECSubmitterTestCase.assertQuerysetEqual
+      ~DotFECSubmitterTestCase.assertRaises
+      ~DotFECSubmitterTestCase.assertRaisesMessage
+      ~DotFECSubmitterTestCase.assertRaisesRegex
+      ~DotFECSubmitterTestCase.assertRaisesRegexp
+      ~DotFECSubmitterTestCase.assertRedirects
+      ~DotFECSubmitterTestCase.assertRegex
+      ~DotFECSubmitterTestCase.assertRegexpMatches
+      ~DotFECSubmitterTestCase.assertSequenceEqual
+      ~DotFECSubmitterTestCase.assertSetEqual
+      ~DotFECSubmitterTestCase.assertTemplateNotUsed
+      ~DotFECSubmitterTestCase.assertTemplateUsed
+      ~DotFECSubmitterTestCase.assertTrue
+      ~DotFECSubmitterTestCase.assertTupleEqual
+      ~DotFECSubmitterTestCase.assertURLEqual
+      ~DotFECSubmitterTestCase.assertWarns
+      ~DotFECSubmitterTestCase.assertWarnsMessage
+      ~DotFECSubmitterTestCase.assertWarnsRegex
+      ~DotFECSubmitterTestCase.assertXMLEqual
+      ~DotFECSubmitterTestCase.assertXMLNotEqual
+      ~DotFECSubmitterTestCase.assert_
+      ~DotFECSubmitterTestCase.captureOnCommitCallbacks
+      ~DotFECSubmitterTestCase.countTestCases
+      ~DotFECSubmitterTestCase.debug
+      ~DotFECSubmitterTestCase.defaultTestResult
+      ~DotFECSubmitterTestCase.doClassCleanups
+      ~DotFECSubmitterTestCase.doCleanups
+      ~DotFECSubmitterTestCase.fail
+      ~DotFECSubmitterTestCase.failIf
+      ~DotFECSubmitterTestCase.failIfAlmostEqual
+      ~DotFECSubmitterTestCase.failIfEqual
+      ~DotFECSubmitterTestCase.failUnless
+      ~DotFECSubmitterTestCase.failUnlessAlmostEqual
+      ~DotFECSubmitterTestCase.failUnlessEqual
+      ~DotFECSubmitterTestCase.failUnlessRaises
+      ~DotFECSubmitterTestCase.id
+      ~DotFECSubmitterTestCase.modify_settings
+      ~DotFECSubmitterTestCase.run
+      ~DotFECSubmitterTestCase.setUp
+      ~DotFECSubmitterTestCase.setUpClass
+      ~DotFECSubmitterTestCase.setUpTestData
+      ~DotFECSubmitterTestCase.settings
+      ~DotFECSubmitterTestCase.shortDescription
+      ~DotFECSubmitterTestCase.skipTest
+      ~DotFECSubmitterTestCase.subTest
+      ~DotFECSubmitterTestCase.tearDown
+      ~DotFECSubmitterTestCase.tearDownClass
+      ~DotFECSubmitterTestCase.test_get_submission_json
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECSubmitterTestCase.available_apps
+      ~DotFECSubmitterTestCase.databases
+      ~DotFECSubmitterTestCase.fixtures
+      ~DotFECSubmitterTestCase.longMessage
+      ~DotFECSubmitterTestCase.maxDiff
+      ~DotFECSubmitterTestCase.reset_sequences
+      ~DotFECSubmitterTestCase.serialized_rollback
+   
+   

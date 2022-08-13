@@ -36,4 +36,7 @@ fecfiler.web\_services.migrations
    fecfiler.web_services.migrations.0003_auto_20220811_0905
    fecfiler.web_services.migrations.0004_auto_20220811_1040
    fecfiler.web_services.migrations.0005_auto_20220811_1213
+   fecfiler.web_services.migrations.0006_webprintsubmission
+   fecfiler.web_services.migrations.0007_webprintsubmission_fec_email
+   fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url
 

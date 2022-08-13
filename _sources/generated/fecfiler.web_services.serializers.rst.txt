@@ -25,6 +25,7 @@ fecfiler.web\_services.serializers
       ReportIdSerializer
       SubmissionRequestSerializer
       UploadSubmissionSerializer
+      WebPrintSubmissionSerializer
    
    
 

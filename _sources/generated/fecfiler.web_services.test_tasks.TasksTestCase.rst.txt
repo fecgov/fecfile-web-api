@@ -111,6 +111,10 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.tearDown
       ~TasksTestCase.tearDownClass
       ~TasksTestCase.test_create_dot_fec
+      ~TasksTestCase.test_submit_missing_file
+      ~TasksTestCase.test_submit_no_password
+      ~TasksTestCase.test_submit_to_fec
+      ~TasksTestCase.test_submit_to_webprint
    
    
 

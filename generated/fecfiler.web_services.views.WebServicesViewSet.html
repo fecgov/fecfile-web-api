@@ -169,7 +169,10 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_fec" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_fec</span></code></a>(request)</p></td>
 <td><p>Create a signed .FEC, store it, and submit it to FEC Webload</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_webprint</span></code></a>(request)</p></td>
+<td><p>Create an unsigned .FEC, store it, and submit it to FEC WebPrint</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
 </tbody>
@@ -481,6 +484,12 @@ will instead be performed lazily, the first time either
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint">
+<span class="sig-name descname"><span class="pre">submit_to_webprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an unsigned .FEC, store it, and submit it to FEC WebPrint</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.web_services.views.WebServicesViewSet.throttled">
 <span class="sig-name descname"><span class="pre">throttled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="Permalink to this definition">¶</a></dt>
 <dd><p>If request is throttled, determine what kind of exception to raise.</p>
@@ -528,7 +537,9 @@ will instead be performed lazily, the first time either
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.renderers.html">fecfiler.web_services.renderers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.serializers.html">fecfiler.web_services.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.tasks.html">fecfiler.web_services.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_models.html">fecfiler.web_services.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_tasks.html">fecfiler.web_services.test_tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.test_web_service_storage.html">fecfiler.web_services.test_web_service_storage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.web_services.urls.html">fecfiler.web_services.urls</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.web_services.views.html">fecfiler.web_services.views</a><ul class="current">
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.web_services.views.WebServicesViewSet</a></li>

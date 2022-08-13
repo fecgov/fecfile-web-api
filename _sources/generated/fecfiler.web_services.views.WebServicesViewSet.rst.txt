@@ -57,6 +57,7 @@ fecfiler.web\_services.views.WebServicesViewSet
       ~WebServicesViewSet.reverse_action
       ~WebServicesViewSet.setup
       ~WebServicesViewSet.submit_to_fec
+      ~WebServicesViewSet.submit_to_webprint
       ~WebServicesViewSet.throttled
    
    

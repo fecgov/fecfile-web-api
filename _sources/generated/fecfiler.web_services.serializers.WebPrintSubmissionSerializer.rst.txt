@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.serializers.WebPrintSubmissionSerializer
+===============================================================
+
+.. currentmodule:: fecfiler.web_services.serializers
+
+.. autoclass:: WebPrintSubmissionSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebPrintSubmissionSerializer.__init__
+      ~WebPrintSubmissionSerializer.bind
+      ~WebPrintSubmissionSerializer.build_field
+      ~WebPrintSubmissionSerializer.build_nested_field
+      ~WebPrintSubmissionSerializer.build_property_field
+      ~WebPrintSubmissionSerializer.build_relational_field
+      ~WebPrintSubmissionSerializer.build_standard_field
+      ~WebPrintSubmissionSerializer.build_unknown_field
+      ~WebPrintSubmissionSerializer.build_url_field
+      ~WebPrintSubmissionSerializer.create
+      ~WebPrintSubmissionSerializer.fail
+      ~WebPrintSubmissionSerializer.get_attribute
+      ~WebPrintSubmissionSerializer.get_default
+      ~WebPrintSubmissionSerializer.get_default_field_names
+      ~WebPrintSubmissionSerializer.get_extra_kwargs
+      ~WebPrintSubmissionSerializer.get_field_names
+      ~WebPrintSubmissionSerializer.get_fields
+      ~WebPrintSubmissionSerializer.get_initial
+      ~WebPrintSubmissionSerializer.get_unique_for_date_validators
+      ~WebPrintSubmissionSerializer.get_unique_together_validators
+      ~WebPrintSubmissionSerializer.get_uniqueness_extra_kwargs
+      ~WebPrintSubmissionSerializer.get_validators
+      ~WebPrintSubmissionSerializer.get_value
+      ~WebPrintSubmissionSerializer.include_extra_kwargs
+      ~WebPrintSubmissionSerializer.is_valid
+      ~WebPrintSubmissionSerializer.many_init
+      ~WebPrintSubmissionSerializer.run_validation
+      ~WebPrintSubmissionSerializer.run_validators
+      ~WebPrintSubmissionSerializer.save
+      ~WebPrintSubmissionSerializer.to_internal_value
+      ~WebPrintSubmissionSerializer.to_representation
+      ~WebPrintSubmissionSerializer.update
+      ~WebPrintSubmissionSerializer.validate
+      ~WebPrintSubmissionSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebPrintSubmissionSerializer.context
+      ~WebPrintSubmissionSerializer.data
+      ~WebPrintSubmissionSerializer.default_error_messages
+      ~WebPrintSubmissionSerializer.default_validators
+      ~WebPrintSubmissionSerializer.errors
+      ~WebPrintSubmissionSerializer.fields
+      ~WebPrintSubmissionSerializer.initial
+      ~WebPrintSubmissionSerializer.root
+      ~WebPrintSubmissionSerializer.serializer_field_mapping
+      ~WebPrintSubmissionSerializer.url_field_name
+      ~WebPrintSubmissionSerializer.validated_data
+      ~WebPrintSubmissionSerializer.validators
+   
+   

@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.test\_models.UploadSubmissionTestCase
+============================================================
+
+.. currentmodule:: fecfiler.web_services.test_models
+
+.. autoclass:: UploadSubmissionTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UploadSubmissionTestCase.__init__
+      ~UploadSubmissionTestCase.addClassCleanup
+      ~UploadSubmissionTestCase.addCleanup
+      ~UploadSubmissionTestCase.addTypeEqualityFunc
+      ~UploadSubmissionTestCase.assertAlmostEqual
+      ~UploadSubmissionTestCase.assertAlmostEquals
+      ~UploadSubmissionTestCase.assertContains
+      ~UploadSubmissionTestCase.assertCountEqual
+      ~UploadSubmissionTestCase.assertDictContainsSubset
+      ~UploadSubmissionTestCase.assertDictEqual
+      ~UploadSubmissionTestCase.assertEqual
+      ~UploadSubmissionTestCase.assertEquals
+      ~UploadSubmissionTestCase.assertFalse
+      ~UploadSubmissionTestCase.assertFieldOutput
+      ~UploadSubmissionTestCase.assertFormError
+      ~UploadSubmissionTestCase.assertFormsetError
+      ~UploadSubmissionTestCase.assertGreater
+      ~UploadSubmissionTestCase.assertGreaterEqual
+      ~UploadSubmissionTestCase.assertHTMLEqual
+      ~UploadSubmissionTestCase.assertHTMLNotEqual
+      ~UploadSubmissionTestCase.assertIn
+      ~UploadSubmissionTestCase.assertInHTML
+      ~UploadSubmissionTestCase.assertIs
+      ~UploadSubmissionTestCase.assertIsInstance
+      ~UploadSubmissionTestCase.assertIsNone
+      ~UploadSubmissionTestCase.assertIsNot
+      ~UploadSubmissionTestCase.assertIsNotNone
+      ~UploadSubmissionTestCase.assertJSONEqual
+      ~UploadSubmissionTestCase.assertJSONNotEqual
+      ~UploadSubmissionTestCase.assertLess
+      ~UploadSubmissionTestCase.assertLessEqual
+      ~UploadSubmissionTestCase.assertListEqual
+      ~UploadSubmissionTestCase.assertLogs
+      ~UploadSubmissionTestCase.assertMultiLineEqual
+      ~UploadSubmissionTestCase.assertNotAlmostEqual
+      ~UploadSubmissionTestCase.assertNotAlmostEquals
+      ~UploadSubmissionTestCase.assertNotContains
+      ~UploadSubmissionTestCase.assertNotEqual
+      ~UploadSubmissionTestCase.assertNotEquals
+      ~UploadSubmissionTestCase.assertNotIn
+      ~UploadSubmissionTestCase.assertNotIsInstance
+      ~UploadSubmissionTestCase.assertNotRegex
+      ~UploadSubmissionTestCase.assertNotRegexpMatches
+      ~UploadSubmissionTestCase.assertNumQueries
+      ~UploadSubmissionTestCase.assertQuerysetEqual
+      ~UploadSubmissionTestCase.assertRaises
+      ~UploadSubmissionTestCase.assertRaisesMessage
+      ~UploadSubmissionTestCase.assertRaisesRegex
+      ~UploadSubmissionTestCase.assertRaisesRegexp
+      ~UploadSubmissionTestCase.assertRedirects
+      ~UploadSubmissionTestCase.assertRegex
+      ~UploadSubmissionTestCase.assertRegexpMatches
+      ~UploadSubmissionTestCase.assertSequenceEqual
+      ~UploadSubmissionTestCase.assertSetEqual
+      ~UploadSubmissionTestCase.assertTemplateNotUsed
+      ~UploadSubmissionTestCase.assertTemplateUsed
+      ~UploadSubmissionTestCase.assertTrue
+      ~UploadSubmissionTestCase.assertTupleEqual
+      ~UploadSubmissionTestCase.assertURLEqual
+      ~UploadSubmissionTestCase.assertWarns
+      ~UploadSubmissionTestCase.assertWarnsMessage
+      ~UploadSubmissionTestCase.assertWarnsRegex
+      ~UploadSubmissionTestCase.assertXMLEqual
+      ~UploadSubmissionTestCase.assertXMLNotEqual
+      ~UploadSubmissionTestCase.assert_
+      ~UploadSubmissionTestCase.captureOnCommitCallbacks
+      ~UploadSubmissionTestCase.countTestCases
+      ~UploadSubmissionTestCase.debug
+      ~UploadSubmissionTestCase.defaultTestResult
+      ~UploadSubmissionTestCase.doClassCleanups
+      ~UploadSubmissionTestCase.doCleanups
+      ~UploadSubmissionTestCase.fail
+      ~UploadSubmissionTestCase.failIf
+      ~UploadSubmissionTestCase.failIfAlmostEqual
+      ~UploadSubmissionTestCase.failIfEqual
+      ~UploadSubmissionTestCase.failUnless
+      ~UploadSubmissionTestCase.failUnlessAlmostEqual
+      ~UploadSubmissionTestCase.failUnlessEqual
+      ~UploadSubmissionTestCase.failUnlessRaises
+      ~UploadSubmissionTestCase.id
+      ~UploadSubmissionTestCase.modify_settings
+      ~UploadSubmissionTestCase.run
+      ~UploadSubmissionTestCase.setUp
+      ~UploadSubmissionTestCase.setUpClass
+      ~UploadSubmissionTestCase.setUpTestData
+      ~UploadSubmissionTestCase.settings
+      ~UploadSubmissionTestCase.shortDescription
+      ~UploadSubmissionTestCase.skipTest
+      ~UploadSubmissionTestCase.subTest
+      ~UploadSubmissionTestCase.tearDown
+      ~UploadSubmissionTestCase.tearDownClass
+      ~UploadSubmissionTestCase.test_initiate_submission
+      ~UploadSubmissionTestCase.test_save_error
+      ~UploadSubmissionTestCase.test_save_fec_response
+      ~UploadSubmissionTestCase.test_webprint_initiate_submission
+      ~UploadSubmissionTestCase.test_webprint_save_fec_response
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UploadSubmissionTestCase.available_apps
+      ~UploadSubmissionTestCase.databases
+      ~UploadSubmissionTestCase.fixtures
+      ~UploadSubmissionTestCase.longMessage
+      ~UploadSubmissionTestCase.maxDiff
+      ~UploadSubmissionTestCase.reset_sequences
+      ~UploadSubmissionTestCase.serialized_rollback
+   
+   
