@@ -48,7 +48,7 @@ class ReportViewMixin(GenericViewSet):
         report_id = (
             (
                 self.request.query_params.get("report_id")
-                or self.request.data["report_id"]
+                or self.request.data.get("report_id")
             )
             if self.request
             else None
