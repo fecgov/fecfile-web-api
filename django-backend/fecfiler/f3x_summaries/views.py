@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
-from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary, ReportCodeLabel
 from fecfiler.scha_transactions.models import SchATransaction
@@ -55,7 +54,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
             return Response(
                 "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
             )
-            return
+
         reports = F3XSummary.objects.filter(
             committee_account__committee_id=committee_id
         )
