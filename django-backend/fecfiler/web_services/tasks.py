@@ -13,7 +13,7 @@ from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
 from .web_service_storage import get_file_bytes, store_file
-from fecfiler.settings import WEBPRINT_EMAIL
+from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
 
 import logging
 
@@ -113,6 +113,7 @@ def submit_to_webprint(
     api=None,
     force_read_from_disk=False,
 ):
+    logger.info(f"FEC API: {FEC_FILING_API}")
     submission = WebPrintSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
