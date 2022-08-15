@@ -88,7 +88,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Start Celery tasks in chain"""
         task = (
             create_dot_fec.s(report_id, upload_submission_id=upload_submission.id)
-            | submit_to_fec.s(upload_submission.id, e_filing_password, FEC_FILING_API)
+            | submit_to_fec.s(
+                upload_submission.id, e_filing_password, FEC_FILING_API, False
+            )
         ).apply_async(retry=False)
 
         logger.debug(f"submit_to_fec report {report_id}: {task.status}")
@@ -117,7 +119,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """
         task = (
             create_dot_fec.s(report_id, webprint_submission_id=webprint_submission.id)
-            | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API)
+            | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API, False)
         ).apply_async(retry=False)
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
