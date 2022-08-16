@@ -55,6 +55,7 @@ fecfiler.f3x\_summaries.views.F3XSummaryViewSet
       ~F3XSummaryViewSet.get_view_description
       ~F3XSummaryViewSet.get_view_name
       ~F3XSummaryViewSet.handle_exception
+      ~F3XSummaryViewSet.hard_delete_reports
       ~F3XSummaryViewSet.http_method_not_allowed
       ~F3XSummaryViewSet.initial
       ~F3XSummaryViewSet.initialize_request
