@@ -1,5 +1,5 @@
 from .models import F3XSummary, ReportCodeLabel
-from rest_framework.serializers import ModelSerializer, SlugRelatedField, EmailField
+from rest_framework.serializers import ModelSerializer, SlugRelatedField, EmailField, SerializerMethodField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
@@ -41,6 +41,13 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         read_only=True,
     )
 
+    submission_status = SerializerMethodField()
+    def get_submission_status(self, obj):
+        if hasattr(obj, "submission_status"):
+            return obj.submission_status
+        return None
+
+
     class Meta:
         model = F3XSummary
         fields = [
@@ -55,7 +62,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "uploadsubmission",
                 "webprintsubmission",
             ]
-        ]
+        ] + ["submission_status"]
         read_only_fields = [
             "id",
             "deleted",
