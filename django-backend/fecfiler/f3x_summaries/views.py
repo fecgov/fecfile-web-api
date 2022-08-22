@@ -41,7 +41,10 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     serializer_class = F3XSummarySerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["form_type", "report_code__label", "coverage_through_date", "upload_submission__fec_status", "submission_status"]
+    ordering_fields = [
+        "form_type", "report_code__label", "coverage_through_date",
+        "upload_submission__fec_status", "submission_status"
+    ]
     ordering = ["form_type"]
 
     @action(detail=False)
