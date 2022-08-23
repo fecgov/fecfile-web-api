@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from fecfiler.f3x_summaries.models import F3XSummary
+
 from .serializers import F3XSummarySerializer
 from fecfiler.authentication.models import Account
 from rest_framework.request import Request, HttpRequest
@@ -56,11 +58,11 @@ class F3XSerializerTestCase(TestCase):
                 "fec_status":"ACCEPTED"
             }
         }
-        f3x_summary["submission_status"] = "In-Progress"
         valid_serializer = F3XSummarySerializer(
             data=f3x_summary,
             context={"request": self.mock_request},
         )
-
-        valid_serializer.is_valid()
-        self.assertEqual(valid_serializer.data["submission_status"], 'In-Progress')
+        f3x_object = F3XSummary()
+        self.assertEqual(valid_serializer.get_submission_status(f3x_object), None)
+        f3x_object.submission_status = "In-Progress"
+        self.assertEqual(valid_serializer.get_submission_status(f3x_object), 'In-Progress')
