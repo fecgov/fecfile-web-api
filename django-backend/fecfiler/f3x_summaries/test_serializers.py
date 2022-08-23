@@ -18,7 +18,7 @@ class F3XSerializerTestCase(TestCase):
             "treasurer_first_name": "Validfirstname",
             "date_signed": "2022-01-01",
             "upload_submission": {
-                "fec_status":" ACCEPTED"
+                "fec_status": " ACCEPTED"
             }
         }
 
