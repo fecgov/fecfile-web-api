@@ -17,8 +17,8 @@ class F3XSerializerTestCase(TestCase):
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
             "date_signed": "2022-01-01",
-            "upload_submission":{
-                "fec_status":"ACCEPTED"
+            "upload_submission": {
+                "fec_status":" ACCEPTED"
             }
         }
 
@@ -54,8 +54,8 @@ class F3XSerializerTestCase(TestCase):
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
             "date_signed": "2022-01-01",
-            "upload_submission":{
-                "fec_status":"ACCEPTED"
+            "upload_submission": {
+                "fec_status": "ACCEPTED"
             }
         }
         valid_serializer = F3XSummarySerializer(
@@ -65,4 +65,7 @@ class F3XSerializerTestCase(TestCase):
         f3x_object = F3XSummary()
         self.assertEqual(valid_serializer.get_submission_status(f3x_object), None)
         f3x_object.submission_status = "In-Progress"
-        self.assertEqual(valid_serializer.get_submission_status(f3x_object), 'In-Progress')
+        self.assertEqual(
+            valid_serializer.get_submission_status(f3x_object),
+            'In-Progress'
+        )
