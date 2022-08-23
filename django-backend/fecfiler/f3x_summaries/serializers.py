@@ -3,7 +3,8 @@ from rest_framework.serializers import (
     ModelSerializer,
     SlugRelatedField,
     EmailField,
-    SerializerMethodField
+    SerializerMethodField,
+    CharField
 )
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
@@ -45,8 +46,11 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
     webprint_submission = WebPrintSubmissionSerializer(
         read_only=True,
     )
+    submission_status = CharField(
+        read_only=True,
+    )
 
-    submission_status = SerializerMethodField()
+    ##submission_status = SerializerMethodField()
 
     def get_submission_status(self, obj):
         if hasattr(obj, "submission_status"):

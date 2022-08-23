@@ -29,6 +29,22 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     queryset = F3XSummary.objects.select_related("report_code").annotate(
         submission_status=Case(
             When(upload_submission=None, then=Value('In-Progress')),
+            When(
+                upload_submission__fecfile_task_status='INITIALIZING',
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_status='CREATING_FILE',
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_status='SUBMITTING',
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_status='FAILED',
+                then=Value('Failed')
+            ),
             When(upload_submission__fec_status='ACCEPTED', then=Value('Submitted')),
             When(upload_submission__fec_status='PROCESSING', then=Value('Submitted')),
             When(upload_submission__fec_status='REJECTED', then=Value('Rejected')),
