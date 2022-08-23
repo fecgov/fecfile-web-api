@@ -56,10 +56,11 @@ class F3XSerializerTestCase(TestCase):
                 "fec_status":"ACCEPTED"
             }
         }
+        f3x_summary["submission_status"] = "In-Progress"
         valid_serializer = F3XSummarySerializer(
             data=f3x_summary,
             context={"request": self.mock_request},
         )
 
         valid_serializer.is_valid()
-        self.assertEqual(valid_serializer.data, 'In-Progress')
+        self.assertEqual(valid_serializer.data["submission_status"], 'In-Progress')
