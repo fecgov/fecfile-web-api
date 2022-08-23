@@ -7,6 +7,7 @@ from rest_framework.mixins import ListModelMixin
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary, ReportCodeLabel
 from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
@@ -30,24 +31,33 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         submission_status=Case(
             When(upload_submission=None, then=Value('In-Progress')),
             When(
-                upload_submission__fecfile_task_status='INITIALIZING',
+                upload_submission__fecfile_task_state=FECSubmissionState.INITIALIZING,
                 then=Value('Submitted')
             ),
             When(
-                upload_submission__fecfile_task_status='CREATING_FILE',
+                upload_submission__fecfile_task_state=FECSubmissionState.CREATING_FILE,
                 then=Value('Submitted')
             ),
             When(
-                upload_submission__fecfile_task_status='SUBMITTING',
+                upload_submission__fecfile_task_state=FECSubmissionState.SUBMITTING,
                 then=Value('Submitted')
             ),
             When(
-                upload_submission__fecfile_task_status='FAILED',
+                upload_submission__fecfile_task_state=FECSubmissionState.FAILED,
                 then=Value('Failed')
             ),
-            When(upload_submission__fec_status='ACCEPTED', then=Value('Submitted')),
-            When(upload_submission__fec_status='PROCESSING', then=Value('Submitted')),
-            When(upload_submission__fec_status='REJECTED', then=Value('Rejected')),
+            When(
+                upload_submission__fec_status=FECStatus.ACCEPTED,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fec_status=FECStatus.PROCESSING,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fec_status=FECStatus.REJECTED,
+                then=Value('Rejected')
+            ),
             When(upload_submission__fec_status=None, then=Value('In-Progress')),
             When(upload_submission__fec_status='', then=Value('In-Progress')),
         )

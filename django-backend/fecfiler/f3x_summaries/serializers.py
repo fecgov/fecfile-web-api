@@ -50,13 +50,6 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         read_only=True,
     )
 
-    ##submission_status = SerializerMethodField()
-
-    def get_submission_status(self, obj):
-        if hasattr(obj, "submission_status"):
-            return obj.submission_status
-        return None
-
     class Meta:
         model = F3XSummary
         fields = [
