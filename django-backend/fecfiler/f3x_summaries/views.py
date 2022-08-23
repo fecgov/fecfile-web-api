@@ -7,9 +7,11 @@ from rest_framework.mixins import ListModelMixin
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary, ReportCodeLabel
 from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
+from django.db.models import Case, Value, When
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,13 +27,50 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = F3XSummary.objects.select_related("report_code").all()
+    queryset = F3XSummary.objects.select_related("report_code").annotate(
+        report_status=Case(
+            When(upload_submission=None, then=Value('In-Progress')),
+            When(
+                upload_submission__fecfile_task_state=FECSubmissionState.INITIALIZING,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_state=FECSubmissionState.CREATING_FILE,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_state=FECSubmissionState.SUBMITTING,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fecfile_task_state=FECSubmissionState.FAILED,
+                then=Value('Failed')
+            ),
+            When(
+                upload_submission__fec_status=FECStatus.ACCEPTED,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fec_status=FECStatus.PROCESSING,
+                then=Value('Submitted')
+            ),
+            When(
+                upload_submission__fec_status=FECStatus.REJECTED,
+                then=Value('Rejected')
+            ),
+            When(upload_submission__fec_status=None, then=Value('In-Progress')),
+            When(upload_submission__fec_status='', then=Value('In-Progress')),
+        )
+    ).all()
     """Join on report code labels"""
 
     serializer_class = F3XSummarySerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["form_type", "report_code__label", "coverage_through_date"]
+    ordering_fields = [
+        "form_type", "report_code__label", "coverage_through_date",
+        "upload_submission__fec_status", "submission_status"
+    ]
     ordering = ["form_type"]
 
     @action(detail=False)
