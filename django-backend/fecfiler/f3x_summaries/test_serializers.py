@@ -1,7 +1,4 @@
 from django.test import TestCase
-
-from fecfiler.f3x_summaries.models import F3XSummary
-
 from .serializers import F3XSummarySerializer
 from fecfiler.authentication.models import Account
 from rest_framework.request import Request, HttpRequest
@@ -46,4 +43,3 @@ class F3XSerializerTestCase(TestCase):
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])
-

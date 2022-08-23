@@ -3,7 +3,6 @@ from rest_framework.serializers import (
     ModelSerializer,
     SlugRelatedField,
     EmailField,
-    SerializerMethodField,
     CharField
 )
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
