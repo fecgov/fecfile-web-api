@@ -45,7 +45,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
     webprint_submission = WebPrintSubmissionSerializer(
         read_only=True,
     )
-    submission_status = CharField(
+    report_status = CharField(
         read_only=True,
     )
 
@@ -63,7 +63,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "uploadsubmission",
                 "webprintsubmission",
             ]
-        ] + ["submission_status"]
+        ] + ["report_status"]
         read_only_fields = [
             "id",
             "deleted",

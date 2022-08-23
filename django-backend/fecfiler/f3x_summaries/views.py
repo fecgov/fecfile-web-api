@@ -28,7 +28,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = F3XSummary.objects.select_related("report_code").annotate(
-        submission_status=Case(
+        report_status=Case(
             When(upload_submission=None, then=Value('In-Progress')),
             When(
                 upload_submission__fecfile_task_state=FECSubmissionState.INITIALIZING,
