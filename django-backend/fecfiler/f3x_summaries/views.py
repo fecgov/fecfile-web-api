@@ -1,11 +1,18 @@
 from django.http import JsonResponse
-from rest_framework import filters
+from rest_framework import filters, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
-from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary, ReportCodeLabel
+from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.memo_text.models import MemoText
+from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class F3XSummaryViewSet(CommitteeOwnedViewSet):
@@ -36,8 +43,63 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         )
         return JsonResponse(data, safe=False)
 
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="hard-delete-reports",
+    )
+    def hard_delete_reports(self, request):
+        committee_id = request.data.get("committee_id")
+        if not committee_id:
+            return Response(
+                "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reports = F3XSummary.objects.filter(
+            committee_account__committee_id=committee_id
+        )
+        report_count = reports.count()
+        transaction_count = SchATransaction.objects.filter(
+            report__committee_account__committee_id=committee_id
+        ).count()
+        memo_count = MemoText.objects.filter(
+            report__committee_account__committee_id=committee_id
+        ).count()
+        dot_fec_count = DotFEC.objects.filter(
+            report__committee_account__committee_id=committee_id
+        ).count()
+        upload_submission_count = UploadSubmission.objects.filter(
+            dot_fec__report__committee_account__committee_id=committee_id
+        ).count()
+        web_print_submission_count = WebPrintSubmission.objects.filter(
+            dot_fec__report__committee_account__committee_id=committee_id
+        ).count()
+        logger.warn(f"Deleting Reports: {report_count}")
+        logger.warn(f"Deleting Transactions: {transaction_count}")
+        logger.warn(f"Memos: {memo_count}")
+        logger.warn(f"Dot Fecs: {dot_fec_count}")
+        logger.warn(f"Upload Submissions: {upload_submission_count}")
+        logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
+
+        reports.hard_delete()
+        return Response(f"Deleted {report_count} Reports")
+
 
 class ReportCodeLabelViewSet(GenericViewSet, ListModelMixin):
     queryset = ReportCodeLabel.objects.all()
     serializer_class = ReportCodeLabelSerializer
     pagination_class = None
+
+
+class ReportViewMixin(GenericViewSet):
+    def get_queryset(self):
+        report_id = (
+            (
+                self.request.query_params.get("report_id")
+                or self.request.data.get("report_id")
+            )
+            if self.request
+            else None
+        )
+        queryset = super().get_queryset()
+        return queryset.filter(report_id=report_id) if report_id else queryset

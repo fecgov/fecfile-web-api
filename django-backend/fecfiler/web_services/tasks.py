@@ -1,68 +1,162 @@
 from datetime import datetime
 import math
+import time
 from celery import shared_task
-from fecfiler.f3x_summaries.models import F3XSummary
-from fecfiler.scha_transactions.models import SchATransaction
-from fecfiler.web_services.models import DotFEC
-from django.core.exceptions import ObjectDoesNotExist
-from .dot_fec_serializer import add_row_to_fec_str, serialize_model_instance
-from .web_service_storage import store_file
+from fecfiler.web_services.models import (
+    DotFEC,
+    UploadSubmission,
+    WebPrintSubmission,
+    FECSubmissionState,
+    FECStatus,
+)
+from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
+from fecfiler.web_services.dot_fec.dot_fec_submitter import DotFECSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
+from .web_service_storage import get_file_bytes, store_file
+from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def serialize_f3x_summary(report_id):
-    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
-    if f3x_summary_result.exists():
-        logger.info(f"serializing f3x summary: {report_id}")
-        f3x_summary = f3x_summary_result.first()
-        return serialize_model_instance("F3X", F3XSummary, f3x_summary)
-    else:
-        raise ObjectDoesNotExist(f"report: {report_id} not found")
-
-
-def serialize_transaction(transaction):
-    if not isinstance(transaction, SchATransaction):
-        raise TypeError(f"{type(transaction)} is not a transaction")
-    logger.info(f"serializing transaction: {transaction.id}")
-    return serialize_model_instance("SchA", SchATransaction, transaction)
-
-
-def serialize_transactions(transactions):
-    if transactions.exists():
-        return [serialize_transaction(transaction) for transaction in transactions]
-    return []
-
-
-def create_dot_fec_content(report_id):
-    logger.info(f"creating .FEC for report: {report_id}")
-    try:
-        f3x_summary_row = serialize_f3x_summary(report_id)
-        transactions = SchATransaction.objects.filter(report_id=report_id)
-        transaction_rows = serialize_transactions(transactions)
-        logger.info("Serialized Report:")
-        logger.info(f3x_summary_row)
-        file_content = add_row_to_fec_str(None, f3x_summary_row)
-        for transaction in transaction_rows:
-            logger.info(transaction)
-            file_content = add_row_to_fec_str(file_content, transaction)
-
-        file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
-        return (file_content, file_name)
-    except Exception as error:
-        logger.error(f"failed to create .FEC for report {report_id}: {str(error)}")
-        return (None, None)
-
-
 @shared_task
-def create_dot_fec(report_id, force_write_to_disk=False):
-    file_content, file_name = create_dot_fec_content(report_id)
+def create_dot_fec(
+    report_id,
+    upload_submission_id=None,
+    webprint_submission_id=None,
+    force_write_to_disk=False,
+):
+    if upload_submission_id:
+        submission = UploadSubmission.objects.get(id=upload_submission_id)
+        submission.save_state(FECSubmissionState.CREATING_FILE)
+    if webprint_submission_id:
+        submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
+        submission.save_state(FECSubmissionState.CREATING_FILE)
+    file_content = compose_dot_fec(report_id, upload_submission_id)
+    file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
     if not file_content or not file_name:
+        if submission:
+            submission.save_error("Creating .FEC failed")
         return None
     store_file(file_content, file_name, force_write_to_disk)
     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
     dot_fec_record.save()
+    if upload_submission_id:
+        UploadSubmission.objects.filter(id=upload_submission_id).update(
+            dot_fec=dot_fec_record
+        )
+    if webprint_submission_id:
+        WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
+            dot_fec=dot_fec_record
+        )
 
-    return file_name
+    return dot_fec_record.id
+
+
+@shared_task
+def submit_to_fec(
+    dot_fec_id,
+    submission_record_id,
+    e_filing_password,
+    api=None,
+    force_read_from_disk=False,
+):
+    logger.info(f"FEC API: {FEC_FILING_API}")
+    logger.info(f"api submitter: {api}")
+    submission = UploadSubmission.objects.get(id=submission_record_id)
+    submission.save_state(FECSubmissionState.SUBMITTING)
+
+    """Get Password"""
+    if not e_filing_password:
+        submission.save_error("No E-Filing Password provided")
+        return
+
+    """Get .FEC file bytes"""
+    dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+    file_name = dot_fec_record.file_name
+    try:
+        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
+    except Exception:
+        submission.save_error("Could not retrieve .FEC bytes")
+        return
+
+    """Submit to FEC"""
+    submitter = DotFECSubmitter(api)
+    logger.info(f"Uploading {file_name} to FEC")
+    submission_json = submitter.get_submission_json(dot_fec_record, e_filing_password)
+    submission_response_string = submitter.submit(dot_fec_bytes, submission_json)
+    submission.save_fec_response(submission_response_string)
+
+    """Poll FEC for status of submission"""
+    # TODO: add timeout?
+    while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+        logger.info(f"Polling status for {submission.fec_submission_id}.")
+        logger.info(
+            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+        )
+        time.sleep(2)
+        status_response_string = submitter.poll_status(submission.fec_submission_id)
+        submission.save_fec_response(status_response_string)
+
+    new_state = (
+        FECSubmissionState.SUCCEEDED
+        if submission.fec_status == FECStatus.ACCEPTED.value
+        else FECSubmissionState.FAILED
+    )
+    submission.save_state(new_state)
+    return submission.id
+
+
+@shared_task
+def submit_to_webprint(
+    dot_fec_id,
+    submission_record_id,
+    api=None,
+    force_read_from_disk=False,
+):
+    logger.info(f"FEC API: {FEC_FILING_API}")
+    logger.info(f"api submitter: {api}")
+    submission = WebPrintSubmission.objects.get(id=submission_record_id)
+    submission.save_state(FECSubmissionState.SUBMITTING)
+
+    """Get .FEC file bytes"""
+    dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+    file_name = dot_fec_record.file_name
+    try:
+        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
+    except Exception:
+        submission.save_error("Could not retrieve .FEC bytes")
+        return
+
+    """Get email for WebPrint
+    There is no way to override this in the UI and we do not
+    want to email actual committees, so this is stopgap"""
+    email = WEBPRINT_EMAIL
+
+    """Submit to WebPrint"""
+    submitter = WebPrintSubmitter(api)
+    logger.info(f"Uploading {file_name} to FEC WebPrint")
+    submission_response_string = submitter.submit(email, dot_fec_bytes)
+    submission.save_fec_response(submission_response_string)
+
+    """Poll FEC for status of submission"""
+    # TODO: add timeout?
+    while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+        logger.info(f"Polling status for {submission.fec_submission_id}.")
+        logger.info(
+            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+        )
+        time.sleep(2)
+        status_response_string = submitter.poll_status(
+            submission.batch_id, submission.fec_submission_id
+        )
+        submission.save_fec_response(status_response_string)
+
+    new_state = (
+        FECSubmissionState.SUCCEEDED
+        if submission.fec_status == FECStatus.COMPLETED.value
+        else FECSubmissionState.FAILED
+    )
+    submission.save_state(new_state)
+    return submission.id

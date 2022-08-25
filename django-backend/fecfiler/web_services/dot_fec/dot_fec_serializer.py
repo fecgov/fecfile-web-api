@@ -75,13 +75,7 @@ def serialize_model_instance(schema_name, model, model_instance):
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.
     """
-    schema = validate.get_schema(schema_name)
-    schema_properties = schema.get("properties", {}).items()
-    column_sequences = {
-        v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties
-    }
-    row_length = max(column_sequences.keys())
-
+    column_sequences, row_length = extract_row_config(schema_name)
     """NOTE: column_index + 1 because FEC schemas define column sequences
     starting at 1"""
     row = [
@@ -93,10 +87,23 @@ def serialize_model_instance(schema_name, model, model_instance):
     return chr(ascii.FS).join(row)
 
 
-def add_row_to_fec_str(dot_fec_str, row):
-    """Returns new string with `row` appended to `dot_fec_str` and adds .FEC line breaks
-    Args:
-        dot_fec_str (string): .FEC content to add row to
-        row (string): Row that will be appended to `dot_fec_str`
-    """
-    return (dot_fec_str or "") + str(row) + CRLF_STR
+def extract_row_config(schema_name):
+    schema = validate.get_schema(schema_name)
+    schema_properties = schema.get("properties", {}).items()
+    column_sequences = {
+        v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties
+    }
+    row_length = max(column_sequences.keys())
+    return column_sequences, row_length
+
+
+def serialize_header(header):
+    column_sequences, row_length = extract_row_config("HDR")
+    row = [
+        str(header[column_sequences[column_index + 1]])
+        if (column_index + 1) in column_sequences
+        and header[column_sequences[column_index + 1]]
+        else ""
+        for column_index in range(0, row_length)
+    ]
+    return chr(ascii.FS).join(row)

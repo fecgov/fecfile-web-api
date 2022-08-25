@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
+    "fecfiler.memo_text",
     "fecfiler.contacts",
     "fecfiler.soft_delete",
     "fecfiler.validation",
@@ -261,10 +262,19 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
 
 
-CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "dot_fecs")
+CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
 CELERY_WORKER_STORAGE = env.get_credential(
     "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
 )
+
+"""FEC Webload settings
+"""
+FEC_FILING_API = env.get_credential("FEC_FILING_API")
+FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
+FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
+FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
+TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
+WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")

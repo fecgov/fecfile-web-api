@@ -12,7 +12,7 @@ class SchATransactionTestCase(TestCase):
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "INDV_REC",
-            "transaction_id": "A561234567891234",
+            "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
             "contributor_organization_name": "John Smith Co",
             "contributor_first_name": "John",
@@ -32,12 +32,14 @@ class SchATransactionTestCase(TestCase):
         self.invalid_scha_transaction = {
             "form_type": "invalidformtype",
             "contributor_last_name": "Validlastname",
+            "transaction_id": "ABCDEF0123456789",
             "transaction_type_identifier": "INDV_REC",
             "report_id": 1,
         }
 
         self.missing_type_transaction = {
             "form_type": "invalidformtype",
+            "transaction_id": "ABCDEF0123456789",
             "contributor_last_name": "Validlastname",
             "report_id": 1,
         }
