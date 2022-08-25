@@ -94,7 +94,7 @@ jobs:
       - run:
           name: Create/run migrations
           command: |
-            python manage.py migrate
+            python manage.py migrate --no-input --check --traceback
           working_directory: ~/project/django-backend/
 
       # Only use SonarCloud security checking for now.
