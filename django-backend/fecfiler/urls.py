@@ -2,7 +2,11 @@ from django.conf.urls import include
 from django.urls import re_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+##from rest_framework_simplejwt.views import obtain_jwt_token, refresh_jwt_token
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .authentication.authenticate_login import LogoutView
@@ -32,8 +36,8 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.memo_text.urls")),
     re_path(r"^api/v1/auth/logout/$", LogoutView.as_view(), name="logout"),
-    re_path(r"^api/v1/token/obtain$", obtain_jwt_token),
-    re_path(r"^api/v1/token/refresh$", refresh_jwt_token),
+    re_path(r"^api/v1/token/obtain$", TokenObtainPairView.as_view()),
+    re_path(r"^api/v1/token/refresh$", TokenRefreshView.as_view()),
     re_path(BASE_V1_URL, include("fecfiler.triage.urls")),
     re_path(BASE_V1_URL, include("fecfiler.authentication.urls")),
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),

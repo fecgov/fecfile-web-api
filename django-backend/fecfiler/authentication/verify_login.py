@@ -6,7 +6,7 @@ from rest_framework.decorators import (
 from .otp import TOTPVerification, OTP_DISABLE
 from .token import token_verification
 from rest_framework import status
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.settings import api_settings
 from django.db import connection
 from .models import Account
 from datetime import datetime

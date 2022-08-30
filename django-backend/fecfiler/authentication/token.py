@@ -3,8 +3,8 @@ from calendar import timegm
 from datetime import datetime
 from fecfiler.settings import SECRET_KEY
 import jwt
-from rest_framework_jwt.compat import get_username_field, get_username
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.compat import get_username_field, get_username
+from rest_framework_simplejwt.settings import api_settings
 import logging
 
 logger = logging.getLogger(__name__)

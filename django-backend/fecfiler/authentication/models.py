@@ -4,7 +4,6 @@ from django.contrib.auth.models import (
     BaseUserManager,
 )
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
 
@@ -49,20 +48,18 @@ class Account(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(
-        _("staff status"),
+        "staff status",
         default=False,
-        help_text=_("Designates whether the user can log into this admin " "site."),
+        help_text="Designates whether the user can log into this admin site."
     )
     is_active = models.BooleanField(
-        _("active"),
+        "active",
         default=True,
-        help_text=_(
-            "Designates whether this user should be treated as "
-            "active. Unselect this instead of deleting accounts."
-        ),
+        help_text="Designates whether this user should be treated as "+
+            "active. Unselect this instead of deleting accounts.",
     )
 
-    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    date_joined = models.DateTimeField("date joined", default=timezone.now)
     login_code_counter = models.CharField(max_length=1, blank=False, default=0)
     register_token = models.CharField(max_length=32, blank=True)
     personal_key = models.CharField(max_length=64, blank=True)
@@ -72,8 +69,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         unique_together = (("username", "email"),)
-        verbose_name = _("user")
-        verbose_name_plural = _("users")
+        verbose_name = "user"
+        verbose_name_plural = "users"
 
     objects = AccountManager()
     USERNAME_FIELD = "username"
