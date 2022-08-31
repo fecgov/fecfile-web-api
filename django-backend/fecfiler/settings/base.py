@@ -280,3 +280,9 @@ AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
+
+"""FEC API settings
+"""
+FEC_API = env.get_credential("FEC_API")
+FEC_API_KEY = env.get_credential("FEC_API_KEY")
+FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
