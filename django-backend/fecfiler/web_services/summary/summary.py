@@ -1,5 +1,4 @@
 from decimal import Decimal
-from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.scha_transactions.models import SchATransaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
