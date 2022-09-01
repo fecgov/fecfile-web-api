@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import Mock
-from rest_framework.request import HttpRequest, Request
 
 
 from django.test import RequestFactory
 
-from fecfiler.authentication.token import login_dot_gov_logout, generate_username
+from fecfiler.authentication.token import (login_dot_gov_logout,
+                                           generate_username)
 
 
-class F3XSummaryViewSetTest(unittest.TestCase):
+class TestToken(unittest.TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -21,10 +21,14 @@ class F3XSummaryViewSetTest(unittest.TestCase):
         mock_request.session = Mock()
         mock_request.session.get.return_value = test_id_token_hint
         mock_request.get_signed_cookie.return_value = test_state
-        
+
         retval = login_dot_gov_logout(mock_request)
         self.maxDiff = None
-        self.assertEqual(retval, 'https://idp.int.identitysandbox.gov/openid_connect/logout?id_token_hint=test_id_token_hint&post_logout_redirect_uri=None&state=test_state')
+        self.assertEqual(retval, ('https://idp.int.identitysandbox.gov'
+                                  '/openid_connect/logout?'
+                                  'id_token_hint=test_id_token_hint'
+                                  '&post_logout_redirect_uri=None'
+                                  '&state=test_state'))
 
     def test_generate_username(self):
         test_uuid = 'test_uuid'
