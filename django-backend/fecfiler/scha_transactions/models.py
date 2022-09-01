@@ -1,21 +1,28 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+from fecfiler.f3x_summaries.models import ReportMixin
+import uuid
+import logging
 
 
-class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
+logger = logging.getLogger(__name__)
+
+
+class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     """Generated model from json schema"""
 
     form_type = models.TextField(null=True, blank=True)
-    report_id = models.ForeignKey(
-        "f3x_summaries.F3XSummary",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
+    # TODO get rid of this field.  It is redundant with the related Committee_Account
     filer_committee_id_number = models.TextField(null=True, blank=True)
-    transaction_id = models.TextField(null=True, blank=True)
-    back_reference_tran_id_number = models.TextField(null=True, blank=True)
+    transaction_id = models.TextField(
+        editable=False, null=True, blank=False, max_length=20
+    )
+    # TODO get rid of this field.  It is redundant with the related Parent Transaction
+    back_reference_tran_id_number = models.TextField(
+        null=True, blank=True, max_length=20
+    )
+    # TODO get rid of this field.  It is redundant with the related Parent Transaction
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     contributor_organization_name = models.TextField(null=True, blank=True)
@@ -33,15 +40,11 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
     election_other_description = models.TextField(null=True, blank=True)
     contribution_date = models.DateField(null=True, blank=True)
     contribution_amount = models.DecimalField(
-        null=True,
-        blank=True,
-        max_digits=11,
-        decimal_places=2)
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     contribution_aggregate = models.DecimalField(
-        null=True,
-        blank=True,
-        max_digits=11,
-        decimal_places=2)
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
     contributor_employer = models.TextField(null=True, blank=True)
     contributor_occupation = models.TextField(null=True, blank=True)
@@ -68,15 +71,49 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
-    parent_transaction_id = models.ForeignKey(
-        "self",
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.CASCADE
+    parent_transaction = models.ForeignKey(
+        "self", null=True, blank=True, default=None, on_delete=models.CASCADE
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "scha_transactions"
+        indexes = [models.Index(fields=["transaction_id"])]
+
+    # This is intended to be useable without instantiating a transaction object
+    @staticmethod
+    def check_for_uid_conflicts(uid):  # noqa
+        return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
+
+    def generate_uid(self):
+        unique_id = uuid.uuid4()
+        hex_id = unique_id.hex.upper()
+        # Take 20 characters from the end, skipping over the 20th char from the right,
+        # which is the version number (uuid4 -> "4")
+        return hex_id[-21] + hex_id[-19:]
+
+    def generate_unique_transaction_id(self):
+        unique_id = self.generate_uid()
+
+        attempts = 0
+        while SchATransaction.check_for_uid_conflicts(unique_id):
+            unique_id = self.generate_uid()
+            attempts += 1
+            logger.info("Transaction unique ID generation: collision detected")
+            if attempts > 5:
+                logger.info("Unique ID generation failed: Over 5 conflicts in a row")
+                return ""
+        return unique_id
+
+    def update_parent_related_values(self, parent):
+        self.back_reference_tran_id_number = parent.transaction_id
+        self.back_reference_sched_name = parent.form_type
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            self.transaction_id = self.generate_unique_transaction_id()
+        if not self.back_reference_tran_id_number and self.parent_transaction:
+            self.update_parent_related_values(self.parent_transaction)
+
+        super(SchATransaction, self).save(*args, **kwargs)
