@@ -1,8 +1,8 @@
-from wsgiref.util import FileWrapper
+from fecfiler.f3x_summaries.models import F3XSummary
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .tasks import calculate_summary
+from .tasks import calculate_summary, CalculationState
 from ..serializers import ReportIdSerializer
 
 import logging
@@ -27,6 +27,9 @@ class SummaryViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
+        report = F3XSummary.objects.get(id=report_id)
+        report.calculation_status = CalculationState.CALCULATING
+        report.save()
         logger.debug(f"Starting Celery Task calculate_summary for report :{report_id}")
         task = calculate_summary.apply_async((report_id,), retry=False)
         logger.debug(f"Status from calculate_summary report {report_id}: {task.status}")
