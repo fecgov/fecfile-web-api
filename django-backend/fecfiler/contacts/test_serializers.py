@@ -16,7 +16,7 @@ class ContactSerializerTestCase(TestCase):
             "street_1": "Street",
             "city": "City",
             "state": "St",
-            "zip": "123456789",
+            "zip": "+1 123456789",
             "country": "Country",
         }
 
