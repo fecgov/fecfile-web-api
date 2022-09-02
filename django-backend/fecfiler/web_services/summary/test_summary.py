@@ -11,9 +11,6 @@ class F3XSerializerTestCase(TestCase):
         "test_summary_transactions",
     ]
 
-    def setUp(self):
-        pass
-
     def test_calculate_summary(self):
         f3x = F3XSummary.objects.get(id=9999)
         summary_service = SummaryService(f3x)
