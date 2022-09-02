@@ -33,19 +33,34 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
+        max_fec_results = 10
+        max_fec_results_param = request.GET.get('max_fec_results', '')
+        if (max_fec_results_param is not None and
+                max_fec_results_param.isnumeric()):
+            max_fec_results = int(max_fec_results_param)
+
+        max_fecfile_results = 10
+        max_fecfile_results_param = request.GET.get('max_fecfile_results', '')
+        if (max_fecfile_results_param is not None and
+                max_fecfile_results_param.isnumeric()):
+            max_fecfile_results = int(max_fecfile_results_param)
+
         query_params = urlencode({
             'q': q,
             'api_key': FEC_API_KEY,
         })
         url = '{url}?{query_params}'.format(
-            url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT, query_params=query_params)
-        json = requests.get(url).json()
-        fec_api_cmtees = json["results"]
+            url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
+            query_params=query_params)
+        json_results = requests.get(url).json()
 
+        fec_api_cmtees = json_results["results"][:max_fec_results]
         fecfile_cmtees = list(
             self.get_queryset()
             .filter(Q(committee_id__contains=q) | Q(name__contains=q))
-            .values("committee_id", "name")
+            .extra(select={'id': 'contacts.committee_id'})
+            .values("id", "name")
+            .order_by('-id')[:max_fecfile_results]
         )
         retval = {
             'fec_api_cmtees': fec_api_cmtees,
