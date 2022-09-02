@@ -12,6 +12,6 @@
 44717 2022-03-01 # numpy - dependencies not caught up yet
 44716 2022-03-01 # numpy - dependencies not caught up yet
 43975 2022-03-01 # urllib3 - botocore dependency needs to catch up
-48040 2022-09-01 # django
-48041 2022-09-01 # django
-48542 2022-09-01 # pyjwt
+48040 2022-09-03 # django
+48041 2022-09-03 # django
+48542 2022-09-03 # pyjwt
