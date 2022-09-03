@@ -35,14 +35,14 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
         max_fec_results = 10
         max_fec_results_param = request.GET.get('max_fec_results', '')
-        if (max_fec_results_param is not None and
-                max_fec_results_param.isnumeric()):
+        if (max_fec_results_param is not None
+                and max_fec_results_param.isnumeric()):
             max_fec_results = int(max_fec_results_param)
 
         max_fecfile_results = 10
         max_fecfile_results_param = request.GET.get('max_fecfile_results', '')
-        if (max_fecfile_results_param is not None and
-                max_fecfile_results_param.isnumeric()):
+        if (max_fecfile_results_param is not None
+                and max_fecfile_results_param.isnumeric()):
             max_fecfile_results = int(max_fecfile_results_param)
 
         query_params = urlencode({
