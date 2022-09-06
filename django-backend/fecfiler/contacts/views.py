@@ -1,5 +1,5 @@
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework.decorators import action
 from fecfiler.settings import FEC_API_KEY, FEC_API_COMMITTEE_LOOKUP_ENDPOINT
 from urllib.parse import urlencode
@@ -29,42 +29,46 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     @action(detail=False)
     def committee_lookup(self, request):
-        q = request.GET.get('q', '').upper()
+        q = request.GET.get("q", "")
         if q is None:
             return HttpResponseBadRequest()
 
         max_fec_results = 10
-        max_fec_results_param = request.GET.get('max_fec_results', '')
-        if (max_fec_results_param is not None
-                and max_fec_results_param.isnumeric()):
+        max_fec_results_param = request.GET.get("max_fec_results", "")
+        if max_fec_results_param is not None and max_fec_results_param.isnumeric():
             max_fec_results = int(max_fec_results_param)
 
         max_fecfile_results = 10
-        max_fecfile_results_param = request.GET.get('max_fecfile_results', '')
-        if (max_fecfile_results_param is not None
-                and max_fecfile_results_param.isnumeric()):
+        max_fecfile_results_param = request.GET.get("max_fecfile_results", "")
+        if (
+            max_fecfile_results_param is not None
+            and max_fecfile_results_param.isnumeric()
+        ):
             max_fecfile_results = int(max_fecfile_results_param)
 
-        query_params = urlencode({
-            'q': q,
-            'api_key': FEC_API_KEY,
-        })
-        url = '{url}?{query_params}'.format(
-            url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
-            query_params=query_params)
+        query_params = urlencode(
+            {
+                "q": q,
+                "api_key": FEC_API_KEY,
+            }
+        )
+        url = "{url}?{query_params}".format(
+            url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT, query_params=query_params
+        )
         json_results = requests.get(url).json()
 
-        fec_api_cmtees = json_results["results"][:max_fec_results]
-        fecfile_cmtees = list(
+        fec_api_committees = json_results.get("results", [])[:max_fec_results]
+        fecfile_committees = list(
             self.get_queryset()
-            .filter(Q(committee_id__contains=q) | Q(name__contains=q))
-            .extra(select={'id': 'contacts.committee_id'})
-            .values("id", "name")
-            .order_by('-id')[:max_fecfile_results]
+            .filter(Q(committee_id__icontains=q) | Q(name__icontains=q))
+            .order_by("-committee_id")
+            .annotate(result_id=F("committee_id"))
+            .values("name", "result_id")
+            .annotate(id=F("result_id"))[:max_fecfile_results]
         )
-        retval = {
-            'fec_api_cmtees': fec_api_cmtees,
-            'fecfile_cmtees': fecfile_cmtees
+        return_value = {
+            "fec_api_committees": fec_api_committees,
+            "fecfile_committees": fecfile_committees,
         }
 
-        return JsonResponse(retval)
+        return JsonResponse(return_value)
