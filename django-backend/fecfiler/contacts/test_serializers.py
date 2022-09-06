@@ -18,6 +18,7 @@ class ContactSerializerTestCase(TestCase):
             "state": "St",
             "zip": "123456789",
             "country": "Country",
+            "telephone": "+1 1234567890",
         }
 
         self.invalid_contact = {
@@ -26,6 +27,7 @@ class ContactSerializerTestCase(TestCase):
             "first_name": "First",
             "street_1": "Street",
             "city": "City",
+            "country": "USA",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -46,7 +48,6 @@ class ContactSerializerTestCase(TestCase):
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["state"])
         self.assertIsNotNone(invalid_serializer.errors["zip"])
-        self.assertIsNotNone(invalid_serializer.errors["country"])
 
     def test_read_only_fields(self):
         update = self.valid_contact.copy()
