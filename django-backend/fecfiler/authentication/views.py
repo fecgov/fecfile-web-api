@@ -1,5 +1,5 @@
 from django.views.generic import View
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
@@ -65,7 +65,7 @@ class LoginDotGovSuccessSpaRedirect(View):
 
 class LoginDotGovSuccessLogoutSpaRedirect(View):
     def get(self, request, *args, **kwargs):
-        response = HttpResponse(status=204)  # no content
+        response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
         response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
                                domain=FFAPI_COOKIE_DOMAIN)
         response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME,
