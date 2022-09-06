@@ -1,0 +1,62 @@
+[
+    {
+        "comment": "SA15 transaction to count",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "id": 9999,
+            "committee_account_id": 1000,
+            "report_id":9999,
+            "form_type": "SA15",
+            "contribution_amount":1234.56,
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier":"OFFSET_TO_OPEX"
+        }
+    },
+    {
+        "comment": "SA15 transaction to count",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "id": 10000,
+            "committee_account_id": 1000,
+            "report_id":9999,
+            "form_type": "SA15",
+            "contribution_amount":891.23,
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier":"OFFSET_TO_OPEX"
+        }
+    },
+    {
+        "comment": "SA15 transaction to NOT count",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "id": 10001,
+            "committee_account_id": 1000,
+            "report_id":9999,
+            "form_type": "SA15",
+            "contribution_amount":10000.23,
+            "memo_code": true,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier":"OFFSET_TO_OPEX"
+        }
+    },
+    {
+        "comment": "SA11AI transaction to NOT count with SA15",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "id": 10002,
+            "committee_account_id": 1000,
+            "report_id":9999,
+            "form_type": "SA11AI",
+            "contribution_amount":10000.23,
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier":"INDV_REC"
+        }
+    }
+]
