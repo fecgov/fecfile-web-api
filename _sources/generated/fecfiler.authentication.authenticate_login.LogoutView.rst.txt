@@ -1,0 +1,77 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.authenticate\_login.LogoutView
+======================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autoclass:: LogoutView
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LogoutView.__init__
+      ~LogoutView.as_view
+      ~LogoutView.check_object_permissions
+      ~LogoutView.check_permissions
+      ~LogoutView.check_throttles
+      ~LogoutView.determine_version
+      ~LogoutView.dispatch
+      ~LogoutView.finalize_response
+      ~LogoutView.get_authenticate_header
+      ~LogoutView.get_authenticators
+      ~LogoutView.get_content_negotiator
+      ~LogoutView.get_exception_handler
+      ~LogoutView.get_exception_handler_context
+      ~LogoutView.get_format_suffix
+      ~LogoutView.get_parser_context
+      ~LogoutView.get_parsers
+      ~LogoutView.get_permissions
+      ~LogoutView.get_renderer_context
+      ~LogoutView.get_renderers
+      ~LogoutView.get_throttles
+      ~LogoutView.get_view_description
+      ~LogoutView.get_view_name
+      ~LogoutView.handle_exception
+      ~LogoutView.http_method_not_allowed
+      ~LogoutView.initial
+      ~LogoutView.initialize_request
+      ~LogoutView.options
+      ~LogoutView.perform_authentication
+      ~LogoutView.perform_content_negotiation
+      ~LogoutView.permission_denied
+      ~LogoutView.post
+      ~LogoutView.raise_uncaught_exception
+      ~LogoutView.setup
+      ~LogoutView.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LogoutView.allowed_methods
+      ~LogoutView.authentication_classes
+      ~LogoutView.default_response_headers
+      ~LogoutView.http_method_names
+      ~LogoutView.parser_classes
+      ~LogoutView.permission_classes
+      ~LogoutView.renderer_classes
+      ~LogoutView.schema
+      ~LogoutView.settings
+      ~LogoutView.throttle_classes
+      ~LogoutView.versioning_class
+   
+   

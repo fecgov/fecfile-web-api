@@ -1,0 +1,6 @@
+fecfiler.authentication.otp.get\_last\_updated\_time
+====================================================
+
+.. currentmodule:: fecfiler.authentication.otp
+
+.. autofunction:: get_last_updated_time

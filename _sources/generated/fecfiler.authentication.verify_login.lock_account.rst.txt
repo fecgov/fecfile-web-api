@@ -1,0 +1,6 @@
+fecfiler.authentication.verify\_login.lock\_account
+===================================================
+
+.. currentmodule:: fecfiler.authentication.verify_login
+
+.. autofunction:: lock_account

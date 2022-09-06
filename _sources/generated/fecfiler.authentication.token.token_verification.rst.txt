@@ -1,0 +1,6 @@
+fecfiler.authentication.token.token\_verification
+=================================================
+
+.. currentmodule:: fecfiler.authentication.token
+
+.. autofunction:: token_verification

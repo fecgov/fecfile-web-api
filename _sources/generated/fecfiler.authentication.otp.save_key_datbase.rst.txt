@@ -1,0 +1,6 @@
+fecfiler.authentication.otp.save\_key\_datbase
+==============================================
+
+.. currentmodule:: fecfiler.authentication.otp
+
+.. autofunction:: save_key_datbase

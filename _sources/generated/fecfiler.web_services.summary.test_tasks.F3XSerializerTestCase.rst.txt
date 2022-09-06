@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
+================================================================
+
+.. currentmodule:: fecfiler.web_services.summary.test_tasks
+
+.. autoclass:: F3XSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XSerializerTestCase.__init__
+      ~F3XSerializerTestCase.addClassCleanup
+      ~F3XSerializerTestCase.addCleanup
+      ~F3XSerializerTestCase.addTypeEqualityFunc
+      ~F3XSerializerTestCase.assertAlmostEqual
+      ~F3XSerializerTestCase.assertAlmostEquals
+      ~F3XSerializerTestCase.assertContains
+      ~F3XSerializerTestCase.assertCountEqual
+      ~F3XSerializerTestCase.assertDictContainsSubset
+      ~F3XSerializerTestCase.assertDictEqual
+      ~F3XSerializerTestCase.assertEqual
+      ~F3XSerializerTestCase.assertEquals
+      ~F3XSerializerTestCase.assertFalse
+      ~F3XSerializerTestCase.assertFieldOutput
+      ~F3XSerializerTestCase.assertFormError
+      ~F3XSerializerTestCase.assertFormsetError
+      ~F3XSerializerTestCase.assertGreater
+      ~F3XSerializerTestCase.assertGreaterEqual
+      ~F3XSerializerTestCase.assertHTMLEqual
+      ~F3XSerializerTestCase.assertHTMLNotEqual
+      ~F3XSerializerTestCase.assertIn
+      ~F3XSerializerTestCase.assertInHTML
+      ~F3XSerializerTestCase.assertIs
+      ~F3XSerializerTestCase.assertIsInstance
+      ~F3XSerializerTestCase.assertIsNone
+      ~F3XSerializerTestCase.assertIsNot
+      ~F3XSerializerTestCase.assertIsNotNone
+      ~F3XSerializerTestCase.assertJSONEqual
+      ~F3XSerializerTestCase.assertJSONNotEqual
+      ~F3XSerializerTestCase.assertLess
+      ~F3XSerializerTestCase.assertLessEqual
+      ~F3XSerializerTestCase.assertListEqual
+      ~F3XSerializerTestCase.assertLogs
+      ~F3XSerializerTestCase.assertMultiLineEqual
+      ~F3XSerializerTestCase.assertNotAlmostEqual
+      ~F3XSerializerTestCase.assertNotAlmostEquals
+      ~F3XSerializerTestCase.assertNotContains
+      ~F3XSerializerTestCase.assertNotEqual
+      ~F3XSerializerTestCase.assertNotEquals
+      ~F3XSerializerTestCase.assertNotIn
+      ~F3XSerializerTestCase.assertNotIsInstance
+      ~F3XSerializerTestCase.assertNotRegex
+      ~F3XSerializerTestCase.assertNotRegexpMatches
+      ~F3XSerializerTestCase.assertNumQueries
+      ~F3XSerializerTestCase.assertQuerysetEqual
+      ~F3XSerializerTestCase.assertRaises
+      ~F3XSerializerTestCase.assertRaisesMessage
+      ~F3XSerializerTestCase.assertRaisesRegex
+      ~F3XSerializerTestCase.assertRaisesRegexp
+      ~F3XSerializerTestCase.assertRedirects
+      ~F3XSerializerTestCase.assertRegex
+      ~F3XSerializerTestCase.assertRegexpMatches
+      ~F3XSerializerTestCase.assertSequenceEqual
+      ~F3XSerializerTestCase.assertSetEqual
+      ~F3XSerializerTestCase.assertTemplateNotUsed
+      ~F3XSerializerTestCase.assertTemplateUsed
+      ~F3XSerializerTestCase.assertTrue
+      ~F3XSerializerTestCase.assertTupleEqual
+      ~F3XSerializerTestCase.assertURLEqual
+      ~F3XSerializerTestCase.assertWarns
+      ~F3XSerializerTestCase.assertWarnsMessage
+      ~F3XSerializerTestCase.assertWarnsRegex
+      ~F3XSerializerTestCase.assertXMLEqual
+      ~F3XSerializerTestCase.assertXMLNotEqual
+      ~F3XSerializerTestCase.assert_
+      ~F3XSerializerTestCase.captureOnCommitCallbacks
+      ~F3XSerializerTestCase.countTestCases
+      ~F3XSerializerTestCase.debug
+      ~F3XSerializerTestCase.defaultTestResult
+      ~F3XSerializerTestCase.doClassCleanups
+      ~F3XSerializerTestCase.doCleanups
+      ~F3XSerializerTestCase.fail
+      ~F3XSerializerTestCase.failIf
+      ~F3XSerializerTestCase.failIfAlmostEqual
+      ~F3XSerializerTestCase.failIfEqual
+      ~F3XSerializerTestCase.failUnless
+      ~F3XSerializerTestCase.failUnlessAlmostEqual
+      ~F3XSerializerTestCase.failUnlessEqual
+      ~F3XSerializerTestCase.failUnlessRaises
+      ~F3XSerializerTestCase.id
+      ~F3XSerializerTestCase.modify_settings
+      ~F3XSerializerTestCase.run
+      ~F3XSerializerTestCase.setUp
+      ~F3XSerializerTestCase.setUpClass
+      ~F3XSerializerTestCase.setUpTestData
+      ~F3XSerializerTestCase.settings
+      ~F3XSerializerTestCase.shortDescription
+      ~F3XSerializerTestCase.skipTest
+      ~F3XSerializerTestCase.subTest
+      ~F3XSerializerTestCase.tearDown
+      ~F3XSerializerTestCase.tearDownClass
+      ~F3XSerializerTestCase.test_report_with_no_transactions
+      ~F3XSerializerTestCase.test_summary_task
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XSerializerTestCase.available_apps
+      ~F3XSerializerTestCase.databases
+      ~F3XSerializerTestCase.fixtures
+      ~F3XSerializerTestCase.longMessage
+      ~F3XSerializerTestCase.maxDiff
+      ~F3XSerializerTestCase.reset_sequences
+      ~F3XSerializerTestCase.serialized_rollback
+   
+   

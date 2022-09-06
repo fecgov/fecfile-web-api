@@ -1,0 +1,48 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.authentication.authenticate\_login
+===========================================
+
+.. automodule:: fecfiler.authentication.authenticate_login
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      activate_account
+      authenticate_login
+      create_jwt_token
+      get_last_login_time
+      lock_account
+      update_counter
+      update_last_login_time
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      AccountViewSet
+      LogoutView
+   
+   
+
+   
+   
+   
+
+
+

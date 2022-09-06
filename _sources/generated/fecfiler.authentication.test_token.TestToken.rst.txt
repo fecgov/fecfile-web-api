@@ -1,0 +1,103 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.test\_token.TestToken
+=============================================
+
+.. currentmodule:: fecfiler.authentication.test_token
+
+.. autoclass:: TestToken
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TestToken.__init__
+      ~TestToken.addClassCleanup
+      ~TestToken.addCleanup
+      ~TestToken.addTypeEqualityFunc
+      ~TestToken.assertAlmostEqual
+      ~TestToken.assertAlmostEquals
+      ~TestToken.assertCountEqual
+      ~TestToken.assertDictContainsSubset
+      ~TestToken.assertDictEqual
+      ~TestToken.assertEqual
+      ~TestToken.assertEquals
+      ~TestToken.assertFalse
+      ~TestToken.assertGreater
+      ~TestToken.assertGreaterEqual
+      ~TestToken.assertIn
+      ~TestToken.assertIs
+      ~TestToken.assertIsInstance
+      ~TestToken.assertIsNone
+      ~TestToken.assertIsNot
+      ~TestToken.assertIsNotNone
+      ~TestToken.assertLess
+      ~TestToken.assertLessEqual
+      ~TestToken.assertListEqual
+      ~TestToken.assertLogs
+      ~TestToken.assertMultiLineEqual
+      ~TestToken.assertNotAlmostEqual
+      ~TestToken.assertNotAlmostEquals
+      ~TestToken.assertNotEqual
+      ~TestToken.assertNotEquals
+      ~TestToken.assertNotIn
+      ~TestToken.assertNotIsInstance
+      ~TestToken.assertNotRegex
+      ~TestToken.assertNotRegexpMatches
+      ~TestToken.assertRaises
+      ~TestToken.assertRaisesRegex
+      ~TestToken.assertRaisesRegexp
+      ~TestToken.assertRegex
+      ~TestToken.assertRegexpMatches
+      ~TestToken.assertSequenceEqual
+      ~TestToken.assertSetEqual
+      ~TestToken.assertTrue
+      ~TestToken.assertTupleEqual
+      ~TestToken.assertWarns
+      ~TestToken.assertWarnsRegex
+      ~TestToken.assert_
+      ~TestToken.countTestCases
+      ~TestToken.debug
+      ~TestToken.defaultTestResult
+      ~TestToken.doClassCleanups
+      ~TestToken.doCleanups
+      ~TestToken.fail
+      ~TestToken.failIf
+      ~TestToken.failIfAlmostEqual
+      ~TestToken.failIfEqual
+      ~TestToken.failUnless
+      ~TestToken.failUnlessAlmostEqual
+      ~TestToken.failUnlessEqual
+      ~TestToken.failUnlessRaises
+      ~TestToken.id
+      ~TestToken.run
+      ~TestToken.setUp
+      ~TestToken.setUpClass
+      ~TestToken.shortDescription
+      ~TestToken.skipTest
+      ~TestToken.subTest
+      ~TestToken.tearDown
+      ~TestToken.tearDownClass
+      ~TestToken.test_generate_username
+      ~TestToken.test_login_dot_gov_logout_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TestToken.longMessage
+      ~TestToken.maxDiff
+   
+   

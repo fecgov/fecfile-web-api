@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.serializers.AccountSerializer
+=====================================================
+
+.. currentmodule:: fecfiler.authentication.serializers
+
+.. autoclass:: AccountSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AccountSerializer.__init__
+      ~AccountSerializer.bind
+      ~AccountSerializer.build_field
+      ~AccountSerializer.build_nested_field
+      ~AccountSerializer.build_property_field
+      ~AccountSerializer.build_relational_field
+      ~AccountSerializer.build_standard_field
+      ~AccountSerializer.build_unknown_field
+      ~AccountSerializer.build_url_field
+      ~AccountSerializer.create
+      ~AccountSerializer.fail
+      ~AccountSerializer.get_attribute
+      ~AccountSerializer.get_default
+      ~AccountSerializer.get_default_field_names
+      ~AccountSerializer.get_extra_kwargs
+      ~AccountSerializer.get_field_names
+      ~AccountSerializer.get_fields
+      ~AccountSerializer.get_initial
+      ~AccountSerializer.get_unique_for_date_validators
+      ~AccountSerializer.get_unique_together_validators
+      ~AccountSerializer.get_uniqueness_extra_kwargs
+      ~AccountSerializer.get_validators
+      ~AccountSerializer.get_value
+      ~AccountSerializer.include_extra_kwargs
+      ~AccountSerializer.is_valid
+      ~AccountSerializer.many_init
+      ~AccountSerializer.run_validation
+      ~AccountSerializer.run_validators
+      ~AccountSerializer.save
+      ~AccountSerializer.to_internal_value
+      ~AccountSerializer.to_representation
+      ~AccountSerializer.update
+      ~AccountSerializer.validate
+      ~AccountSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AccountSerializer.context
+      ~AccountSerializer.data
+      ~AccountSerializer.default_error_messages
+      ~AccountSerializer.default_validators
+      ~AccountSerializer.errors
+      ~AccountSerializer.fields
+      ~AccountSerializer.initial
+      ~AccountSerializer.root
+      ~AccountSerializer.serializer_field_mapping
+      ~AccountSerializer.url_field_name
+      ~AccountSerializer.validated_data
+      ~AccountSerializer.validators
+   
+   

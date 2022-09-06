@@ -1,0 +1,6 @@
+fecfiler.authentication.verify\_login.check\_account\_exist
+===========================================================
+
+.. currentmodule:: fecfiler.authentication.verify_login
+
+.. autofunction:: check_account_exist

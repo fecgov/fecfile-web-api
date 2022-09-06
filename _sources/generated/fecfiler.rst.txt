@@ -31,6 +31,7 @@ fecfiler
    :template: custom-module-template.rst                 
    :recursive:
 
+   fecfiler.authentication
    fecfiler.celery
    fecfiler.committee_accounts
    fecfiler.contacts

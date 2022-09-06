@@ -1,0 +1,6 @@
+fecfiler.authentication.authenticate\_login.get\_last\_login\_time
+==================================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autofunction:: get_last_login_time

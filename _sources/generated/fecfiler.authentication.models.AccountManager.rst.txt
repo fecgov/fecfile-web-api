@@ -1,0 +1,90 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.models.AccountManager
+=============================================
+
+.. currentmodule:: fecfiler.authentication.models
+
+.. autoclass:: AccountManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AccountManager.__init__
+      ~AccountManager.aggregate
+      ~AccountManager.alias
+      ~AccountManager.all
+      ~AccountManager.annotate
+      ~AccountManager.bulk_create
+      ~AccountManager.bulk_update
+      ~AccountManager.check
+      ~AccountManager.complex_filter
+      ~AccountManager.contribute_to_class
+      ~AccountManager.count
+      ~AccountManager.create
+      ~AccountManager.create_superuser
+      ~AccountManager.create_user
+      ~AccountManager.dates
+      ~AccountManager.datetimes
+      ~AccountManager.db_manager
+      ~AccountManager.deconstruct
+      ~AccountManager.defer
+      ~AccountManager.difference
+      ~AccountManager.distinct
+      ~AccountManager.earliest
+      ~AccountManager.exclude
+      ~AccountManager.exists
+      ~AccountManager.explain
+      ~AccountManager.extra
+      ~AccountManager.filter
+      ~AccountManager.first
+      ~AccountManager.from_queryset
+      ~AccountManager.get
+      ~AccountManager.get_by_natural_key
+      ~AccountManager.get_or_create
+      ~AccountManager.get_queryset
+      ~AccountManager.in_bulk
+      ~AccountManager.intersection
+      ~AccountManager.iterator
+      ~AccountManager.last
+      ~AccountManager.latest
+      ~AccountManager.make_random_password
+      ~AccountManager.none
+      ~AccountManager.normalize_email
+      ~AccountManager.only
+      ~AccountManager.order_by
+      ~AccountManager.prefetch_related
+      ~AccountManager.raw
+      ~AccountManager.reverse
+      ~AccountManager.select_for_update
+      ~AccountManager.select_related
+      ~AccountManager.union
+      ~AccountManager.update
+      ~AccountManager.update_or_create
+      ~AccountManager.using
+      ~AccountManager.values
+      ~AccountManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AccountManager.auto_created
+      ~AccountManager.creation_counter
+      ~AccountManager.db
+      ~AccountManager.use_in_migrations
+   
+   

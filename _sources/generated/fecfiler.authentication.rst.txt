@@ -1,0 +1,44 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.authentication
+=======================
+
+.. automodule:: fecfiler.authentication
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.authentication.authenticate_login
+   fecfiler.authentication.models
+   fecfiler.authentication.otp
+   fecfiler.authentication.permissions
+   fecfiler.authentication.serializers
+   fecfiler.authentication.test_token
+   fecfiler.authentication.token
+   fecfiler.authentication.urls
+   fecfiler.authentication.verify_login
+   fecfiler.authentication.views
+

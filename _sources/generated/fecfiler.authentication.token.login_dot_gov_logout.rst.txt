@@ -1,0 +1,6 @@
+fecfiler.authentication.token.login\_dot\_gov\_logout
+=====================================================
+
+.. currentmodule:: fecfiler.authentication.token
+
+.. autofunction:: login_dot_gov_logout

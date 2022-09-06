@@ -87,7 +87,7 @@ a model instance to an F3X Report</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.ReportMixin.refresh_from_db" title="fecfiler.f3x_summaries.models.ReportMixin.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.ReportMixin.save" title="fecfiler.f3x_summaries.models.ReportMixin.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.ReportMixin.save" title="fecfiler.f3x_summaries.models.ReportMixin.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.ReportMixin.save_base" title="fecfiler.f3x_summaries.models.ReportMixin.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
@@ -167,7 +167,7 @@ of the field will call this method.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.f3x_summaries.models.ReportMixin.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_insert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.models.ReportMixin.save" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.models.ReportMixin.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the current instance. Override this in a subclass if you want to
 control the saving process.</p>
 <p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
@@ -229,6 +229,7 @@ failed.</p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>

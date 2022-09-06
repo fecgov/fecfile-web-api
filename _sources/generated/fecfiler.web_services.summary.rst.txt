@@ -1,0 +1,39 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.web\_services.summary
+==============================
+
+.. automodule:: fecfiler.web_services.summary
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.web_services.summary.summary
+   fecfiler.web_services.summary.tasks
+   fecfiler.web_services.summary.test_summary
+   fecfiler.web_services.summary.test_tasks
+   fecfiler.web_services.summary.views
+

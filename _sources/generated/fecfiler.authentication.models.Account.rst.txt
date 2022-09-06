@@ -1,0 +1,109 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.models.Account
+======================================
+
+.. currentmodule:: fecfiler.authentication.models
+
+.. autoclass:: Account
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Account.__init__
+      ~Account.check
+      ~Account.check_password
+      ~Account.clean
+      ~Account.clean_fields
+      ~Account.date_error_message
+      ~Account.delete
+      ~Account.email_user
+      ~Account.from_db
+      ~Account.full_clean
+      ~Account.get_all_permissions
+      ~Account.get_by_natural_key
+      ~Account.get_deferred_fields
+      ~Account.get_email_field_name
+      ~Account.get_full_name
+      ~Account.get_group_permissions
+      ~Account.get_next_by_created_at
+      ~Account.get_next_by_date_joined
+      ~Account.get_next_by_last_login
+      ~Account.get_next_by_updated_at
+      ~Account.get_previous_by_created_at
+      ~Account.get_previous_by_date_joined
+      ~Account.get_previous_by_last_login
+      ~Account.get_previous_by_updated_at
+      ~Account.get_session_auth_hash
+      ~Account.get_short_name
+      ~Account.get_user_permissions
+      ~Account.get_username
+      ~Account.has_module_perms
+      ~Account.has_perm
+      ~Account.has_perms
+      ~Account.has_usable_password
+      ~Account.natural_key
+      ~Account.normalize_username
+      ~Account.prepare_database_save
+      ~Account.refresh_from_db
+      ~Account.save
+      ~Account.save_base
+      ~Account.serializable_value
+      ~Account.set_password
+      ~Account.set_unusable_password
+      ~Account.unique_error_message
+      ~Account.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Account.REQUIRED_FIELDS
+      ~Account.USERNAME_FIELD
+      ~Account.cmtee_id
+      ~Account.code_generated_counter
+      ~Account.contact
+      ~Account.created_at
+      ~Account.date_joined
+      ~Account.delete_ind
+      ~Account.email
+      ~Account.first_name
+      ~Account.groups
+      ~Account.id
+      ~Account.is_active
+      ~Account.is_anonymous
+      ~Account.is_authenticated
+      ~Account.is_staff
+      ~Account.is_superuser
+      ~Account.last_login
+      ~Account.last_name
+      ~Account.logentry_set
+      ~Account.login_code_counter
+      ~Account.objects
+      ~Account.password
+      ~Account.personal_key
+      ~Account.pk
+      ~Account.register_token
+      ~Account.role
+      ~Account.secret_key
+      ~Account.status
+      ~Account.tagline
+      ~Account.totpdevice_set
+      ~Account.updated_at
+      ~Account.user_permissions
+      ~Account.username
+   
+   

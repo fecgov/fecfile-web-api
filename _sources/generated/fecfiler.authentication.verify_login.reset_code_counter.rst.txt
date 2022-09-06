@@ -1,0 +1,6 @@
+fecfiler.authentication.verify\_login.reset\_code\_counter
+==========================================================
+
+.. currentmodule:: fecfiler.authentication.verify_login
+
+.. autofunction:: reset_code_counter

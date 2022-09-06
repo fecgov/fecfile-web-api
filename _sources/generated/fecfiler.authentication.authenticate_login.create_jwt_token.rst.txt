@@ -1,0 +1,6 @@
+fecfiler.authentication.authenticate\_login.create\_jwt\_token
+==============================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autofunction:: create_jwt_token

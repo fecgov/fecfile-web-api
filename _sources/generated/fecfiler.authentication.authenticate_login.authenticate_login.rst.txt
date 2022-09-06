@@ -1,0 +1,6 @@
+fecfiler.authentication.authenticate\_login.authenticate\_login
+===============================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autofunction:: authenticate_login

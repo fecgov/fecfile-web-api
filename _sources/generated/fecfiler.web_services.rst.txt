@@ -36,6 +36,7 @@ fecfiler.web\_services
    fecfiler.web_services.models
    fecfiler.web_services.renderers
    fecfiler.web_services.serializers
+   fecfiler.web_services.summary
    fecfiler.web_services.tasks
    fecfiler.web_services.test_models
    fecfiler.web_services.test_tasks

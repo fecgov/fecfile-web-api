@@ -1,0 +1,6 @@
+fecfiler.authentication.authenticate\_login.activate\_account
+=============================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autofunction:: activate_account
