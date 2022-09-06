@@ -13,18 +13,15 @@ def mocked_requests_get(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    return MockResponse({"results": [
+    return MockResponse(
         {
-            "name": "BIDEN FOR PRESIDENT",
-            "id": "C00703975",
-            "is_active": "true"
+            "results": [
+                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
+                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
+            ]
         },
-        {
-            "name": "BIDEN VICTORY FUND",
-            "id": "C00744946",
-            "is_active": "true"
-        }
-    ]}, 200)
+        200,
+    )
 
 
 class ContactViewSetTest(TestCase):
@@ -34,7 +31,7 @@ class ContactViewSetTest(TestCase):
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
 
-    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
     def test_committee_lookup_happy_path(self, mock_get):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
@@ -43,21 +40,12 @@ class ContactViewSetTest(TestCase):
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
 
         expected_json = {
-            "fec_api_cmtees": [
-                {
-                    "name": "BIDEN FOR PRESIDENT",
-                    "id": "C00703975",
-                    "is_active": "true"
-                },
-                {
-                    "name": "BIDEN VICTORY FUND",
-                    "id": "C00744946",
-                    "is_active": "true"
-                }
+            "fec_api_committees": [
+                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
+                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
             ],
-            "fecfile_cmtees": []
+            "fecfile_committees": [],
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(str(response.content,
-                             encoding="utf8"), expected_json)
+        self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
