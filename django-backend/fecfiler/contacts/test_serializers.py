@@ -16,8 +16,9 @@ class ContactSerializerTestCase(TestCase):
             "street_1": "Street",
             "city": "City",
             "state": "St",
-            "zip": "+1 123456789",
+            "zip": "123456789",
             "country": "Country",
+            "telephone": "+1 1234567890",
         }
 
         self.invalid_contact = {
