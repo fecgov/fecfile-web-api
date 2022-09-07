@@ -1,0 +1,131 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.test\_views.ContactViewSetTest
+================================================
+
+.. currentmodule:: fecfiler.contacts.test_views
+
+.. autoclass:: ContactViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactViewSetTest.__init__
+      ~ContactViewSetTest.addClassCleanup
+      ~ContactViewSetTest.addCleanup
+      ~ContactViewSetTest.addTypeEqualityFunc
+      ~ContactViewSetTest.assertAlmostEqual
+      ~ContactViewSetTest.assertAlmostEquals
+      ~ContactViewSetTest.assertContains
+      ~ContactViewSetTest.assertCountEqual
+      ~ContactViewSetTest.assertDictContainsSubset
+      ~ContactViewSetTest.assertDictEqual
+      ~ContactViewSetTest.assertEqual
+      ~ContactViewSetTest.assertEquals
+      ~ContactViewSetTest.assertFalse
+      ~ContactViewSetTest.assertFieldOutput
+      ~ContactViewSetTest.assertFormError
+      ~ContactViewSetTest.assertFormsetError
+      ~ContactViewSetTest.assertGreater
+      ~ContactViewSetTest.assertGreaterEqual
+      ~ContactViewSetTest.assertHTMLEqual
+      ~ContactViewSetTest.assertHTMLNotEqual
+      ~ContactViewSetTest.assertIn
+      ~ContactViewSetTest.assertInHTML
+      ~ContactViewSetTest.assertIs
+      ~ContactViewSetTest.assertIsInstance
+      ~ContactViewSetTest.assertIsNone
+      ~ContactViewSetTest.assertIsNot
+      ~ContactViewSetTest.assertIsNotNone
+      ~ContactViewSetTest.assertJSONEqual
+      ~ContactViewSetTest.assertJSONNotEqual
+      ~ContactViewSetTest.assertLess
+      ~ContactViewSetTest.assertLessEqual
+      ~ContactViewSetTest.assertListEqual
+      ~ContactViewSetTest.assertLogs
+      ~ContactViewSetTest.assertMultiLineEqual
+      ~ContactViewSetTest.assertNotAlmostEqual
+      ~ContactViewSetTest.assertNotAlmostEquals
+      ~ContactViewSetTest.assertNotContains
+      ~ContactViewSetTest.assertNotEqual
+      ~ContactViewSetTest.assertNotEquals
+      ~ContactViewSetTest.assertNotIn
+      ~ContactViewSetTest.assertNotIsInstance
+      ~ContactViewSetTest.assertNotRegex
+      ~ContactViewSetTest.assertNotRegexpMatches
+      ~ContactViewSetTest.assertNumQueries
+      ~ContactViewSetTest.assertQuerysetEqual
+      ~ContactViewSetTest.assertRaises
+      ~ContactViewSetTest.assertRaisesMessage
+      ~ContactViewSetTest.assertRaisesRegex
+      ~ContactViewSetTest.assertRaisesRegexp
+      ~ContactViewSetTest.assertRedirects
+      ~ContactViewSetTest.assertRegex
+      ~ContactViewSetTest.assertRegexpMatches
+      ~ContactViewSetTest.assertSequenceEqual
+      ~ContactViewSetTest.assertSetEqual
+      ~ContactViewSetTest.assertTemplateNotUsed
+      ~ContactViewSetTest.assertTemplateUsed
+      ~ContactViewSetTest.assertTrue
+      ~ContactViewSetTest.assertTupleEqual
+      ~ContactViewSetTest.assertURLEqual
+      ~ContactViewSetTest.assertWarns
+      ~ContactViewSetTest.assertWarnsMessage
+      ~ContactViewSetTest.assertWarnsRegex
+      ~ContactViewSetTest.assertXMLEqual
+      ~ContactViewSetTest.assertXMLNotEqual
+      ~ContactViewSetTest.assert_
+      ~ContactViewSetTest.captureOnCommitCallbacks
+      ~ContactViewSetTest.countTestCases
+      ~ContactViewSetTest.debug
+      ~ContactViewSetTest.defaultTestResult
+      ~ContactViewSetTest.doClassCleanups
+      ~ContactViewSetTest.doCleanups
+      ~ContactViewSetTest.fail
+      ~ContactViewSetTest.failIf
+      ~ContactViewSetTest.failIfAlmostEqual
+      ~ContactViewSetTest.failIfEqual
+      ~ContactViewSetTest.failUnless
+      ~ContactViewSetTest.failUnlessAlmostEqual
+      ~ContactViewSetTest.failUnlessEqual
+      ~ContactViewSetTest.failUnlessRaises
+      ~ContactViewSetTest.id
+      ~ContactViewSetTest.modify_settings
+      ~ContactViewSetTest.run
+      ~ContactViewSetTest.setUp
+      ~ContactViewSetTest.setUpClass
+      ~ContactViewSetTest.setUpTestData
+      ~ContactViewSetTest.settings
+      ~ContactViewSetTest.shortDescription
+      ~ContactViewSetTest.skipTest
+      ~ContactViewSetTest.subTest
+      ~ContactViewSetTest.tearDown
+      ~ContactViewSetTest.tearDownClass
+      ~ContactViewSetTest.test_committee_lookup_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactViewSetTest.available_apps
+      ~ContactViewSetTest.databases
+      ~ContactViewSetTest.fixtures
+      ~ContactViewSetTest.longMessage
+      ~ContactViewSetTest.maxDiff
+      ~ContactViewSetTest.reset_sequences
+      ~ContactViewSetTest.serialized_rollback
+   
+   

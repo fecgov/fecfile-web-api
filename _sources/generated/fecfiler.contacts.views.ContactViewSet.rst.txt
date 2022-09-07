@@ -24,6 +24,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.check_object_permissions
       ~ContactViewSet.check_permissions
       ~ContactViewSet.check_throttles
+      ~ContactViewSet.committee_lookup
       ~ContactViewSet.create
       ~ContactViewSet.destroy
       ~ContactViewSet.determine_version

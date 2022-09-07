@@ -38,6 +38,7 @@ fecfiler.contacts
    fecfiler.contacts.signals
    fecfiler.contacts.test_models
    fecfiler.contacts.test_serializers
+   fecfiler.contacts.test_views
    fecfiler.contacts.urls
    fecfiler.contacts.views
 
