@@ -70,4 +70,6 @@ class LoginDotGovSuccessLogoutSpaRedirect(View):
                                domain=FFAPI_COOKIE_DOMAIN)
         response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME,
                                domain=FFAPI_COOKIE_DOMAIN)
+        response.delete_cookie('csrftoken',
+                               domain=FFAPI_COOKIE_DOMAIN)
         return response
