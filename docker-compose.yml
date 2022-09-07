@@ -100,3 +100,5 @@ services:
       FILE_AS_TEST_COMMITTEE:
       TEST_COMMITTEE_PASSWORD:
       WEBPRINT_EMAIL:
+      FEC_API:
+      FEC_API_KEY:
