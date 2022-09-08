@@ -40,8 +40,9 @@ fi
 git secrets --register-aws $GLOBAL_TOKEN
 
 # Add general custom rules
-git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|password|user|guid|hostname|pw|auth)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
-git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|API_KEY|APIKEY|PASSWORD|USER|GUID|HOSTNAME|PW|AUTH)\s*[=:]\s*['"'"'0-9a-zA-Z_\/+!{}=-]{4,120}'
+git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|password|guid|hostname|pw).*[=:][^(?>|.*=>|.*>$)]'
+git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|API_KEY|APIKEY|PASSWORD|GUID|HOSTNAME|PW).*[=:][^(?>|.*=>|.*>$)]'
+git secrets --add $GLOBAL_TOKEN '(user|auth|USER|AUTH)\s*[=:][^(?>|.*=>|.*>$)]'
 git secrets --add $GLOBAL_TOKEN '(aws_access_key_id|aws_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 git secrets --add $GLOBAL_TOKEN '(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 
