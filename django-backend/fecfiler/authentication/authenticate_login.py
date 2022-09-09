@@ -10,6 +10,8 @@ import pytz
 import jwt
 import time
 from django.db import connection
+
+from fecfiler.authentication.token import jwt_payload_handler
 from .models import Account
 from datetime import datetime, timedelta
 from django.http import JsonResponse
@@ -271,12 +273,19 @@ def authenticate_login(request):
                 )
             )
 
+            user = Account.objects.filter(username=username).first()
+            payload = jwt_payload_handler(user)
+            from rest_framework_jwt.settings import api_settings
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+            token = jwt_encode_handler(payload)
+
             response = {
                 "is_allowed": is_allowed,
                 "committee_id": account.cmtee_id,
                 "email": account.email,
                 "token": token,
             }
+
             return JsonResponse(response, status=200, safe=False)
         except Exception as e:
             logger.error("exception occurred while getting account information", str(e))

@@ -26,6 +26,8 @@ CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
 
+# E2E Testing Login API
+E2E_TESTING_LOGIN = True
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
