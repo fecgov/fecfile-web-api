@@ -1,5 +1,6 @@
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.db.models import Q, F
+from django.db.models.functions import Lower
 from rest_framework.decorators import action
 from fecfiler.settings import FEC_API_KEY, FEC_API_COMMITTEE_LOOKUP_ENDPOINT
 from urllib.parse import urlencode
@@ -29,7 +30,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     @action(detail=False)
     def committee_lookup(self, request):
-        q = request.GET.get("q", "")
+        q = request.GET.get("q")
         if q is None:
             return HttpResponseBadRequest()
 
@@ -69,6 +70,33 @@ class ContactViewSet(CommitteeOwnedViewSet):
         return_value = {
             "fec_api_committees": fec_api_committees,
             "fecfile_committees": fecfile_committees,
+        }
+
+        return JsonResponse(return_value)
+
+    @action(detail=False)
+    def individual_lookup(self, request):
+        q = request.GET.get("q")
+        if q is None:
+            return HttpResponseBadRequest()
+
+        max_fecfile_results = 10
+        max_fecfile_results_param = request.GET.get("max_fecfile_results", "")
+        if (
+            max_fecfile_results_param is not None
+            and max_fecfile_results_param.isnumeric()
+        ):
+            max_fecfile_results = int(max_fecfile_results_param)
+
+        fecfile_individuals = list(
+            self.get_queryset()
+            .filter(Q(type__icontains="IND") &
+                    (Q(last_name__icontains=q) | Q(first_name__icontains=q)))
+            .values("id", "last_name", "first_name")
+            .order_by(Lower("last_name").desc())[:max_fecfile_results]
+        )
+        return_value = {
+            "fecfile_individuals": fecfile_individuals,
         }
 
         return JsonResponse(return_value)
