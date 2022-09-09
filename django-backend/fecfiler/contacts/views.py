@@ -90,8 +90,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
         fecfile_individuals = list(
             self.get_queryset()
-            .filter(Q(type__icontains="IND") &
-                    (Q(last_name__icontains=q) | Q(first_name__icontains=q)))
+            .filter(Q(type__icontains="IND") & (
+                    Q(last_name__icontains=q) | Q(first_name__icontains=q)))
             .values("id", "last_name", "first_name")
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
         )
