@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -21,6 +22,8 @@ class ReportCodeLabel(models.Model):
 
 class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     form_type = models.TextField(null=True, blank=True)
     # TODO get rid of this field.  It is redundant with the related Committee_Account

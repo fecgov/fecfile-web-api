@@ -1,5 +1,6 @@
 from enum import Enum
 import json
+import uuid
 from django.db import models
 from fecfiler.f3x_summaries.models import F3XSummary
 import logging
@@ -13,6 +14,7 @@ class DotFEC(models.Model):
     Look up file names by reports
     """
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     report = models.ForeignKey(F3XSummary, on_delete=models.CASCADE)
     file_name = models.TextField()
 
@@ -93,6 +95,7 @@ class WebPrintSubmissionManager(models.Manager):
 class BaseSubmission(models.Model):
     """Base Model tracking submissions to FEC"""
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     dot_fec = models.ForeignKey(DotFEC, on_delete=models.SET_NULL, null=True)
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
