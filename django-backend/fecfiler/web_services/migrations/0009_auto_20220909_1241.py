@@ -40,17 +40,17 @@ class Migration(migrations.Migration):
             field=models.UUIDField(default=uuid.uuid4, editable=False),
         ),
         migrations.RunPython(create_uuid),
-        migrations.AddField(
+        migrations.AlterField(
             model_name="dotfec",
             name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
-        migrations.AddField(
+        migrations.AlterField(
             model_name="uploadsubmission",
             name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
-        migrations.AddField(
+        migrations.AlterField(
             model_name="webprintsubmission",
             name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
