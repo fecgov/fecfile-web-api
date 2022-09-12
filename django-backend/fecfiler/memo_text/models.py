@@ -2,9 +2,11 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
 from django.db import models
+import uuid
 
 
 class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     rec_type = models.TextField(null=True, blank=True)
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id_number = models.TextField(null=True, blank=True)

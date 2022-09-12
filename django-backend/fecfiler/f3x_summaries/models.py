@@ -23,7 +23,7 @@ class ReportCodeLabel(models.Model):
 class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     form_type = models.TextField(null=True, blank=True)
     # TODO get rid of this field.  It is redundant with the related Committee_Account

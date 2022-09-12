@@ -23,7 +23,7 @@ class ContactSerializer(
         model = Contact
         fields = [f.name for f in Contact._meta.get_fields() if f.name != "deleted"]
         read_only_fields = [
-            "id",
+            "uuid",
             "deleted",
             "created",
             "updated",

@@ -14,8 +14,10 @@ class DotFEC(models.Model):
     Look up file names by reports
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    report = models.ForeignKey(F3XSummary, on_delete=models.CASCADE)
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, primary_key=True
+    )
+    report = models.IntegerField()
     file_name = models.TextField()
 
     class Meta:
@@ -95,7 +97,7 @@ class WebPrintSubmissionManager(models.Manager):
 class BaseSubmission(models.Model):
     """Base Model tracking submissions to FEC"""
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     dot_fec = models.ForeignKey(DotFEC, on_delete=models.SET_NULL, null=True)
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
