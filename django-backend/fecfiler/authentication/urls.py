@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AccountViewSet
-from .authenticate_login import authenticate_login, LogoutView
+from .authenticate_login import authenticate_two_login_boogaloo, LogoutView
 from .views import (
     LoginDotGovSuccessSpaRedirect,
     LoginDotGovSuccessLogoutSpaRedirect
@@ -24,5 +24,5 @@ urlpatterns = [
 
 if (E2E_TESTING_LOGIN == True):
     urlpatterns.append(
-        path("user/login/authenticate", authenticate_login, name="login_authenticate")
+        path("user/login/authenticate", authenticate_two_login_boogaloo, name="login_authenticate")
     )
