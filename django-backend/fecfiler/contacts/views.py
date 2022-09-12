@@ -1,5 +1,5 @@
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.db.models import Q, F
+from django.db.models import Q
 from django.db.models.functions import Lower
 from rest_framework.decorators import action
 from fecfiler.settings import FEC_API_KEY, FEC_API_COMMITTEE_LOOKUP_ENDPOINT
@@ -62,10 +62,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fecfile_committees = list(
             self.get_queryset()
             .filter(Q(committee_id__icontains=q) | Q(name__icontains=q))
-            .order_by("-committee_id")
-            .annotate(result_id=F("committee_id"))
-            .values("name", "result_id")
-            .annotate(id=F("result_id"))[:max_fecfile_results]
+            .values()
+            .order_by("-committee_id")[:max_fecfile_results]
         )
         return_value = {
             "fec_api_committees": fec_api_committees,
@@ -92,7 +90,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             self.get_queryset()
             .filter(Q(type__icontains="IND") & (
                     Q(last_name__icontains=q) | Q(first_name__icontains=q)))
-            .values("id", "last_name", "first_name")
+            .values()
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
         )
         return_value = {
