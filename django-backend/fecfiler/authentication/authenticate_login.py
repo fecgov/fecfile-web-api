@@ -7,7 +7,6 @@ from rest_framework.decorators import (
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
-
 from fecfiler.authentication.token import jwt_payload_handler
 from .models import Account
 from datetime import datetime, timedelta
@@ -24,26 +23,24 @@ def update_last_login_time(account):
     account.save()
 
 
-def handle_invalid_login():
-    response = JsonResponse({
+def handle_invalid_login(username):
+    logger.debug("Unauthorized login attempt: {}".format(username))
+    return JsonResponse({
         "is_allowed": False,
         "status": "Unauthorized",
         "message": "ID/Password combination invalid.",
     }, status=401)
 
-    return response
-
 
 def handle_valid_login(account):
     update_last_login_time(account)
-    is_allowed = True
     payload = jwt_payload_handler(account)
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
     token = jwt_encode_handler(payload)
 
     logger.debug("Successful login: {}".format(account))
     return JsonResponse({
-        "is_allowed": is_allowed,
+        "is_allowed": True,
         "committee_id": account.cmtee_id,
         "email": account.email,
         "token": token,
@@ -56,7 +53,6 @@ def handle_valid_login(account):
 def authenticate_two_login_boogaloo(request):
     username = request.data.get("username", None)
     password = request.data.get("password", None)
-
     account = authenticate(
         request=request, username=username, password=password
     ) ## Returns an account if the username is found and the password is valid
@@ -64,12 +60,11 @@ def authenticate_two_login_boogaloo(request):
     if account:
         return handle_valid_login(account)
     else:
-        return handle_invalid_login()
+        return handle_invalid_login(username)
 
 
 class AccountViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
-
     serializer_class = AccountSerializer
 
     def get_queryset(self):
