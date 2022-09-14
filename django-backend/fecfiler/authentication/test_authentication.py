@@ -6,8 +6,9 @@ from fecfiler.authentication.authenticate_login import (
     handle_valid_login,
 )
 
+
 class TestAuthentication(TestCase):
-    fixtures=["test_accounts"]
+    fixtures = ["test_accounts"]
     acc = None
 
     def setUp(self):
