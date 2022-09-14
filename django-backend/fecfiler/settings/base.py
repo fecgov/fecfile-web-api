@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
 
-# E2E Testing Login API 
+# E2E Testing Login API
 # Defaults to False, overriden by local.py & e2e.py
 E2E_TESTING_LOGIN = False
 

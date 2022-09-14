@@ -54,7 +54,7 @@ def handle_valid_login(account):
 def authenticate_login(request):
     if request.method == "GET":
         return JsonResponse({"endpoint_available": E2E_TESTING_LOGIN})
-    
+
     if not E2E_TESTING_LOGIN:
         return JsonResponse(status=405, safe=False)
 
@@ -62,7 +62,7 @@ def authenticate_login(request):
     password = request.data.get("password", None)
     account = authenticate(
         request=request, username=username, password=password
-    ) ## Returns an account if the username is found and the password is valid
+    ) #  Returns an account if the username is found and the password is valid
 
     if account:
         return handle_valid_login(account)
