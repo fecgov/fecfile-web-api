@@ -12,6 +12,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+default_max_fec_results = 10
+default_max_fecfile_results = 10
+max_allowed_results = 100
+
 
 class ContactViewSet(CommitteeOwnedViewSet):
     """
@@ -34,18 +38,12 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fec_results = 10
-        max_fec_results_param = request.GET.get("max_fec_results", "")
-        if max_fec_results_param is not None and max_fec_results_param.isnumeric():
-            max_fec_results = int(max_fec_results_param)
+        max_fec_results = self.get_int_param_value(
+            request, "max_fec_results", default_max_fec_results, max_allowed_results)
 
-        max_fecfile_results = 10
-        max_fecfile_results_param = request.GET.get("max_fecfile_results", "")
-        if (
-            max_fecfile_results_param is not None
-            and max_fecfile_results_param.isnumeric()
-        ):
-            max_fecfile_results = int(max_fecfile_results_param)
+        max_fecfile_results = self.get_int_param_value(
+            request, "max_fecfile_results", default_max_fecfile_results,
+            max_allowed_results)
 
         query_params = urlencode(
             {
@@ -78,17 +76,13 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fecfile_results = 10
-        max_fecfile_results_param = request.GET.get("max_fecfile_results", "")
-        if (
-            max_fecfile_results_param is not None
-            and max_fecfile_results_param.isnumeric()
-        ):
-            max_fecfile_results = int(max_fecfile_results_param)
+        max_fecfile_results = self.get_int_param_value(
+            request, "max_fecfile_results", default_max_fecfile_results,
+            max_allowed_results)
 
         fecfile_individuals = list(
             self.get_queryset()
-            .filter(Q(type__icontains="IND") & (
+            .filter(Q(type="IND") & (
                     Q(last_name__icontains=q) | Q(first_name__icontains=q)))
             .values()
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
@@ -98,3 +92,14 @@ class ContactViewSet(CommitteeOwnedViewSet):
         }
 
         return JsonResponse(return_value)
+
+    def get_int_param_value(self, request, param_name: str,
+                            default_param_value: int, max_param_value: int):
+        if request:
+            param_val = request.GET.get(param_name, "")
+            if param_val and param_val.isnumeric():
+                param_int_val = int(param_val)
+                if param_int_val <= max_param_value:
+                    return param_int_val
+                return max_param_value
+        return default_param_value
