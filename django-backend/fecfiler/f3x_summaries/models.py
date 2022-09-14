@@ -1,6 +1,10 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ReportCodeLabel(models.Model):
@@ -370,6 +374,9 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
         null=True,
         blank=True,
     )
+
+    calculation_status = models.CharField(max_length=255, null=True, blank=True)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -387,6 +394,14 @@ class ReportMixin(models.Model):
     report = models.ForeignKey(
         "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
     )
+
+    def save(self, *args, **kwargs):
+        if self.report:
+            self.report.calculation_status = None
+            self.report.save()
+            logger.info(f"F3X Summary: {self.report.id} marked for recalcuation")
+
+        super(ReportMixin, self).save(*args, **kwargs)
 
     class Meta:
         abstract = True
