@@ -62,7 +62,7 @@ def authenticate_login(request):
     password = request.data.get("password", None)
     account = authenticate(
         request=request, username=username, password=password
-    ) #  Returns an account if the username is found and the password is valid
+    )  # Returns an account if the username is found and the password is valid
 
     if account:
         return handle_valid_login(account)
