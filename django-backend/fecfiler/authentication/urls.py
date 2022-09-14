@@ -6,7 +6,6 @@ from .views import (
     LoginDotGovSuccessSpaRedirect,
     LoginDotGovSuccessLogoutSpaRedirect
 )
-from fecfiler.settings import E2E_TESTING_LOGIN
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -19,10 +18,6 @@ urlpatterns = [
          name="login-redirect"),
     path("auth/logout-redirect", LoginDotGovSuccessLogoutSpaRedirect.as_view(),
          name="logout-redirect"),
-    path("", include(router.urls))
+    path("", include(router.urls)),
+    path("user/login/authenticate", authenticate_login, name="login_authenticate")
 ]
-
-if (E2E_TESTING_LOGIN == True):
-    urlpatterns.append(
-        path("user/login/authenticate", authenticate_login, name="login_authenticate")
-    )

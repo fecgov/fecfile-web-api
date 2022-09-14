@@ -9,11 +9,12 @@ from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from fecfiler.authentication.token import jwt_payload_handler
 from .models import Account
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.http import JsonResponse
 from .serializers import AccountSerializer
 from .permissions import IsAccountOwner
 import logging
+from fecfiler.settings import E2E_TESTING_LOGIN
 
 logger = logging.getLogger(__name__)
 
@@ -47,10 +48,16 @@ def handle_valid_login(account):
     }, status=200, safe=False)
 
 
-@api_view(["POST"])
+@api_view(["POST", "GET"])
 @authentication_classes([])
 @permission_classes([])
 def authenticate_login(request):
+    if request.method == "GET":
+        return JsonResponse({"endpoint_available": E2E_TESTING_LOGIN})
+    
+    if not E2E_TESTING_LOGIN:
+        return JsonResponse(status=405, safe=False)
+
     username = request.data.get("username", None)
     password = request.data.get("password", None)
     account = authenticate(
