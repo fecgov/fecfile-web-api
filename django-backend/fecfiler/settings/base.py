@@ -28,7 +28,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # E2E Testing Login API
 # Defaults to False, overriden by local.py & e2e.py
-E2E_TESTING_LOGIN = False
+E2E_TESTING_LOGIN = True
 
 
 LOGIN_TIMEOUT_TIME = 15
