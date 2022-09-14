@@ -8,7 +8,6 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from fecfiler.authentication.token import jwt_payload_handler
-from fecfiler.settings import E2E_TESTING_LOGIN
 from .models import Account
 from datetime import datetime, timedelta
 from django.http import JsonResponse
@@ -46,11 +45,6 @@ def handle_valid_login(account):
         "email": account.email,
         "token": token,
     }, status=200, safe=False)
-
-
-@api_view(["GET"])
-def e2e_authentication_available(_):
-    
 
 
 @api_view(["POST"])
