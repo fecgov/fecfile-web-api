@@ -97,7 +97,13 @@ class WebPrintSubmissionManager(models.Manager):
 class BaseSubmission(models.Model):
     """Base Model tracking submissions to FEC"""
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
     dot_fec = models.ForeignKey(DotFEC, on_delete=models.SET_NULL, null=True)
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)

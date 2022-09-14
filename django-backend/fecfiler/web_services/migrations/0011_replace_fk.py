@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         WebPrintSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
 
     dependencies = [
-        ("web_services", "0011_auto_20220912_1728"),
+        ("web_services", "0010_remove_fk_uuid_to_pk"),
     ]
 
     operations = [
@@ -39,4 +39,16 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(update_uuid),
+        migrations.RemoveField(
+            model_name="dotfec",
+            name="id",
+        ),
+        migrations.RemoveField(
+            model_name="uploadsubmission",
+            name="dot_fec_old",
+        ),
+        migrations.RemoveField(
+            model_name="webprintsubmission",
+            name="dot_fec_old",
+        ),
     ]
