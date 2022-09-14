@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     def update_uuid(apps, schema_editor):
-        F3XSummary = apps.get_model("web_services", "F3XSummary")
+        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
         UploadSubmission = apps.get_model("web_services", "UploadSubmission")
         WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
         upload_uuid = UploadSubmission.objects.filter(
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("web_services", "0012_use_uuid"),
-        ("f3x_summaries", "0017_f3xsummary_calculation_status"),
+        ("f3x_summaries", "0019_f3xsummary_submission_keys"),
     ]
 
     operations = [
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 null=True,
                 on_delete=models.deletion.SET_NULL,
-                to="web_services.dotfec",
+                to="web_services.UploadSubmission",
             ),
         ),
         migrations.AddField(
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 null=True,
                 on_delete=models.deletion.SET_NULL,
-                to="web_services.dotfec",
+                to="web_services.WebPrintSubmission",
             ),
         ),
         migrations.RunPython(update_uuid),

@@ -25,12 +25,10 @@ class Migration(migrations.Migration):
             model_name="f3xsummary",
             old_name="upload_submission",
             new_name="upload_submission_old",
-            field=models.IntegerField(null=True),
         ),
         migrations.RenameField(
             model_name="f3xsummary",
             old_name="webprint_submission",
             new_name="webprint_submission_old",
-            field=models.IntegerField(null=True),
         ),
     ]
