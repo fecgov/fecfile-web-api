@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     """Generated model from json schema"""
 
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
         primary_key=True,

@@ -7,7 +7,7 @@ COMMITTEE_ID_REGEX = RegexValidator(r"^C[0-9]{8}$", "invalid committee id format
 
 
 class CommitteeAccount(SoftDeleteModel):
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
         primary_key=True,
@@ -37,7 +37,7 @@ class CommitteeOwnedModel(models.Model):
     """
 
     committee_account = models.ForeignKey(
-        "committee_accounts.CommitteeAccount", on_delete=models.CASCADE
+        "committee_accounts.CommitteeAccount", on_delete=models.CASCADE, null=True
     )
 
     class Meta:

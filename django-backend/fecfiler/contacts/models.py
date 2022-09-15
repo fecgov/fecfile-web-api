@@ -5,7 +5,7 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
 class Contact(SoftDeleteModel, CommitteeOwnedModel):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
 
     class ContactType(models.TextChoices):
         COMMITTEE = "COM"

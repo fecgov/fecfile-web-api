@@ -14,7 +14,7 @@ class DotFEC(models.Model):
     Look up file names by reports
     """
 
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
         primary_key=True,
@@ -101,7 +101,7 @@ class WebPrintSubmissionManager(models.Manager):
 class BaseSubmission(models.Model):
     """Base Model tracking submissions to FEC"""
 
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
         primary_key=True,
