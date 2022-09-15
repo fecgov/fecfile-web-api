@@ -29,6 +29,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="memotext",
+            name="id",
+            field=models.IntegerField(),
+        ),
+        migrations.AlterField(
+            model_name="memotext",
             name="uuid",
             field=models.UUIDField(
                 default=uuid.uuid4,
