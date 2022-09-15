@@ -1,14 +1,17 @@
-from django.http import HttpResponseBadRequest, JsonResponse
-from django.db.models import Q
-from django.db.models.functions import Lower
-from rest_framework.decorators import action
-from fecfiler.settings import FEC_API_KEY, FEC_API_COMMITTEE_LOOKUP_ENDPOINT
+import logging
+import re
 from urllib.parse import urlencode
+
+import requests
+from django.db.models import CharField, Q, Value
+from django.db.models.functions import Concat, Lower
+from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from fecfiler.settings import FEC_API_COMMITTEE_LOOKUP_ENDPOINT, FEC_API_KEY
+from rest_framework.decorators import action
+
 from .models import Contact
 from .serializers import ContactSerializer
-import requests
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -76,14 +79,23 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
+        tokens = list(filter(None, re.split('[^\\w+]', q)))
+        if (not tokens) or (len(tokens) < 1):
+            return HttpResponseBadRequest()
+        term = ('.*' + '.* .*'.join(tokens) + '.*').lower()
+
         max_fecfile_results = self.get_int_param_value(
             request, "max_fecfile_results", default_max_fecfile_results,
             max_allowed_results)
 
         fecfile_individuals = list(
             self.get_queryset()
-            .filter(Q(type="IND") & (
-                    Q(last_name__icontains=q) | Q(first_name__icontains=q)))
+            .annotate(full_name_fwd=Lower(Concat('first_name', Value(' '),
+                      'last_name', output_field=CharField())))
+            .annotate(full_name_bwd=Lower(Concat('last_name', Value(' '),
+                      'first_name', output_field=CharField())))
+            .filter(Q(type="IND") & (Q(full_name_fwd__regex=term)
+                                     | Q(full_name_bwd__regex=term)))
             .values()
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
         )
