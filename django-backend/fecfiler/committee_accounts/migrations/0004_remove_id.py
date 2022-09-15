@@ -6,7 +6,7 @@ import uuid
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("committee_accounts", "0002_committeeaccount_uuid"),
+        ("committee_accounts", "0003_uuid_pk"),
         ("contacts", "0009_committee_uuid_fk"),
         ("f3x_summaries", "0024_committee_uuid_fk"),
         ("memo_text", "0006_committee_uuid_fk"),
