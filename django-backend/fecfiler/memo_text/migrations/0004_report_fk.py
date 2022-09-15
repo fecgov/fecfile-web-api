@@ -37,4 +37,5 @@ class Migration(migrations.Migration):
             model_name="memotext",
             name="report_old",
         ),
+        migrations.RemoveField(model_name="memotext", name="id"),
     ]

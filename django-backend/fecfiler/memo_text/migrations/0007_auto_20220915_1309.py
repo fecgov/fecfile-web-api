@@ -8,23 +8,24 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', '0025_auto_20220915_1309'),
-        ('memo_text', '0006_committee_uuid_fk'),
+        ("f3x_summaries", "0025_auto_20220915_1309"),
+        ("memo_text", "0006_committee_uuid_fk"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='memotext',
-            name='uuid',
+        migrations.RenameField(
+            model_name="memotext",
+            old_name="uuid",
+            new_name="id",
         ),
         migrations.AlterField(
-            model_name='memotext',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True),
-        ),
-        migrations.AlterField(
-            model_name='memotext',
-            name='report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary'),
+            model_name="memotext",
+            name="report",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="f3x_summaries.f3xsummary",
+            ),
         ),
     ]
