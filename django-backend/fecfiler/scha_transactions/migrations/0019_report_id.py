@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("scha_transactions", "0017_schatransaction_uuid"),
+        ("scha_transactions", "0018_remove_id"),
     ]
 
     operations = [

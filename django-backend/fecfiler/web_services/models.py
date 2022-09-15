@@ -15,7 +15,11 @@ class DotFEC(models.Model):
     """
 
     uuid = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, primary_key=True
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
     )
     report = models.IntegerField()
     file_name = models.TextField()

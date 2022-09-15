@@ -6,7 +6,13 @@ import uuid
 
 
 class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
     rec_type = models.TextField(null=True, blank=True)
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id_number = models.TextField(null=True, blank=True)

@@ -16,31 +16,9 @@ class Migration(migrations.Migration):
             name="id",
             field=models.IntegerField(),
         ),
-        migrations.AlterField(
-            model_name="uploadsubmission",
-            name="uuid",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                unique=True,
-            ),
-        ),
-        migrations.AlterField(
+        migrations.RemoveField(
             model_name="webprintsubmission",
             name="id",
             field=models.IntegerField(),
-        ),
-        migrations.AlterField(
-            model_name="webprintsubmission",
-            name="uuid",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                unique=True,
-            ),
         ),
     ]

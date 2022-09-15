@@ -11,15 +11,6 @@ class Migration(migrations.Migration):
             scha_transaction.uuid = uuid.uuid4()
             scha_transaction.save()
 
-    def update_uuid(apps, schema_editor):
-        SchATransaction = apps.get_model("scha_transactions", "SchATransaction")
-        transaction_uuid = SchATransaction.objects.filter(
-            id=models.OuterRef("parent_transaction_old")
-        ).values_list("uuid")[:1]
-        SchATransaction.objects.update(
-            parent_transaction=models.Subquery(transaction_uuid)
-        )
-
     dependencies = [
         ("scha_transactions", "0016_auto_20220810_0938"),
     ]
@@ -56,28 +47,5 @@ class Migration(migrations.Migration):
                 serialize=False,
                 unique=True,
             ),
-        ),
-        migrations.RenameField(
-            model_name="schatransaction",
-            old_name="parent_transaction",
-            new_name="parent_transaction_old",
-        ),
-        migrations.AddField(
-            model_name="schatransaction",
-            name="parent_transaction",
-            field=models.ForeignKey(
-                null=True,
-                on_delete=models.deletion.CASCADE,
-                to="self",
-            ),
-        ),
-        migrations.RunPython(update_uuid),
-        migrations.RemoveField(
-            model_name="schatransaction",
-            name="id",
-        ),
-        migrations.RemoveField(
-            model_name="schatransaction",
-            name="parent_transaction_old",
         ),
     ]
