@@ -4,12 +4,14 @@ from django.db import migrations, models
 import uuid
 
 
+def create_uuid(apps, schema_editor):
+    MemoText = apps.get_model("memo_text", "MemoText")
+    for memo_text in MemoText.objects.all():
+        memo_text.uuid = uuid.uuid4()
+        memo_text.save()
+
+
 class Migration(migrations.Migration):
-    def create_uuid(apps, schema_editor):
-        MemoText = apps.get_model("memo_text", "MemoText")
-        for memo_text in MemoText.objects.all():
-            memo_text.uuid = uuid.uuid4()
-            memo_text.save()
 
     dependencies = [
         ("memo_text", "0001_initial"),

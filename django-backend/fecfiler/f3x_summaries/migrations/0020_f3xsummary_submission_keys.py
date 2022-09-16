@@ -3,21 +3,23 @@
 from django.db import migrations, models
 
 
+def update_uuid(apps, schema_editor):
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    upload_uuid = UploadSubmission.objects.filter(
+        id=models.OuterRef("upload_submission_old")
+    ).values_list("uuid")[:1]
+    webprint_uuid = WebPrintSubmission.objects.filter(
+        id=models.OuterRef("webprint_submission_old")
+    ).values_list("uuid")[:1]
+    F3XSummary.objects.update(
+        upload_submission=models.Subquery(upload_uuid),
+        webprint_submission=models.Subquery(webprint_uuid),
+    )
+
+
 class Migration(migrations.Migration):
-    def update_uuid(apps, schema_editor):
-        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-        UploadSubmission = apps.get_model("web_services", "UploadSubmission")
-        WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
-        upload_uuid = UploadSubmission.objects.filter(
-            id=models.OuterRef("upload_submission_old")
-        ).values_list("uuid")[:1]
-        webprint_uuid = WebPrintSubmission.objects.filter(
-            id=models.OuterRef("webprint_submission_old")
-        ).values_list("uuid")[:1]
-        F3XSummary.objects.update(
-            upload_submission=models.Subquery(upload_uuid),
-            webprint_submission=models.Subquery(webprint_uuid),
-        )
 
     dependencies = [
         ("web_services", "0012_use_uuid"),

@@ -4,12 +4,14 @@ from django.db import migrations, models
 import uuid
 
 
+def create_uuid(apps, schema_editor):
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
+    for f3xsummary in F3XSummary.objects.all():
+        f3xsummary.uuid = uuid.uuid4()
+        f3xsummary.save()
+
+
 class Migration(migrations.Migration):
-    def create_uuid(apps, schema_editor):
-        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-        for f3xsummary in F3XSummary.objects.all():
-            f3xsummary.uuid = uuid.uuid4()
-            f3xsummary.save()
 
     dependencies = [
         ("f3x_summaries", "0017_f3xsummary_calculation_status"),

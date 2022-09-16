@@ -4,20 +4,22 @@ from django.db import migrations, models
 import uuid
 
 
+def create_uuid(apps, schema_editor):
+    DotFEC = apps.get_model("web_services", "DotFEC")
+    for dotfec in DotFEC.objects.all():
+        dotfec.uuid = uuid.uuid4()
+        dotfec.save()
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
+    for uploadsubmission in UploadSubmission.objects.all():
+        uploadsubmission.uuid = uuid.uuid4()
+        uploadsubmission.save()
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    for webprintsubmission in WebPrintSubmission.objects.all():
+        webprintsubmission.uuid = uuid.uuid4()
+        webprintsubmission.save()
+
+
 class Migration(migrations.Migration):
-    def create_uuid(apps, schema_editor):
-        DotFEC = apps.get_model("web_services", "DotFEC")
-        for dotfec in DotFEC.objects.all():
-            dotfec.uuid = uuid.uuid4()
-            dotfec.save()
-        UploadSubmission = apps.get_model("web_services", "UploadSubmission")
-        for uploadsubmission in UploadSubmission.objects.all():
-            uploadsubmission.uuid = uuid.uuid4()
-            uploadsubmission.save()
-        WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
-        for webprintsubmission in WebPrintSubmission.objects.all():
-            webprintsubmission.uuid = uuid.uuid4()
-            webprintsubmission.save()
 
     dependencies = [
         ("web_services", "0008_webprintsubmission_fec_image_url"),

@@ -3,14 +3,16 @@
 from django.db import migrations, models
 
 
+def update_uuid(apps, schema_editor):
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
+    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")
+    committee_uuid = CommitteeAccount.objects.filter(
+        id=models.OuterRef("committee_account_old")
+    ).values_list("uuid")[:1]
+    F3XSummary.objects.update(committee_account=models.Subquery(committee_uuid))
+
+
 class Migration(migrations.Migration):
-    def update_uuid(apps, schema_editor):
-        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-        CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")
-        committee_uuid = CommitteeAccount.objects.filter(
-            id=models.OuterRef("committee_account_old")
-        ).values_list("uuid")[:1]
-        F3XSummary.objects.update(committee_account=models.Subquery(committee_uuid))
 
     dependencies = [
         ("f3x_summaries", "0023_committee_fk_to_int"),

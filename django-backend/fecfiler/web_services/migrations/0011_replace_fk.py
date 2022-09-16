@@ -4,16 +4,18 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def update_uuid(apps, schema_editor):
+    DotFEC = apps.get_model("web_services", "DotFEC")
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    dot_fec_uuid = DotFEC.objects.filter(id=models.OuterRef("dot_fec_old")).values_list(
+        "uuid"
+    )[:1]
+    UploadSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
+    WebPrintSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
+
+
 class Migration(migrations.Migration):
-    def update_uuid(apps, schema_editor):
-        DotFEC = apps.get_model("web_services", "DotFEC")
-        UploadSubmission = apps.get_model("web_services", "UploadSubmission")
-        WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
-        dot_fec_uuid = DotFEC.objects.filter(
-            id=models.OuterRef("dot_fec_old")
-        ).values_list("uuid")[:1]
-        UploadSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
-        WebPrintSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
 
     dependencies = [
         ("web_services", "0010_remove_fk_uuid_to_pk"),

@@ -4,12 +4,14 @@ from django.db import migrations, models
 import uuid
 
 
+def create_uuid(apps, schema_editor):
+    Contact = apps.get_model("contacts", "Contact")
+    for contact in Contact.objects.all():
+        contact.uuid = uuid.uuid4()
+        contact.save()
+
+
 class Migration(migrations.Migration):
-    def create_uuid(apps, schema_editor):
-        Contact = apps.get_model("contacts", "Contact")
-        for contact in Contact.objects.all():
-            contact.uuid = uuid.uuid4()
-            contact.save()
 
     dependencies = [
         ("contacts", "0006_alter_contact_committee_account"),

@@ -3,14 +3,16 @@
 from django.db import migrations, models
 
 
+def update_uuid(apps, schema_editor):
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
+    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")
+    report_uuid = F3XSummary.objects.filter(
+        id=models.OuterRef("report_old")
+    ).values_list("uuid")[:1]
+    SchATransaction.objects.update(report=models.Subquery(report_uuid))
+
+
 class Migration(migrations.Migration):
-    def update_uuid(apps, schema_editor):
-        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-        SchATransaction = apps.get_model("scha_transactions", "SchATransaction")
-        report_uuid = F3XSummary.objects.filter(
-            id=models.OuterRef("report_old")
-        ).values_list("uuid")[:1]
-        SchATransaction.objects.update(report=models.Subquery(report_uuid))
 
     dependencies = [
         ("scha_transactions", "0019_report_id"),
