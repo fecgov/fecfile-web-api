@@ -108,7 +108,7 @@ class ContactViewSetTest(TestCase):
 
         response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
 
-        expected_json_fragment = ("\"name\": \"test name contains TestOrgName\"")
+        expected_json_fragment = ("\"name\": \"test name contains TestOrgName1\"")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment,
