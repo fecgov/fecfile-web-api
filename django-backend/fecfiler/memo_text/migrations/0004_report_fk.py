@@ -4,8 +4,8 @@ from django.db import migrations, models
 
 
 def update_uuid(apps, schema_editor):
-    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-    MemoText = apps.get_model("memo_text", "MemoText")
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
+    MemoText = apps.get_model("memo_text", "MemoText")  # noqa
     report_uuid = F3XSummary.objects.filter(
         id=models.OuterRef("report_old")
     ).values_list("uuid")[:1]

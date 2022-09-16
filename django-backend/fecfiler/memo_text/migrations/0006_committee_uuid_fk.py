@@ -4,8 +4,8 @@ from django.db import migrations, models
 
 
 def update_uuid(apps, schema_editor):
-    MemoText = apps.get_model("memo_text", "MemoText")
-    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")
+    MemoText = apps.get_model("memo_text", "MemoText")  # noqa
+    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")  # noqa
     committee_uuid = CommitteeAccount.objects.filter(
         id=models.OuterRef("committee_account_old")
     ).values_list("uuid")[:1]

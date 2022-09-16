@@ -5,7 +5,7 @@ import uuid
 
 
 def create_uuid(apps, schema_editor):
-    Contact = apps.get_model("contacts", "Contact")
+    Contact = apps.get_model("contacts", "Contact")  # noqa
     for contact in Contact.objects.all():
         contact.uuid = uuid.uuid4()
         contact.save()

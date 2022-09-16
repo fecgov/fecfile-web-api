@@ -4,7 +4,7 @@ from django.db import migrations, models
 
 
 def update_uuid(apps, schema_editor):
-    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")
+    SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
     transaction_uuid = SchATransaction.objects.filter(
         id=models.OuterRef("parent_transaction_old")
     ).values_list("uuid")[:1]

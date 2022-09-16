@@ -4,9 +4,9 @@ from django.db import migrations, models
 
 
 def update_uuid(apps, schema_editor):
-    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
-    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
-    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")  # noqa
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")  # noqa
     upload_uuid = UploadSubmission.objects.filter(
         id=models.OuterRef("upload_submission_old")
     ).values_list("uuid")[:1]

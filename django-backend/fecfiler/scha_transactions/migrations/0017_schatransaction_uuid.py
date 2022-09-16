@@ -6,7 +6,7 @@ import uuid
 
 class Migration(migrations.Migration):
     def create_uuid(apps, schema_editor):
-        SchATransaction = apps.get_model("scha_transactions", "SchATransaction")
+        SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
         for scha_transaction in SchATransaction.objects.all():
             scha_transaction.uuid = uuid.uuid4()
             scha_transaction.save()

@@ -5,7 +5,7 @@ import uuid
 
 
 def create_uuid(apps, schema_editor):
-    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")
+    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")  # noqa
     for committee_account in CommitteeAccount.objects.all():
         committee_account.uuid = uuid.uuid4()
         committee_account.save()

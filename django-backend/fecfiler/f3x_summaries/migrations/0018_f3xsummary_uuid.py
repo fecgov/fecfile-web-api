@@ -5,7 +5,7 @@ import uuid
 
 
 def create_uuid(apps, schema_editor):
-    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")
+    F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
     for f3xsummary in F3XSummary.objects.all():
         f3xsummary.uuid = uuid.uuid4()
         f3xsummary.save()

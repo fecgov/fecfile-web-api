@@ -5,15 +5,15 @@ import uuid
 
 
 def create_uuid(apps, schema_editor):
-    DotFEC = apps.get_model("web_services", "DotFEC")
+    DotFEC = apps.get_model("web_services", "DotFEC")  # noqa
     for dotfec in DotFEC.objects.all():
         dotfec.uuid = uuid.uuid4()
         dotfec.save()
-    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")  # noqa
     for uploadsubmission in UploadSubmission.objects.all():
         uploadsubmission.uuid = uuid.uuid4()
         uploadsubmission.save()
-    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")  # noqa
     for webprintsubmission in WebPrintSubmission.objects.all():
         webprintsubmission.uuid = uuid.uuid4()
         webprintsubmission.save()

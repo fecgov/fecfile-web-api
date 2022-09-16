@@ -5,9 +5,9 @@ import django.db.models.deletion
 
 
 def update_uuid(apps, schema_editor):
-    DotFEC = apps.get_model("web_services", "DotFEC")
-    UploadSubmission = apps.get_model("web_services", "UploadSubmission")
-    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")
+    DotFEC = apps.get_model("web_services", "DotFEC")  # noqa
+    UploadSubmission = apps.get_model("web_services", "UploadSubmission")  # noqa
+    WebPrintSubmission = apps.get_model("web_services", "WebPrintSubmission")  # noqa
     dot_fec_uuid = DotFEC.objects.filter(id=models.OuterRef("dot_fec_old")).values_list(
         "uuid"
     )[:1]
