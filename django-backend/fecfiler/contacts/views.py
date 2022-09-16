@@ -80,8 +80,6 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return HttpResponseBadRequest()
 
         tokens = list(filter(None, re.split('[^\\w+]', q)))
-        if (not tokens) or (len(tokens) < 1):
-            return HttpResponseBadRequest()
         term = ('.*' + '.* .*'.join(tokens) + '.*').lower()
 
         max_fecfile_results = self.get_int_param_value(
