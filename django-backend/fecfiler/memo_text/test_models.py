@@ -1,3 +1,4 @@
+import uuid
 from django.test import TestCase
 from .models import MemoText
 
@@ -9,7 +10,7 @@ class MemoTextTestCase(TestCase):
         self.valid_memo_text = MemoText(
             back_reference_sched_form_name="F3XN",
             filer_committee_id_number="C00601211",
-            id="valid_memo_text",
+            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
             rec_type="TEXT",
             text4000="tessst4",
             transaction_id_number="REPORT_MEMO_TEXT_3",
@@ -18,12 +19,16 @@ class MemoTextTestCase(TestCase):
         )
 
     def test_get_memo_text(self):
-        memo_text = MemoText.objects.get(id="memo_text_1")
+        memo_text = MemoText.objects.get(id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d")
         self.assertEquals(memo_text.text4000, "dahtest2")
 
     def test_save_and_delete(self):
         self.valid_memo_text.save()
-        memo_text_from_db = MemoText.objects.get(id="valid_memo_text")
+        memo_text_from_db = MemoText.objects.get(
+            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b"
+        )
         self.assertIsInstance(memo_text_from_db, MemoText)
-        self.assertEquals(memo_text_from_db.id, "valid_memo_text")
+        self.assertEquals(
+            memo_text_from_db.id, uuid.UUID("94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
+        )
         self.assertEquals(memo_text_from_db.text4000, "tessst4")

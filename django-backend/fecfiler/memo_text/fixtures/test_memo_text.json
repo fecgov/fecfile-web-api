@@ -2,7 +2,7 @@
    {
       "model": "memo_text.memotext",
       "fields": {
-         "id": "memo_text_1",
+         "id": "1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d",
          "back_reference_sched_form_name": "F3XN",
          "back_reference_tran_id_number": null,
          "filer_committee_id_number": "C00601211",
@@ -16,7 +16,7 @@
    {
       "model": "memo_text.memotext",
       "fields": {
-         "id": "memo_text_2",
+         "id": "35b5da53-a5bc-48d6-9219-769194e00e6f",
          "back_reference_sched_form_name": "F3XN",
          "back_reference_tran_id_number": null,
          "filer_committee_id_number": "C00601211",
@@ -30,7 +30,7 @@
    {
       "model": "memo_text.memotext",
       "fields": {
-         "id": "memo_text_3",
+         "id": "e7f046dd-f553-4349-a7bd-9b7c669bd4e9",
          "back_reference_sched_form_name": "F3XN",
          "back_reference_tran_id_number": null,
          "filer_committee_id_number": "C00601211",
