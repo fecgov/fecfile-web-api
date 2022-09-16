@@ -15,11 +15,4 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(clean_dotfec),
-        migrations.AlterField(
-            model_name="dotfec",
-            name="report",
-            field=models.ForeignKey(
-                on_delete=models.deletion.CASCADE, to="f3x_summaries.F3XSummary"
-            ),
-        ),
     ]

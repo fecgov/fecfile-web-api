@@ -7,17 +7,13 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contacts', '0009_committee_uuid_fk'),
+        ("contacts", "0009_committee_uuid_fk"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='contact',
-            name='uuid',
-        ),
-        migrations.AddField(
-            model_name='contact',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+        migrations.RenameField(
+            model_name="contact",
+            old_name="uuid",
+            new_name="id",
         ),
     ]
