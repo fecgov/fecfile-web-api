@@ -14,5 +14,20 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": 1000
         }
+    },
+    {
+        "model": "contacts.contact",
+        "fields": {
+            "type": "ORG",
+            "name": "test name contains TestOrgName1",
+            "street_1": "Street",
+            "city": "City",
+            "state": "State",
+            "zip": "12345678",
+            "country": "Country",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": 1000
+        }
     }
 ]

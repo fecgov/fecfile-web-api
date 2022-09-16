@@ -62,7 +62,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fec_api_committees = json_results.get("results", [])[:max_fec_results]
         fecfile_committees = list(
             self.get_queryset()
-            .filter(Q(committee_id__icontains=q) | Q(name__icontains=q))
+            .filter(Q(type="COM") & (
+                Q(committee_id__icontains=q) | Q(name__icontains=q)))
             .values()
             .order_by("-committee_id")[:max_fecfile_results]
         )
@@ -99,6 +100,28 @@ class ContactViewSet(CommitteeOwnedViewSet):
         )
         return_value = {
             "fecfile_individuals": fecfile_individuals,
+        }
+
+        return JsonResponse(return_value)
+
+    @action(detail=False)
+    def organization_lookup(self, request):
+        q = request.GET.get("q")
+        if q is None:
+            return HttpResponseBadRequest()
+
+        max_fecfile_results = self.get_int_param_value(
+            request, "max_fecfile_results", default_max_fecfile_results,
+            max_allowed_results)
+
+        fecfile_organizations = list(
+            self.get_queryset()
+            .filter(Q(type="ORG") & Q(name__icontains=q))
+            .values()
+            .order_by("-name")[:max_fecfile_results]
+        )
+        return_value = {
+            "fecfile_organizations": fecfile_organizations
         }
 
         return JsonResponse(return_value)
