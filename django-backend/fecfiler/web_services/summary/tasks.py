@@ -33,4 +33,4 @@ def calculate_summary(report_id):
     report.L37_offsets_to_operating_expenditures_period = summary["line_15"]
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
-    return report
+    return report.id

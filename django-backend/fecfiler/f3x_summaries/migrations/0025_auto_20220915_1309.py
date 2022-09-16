@@ -7,24 +7,34 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0014_auto_20220915_1309'),
-        ('f3x_summaries', '0024_committee_uuid_fk'),
+        ("web_services", "0014_auto_20220915_1309"),
+        ("f3x_summaries", "0024_committee_uuid_fk"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='f3xsummary',
-            old_name='uuid',
-            new_name='id',
+            model_name="f3xsummary",
+            old_name="uuid",
+            new_name="id",
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='upload_submission',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.uploadsubmission'),
+            model_name="f3xsummary",
+            name="upload_submission",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.uploadsubmission",
+            ),
         ),
         migrations.AlterField(
-            model_name='f3xsummary',
-            name='webprint_submission',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.webprintsubmission'),
+            model_name="f3xsummary",
+            name="webprint_submission",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.webprintsubmission",
+            ),
         ),
     ]

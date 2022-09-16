@@ -7,24 +7,35 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', '0025_auto_20220915_1309'),
-        ('scha_transactions', '0022_committee_uuid_fk'),
+        ("f3x_summaries", "0025_auto_20220915_1309"),
+        ("scha_transactions", "0022_committee_uuid_fk"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='schatransaction',
-            old_name='uuid',
-            new_name='id',
+            model_name="schatransaction",
+            old_name="uuid",
+            new_name="id",
         ),
         migrations.AlterField(
-            model_name='schatransaction',
-            name='parent_transaction',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='scha_transactions.schatransaction'),
+            model_name="schatransaction",
+            name="parent_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="scha_transactions.schatransaction",
+            ),
         ),
         migrations.AlterField(
-            model_name='schatransaction',
-            name='report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary'),
+            model_name="schatransaction",
+            name="report",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="f3x_summaries.f3xsummary",
+            ),
         ),
     ]
