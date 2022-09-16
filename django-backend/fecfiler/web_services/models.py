@@ -21,7 +21,7 @@ class DotFEC(models.Model):
         serialize=False,
         unique=True,
     )
-    report = models.IntegerField()
+    report = models.ForeignKey(F3XSummary, on_delete=models.CASCADE)
     file_name = models.TextField()
 
     class Meta:
