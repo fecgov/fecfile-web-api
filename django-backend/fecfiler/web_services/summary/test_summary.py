@@ -15,13 +15,11 @@ class F3XSerializerTestCase(TestCase):
     def test_calculate_summary(self):
         f3x = F3XSummary.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
-        f3x_id = summary_service.calculate_summary()
-        summary = F3XSummary.objects.get(id=uuid.UUID(f3x_id))
+        summary = summary_service.calculate_summary()
         self.assertEqual(summary["line_15"], Decimal("2125.79"))
 
     def test_report_with_no_transactions(self):
         f3x = F3XSummary.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
         summary_service = SummaryService(f3x)
-        f3x_id = summary_service.calculate_summary()
-        summary = F3XSummary.objects.get(id=uuid.UUID(f3x_id))
+        summary = summary_service.calculate_summary()
         self.assertEqual(summary["line_15"], Decimal("0"))
