@@ -24,7 +24,7 @@ class F3XSerializerTestCase(TestCase):
         self.assertEqual(
             report.L37_offsets_to_operating_expenditures_period, Decimal("2125.79")
         )
-        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED)
+        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
 
     def test_report_with_no_transactions(self):
         report_id = calculate_summary("a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
@@ -36,4 +36,4 @@ class F3XSerializerTestCase(TestCase):
         self.assertEqual(
             report.L37_offsets_to_operating_expenditures_period, Decimal("0")
         )
-        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED)
+        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
