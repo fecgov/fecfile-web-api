@@ -4,7 +4,7 @@ from fecfiler.f3x_summaries.models import F3XSummary
 
 
 class ReportIdSerializer(serializers.Serializer):
-    report_id = serializers.IntegerField()
+    report_id = serializers.UUIDField()
 
     def validate(self, data):
         request = self.context["request"]

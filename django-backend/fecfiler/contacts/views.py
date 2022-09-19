@@ -33,7 +33,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
-    queryset = Contact.objects.all().order_by("-id")
+    queryset = Contact.objects.all().order_by("-created")
 
     @action(detail=False)
     def committee_lookup(self, request):

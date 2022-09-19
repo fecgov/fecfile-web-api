@@ -12,6 +12,14 @@ logger = logging.getLogger(__name__)
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     """Generated model from json schema"""
 
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+
     form_type = models.TextField(null=True, blank=True)
     # TODO get rid of this field.  It is redundant with the related Committee_Account
     filer_committee_id_number = models.TextField(null=True, blank=True)
