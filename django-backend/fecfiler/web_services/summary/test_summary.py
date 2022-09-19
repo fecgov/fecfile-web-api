@@ -1,6 +1,5 @@
 from decimal import Decimal
 from django.test import TestCase
-import uuid
 from fecfiler.f3x_summaries.models import F3XSummary
 from .summary import SummaryService
 
