@@ -11,6 +11,10 @@ def create_uuid(apps, schema_editor):
         scha_transaction.save()
 
 
+def noop():
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -23,7 +27,7 @@ class Migration(migrations.Migration):
             name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False),
         ),
-        migrations.RunPython(create_uuid),
+        migrations.RunPython(create_uuid, noop),
         migrations.AlterField(
             model_name="schatransaction",
             name="uuid",

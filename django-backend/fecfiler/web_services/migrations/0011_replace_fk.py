@@ -15,6 +15,10 @@ def update_uuid(apps, schema_editor):
     WebPrintSubmission.objects.update(dot_fec=models.Subquery(dot_fec_uuid))
 
 
+def noop():
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -40,7 +44,7 @@ class Migration(migrations.Migration):
                 to="web_services.dotfec",
             ),
         ),
-        migrations.RunPython(update_uuid),
+        migrations.RunPython(update_uuid, noop),
         migrations.RemoveField(
             model_name="dotfec",
             name="id",

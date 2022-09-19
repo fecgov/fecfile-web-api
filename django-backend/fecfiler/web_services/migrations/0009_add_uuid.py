@@ -18,6 +18,8 @@ def create_uuid(apps, schema_editor):
         webprintsubmission.uuid = uuid.uuid4()
         webprintsubmission.save()
 
+def noop():
+    pass
 
 class Migration(migrations.Migration):
 
@@ -41,7 +43,7 @@ class Migration(migrations.Migration):
             name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False),
         ),
-        migrations.RunPython(create_uuid),
+        migrations.RunPython(create_uuid, pass),
         migrations.AlterField(
             model_name="dotfec",
             name="uuid",

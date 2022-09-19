@@ -19,6 +19,10 @@ def update_uuid(apps, schema_editor):
     )
 
 
+def noop():
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -45,7 +49,7 @@ class Migration(migrations.Migration):
                 to="web_services.WebPrintSubmission",
             ),
         ),
-        migrations.RunPython(update_uuid),
+        migrations.RunPython(update_uuid, noop),
         migrations.RemoveField(
             model_name="f3xsummary",
             name="upload_submission_old",

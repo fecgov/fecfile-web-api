@@ -12,6 +12,10 @@ def update_uuid(apps, schema_editor):
     SchATransaction.objects.update(report=models.Subquery(report_uuid))
 
 
+def noop():
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -34,7 +38,7 @@ class Migration(migrations.Migration):
                 to="f3x_summaries.F3XSummary",
             ),
         ),
-        migrations.RunPython(update_uuid),
+        migrations.RunPython(update_uuid, noop),
         migrations.RemoveField(
             model_name="schatransaction",
             name="report_old",
