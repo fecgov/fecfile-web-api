@@ -1,6 +1,6 @@
 from .models import MemoText
 from fecfiler.validation import serializers
-from rest_framework.serializers import IntegerField
+from rest_framework.serializers import UUIDField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 import logging
 
@@ -11,7 +11,7 @@ class MemoTextSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     schema_name = "Text"
-    report_id = IntegerField(required=True, allow_null=False)
+    report_id = UUIDField(required=True, allow_null=False)
 
     class Meta:
         model = MemoText

@@ -22,15 +22,21 @@ class TasksTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(id=9999).first()
-        self.transaction = SchATransaction.objects.filter(id=9999).first()
+        self.f3x = F3XSummary.objects.filter(
+            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        ).first()
+        self.transaction = SchATransaction.objects.filter(
+            id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
+        ).first()
 
     """
     CREATE DOT FEC TESTS
     """
 
     def test_create_dot_fec(self):
-        dot_fec_id = create_dot_fec(9999, None, None, True)
+        dot_fec_id = create_dot_fec(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None, None, True
+        )
         dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
         result_dot_fec = Path(CELERY_LOCAL_STORAGE_DIRECTORY).joinpath(
             dot_fec_record.file_name
@@ -50,9 +56,11 @@ class TasksTestCase(TestCase):
     """
 
     def test_submit_to_fec(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        upload_submission = UploadSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         dot_fec_id = create_dot_fec(
-            9999,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -78,9 +86,11 @@ class TasksTestCase(TestCase):
         self.assertEqual(len(upload_submission.fec_report_id), 36)
 
     def test_submit_no_password(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        upload_submission = UploadSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         dot_fec_id = create_dot_fec(
-            9999,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -94,9 +104,11 @@ class TasksTestCase(TestCase):
         )
 
     def test_submit_missing_file(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(9999)
+        upload_submission = UploadSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         dot_fec_id = create_dot_fec(
-            9999,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -117,9 +129,11 @@ class TasksTestCase(TestCase):
     """
 
     def test_submit_to_webprint(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(9999)
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         dot_fec_id = create_dot_fec(
-            9999,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             webprint_submission_id=webprint_submission.id,
             force_write_to_disk=True,
         )

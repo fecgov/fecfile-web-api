@@ -15,7 +15,7 @@ class ContactTestCase(TestCase):
             state="St",
             zip="123456789",
             country="Country",
-            committee_account_id=1000,
+            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
         )
 
     def test_get_contact(self):
