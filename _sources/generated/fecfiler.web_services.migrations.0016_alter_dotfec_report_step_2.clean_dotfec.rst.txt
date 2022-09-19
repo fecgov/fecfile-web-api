@@ -1,0 +1,6 @@
+fecfiler.web\_services.migrations.0016\_alter\_dotfec\_report\_step\_2.clean\_dotfec
+====================================================================================
+
+.. currentmodule:: fecfiler.web_services.migrations.0016_alter_dotfec_report_step_2
+
+.. autofunction:: clean_dotfec

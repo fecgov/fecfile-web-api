@@ -1,0 +1,6 @@
+fecfiler.web\_services.migrations.0011\_replace\_fk.update\_uuid
+================================================================
+
+.. currentmodule:: fecfiler.web_services.migrations.0011_replace_fk
+
+.. autofunction:: update_uuid

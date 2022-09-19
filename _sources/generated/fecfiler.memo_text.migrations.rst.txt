@@ -32,4 +32,10 @@ fecfiler.memo\_text.migrations
    :recursive:
 
    fecfiler.memo_text.migrations.0001_initial
+   fecfiler.memo_text.migrations.0002_memotext_uuid
+   fecfiler.memo_text.migrations.0003_report_id
+   fecfiler.memo_text.migrations.0004_report_fk
+   fecfiler.memo_text.migrations.0005_committee_fk_to_int
+   fecfiler.memo_text.migrations.0006_committee_uuid_fk
+   fecfiler.memo_text.migrations.0007_auto_20220915_1309
 

@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0022\_committee\_uuid\_fk.noop
+=====================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0022_committee_uuid_fk
+
+.. autofunction:: noop

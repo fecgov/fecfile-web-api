@@ -37,4 +37,8 @@ fecfiler.contacts.migrations
    fecfiler.contacts.migrations.0004_auto_20220317_1636
    fecfiler.contacts.migrations.0005_contact_committee_account
    fecfiler.contacts.migrations.0006_alter_contact_committee_account
+   fecfiler.contacts.migrations.0007_contact_uuid
+   fecfiler.contacts.migrations.0008_committee_fk_to_int
+   fecfiler.contacts.migrations.0009_committee_uuid_fk
+   fecfiler.contacts.migrations.0010_auto_20220915_1309
 

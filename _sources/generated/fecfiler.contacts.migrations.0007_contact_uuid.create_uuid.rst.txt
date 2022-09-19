@@ -1,0 +1,6 @@
+fecfiler.contacts.migrations.0007\_contact\_uuid.create\_uuid
+=============================================================
+
+.. currentmodule:: fecfiler.contacts.migrations.0007_contact_uuid
+
+.. autofunction:: create_uuid

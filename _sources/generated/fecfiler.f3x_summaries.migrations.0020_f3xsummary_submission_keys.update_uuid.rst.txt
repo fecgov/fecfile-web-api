@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.migrations.0020\_f3xsummary\_submission\_keys.update\_uuid
+==================================================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys
+
+.. autofunction:: update_uuid

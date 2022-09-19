@@ -39,4 +39,13 @@ fecfiler.web\_services.migrations
    fecfiler.web_services.migrations.0006_webprintsubmission
    fecfiler.web_services.migrations.0007_webprintsubmission_fec_email
    fecfiler.web_services.migrations.0008_webprintsubmission_fec_image_url
+   fecfiler.web_services.migrations.0009_add_uuid
+   fecfiler.web_services.migrations.0010_remove_fk_uuid_to_pk
+   fecfiler.web_services.migrations.0011_replace_fk
+   fecfiler.web_services.migrations.0012_use_uuid
+   fecfiler.web_services.migrations.0013_remove_id_after_f3x
+   fecfiler.web_services.migrations.0014_auto_20220915_1309
+   fecfiler.web_services.migrations.0015_alter_dotfec_report_step_1
+   fecfiler.web_services.migrations.0016_alter_dotfec_report_step_2
+   fecfiler.web_services.migrations.0017_alter_dotfec_report_step_3
 

@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.migrations.0013\_remove\_id\_after\_f3x.Migration
+========================================================================
+
+.. currentmodule:: fecfiler.web_services.migrations.0013_remove_id_after_f3x
+
+.. autoclass:: Migration
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Migration.__init__
+      ~Migration.apply
+      ~Migration.mutate_state
+      ~Migration.suggest_name
+      ~Migration.unapply
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Migration.atomic
+      ~Migration.dependencies
+      ~Migration.initial
+      ~Migration.operations
+      ~Migration.replaces
+      ~Migration.run_before
+   
+   

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.migrations.0002\_committeeaccount\_uuid.create\_uuid
+=================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.migrations.0002_committeeaccount_uuid
+
+.. autofunction:: create_uuid

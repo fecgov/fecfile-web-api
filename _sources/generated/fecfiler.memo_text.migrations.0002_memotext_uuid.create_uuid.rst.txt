@@ -1,0 +1,6 @@
+fecfiler.memo\_text.migrations.0002\_memotext\_uuid.create\_uuid
+================================================================
+
+.. currentmodule:: fecfiler.memo_text.migrations.0002_memotext_uuid
+
+.. autofunction:: create_uuid

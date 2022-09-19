@@ -48,4 +48,12 @@ fecfiler.f3x\_summaries.migrations
    fecfiler.f3x_summaries.migrations.0015_f3xsummary_upload_submission
    fecfiler.f3x_summaries.migrations.0016_f3xsummary_webprint_submission
    fecfiler.f3x_summaries.migrations.0017_f3xsummary_calculation_status
+   fecfiler.f3x_summaries.migrations.0018_f3xsummary_uuid
+   fecfiler.f3x_summaries.migrations.0019_f3xsummary_submission_keys
+   fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys
+   fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary
+   fecfiler.f3x_summaries.migrations.0022_remove_id
+   fecfiler.f3x_summaries.migrations.0023_committee_fk_to_int
+   fecfiler.f3x_summaries.migrations.0024_committee_uuid_fk
+   fecfiler.f3x_summaries.migrations.0025_auto_20220915_1309
 

@@ -59,6 +59,7 @@ fecfiler.web\_services.models.BaseSubmission
       ~BaseSubmission.fec_submission_id
       ~BaseSubmission.fecfile_error
       ~BaseSubmission.fecfile_task_state
+      ~BaseSubmission.id
       ~BaseSubmission.pk
       ~BaseSubmission.updated
    
