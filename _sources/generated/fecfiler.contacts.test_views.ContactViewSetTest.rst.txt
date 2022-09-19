@@ -111,6 +111,9 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.tearDown
       ~ContactViewSetTest.tearDownClass
       ~ContactViewSetTest.test_committee_lookup_happy_path
+      ~ContactViewSetTest.test_committee_lookup_no_q
+      ~ContactViewSetTest.test_individual_lookup_happy_path
+      ~ContactViewSetTest.test_individual_lookup_no_q
    
    
 

@@ -39,6 +39,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.get_extra_action_url_map
       ~ContactViewSet.get_extra_actions
       ~ContactViewSet.get_format_suffix
+      ~ContactViewSet.get_int_param_value
       ~ContactViewSet.get_object
       ~ContactViewSet.get_paginated_response
       ~ContactViewSet.get_parser_context
@@ -56,6 +57,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.get_view_name
       ~ContactViewSet.handle_exception
       ~ContactViewSet.http_method_not_allowed
+      ~ContactViewSet.individual_lookup
       ~ContactViewSet.initial
       ~ContactViewSet.initialize_request
       ~ContactViewSet.list
