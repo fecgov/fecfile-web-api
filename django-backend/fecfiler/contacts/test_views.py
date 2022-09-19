@@ -32,9 +32,20 @@ class ContactViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     @mock.patch("requests.get", side_effect=mocked_requests_get)
-    def test_committee_lookup_happy_path(self, mock_get):
+    def test_committee_lookup_no_q(self, mock_get):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    def test_committee_lookup_happy_path(self, mock_get):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/committee_lookup?"
+                                   "q=test&max_fecfile_results=5&max_fec_results=5")
         request.user = self.user
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
@@ -49,3 +60,29 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    def test_individual_lookup_no_q(self, mock_get):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/individual_lookup")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    def test_individual_lookup_happy_path(self, mock_get):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/individual_lookup?"
+                                   "q=Lastname&max_fecfile_results=5")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
+
+        expected_json_fragment = ("\"last_name\": \"Lastname\", \"first_name\": "
+                                  "\"Firstname\"")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(expected_json_fragment,
+                      str(response.content, encoding="utf8"))
