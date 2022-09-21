@@ -62,6 +62,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.initialize_request
       ~ContactViewSet.list
       ~ContactViewSet.options
+      ~ContactViewSet.organization_lookup
       ~ContactViewSet.paginate_queryset
       ~ContactViewSet.partial_update
       ~ContactViewSet.perform_authentication
