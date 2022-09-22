@@ -32,7 +32,25 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         .all()
     )
-    """QuerySet: all schedule a transactions with an aditional contributor_name field"""
+
+    def get_queryset(self):
+        """QuerySet: all schedule a transactions with an aditional contributor_name field"""
+        last_and_first_name = Concat(
+            "contributor_last_name",
+            Value(", "),
+            "contributor_first_name",
+            output_field=TextField(),
+        )
+        contributor_name = Coalesce(
+            "contributor_organization_name", last_and_first_name
+        )
+        queryset = SchATransaction.objects.alias(
+            contributor_name=contributor_name
+        ).all()
+        parent_id = self.request.query_params.get("parent_transaction_id")
+        if parent_id:
+            queryset = queryset.filter(parent_transaction_id=parent_id)
+        return queryset
 
     serializer_class = SchATransactionSerializer
     permission_classes = []
