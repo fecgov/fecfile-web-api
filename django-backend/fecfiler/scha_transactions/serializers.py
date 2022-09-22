@@ -18,6 +18,8 @@ class SchATransactionSerializer(
 
     report_id = UUIDField(required=True, allow_null=False)
 
+    contact_id = UUIDField(required=True, allow_null=False)
+
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
         if not transaction_type:
@@ -36,7 +38,7 @@ class SchATransactionSerializer(
             f.name
             for f in SchATransaction._meta.get_fields()
             if f.name not in ["deleted", "schatransaction"]
-        ] + ["parent_transaction_id", "report_id"]
+        ] + ["parent_transaction_id", "report_id", "contact_id"]
 
         read_only_fields = [
             "id",

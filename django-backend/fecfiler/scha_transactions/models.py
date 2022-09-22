@@ -84,6 +84,9 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    contact = models.ForeignKey(
+        "contacts.Contact", on_delete=models.CASCADE, null=True
+    )
 
     class Meta:
         db_table = "scha_transactions"

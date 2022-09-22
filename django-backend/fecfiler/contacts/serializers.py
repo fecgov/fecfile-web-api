@@ -21,7 +21,15 @@ class ContactSerializer(
 
     class Meta:
         model = Contact
-        fields = [f.name for f in Contact._meta.get_fields() if f.name != "deleted"]
+        fields = [
+            f.name
+            for f in Contact._meta.get_fields() 
+            if f.name
+            not in [
+                "deleted",
+                "schatransaction",
+            ]
+        ]
         read_only_fields = [
             "uuid",
             "deleted",
