@@ -2,6 +2,7 @@
     {
         "model": "contacts.contact",
         "fields": {
+            "id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "type": "IND",
             "last_name": "Lastname",
             "first_name": "Firstname",
@@ -18,6 +19,7 @@
     {
         "model": "contacts.contact",
         "fields": {
+            "id": "5720a518-6486-4062-944f-aa0c4cbe4073",
             "type": "ORG",
             "name": "test name contains TestOrgName1",
             "street_1": "Street",
