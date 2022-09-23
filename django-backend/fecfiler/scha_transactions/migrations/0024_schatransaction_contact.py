@@ -32,7 +32,7 @@ def add_new_contact_id(apps, schema_editor):
         elif trans.entity_type == 'ORG':
             contactDict['name'] = trans.contributor_organization_name
         retval = contact.objects.create(**contactDict)
-        trans.contact_id = retval['id']
+        trans.contact_id = retval.id
         trans.save()
 
 
