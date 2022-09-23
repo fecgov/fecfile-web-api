@@ -1,7 +1,9 @@
-from .models import Contact
+import logging
+
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-import logging
+
+from .models import Contact
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ class ContactSerializer(
         model = Contact
         fields = [
             f.name
-            for f in Contact._meta.get_fields() 
+            for f in Contact._meta.get_fields()
             if f.name
             not in [
                 "deleted",
