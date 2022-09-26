@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0024\_schatransaction\_contact.remove\_contact\_id
+=========================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0024_schatransaction_contact
+
+.. autofunction:: remove_contact_id

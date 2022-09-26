@@ -54,4 +54,5 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0021_committee_fk_to_int
    fecfiler.scha_transactions.migrations.0022_committee_uuid_fk
    fecfiler.scha_transactions.migrations.0023_auto_20220915_1309
+   fecfiler.scha_transactions.migrations.0024_schatransaction_contact
 

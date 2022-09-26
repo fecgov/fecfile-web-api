@@ -64,6 +64,8 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.conduit_street1
       ~SchATransaction.conduit_street2
       ~SchATransaction.conduit_zip
+      ~SchATransaction.contact
+      ~SchATransaction.contact_id
       ~SchATransaction.contribution_aggregate
       ~SchATransaction.contribution_amount
       ~SchATransaction.contribution_date
