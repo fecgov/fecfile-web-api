@@ -28,6 +28,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # E2E Testing Login API
 # Defaults to False, overriden by local.py & e2e.py
+# Set to True until we're ready to deprecate the old login
 E2E_TESTING_LOGIN = True
 
 
