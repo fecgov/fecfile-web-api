@@ -8,10 +8,8 @@
 # Example:
 # 40104 2022-01-15
 #
-44715 2022-03-01 # numpy - no fix yet
-44717 2022-03-01 # numpy - dependencies not caught up yet
-44716 2022-03-01 # numpy - dependencies not caught up yet
-43975 2022-03-01 # urllib3 - botocore dependency needs to catch up
 48040 2022-10-01 # django
 48041 2022-10-01 # django
 48542 2022-10-01 # pyjwt
+49733 2022-10-01 # django
+50454 2022-10-01 # django
