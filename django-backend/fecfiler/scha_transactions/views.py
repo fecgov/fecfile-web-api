@@ -2,7 +2,7 @@ from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from .models import SchATransaction
-from .serializers import SchATransactionSerializer
+from .serializers import SchATransactionParentSerializer
 from django.db.models import TextField, Value
 from django.db.models.functions import Concat, Coalesce
 
@@ -16,22 +16,6 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
-
-    queryset = (
-        SchATransaction.objects.select_related("parent_transaction")
-        .alias(
-            contributor_name=Coalesce(
-                "contributor_organization_name",
-                Concat(
-                    "contributor_last_name",
-                    Value(", "),
-                    "contributor_first_name",
-                    output_field=TextField(),
-                ),
-            )
-        )
-        .all()
-    )
 
     def get_queryset(self):
         """QuerySet: all schedule a transactions with an aditional contributor_name field"""
@@ -52,7 +36,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             queryset = queryset.filter(parent_transaction_id=parent_id)
         return queryset
 
-    serializer_class = SchATransactionSerializer
+    serializer_class = SchATransactionParentSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [

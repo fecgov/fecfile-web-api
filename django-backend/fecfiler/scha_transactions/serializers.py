@@ -1,7 +1,8 @@
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import CharField, UUIDField
+from django.db import transaction
+from rest_framework.serializers import UUIDField, ListSerializer
 from rest_framework.exceptions import ValidationError
 import logging
 
@@ -12,9 +13,6 @@ class SchATransactionSerializer(
     CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
 ):
     parent_transaction_id = UUIDField(required=False, allow_null=True)
-    transaction_id = CharField(
-        required=True, max_length=20, allow_blank=False, allow_null=True
-    )
 
     report_id = UUIDField(required=True, allow_null=False)
 
@@ -37,10 +35,41 @@ class SchATransactionSerializer(
             for f in SchATransaction._meta.get_fields()
             if f.name not in ["deleted", "schatransaction"]
         ] + ["parent_transaction_id", "report_id"]
-
         read_only_fields = [
             "id",
             "deleted",
             "created",
             "updated",
         ]
+
+
+class SchATransactionParentSerializer(SchATransactionSerializer):
+    children = ListSerializer(
+        child=SchATransactionSerializer(),
+        write_only=True,
+        allow_null=True,
+        allow_empty=True,
+        required=False,
+    )
+
+    def create(self, validated_data: dict):
+        with transaction.atomic():
+            children = validated_data.pop("children", [])
+            parent = super().create(validated_data)
+            for child in children:
+                logger.error(children)
+                child.parent_transaction_id = parent.id
+                super().create(child)
+            return parent
+
+    # def update(self, instance: SchATransaction, validated_data: dict):
+    #     with transaction.atomic():
+    #         children = validated_data.pop("children", [])
+    #         super().update(instance, validated_data)
+
+    class Meta(SchATransactionSerializer.Meta):
+        fields = [
+            f.name
+            for f in SchATransaction._meta.get_fields()
+            if f.name not in ["deleted", "schatransaction"]
+        ] + ["parent_transaction_id", "report_id", "children"]
