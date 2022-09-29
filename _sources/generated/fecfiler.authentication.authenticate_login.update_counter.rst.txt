@@ -1,6 +1,0 @@
-fecfiler.authentication.authenticate\_login.update\_counter
-===========================================================
-
-.. currentmodule:: fecfiler.authentication.authenticate_login
-
-.. autofunction:: update_counter

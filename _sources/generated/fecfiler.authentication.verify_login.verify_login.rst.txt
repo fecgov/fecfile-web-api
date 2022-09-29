@@ -1,6 +1,0 @@
-fecfiler.authentication.verify\_login.verify\_login
-===================================================
-
-.. currentmodule:: fecfiler.authentication.verify_login
-
-.. autofunction:: verify_login

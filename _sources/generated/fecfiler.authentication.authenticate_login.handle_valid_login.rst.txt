@@ -1,0 +1,6 @@
+fecfiler.authentication.authenticate\_login.handle\_valid\_login
+================================================================
+
+.. currentmodule:: fecfiler.authentication.authenticate_login
+
+.. autofunction:: handle_valid_login

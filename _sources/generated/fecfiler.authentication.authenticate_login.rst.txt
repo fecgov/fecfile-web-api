@@ -17,12 +17,9 @@ fecfiler.authentication.authenticate\_login
    .. autosummary::
       :toctree:                                          
    
-      activate_account
       authenticate_login
-      create_jwt_token
-      get_last_login_time
-      lock_account
-      update_counter
+      handle_invalid_login
+      handle_valid_login
       update_last_login_time
    
    

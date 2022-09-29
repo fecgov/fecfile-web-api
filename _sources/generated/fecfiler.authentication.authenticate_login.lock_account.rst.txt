@@ -1,6 +1,0 @@
-fecfiler.authentication.authenticate\_login.lock\_account
-=========================================================
-
-.. currentmodule:: fecfiler.authentication.authenticate_login
-
-.. autofunction:: lock_account

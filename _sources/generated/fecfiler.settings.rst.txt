@@ -32,6 +32,7 @@ fecfiler.settings
    :recursive:
 
    fecfiler.settings.base
+   fecfiler.settings.e2e
    fecfiler.settings.env
    fecfiler.settings.local
    fecfiler.settings.production

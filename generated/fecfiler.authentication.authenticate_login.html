@@ -15,7 +15,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.authentication.authenticate_login.activate_account" href="fecfiler.authentication.authenticate_login.activate_account.html" />
+    <link rel="next" title="fecfiler.authentication.authenticate_login.authenticate_login" href="fecfiler.authentication.authenticate_login.authenticate_login.html" />
     <link rel="prev" title="fecfiler.authentication" href="fecfiler.authentication.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -42,25 +42,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.activate_account.html#fecfiler.authentication.authenticate_login.activate_account" title="fecfiler.authentication.authenticate_login.activate_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activate_account</span></code></a>(username)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.authenticate_login.html#fecfiler.authentication.authenticate_login.authenticate_login" title="fecfiler.authentication.authenticate_login.authenticate_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">authenticate_login</span></code></a>(self, request, *args, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.authenticate_login.html#fecfiler.authentication.authenticate_login.authenticate_login" title="fecfiler.authentication.authenticate_login.authenticate_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">authenticate_login</span></code></a>(self, request, *args, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.handle_invalid_login.html#fecfiler.authentication.authenticate_login.handle_invalid_login" title="fecfiler.authentication.authenticate_login.handle_invalid_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_invalid_login</span></code></a>(username)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.create_jwt_token.html#fecfiler.authentication.authenticate_login.create_jwt_token" title="fecfiler.authentication.authenticate_login.create_jwt_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_jwt_token</span></code></a>(email, cmte_id)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.handle_valid_login.html#fecfiler.authentication.authenticate_login.handle_valid_login" title="fecfiler.authentication.authenticate_login.handle_valid_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_valid_login</span></code></a>(account)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.get_last_login_time.html#fecfiler.authentication.authenticate_login.get_last_login_time" title="fecfiler.authentication.authenticate_login.get_last_login_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_last_login_time</span></code></a>(username)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.lock_account.html#fecfiler.authentication.authenticate_login.lock_account" title="fecfiler.authentication.authenticate_login.lock_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lock_account</span></code></a>(counter, key)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.update_counter.html#fecfiler.authentication.authenticate_login.update_counter" title="fecfiler.authentication.authenticate_login.update_counter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_counter</span></code></a>(counter, username)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.update_last_login_time.html#fecfiler.authentication.authenticate_login.update_last_login_time" title="fecfiler.authentication.authenticate_login.update_last_login_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_last_login_time</span></code></a>(username)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.authenticate_login.update_last_login_time.html#fecfiler.authentication.authenticate_login.update_last_login_time" title="fecfiler.authentication.authenticate_login.update_last_login_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_last_login_time</span></code></a>(account)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -104,25 +95,21 @@
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.authentication.authenticate_login</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.activate_account.html">fecfiler.authentication.authenticate_login.activate_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.authenticate_login.html">fecfiler.authentication.authenticate_login.authenticate_login</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.create_jwt_token.html">fecfiler.authentication.authenticate_login.create_jwt_token</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.get_last_login_time.html">fecfiler.authentication.authenticate_login.get_last_login_time</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.lock_account.html">fecfiler.authentication.authenticate_login.lock_account</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.update_counter.html">fecfiler.authentication.authenticate_login.update_counter</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.handle_invalid_login.html">fecfiler.authentication.authenticate_login.handle_invalid_login</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.handle_valid_login.html">fecfiler.authentication.authenticate_login.handle_valid_login</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.update_last_login_time.html">fecfiler.authentication.authenticate_login.update_last_login_time</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.AccountViewSet.html">fecfiler.authentication.authenticate_login.AccountViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.authenticate_login.LogoutView.html">fecfiler.authentication.authenticate_login.LogoutView</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.models.html">fecfiler.authentication.models</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.otp.html">fecfiler.authentication.otp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.permissions.html">fecfiler.authentication.permissions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.serializers.html">fecfiler.authentication.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_authentication.html">fecfiler.authentication.test_authentication</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_token.html">fecfiler.authentication.test_token</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.token.html">fecfiler.authentication.token</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.urls.html">fecfiler.authentication.urls</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.verify_login.html">fecfiler.authentication.verify_login</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.views.html">fecfiler.authentication.views</a></li>
 </ul>
 </li>
@@ -153,7 +140,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.authentication.html">fecfiler.authentication</a><ul>
       <li>Previous: <a href="fecfiler.authentication.html" title="previous chapter">fecfiler.authentication</a></li>
-      <li>Next: <a href="fecfiler.authentication.authenticate_login.activate_account.html" title="next chapter">fecfiler.authentication.authenticate_login.activate_account</a></li>
+      <li>Next: <a href="fecfiler.authentication.authenticate_login.authenticate_login.html" title="next chapter">fecfiler.authentication.authenticate_login.authenticate_login</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

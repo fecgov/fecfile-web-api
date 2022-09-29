@@ -33,12 +33,11 @@ fecfiler.authentication
 
    fecfiler.authentication.authenticate_login
    fecfiler.authentication.models
-   fecfiler.authentication.otp
    fecfiler.authentication.permissions
    fecfiler.authentication.serializers
+   fecfiler.authentication.test_authentication
    fecfiler.authentication.test_token
    fecfiler.authentication.token
    fecfiler.authentication.urls
-   fecfiler.authentication.verify_login
    fecfiler.authentication.views
 

@@ -1,6 +1,0 @@
-fecfiler.authentication.otp.get\_current\_counter\_val
-======================================================
-
-.. currentmodule:: fecfiler.authentication.otp
-
-.. autofunction:: get_current_counter_val

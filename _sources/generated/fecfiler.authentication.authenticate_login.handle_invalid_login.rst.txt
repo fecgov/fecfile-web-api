@@ -1,6 +1,6 @@
-fecfiler.authentication.authenticate\_login.get\_last\_login\_time
+fecfiler.authentication.authenticate\_login.handle\_invalid\_login
 ==================================================================
 
 .. currentmodule:: fecfiler.authentication.authenticate_login
 
-.. autofunction:: get_last_login_time
+.. autofunction:: handle_invalid_login
