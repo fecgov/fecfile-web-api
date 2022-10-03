@@ -5,6 +5,9 @@ from .models import SchATransaction
 from .serializers import SchATransactionParentSerializer
 from django.db.models import TextField, Value
 from django.db.models.functions import Concat, Coalesce
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
@@ -17,24 +20,21 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    def get_queryset(self):
-        """QuerySet: all schedule a transactions with an aditional contributor_name field"""
-        last_and_first_name = Concat(
-            "contributor_last_name",
-            Value(", "),
-            "contributor_first_name",
-            output_field=TextField(),
+    queryset = (
+        SchATransaction.objects.select_related("parent_transaction")
+        .alias(
+            contributor_name=Coalesce(
+                "contributor_organization_name",
+                Concat(
+                    "contributor_last_name",
+                    Value(", "),
+                    "contributor_first_name",
+                    output_field=TextField(),
+                ),
+            )
         )
-        contributor_name = Coalesce(
-            "contributor_organization_name", last_and_first_name
-        )
-        queryset = SchATransaction.objects.alias(
-            contributor_name=contributor_name
-        ).all()
-        parent_id = self.request.query_params.get("parent_transaction_id")
-        if parent_id:
-            queryset = queryset.filter(parent_transaction_id=parent_id)
-        return queryset
+        .all()
+    )
 
     serializer_class = SchATransactionParentSerializer
     permission_classes = []
