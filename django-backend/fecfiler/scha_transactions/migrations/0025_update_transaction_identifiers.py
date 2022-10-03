@@ -59,11 +59,12 @@ def update_identifier(transaction, identifiers):
 def update_purpose_description(transaction, purpose_desc):
     updated = False
     for key in purpose_desc.keys():
-        if (key in transaction.contribution_purpose_descrip):
-            new_desc = transaction.contribution_purpose_descrip.replace(key, purpose_desc[key])
-            transaction.contribution_purpose_descrip = new_desc
-            updated = True
-    return updated   
+        if (transaction.contribution_purpose_descrip != None):
+            if (key in transaction.contribution_purpose_descrip):
+                new_desc = transaction.contribution_purpose_descrip.replace(key, purpose_desc[key])
+                transaction.contribution_purpose_descrip = new_desc
+                updated = True
+    return updated
 
 
 class Migration(migrations.Migration):
