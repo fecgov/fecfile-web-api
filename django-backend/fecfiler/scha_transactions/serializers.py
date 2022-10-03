@@ -57,15 +57,28 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
             for child in children:
-                logger.error(children)
-                child.parent_transaction_id = parent.id
-                super().create(child)
+                child["parent_transaction_id"] = parent.id
+                self.create(child)
             return parent
 
-    # def update(self, instance: SchATransaction, validated_data: dict):
-    #     with transaction.atomic():
-    #         children = validated_data.pop("children", [])
-    #         super().update(instance, validated_data)
+    def update(self, instance: SchATransaction, validated_data: dict):
+        with transaction.atomic():
+            children = validated_data.pop("children", [])
+
+            existing_children = SchATransaction.objects.filter(
+                parent_transaction_id=instance.id
+            ).all()
+            children_to_delete = map((lambda c: c.id), existing_children)
+            for child in children:
+                try:
+                    # this will not make multiple db calls because the existing_children queryset is cached
+                    existing_child = existing_children.get(id=child.get("id", None))
+                    children_to_delete.remove(existing_child.get("id", None))
+                    self.update(existing_child, child)
+                except SchATransaction.DoesNotExist:
+                    self.create(child)
+            SchATransaction.objects.filter(id__in=children_to_delete).delete()
+            return super().update(instance, validated_data)
 
     class Meta(SchATransactionSerializer.Meta):
         fields = [
