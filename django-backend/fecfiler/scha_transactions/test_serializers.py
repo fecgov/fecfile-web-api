@@ -6,7 +6,7 @@ from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries"]
+    fixtures = ["test_committee_accounts", "test_f3x_summaries", "test_contacts"]
 
     def setUp(self):
         self.valid_scha_transaction = {
