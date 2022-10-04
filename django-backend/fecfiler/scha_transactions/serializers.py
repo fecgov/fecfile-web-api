@@ -68,7 +68,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             existing_children = SchATransaction.objects.filter(
                 parent_transaction_id=instance.id
             ).all()
-            children_to_delete = map((lambda c: c.id), existing_children)
+            children_to_delete = [child.id for child in existing_children]
             for child in children:
                 try:
                     # this will not make multiple db calls because the existing_children queryset is cached
@@ -77,6 +77,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
                     self.update(existing_child, child)
                 except SchATransaction.DoesNotExist:
                     self.create(child)
+            print(f"children to delete: {children_to_delete}")
             SchATransaction.objects.filter(id__in=children_to_delete).delete()
             return super().update(instance, validated_data)
 

@@ -2,6 +2,7 @@ from django.test import TestCase
 from .serializers import SchATransactionSerializer, SchATransactionParentSerializer
 from rest_framework.request import Request, HttpRequest
 from fecfiler.authentication.models import Account
+from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
@@ -90,3 +91,34 @@ class SchATransactionTestCase(TestCase):
             context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
+        serializer.create(serializer.to_internal_value(parent))
+        parent_instance = SchATransaction.objects.filter(
+            transaction_type_identifier="EAR_REC"
+        )[0]
+        children = SchATransaction.objects.filter(parent_transaction=parent_instance)
+        self.assertNotEqual(children.count(), 0)
+
+        parent = parent_instance.__dict__.copy()
+        child = children[0].__dict__.copy()
+        parent["contribution_purpose_descrip"] = "updated parent"
+        child["contribution_purpose_descrip"] = "updated child"
+        parent["children"] = [child]
+        parent_instance = serializer.update(
+            parent_instance, serializer.to_internal_value(parent)
+        )
+        self.assertEqual(parent_instance.contribution_purpose_descrip, "updated parent")
+
+        children = SchATransaction.objects.filter(parent_transaction_id=parent_instance)
+        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
+
+        old_child_id = children[0].id
+        child["id"] = None
+        child["contribution_purpose_descrip"] = "very new child"
+        parent["children"] = [child]
+        parent_instance = serializer.update(
+            parent_instance, serializer.to_internal_value(parent)
+        )
+        children = SchATransaction.objects.filter(parent_transaction_id=parent_instance)
+        self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
+        with self.assertRaises(SchATransaction.DoesNotExist):
+            SchATransaction.objects.get(id=old_child_id)
