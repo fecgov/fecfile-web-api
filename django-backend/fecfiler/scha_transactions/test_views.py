@@ -8,6 +8,7 @@ class SchATransactionsViewTest(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_f3x_summaries",
+        "test_contacts",
         "test_scha_transactions",
         "test_accounts",
     ]

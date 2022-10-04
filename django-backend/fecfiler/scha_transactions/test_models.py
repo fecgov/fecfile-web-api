@@ -7,6 +7,7 @@ from ..committee_accounts.models import CommitteeAccount
 class SchATransactionTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
+        "test_contacts",
         "test_scha_transactions",
         "test_f3x_summaries",
     ]
