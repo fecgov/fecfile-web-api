@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .serializers import SchATransactionSerializer
+from .serializers import SchATransactionSerializer, SchATransactionParentSerializer
 from rest_framework.request import Request, HttpRequest
 from fecfiler.authentication.models import Account
 
@@ -73,3 +73,20 @@ class SchATransactionTestCase(TestCase):
         self.assertIsNotNone(
             missing_type_serializer.errors["transaction_type_identifier"]
         )
+
+    def test_parent(self):
+        parent = self.valid_scha_transaction.copy()
+        parent["transaction_type_identifier"] = "EAR_REC"
+        parent["contribution_purpose_descrip"] = "test"
+        child = self.valid_scha_transaction.copy()
+        child["transaction_type_identifier"] = "EAR_MEMO"
+        child["contribution_purpose_descrip"] = "test"
+        child["back_reference_sched_name"] = "test"
+        child["back_reference_tran_id_number"] = "test"
+        child["memo_code"] = True
+        parent["children"] = [child]
+        serializer = SchATransactionParentSerializer(
+            data=parent,
+            context={"request": self.mock_request},
+        )
+        self.assertTrue(serializer.is_valid(raise_exception=True))
