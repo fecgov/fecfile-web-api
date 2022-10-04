@@ -71,7 +71,9 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             children_to_delete = [child.id for child in existing_children]
             for child in children:
                 try:
-                    # this will not make multiple db calls because the existing_children queryset is cached
+                    """this will not make multiple db calls because
+                    the existing_children queryset is cached
+                    """
                     existing_child = existing_children.get(id=child.get("id", None))
                     children_to_delete.remove(existing_child.get("id", None))
                     self.update(existing_child, child)
