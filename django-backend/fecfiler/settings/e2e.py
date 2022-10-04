@@ -1,4 +1,5 @@
 from .base import *  # NOSONAR # noqa F401, F403
+import os
 
 # These settings are for local development only.
 
@@ -20,6 +21,7 @@ LOGGING = {
 }
 
 # E2E Testing Login API
+os.environ["DOCKERFILE"] = "Dockerfile-e2e"
 E2E_TESTING_LOGIN = True
 
 try:
