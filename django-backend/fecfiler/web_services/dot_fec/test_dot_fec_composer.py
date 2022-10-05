@@ -14,14 +14,18 @@ class DotFECSerializerTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(id=9999).first()
-        self.transaction = SchATransaction.objects.filter(id=9999).first()
+        self.f3x = F3XSummary.objects.filter(
+            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        ).first()
+        self.transaction = SchATransaction.objects.filter(
+            id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
+        ).first()
 
     def test_compose_dot_fec(self):
         with self.assertRaisesMessage(Exception, "report: 100000000 not found"):
             compose_dot_fec(100000000, None)
 
-        file_content = compose_dot_fec(9999, None)
+        file_content = compose_dot_fec("b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None)
         self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):

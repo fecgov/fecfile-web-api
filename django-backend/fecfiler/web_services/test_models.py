@@ -16,7 +16,9 @@ class UploadSubmissionTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(id=9999).first()
+        self.f3x = F3XSummary.objects.filter(
+            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        ).first()
         self.upload_submission = UploadSubmission()
         self.webprint_submission = WebPrintSubmission()
 
@@ -26,7 +28,9 @@ class UploadSubmissionTestCase(TestCase):
 
     def test_initiate_submission(self):
         self.assertIsNone(self.f3x.upload_submission_id)
-        submission = UploadSubmission.objects.initiate_submission(9999)
+        submission = UploadSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         self.assertEqual(
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,
@@ -65,7 +69,9 @@ class UploadSubmissionTestCase(TestCase):
 
     def test_webprint_initiate_submission(self):
         self.assertIsNone(self.f3x.webprint_submission_id)
-        submission = WebPrintSubmission.objects.initiate_submission(9999)
+        submission = WebPrintSubmission.objects.initiate_submission(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         self.assertEqual(
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,

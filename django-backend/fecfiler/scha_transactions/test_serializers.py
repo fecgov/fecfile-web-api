@@ -26,7 +26,8 @@ class SchATransactionTestCase(TestCase):
             "contribution_aggregate": 1234,
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
-            "report_id": 1,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
         }
 
         self.invalid_scha_transaction = {
@@ -34,14 +35,16 @@ class SchATransactionTestCase(TestCase):
             "contributor_last_name": "Validlastname",
             "transaction_id": "ABCDEF0123456789",
             "transaction_type_identifier": "INDV_REC",
-            "report_id": 1,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
         }
 
         self.missing_type_transaction = {
             "form_type": "invalidformtype",
             "transaction_id": "ABCDEF0123456789",
             "contributor_last_name": "Validlastname",
-            "report_id": 1,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
         }
 
         self.mock_request = Request(HttpRequest())

@@ -17,7 +17,9 @@ class MemoTextViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     def test_get_memo_texts_for_report_id(self):
-        request = self.factory.get("/api/v1/memo-text/?report_id=9999")
+        request = self.factory.get(
+            "/api/v1/memo-text/?report_id=b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        )
         request.user = self.user
         response = MemoTextViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
@@ -26,7 +28,7 @@ class MemoTextViewSetTest(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         data = {
-            "report_id": 10001,
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "rec_type": "TEXT",
             "filer_committee_id_number": "C00601211",
             "back_reference_sched_form_name": "F3XN",
@@ -41,7 +43,7 @@ class MemoTextViewSetTest(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
         data = {
-            "report_id": 10000,
+            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
             "rec_type": "TEXT",
             "filer_committee_id_number": "C00601211",
             "back_reference_sched_form_name": "F3XN",

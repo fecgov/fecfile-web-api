@@ -12,20 +12,20 @@ class MemoTextSerializerTestCase(TestCase):
             "back_reference_sched_form_name": "F3XN",
             "filer_committee_id_number": "C00601211",
             "rec_type": "TEXT",
-            "report_id": 1,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "text4000": "tessst4",
             "transaction_id_number": "REPORT_MEMO_TEXT_3",
-            "committee_account": 1000,
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
         }
 
         self.invalid_memo_text = {
             "back_reference_sched_form_name": "F3XN",
             "filer_committee_id_number": "C00601211",
             "rec_type": "Invalid_rec_type",
-            "report_id": 1,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "text4000": "tessst4",
             "transaction_id_number": "REPORT_MEMO_TEXT_3",
-            "committee_account": 1000,
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
         }
 
         self.mock_request = Request(HttpRequest())

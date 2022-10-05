@@ -7,6 +7,7 @@ from ..committee_accounts.models import CommitteeAccount
 class SchATransactionTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
+        "test_contacts",
         "test_scha_transactions",
         "test_f3x_summaries",
     ]
@@ -19,7 +20,7 @@ class SchATransactionTestCase(TestCase):
             contributor_organization_name="John Smith & Co.",
             contributor_first_name="First",
             contributor_last_name="Last",
-            committee_account_id=1,
+            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
         )
 
     def test_get_scha_transaction(self):
@@ -43,13 +44,8 @@ class SchATransactionTestCase(TestCase):
 
     def test_generate_uid(self):
         committee = CommitteeAccount()
-        f3x = F3XSummary(
-            committee_account=committee
-        )
-        trans = SchATransaction(
-            committee_account=committee,
-            report=f3x
-        )
+        f3x = F3XSummary(committee_account=committee)
+        trans = SchATransaction(committee_account=committee, report=f3x)
         self.assertFalse(trans.transaction_id)
         unique_id = trans.generate_unique_transaction_id()
         self.assertTrue(unique_id)

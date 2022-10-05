@@ -8,13 +8,14 @@ class SchATransactionsViewTest(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_f3x_summaries",
+        "test_contacts",
         "test_scha_transactions",
         "test_accounts",
     ]
 
     def setUp(self):
-        self.f3x_id = 9999
-        self.f3x_2_id = 10000
+        self.f3x_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        self.f3x_2_id = "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965"
         self.f3x_transaction_count = len(
             SchATransaction.objects.filter(report_id=self.f3x_id)
         )

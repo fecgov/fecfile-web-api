@@ -13,9 +13,11 @@ class DotFECSubmitterTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(id=9999).first()
+        self.f3x = F3XSummary.objects.filter(
+            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        ).first()
         self.dot_fec_id = create_dot_fec(
-            9999,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             force_write_to_disk=True,
         )
         self.dot_fec_record = DotFEC.objects.get(id=self.dot_fec_id)

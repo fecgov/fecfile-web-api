@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 
 
 class Contact(SoftDeleteModel, CommitteeOwnedModel):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     class ContactType(models.TextChoices):
         COMMITTEE = "COM"
         ORGANIZATION = "ORG"
