@@ -1,10 +1,11 @@
+import datetime
 import logging
 import re
 from urllib.parse import urlencode
 
 import requests
-from django.db.models import CharField, Q, Value
-from django.db.models.functions import Concat, Lower
+from django.db.models import CharField, Q, Value, Sum
+from django.db.models.functions import Concat, Lower, ExtractYear
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import FEC_API_COMMITTEE_LOOKUP_ENDPOINT, FEC_API_KEY
@@ -12,6 +13,7 @@ from rest_framework.decorators import action
 
 from .models import Contact
 from .serializers import ContactSerializer
+from fecfiler.scha_transactions.models import SchATransaction
 
 logger = logging.getLogger(__name__)
 
@@ -136,3 +138,31 @@ class ContactViewSet(CommitteeOwnedViewSet):
                     return param_int_val
                 return max_param_value
         return default_param_value
+
+    @action(
+        detail=False,
+        methods=["post"]
+    )
+    def contribution_aggregate(self, request):
+        if not request:
+            return
+
+        contact_id = request.data.get("contact_id")
+        contribution_date = request.data.get("contribution_date")
+        date = datetime.datetime.strptime(contribution_date, '%Y-%m-%d')
+        year = date.year
+
+        transactions = SchATransaction.objects.annotate(
+            contribution_year=ExtractYear('contribution_date')
+        ).filter(
+            Q(contact=contact_id) &
+            Q(contribution_year=year) &
+            Q(contribution_date__lte=contribution_date)
+        )
+
+        for t in transactions:
+            print(t.contribution_date)
+
+        return JsonResponse(
+            transactions.aggregate(Sum("contribution_amount"))
+        )
