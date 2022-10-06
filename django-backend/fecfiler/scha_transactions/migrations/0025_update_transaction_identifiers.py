@@ -62,9 +62,10 @@ def update_identifier(transaction, identifiers):
 def update_purpose_description(transaction, purpose_desc):
     updated = False
     for key in purpose_desc.keys():
-        if (transaction.contribution_purpose_descrip != None):
+        if (transaction.contribution_purpose_descrip):
             if (key in transaction.contribution_purpose_descrip):
-                new_desc = transaction.contribution_purpose_descrip.replace(key, purpose_desc[key])
+                old_desc = transaction.contribution_purpose_descrip
+                new_desc = old_desc.replace(key, purpose_desc[key])
                 transaction.contribution_purpose_descrip = new_desc
                 updated = True
     return updated
