@@ -49,41 +49,54 @@ class SchATransactionSerializer(
         if contact and transaction:
             if ((contact.type == Contact.ContactType.INDIVIDUAL)
                     and (transaction["entity_type"] == "IND")):
-                if contact.last_name != transaction["contributor_last_name"]:
-                    contact.last_name = transaction["contributor_last_name"]
-                if contact.first_name != transaction["contributor_first_name"]:
-                    contact.first_name = transaction["contributor_first_name"]
-                if contact.middle_name != transaction["contributor_middle_name"]:
-                    contact.middle_name = transaction["contributor_middle_name"]
-                if contact.prefix != transaction["contributor_prefix"]:
-                    contact.prefix = transaction["contributor_prefix"]
-                if contact.suffix != transaction["contributor_suffix"]:
-                    contact.suffix = transaction["contributor_suffix"]
-                if contact.employer != transaction["contributor_employer"]:
-                    contact.employer = transaction["contributor_employer"]
-                if contact.occupation != transaction["contributor_occupation"]:
-                    contact.occupation = transaction["contributor_occupation"]
+                contributor_last_name = transaction.get("contributor_last_name")
+                if (contact.last_name != contributor_last_name):
+                    contact.last_name = contributor_last_name
+                contributor_first_name = transaction.get("contributor_first_name")
+                if (contact.first_name != contributor_first_name):
+                    contact.first_name = contributor_first_name
+                contributor_middle_name = transaction.get("contributor_middle_name")
+                if (contact.middle_name != contributor_middle_name):
+                    contact.middle_name = contributor_middle_name
+                contributor_prefix = transaction.get("contributor_prefix")
+                if (contact.prefix != contributor_prefix):
+                    contact.prefix = contributor_prefix
+                contributor_suffix = transaction.get("contributor_suffix")
+                if (contact.suffix != contributor_suffix):
+                    contact.suffix = contributor_suffix
+                contributor_employer = transaction.get("contributor_employer")
+                if (contact.employer != contributor_employer):
+                    contact.employer = contributor_employer
+                contributor_occupation = transaction.get("contributor_occupation")
+                if (contact.occupation != contributor_occupation):
+                    contact.occupation = contributor_occupation
             elif ((contact.type == Contact.ContactType.COMMITTEE)
                   and (transaction["entity_type"] == "COM")):
-                if contact.committee_id != transaction.get("donor_committee_fec_id", None):
-                    contact.committee_id = transaction.get("donor_committee_fec_id", None)
-                if contact.name != transaction["contributor_organization_name"]:
-                    contact.name = transaction["contributor_organization_name"]
+                donor_committee_fec_id = transaction.get("donor_committee_fec_id")
+                if (contact.committee_id != donor_committee_fec_id):
+                    contact.committee_id = donor_committee_fec_id
+                contributor_organization_name = transaction.get(
+                    "contributor_organization_name")
+                if (contact.name != contributor_organization_name):
+                    contact.name = contributor_organization_name
             elif ((contact.type == Contact.ContactType.ORGANIZATION)
                   and (transaction["entity_type"] == "ORG")):
-                if contact.name != transaction["contributor_organization_name"]:
-                    contact.name = transaction["contributor_organization_name"]
-
-            if contact.street_1 != transaction["contributor_street_1"]:
-                contact.street_1 = transaction["contributor_street_1"]
-            if contact.street_2 != transaction["contributor_street_2"]:
-                contact.street_2 = transaction["contributor_street_2"]
-            if contact.city != transaction["contributor_city"]:
-                contact.city = transaction["contributor_city"]
-            if contact.state != transaction["contributor_state"]:
-                contact.state = transaction["contributor_state"]
-            if contact.zip != transaction["contributor_zip"]:
-                contact.zip = transaction["contributor_zip"]
+                contributor_organization_name = transaction.get(
+                    "contributor_organization_name")
+                if (contact.name != contributor_organization_name):
+                    contact.name = contributor_organization_name
+            contributor_street_1 = transaction.get("contributor_street_1")
+            if (contact.street_1 != contributor_street_1):
+                contact.street_1 = contributor_street_1
+            contributor_street_2 = transaction.get("contributor_street_2")
+            if (contact.street_2 != contributor_street_2):
+                contact.street_2 = contributor_street_2
+            contributor_city = transaction.get("contributor_city")
+            if (contact.city != contributor_city):
+                contact.city = contributor_city
+            contributor_zip = transaction.get("contributor_zip")
+            if (contact.zip != contributor_zip):
+                contact.zip = contributor_zip
             contact.save()
             transaction["contact_id"] = contact.id
 

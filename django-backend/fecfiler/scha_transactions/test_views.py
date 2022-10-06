@@ -1,7 +1,9 @@
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
+from rest_framework.test import APIClient
+
+from ..authentication.models import Account
 from .models import SchATransaction
 from .views import SchATransactionViewSet
-from ..authentication.models import Account
 
 
 class SchATransactionsViewTest(TestCase):
@@ -62,3 +64,109 @@ class SchATransactionsViewTest(TestCase):
             responses.append(response.data)
 
         self.assertNotEqual(responses[0]["count"], responses[1]["count"])
+
+    def test_create_new_scha_transaction_create_ind_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contributor_last_name": "test_ln1",
+            "contributor_first_name": "test_fn1",
+            "contributor_middle_name": "test_mn1",
+            "contributor_prefix": "test_px1",
+            "contributor_suffix": "test_sx1",
+            "contributor_employer": "test_employer1",
+            "contributor_occupation": "test_occupation1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "IND",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTH_REC",
+        }
+        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_update_ind_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "contributor_last_name": "test_ln1",
+            "contributor_first_name": "test_fn1",
+            "contributor_middle_name": "test_mn1",
+            "contributor_prefix": "test_px1",
+            "contributor_suffix": "test_sx1",
+            "contributor_employer": "test_employer1",
+            "contributor_occupation": "test_occupation1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "IND",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTH_REC",
+        }
+        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_create_cmtee_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "donor_committee_fec_id": "C12345678",
+            "contributor_organization_name": "test_orgname1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "COM",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTH_REC",
+        }
+        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_create_org_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contributor_organization_name": "test_orgname1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "ORG",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTH_REC",
+        }
+        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        self.assertEqual(response.status_code, 201)
