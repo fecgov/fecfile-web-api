@@ -12,7 +12,7 @@ def update_transaction_type_identifiers(apps, schema_editor):
         "INDV_REC": "INDIVIDUAL_RECEIPT",
         "OTH_REC": "OTHER_RECEIPT",
         "JF_TRAN": "JOINT_FUNDRAISING_TRANSFER",
-        "JF_TRAN_PAC_MEMO": "JOINT_FUNDRAISING_TRANSFER_PAC_MEMO",
+        "JF_TRAN_PAC_MEMO": "JF_TRANSFER_PAC_MEMO",
         "OFFSET_TO_OPEX": "OFFSET_TO_OPERATING_EXPENDITURES",
     }
 
@@ -36,7 +36,7 @@ def reverse_tid_update(apps, schema_editor):
         "INDIVIDUAL_RECEIPT": "INDV_REC",
         "OTHER_RECEIPT": "OTH_REC",
         "JOINT_FUNDRAISING_TRANSFER": "JF_TRAN",
-        "JOINT_FUNDRAISING_TRANSFER_PAC_MEMO": "JF_TRAN_PAC_MEMO",
+        "JF_TRANSFER_PAC_MEMO": "JF_TRAN_PAC_MEMO",
         "OFFSET_TO_OPERATING_EXPENDITURES": "OFFSET_TO_OPEX",
     }
 
