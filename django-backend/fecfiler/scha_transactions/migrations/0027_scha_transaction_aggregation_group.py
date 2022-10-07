@@ -26,7 +26,7 @@ def reverse_op(_apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0025_update_transaction_identifiers'),
+        ('scha_transactions', '0026_auto_20221007_1427'),
     ]
 
     operations = [
