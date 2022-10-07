@@ -50,7 +50,7 @@ def update_purpose_description(transaction, purpose_desc):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scha_transactions', '0026_schatransaction_aggregation_group'),
+        ('scha_transactions', '0025_update_transaction_identifiers'),
     ]
 
     operations = [
