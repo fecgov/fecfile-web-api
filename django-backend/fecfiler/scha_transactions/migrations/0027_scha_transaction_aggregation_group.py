@@ -4,11 +4,17 @@ from django.db import migrations, models
 
 
 # Machine-generated dict right here.  Not sure it'd be worth it to break it up
-tid_to_aggregation_groups = {'INDIVIDUAL_RECEIPT': 'General', 'TRIBAL_RECEIPT': 'General', 'EARMARK_RECEIPT': 'General', 'EARMARK_MEMO': 'General', 'PARTY_RECEIPT': 'General', 'PAC_RECEIPT': 'General', 'PAC_EARMARK_RECEIPT': 'General', 'PAC_EARMARK_MEMO': 'General', 'TRANSFER': 'General', 'JOINT_FUNDRAISING_TRANSFER': 'General', 'INDIVIDUAL_JF_TRANSFER_MEMO': 'General', 'PARTY_JF_TRANSFER_MEMO': 'General', 'PAC_JF_TRANSFER_MEMO': 'General', 'TRIBAL_JF_TRANSFER_MEMO': 'General', 'PARTNERSHIP_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_JF_TRANSFER_MEMO': ' DESIGN TBD', 'OFFSET_TO_OPERATING_EXPENDITURES': 'Line 15', 'REFUND_TO_REGISTERED_COMMITTEE': 'Line 16', 'REFUND_TO_UNREGISTERED_COMMITTEE': 'Line 16', 'JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT': 'National Party Convention Account', 'INDIVIDUAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': 'National Party Convention Account', 'PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': 'National Party Convention Account', 'TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': 'National Party Convention Account', 'PARTNERSHIP_CONVENTION_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_CONVENTION_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_CONVENTION_ACCOUNT': 'National Party Convention Account', 'PARTY_NATIONAL_PARTY_CONVENTION_ACCOUNT': 'National Party Convention Account', 'PAC_NATIONAL_PARTY_CONVENTION_ACCOUNT': 'National Party Convention Account', 'TRIBAL_NATIONAL_PARTY_CONVENTION_ACCOUNT': 'National Party Convention Account', 'JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': 'National Party Headquarters Account', 'INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': 'National Party Headquarters Account', 'PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': 'National Party Headquarters Account', 'TRIBAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': 'National Party Headquarters Account', 'PARTNERSHIP_HEADQUARTERS_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_HEADQUARTERS_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': 'National Party Headquarters Account', 'PARTY_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': 'National Party Headquarters Account', 'PAC_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': 'National Party Headquarters Account', 'TRIBAL_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': 'National Party Headquarters Account', 'JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT': 'National Party Recount Account', 'INDIVIDUAL_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': 'National Party Recount Account', 'PAC_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': 'National Party Recount Account', 'TRIBAL_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': 'National Party Recount Account', 'PARTNERSHIP_RECOUNT_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_RECOUNT_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_RECOUNT_ACCOUNT': 'National Party Recount Account', 'PARTY_NATIONAL_PARTY_RECOUNT_ACCOUNT': 'National Party Recount Account', 'PAC_NATIONAL_PARTY_RECOUNT_ACCOUNT': 'National Party Recount Account', 'TRIBAL_NATIONAL_PARTY_RECOUNT_ACCOUNT': 'National Party Recount Account', 'INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT': 'Non-Contribution Account', 'OTHER_COMMITTEE_NON_CONTRIBUTION_ACCOUNT': 'Non-Contribution Account', 'BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT': 'Non-Contribution Account', 'OTHER_RECEIPT': 'Other Receipts', 'INDIVIDUAL_RECOUNT_RECEIPT': 'Recount Account', 'PARTY_RECOUNT_RECEIPT': 'Recount Account', 'PAC_RECOUNT_RECEIPT': 'Recount Account', 'TRIBAL_RECOUNT_RECEIPT': 'Recount Account'}  # noqa
+general='General'
+np_hq='National Party Headquarters Account'
+recount='Recount Account'
+non_contribution='Non-Contribution Account'
+np_convention='National Party Convention Account'
+np_recount='National Party Recount Account'
+tid_to_aggregation_groups = {'INDIVIDUAL_RECEIPT': general, 'TRIBAL_RECEIPT': general, 'EARMARK_RECEIPT': general, 'EARMARK_MEMO': general, 'PARTY_RECEIPT': general, 'PAC_RECEIPT': general, 'PAC_EARMARK_RECEIPT': general, 'PAC_EARMARK_MEMO': general, 'TRANSFER': general, 'JOINT_FUNDRAISING_TRANSFER': general, 'INDIVIDUAL_JF_TRANSFER_MEMO': general, 'PARTY_JF_TRANSFER_MEMO': general, 'PAC_JF_TRANSFER_MEMO': general, 'TRIBAL_JF_TRANSFER_MEMO': general, 'PARTNERSHIP_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_JF_TRANSFER_MEMO': ' DESIGN TBD', 'OFFSET_TO_OPERATING_EXPENDITURES': 'Line 15', 'REFUND_TO_REGISTERED_COMMITTEE': 'Line 16', 'REFUND_TO_UNREGISTERED_COMMITTEE': 'Line 16', 'JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT': np_convention, 'INDIVIDUAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': np_convention, 'PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': np_convention, 'TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': np_convention, 'PARTNERSHIP_CONVENTION_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_CONVENTION_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_CONVENTION_ACCOUNT': np_convention, 'PARTY_NATIONAL_PARTY_CONVENTION_ACCOUNT': np_convention, 'PAC_NATIONAL_PARTY_CONVENTION_ACCOUNT': np_convention, 'TRIBAL_NATIONAL_PARTY_CONVENTION_ACCOUNT': np_convention, 'JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': np_hq, 'INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': np_hq, 'PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': np_hq, 'TRIBAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': np_hq, 'PARTNERSHIP_HEADQUARTERS_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_HEADQUARTERS_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': np_hq, 'PARTY_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': np_hq, 'PAC_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': np_hq, 'TRIBAL_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': np_hq, 'JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT': np_recount, 'INDIVIDUAL_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': np_recount, 'PAC_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': np_recount, 'TRIBAL_NATIONAL_PARTY_JF_TRANSFER_RECOUNT_MEMO': np_recount, 'PARTNERSHIP_RECOUNT_JF_TRANSFER_MEMO': ' DESIGN TBD', 'PARTNERSHIP_INDIVIDUAL_RECOUNT_JF_TRANSFER_MEMO': ' DESIGN TBD', 'INDIVIDUAL_NATIONAL_PARTY_RECOUNT_ACCOUNT': np_recount, 'PARTY_NATIONAL_PARTY_RECOUNT_ACCOUNT': np_recount, 'PAC_NATIONAL_PARTY_RECOUNT_ACCOUNT': np_recount, 'TRIBAL_NATIONAL_PARTY_RECOUNT_ACCOUNT': np_recount, 'INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT': non_contribution, 'OTHER_COMMITTEE_NON_CONTRIBUTION_ACCOUNT': non_contribution, 'BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT': non_contribution, 'OTHER_RECEIPT': 'Other Receipts', 'INDIVIDUAL_RECOUNT_RECEIPT': recount, 'PARTY_RECOUNT_RECEIPT': recount, 'PAC_RECOUNT_RECEIPT': recount, 'TRIBAL_RECOUNT_RECEIPT': recount}  # noqa
 
 
 def populate_aggregation_group_fields(apps, _):
-    sch_a_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+    sch_a_transaction = apps.get_model('scha_transactions', 'SchATransaction')  # noqa
 
     for t in sch_a_transaction.objects.all():
         tid = t.transaction_type_identifier
@@ -16,11 +22,11 @@ def populate_aggregation_group_fields(apps, _):
             t.aggregation_group = tid_to_aggregation_groups[tid]
             t.save()
         else:
-            print("\nMissing Transaction Type Identifier!", tid)
+            print('\nMissing Transaction Type Identifier!', tid)
 
 
-# Empty function to pass as a reverse method to RunPython
-def reverse_op(_apps, _):
+def noop(_apps, _):
+    # Empty function to pass as a reverse method to RunPython
     pass
 
 
@@ -36,5 +42,5 @@ class Migration(migrations.Migration):
             name='aggregation_group',
             field=models.TextField(blank=True, null=True),
         ),
-        migrations.RunPython(populate_aggregation_group_fields, reverse_op)
+        migrations.RunPython(populate_aggregation_group_fields, noop)
     ]
