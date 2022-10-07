@@ -19,7 +19,7 @@ def reverse_tid_update(apps, schema_editor):
     sch_a_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
 
     identifiers = {
-        "PAC_JF_TRANSFER_MEMO":"JF_TRANSFER_PAC_MEMO",
+        "PAC_JF_TRANSFER_MEMO": "JF_TRANSFER_PAC_MEMO",
     }
 
     for transaction in sch_a_transaction.objects.all():
