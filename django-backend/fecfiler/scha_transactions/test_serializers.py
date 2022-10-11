@@ -24,7 +24,7 @@ class SchATransactionTestCase(TestCase):
             "contribution_date": "2009-01-01",
             "contribution_amount": 1234,
             "contribution_aggregate": 1234,
-            "aggregation_group": "General",
+            "aggregation_group": "GENERAL",
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
