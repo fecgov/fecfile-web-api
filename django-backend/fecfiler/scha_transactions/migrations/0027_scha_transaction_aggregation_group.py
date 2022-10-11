@@ -10,7 +10,8 @@ recount = 'RECOUNT_ACCOUNT'
 non_contribution = 'NON-CONTRIBUTION_ACCOUNT'
 np_convention = 'NATIONAL_PARTY_CONVENTION_ACCOUNT'
 np_recount = 'NATIONAL_PARTY_RECOUNT_ACCOUNT'
-tid_to_aggregation_groups = {'INDIVIDUAL_RECEIPT': general,
+tid_to_aggregation_groups = {
+    'INDIVIDUAL_RECEIPT': general,
     'TRIBAL_RECEIPT': general,
     'EARMARK_RECEIPT': general,
     'EARMARK_MEMO': general,
