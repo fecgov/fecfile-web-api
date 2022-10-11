@@ -1,7 +1,7 @@
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import CharField, UUIDField
+from rest_framework.serializers import CharField, UUIDField, DecimalField
 from rest_framework.exceptions import ValidationError
 import logging
 
@@ -19,6 +19,10 @@ class SchATransactionSerializer(
     report_id = UUIDField(required=True, allow_null=False)
 
     contact_id = UUIDField(required=True, allow_null=False)
+
+    contribution_aggregate = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
@@ -38,7 +42,12 @@ class SchATransactionSerializer(
             f.name
             for f in SchATransaction._meta.get_fields()
             if f.name not in ["deleted", "schatransaction"]
-        ] + ["parent_transaction_id", "report_id", "contact_id"]
+        ] + [
+            "parent_transaction_id",
+            "report_id",
+            "contact_id",
+            "contribution_aggregate",
+        ]
 
         read_only_fields = [
             "id",
