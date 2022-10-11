@@ -87,8 +87,8 @@ class SchATransactionsViewTest(TestCase):
             "entity_type": "IND",
             "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
-            "report": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
-            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTH_REC",
         }
@@ -118,8 +118,8 @@ class SchATransactionsViewTest(TestCase):
             "entity_type": "IND",
             "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
-            "report": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
-            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTH_REC",
         }
@@ -143,8 +143,8 @@ class SchATransactionsViewTest(TestCase):
             "entity_type": "COM",
             "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
-            "report": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
-            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTH_REC",
         }
@@ -167,8 +167,8 @@ class SchATransactionsViewTest(TestCase):
             "entity_type": "ORG",
             "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
-            "report": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
-            "report_id": "1aa6a9af-d079-4b23-b954-55ec81ea6dbe",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTH_REC",
         }
