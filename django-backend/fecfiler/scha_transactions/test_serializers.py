@@ -93,7 +93,7 @@ class SchATransactionTestCase(TestCase):
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
         parent_instance = SchATransaction.objects.filter(
-            transaction_type_identifier="EAR_REC"
+            transaction_type_identifier="EARMARK_RECEIPT"
         )[0]
         children = SchATransaction.objects.filter(parent_transaction=parent_instance)
         self.assertNotEqual(children.count(), 0)
