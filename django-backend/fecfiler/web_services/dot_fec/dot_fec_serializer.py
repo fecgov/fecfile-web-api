@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import FieldDoesNotExist
 from fecfile_validate import validate
 from curses import ascii
 
@@ -60,7 +61,10 @@ def serialize_field(model, model_instance, field_name):
         another field in the `model_instance`, so we pass it to the serializer.
         field_name (str): name of field to serialize
     """
-    field = model._meta.get_field(field_name)
+    try:
+        field = model._meta.get_field(field_name)
+    except FieldDoesNotExist as e:
+        field = model.get_virtual_field(field_name)
     serializer = FIELD_SERIALIZERS.get(type(field), FIELD_SERIALIZERS[None])
     return serializer(model_instance, field_name)
 

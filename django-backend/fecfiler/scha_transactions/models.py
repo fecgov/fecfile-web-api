@@ -92,6 +92,15 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         db_table = "scha_transactions"
         indexes = [models.Index(fields=["transaction_id"])]
 
+    @staticmethod
+    def get_virtual_field(field_name):
+        virtual_fields = {
+            "contribution_aggregate": models.DecimalField(
+                max_digits=11, decimal_places=2
+            )
+        }
+        return virtual_fields[field_name]
+
     # This is intended to be useable without instantiating a transaction object
     @staticmethod
     def check_for_uid_conflicts(uid):  # noqa

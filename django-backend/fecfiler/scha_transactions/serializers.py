@@ -36,6 +36,13 @@ class SchATransactionSerializer(
             )
         return transaction_type
 
+    def validate(self, attrs):
+        """Adds stub contribution_aggregate to pass validation"""
+        attrs["contribution_aggregate"] = 0
+        data = super().validate(attrs)
+        del data["contribution_aggregate"]
+        return data
+
     class Meta:
         model = SchATransaction
         fields = [

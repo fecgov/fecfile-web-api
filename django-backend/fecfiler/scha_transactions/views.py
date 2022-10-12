@@ -72,7 +72,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             .filter(
                 Q(contact_id=contact_id),
                 Q(contribution_date__year=contribution_date.year),
-                Q(contribution_date__lt=contribution_date),
+                Q(contribution_date__lte=contribution_date),
             )
             .order_by("-created")
             .first()
