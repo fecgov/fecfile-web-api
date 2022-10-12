@@ -53,6 +53,7 @@ fecfiler.scha\_transactions.models.SchATransaction
 
    .. autosummary::
    
+      ~SchATransaction.aggregation_group
       ~SchATransaction.all_objects
       ~SchATransaction.back_reference_sched_name
       ~SchATransaction.back_reference_tran_id_number
