@@ -51,6 +51,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     contribution_aggregate = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    aggregation_group = models.TextField(null=True, blank=True)
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
     contributor_employer = models.TextField(null=True, blank=True)
     contributor_occupation = models.TextField(null=True, blank=True)
