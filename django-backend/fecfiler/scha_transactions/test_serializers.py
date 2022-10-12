@@ -11,7 +11,7 @@ class SchATransactionTestCase(TestCase):
         self.valid_scha_transaction = {
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
-            "transaction_type_identifier": "INDV_REC",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
             "contributor_organization_name": "John Smith Co",
@@ -34,7 +34,7 @@ class SchATransactionTestCase(TestCase):
             "form_type": "invalidformtype",
             "contributor_last_name": "Validlastname",
             "transaction_id": "ABCDEF0123456789",
-            "transaction_type_identifier": "INDV_REC",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
         }
