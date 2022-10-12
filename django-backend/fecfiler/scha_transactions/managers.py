@@ -1,7 +1,5 @@
-from datetime import datetime
 from fecfiler.soft_delete.managers import SoftDeleteManager
-from django.db.models import OuterRef, Subquery, Sum, F, Q
-from django.db import models
+from django.db.models import OuterRef, Subquery, Sum, Q
 
 """Manager to calculate contribution_aggregate just-in-time"""
 

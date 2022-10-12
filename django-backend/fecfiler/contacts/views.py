@@ -1,11 +1,10 @@
-import datetime
 import logging
 import re
 from urllib.parse import urlencode
 
 import requests
-from django.db.models import CharField, Q, Value, Sum
-from django.db.models.functions import Concat, Lower, ExtractYear
+from django.db.models import CharField, Q, Value
+from django.db.models.functions import Concat, Lower
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import FEC_API_COMMITTEE_LOOKUP_ENDPOINT, FEC_API_KEY
@@ -13,7 +12,6 @@ from rest_framework.decorators import action
 
 from .models import Contact
 from .serializers import ContactSerializer
-from fecfiler.scha_transactions.models import SchATransaction
 
 logger = logging.getLogger(__name__)
 

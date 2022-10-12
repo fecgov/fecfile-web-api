@@ -63,7 +63,7 @@ def serialize_field(model, model_instance, field_name):
     """
     try:
         field = model._meta.get_field(field_name)
-    except FieldDoesNotExist as e:
+    except FieldDoesNotExist:
         field = model.get_virtual_field(field_name)
     serializer = FIELD_SERIALIZERS.get(type(field), FIELD_SERIALIZERS[None])
     return serializer(model_instance, field_name)
