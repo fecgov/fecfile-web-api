@@ -17,6 +17,8 @@ class SchATransactionsViewTest(TestCase):
         "test_accounts",
     ]
 
+    test_endpoint = "/api/v1/sch-a-transactions/"
+    test_phone = "+1 1234567890"
     test_data = {
         "contact": {
             "type": "IND",
@@ -33,7 +35,7 @@ class SchATransactionsViewTest(TestCase):
             "state": "AZ",
             "zip": "12345",
             "country": "USA",
-            "telephone": "+1 1234567890",
+            "telephone": test_phone,
         },
         "transaction": {
             "contributor_last_name": "test_ln1",
@@ -60,8 +62,6 @@ class SchATransactionsViewTest(TestCase):
             "transaction_type_identifier": "OTHER_RECEIPT",
         }
     }
-
-    test_endpoint = "/api/v1/sch-a-transactions/"
 
     def setUp(self):
         self.f3x_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
@@ -132,7 +132,7 @@ class SchATransactionsViewTest(TestCase):
                 "state": "AZ",
                 "zip": "12345",
                 "country": "USA",
-                "telephone": "+1 1234567890",
+                "telephone": self.test_phone,
             }
         }
         response = client.post(self.test_endpoint, data, format="json")
@@ -170,6 +170,14 @@ class SchATransactionsViewTest(TestCase):
         response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 400)
 
+    def test_create_new_scha_transaction_create_ind_contact_invalid_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = copy.deepcopy(self.test_data)
+        del data["contact"]["last_name"]
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 400)
+
     def test_create_new_scha_transaction_create_ind_contact(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
@@ -199,7 +207,7 @@ class SchATransactionsViewTest(TestCase):
                 "state": "AZ",
                 "zip": "12345",
                 "country": "USA",
-                "telephone": "+1 1234567890",
+                "telephone": self.test_phone,
             },
             "transaction": {
                 "donor_committee_fec_id": "C12345678",
@@ -219,6 +227,7 @@ class SchATransactionsViewTest(TestCase):
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "transaction_id": "C8758663365855FEAC76",
                 "transaction_type_identifier": "OTHER_RECEIPT",
+                "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             }
         }
         response = client.post(self.test_endpoint, data, format="json")
@@ -237,7 +246,7 @@ class SchATransactionsViewTest(TestCase):
                 "state": "AZ",
                 "zip": "12345",
                 "country": "USA",
-                "telephone": "+1 1234567890",
+                "telephone": self.test_phone,
             },
             "transaction": {
                 "contributor_organization_name": "test_orgname1",
@@ -256,6 +265,7 @@ class SchATransactionsViewTest(TestCase):
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "transaction_id": "C8758663365855FEAC76",
                 "transaction_type_identifier": "OTHER_RECEIPT",
+                "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             }
         }
         response = client.post(self.test_endpoint, data, format="json")
