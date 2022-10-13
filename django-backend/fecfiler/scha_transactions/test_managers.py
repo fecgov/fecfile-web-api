@@ -11,9 +11,6 @@ class SchATransactionTestCase(TestCase):
         "test_f3x_summaries",
     ]
 
-    def setUp(self):
-        pass
-
     def test_aggregate_one(self):
         scha_transaction = SchATransaction.objects.get(transaction_id="1")
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("1.01"))
