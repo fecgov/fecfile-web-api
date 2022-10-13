@@ -1,3 +1,5 @@
+import copy
+
 from django.test import RequestFactory, TestCase
 from rest_framework.test import APIClient
 
@@ -14,6 +16,52 @@ class SchATransactionsViewTest(TestCase):
         "test_scha_transactions",
         "test_accounts",
     ]
+
+    test_data = {
+        "contact": {
+            "type": "IND",
+            "last_name": "test_ln1",
+            "first_name": "test_ln1",
+            "middle_name": "test_mn1",
+            "prefix": "test_px1",
+            "suffix": "test_sx1",
+            "employer": "test_employer1",
+            "occupation": "test_occupation1",
+            "street_1": "test_streetOne1",
+            "street_2": "test_streetTwo1",
+            "city": "test_city1",
+            "state": "AZ",
+            "zip": "12345",
+            "country": "USA",
+            "telephone": "+1 1234567890",
+        },
+        "transaction": {
+            "contributor_last_name": "test_ln1",
+            "contributor_first_name": "test_fn1",
+            "contributor_middle_name": "test_mn1",
+            "contributor_prefix": "test_px1",
+            "contributor_suffix": "test_sx1",
+            "contributor_employer": "test_employer1",
+            "contributor_occupation": "test_occupation1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "12345",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "IND",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTHER_RECEIPT",
+        }
+    }
+
+    test_endpoint = "/api/v1/sch-a-transactions/"
 
     def setUp(self):
         self.f3x_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
@@ -87,7 +135,7 @@ class SchATransactionsViewTest(TestCase):
                 "telephone": "+1 1234567890",
             }
         }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 400)
 
     def test_create_new_scha_transaction_create_ind_contact_no_contact_id(self):
@@ -119,155 +167,22 @@ class SchATransactionsViewTest(TestCase):
                 "transaction_type_identifier": "OTHER_RECEIPT",
             }
         }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_create_new_scha_transaction_create_ind_contact_invalid_contact(self):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        data = {
-            "contact": {
-                "type": "IND",
-                "last_name2": "test_ln1",
-                "first_name": "test_ln1",
-                "middle_name": "test_mn1",
-                "prefix": "test_px1",
-                "suffix": "test_sx1",
-                "employer": "test_employer1",
-                "occupation": "test_occupation1",
-                "street_1": "test_streetOne1",
-                "street_2": "test_streetTwo1",
-                "city": "test_city1",
-                "state": "AZ",
-                "zip": "12345",
-                "country": "USA",
-                "telephone": "+1 1234567890",
-            },
-            "transaction": {
-                "contributor_last_name": "test_ln1",
-                "contributor_first_name": "test_fn1",
-                "contributor_middle_name": "test_mn1",
-                "contributor_prefix": "test_px1",
-                "contributor_suffix": "test_sx1",
-                "contributor_employer": "test_employer1",
-                "contributor_occupation": "test_occupation1",
-                "contributor_street_1": "test_streetOne1",
-                "contributor_street_2": "test_streetTwo1",
-                "contributor_city": "test_city1",
-                "contributor_state": "AZ",
-                "contributor_zip": "12345",
-                "contribution_aggregate": "0.00",
-                "contribution_amount": "12.00",
-                "contribution_date": "2022-10-07",
-                "entity_type": "IND",
-                "filer_committee_id_number": "C00601211",
-                "form_type": "SA17",
-                "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "transaction_id": "C8758663365855FEAC76",
-                "transaction_type_identifier": "OTHER_RECEIPT",
-            }
-        }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 400)
 
     def test_create_new_scha_transaction_create_ind_contact(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        data = {
-            "contact": {
-                "type": "IND",
-                "last_name": "test_ln1",
-                "first_name": "test_ln1",
-                "middle_name": "test_mn1",
-                "prefix": "test_px1",
-                "suffix": "test_sx1",
-                "employer": "test_employer1",
-                "occupation": "test_occupation1",
-                "street_1": "test_streetOne1",
-                "street_2": "test_streetTwo1",
-                "city": "test_city1",
-                "state": "AZ",
-                "zip": "12345",
-                "country": "USA",
-                "telephone": "+1 1234567890",
-            },
-            "transaction": {
-                "contributor_last_name": "test_ln1",
-                "contributor_first_name": "test_fn1",
-                "contributor_middle_name": "test_mn1",
-                "contributor_prefix": "test_px1",
-                "contributor_suffix": "test_sx1",
-                "contributor_employer": "test_employer1",
-                "contributor_occupation": "test_occupation1",
-                "contributor_street_1": "test_streetOne1",
-                "contributor_street_2": "test_streetTwo1",
-                "contributor_city": "test_city1",
-                "contributor_state": "AZ",
-                "contributor_zip": "12345",
-                "contribution_aggregate": "0.00",
-                "contribution_amount": "12.00",
-                "contribution_date": "2022-10-07",
-                "entity_type": "IND",
-                "filer_committee_id_number": "C00601211",
-                "form_type": "SA17",
-                "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "transaction_id": "C8758663365855FEAC76",
-                "transaction_type_identifier": "OTHER_RECEIPT",
-            }
-        }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        data = copy.deepcopy(self.test_data)
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_new_scha_transaction_update_ind_contact(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
-        data = {
-            "contact": {
-                "type": "IND",
-                "last_name": "test_ln1",
-                "first_name": "test_ln1",
-                "middle_name": "test_mn1",
-                "prefix": "test_px1",
-                "suffix": "test_sx1",
-                "employer": "test_employer1",
-                "occupation": "test_occupation1",
-                "street_1": "test_streetOne1",
-                "street_2": "test_streetTwo1",
-                "city": "test_city1",
-                "state": "AZ",
-                "zip": "12345",
-                "country": "USA",
-                "telephone": "+1 1234567890",
-            },
-            "transaction": {
-                "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
-                "contributor_last_name": "test_ln1",
-                "contributor_first_name": "test_fn1",
-                "contributor_middle_name": "test_mn1",
-                "contributor_prefix": "test_px1",
-                "contributor_suffix": "test_sx1",
-                "contributor_employer": "test_employer1",
-                "contributor_occupation": "test_occupation1",
-                "contributor_street_1": "test_streetOne1",
-                "contributor_street_2": "test_streetTwo1",
-                "contributor_city": "test_city1",
-                "contributor_state": "AZ",
-                "contributor_zip": "12345",
-                "contribution_aggregate": "0.00",
-                "contribution_amount": "12.00",
-                "contribution_date": "2022-10-07",
-                "entity_type": "IND",
-                "filer_committee_id_number": "C00601211",
-                "form_type": "SA17",
-                "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-                "transaction_id": "C8758663365855FEAC76",
-                "transaction_type_identifier": "OTHER_RECEIPT",
-            }
-        }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        data = copy.deepcopy(self.test_data)
+        data["transaction"]["contact_id"] = "a5061946-93ef-47f4-82f6-f1782c333d70"
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_new_scha_transaction_create_cmtee_contact(self):
@@ -306,7 +221,7 @@ class SchATransactionsViewTest(TestCase):
                 "transaction_type_identifier": "OTHER_RECEIPT",
             }
         }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_new_scha_transaction_create_org_contact(self):
@@ -343,5 +258,5 @@ class SchATransactionsViewTest(TestCase):
                 "transaction_type_identifier": "OTHER_RECEIPT",
             }
         }
-        response = client.post("/api/v1/sch-a-transactions/", data, format="json")
+        response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)

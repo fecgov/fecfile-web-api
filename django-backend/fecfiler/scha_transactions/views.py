@@ -102,16 +102,16 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         if contact and transaction:
             if ((contact.type == Contact.ContactType.INDIVIDUAL)
                     and (transaction["entity_type"] == "IND")):
-                changes = changes and self.update_ind_contact_for_transaction(
-                    contact, transaction)
+                if self.update_ind_contact_for_transaction(contact, transaction):
+                    changes = True
             elif ((contact.type == Contact.ContactType.COMMITTEE)
                   and (transaction["entity_type"] == "COM")):
-                changes = changes and self.update_com_contact_for_transaction(
-                    contact, transaction)
+                if self.update_com_contact_for_transaction(contact, transaction):
+                    changes = True
             elif ((contact.type == Contact.ContactType.ORGANIZATION)
                   and (transaction["entity_type"] == "ORG")):
-                changes = changes and self.update_org_contact_for_transaction(
-                    contact, transaction)
+                if self.update_org_contact_for_transaction(contact, transaction):
+                    changes = True
             contributor_street_1 = transaction.get("contributor_street_1")
             if (contact.street_1 != contributor_street_1):
                 contact.street_1 = contributor_street_1
