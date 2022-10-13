@@ -20,7 +20,7 @@ class SchATransactionSerializer(
 
     report_id = UUIDField(required=True, allow_null=False)
 
-    contact_id = UUIDField(required=False)
+    contact_id = UUIDField(required=False, allow_null=False)
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)

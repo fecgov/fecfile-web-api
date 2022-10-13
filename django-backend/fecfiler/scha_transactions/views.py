@@ -82,11 +82,8 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             contact = Contact.objects.get(id=contact_id)
         self.update_contact_for_transaction(contact, scha_tran)
         scha_tran_serializer.validated_data["contact_id"] = contact.id
-        if scha_tran.id:
-            scha_tran_serializer.update(
-                self.get_object(), scha_tran_serializer.validated_data)
-            return Response(scha_tran_serializer.data)
         scha_tran_serializer.save()
+
         headers = self.get_success_headers(scha_tran_serializer.data)
         return Response(
             scha_tran_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
