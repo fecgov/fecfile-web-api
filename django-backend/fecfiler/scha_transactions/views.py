@@ -57,88 +57,144 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
     def create(self, request, *args, **kwargs):
         with transaction.atomic():
-            return self.create_or_update_contact(request, args, kwargs)
+            response = self.create_or_update_contact(request)
+            if response:
+                return response
+            return super().create(request, args, kwargs)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
-            return self.create_or_update_contact(request, args, kwargs)
+            response = self.create_or_update_contact(request)
+            if response:
+                return response
+            return super().update(request, args, kwargs)
 
-    def create_or_update_contact(self, request, *args, **kwargs):
-        scha_tran_serializer = SchATransactionSerializer(
-            data=request.data["transaction"], context={"request": request}
-        )
-        if not scha_tran_serializer.is_valid():
+    def create_or_update_contact(self, request):
+        request_transaction = request.data.get("transaction")
+        if not request_transaction:
             return Response(
-                scha_tran_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                "No transaction provided", status=status.HTTP_400_BAD_REQUEST
             )
-        scha_tran = SchATransaction(**scha_tran_serializer.validated_data)
-        tran_contact = scha_tran.contact
-        contact_id = None
-        if tran_contact:
-            contact_id = tran_contact.id
-        if not contact_id:
+        request_contact = request.data.get("contact")
+        request_transaction_contact_id = request_transaction.get("contact_id")
+        if not request_transaction_contact_id:
+            if not request_contact:
+                return Response(
+                    "No contact provided with no transaction contact id",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             contact_serializer = ContactSerializer(
-                data=request.data["contact"], context={"request": request}
+                data=request_contact, context={"request": request}
             )
             if not contact_serializer.is_valid():
                 return Response(
                     contact_serializer.errors, status=status.HTTP_400_BAD_REQUEST
                 )
             contact = Contact(**contact_serializer.validated_data)
-        else:
-            contact = Contact.objects.get(id=contact_id)
-        self.update_contact_for_transaction(contact, scha_tran)
-        scha_tran_serializer.validated_data["contact_id"] = contact.id
-        if scha_tran.id:
-            scha_tran_serializer.update(
-                self.get_object(), scha_tran_serializer.validated_data
-            )
-            return Response(scha_tran_serializer.data)
-        scha_tran_serializer.save()
-        headers = self.get_success_headers(scha_tran_serializer.data)
-        return Response(
-            scha_tran_serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
-
-    def update_contact_for_transaction(
-        self, contact: Contact, scha_tran: SchATransaction
-    ):
-        if contact and scha_tran:
-            if (contact.type == Contact.ContactType.INDIVIDUAL) and (
-                scha_tran.entity_type == "IND"
-            ):
-                if contact.last_name != scha_tran.contributor_last_name:
-                    contact.last_name = scha_tran.contributor_last_name
-                if contact.first_name != scha_tran.contributor_first_name:
-                    contact.first_name = scha_tran.contributor_first_name
-                if contact.middle_name != scha_tran.contributor_middle_name:
-                    contact.middle_name = scha_tran.contributor_middle_name
-                if contact.prefix != scha_tran.contributor_prefix:
-                    contact.prefix = scha_tran.contributor_prefix
-                if contact.suffix != scha_tran.contributor_suffix:
-                    contact.suffix = scha_tran.contributor_suffix
-                if contact.employer != scha_tran.contributor_employer:
-                    contact.employer = scha_tran.contributor_employer
-                if contact.occupation != scha_tran.contributor_occupation:
-                    contact.occupation = scha_tran.contributor_occupation
-            elif (contact.type == Contact.ContactType.COMMITTEE) and (
-                scha_tran.entity_type == "COM"
-            ):
-                if contact.committee_id != scha_tran.donor_committee_fec_id:
-                    contact.committee_id = scha_tran.donor_committee_fec_id
-                if contact.name != scha_tran.contributor_organization_name:
-                    contact.name = scha_tran.contributor_organization_name
-            elif (contact.type == Contact.ContactType.ORGANIZATION) and (
-                scha_tran.entity_type == "ORG"
-            ):
-                if contact.name != scha_tran.contributor_organization_name:
-                    contact.name = scha_tran.contributor_organization_name
-            if contact.street_1 != scha_tran.contributor_street_1:
-                contact.street_1 = scha_tran.contributor_street_1
-            if contact.street_2 != scha_tran.contributor_street_2:
-                contact.street_2 = scha_tran.contributor_street_2
-            if contact.city != scha_tran.contributor_city:
-                contact.city = scha_tran.contributor_city
-            if contact.zip != scha_tran.contributor_zip:
-                contact.zip = scha_tran.contributor_zip
             contact.save()
+            request_transaction["contact_id"] = contact.id
+        else:
+            contact = Contact.objects.get(id=request_transaction_contact_id)
+            changes = self.update_contact_for_transaction(contact, request_transaction)
+            if changes:
+                contact.save()
+        request.data.clear()
+        request.data.update(request_transaction)
+
+    def update_contact_for_transaction(self, contact: Contact, transaction: dict):
+        changes = False
+        if contact and transaction:
+            if (contact.type == Contact.ContactType.INDIVIDUAL) and (
+                transaction["entity_type"] == "IND"
+            ):
+                changes = changes and self.update_ind_contact_for_transaction(
+                    contact, transaction
+                )
+            elif (contact.type == Contact.ContactType.COMMITTEE) and (
+                transaction["entity_type"] == "COM"
+            ):
+                changes = changes and self.update_com_contact_for_transaction(
+                    contact, transaction
+                )
+            elif (contact.type == Contact.ContactType.ORGANIZATION) and (
+                transaction["entity_type"] == "ORG"
+            ):
+                changes = changes and self.update_org_contact_for_transaction(
+                    contact, transaction
+                )
+            contributor_street_1 = transaction.get("contributor_street_1")
+            if contact.street_1 != contributor_street_1:
+                contact.street_1 = contributor_street_1
+                changes = True
+            contributor_street_2 = transaction.get("contributor_street_2")
+            if contact.street_2 != contributor_street_2:
+                contact.street_2 = contributor_street_2
+                changes = True
+            contributor_city = transaction.get("contributor_city")
+            if contact.city != contributor_city:
+                contact.city = contributor_city
+                changes = True
+            contributor_zip = transaction.get("contributor_zip")
+            if contact.zip != contributor_zip:
+                contact.zip = contributor_zip
+                changes = True
+        return changes
+
+    def update_ind_contact_for_transaction(self, contact: Contact, transaction: dict):
+        changes = False
+        if contact and transaction:
+            contributor_last_name = transaction.get("contributor_last_name")
+            if contact.last_name != contributor_last_name:
+                contact.last_name = contributor_last_name
+                changes = True
+            contributor_first_name = transaction.get("contributor_first_name")
+            if contact.first_name != contributor_first_name:
+                contact.first_name = contributor_first_name
+                changes = True
+            contributor_middle_name = transaction.get("contributor_middle_name")
+            if contact.middle_name != contributor_middle_name:
+                contact.middle_name = contributor_middle_name
+                changes = True
+            contributor_prefix = transaction.get("contributor_prefix")
+            if contact.prefix != contributor_prefix:
+                contact.prefix = contributor_prefix
+                changes = True
+            contributor_suffix = transaction.get("contributor_suffix")
+            if contact.suffix != contributor_suffix:
+                contact.suffix = contributor_suffix
+                changes = True
+            contributor_employer = transaction.get("contributor_employer")
+            if contact.employer != contributor_employer:
+                contact.employer = contributor_employer
+                changes = True
+            contributor_occupation = transaction.get("contributor_occupation")
+            if contact.occupation != contributor_occupation:
+                contact.occupation = contributor_occupation
+                changes = True
+        return changes
+
+    def update_com_contact_for_transaction(self, contact: Contact, transaction: dict):
+        changes = False
+        if contact and transaction:
+            donor_committee_fec_id = transaction.get("donor_committee_fec_id")
+            if contact.committee_id != donor_committee_fec_id:
+                contact.committee_id = donor_committee_fec_id
+                changes = True
+            contributor_organization_name = transaction.get(
+                "contributor_organization_name"
+            )
+            if contact.name != contributor_organization_name:
+                contact.name = contributor_organization_name
+                changes = True
+        return changes
+
+    def update_org_contact_for_transaction(self, contact: Contact, transaction: dict):
+        changes = False
+        if contact and transaction:
+            contributor_organization_name = transaction.get(
+                "contributor_organization_name"
+            )
+            if contact.name != contributor_organization_name:
+                contact.name = contributor_organization_name
+                changes = True
+        return changes
