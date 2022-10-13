@@ -57,6 +57,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
     @action(detail=False, methods=["get"])
     def previous(self, request):
+        transaction_id = request.query_params.get("transaction_id", None)
         contact_id = request.query_params.get("contact_id", None)
         contribution_date = request.query_params.get("contribution_date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
@@ -71,6 +72,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         previous_transaction = (
             self.get_queryset()
             .filter(
+                ~Q(id=transaction_id),
                 Q(contact_id=contact_id),
                 Q(contribution_date__year=contribution_date.year),
                 Q(contribution_date__lte=contribution_date),
