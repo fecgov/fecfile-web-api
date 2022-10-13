@@ -59,6 +59,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def previous(self, request):
         contact_id = request.query_params.get("contact_id", None)
         contribution_date = request.query_params.get("contribution_date", None)
+        aggregation_group = request.query_params.get("aggregation_group", None)
         if not (contact_id and contribution_date):
             return Response(
                 "Please provide contact_id and contribution_date in query params.",
@@ -73,12 +74,11 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 Q(contact_id=contact_id),
                 Q(contribution_date__year=contribution_date.year),
                 Q(contribution_date__lte=contribution_date),
+                Q(aggregation_group=aggregation_group),
             )
             .order_by("-created")
             .first()
         )
-
-        logger.error(f"AHOY: {previous_transaction}")
 
         serializer = self.get_serializer(previous_transaction)
         return Response(data=serializer.data)
