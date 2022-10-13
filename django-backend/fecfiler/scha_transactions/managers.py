@@ -14,14 +14,10 @@ class SchATransactionManager(SoftDeleteManager):
             contribution_date=OuterRef("contribution_date"),
             created__lte=OuterRef("created"),
         )
+        group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
 
         aggregate_clause = (
-            queryset.filter(
-                contact_clause,
-                year_clause,
-                date_clause
-                # aggregation_group=OuterRef("aggregation_group")
-            )
+            queryset.filter(contact_clause, year_clause, date_clause, group_clause)
             .values("committee_account_id")
             .annotate(aggregate=Sum("contribution_amount"))
             .values("aggregate")
