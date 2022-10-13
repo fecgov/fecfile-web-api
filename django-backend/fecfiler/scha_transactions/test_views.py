@@ -227,7 +227,7 @@ class SchATransactionsViewTest(TestCase):
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "transaction_id": "C8758663365855FEAC76",
                 "transaction_type_identifier": "OTHER_RECEIPT",
-                "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+                "contact_id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
             }
         }
         response = client.post(self.test_endpoint, data, format="json")
@@ -265,7 +265,7 @@ class SchATransactionsViewTest(TestCase):
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "transaction_id": "C8758663365855FEAC76",
                 "transaction_type_identifier": "OTHER_RECEIPT",
-                "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+                "contact_id": "5720a518-6486-4062-944f-aa0c4cbe4073",
             }
         }
         response = client.post(self.test_endpoint, data, format="json")
