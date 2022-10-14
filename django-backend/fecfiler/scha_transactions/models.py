@@ -1,4 +1,5 @@
 from django.db import models
+from .managers import SchATransactionManager
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
@@ -10,6 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+    """Manager Definition"""
+
+    objects = SchATransactionManager()
     """Generated model from json schema"""
 
     id = models.UUIDField(
@@ -48,9 +52,6 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     contribution_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    contribution_aggregate = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
     aggregation_group = models.TextField(null=True, blank=True)
     contribution_purpose_descrip = models.TextField(null=True, blank=True)
     contributor_employer = models.TextField(null=True, blank=True)
@@ -83,13 +84,20 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    contact = models.ForeignKey(
-        "contacts.Contact", on_delete=models.CASCADE, null=True
-    )
+    contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = "scha_transactions"
         indexes = [models.Index(fields=["transaction_id"])]
+
+    @staticmethod
+    def get_virtual_field(field_name):
+        virtual_fields = {
+            "contribution_aggregate": models.DecimalField(
+                max_digits=11, decimal_places=2
+            )
+        }
+        return virtual_fields[field_name]
 
     # This is intended to be useable without instantiating a transaction object
     @staticmethod
