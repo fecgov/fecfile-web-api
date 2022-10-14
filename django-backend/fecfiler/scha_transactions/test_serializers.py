@@ -23,7 +23,6 @@ class SchATransactionTestCase(TestCase):
             "contributor_street_1": "1 Homer Spit Road",
             "contribution_date": "2009-01-01",
             "contribution_amount": 1234,
-            "contribution_aggregate": 1234,
             "aggregation_group": "GENERAL",
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
