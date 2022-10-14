@@ -1,7 +1,7 @@
 from .models import SchATransaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import CharField, UUIDField, DecimalField
+from rest_framework.serializers import CharField, UUIDField, DecimalField, BooleanField
 from rest_framework.exceptions import ValidationError
 import logging
 
@@ -23,6 +23,8 @@ class SchATransactionSerializer(
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
+
+    itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
@@ -54,6 +56,7 @@ class SchATransactionSerializer(
             "report_id",
             "contact_id",
             "contribution_aggregate",
+            "itemized",
         ]
 
         read_only_fields = [

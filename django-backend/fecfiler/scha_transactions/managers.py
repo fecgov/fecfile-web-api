@@ -1,5 +1,6 @@
+from decimal import Decimal
 from fecfiler.soft_delete.managers import SoftDeleteManager
-from django.db.models import OuterRef, Subquery, Sum, Q
+from django.db.models import OuterRef, Subquery, Sum, Q, Case, When, Value, BooleanField
 
 """Manager to calculate contribution_aggregate just-in-time"""
 
@@ -25,5 +26,18 @@ class SchATransactionManager(SoftDeleteManager):
         return (
             super()
             .get_queryset()
-            .annotate(contribution_aggregate=Subquery(aggregate_clause))
+            .annotate(
+                contribution_aggregate=Subquery(aggregate_clause),
+                itemized=self.get_itemization_clause(),
+            )
+        )
+
+    def get_itemization_clause(self):
+        return Case(
+            When(
+                aggregation_group__in=["GENERAL", "LINE_15", "OTHER_RECIEPTS"],
+                then=Q(contribution_aggregate__gt=Value(Decimal(200))),
+            ),
+            default=Value(True),
+            output_field=BooleanField(),
         )
