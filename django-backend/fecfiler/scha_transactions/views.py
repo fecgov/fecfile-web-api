@@ -72,7 +72,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         previous_transaction = (
             self.get_queryset()
             .filter(
-                ~Q(id=transaction_id),
+                ~Q(id=transaction_id or None),
                 Q(contact_id=contact_id),
                 Q(contribution_date__year=contribution_date.year),
                 Q(contribution_date__lte=contribution_date),
