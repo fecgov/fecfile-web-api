@@ -30,7 +30,7 @@ def compose_f3x_summary(report_id, upload_submission_record_id):
 
 
 def compose_transactions(report_id):
-    transactions = SchATransaction.objects.filter(report_id=report_id)
+    transactions = SchATransaction.objects.filter(report_id=report_id, itemized=True)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
