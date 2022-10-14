@@ -4,28 +4,6 @@ from django.db import migrations
 from django.db.models import Value, Case, When, F, TextField
 
 
-# Machine-generated dict right here.  Not sure it'd be worth it to break it up
-non_contribution = "NON_CONTRIBUTION_ACCOUNT"
-design_tbd = "DESIGN_TBD"
-tid_to_aggregation_groups = {
-    "PARTNERSHIP_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_INDIVIDUAL_JF_TRANSFER_MEMO": " DESIGN_TBD",
-    "OFFSET_TO_OPERATING_EXPENDITURES": "LINE_15",
-    "REFUND_TO_REGISTERED_COMMITTEE": "LINE_16",
-    "REFUND_TO_UNREGISTERED_COMMITTEE": "LINE_16",
-    "PARTNERSHIP_CONVENTION_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_INDIVIDUAL_CONVENTION_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_HEADQUARTERS_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_INDIVIDUAL_HEADQUARTERS_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_RECOUNT_JF_TRANSFER_MEMO": design_tbd,
-    "PARTNERSHIP_INDIVIDUAL_RECOUNT_JF_TRANSFER_MEMO": design_tbd,
-    "INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT": non_contribution,
-    "OTHER_COMMITTEE_NON_CONTRIBUTION_ACCOUNT": non_contribution,
-    "BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT": non_contribution,
-    "OTHER_RECEIPT": "OTHER_RECIEPTS",
-}
-
-
 def populate_aggregation_group_fields(apps, _):
     sch_a_transaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
 
