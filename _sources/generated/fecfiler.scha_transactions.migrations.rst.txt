@@ -58,4 +58,5 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0025_update_transaction_identifiers
    fecfiler.scha_transactions.migrations.0026_auto_20221007_1427
    fecfiler.scha_transactions.migrations.0027_scha_transaction_aggregation_group
+   fecfiler.scha_transactions.migrations.0028_remove_schatransaction_contribution_aggregate
 

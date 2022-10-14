@@ -156,8 +156,8 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
-<td><p>Overrides Django Rest Framework's Serializer validate to validate with fecfile_validate rules.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(attrs)</p></td>
+<td><p>Adds stub contribution_aggregate to pass validation</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
 <td><p>Validate empty values, and either:</p></td>
@@ -522,14 +522,8 @@ CommitteeAccount as the owner of the object</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overrides Django Rest Framework’s Serializer validate to validate with
-fecfile_validate rules.</p>
-<dl class="simple">
-<dt>We need to translate the list of fecfile validation errors to a dictionary</dt><dd><p>of <code class="docutils literal notranslate"><span class="pre">`path`</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">`message`</span></code> to comply with DJR’s validation error
-pattern</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.serializers.SchATransactionSerializer.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds stub contribution_aggregate to pass validation</p>
 </dd></dl>
 
 <dl class="py method">
@@ -579,6 +573,7 @@ have validation applied as normal.</p></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.apps.html">fecfiler.scha_transactions.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.managers.html">fecfiler.scha_transactions.managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.migrations.html">fecfiler.scha_transactions.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.models.html">fecfiler.scha_transactions.models</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.scha_transactions.serializers.html">fecfiler.scha_transactions.serializers</a><ul class="current">
@@ -586,6 +581,7 @@ have validation applied as normal.</p></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.signals.html">fecfiler.scha_transactions.signals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.test_managers.html">fecfiler.scha_transactions.test_managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.test_models.html">fecfiler.scha_transactions.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.test_serializers.html">fecfiler.scha_transactions.test_serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.scha_transactions.test_views.html">fecfiler.scha_transactions.test_views</a></li>

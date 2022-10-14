@@ -35,6 +35,7 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.get_next_by_updated
       ~SchATransaction.get_previous_by_created
       ~SchATransaction.get_previous_by_updated
+      ~SchATransaction.get_virtual_field
       ~SchATransaction.hard_delete
       ~SchATransaction.prepare_database_save
       ~SchATransaction.refresh_from_db
@@ -67,7 +68,6 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.conduit_zip
       ~SchATransaction.contact
       ~SchATransaction.contact_id
-      ~SchATransaction.contribution_aggregate
       ~SchATransaction.contribution_amount
       ~SchATransaction.contribution_date
       ~SchATransaction.contribution_purpose_descrip

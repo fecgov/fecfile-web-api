@@ -67,6 +67,7 @@ fecfiler.scha\_transactions.views.SchATransactionViewSet
       ~SchATransactionViewSet.perform_destroy
       ~SchATransactionViewSet.perform_update
       ~SchATransactionViewSet.permission_denied
+      ~SchATransactionViewSet.previous
       ~SchATransactionViewSet.raise_uncaught_exception
       ~SchATransactionViewSet.retrieve
       ~SchATransactionViewSet.reverse_action
