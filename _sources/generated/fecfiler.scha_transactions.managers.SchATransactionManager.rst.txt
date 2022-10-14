@@ -47,6 +47,7 @@ fecfiler.scha\_transactions.managers.SchATransactionManager
       ~SchATransactionManager.first
       ~SchATransactionManager.from_queryset
       ~SchATransactionManager.get
+      ~SchATransactionManager.get_itemization_clause
       ~SchATransactionManager.get_or_create
       ~SchATransactionManager.get_queryset
       ~SchATransactionManager.hard_delete
