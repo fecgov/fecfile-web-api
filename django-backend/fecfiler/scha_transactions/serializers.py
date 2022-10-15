@@ -6,8 +6,12 @@ from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import (BooleanField, DecimalField,
-                                        ListSerializer, UUIDField)
+from rest_framework.serializers import (
+    BooleanField,
+    DecimalField,
+    ListSerializer,
+    UUIDField,
+)
 
 from .models import SchATransaction
 
@@ -23,11 +27,7 @@ class SchATransactionSerializer(
 
     contact_id = UUIDField(required=False, allow_null=False)
 
-    contact = ContactSerializer(
-        write_only=True,
-        allow_null=True,
-        required=False
-    )
+    contact = ContactSerializer(write_only=True, allow_null=True, required=False)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -124,11 +124,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         if not tran_contact_id:
             if not contact_data:
                 raise ValidationError(
-                    {
-                        "contact_id": [
-                            "No transaction contact or contact id provided"
-                        ]
-                    }
+                    {"contact_id": ["No transaction contact or contact id provided"]}
                 )
             contact: Contact = Contact.objects.create(**contact_data)
             validated_data["contact_id"] = contact.id
@@ -227,6 +223,10 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         contributor_city = transaction.get("contributor_city")
         if contact.city != contributor_city:
             contact.city = contributor_city
+            changes = True
+        contributor_state = transaction.get("contributor_state")
+        if contact.state != contributor_state:
+            contact.state = contributor_state
             changes = True
         contributor_zip = transaction.get("contributor_zip")
         if contact.zip != contributor_zip:
