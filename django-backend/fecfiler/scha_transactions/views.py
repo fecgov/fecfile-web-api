@@ -1,16 +1,17 @@
+import logging
+
+from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
 from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
+
 from .models import SchATransaction
-from .serializers import SchATransactionSerializer
+from .serializers import SchATransactionParentSerializer
 from django.db.models import TextField, Value, Q
-from django.db.models.functions import Concat, Coalesce
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +41,8 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         .all()
     )
-    """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
-    serializer_class = SchATransactionSerializer
+    serializer_class = SchATransactionParentSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [

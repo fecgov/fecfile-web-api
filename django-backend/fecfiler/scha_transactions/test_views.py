@@ -1,7 +1,11 @@
-from django.test import TestCase, RequestFactory
+import copy
+
+from django.test import RequestFactory, TestCase
+from rest_framework.test import APIClient
+
+from ..authentication.models import Account
 from .models import SchATransaction
 from .views import SchATransactionViewSet
-from ..authentication.models import Account
 
 
 class SchATransactionsViewTest(TestCase):
@@ -12,6 +16,51 @@ class SchATransactionsViewTest(TestCase):
         "test_scha_transactions",
         "test_accounts",
     ]
+
+    test_endpoint = "/api/v1/sch-a-transactions/"
+    test_phone = "+1 1234567890"
+    test_data = {
+        "contact": {
+            "type": "IND",
+            "last_name": "test_ln1",
+            "first_name": "test_ln1",
+            "middle_name": "test_mn1",
+            "prefix": "test_px1",
+            "suffix": "test_sx1",
+            "employer": "test_employer1",
+            "occupation": "test_occupation1",
+            "street_1": "test_streetOne1",
+            "street_2": "test_streetTwo1",
+            "city": "test_city1",
+            "state": "AZ",
+            "zip": "12345",
+            "country": "USA",
+            "telephone": test_phone,
+        },
+        "contributor_last_name": "test_ln1",
+        "contributor_first_name": "test_fn1",
+        "contributor_middle_name": "test_mn1",
+        "contributor_prefix": "test_px1",
+        "contributor_suffix": "test_sx1",
+        "contributor_employer": "test_employer1",
+        "contributor_occupation": "test_occupation1",
+        "contributor_street_1": "test_streetOne1",
+        "contributor_street_2": "test_streetTwo1",
+        "contributor_city": "test_city1",
+        "contributor_state": "AZ",
+        "contributor_zip": "12345",
+        "contribution_aggregate": "0.00",
+        "contribution_amount": "12.00",
+        "aggregation_group": "OTHER_RECEIPTS",
+        "contribution_date": "2022-10-07",
+        "entity_type": "IND",
+        "filer_committee_id_number": "C00601211",
+        "form_type": "SA17",
+        "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+        "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+        "transaction_id": "C8758663365855FEAC76",
+        "transaction_type_identifier": "OTHER_RECEIPT",
+    }
 
     def setUp(self):
         self.f3x_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
@@ -62,3 +111,157 @@ class SchATransactionsViewTest(TestCase):
             responses.append(response.data)
 
         self.assertNotEqual(responses[0]["count"], responses[1]["count"])
+
+    def test_create_new_scha_transaction_create_ind_contact_no_transaction(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contact": {
+                "type": "IND",
+                "last_name": "test_ln1",
+                "first_name": "test_ln1",
+                "middle_name": "test_mn1",
+                "prefix": "test_px1",
+                "suffix": "test_sx1",
+                "employer": "test_employer1",
+                "occupation": "test_occupation1",
+                "street_1": "test_streetOne1",
+                "street_2": "test_streetTwo1",
+                "city": "test_city1",
+                "state": "AZ",
+                "zip": "12345",
+                "country": "USA",
+                "telephone": self.test_phone,
+            }
+        }
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_new_scha_transaction_create_ind_contact_no_contact_id(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contributor_last_name": "test_ln1",
+            "contributor_first_name": "test_fn1",
+            "contributor_middle_name": "test_mn1",
+            "contributor_prefix": "test_px1",
+            "contributor_suffix": "test_sx1",
+            "contributor_employer": "test_employer1",
+            "contributor_occupation": "test_occupation1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "12345",
+            "contribution_aggregate": "0.00",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "IND",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTHER_RECEIPT",
+        }
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_new_scha_transaction_create_ind_contact_invalid_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = copy.deepcopy(self.test_data)
+        del data["contact"]["last_name"]
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_new_scha_transaction_create_ind_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = copy.deepcopy(self.test_data)
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_update_ind_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = copy.deepcopy(self.test_data)
+        data["contact_id"] = "a5061946-93ef-47f4-82f6-f1782c333d70"
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_create_cmtee_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contact": {
+                "type": "COM",
+                "name": "test_orgname1",
+                "committee_id": "C12345678",
+                "street_1": "test_streetOne1",
+                "street_2": "test_streetTwo1",
+                "city": "test_city1",
+                "state": "AZ",
+                "zip": "12345",
+                "country": "USA",
+                "telephone": self.test_phone,
+            },
+            "donor_committee_fec_id": "C12345678",
+            "contributor_organization_name": "test_orgname1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "aggregation_group": "OTHER_RECEIPTS",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "COM",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTHER_RECEIPT",
+            "contact_id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
+        }
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_create_new_scha_transaction_create_org_contact(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        data = {
+            "contact": {
+                "type": "ORG",
+                "name": "test_orgname1",
+                "street_1": "test_streetOne1",
+                "street_2": "test_streetTwo1",
+                "city": "test_city1",
+                "state": "AZ",
+                "zip": "12345",
+                "country": "USA",
+                "telephone": self.test_phone,
+            },
+            "contributor_organization_name": "test_orgname1",
+            "contributor_street_1": "test_streetOne1",
+            "contributor_street_2": "test_streetTwo1",
+            "contributor_city": "test_city1",
+            "contributor_state": "AZ",
+            "contributor_zip": "test_zip1",
+            "contribution_aggregate": "0.00",
+            "aggregation_group": "OTHER_RECEIPTS",
+            "contribution_amount": "12.00",
+            "contribution_date": "2022-10-07",
+            "entity_type": "ORG",
+            "filer_committee_id_number": "C00601211",
+            "form_type": "SA17",
+            "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id": "C8758663365855FEAC76",
+            "transaction_type_identifier": "OTHER_RECEIPT",
+            "contact_id": "5720a518-6486-4062-944f-aa0c4cbe4073",
+        }
+        response = client.post(self.test_endpoint, data, format="json")
+        self.assertEqual(response.status_code, 201)
