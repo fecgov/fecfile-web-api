@@ -6,12 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("scha_transactions", "0027_scha_transaction_aggregation_group"),
+        ("scha_transactions", "0028_alter_schatransaction_transaction_id"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name="schatransaction",
-            name="contribution_aggregate",
+            model_name="schatransaction", name="contribution_aggregate",
         ),
     ]

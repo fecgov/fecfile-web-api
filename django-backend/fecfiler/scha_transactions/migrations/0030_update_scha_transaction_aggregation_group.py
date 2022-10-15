@@ -35,7 +35,7 @@ def noop(_apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("scha_transactions", "0028_remove_schatransaction_contribution_aggregate"),
+        ("scha_transactions", "0029_remove_schatransaction_contribution_aggregate"),
     ]
 
     operations = [
