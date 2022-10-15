@@ -110,6 +110,13 @@ fecfiler.scha\_transactions.test\_views.SchATransactionsViewTest
       ~SchATransactionsViewTest.subTest
       ~SchATransactionsViewTest.tearDown
       ~SchATransactionsViewTest.tearDownClass
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_cmtee_contact
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_ind_contact
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_ind_contact_invalid_contact
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_ind_contact_no_contact_id
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_ind_contact_no_transaction
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_create_org_contact
+      ~SchATransactionsViewTest.test_create_new_scha_transaction_update_ind_contact
       ~SchATransactionsViewTest.test_is_paginated
       ~SchATransactionsViewTest.test_only_from_one_report
       ~SchATransactionsViewTest.test_view_url_exists_at_desired_location
@@ -129,5 +136,8 @@ fecfiler.scha\_transactions.test\_views.SchATransactionsViewTest
       ~SchATransactionsViewTest.maxDiff
       ~SchATransactionsViewTest.reset_sequences
       ~SchATransactionsViewTest.serialized_rollback
+      ~SchATransactionsViewTest.test_data
+      ~SchATransactionsViewTest.test_endpoint
+      ~SchATransactionsViewTest.test_phone
    
    

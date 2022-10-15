@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
     
-fecfiler.scha\_transactions.serializers
-=======================================
+fecfiler.scha\_transactions.migrations.0029\_remove\_schatransaction\_contribution\_aggregate
+=============================================================================================
 
-.. automodule:: fecfiler.scha_transactions.serializers
+.. automodule:: fecfiler.scha_transactions.migrations.0029_remove_schatransaction_contribution_aggregate
   
    
    
@@ -22,8 +22,7 @@ fecfiler.scha\_transactions.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      SchATransactionParentSerializer
-      SchATransactionSerializer
+      Migration
    
    
 

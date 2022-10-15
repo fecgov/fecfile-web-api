@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.scha\_transactions.migrations.0028\_remove\_schatransaction\_contribution\_aggregate.Migration
-=======================================================================================================
+fecfiler.scha\_transactions.migrations.0030\_update\_scha\_transaction\_aggregation\_group.Migration
+====================================================================================================
 
-.. currentmodule:: fecfiler.scha_transactions.migrations.0028_remove_schatransaction_contribution_aggregate
+.. currentmodule:: fecfiler.scha_transactions.migrations.0030_update_scha_transaction_aggregation_group
 
 .. autoclass:: Migration
    :members:                                    
