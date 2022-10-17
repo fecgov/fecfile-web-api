@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class SchATransactionSerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
+    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
 ):
     parent_transaction_id = UUIDField(required=False, allow_null=True)
 
@@ -66,6 +66,7 @@ class SchATransactionSerializer(
             "contact_id",
             "contribution_aggregate",
             "itemized",
+            "fields_to_validate",
         ]
 
         read_only_fields = [
@@ -246,4 +247,5 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "children",
             "contribution_aggregate",
             "itemized",
+            "fields_to_validate",
         ]

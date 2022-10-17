@@ -25,7 +25,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     schema_name = None
 
-    fields_to_validate = ListField(child=CharField(), write_only=True)
+    fields_to_validate = ListField(child=CharField(), write_only=True, default=[])
 
     def get_schema_name(self, data):
         """Gets the schema name to retrieve the correct schema from fecfile_validate
@@ -82,6 +82,14 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         meta = getattr(self, "Meta", None)
         foreign_key_fields = getattr(meta, "foreign_key_fields", None)
         return dict(foreign_key_fields) if foreign_key_fields else {}
+
+    def create(self, validated_data):
+        validated_data.pop("fields_to_validate", None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data.pop("fields_to_validate", None)
+        return super().update(instance, validated_data)
 
     def validate(self, data):
         """Overrides Django Rest Framework's Serializer validate to validate with
