@@ -239,4 +239,12 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             f.name
             for f in SchATransaction._meta.get_fields()
             if f.name not in ["deleted", "schatransaction"]
-        ] + ["parent_transaction_id", "report_id", "contact_id", "children"]
+        ] + [
+            "parent_transaction_id",
+            "report_id",
+            "contact_id",
+            "children",
+            "contribution_aggregate",
+            "itemized",
+        ]
+

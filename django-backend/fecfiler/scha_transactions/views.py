@@ -78,7 +78,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 Q(contribution_date__lte=contribution_date),
                 Q(aggregation_group=aggregation_group),
             )
-            .order_by("-created")
+            .order_by("-contribution_date", "-created")
             .first()
         )
 
