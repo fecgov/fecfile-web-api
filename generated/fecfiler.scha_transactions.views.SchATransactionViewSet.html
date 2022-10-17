@@ -280,8 +280,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.queryset" title="fecfiler.scha_transactions.views.SchATransactionViewSet.queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></a></p></td>
+<td><p>all schedule a transactions with an aditional contributor_name field</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renderer_classes</span></code></p></td>
 <td><p></p></td>
@@ -600,6 +600,17 @@ will instead be performed lazily, the first time either
 <dd><p>If request is not permitted, determine what kind of exception to raise.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.views.SchATransactionViewSet.queryset">
+<span class="sig-name descname"><span class="pre">queryset</span></span><a class="headerlink" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>all schedule a transactions with an aditional contributor_name field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>QuerySet</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.views.SchATransactionViewSet.reverse_action">
 <span class="sig-name descname"><span class="pre">reverse_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.reverse_action" title="Permalink to this definition">¶</a></dt>
@@ -609,7 +620,7 @@ will instead be performed lazily, the first time either
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.views.SchATransactionViewSet.serializer_class">
 <span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#fecfiler.scha_transactions.views.SchATransactionViewSet.serializer_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="fecfiler.scha_transactions.serializers.SchATransactionParentSerializer.html#fecfiler.scha_transactions.serializers.SchATransactionParentSerializer" title="fecfiler.scha_transactions.serializers.SchATransactionParentSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.scha_transactions.serializers.SchATransactionParentSerializer</span></code></a></p>
+<dd><p>alias of <a class="reference internal" href="fecfiler.scha_transactions.serializers.SchATransactionSerializer.html#fecfiler.scha_transactions.serializers.SchATransactionSerializer" title="fecfiler.scha_transactions.serializers.SchATransactionSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.scha_transactions.serializers.SchATransactionSerializer</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">

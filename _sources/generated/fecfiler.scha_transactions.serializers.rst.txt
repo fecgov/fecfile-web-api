@@ -22,7 +22,6 @@ fecfiler.scha\_transactions.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      SchATransactionParentSerializer
       SchATransactionSerializer
    
    

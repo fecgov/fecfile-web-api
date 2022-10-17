@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0030\_update\_scha\_transaction\_aggregation\_group.populate\_aggregation\_group\_fields
-===============================================================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0030_update_scha_transaction_aggregation_group
-
-.. autofunction:: populate_aggregation_group_fields
