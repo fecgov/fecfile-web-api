@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("scha_transactions", "0027_scha_transaction_aggregation_group"),
+        ("scha_transactions", "0029_update_scha_transaction_aggregation_group"),
     ]
 
     operations = [
