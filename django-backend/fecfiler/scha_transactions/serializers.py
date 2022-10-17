@@ -247,4 +247,3 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "contribution_aggregate",
             "itemized",
         ]
-
