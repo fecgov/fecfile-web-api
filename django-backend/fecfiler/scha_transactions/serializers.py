@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class SchATransactionSerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
+    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
 ):
     parent_transaction_id = UUIDField(required=False, allow_null=True)
 
