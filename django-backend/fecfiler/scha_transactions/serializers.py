@@ -66,6 +66,7 @@ class SchATransactionSerializer(
             "contact_id",
             "contribution_aggregate",
             "itemized",
+            "fields_to_validate",
         ]
 
         read_only_fields = [
@@ -246,4 +247,5 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "children",
             "contribution_aggregate",
             "itemized",
+            "fields_to_validate",
         ]
