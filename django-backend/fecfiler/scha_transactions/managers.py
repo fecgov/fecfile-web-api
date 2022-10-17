@@ -35,7 +35,7 @@ class SchATransactionManager(SoftDeleteManager):
     def get_itemization_clause(self):
         return Case(
             When(
-                aggregation_group__in=["GENERAL", "LINE_15", "OTHER_RECIEPTS"],
+                aggregation_group__in=["GENERAL", "LINE_15", "OTHER_RECEIPTS"],
                 then=Q(contribution_aggregate__gt=Value(Decimal(200))),
             ),
             default=Value(True),
