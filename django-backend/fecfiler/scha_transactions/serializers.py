@@ -85,6 +85,8 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         required=False,
     )
 
+    parent_transaction = SchATransactionSerializer(required=False, allow_null=True)
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
@@ -253,6 +255,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             if f.name not in ["deleted", "schatransaction"]
         ] + [
             "parent_transaction_id",
+            "parent_transaction",
             "report_id",
             "contact_id",
             "children",
