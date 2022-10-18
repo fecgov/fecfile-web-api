@@ -27,7 +27,7 @@ class SchATransactionSerializer(
 
     contact_id = UUIDField(required=False, allow_null=False)
 
-    contact = ContactSerializer(write_only=True, allow_null=True, required=False)
+    contact = ContactSerializer(allow_null=True, required=False)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -80,11 +80,22 @@ class SchATransactionSerializer(
 class SchATransactionParentSerializer(SchATransactionSerializer):
     children = ListSerializer(
         child=SchATransactionSerializer(),
-        write_only=True,
         allow_null=True,
         allow_empty=True,
         required=False,
     )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        # Add child transactions to transaction.children field in JSON output
+        existing_children = SchATransaction.objects.filter(
+            parent_transaction_id=instance.id
+        ).all()
+        ret["children"] = map(
+            lambda child: SchATransactionParentSerializer(child).data, existing_children
+        )
+        return ret
 
     def create(self, validated_data: dict):
         with transaction.atomic():
