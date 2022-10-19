@@ -63,15 +63,19 @@ class ContactViewSet(CommitteeOwnedViewSet):
         )
         json_results = requests.get(url).json()
 
-        fec_api_committees = json_results.get("results", [])[:max_fec_results]
         fecfile_committees = list(
             self.get_queryset()
             .filter(
                 Q(type="COM") & (Q(committee_id__icontains=q) | Q(name__icontains=q))
             )
             .values()
-            .order_by("-committee_id")[:max_fecfile_results]
+            .order_by("-committee_id")
         )
+        fec_api_committees = json_results.get("results", [])
+        fec_api_committees = [fac for fac in fec_api_committees if not any(
+            fac["id"] == ffc["committee_id"] for ffc in fecfile_committees)]
+        fec_api_committees = fec_api_committees[:max_fec_results]
+        fecfile_committees = fecfile_committees[:max_fecfile_results]
         return_value = {
             "fec_api_committees": fec_api_committees,
             "fecfile_committees": fecfile_committees,
