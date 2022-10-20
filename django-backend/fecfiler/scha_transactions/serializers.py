@@ -92,9 +92,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         existing_children = SchATransaction.objects.filter(
             parent_transaction_id=instance.id
         ).all()
-        ret["children"] = map(
-            lambda child: SchATransactionParentSerializer(child).data, existing_children
-        )
+        ret["children"] = map(self.to_representation, existing_children)
         return ret
 
     def to_internal_value(self, data):
