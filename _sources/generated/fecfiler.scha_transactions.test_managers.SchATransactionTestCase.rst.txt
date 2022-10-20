@@ -110,6 +110,7 @@ fecfiler.scha\_transactions.test\_managers.SchATransactionTestCase
       ~SchATransactionTestCase.subTest
       ~SchATransactionTestCase.tearDown
       ~SchATransactionTestCase.tearDownClass
+      ~SchATransactionTestCase.test_aggregate_negative_offset
       ~SchATransactionTestCase.test_aggregate_one
       ~SchATransactionTestCase.test_aggregate_three
       ~SchATransactionTestCase.test_aggregate_two
