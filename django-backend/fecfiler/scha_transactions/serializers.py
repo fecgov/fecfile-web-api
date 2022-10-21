@@ -27,7 +27,7 @@ class SchATransactionSerializer(
 
     contact_id = UUIDField(required=False, allow_null=False)
 
-    contact = ContactSerializer(write_only=True, allow_null=True, required=False)
+    contact = ContactSerializer(allow_null=True, required=False)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -80,11 +80,33 @@ class SchATransactionSerializer(
 class SchATransactionParentSerializer(SchATransactionSerializer):
     children = ListSerializer(
         child=SchATransactionSerializer(),
-        write_only=True,
         allow_null=True,
         allow_empty=True,
         required=False,
     )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        # Add child transactions to transaction.children field in JSON output
+        existing_children = SchATransaction.objects.filter(
+            parent_transaction_id=instance.id
+        ).all()
+        ret["children"] = map(self.to_representation, existing_children)
+        return ret
+
+    def to_internal_value(self, data):
+        # We are not saving report or parent_transaction objects so
+        # we need to ensure their object properties are UUIDs and not objects
+        def insert_foreign_keys(transaction):
+            transaction["report"] = transaction["report_id"]
+            if "parent_transaction_id" in transaction:
+                transaction["parent_transaction"] = transaction["parent_transaction_id"]
+            return transaction
+
+        if "children" in data:
+            data["children"] = list(map(insert_foreign_keys, data["children"]))
+        return super().to_internal_value(data)
 
     def create(self, validated_data: dict):
         with transaction.atomic():
@@ -242,6 +264,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             if f.name not in ["deleted", "schatransaction"]
         ] + [
             "parent_transaction_id",
+            "parent_transaction",
             "report_id",
             "contact_id",
             "children",
@@ -249,3 +272,5 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "itemized",
             "fields_to_validate",
         ]
+
+        depth = 1
