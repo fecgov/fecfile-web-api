@@ -148,7 +148,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             contact: Contact = Contact.objects.create(**contact_data)
             validated_data["contact_id"] = contact.id
         else:
-            Contact.objects.update(**contact_data)
+            Contact.objects.filter(id=tran_contact_id).update(**contact_data)
 
     class Meta(SchATransactionSerializer.Meta):
         fields = [
