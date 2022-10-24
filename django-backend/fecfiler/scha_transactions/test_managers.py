@@ -29,4 +29,4 @@ class SchATransactionTestCase(TestCase):
     def test_aggregate_negative_offset(self):
         scha_transaction = SchATransaction.objects.get(transaction_id="5")
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("-111.11"))
-        self.assertTrue(scha_transaction.itemized)
+        self.assertFalse(scha_transaction.itemized)
