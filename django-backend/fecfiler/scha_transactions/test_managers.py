@@ -30,3 +30,18 @@ class SchATransactionTestCase(TestCase):
         scha_transaction = SchATransaction.objects.get(transaction_id="5")
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("-111.11"))
         self.assertFalse(scha_transaction.itemized)
+
+    def test_aggregate_offset_to_opex_one(self):
+        scha_transaction = SchATransaction.objects.get(transaction_id="OffsetToOpex-1")
+        self.assertEquals(scha_transaction.contribution_aggregate, Decimal("105.25"))
+        self.assertFalse(scha_transaction.itemized)
+
+    def test_aggregate_offset_to_opex_two(self):
+        scha_transaction = SchATransaction.objects.get(transaction_id="OffsetToOpex-2")
+        self.assertEquals(scha_transaction.contribution_aggregate, Decimal("316.00"))
+        self.assertTrue(scha_transaction.itemized)
+
+    def test_aggregate_offset_to_opex_other(self):
+        scha_transaction = SchATransaction.objects.get(transaction_id="OffsetToOpex-OtherYear")
+        self.assertEquals(scha_transaction.contribution_aggregate, Decimal("102.50"))
+        self.assertFalse(scha_transaction.itemized)
