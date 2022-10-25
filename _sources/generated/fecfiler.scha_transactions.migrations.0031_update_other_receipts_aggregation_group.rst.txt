@@ -1,0 +1,42 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.scha\_transactions.migrations.0031\_update\_other\_receipts\_aggregation\_group
+========================================================================================
+
+.. automodule:: fecfiler.scha_transactions.migrations.0031_update_other_receipts_aggregation_group
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      noop
+      populate_aggregation_group_fields
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

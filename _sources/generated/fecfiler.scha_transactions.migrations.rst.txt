@@ -61,4 +61,5 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0028_remove_schatransaction_contribution_aggregate
    fecfiler.scha_transactions.migrations.0029_update_scha_transaction_aggregation_group
    fecfiler.scha_transactions.migrations.0030_alter_schatransaction_transaction_id
+   fecfiler.scha_transactions.migrations.0031_update_other_receipts_aggregation_group
 

@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0031\_update\_other\_receipts\_aggregation\_group.populate\_aggregation\_group\_fields
+=============================================================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0031_update_other_receipts_aggregation_group
+
+.. autofunction:: populate_aggregation_group_fields

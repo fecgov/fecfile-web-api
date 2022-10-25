@@ -55,11 +55,6 @@ fecfiler.scha\_transactions.serializers.SchATransactionParentSerializer
       ~SchATransactionParentSerializer.to_internal_value
       ~SchATransactionParentSerializer.to_representation
       ~SchATransactionParentSerializer.update
-      ~SchATransactionParentSerializer.update_com_contact_for_transaction
-      ~SchATransactionParentSerializer.update_contact_for_transaction
-      ~SchATransactionParentSerializer.update_contact_for_transaction_shared_fields
-      ~SchATransactionParentSerializer.update_ind_contact_for_transaction
-      ~SchATransactionParentSerializer.update_org_contact_for_transaction
       ~SchATransactionParentSerializer.validate
       ~SchATransactionParentSerializer.validate_empty_values
    
