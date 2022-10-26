@@ -15,10 +15,10 @@ drf-spectacular==0.21.2
 git+https://github.com/fecgov/fecfile-validate@ebdffdc56d91a6cb93f70a5ce737a298402db1f7#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.27
 gunicorn==19.10.0
-Jinja2==2.11.3
+Jinja2==3.1.2
 invoke==1.7.0
 itypes==1.1.0
-MarkupSafe==1.1.1
+MarkupSafe==2.1.1
 openapi-codec==1.3.2
 psycopg2-binary==2.9.3
 PyJWT==1.6.4
