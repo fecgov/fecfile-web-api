@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Load test database fixure
           command: |
-            psql ${DATABASE_URL} < e2e-test-db.sql.sql
+            psql ${DATABASE_URL} < e2e-test-db.sql
           working_directory: ~/project/db
 
       - run:
