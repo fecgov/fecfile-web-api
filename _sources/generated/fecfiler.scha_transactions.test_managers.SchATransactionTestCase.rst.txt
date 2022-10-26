@@ -110,6 +110,7 @@ fecfiler.scha\_transactions.test\_managers.SchATransactionTestCase
       ~SchATransactionTestCase.subTest
       ~SchATransactionTestCase.tearDown
       ~SchATransactionTestCase.tearDownClass
+      ~SchATransactionTestCase.test_aggregate_itemize_jf_transfer
       ~SchATransactionTestCase.test_aggregate_negative_offset
       ~SchATransactionTestCase.test_aggregate_offset_to_opex_one
       ~SchATransactionTestCase.test_aggregate_offset_to_opex_other
