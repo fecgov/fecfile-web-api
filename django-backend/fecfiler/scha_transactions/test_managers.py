@@ -31,6 +31,11 @@ class SchATransactionTestCase(TestCase):
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("-111.11"))
         self.assertFalse(scha_transaction.itemized)
 
+    def test_aggregate_itemize_jf_transfer(self):
+        scha_transaction = SchATransaction.objects.get(transaction_id="6")
+        self.assertEquals(scha_transaction.contribution_aggregate, Decimal("111.11"))
+        self.assertTrue(scha_transaction.itemized)
+
     def test_aggregate_offset_to_opex_one(self):
         scha_transaction = SchATransaction.objects.get(transaction_id="OffsetToOpex-1")
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("105.25"))
