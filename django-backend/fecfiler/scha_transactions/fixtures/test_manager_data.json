@@ -179,6 +179,7 @@
         "comment": "Offset to Operating Expenditures, transaction 1",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-1",
@@ -200,6 +201,7 @@
         "comment": "Offset to Operating Expenditures, transaction 2",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-2",
@@ -221,6 +223,7 @@
         "comment": "Offset to Operating Expenditures, different year",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-OtherYear",
