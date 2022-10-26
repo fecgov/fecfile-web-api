@@ -172,14 +172,14 @@
             "updated": "2022-01-01T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
-            "contact_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
         }
     },
     {
         "comment": "Offset to Operating Expenditures, transaction 1",
         "model": "scha_transactions.schatransaction",
         "fields": {
-            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-1",
@@ -201,7 +201,7 @@
         "comment": "Offset to Operating Expenditures, transaction 2",
         "model": "scha_transactions.schatransaction",
         "fields": {
-            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-2",
@@ -223,7 +223,7 @@
         "comment": "Offset to Operating Expenditures, different year",
         "model": "scha_transactions.schatransaction",
         "fields": {
-            "transaction_type_identifier": "OFFSETS_TO_OPERATING_EXPENDITURES",
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "OffsetToOpex-OtherYear",
