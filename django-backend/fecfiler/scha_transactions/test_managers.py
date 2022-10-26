@@ -42,6 +42,8 @@ class SchATransactionTestCase(TestCase):
         self.assertTrue(scha_transaction.itemized)
 
     def test_aggregate_offset_to_opex_other(self):
-        scha_transaction = SchATransaction.objects.get(transaction_id="OffsetToOpex-OtherYear")
+        scha_transaction = SchATransaction.objects.get(
+            transaction_id="OffsetToOpex-OtherYear"
+        )
         self.assertEquals(scha_transaction.contribution_aggregate, Decimal("102.50"))
         self.assertFalse(scha_transaction.itemized)
