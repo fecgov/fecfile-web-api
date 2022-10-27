@@ -4,6 +4,7 @@ from django.db import transaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (BooleanField, DecimalField,
@@ -22,8 +23,10 @@ class SchATransactionSerializer(
     report_id = UUIDField(required=True, allow_null=False)
 
     contact_id = UUIDField(required=False, allow_null=False)
+    memo_text_id = UUIDField(required=False, allow_null=False)
 
     contact = ContactSerializer(allow_null=True, required=False)
+    memo_text = MemoTextSerializer(allow_null=True, required=False)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -60,6 +63,7 @@ class SchATransactionSerializer(
             "parent_transaction_id",
             "report_id",
             "contact_id",
+            "memo_text_id",
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
@@ -160,6 +164,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "parent_transaction",
             "report_id",
             "contact_id",
+            "memo_text_id",
             "children",
             "contribution_aggregate",
             "itemized",
