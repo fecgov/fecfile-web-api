@@ -6,12 +6,8 @@ from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import (
-    BooleanField,
-    DecimalField,
-    ListSerializer,
-    UUIDField,
-)
+from rest_framework.serializers import (BooleanField, DecimalField,
+                                        ListSerializer, UUIDField)
 
 from .models import SchATransaction
 
@@ -152,110 +148,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             contact: Contact = Contact.objects.create(**contact_data)
             validated_data["contact_id"] = contact.id
         else:
-            contact = Contact.objects.get(id=tran_contact_id)
-        changes = self.update_contact_for_transaction(contact, validated_data)
-        if changes:
-            contact.save()
-
-    def update_contact_for_transaction(self, contact: Contact, transaction: dict):
-        changes = False
-        if contact and transaction:
-            if (contact.type == Contact.ContactType.INDIVIDUAL) and (
-                transaction["entity_type"] == "IND"
-            ):
-                if self.update_ind_contact_for_transaction(contact, transaction):
-                    changes = True
-            elif (contact.type == Contact.ContactType.COMMITTEE) and (
-                transaction["entity_type"] == "COM"
-            ):
-                if self.update_com_contact_for_transaction(contact, transaction):
-                    changes = True
-            elif (contact.type == Contact.ContactType.ORGANIZATION) and (
-                transaction["entity_type"] == "ORG"
-            ):
-                if self.update_org_contact_for_transaction(contact, transaction):
-                    changes = True
-            if self.update_contact_for_transaction_shared_fields(contact, transaction):
-                changes = True
-        return changes
-
-    def update_ind_contact_for_transaction(self, contact: Contact, transaction: dict):
-        changes = False
-        contributor_last_name = transaction.get("contributor_last_name")
-        if contact.last_name != contributor_last_name:
-            contact.last_name = contributor_last_name
-            changes = True
-        contributor_first_name = transaction.get("contributor_first_name")
-        if contact.first_name != contributor_first_name:
-            contact.first_name = contributor_first_name
-            changes = True
-        contributor_middle_name = transaction.get("contributor_middle_name")
-        if contact.middle_name != contributor_middle_name:
-            contact.middle_name = contributor_middle_name
-            changes = True
-        contributor_prefix = transaction.get("contributor_prefix")
-        if contact.prefix != contributor_prefix:
-            contact.prefix = contributor_prefix
-            changes = True
-        contributor_suffix = transaction.get("contributor_suffix")
-        if contact.suffix != contributor_suffix:
-            contact.suffix = contributor_suffix
-            changes = True
-        contributor_employer = transaction.get("contributor_employer")
-        if contact.employer != contributor_employer:
-            contact.employer = contributor_employer
-            changes = True
-        contributor_occupation = transaction.get("contributor_occupation")
-        if contact.occupation != contributor_occupation:
-            contact.occupation = contributor_occupation
-            changes = True
-        return changes
-
-    def update_com_contact_for_transaction(self, contact: Contact, transaction: dict):
-        changes = False
-        donor_committee_fec_id = transaction.get("donor_committee_fec_id")
-        if contact.committee_id != donor_committee_fec_id:
-            contact.committee_id = donor_committee_fec_id
-            changes = True
-        contributor_organization_name = transaction.get("contributor_organization_name")
-        if contact.name != contributor_organization_name:
-            contact.name = contributor_organization_name
-            changes = True
-        return changes
-
-    def update_org_contact_for_transaction(self, contact: Contact, transaction: dict):
-        changes = False
-        contributor_organization_name = transaction.get("contributor_organization_name")
-        if contact.name != contributor_organization_name:
-            contact.name = contributor_organization_name
-            changes = True
-        return changes
-
-    def update_contact_for_transaction_shared_fields(
-        self, contact: Contact, transaction: dict
-    ):
-        changes = False
-        contributor_street_1 = transaction.get("contributor_street_1")
-        if contact.street_1 != contributor_street_1:
-            contact.street_1 = contributor_street_1
-            changes = True
-        contributor_street_2 = transaction.get("contributor_street_2")
-        if contact.street_2 != contributor_street_2:
-            contact.street_2 = contributor_street_2
-            changes = True
-        contributor_city = transaction.get("contributor_city")
-        if contact.city != contributor_city:
-            contact.city = contributor_city
-            changes = True
-        contributor_state = transaction.get("contributor_state")
-        if contact.state != contributor_state:
-            contact.state = contributor_state
-            changes = True
-        contributor_zip = transaction.get("contributor_zip")
-        if contact.zip != contributor_zip:
-            contact.zip = contributor_zip
-            changes = True
-        return changes
+            Contact.objects.filter(id=tran_contact_id).update(**contact_data)
 
     class Meta(SchATransactionSerializer.Meta):
         fields = [
