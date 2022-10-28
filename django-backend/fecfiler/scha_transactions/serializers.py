@@ -3,12 +3,14 @@ import logging
 from django.db import transaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.models import Contact
+from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (BooleanField, DecimalField,
                                         ListSerializer, UUIDField)
+
 
 from .models import SchATransaction
 
@@ -23,7 +25,7 @@ class SchATransactionSerializer(
     report_id = UUIDField(required=True, allow_null=False)
 
     contact_id = UUIDField(required=False, allow_null=False)
-    memo_text_id = UUIDField(required=False, allow_null=False)
+    memo_text_id = UUIDField(required=False, allow_null=True)
 
     contact = ContactSerializer(allow_null=True, required=False)
     memo_text = MemoTextSerializer(allow_null=True, required=False)
@@ -111,6 +113,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data)
+            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
             for child in children:
@@ -121,6 +124,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
     def update(self, instance: SchATransaction, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data)
+            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
 
             existing_children = SchATransaction.objects.filter(
@@ -153,6 +157,18 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             validated_data["contact_id"] = contact.id
         else:
             Contact.objects.filter(id=tran_contact_id).update(**contact_data)
+
+    def create_or_update_memo_text(self, validated_data: dict):
+        memo_data = validated_data.pop("memo_text", None)
+        tran_memo_text_id = validated_data.get("memo_text_id", None)
+        
+        if not tran_memo_text_id:
+            if memo_data:
+                memo_text: MemoText = MemoText.objects.create(**memo_data)
+                validated_data["memo_text_id"] = memo_text.id
+        else:
+            memo_data["report_id"] = validated_data.get("report_id", None)
+            MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
 
     class Meta(SchATransactionSerializer.Meta):
         fields = [
