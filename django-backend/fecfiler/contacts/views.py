@@ -42,11 +42,15 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return HttpResponseBadRequest()
 
         max_fec_results = self.get_int_param_value(
-            request, "max_fec_results", default_max_fec_results, max_allowed_results)
+            request, "max_fec_results", default_max_fec_results, max_allowed_results
+        )
 
         max_fecfile_results = self.get_int_param_value(
-            request, "max_fecfile_results", default_max_fecfile_results,
-            max_allowed_results)
+            request,
+            "max_fecfile_results",
+            default_max_fecfile_results,
+            max_allowed_results,
+        )
 
         query_params = urlencode(
             {
@@ -62,8 +66,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fec_api_committees = json_results.get("results", [])[:max_fec_results]
         fecfile_committees = list(
             self.get_queryset()
-            .filter(Q(type="COM") & (
-                Q(committee_id__icontains=q) | Q(name__icontains=q)))
+            .filter(
+                Q(type="COM") & (Q(committee_id__icontains=q) | Q(name__icontains=q))
+            )
             .values()
             .order_by("-committee_id")[:max_fecfile_results]
         )
@@ -80,21 +85,36 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        tokens = list(filter(None, re.split('[^\\w+]', q)))
-        term = ('.*' + '.* .*'.join(tokens) + '.*').lower()
+        tokens = list(filter(None, re.split("[^\\w+]", q)))
+        term = (".*" + ".* .*".join(tokens) + ".*").lower()
 
         max_fecfile_results = self.get_int_param_value(
-            request, "max_fecfile_results", default_max_fecfile_results,
-            max_allowed_results)
+            request,
+            "max_fecfile_results",
+            default_max_fecfile_results,
+            max_allowed_results,
+        )
 
         fecfile_individuals = list(
             self.get_queryset()
-            .annotate(full_name_fwd=Lower(Concat('first_name', Value(' '),
-                      'last_name', output_field=CharField())))
-            .annotate(full_name_bwd=Lower(Concat('last_name', Value(' '),
-                      'first_name', output_field=CharField())))
-            .filter(Q(type="IND") & (Q(full_name_fwd__regex=term)
-                                     | Q(full_name_bwd__regex=term)))
+            .annotate(
+                full_name_fwd=Lower(
+                    Concat(
+                        "first_name", Value(" "), "last_name", output_field=CharField()
+                    )
+                )
+            )
+            .annotate(
+                full_name_bwd=Lower(
+                    Concat(
+                        "last_name", Value(" "), "first_name", output_field=CharField()
+                    )
+                )
+            )
+            .filter(
+                Q(type="IND")
+                & (Q(full_name_fwd__regex=term) | Q(full_name_bwd__regex=term))
+            )
             .values()
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
         )
@@ -111,8 +131,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return HttpResponseBadRequest()
 
         max_fecfile_results = self.get_int_param_value(
-            request, "max_fecfile_results", default_max_fecfile_results,
-            max_allowed_results)
+            request,
+            "max_fecfile_results",
+            default_max_fecfile_results,
+            max_allowed_results,
+        )
 
         fecfile_organizations = list(
             self.get_queryset()
@@ -120,14 +143,13 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .values()
             .order_by("-name")[:max_fecfile_results]
         )
-        return_value = {
-            "fecfile_organizations": fecfile_organizations
-        }
+        return_value = {"fecfile_organizations": fecfile_organizations}
 
         return JsonResponse(return_value)
 
-    def get_int_param_value(self, request, param_name: str,
-                            default_param_value: int, max_param_value: int):
+    def get_int_param_value(
+        self, request, param_name: str, default_param_value: int, max_param_value: int
+    ):
         if request:
             param_val = request.GET.get(param_name, "")
             if param_val and param_val.isnumeric():

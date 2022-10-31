@@ -28,7 +28,6 @@
             "election_other_description": "test_string_value",
             "contribution_date": "2020-04-19",
             "contribution_amount": 1234.56,
-            "contribution_aggregate": 1234.56,
             "contribution_purpose_descrip": "test_string_value",
             "contributor_employer": "test_string_value",
             "contributor_occupation": "test_string_value",

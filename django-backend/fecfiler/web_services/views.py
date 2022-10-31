@@ -45,7 +45,7 @@ class WebServicesViewSet(viewsets.ViewSet):
     @action(
         detail=False,
         methods=["get"],
-        url_path="dot-fec/(?P<report_id>[a-z0-9]+)",
+        url_path="dot-fec/(?P<report_id>[a-z0-9-]+)",
         renderer_classes=(DotFECRenderer,),
     )
     def get_dot_fec(self, request, report_id):

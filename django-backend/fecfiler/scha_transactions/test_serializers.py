@@ -1,17 +1,18 @@
 from django.test import TestCase
-from .serializers import SchATransactionSerializer
+from .serializers import SchATransactionSerializer, SchATransactionParentSerializer
 from rest_framework.request import Request, HttpRequest
 from fecfiler.authentication.models import Account
+from .models import SchATransaction
 
 
 class SchATransactionTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries"]
+    fixtures = ["test_committee_accounts", "test_f3x_summaries", "test_contacts"]
 
     def setUp(self):
         self.valid_scha_transaction = {
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
-            "transaction_type_identifier": "INDV_REC",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
             "contributor_organization_name": "John Smith Co",
@@ -23,7 +24,7 @@ class SchATransactionTestCase(TestCase):
             "contributor_street_1": "1 Homer Spit Road",
             "contribution_date": "2009-01-01",
             "contribution_amount": 1234,
-            "contribution_aggregate": 1234,
+            "aggregation_group": "GENERAL",
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
@@ -34,7 +35,7 @@ class SchATransactionTestCase(TestCase):
             "form_type": "invalidformtype",
             "contributor_last_name": "Validlastname",
             "transaction_id": "ABCDEF0123456789",
-            "transaction_type_identifier": "INDV_REC",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
         }
@@ -54,13 +55,11 @@ class SchATransactionTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_serializer = SchATransactionSerializer(
-            data=self.valid_scha_transaction,
-            context={"request": self.mock_request},
+            data=self.valid_scha_transaction, context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = SchATransactionSerializer(
-            data=self.invalid_scha_transaction,
-            context={"request": self.mock_request},
+            data=self.invalid_scha_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -69,10 +68,56 @@ class SchATransactionTestCase(TestCase):
     def test_no_transaction_type_identifier(self):
 
         missing_type_serializer = SchATransactionSerializer(
-            data=self.missing_type_transaction,
-            context={"request": self.mock_request},
+            data=self.missing_type_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
             missing_type_serializer.errors["transaction_type_identifier"]
         )
+
+    def test_parent(self):
+        parent = self.valid_scha_transaction.copy()
+        parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
+        parent["contribution_purpose_descrip"] = "test"
+        child = self.valid_scha_transaction.copy()
+        child["transaction_type_identifier"] = "EARMARK_MEMO"
+        child["contribution_purpose_descrip"] = "test"
+        child["back_reference_sched_name"] = "test"
+        child["back_reference_tran_id_number"] = "test"
+        child["memo_code"] = True
+        parent["children"] = [child]
+        serializer = SchATransactionParentSerializer(
+            data=parent, context={"request": self.mock_request},
+        )
+        self.assertTrue(serializer.is_valid(raise_exception=True))
+        serializer.create(serializer.to_internal_value(parent))
+        parent_instance = SchATransaction.objects.filter(
+            transaction_type_identifier="EARMARK_RECEIPT"
+        )[0]
+        children = SchATransaction.objects.filter(parent_transaction=parent_instance)
+        self.assertNotEqual(children.count(), 0)
+
+        parent = parent_instance.__dict__.copy()
+        child = children[0].__dict__.copy()
+        parent["contribution_purpose_descrip"] = "updated parent"
+        child["contribution_purpose_descrip"] = "updated child"
+        parent["children"] = [child]
+        parent_instance = serializer.update(
+            parent_instance, serializer.to_internal_value(parent)
+        )
+        self.assertEqual(parent_instance.contribution_purpose_descrip, "updated parent")
+
+        children = SchATransaction.objects.filter(parent_transaction_id=parent_instance)
+        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
+
+        old_child_id = children[0].id
+        child["id"] = None
+        child["contribution_purpose_descrip"] = "very new child"
+        parent["children"] = [child]
+        parent_instance = serializer.update(
+            parent_instance, serializer.to_internal_value(parent)
+        )
+        children = SchATransaction.objects.filter(parent_transaction_id=parent_instance)
+        self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
+        with self.assertRaises(SchATransaction.DoesNotExist):
+            SchATransaction.objects.get(id=old_child_id)

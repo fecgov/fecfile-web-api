@@ -56,7 +56,7 @@
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDV_REC"
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
         }
     }
 ]

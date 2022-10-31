@@ -2,6 +2,7 @@ from datetime import date
 from rest_framework import serializers
 from fecfile_validate import validate
 from rest_framework import exceptions
+from rest_framework.serializers import CharField, ListField
 from functools import reduce
 import logging
 
@@ -23,6 +24,8 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
     """
 
     schema_name = None
+
+    fields_to_validate = ListField(child=CharField(), write_only=True)
 
     def get_schema_name(self, data):
         """Gets the schema name to retrieve the correct schema from fecfile_validate
@@ -88,9 +91,9 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             of ```path``` -> ```message``` to comply with DJR's validation error
             pattern
         """
-        fields_to_validate = []
+        fields_to_validate = data.pop("fields_to_validate", [])
         request = self.context.get("request", None)
-        if request:
+        if request and not fields_to_validate:
             fields_to_validate_str = request.query_params.get("fields_to_validate")
             fields_to_validate = (
                 fields_to_validate_str.split(",") if fields_to_validate_str else []

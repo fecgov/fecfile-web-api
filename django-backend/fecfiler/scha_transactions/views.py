@@ -1,10 +1,19 @@
+import logging
+
+from django.db.models.functions import Coalesce, Concat
+from datetime import datetime
 from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
+
 from .models import SchATransaction
-from .serializers import SchATransactionSerializer
-from django.db.models import TextField, Value
-from django.db.models.functions import Concat, Coalesce
+from .serializers import SchATransactionParentSerializer
+from django.db.models import TextField, Value, Q
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+
+logger = logging.getLogger(__name__)
 
 
 class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
@@ -32,9 +41,8 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         .all()
     )
-    """QuerySet: all schedule a transactions with an aditional contributor_name field"""
 
-    serializer_class = SchATransactionSerializer
+    serializer_class = SchATransactionParentSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
@@ -45,4 +53,34 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "memo_code",
         "contribution_amount",
     ]
-    ordering = ["-id"]
+    ordering = ["-created"]
+
+    @action(detail=False, methods=["get"])
+    def previous(self, request):
+        transaction_id = request.query_params.get("transaction_id", None)
+        contact_id = request.query_params.get("contact_id", None)
+        contribution_date = request.query_params.get("contribution_date", None)
+        aggregation_group = request.query_params.get("aggregation_group", None)
+        if not (contact_id and contribution_date):
+            return Response(
+                "Please provide contact_id and contribution_date in query params.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        contribution_date = datetime.fromisoformat(contribution_date)
+
+        previous_transaction = (
+            self.get_queryset()
+            .filter(
+                ~Q(id=transaction_id or None),
+                Q(contact_id=contact_id),
+                Q(contribution_date__year=contribution_date.year),
+                Q(contribution_date__lte=contribution_date),
+                Q(aggregation_group=aggregation_group),
+            )
+            .order_by("-contribution_date", "-created")
+            .first()
+        )
+
+        serializer = self.get_serializer(previous_transaction)
+        return Response(data=serializer.data)
