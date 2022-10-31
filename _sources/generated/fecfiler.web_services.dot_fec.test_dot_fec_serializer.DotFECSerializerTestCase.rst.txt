@@ -112,6 +112,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestC
       ~DotFECSerializerTestCase.tearDownClass
       ~DotFECSerializerTestCase.test_serialize_f3x_summary
       ~DotFECSerializerTestCase.test_serialize_field
+      ~DotFECSerializerTestCase.test_serialize_report_level_memo
       ~DotFECSerializerTestCase.test_serialize_scha_transaction
    
    
