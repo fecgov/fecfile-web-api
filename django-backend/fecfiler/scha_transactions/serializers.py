@@ -167,7 +167,6 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
                     {"memo_text": ["No memo_text or memo_text_id provided"]}
                 )
             memo_text: MemoText = MemoText.objects.create(**memo_data)
-            memo_text.fields_to_validate = ["text4000"]
             validated_data["memo_text_id"] = memo_text.id
         else:
             memo_data["report_id"] = validated_data.get("report_id", None)
