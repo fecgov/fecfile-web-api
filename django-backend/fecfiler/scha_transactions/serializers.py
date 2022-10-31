@@ -161,11 +161,14 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
     def create_or_update_memo_text(self, validated_data: dict):
         memo_data = validated_data.pop("memo_text", None)
         tran_memo_text_id = validated_data.get("memo_text_id", None)
-        
         if not tran_memo_text_id:
-            if memo_data:
-                memo_text: MemoText = MemoText.objects.create(**memo_data)
-                validated_data["memo_text_id"] = memo_text.id
+            if not memo_data:
+                raise ValidationError(
+                    {"memo_text": ["No memo_text or memo_text_id provided"]}
+                )
+            memo_text: MemoText = MemoText.objects.create(**memo_data)
+            memo_text.fields_to_validate = ["text4000"]
+            validated_data["memo_text_id"] = memo_text.id
         else:
             memo_data["report_id"] = validated_data.get("report_id", None)
             MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
