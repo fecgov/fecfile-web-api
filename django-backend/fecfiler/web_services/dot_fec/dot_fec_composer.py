@@ -1,3 +1,5 @@
+from fecfiler.memo_text.models import MemoText
+from fecfiler.memo_text.views import TRANSACTION_ID_NUMBER_FIELD
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.scha_transactions.models import SchATransaction
@@ -41,6 +43,22 @@ def compose_transactions(report_id):
         return transactions
     else:
         logger.info(f"no transactions found for report: {report_id}")
+        return []
+
+
+def compose_report_level_memos(report_id):
+    report_level_memos = MemoText.objects.filter(
+        report_id=report_id
+    ).order_by(f"{TRANSACTION_ID_NUMBER_FIELD}")
+    if report_level_memos.exists():
+        logger.info(f"composing report level memos: {report_id}")
+        for memo in report_level_memos:
+            memo.filer_committee_id_number = (
+                FILE_AS_TEST_COMMITTEE or memo.committee_account.committee_id
+            )
+        return report_level_memos
+    else:
+        logger.info(f"no report level memos found for report: {report_id}")
         return []
 
 
@@ -90,6 +108,16 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             logger.debug("Serialized Transaction:")
             logger.debug(transaction)
             file_content = add_row_to_content(file_content, transaction)
+
+        report_level_memos = compose_report_level_memos(report_id)
+        report_level_memo_rows = [
+            serialize_model_instance("Text", MemoText, memo)
+            for memo in report_level_memos
+        ]
+        for memo in report_level_memo_rows:
+            logger.debug("Serialized Report Level Memo:")
+            logger.debug(memo)
+            file_content = add_row_to_content(file_content, memo)
 
         return file_content
     except Exception as error:

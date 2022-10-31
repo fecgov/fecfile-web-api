@@ -1,14 +1,31 @@
 from django.test import TestCase
-from .serializers import SchATransactionSerializer, SchATransactionParentSerializer
-from rest_framework.request import Request, HttpRequest
 from fecfiler.authentication.models import Account
+from rest_framework.request import HttpRequest, Request
+
 from .models import SchATransaction
+from .serializers import (SchATransactionParentSerializer,
+                          SchATransactionSerializer)
 
 
 class SchATransactionTestCase(TestCase):
     fixtures = ["test_committee_accounts", "test_f3x_summaries", "test_contacts"]
 
     def setUp(self):
+        self.test_contact = {
+            "id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "type": "IND",
+            "last_name": "Lastname",
+            "first_name": "Firstname",
+            "street_1": "Street",
+            "city": "City",
+            "state": "CA",
+            "zip": "12345678",
+            "country": "Country",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+        }
+
         self.valid_scha_transaction = {
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
@@ -29,6 +46,7 @@ class SchATransactionTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "contact": self.test_contact.copy(),
         }
 
         self.invalid_scha_transaction = {
@@ -38,6 +56,7 @@ class SchATransactionTestCase(TestCase):
             "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "contact": self.test_contact.copy(),
         }
 
         self.missing_type_transaction = {
@@ -46,6 +65,7 @@ class SchATransactionTestCase(TestCase):
             "contributor_last_name": "Validlastname",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "contact": self.test_contact.copy(),
         }
 
         self.mock_request = Request(HttpRequest())
@@ -102,6 +122,8 @@ class SchATransactionTestCase(TestCase):
         parent["contribution_purpose_descrip"] = "updated parent"
         child["contribution_purpose_descrip"] = "updated child"
         parent["children"] = [child]
+        parent["contact"] = self.test_contact.copy()
+        child["contact"] = self.test_contact.copy()
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
