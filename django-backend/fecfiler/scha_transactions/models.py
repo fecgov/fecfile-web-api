@@ -141,7 +141,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         if not self.back_reference_tran_id_number and self.parent_transaction:
             self.update_parent_related_values(self.parent_transaction)
         if self.memo_text:
-            self.memo_text.transaction_id = self.id
+            self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
 
         super(SchATransaction, self).save(*args, **kwargs)

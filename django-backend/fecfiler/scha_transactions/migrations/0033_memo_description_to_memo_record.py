@@ -9,7 +9,7 @@ def text_field_to_text_record(apps, _):
     for transaction in sch_a_transaction.objects.all():
         transaction.memo_text = memo_text()
         transaction.memo_text.text4000 = transaction.memo_text_description
-        transaction.memo_text.transaction_id = transaction.id
+        transaction.memo_text.transaction_uuid = transaction.id
         transaction.memo_text.save()
         transaction.save()
 
