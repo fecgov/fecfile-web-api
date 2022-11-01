@@ -13,11 +13,12 @@ def text_field_to_text_record(apps, _):
         transaction.memo_text.save()
         transaction.save()
 
+
 def text_record_to_text_field(apps, _):
     sch_a_transaction = apps.get_model("scha_transactions", "schatransaction")  # noqa
     memo_text = apps.get_model("memo_text", "memotext")
     for transaction in sch_a_transaction.objects.all():
-        record = memo_text.objects.get(id=transaction.memo_text.id) 
+        record = memo_text.objects.get(id=transaction.memo_text.id)
         text = record.text4000
         transaction.memo_text_description = text
         transaction.memo_text = None
@@ -25,9 +26,6 @@ def text_record_to_text_field(apps, _):
         record.delete()
         record.save()
 
-def noop(_apps, _):
-    # Empty function to pass as a reverse method to RunPython
-    pass
 
 class Migration(migrations.Migration):
 

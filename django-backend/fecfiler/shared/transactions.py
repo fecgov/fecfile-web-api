@@ -5,9 +5,9 @@ def get_from_sched_tables_by_uuid(uuid):
     matches = []
     for table in tables:
         matches += list(table.objects.filter(id=uuid))
-    
+
     if len(matches) > 1:
-      raise LookupError
+        raise LookupError
     if len(matches) == 1:
-      return matches[0]
+        return matches[0]
     return None

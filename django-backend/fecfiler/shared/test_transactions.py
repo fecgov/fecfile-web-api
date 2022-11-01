@@ -1,8 +1,7 @@
-from decimal import Decimal
 from django.test import TestCase
 from fecfiler.scha_transactions.models import SchATransaction
 
-from .transactions import *
+from .transactions import get_from_sched_tables_by_uuid
 
 
 class SchATransactionTestCase(TestCase):

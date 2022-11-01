@@ -8,7 +8,12 @@ from .serializers import (SchATransactionParentSerializer,
 
 
 class SchATransactionTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries", "test_contacts", "test_memo_text"]
+    fixtures = [
+        "test_committee_accounts",
+        "test_f3x_summaries",
+        "test_contacts",
+        "test_memo_text"
+    ]
 
     def setUp(self):
         self.test_contact = {
@@ -30,9 +35,9 @@ class SchATransactionTestCase(TestCase):
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
             "filer_committee_id_number": "C00123456",
-            "rec_type":"",
-            "back_reference_sched_form_name":"",
-            "back_reference_sched_form_name":"",
+            "rec_type": "",
+            "back_reference_sched_form_name": "",
+            "back_reference_sched_form_name": "",
         }
 
         self.valid_scha_transaction = {

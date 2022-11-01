@@ -15,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='schatransaction',
             name='memo_text',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='memo_text.memotext'),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to='memo_text.memotext'
+            ),
         ),
     ]
