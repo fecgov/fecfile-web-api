@@ -4,6 +4,7 @@ from .dot_fec_serializer import (
     serialize_model_instance,
 )
 from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.memo_text.models import MemoText
 from fecfiler.scha_transactions.models import SchATransaction
 from curses import ascii
 
@@ -14,6 +15,7 @@ class DotFECSerializerTestCase(TestCase):
         "test_f3x_summaries",
         "test_individual_receipt",
         "test_memo_text",
+        "test_memo_text"
     ]
 
     def setUp(self):
@@ -22,6 +24,9 @@ class DotFECSerializerTestCase(TestCase):
         ).first()
         self.transaction = SchATransaction.objects.filter(
             id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
+        ).first()
+        self.report_level_memo_text = MemoText.objects.filter(
+            id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d"
         ).first()
 
     def test_serialize_field(self):
@@ -97,3 +102,14 @@ class DotFECSerializerTestCase(TestCase):
         )
         split_row = transaction_row.split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
+
+    def test_serialize_report_level_memo(self):
+        report_level_memo_row = serialize_model_instance(
+            "Text", MemoText, self.report_level_memo_text
+        )
+        split_row = report_level_memo_row.split(chr(ascii.FS))
+        self.assertEqual(split_row[0], "TEXT")
+        self.assertEqual(split_row[1], "C00601211")
+        self.assertEqual(split_row[2], "REPORT_MEMO_TEXT_1")
+        self.assertEqual(split_row[4], "F3XN")
+        self.assertEqual(split_row[5], "dahtest2")
