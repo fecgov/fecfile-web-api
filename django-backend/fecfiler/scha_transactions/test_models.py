@@ -9,6 +9,7 @@ class SchATransactionTestCase(TestCase):
         "test_committee_accounts",
         "test_contacts",
         "test_scha_transactions",
+        "test_memo_text",
         "test_f3x_summaries",
     ]
 
