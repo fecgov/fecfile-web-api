@@ -63,13 +63,14 @@ class SchATransactionsViewTest(TestCase):
         "transaction_type_identifier": "OTHER_RECEIPT",
         "memo_text": {
             "text4000":"Note!",
-            "rec_type":"",
-            "filer_committee_id_number":"",
-            "transaction_id_number":"",
-            "transaction_id":"",
-            "back_reference_tran_id_number":"",
-            "back_reference_sched_form_name":"",
-        }
+            "rec_type":None,
+            "filer_committee_id_number":"C00000001",
+            "transaction_id_number":None,
+            "transaction_id":None,
+            "back_reference_tran_id_number":None,
+            "back_reference_sched_form_name":None,
+        },
+        "memo_text_id":None,
     }
 
     def setUp(self):

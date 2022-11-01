@@ -13,6 +13,7 @@ class DotFECSerializerTestCase(TestCase):
         "test_committee_accounts",
         "test_f3x_summaries",
         "test_individual_receipt",
+        "test_memo_text",
     ]
 
     def setUp(self):

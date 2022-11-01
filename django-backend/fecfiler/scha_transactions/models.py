@@ -74,6 +74,7 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     conduit_state = models.TextField(null=True, blank=True)
     conduit_zip = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
+    memo_text_description = models.BooleanField(null=True, blank=True)
     reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
         null=True, blank=True
     )
