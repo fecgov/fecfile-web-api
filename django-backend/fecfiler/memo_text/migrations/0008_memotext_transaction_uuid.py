@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='memotext',
-            name='transaction_id',
+            name='transaction_uuid',
             field=models.TextField(blank=True, null=True),
         ),
     ]

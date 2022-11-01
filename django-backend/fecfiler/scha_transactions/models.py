@@ -128,6 +128,9 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
                 return ""
         return unique_id
 
+    def get_fec_id(self):
+        return str(self.id).replace("-", "")[:20].upper()
+
     def update_parent_related_values(self, parent):
         self.back_reference_tran_id_number = parent.transaction_id
         self.back_reference_sched_name = parent.form_type

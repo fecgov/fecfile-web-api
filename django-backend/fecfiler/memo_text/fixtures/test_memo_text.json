@@ -52,7 +52,7 @@
          "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
          "text4000": "testtest",
          "transaction_id_number": "REPORT_MEMO_TEXT_1",
-         "transaction_id": "11111111-1111-1111-1111-111111111111",
+         "transaction_uuid": "11111111-1111-1111-1111-111111111111",
          "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
       }
    }
