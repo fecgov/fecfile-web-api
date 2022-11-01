@@ -62,15 +62,14 @@ class SchATransactionsViewTest(TestCase):
         "transaction_id": "C8758663365855FEAC76",
         "transaction_type_identifier": "OTHER_RECEIPT",
         "memo_text": {
-            "text4000":"Note!",
-            "rec_type":None,
-            "filer_committee_id_number":"C00000001",
-            "transaction_id_number":None,
-            "transaction_id":None,
-            "back_reference_tran_id_number":None,
-            "back_reference_sched_form_name":None,
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id_number": "ABCDEF0123456789",
+            "filer_committee_id_number": "C00123456",
+            "rec_type":"",
+            "back_reference_sched_form_name":"",
+            "back_reference_sched_form_name":"",
         },
-        "memo_text_id":None,
+        "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
     }
 
     def setUp(self):
@@ -82,6 +81,15 @@ class SchATransactionsViewTest(TestCase):
         self.f3x_2_transaction_count = len(
             SchATransaction.objects.filter(report_id=self.f3x_2_id)
         )
+
+        self.memo_text = {
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id_number": "ABCDEF0123456789",
+            "filer_committee_id_number": "C00123456",
+            "rec_type":"",
+            "back_reference_sched_form_name":"",
+            "back_reference_sched_form_name":"",
+        }
 
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
@@ -236,9 +244,8 @@ class SchATransactionsViewTest(TestCase):
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTHER_RECEIPT",
             "contact_id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
-            "memo_text": {
-                "text4000":"Note!"
-            }
+            "memo_text": self.memo_text,
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
         }
         response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
@@ -276,9 +283,8 @@ class SchATransactionsViewTest(TestCase):
             "transaction_id": "C8758663365855FEAC76",
             "transaction_type_identifier": "OTHER_RECEIPT",
             "contact_id": "5720a518-6486-4062-944f-aa0c4cbe4073",
-            "memo_text": {
-                "text4000":"Note!"
-            }
+            "memo_text": self.memo_text,
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
         }
         response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
