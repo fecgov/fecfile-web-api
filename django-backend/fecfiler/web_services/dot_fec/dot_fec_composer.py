@@ -101,14 +101,22 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         file_content = add_row_to_content(file_content, f3x_summary_row)
 
         transactions = compose_transactions(report_id)
-        transaction_rows = [
-            serialize_model_instance("SchA", SchATransaction, transaction)
-            for transaction in transactions
-        ]
-        for transaction in transaction_rows:
+        transaction_rows = []
+        for transaction in transactions:
+            transaction_rows.append(
+                [serialize_model_instance("SchA", SchATransaction, transaction)]
+            )
+            memo_content = None
+            if transaction.memo_text:
+                memo_content = serialize_model_instance("Text", MemoText, transaction.memo_text)            
+            transaction_rows[-1].append(memo_content)
+
+        for transaction, memo_text in transaction_rows:
             logger.debug("Serialized Transaction:")
             logger.debug(transaction)
             file_content = add_row_to_content(file_content, transaction)
+            if memo_text:
+                file_content = add_row_to_content(file_content, memo_text)
 
         report_level_memos = compose_report_level_memos(report_id)
         report_level_memo_rows = [
