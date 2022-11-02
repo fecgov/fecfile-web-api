@@ -1,4 +1,5 @@
 from .models import MemoText
+from django.db.models import Q
 from .serializers import MemoTextSerializer
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
@@ -13,6 +14,22 @@ class MemoTextViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             TRANSACTION_ID_NUMBER_FIELD
         ] = self.get_next_transaction_id_number()
         return super().create(request, args, kwargs)
+
+    def get_queryset(self):
+        filter = (
+            (
+                self.request.query_params.get(TRANSACTION_ID_NUMBER_FIELD)
+                or self.request.data.get(TRANSACTION_ID_NUMBER_FIELD)
+            )
+            if self.request
+            else None
+        )
+        queryset = super().get_queryset()
+        return (
+            queryset.filter(Q((TRANSACTION_ID_NUMBER_FIELD, filter)))
+            if filter
+            else queryset
+        )
 
     def get_next_transaction_id_number(self):
         latest_memo = (
