@@ -48,7 +48,8 @@ def compose_transactions(report_id):
 
 def compose_report_level_memos(report_id):
     report_level_memos = MemoText.objects.filter(
-        report_id=report_id
+        report_id=report_id,
+        transaction_uuid=None,
     ).order_by(f"{TRANSACTION_ID_NUMBER_FIELD}")
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")
