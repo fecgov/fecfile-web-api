@@ -23,3 +23,34 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     class Meta:
         db_table = "memo_text"
+
+    # This is intended to be useable without instantiating a transaction object
+    @staticmethod
+    def check_for_uid_conflicts(uid):  # noqa
+        return len(MemoText.objects.filter(transaction_id_number=uid)) > 0
+
+    def generate_uid(self):
+        unique_id = uuid.uuid4()
+        hex_id = unique_id.hex.upper()
+        # Take 20 characters from the end, skipping over the 20th char from the right,
+        # which is the version number (uuid4 -> "4")
+        return hex_id[-21] + hex_id[-19:]
+
+    def generate_unique_transaction_id(self):
+        unique_id = self.generate_uid()
+
+        attempts = 0
+        while MemoText.check_for_uid_conflicts(unique_id):
+            unique_id = self.generate_uid()
+            attempts += 1
+            logger.info("Transaction unique ID generation: collision detected")
+            if attempts > 5:
+                logger.info("Unique ID generation failed: Over 5 conflicts in a row")
+                return ""
+        return unique_id
+
+    def save(self, *args, **kwargs):
+        if not self.transaction_id_number:
+            self.transaction_id_number = self.generate_unique_transaction_id()
+
+        super(MemoText, self).save(*args, **kwargs)
