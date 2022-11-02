@@ -7,6 +7,7 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
+from fecfiler.shared.transactions import get_from_sched_tables_by_uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (BooleanField, DecimalField,
                                         ListSerializer, UUIDField)
@@ -162,15 +163,17 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         memo_data = validated_data.pop("memo_text", None)
         tran_memo_text_id = validated_data.get("memo_text_id", None)
         if not tran_memo_text_id:
-            if not memo_data:
-                raise ValidationError(
-                    {"memo_text": ["No memo_text or memo_text_id provided"]}
-                )
-            memo_text: MemoText = MemoText.objects.create(**memo_data)
-            validated_data["memo_text_id"] = memo_text.id
+            if memo_data:
+                memo_text: MemoText = MemoText.objects.create(**memo_data)
+                validated_data["memo_text_id"] = memo_text.id
         else:
-            memo_data["report_id"] = validated_data.get("report_id", None)
-            MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
+            if memo_data:
+                memo_data["report_id"] = validated_data.get("report_id", None)
+                MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
+            else:
+                memo_object = MemoText.objects.get(id=tran_memo_text_id)
+                memo_object.delete()
+                validated_data["memo_text_id"] = None
 
     class Meta(SchATransactionSerializer.Meta):
         fields = [
