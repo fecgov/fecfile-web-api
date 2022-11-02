@@ -31,7 +31,7 @@ class DotFECSerializerTestCase(TestCase):
             compose_dot_fec(100000000, None)
 
         file_content = compose_dot_fec("b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None)
-        self.assertEqual(file_content.count(CRLF_STR), 4)
+        self.assertEqual(file_content.count(CRLF_STR), 5)
 
     def test_add_row_to_content(self):
         summary_row = serialize_model_instance("F3X", F3XSummary, self.f3x)
