@@ -42,7 +42,7 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             report_id=self.report_id,
             transaction_uuid=None
         )
-        return "REPORT_MEMO_TEXT"+str(len(report_memos)+1)
+        return "REPORT_MEMO_TEXT"+str(len(report_memos) + 1)
 
     def generate_uid(self):
         unique_id = uuid.uuid4()
