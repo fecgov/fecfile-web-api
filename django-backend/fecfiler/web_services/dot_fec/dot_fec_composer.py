@@ -1,5 +1,4 @@
 from fecfiler.memo_text.models import MemoText
-from fecfiler.memo_text.views import TRANSACTION_ID_NUMBER_FIELD
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.scha_transactions.models import SchATransaction
@@ -50,7 +49,7 @@ def compose_report_level_memos(report_id):
     report_level_memos = MemoText.objects.filter(
         report_id=report_id,
         transaction_uuid=None,
-    ).order_by(f"{TRANSACTION_ID_NUMBER_FIELD}")
+    )
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")
         for memo in report_level_memos:

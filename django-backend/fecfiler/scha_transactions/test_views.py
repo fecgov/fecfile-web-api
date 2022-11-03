@@ -67,7 +67,6 @@ class SchATransactionsViewTest(TestCase):
             "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "back_reference_sched_form_name": "",
-            "back_reference_sched_form_name": "",
         },
         "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
     }
@@ -87,7 +86,6 @@ class SchATransactionsViewTest(TestCase):
             "transaction_id_number": "ABCDEF0123456789",
             "filer_committee_id_number": "C00123456",
             "rec_type": "",
-            "back_reference_sched_form_name": "",
             "back_reference_sched_form_name": "",
         }
 

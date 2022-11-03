@@ -37,7 +37,6 @@ class SchATransactionTestCase(TestCase):
             "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "back_reference_sched_form_name": "",
-            "back_reference_sched_form_name": "",
         }
 
         self.valid_scha_transaction = {
