@@ -35,6 +35,7 @@ class MemoTextViewSetTest(TestCase):
             "text4000": "test_new_text",
             "back_reference_tran_id_number": None,
             "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_id_number": "id_number",
             "transaction_uuid": None,
         }
         response = client.post("/api/v1/memo-text/", data, format="json")
@@ -50,6 +51,10 @@ class MemoTextViewSetTest(TestCase):
             "filer_committee_id_number": "C00601211",
             "back_reference_sched_form_name": "F3XN",
             "text4000": "test_existing_text",
+            "back_reference_tran_id_number": None,
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_id_number": "id_number",
+            "transaction_uuid": None,
         }
         response = client.post("/api/v1/memo-text/", data, format="json")
         self.assertEqual(response.status_code, 201)
