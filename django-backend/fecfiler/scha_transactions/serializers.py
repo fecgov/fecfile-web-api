@@ -163,7 +163,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         tran_memo_text_id = validated_data.get("memo_text_id", None)
         if not tran_memo_text_id:
             if memo_data:
-                memo_data["report_level_memo"] = False
+                memo_data["is_report_level_memo"] = False
                 memo_text: MemoText = MemoText.objects.create(**memo_data)
                 validated_data["memo_text_id"] = memo_text.id
         else:
