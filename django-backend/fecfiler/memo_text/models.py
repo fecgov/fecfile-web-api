@@ -39,7 +39,8 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     def generate_report_id(self):
         report_memos = MemoText.objects.filter(
-            report_id=self.report_id
+            report_id=self.report_id,
+            transaction_uuid=None
         )
         return "REPORT_MEMO_TEXT"+str(len(report_memos)+1)
 
