@@ -26,5 +26,5 @@ class Migration(migrations.Migration):
             name='is_report_level_memo',
             field=models.BooleanField(default=True),
         ),
-        migrations.runpython(set_is_report_level_memo, noop),
+        migrations.RunPython(set_is_report_level_memo, noop),
     ]
