@@ -7,7 +7,6 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
-from fecfiler.shared.transactions import get_from_sched_tables_by_uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (BooleanField, DecimalField,
                                         ListSerializer, UUIDField)

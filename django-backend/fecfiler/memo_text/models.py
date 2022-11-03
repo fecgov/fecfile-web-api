@@ -3,6 +3,10 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
 from django.db import models
 import uuid
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):

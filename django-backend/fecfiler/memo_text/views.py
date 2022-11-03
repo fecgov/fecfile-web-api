@@ -1,5 +1,4 @@
 from .models import MemoText
-from django.db.models import Q
 from .serializers import MemoTextSerializer
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
