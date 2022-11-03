@@ -173,7 +173,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             else:
                 memo_data["report_id"] = validated_data.get("report_id", None)
                 MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
-        else:
+        elif tran_memo_text_id:
             memo_object = MemoText.objects.get(id=tran_memo_text_id)
             memo_object.delete()
             validated_data["memo_text_id"] = None
