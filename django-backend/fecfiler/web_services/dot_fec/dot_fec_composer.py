@@ -102,19 +102,16 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         transactions = compose_transactions(report_id)
         for transaction in transactions:
             serialized_transaction = serialize_model_instance(
-                "SchA",
-                SchATransaction,
-                transaction
+                "SchA", SchATransaction, transaction
             )
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
             file_content = add_row_to_content(file_content, serialized_transaction)
             if transaction.memo_text:
-                serialized_memo = serialize_model_instance(
-                    "Text",
-                    MemoText,
-                    transaction.memo_text
-                )
+                memo = transaction.memo_text
+                memo.back_reference_tran_id_number = transaction.transaction_id
+                memo.back_reference_sched_name = transaction.form_type
+                serialized_memo = serialize_model_instance("Text", MemoText, memo)
                 logger.debug("Serialized Memo:")
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
