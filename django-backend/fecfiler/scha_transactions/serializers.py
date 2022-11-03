@@ -166,14 +166,16 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         memo_data = validated_data.pop("memo_text", None)
         tran_memo_text_id = validated_data.get("memo_text_id", None)
         if memo_data:
-            if not tran_memo_text_id:
-                memo_data["is_report_level_memo"] = False
-                memo_text: MemoText = MemoText.objects.create(**memo_data)
-                validated_data["memo_text_id"] = memo_text.id
-            else:
-                memo_data["report_id"] = validated_data.get("report_id", None)
-                MemoText.objects.filter(id=tran_memo_text_id).update(**memo_data)
-        else:
+            memo_text, _ = MemoText.objects.update_or_create(
+                id=tran_memo_text_id,
+                defaults={
+                    "is_report_level_memo": False,
+                    "report_id": validated_data.get("report_id", None),
+                    **memo_data,
+                },
+            )
+            validated_data["memo_text_id"] = memo_text.id
+        elif tran_memo_text_id:
             memo_object = MemoText.objects.get(id=tran_memo_text_id)
             memo_object.delete()
             validated_data["memo_text_id"] = None
