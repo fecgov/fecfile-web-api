@@ -6,7 +6,7 @@ from django.db import migrations, models
 def set_is_report_level_memo(apps, _):
     memo_text = apps.get_model("memo_text", "memotext")
     for memo in memo_text.objects.all():
-        memo.is_report_level_memo = memo.transaction_uuid != None
+        memo.is_report_level_memo = memo.transaction_uuid is not None
         memo.save()
 
 
@@ -18,13 +18,13 @@ def noop(_apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('memo_text', '0008_memotext_transaction_uuid'),
+        ("memo_text", "0008_memotext_transaction_uuid"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='memotext',
-            name='is_report_level_memo',
+            model_name="memotext",
+            name="is_report_level_memo",
             field=models.BooleanField(default=True),
         ),
         migrations.RunPython(set_is_report_level_memo, noop),

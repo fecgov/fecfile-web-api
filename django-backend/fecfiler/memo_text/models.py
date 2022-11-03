@@ -32,17 +32,16 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     # This is intended to be useable without instantiating a transaction object
     @staticmethod
     def check_for_uid_conflicts(uid, report_id):  # noqa
-        return len(MemoText.objects.filter(
-            transaction_id_number=uid,
-            report_id=report_id
-        )) > 0
+        return (
+            len(MemoText.objects.filter(transaction_id_number=uid, report_id=report_id))
+            > 0
+        )
 
     def generate_report_id(self):
         report_memos = MemoText.objects.filter(
-            report_id=self.report_id,
-            transaction_uuid=None
+            report_id=self.report_id, transaction_uuid=None
         )
-        return "REPORT_MEMO_TEXT"+str(len(report_memos)+1)
+        return "REPORT_MEMO_TEXT" + str(len(report_memos) + 1)
 
     def generate_uid(self):
         unique_id = uuid.uuid4()
