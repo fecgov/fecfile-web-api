@@ -30,4 +30,5 @@ class MemoTextTestCase(TestCase):
         self.assertEquals(
             memo_text_from_db.id, uuid.UUID("94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
         )
+        self.assertEquals(memo_text_from_db.transaction_id_number, "REPORT_MEMO_TEXT2")
         self.assertEquals(memo_text_from_db.text4000, "tessst4")
