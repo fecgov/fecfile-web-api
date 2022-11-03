@@ -11,6 +11,7 @@ def set_is_report_level_memo(apps, _):
 
 
 def noop(_apps, _):
+    # Empty function for reversing the migration
     pass
 
 
