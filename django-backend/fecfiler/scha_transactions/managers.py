@@ -39,6 +39,7 @@ class SchATransactionManager(SoftDeleteManager):
             "OFFSET_TO_OPERATING_EXPENDITURES",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
+            "PAC_RECOUNT_RECEIPT",
         ]
         return Case(
             When(
