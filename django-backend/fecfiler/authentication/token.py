@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 def login_dot_gov_logout(request):
-    id_token_hint = request.session.get("oidc_id_token")
+    client_id = settings.OIDC_RP_CLIENT_ID
     post_logout_redirect_uri = settings.LOGOUT_REDIRECT_URL
     state = request.get_signed_cookie('oidc_state')
 
     params = {
-        'id_token_hint': id_token_hint,
+        'client_id': client_id,
         'post_logout_redirect_uri': post_logout_redirect_uri,
         'state': state,
     }
