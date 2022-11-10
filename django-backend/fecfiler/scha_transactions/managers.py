@@ -35,10 +35,12 @@ class SchATransactionManager(SoftDeleteManager):
     def get_itemization_clause(self):
         over_two_hundred_types = [
             "INDIVIDUAL_RECEIPT",
+            "INDIVIDUAL_RECOUNT_RECEIPT",
             "OFFSET_TO_OPERATING_EXPENDITURES",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
             "PAC_RECOUNT_RECEIPT",
+            "PARTY_RECOUNT_RECEIPT",
         ]
         return Case(
             When(
