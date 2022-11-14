@@ -1,5 +1,6 @@
 import uuid
 
+
 def generate_fec_uid():
     unique_id = uuid.uuid4()
     hex_id = unique_id.hex.upper()
