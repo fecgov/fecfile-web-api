@@ -1,6 +1,7 @@
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid
 import logging
@@ -43,15 +44,8 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         )
         return "REPORT_MEMO_TEXT" + str(len(report_memos) + 1)
 
-    def generate_uid(self):
-        unique_id = uuid.uuid4()
-        hex_id = unique_id.hex.upper()
-        # Take 20 characters from the end, skipping over the 20th char from the right,
-        # which is the version number (uuid4 -> "4")
-        return hex_id[-21] + hex_id[-19:]
-
     def generate_unique_transaction_id(self):
-        id_generator = self.generate_uid
+        id_generator = generate_fec_uid
         if self.is_report_level_memo:
             id_generator = self.generate_report_id
         unique_id = id_generator()

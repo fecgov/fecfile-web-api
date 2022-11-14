@@ -3,6 +3,7 @@ from .managers import SchATransactionManager
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.shared.utilities import generate_fec_uid
 import uuid
 import logging
 
@@ -108,15 +109,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def check_for_uid_conflicts(uid):  # noqa
         return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
 
-    def generate_uid(self):
-        unique_id = uuid.uuid4()
-        hex_id = unique_id.hex.upper()
-        # Take 20 characters from the end, skipping over the 20th char from the right,
-        # which is the version number (uuid4 -> "4")
-        return hex_id[-21] + hex_id[-19:]
-
     def generate_unique_transaction_id(self):
-        unique_id = self.generate_uid()
+        unique_id = generate_fec_uid()
 
         attempts = 0
         while SchATransaction.check_for_uid_conflicts(unique_id):
