@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ContactSerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
+    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
 ):
     contact_value = dict(
         COM="Committee",

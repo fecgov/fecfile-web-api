@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class MemoTextSerializer(
-    CommitteeOwnedSerializer, serializers.FecSchemaValidatorSerializerMixin
+    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
 ):
     schema_name = "Text"
     report_id = UUIDField(required=True, allow_null=False)

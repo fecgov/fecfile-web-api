@@ -33,9 +33,15 @@ class SchATransactionManager(SoftDeleteManager):
         )
 
     def get_itemization_clause(self):
+        over_two_hundred_types = [
+            "INDIVIDUAL_RECEIPT",
+            "OFFSET_TO_OPERATING_EXPENDITURES",
+            "OTHER_RECEIPT",
+            "TRIBAL_RECEIPT",
+        ]
         return Case(
             When(
-                aggregation_group__in=["GENERAL", "LINE_15", "OTHER_RECEIPTS"],
+                transaction_type_identifier__in=over_two_hundred_types,
                 then=Q(contribution_aggregate__gt=Value(Decimal(200))),
             ),
             default=Value(True),

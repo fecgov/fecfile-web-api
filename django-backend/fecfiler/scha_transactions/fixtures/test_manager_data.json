@@ -3,6 +3,7 @@
         "comment": "first",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "1",
@@ -24,6 +25,7 @@
         "comment": "second",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "2",
@@ -45,6 +47,7 @@
         "comment": "third",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "3",
@@ -66,6 +69,7 @@
         "comment": "different contact",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "4",
@@ -87,6 +91,7 @@
         "comment": "different group",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "OTHER_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "5",
@@ -94,8 +99,8 @@
             "contributor_organization_name": "John Smith & Co.",
             "contributor_first_name": "John",
             "contributor_last_name": "Smith",
-            "contribution_amount": 111.11,
-            "aggregation_group": "NOT GENERAL",
+            "contribution_amount": -111.11,
+            "aggregation_group": "OTHER_RECEIPTS",
             "contribution_date": "2022-01-01",
             "created": "2022-01-01T00:00:00.000Z",
             "updated": "2022-01-01T00:00:00.000Z",
@@ -108,6 +113,7 @@
         "comment": "created after third but same contribution date",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "3.5",
@@ -129,6 +135,7 @@
         "comment": "earlier than third but last year",
         "model": "scha_transactions.schatransaction",
         "fields": {
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "form_type": "SA11AI",
             "filer_committee_id_number": "C00123456",
             "transaction_id": "3.5",
@@ -141,6 +148,94 @@
             "contribution_date": "2021-01-01",
             "created": "2022-01-02T00:00:00.000Z",
             "updated": "2022-01-02T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+        }
+    },
+    {
+        "comment": "jf transfer under $200 - different report",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "transaction_type_identifier": "JOINT_FUNDRAISING_TRANSFER",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "6",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "contribution_amount": 111.11,
+            "aggregation_group": "GENERAL",
+            "contribution_date": "2021-01-01",
+            "created": "2022-01-01T00:00:00.000Z",
+            "updated": "2022-01-01T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+        }
+    },
+    {
+        "comment": "Offset to Operating Expenditures, transaction 1",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "OffsetToOpex-1",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "contribution_amount": 105.25,
+            "aggregation_group": "LINE_15",
+            "contribution_date": "2021-01-01",
+            "created": "2022-01-02T00:00:00.000Z",
+            "updated": "2022-01-02T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+        }
+    },
+    {
+        "comment": "Offset to Operating Expenditures, transaction 2",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "OffsetToOpex-2",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "contribution_amount": 210.75,
+            "aggregation_group": "LINE_15",
+            "contribution_date": "2021-01-02",
+            "created": "2022-01-03T00:00:00.000Z",
+            "updated": "2022-01-03T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+        }
+    },
+    {
+        "comment": "Offset to Operating Expenditures, different year",
+        "model": "scha_transactions.schatransaction",
+        "fields": {
+            "transaction_type_identifier": "OFFSET_TO_OPERATING_EXPENDITURES",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "OffsetToOpex-OtherYear",
+            "entity_type": "IND",
+            "contributor_organization_name": "John Smith & Co.",
+            "contributor_first_name": "John",
+            "contributor_last_name": "Smith",
+            "contribution_amount": 102.50,
+            "aggregation_group": "LINE_15",
+            "contribution_date": "2022-01-03",
+            "created": "2022-01-04T00:00:00.000Z",
+            "updated": "2022-01-04T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
