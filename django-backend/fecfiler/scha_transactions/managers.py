@@ -39,6 +39,7 @@ class SchATransactionManager(SoftDeleteManager):
             "OFFSET_TO_OPERATING_EXPENDITURES",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
+            "TRIBAL_RECOUNT_RECEIPT",
             "PAC_RECOUNT_RECEIPT",
             "PARTY_RECOUNT_RECEIPT",
         ]
