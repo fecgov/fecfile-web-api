@@ -36,6 +36,7 @@ class SchATransactionManager(SoftDeleteManager):
         over_two_hundred_types = [
             "INDIVIDUAL_RECEIPT",
             "INDIVIDUAL_RECOUNT_RECEIPT",
+            "JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "OFFSET_TO_OPERATING_EXPENDITURES",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
@@ -43,6 +44,10 @@ class SchATransactionManager(SoftDeleteManager):
             "PAC_RECOUNT_RECEIPT",
             "PARTY_RECOUNT_RECEIPT",
             "BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT",
+            "JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT",
+            "PAC_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            "INDIVIDUAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            "TRIBAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
         ]
         return Case(
             When(
