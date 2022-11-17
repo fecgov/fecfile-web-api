@@ -42,6 +42,7 @@ class SchATransactionManager(SoftDeleteManager):
             "TRIBAL_RECOUNT_RECEIPT",
             "PAC_RECOUNT_RECEIPT",
             "PARTY_RECOUNT_RECEIPT",
+            "BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT",
         ]
         return Case(
             When(
