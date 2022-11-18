@@ -1,0 +1,6 @@
+fecfiler.shared.utilities.generate\_fec\_uid
+============================================
+
+.. currentmodule:: fecfiler.shared.utilities
+
+.. autofunction:: generate_fec_uid

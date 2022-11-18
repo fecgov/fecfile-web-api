@@ -21,12 +21,15 @@ fecfiler.memo\_text.models.MemoText
    
       ~MemoText.__init__
       ~MemoText.check
+      ~MemoText.check_for_uid_conflicts
       ~MemoText.clean
       ~MemoText.clean_fields
       ~MemoText.date_error_message
       ~MemoText.delete
       ~MemoText.from_db
       ~MemoText.full_clean
+      ~MemoText.generate_report_id
+      ~MemoText.generate_unique_transaction_id
       ~MemoText.get_deferred_fields
       ~MemoText.hard_delete
       ~MemoText.prepare_database_save
@@ -53,12 +56,15 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.deleted
       ~MemoText.filer_committee_id_number
       ~MemoText.id
+      ~MemoText.is_report_level_memo
       ~MemoText.objects
       ~MemoText.pk
       ~MemoText.rec_type
       ~MemoText.report
       ~MemoText.report_id
+      ~MemoText.schatransaction_set
       ~MemoText.text4000
       ~MemoText.transaction_id_number
+      ~MemoText.transaction_uuid
    
    

@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
+=======================================================
+
+.. currentmodule:: fecfiler.shared.test_utilities
+
+.. autoclass:: SharedUtilitiesTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SharedUtilitiesTestCase.__init__
+      ~SharedUtilitiesTestCase.addClassCleanup
+      ~SharedUtilitiesTestCase.addCleanup
+      ~SharedUtilitiesTestCase.addTypeEqualityFunc
+      ~SharedUtilitiesTestCase.assertAlmostEqual
+      ~SharedUtilitiesTestCase.assertAlmostEquals
+      ~SharedUtilitiesTestCase.assertContains
+      ~SharedUtilitiesTestCase.assertCountEqual
+      ~SharedUtilitiesTestCase.assertDictContainsSubset
+      ~SharedUtilitiesTestCase.assertDictEqual
+      ~SharedUtilitiesTestCase.assertEqual
+      ~SharedUtilitiesTestCase.assertEquals
+      ~SharedUtilitiesTestCase.assertFalse
+      ~SharedUtilitiesTestCase.assertFieldOutput
+      ~SharedUtilitiesTestCase.assertFormError
+      ~SharedUtilitiesTestCase.assertFormsetError
+      ~SharedUtilitiesTestCase.assertGreater
+      ~SharedUtilitiesTestCase.assertGreaterEqual
+      ~SharedUtilitiesTestCase.assertHTMLEqual
+      ~SharedUtilitiesTestCase.assertHTMLNotEqual
+      ~SharedUtilitiesTestCase.assertIn
+      ~SharedUtilitiesTestCase.assertInHTML
+      ~SharedUtilitiesTestCase.assertIs
+      ~SharedUtilitiesTestCase.assertIsInstance
+      ~SharedUtilitiesTestCase.assertIsNone
+      ~SharedUtilitiesTestCase.assertIsNot
+      ~SharedUtilitiesTestCase.assertIsNotNone
+      ~SharedUtilitiesTestCase.assertJSONEqual
+      ~SharedUtilitiesTestCase.assertJSONNotEqual
+      ~SharedUtilitiesTestCase.assertLess
+      ~SharedUtilitiesTestCase.assertLessEqual
+      ~SharedUtilitiesTestCase.assertListEqual
+      ~SharedUtilitiesTestCase.assertLogs
+      ~SharedUtilitiesTestCase.assertMultiLineEqual
+      ~SharedUtilitiesTestCase.assertNotAlmostEqual
+      ~SharedUtilitiesTestCase.assertNotAlmostEquals
+      ~SharedUtilitiesTestCase.assertNotContains
+      ~SharedUtilitiesTestCase.assertNotEqual
+      ~SharedUtilitiesTestCase.assertNotEquals
+      ~SharedUtilitiesTestCase.assertNotIn
+      ~SharedUtilitiesTestCase.assertNotIsInstance
+      ~SharedUtilitiesTestCase.assertNotRegex
+      ~SharedUtilitiesTestCase.assertNotRegexpMatches
+      ~SharedUtilitiesTestCase.assertNumQueries
+      ~SharedUtilitiesTestCase.assertQuerysetEqual
+      ~SharedUtilitiesTestCase.assertRaises
+      ~SharedUtilitiesTestCase.assertRaisesMessage
+      ~SharedUtilitiesTestCase.assertRaisesRegex
+      ~SharedUtilitiesTestCase.assertRaisesRegexp
+      ~SharedUtilitiesTestCase.assertRedirects
+      ~SharedUtilitiesTestCase.assertRegex
+      ~SharedUtilitiesTestCase.assertRegexpMatches
+      ~SharedUtilitiesTestCase.assertSequenceEqual
+      ~SharedUtilitiesTestCase.assertSetEqual
+      ~SharedUtilitiesTestCase.assertTemplateNotUsed
+      ~SharedUtilitiesTestCase.assertTemplateUsed
+      ~SharedUtilitiesTestCase.assertTrue
+      ~SharedUtilitiesTestCase.assertTupleEqual
+      ~SharedUtilitiesTestCase.assertURLEqual
+      ~SharedUtilitiesTestCase.assertWarns
+      ~SharedUtilitiesTestCase.assertWarnsMessage
+      ~SharedUtilitiesTestCase.assertWarnsRegex
+      ~SharedUtilitiesTestCase.assertXMLEqual
+      ~SharedUtilitiesTestCase.assertXMLNotEqual
+      ~SharedUtilitiesTestCase.assert_
+      ~SharedUtilitiesTestCase.captureOnCommitCallbacks
+      ~SharedUtilitiesTestCase.countTestCases
+      ~SharedUtilitiesTestCase.debug
+      ~SharedUtilitiesTestCase.defaultTestResult
+      ~SharedUtilitiesTestCase.doClassCleanups
+      ~SharedUtilitiesTestCase.doCleanups
+      ~SharedUtilitiesTestCase.fail
+      ~SharedUtilitiesTestCase.failIf
+      ~SharedUtilitiesTestCase.failIfAlmostEqual
+      ~SharedUtilitiesTestCase.failIfEqual
+      ~SharedUtilitiesTestCase.failUnless
+      ~SharedUtilitiesTestCase.failUnlessAlmostEqual
+      ~SharedUtilitiesTestCase.failUnlessEqual
+      ~SharedUtilitiesTestCase.failUnlessRaises
+      ~SharedUtilitiesTestCase.id
+      ~SharedUtilitiesTestCase.modify_settings
+      ~SharedUtilitiesTestCase.run
+      ~SharedUtilitiesTestCase.setUp
+      ~SharedUtilitiesTestCase.setUpClass
+      ~SharedUtilitiesTestCase.setUpTestData
+      ~SharedUtilitiesTestCase.settings
+      ~SharedUtilitiesTestCase.shortDescription
+      ~SharedUtilitiesTestCase.skipTest
+      ~SharedUtilitiesTestCase.subTest
+      ~SharedUtilitiesTestCase.tearDown
+      ~SharedUtilitiesTestCase.tearDownClass
+      ~SharedUtilitiesTestCase.test_uid_all_uppercase
+      ~SharedUtilitiesTestCase.test_uid_has_length_20
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SharedUtilitiesTestCase.available_apps
+      ~SharedUtilitiesTestCase.databases
+      ~SharedUtilitiesTestCase.fixtures
+      ~SharedUtilitiesTestCase.longMessage
+      ~SharedUtilitiesTestCase.maxDiff
+      ~SharedUtilitiesTestCase.reset_sequences
+      ~SharedUtilitiesTestCase.serialized_rollback
+   
+   

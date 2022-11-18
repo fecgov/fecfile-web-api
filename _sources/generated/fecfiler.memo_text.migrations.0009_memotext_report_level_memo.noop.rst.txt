@@ -1,0 +1,6 @@
+fecfiler.memo\_text.migrations.0009\_memotext\_report\_level\_memo.noop
+=======================================================================
+
+.. currentmodule:: fecfiler.memo_text.migrations.0009_memotext_report_level_memo
+
+.. autofunction:: noop

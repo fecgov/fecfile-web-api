@@ -1,0 +1,6 @@
+fecfiler.scha\_transactions.migrations.0033\_memo\_description\_to\_memo\_record.text\_field\_to\_text\_record
+==============================================================================================================
+
+.. currentmodule:: fecfiler.scha_transactions.migrations.0033_memo_description_to_memo_record
+
+.. autofunction:: text_field_to_text_record

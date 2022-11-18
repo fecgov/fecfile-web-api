@@ -1,0 +1,42 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.memo\_text.migrations.0009\_memotext\_report\_level\_memo
+==================================================================
+
+.. automodule:: fecfiler.memo_text.migrations.0009_memotext_report_level_memo
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      noop
+      set_is_report_level_memo
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

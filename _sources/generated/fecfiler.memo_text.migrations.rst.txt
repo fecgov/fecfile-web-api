@@ -38,4 +38,6 @@ fecfiler.memo\_text.migrations
    fecfiler.memo_text.migrations.0005_committee_fk_to_int
    fecfiler.memo_text.migrations.0006_committee_uuid_fk
    fecfiler.memo_text.migrations.0007_auto_20220915_1309
+   fecfiler.memo_text.migrations.0008_memotext_transaction_uuid
+   fecfiler.memo_text.migrations.0009_memotext_report_level_memo
 

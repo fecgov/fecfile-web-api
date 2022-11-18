@@ -62,4 +62,6 @@ fecfiler.scha\_transactions.migrations
    fecfiler.scha_transactions.migrations.0029_update_scha_transaction_aggregation_group
    fecfiler.scha_transactions.migrations.0030_alter_schatransaction_transaction_id
    fecfiler.scha_transactions.migrations.0031_update_other_receipts_aggregation_group
+   fecfiler.scha_transactions.migrations.0032_schatransaction_memo_text
+   fecfiler.scha_transactions.migrations.0033_memo_description_to_memo_record
 

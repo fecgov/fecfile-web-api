@@ -38,7 +38,6 @@ fecfiler.memo\_text.views.MemoTextViewSet
       ~MemoTextViewSet.get_extra_action_url_map
       ~MemoTextViewSet.get_extra_actions
       ~MemoTextViewSet.get_format_suffix
-      ~MemoTextViewSet.get_next_transaction_id_number
       ~MemoTextViewSet.get_object
       ~MemoTextViewSet.get_paginated_response
       ~MemoTextViewSet.get_parser_context

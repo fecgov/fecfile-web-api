@@ -30,6 +30,7 @@ fecfiler.scha\_transactions.serializers.SchATransactionParentSerializer
       ~SchATransactionParentSerializer.build_url_field
       ~SchATransactionParentSerializer.create
       ~SchATransactionParentSerializer.create_or_update_contact
+      ~SchATransactionParentSerializer.create_or_update_memo_text
       ~SchATransactionParentSerializer.fail
       ~SchATransactionParentSerializer.get_attribute
       ~SchATransactionParentSerializer.get_default
