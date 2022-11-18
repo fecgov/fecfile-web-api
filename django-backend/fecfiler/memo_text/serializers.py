@@ -16,7 +16,6 @@ class MemoTextSerializer(
 
     back_reference_tran_id_number = SerializerMethodField()
 
-
     class Meta:
         model = MemoText
         fields = [
@@ -31,7 +30,6 @@ class MemoTextSerializer(
             "updated",
             "back_reference_tran_id_number",
         ]
-
 
     def get_back_reference_tran_id_number(self, memo_text_obj):
         transaction = get_from_sched_tables_by_uuid(memo_text_obj.transaction_uuid)
