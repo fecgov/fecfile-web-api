@@ -31,6 +31,7 @@ fecfiler.memo\_text.serializers.MemoTextSerializer
       ~MemoTextSerializer.create
       ~MemoTextSerializer.fail
       ~MemoTextSerializer.get_attribute
+      ~MemoTextSerializer.get_back_reference_tran_id_number
       ~MemoTextSerializer.get_default
       ~MemoTextSerializer.get_default_field_names
       ~MemoTextSerializer.get_extra_kwargs
