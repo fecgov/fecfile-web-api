@@ -3,6 +3,7 @@ from .managers import SchATransactionManager
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.shared.utilities import generate_fec_uid
 import uuid
 import logging
 
@@ -85,6 +86,10 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, null=True)
+    memo_text = models.ForeignKey(
+        'memo_text.MemoText',
+        on_delete=models.CASCADE, null=True
+    )
 
     class Meta:
         db_table = "scha_transactions"
@@ -104,15 +109,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def check_for_uid_conflicts(uid):  # noqa
         return len(SchATransaction.objects.filter(transaction_id=uid)) > 0
 
-    def generate_uid(self):
-        unique_id = uuid.uuid4()
-        hex_id = unique_id.hex.upper()
-        # Take 20 characters from the end, skipping over the 20th char from the right,
-        # which is the version number (uuid4 -> "4")
-        return hex_id[-21] + hex_id[-19:]
-
     def generate_unique_transaction_id(self):
-        unique_id = self.generate_uid()
+        unique_id = generate_fec_uid()
 
         attempts = 0
         while SchATransaction.check_for_uid_conflicts(unique_id):
@@ -133,5 +131,8 @@ class SchATransaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             self.transaction_id = self.generate_unique_transaction_id()
         if not self.back_reference_tran_id_number and self.parent_transaction:
             self.update_parent_related_values(self.parent_transaction)
+        if self.memo_text:
+            self.memo_text.transaction_uuid = self.id
+            self.memo_text.save()
 
         super(SchATransaction, self).save(*args, **kwargs)

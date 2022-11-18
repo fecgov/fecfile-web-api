@@ -3,11 +3,18 @@ import logging
 from django.db import transaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.models import Contact
+from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import (BooleanField, DecimalField,
-                                        ListSerializer, UUIDField)
+from rest_framework.serializers import (
+    BooleanField,
+    DecimalField,
+    ListSerializer,
+    UUIDField,
+)
+
 
 from .models import SchATransaction
 
@@ -22,8 +29,10 @@ class SchATransactionSerializer(
     report_id = UUIDField(required=True, allow_null=False)
 
     contact_id = UUIDField(required=False, allow_null=False)
+    memo_text_id = UUIDField(required=False, allow_null=True)
 
     contact = ContactSerializer(allow_null=True, required=False)
+    memo_text = MemoTextSerializer(allow_null=True, required=False)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -60,6 +69,7 @@ class SchATransactionSerializer(
             "parent_transaction_id",
             "report_id",
             "contact_id",
+            "memo_text_id",
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
@@ -107,6 +117,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data)
+            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
             for child in children:
@@ -117,6 +128,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
     def update(self, instance: SchATransaction, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data)
+            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
 
             existing_children = SchATransaction.objects.filter(
@@ -150,6 +162,24 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         else:
             Contact.objects.filter(id=tran_contact_id).update(**contact_data)
 
+    def create_or_update_memo_text(self, validated_data: dict):
+        memo_data = validated_data.pop("memo_text", None)
+        tran_memo_text_id = validated_data.get("memo_text_id", None)
+        if memo_data:
+            memo_text, _ = MemoText.objects.update_or_create(
+                id=tran_memo_text_id,
+                defaults={
+                    "is_report_level_memo": False,
+                    "report_id": validated_data.get("report_id", None),
+                    **memo_data,
+                },
+            )
+            validated_data["memo_text_id"] = memo_text.id
+        elif tran_memo_text_id:
+            memo_object = MemoText.objects.get(id=tran_memo_text_id)
+            memo_object.delete()
+            validated_data["memo_text_id"] = None
+
     class Meta(SchATransactionSerializer.Meta):
         fields = [
             f.name
@@ -160,6 +190,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "parent_transaction",
             "report_id",
             "contact_id",
+            "memo_text_id",
             "children",
             "contribution_aggregate",
             "itemized",

@@ -13,7 +13,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -30,7 +31,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -47,7 +49,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -64,7 +67,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -81,7 +85,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -98,7 +103,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -115,7 +121,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -132,7 +139,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -149,7 +157,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -166,7 +175,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -183,7 +193,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -200,7 +211,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -217,7 +229,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -234,7 +247,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -251,7 +265,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -268,7 +283,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -285,7 +301,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -302,7 +319,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -319,7 +337,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -336,7 +355,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -353,7 +373,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -370,7 +391,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -387,7 +409,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -404,7 +427,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -421,7 +445,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -438,7 +463,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -455,7 +481,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -472,7 +499,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -489,7 +517,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     },
     {
@@ -506,7 +535,8 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70"
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     }
 ]
