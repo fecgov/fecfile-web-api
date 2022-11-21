@@ -1,5 +1,4 @@
 from fecfiler.memo_text.models import MemoText
-from fecfiler.memo_text.views import TRANSACTION_ID_NUMBER_FIELD
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.scha_transactions.models import SchATransaction
@@ -48,8 +47,9 @@ def compose_transactions(report_id):
 
 def compose_report_level_memos(report_id):
     report_level_memos = MemoText.objects.filter(
-        report_id=report_id
-    ).order_by(f"{TRANSACTION_ID_NUMBER_FIELD}")
+        report_id=report_id,
+        transaction_uuid=None,
+    )
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")
         for memo in report_level_memos:
@@ -100,14 +100,21 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         file_content = add_row_to_content(file_content, f3x_summary_row)
 
         transactions = compose_transactions(report_id)
-        transaction_rows = [
-            serialize_model_instance("SchA", SchATransaction, transaction)
-            for transaction in transactions
-        ]
-        for transaction in transaction_rows:
+        for transaction in transactions:
+            serialized_transaction = serialize_model_instance(
+                "SchA", SchATransaction, transaction
+            )
             logger.debug("Serialized Transaction:")
-            logger.debug(transaction)
-            file_content = add_row_to_content(file_content, transaction)
+            logger.debug(serialized_transaction)
+            file_content = add_row_to_content(file_content, serialized_transaction)
+            if transaction.memo_text:
+                memo = transaction.memo_text
+                memo.back_reference_tran_id_number = transaction.transaction_id
+                memo.back_reference_sched_name = transaction.form_type
+                serialized_memo = serialize_model_instance("Text", MemoText, memo)
+                logger.debug("Serialized Memo:")
+                logger.debug(serialized_memo)
+                file_content = add_row_to_content(file_content, serialized_memo)
 
         report_level_memos = compose_report_level_memos(report_id)
         report_level_memo_rows = [

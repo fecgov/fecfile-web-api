@@ -9,6 +9,7 @@ class SchATransactionTestCase(TestCase):
         "test_contacts",
         "test_manager_data",
         "test_f3x_summaries",
+        "test_memo_text",
     ]
 
     def test_aggregate_one(self):
