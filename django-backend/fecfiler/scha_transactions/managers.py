@@ -38,6 +38,7 @@ class SchATransactionManager(SoftDeleteManager):
             "INDIVIDUAL_RECOUNT_RECEIPT",
             "JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "OFFSET_TO_OPERATING_EXPENDITURES",
+            "OTHER_COMMITTEE_NON_CONTRIBUTION_ACCOUNT",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
             "TRIBAL_RECOUNT_RECEIPT",
