@@ -55,6 +55,7 @@ class SchATransactionManager(SoftDeleteManager):
             "INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT",
         ]
         return Case(
+            When(contribution_aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
                 then=Q(contribution_aggregate__gt=Value(Decimal(200))),
