@@ -40,11 +40,13 @@ class SchATransactionManager(SoftDeleteManager):
             "JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
             "OFFSET_TO_OPERATING_EXPENDITURES",
+            "OTHER_COMMITTEE_NON_CONTRIBUTION_ACCOUNT",
             "OTHER_RECEIPT",
             "TRIBAL_RECEIPT",
             "TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
             "TRIBAL_RECOUNT_RECEIPT",
             "PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+            "PAC_NATIONAL_PARTY_RECOUNT_ACCOUNT",
             "PAC_RECOUNT_RECEIPT",
             "PARTY_RECOUNT_RECEIPT",
             "BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT",
@@ -55,6 +57,7 @@ class SchATransactionManager(SoftDeleteManager):
             "INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT",
         ]
         return Case(
+            When(contribution_aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
                 then=Q(contribution_aggregate__gt=Value(Decimal(200))),
