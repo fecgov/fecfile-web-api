@@ -1,6 +1,5 @@
-from .models import F3XSummary, ReportCodeLabel
+from .models import F3XSummary
 from rest_framework.serializers import (
-    ModelSerializer,
     EmailField,
     CharField,
 )
@@ -60,9 +59,3 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
             ]
         ] + ["report_status", "report_code_label"]
         read_only_fields = ["id", "deleted", "created", "updated"]
-
-
-class ReportCodeLabelSerializer(ModelSerializer):
-    class Meta:
-        model = ReportCodeLabel
-        fields = ("label", "report_code")

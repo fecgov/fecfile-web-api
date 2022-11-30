@@ -5,13 +5,13 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import F3XSummary, ReportCodeLabel
+from .models import F3XSummary
 from .report_codes.views import report_code_label_mapping
 from fecfiler.scha_transactions.models import SchATransaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from .serializers import F3XSummarySerializer, ReportCodeLabelSerializer
+from .serializers import F3XSummarySerializer
 from django.db.models import Case, Value, When
 import logging
 
@@ -74,7 +74,6 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",
-        "report_code__label",
         "report_code_label",
         "coverage_through_date",
         "upload_submission__fec_status",
@@ -131,12 +130,6 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
 
         reports.hard_delete()
         return Response(f"Deleted {report_count} Reports")
-
-
-class ReportCodeLabelViewSet(GenericViewSet, ListModelMixin):
-    queryset = ReportCodeLabel.objects.all()
-    serializer_class = ReportCodeLabelSerializer
-    pagination_class = None
 
 
 class ReportViewMixin(GenericViewSet):
