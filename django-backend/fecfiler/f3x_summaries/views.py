@@ -12,10 +12,31 @@ from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XSummarySerializer
-from django.db.models import Case, Value, When
+from django.db.models import Case, Value, When, Q
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def get_status_mapping():
+    """returns Django Case that determines report status based on upload submission"""
+    in_progress = Q(upload_submission__fec_status=None) | Q(upload_submission=None)
+    submitted = Q(
+        upload_submission__fecfile_task_state__in=[
+            FECSubmissionState.INITIALIZING,
+            FECSubmissionState.CREATING_FILE,
+            FECSubmissionState.SUBMITTING,
+        ]
+    ) | Q(upload_submission__fec_status__in=[FECStatus.ACCEPTED, FECStatus.PROCESSING])
+    failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED)
+    rejected = Q(upload_submission__fec_status=FECStatus.REJECTED)
+
+    return Case(
+        When(in_progress, then=Value("In-Progress")),
+        When(submitted, then=Value("Submitted")),
+        When(failed, then=Value("Failed")),
+        When(rejected, then=Value("Rejected")),
+    )
 
 
 class F3XSummaryViewSet(CommitteeOwnedViewSet):
@@ -30,44 +51,9 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
 
     queryset = (
         F3XSummary.objects.annotate(report_code_label=report_code_label_mapping)
-        .annotate(
-            report_status=Case(
-                When(upload_submission=None, then=Value("In-Progress")),
-                When(
-                    upload_submission__fecfile_task_state=FECSubmissionState.INITIALIZING,
-                    then=Value("Submitted"),
-                ),
-                When(
-                    upload_submission__fecfile_task_state=FECSubmissionState.CREATING_FILE,
-                    then=Value("Submitted"),
-                ),
-                When(
-                    upload_submission__fecfile_task_state=FECSubmissionState.SUBMITTING,
-                    then=Value("Submitted"),
-                ),
-                When(
-                    upload_submission__fecfile_task_state=FECSubmissionState.FAILED,
-                    then=Value("Failed"),
-                ),
-                When(
-                    upload_submission__fec_status=FECStatus.ACCEPTED,
-                    then=Value("Submitted"),
-                ),
-                When(
-                    upload_submission__fec_status=FECStatus.PROCESSING,
-                    then=Value("Submitted"),
-                ),
-                When(
-                    upload_submission__fec_status=FECStatus.REJECTED,
-                    then=Value("Rejected"),
-                ),
-                When(upload_submission__fec_status=None, then=Value("In-Progress")),
-                When(upload_submission__fec_status="", then=Value("In-Progress")),
-            ),
-        )
+        .annotate(report_status=get_status_mapping())
         .all()
     )
-    """Join on report code labels"""
 
     serializer_class = F3XSummarySerializer
     permission_classes = []
