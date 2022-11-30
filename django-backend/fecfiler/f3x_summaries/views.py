@@ -29,8 +29,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        F3XSummary.objects.select_related("report_code")
-        .annotate(report_code_label=report_code_label_mapping)
+        F3XSummary.objects.annotate(report_code_label=report_code_label_mapping)
         .annotate(
             report_status=Case(
                 When(upload_submission=None, then=Value("In-Progress")),
