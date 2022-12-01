@@ -3,8 +3,9 @@ from calendar import timegm
 from datetime import datetime
 from fecfiler.settings import SECRET_KEY
 import jwt
-from rest_framework_jwt.compat import get_username_field, get_username
-from rest_framework_jwt.settings import api_settings, settings
+from rest_framework_simplejwt.models.TokenUser import get_username
+from rest_framework_simplejwt.settings import api_settings
+from rest_framework_jwt.settings import settings
 import logging
 from urllib.parse import urlencode
 
@@ -33,35 +34,28 @@ def generate_username(uuid):
 
 
 def jwt_payload_handler(user):
-    username_field = get_username_field()
     username = get_username(user)
-
-    warnings.warn(
-        "The following fields will be removed in the future: "
-        "`email` and `user_id`. ",
-        DeprecationWarning,
-    )
 
     payload = {
         "user_id": user.pk,
         "email": user.email,
         "username": username,
         "role": user.role,
-        "exp": datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
+        "exp": datetime.utcnow() + api_settings.ACCESS_TOKEN_LIFETIME,
     }
 
-    payload[username_field] = username
+    payload["username_field"] = username
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
-    if api_settings.JWT_ALLOW_REFRESH:
+    if api_settings.ROTATE_REFRESH_TOKENS:
         payload["orig_iat"] = timegm(datetime.utcnow().utctimetuple())
 
-    if api_settings.JWT_AUDIENCE is not None:
-        payload["aud"] = api_settings.JWT_AUDIENCE
+    if api_settings.AUDIENCE is not None:
+        payload["aud"] = api_settings.AUDIENCE
 
-    if api_settings.JWT_ISSUER is not None:
-        payload["iss"] = api_settings.JWT_ISSUER
+    if api_settings.ISSUER is not None:
+        payload["iss"] = api_settings.ISSUER
 
     return payload
 

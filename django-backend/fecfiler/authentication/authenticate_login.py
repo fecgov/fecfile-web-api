@@ -6,13 +6,12 @@ from rest_framework.decorators import (
 )
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
-from rest_framework_jwt.settings import api_settings
-from fecfiler.authentication.token import jwt_payload_handler
 from .models import Account
 from datetime import datetime
 from django.http import JsonResponse
 from .serializers import AccountSerializer
 from .permissions import IsAccountOwner
+import json
 import logging
 from fecfiler.settings import E2E_TESTING_LOGIN
 
@@ -32,11 +31,13 @@ def handle_invalid_login(username):
         "message": "ID/Password combination invalid.",
     }, status=401)
 
+def jwt_encode_handler(payload):
+    return json.dump(payload)
+
 
 def handle_valid_login(account):
     update_last_login_time(account)
     payload = jwt_payload_handler(account)
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
     token = jwt_encode_handler(payload)
 
     logger.debug("Successful login: {}".format(account))
