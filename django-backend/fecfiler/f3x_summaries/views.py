@@ -3,7 +3,6 @@ from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary
 from .report_codes.views import report_code_label_mapping
