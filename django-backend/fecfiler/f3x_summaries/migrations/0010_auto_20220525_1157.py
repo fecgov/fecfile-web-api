@@ -8,12 +8,11 @@ import django.db.models.deletion
 def forwards_func(apps, schema_editor):
     original_apps = serializers.python.apps
     serializers.python.apps = apps
-    fixture_file = 'fecfiler/f3x_summaries/fixtures/report_code_labels.json'
-    fixture = open(fixture_file)
-    objects = serializers.deserialize('json', fixture)
-    for obj in objects:
-        obj.save()
-    fixture.close()
+    fixture_file = "fecfiler/f3x_summaries/fixtures/report_code_labels.json"
+    with open(fixture_file) as fixture:
+        objects = serializers.deserialize("json", fixture)
+        for obj in objects:
+            obj.save()
     serializers.python.apps = original_apps
 
 
