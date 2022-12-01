@@ -5,12 +5,9 @@ from django.db import migrations
 
 def patch_report_code_label(apps, schema_editor):
     report_code_label_model = apps.get_model("f3x_summaries", "ReportCodeLabel")  # noqa
-    try:
-        errant_object = report_code_label_model.objects.get(report_code="MY")
-        errant_object.label = "JULY 31 (MY)"
-        errant_object.save()
-    except:
-        print("report code MY not found")
+    errant_object = report_code_label_model.objects.get(report_code="MY")
+    errant_object.label = "JULY 31 (MY)"
+    errant_object.save()
 
 
 class Migration(migrations.Migration):
