@@ -8,6 +8,7 @@ from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
 from .models import Account
 from datetime import datetime
+from .token import jwt_payload_handler
 from django.http import JsonResponse
 from .serializers import AccountSerializer
 from .permissions import IsAccountOwner
@@ -32,7 +33,7 @@ def handle_invalid_login(username):
     }, status=401)
 
 def jwt_encode_handler(payload):
-    return json.dump(payload)
+    return json.dumps(payload)
 
 
 def handle_valid_login(account):

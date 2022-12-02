@@ -3,9 +3,9 @@ from calendar import timegm
 from datetime import datetime
 from fecfiler.settings import SECRET_KEY
 import jwt
-from rest_framework_simplejwt.models.TokenUser import get_username
+from rest_framework_simplejwt.models import TokenUser
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework_jwt.settings import settings
+#from rest_framework_jwt.settings import settings
 import logging
 from urllib.parse import urlencode
 
@@ -13,8 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 def login_dot_gov_logout(request):
-    client_id = settings.OIDC_RP_CLIENT_ID
-    post_logout_redirect_uri = settings.LOGOUT_REDIRECT_URL
+    #client_id = settings.OIDC_RP_CLIENT_ID
+    client_id = ""
+    #post_logout_redirect_uri = settings.LOGOUT_REDIRECT_URL
+    post_logout_redirect_uri = "/"
     state = request.get_signed_cookie('oidc_state')
 
     params = {
@@ -23,7 +25,8 @@ def login_dot_gov_logout(request):
         'state': state,
     }
     query = urlencode(params)
-    op_logout_url = settings.OIDC_OP_LOGOUT_ENDPOINT
+    #op_logout_url = settings.OIDC_OP_LOGOUT_ENDPOINT
+    op_logout_url = "/"
     redirect_url = '{url}?{query}'.format(url=op_logout_url, query=query)
 
     return redirect_url
@@ -34,14 +37,14 @@ def generate_username(uuid):
 
 
 def jwt_payload_handler(user):
-    username = get_username(user)
+    username = TokenUser.get_username(user)
 
     payload = {
         "user_id": user.pk,
         "email": user.email,
         "username": username,
         "role": user.role,
-        "exp": datetime.utcnow() + api_settings.ACCESS_TOKEN_LIFETIME,
+#        "exp": datetime.utcnow() + api_settings.ACCESS_TOKEN_LIFETIME,
     }
 
     payload["username_field"] = username
