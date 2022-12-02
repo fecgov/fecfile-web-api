@@ -4,8 +4,9 @@ ENV PYTHONUNBUFFERED=1
 RUN mkdir /opt/nxg_fec_e2e
 WORKDIR /opt/nxg_fec_e2e
 ADD requirements.txt /opt
+ADD django-backend /opt/nxg_fec_e2e/
 RUN pip3 install -r /opt/requirements.txt
 
 RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
 
-ENTRYPOINT ["/bin/sh", "-c", "celery -A fecfiler worker --loglevel=info"]
+ENTRYPOINT ["/bin/sh", "-c", "cd django-backend && celery -A fecfiler worker --loglevel=info"]
