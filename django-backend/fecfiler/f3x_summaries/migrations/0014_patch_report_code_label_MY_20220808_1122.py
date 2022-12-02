@@ -13,12 +13,11 @@ def patch_report_code_label(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('f3x_summaries', '0013_auto_20220807_0743'),
+        ("f3x_summaries", "0013_auto_20220807_0743"),
     ]
 
     operations = [
         migrations.RunPython(
-            code=patch_report_code_label,
-            reverse_code=migrations.RunPython.noop
+            code=patch_report_code_label, reverse_code=migrations.RunPython.noop
         )
     ]
