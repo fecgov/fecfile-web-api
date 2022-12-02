@@ -34,6 +34,7 @@ fecfiler.f3x\_summaries
    fecfiler.f3x_summaries.apps
    fecfiler.f3x_summaries.migrations
    fecfiler.f3x_summaries.models
+   fecfiler.f3x_summaries.report_codes
    fecfiler.f3x_summaries.serializers
    fecfiler.f3x_summaries.signals
    fecfiler.f3x_summaries.test_models

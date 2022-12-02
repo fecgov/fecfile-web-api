@@ -23,7 +23,6 @@ fecfiler.f3x\_summaries.serializers
       :template: custom-class-template.rst               
    
       F3XSummarySerializer
-      ReportCodeLabelSerializer
    
    
 

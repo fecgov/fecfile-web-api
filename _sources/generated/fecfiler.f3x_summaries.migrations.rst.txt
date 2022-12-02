@@ -56,4 +56,5 @@ fecfiler.f3x\_summaries.migrations
    fecfiler.f3x_summaries.migrations.0023_committee_fk_to_int
    fecfiler.f3x_summaries.migrations.0024_committee_uuid_fk
    fecfiler.f3x_summaries.migrations.0025_auto_20220915_1309
+   fecfiler.f3x_summaries.migrations.0026_auto_20221130_1459
 

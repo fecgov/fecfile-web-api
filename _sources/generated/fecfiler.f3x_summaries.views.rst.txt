@@ -12,6 +12,13 @@ fecfiler.f3x\_summaries.views
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_status_mapping
+   
    
 
    
@@ -23,7 +30,6 @@ fecfiler.f3x\_summaries.views
       :template: custom-class-template.rst               
    
       F3XSummaryViewSet
-      ReportCodeLabelViewSet
       ReportViewMixin
    
    

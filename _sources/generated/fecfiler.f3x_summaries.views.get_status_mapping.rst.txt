@@ -1,0 +1,6 @@
+fecfiler.f3x\_summaries.views.get\_status\_mapping
+==================================================
+
+.. currentmodule:: fecfiler.f3x_summaries.views
+
+.. autofunction:: get_status_mapping

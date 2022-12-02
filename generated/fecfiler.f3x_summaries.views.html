@@ -15,7 +15,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.f3x_summaries.views.F3XSummaryViewSet" href="fecfiler.f3x_summaries.views.F3XSummaryViewSet.html" />
+    <link rel="next" title="fecfiler.f3x_summaries.views.get_status_mapping" href="fecfiler.f3x_summaries.views.get_status_mapping.html" />
     <link rel="prev" title="fecfiler.f3x_summaries.urls" href="fecfiler.f3x_summaries.urls.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,6 +35,18 @@
             
   <section id="module-fecfiler.f3x_summaries.views">
 <span id="fecfiler-f3x-summaries-views"></span><h1>fecfiler.f3x_summaries.views<a class="headerlink" href="#module-fecfiler.f3x_summaries.views" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.f3x_summaries.views.get_status_mapping.html#fecfiler.f3x_summaries.views.get_status_mapping" title="fecfiler.f3x_summaries.views.get_status_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_status_mapping</span></code></a>()</p></td>
+<td><p>returns Django Case that determines report status based on upload submission</p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -45,10 +57,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.f3x_summaries.views.F3XSummaryViewSet.html#fecfiler.f3x_summaries.views.F3XSummaryViewSet" title="fecfiler.f3x_summaries.views.F3XSummaryViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">F3XSummaryViewSet</span></code></a>(**kwargs)</p></td>
 <td><p>This viewset automatically provides <cite>list</cite>, <cite>create</cite>, <cite>retrieve</cite>, <cite>update</cite> and <cite>destroy</cite> actions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.f3x_summaries.views.ReportCodeLabelViewSet.html#fecfiler.f3x_summaries.views.ReportCodeLabelViewSet" title="fecfiler.f3x_summaries.views.ReportCodeLabelViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportCodeLabelViewSet</span></code></a>(**kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.f3x_summaries.views.ReportViewMixin.html#fecfiler.f3x_summaries.views.ReportViewMixin" title="fecfiler.f3x_summaries.views.ReportViewMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportViewMixin</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.f3x_summaries.views.ReportViewMixin.html#fecfiler.f3x_summaries.views.ReportViewMixin" title="fecfiler.f3x_summaries.views.ReportViewMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportViewMixin</span></code></a>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -83,6 +92,7 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.apps.html">fecfiler.f3x_summaries.apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.html">fecfiler.f3x_summaries.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.models.html">fecfiler.f3x_summaries.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.report_codes.html">fecfiler.f3x_summaries.report_codes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.serializers.html">fecfiler.f3x_summaries.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.signals.html">fecfiler.f3x_summaries.signals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.test_models.html">fecfiler.f3x_summaries.test_models</a></li>
@@ -90,8 +100,8 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.test_views.html">fecfiler.f3x_summaries.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.urls.html">fecfiler.f3x_summaries.urls</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.f3x_summaries.views</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.views.get_status_mapping.html">fecfiler.f3x_summaries.views.get_status_mapping</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.views.F3XSummaryViewSet.html">fecfiler.f3x_summaries.views.F3XSummaryViewSet</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.views.ReportCodeLabelViewSet.html">fecfiler.f3x_summaries.views.ReportCodeLabelViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.views.ReportViewMixin.html">fecfiler.f3x_summaries.views.ReportViewMixin</a></li>
 </ul>
 </li>
@@ -121,7 +131,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a><ul>
       <li>Previous: <a href="fecfiler.f3x_summaries.urls.html" title="previous chapter">fecfiler.f3x_summaries.urls</a></li>
-      <li>Next: <a href="fecfiler.f3x_summaries.views.F3XSummaryViewSet.html" title="next chapter">fecfiler.f3x_summaries.views.F3XSummaryViewSet</a></li>
+      <li>Next: <a href="fecfiler.f3x_summaries.views.get_status_mapping.html" title="next chapter">fecfiler.f3x_summaries.views.get_status_mapping</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
