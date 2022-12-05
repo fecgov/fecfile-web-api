@@ -10,6 +10,11 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
+        print(
+            '\n\n\n',
+            self.request.__dict__.keys(),
+            '\n\n\n'
+        )
         committee_id = self.request.user.cmtee_id
         queryset = super().get_queryset()
         return queryset.filter(committee_account__committee_id=committee_id)

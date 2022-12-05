@@ -1,11 +1,12 @@
 import warnings
 from calendar import timegm
-from datetime import datetime
+from datetime import datetime, timedelta
 from fecfiler.settings import SECRET_KEY
 import jwt
 from rest_framework_simplejwt.models import TokenUser
 from rest_framework_simplejwt.settings import api_settings
 #from rest_framework_jwt.settings import settings
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 from urllib.parse import urlencode
 
@@ -39,15 +40,14 @@ def generate_username(uuid):
 def jwt_payload_handler(user):
     username = TokenUser.get_username(user)
 
+    print("\n\n\nUser:", user, "\n\n\n")
     payload = {
         "user_id": user.pk,
         "email": user.email,
         "username": username,
         "role": user.role,
-#        "exp": datetime.utcnow() + api_settings.ACCESS_TOKEN_LIFETIME,
+        "exp": datetime.utcnow() + timedelta(minutes=30),
     }
-
-    payload["username_field"] = username
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -68,6 +68,7 @@ def verify_token(token_received):
         "verify_exp": True,  # Skipping expiration date check
         "verify_aud": False,
     }  # Skipping audience check
+    print("\n\n\nPayload received:",payload,"\n\n\n")
     payload = jwt.decode(
         token_received, key=SECRET_KEY, algorithms="HS256", options=options
     )

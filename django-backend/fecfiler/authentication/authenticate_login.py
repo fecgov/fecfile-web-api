@@ -6,15 +6,17 @@ from rest_framework.decorators import (
 )
 from rest_framework import permissions, status, views, viewsets
 from rest_framework.response import Response
+
+from fecfiler.settings import SECRET_KEY, E2E_TESTING_LOGIN
 from .models import Account
 from datetime import datetime
 from .token import jwt_payload_handler
+from rest_framework_simplejwt.tokens import RefreshToken
+import jwt
 from django.http import JsonResponse
 from .serializers import AccountSerializer
 from .permissions import IsAccountOwner
-import json
 import logging
-from fecfiler.settings import E2E_TESTING_LOGIN
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +35,7 @@ def handle_invalid_login(username):
     }, status=401)
 
 def jwt_encode_handler(payload):
-    return json.dumps(payload)
-
+    return jwt.encode(payload, key=SECRET_KEY, algorithm="HS256")
 
 def handle_valid_login(account):
     update_last_login_time(account)
@@ -46,7 +47,7 @@ def handle_valid_login(account):
         "is_allowed": True,
         "committee_id": account.cmtee_id,
         "email": account.email,
-        "token": token,
+        "token": str(token),
     }, status=200, safe=False)
 
 
