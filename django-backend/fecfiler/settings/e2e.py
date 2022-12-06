@@ -21,7 +21,7 @@ LOGGING = {
 }
 
 # E2E Testing Login API
-os.environ["DOCKERFILE"] = "Dockerfile-e2e"
+os.environ["DB_DOCKERFILE"] = "Dockerfile-e2e"
 E2E_TESTING_LOGIN = True
 
 try:
