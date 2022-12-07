@@ -37,19 +37,19 @@ def handle_invalid_login(username):
 def jwt_encode_handler(payload):
     return jwt.encode(payload, key=SECRET_KEY, algorithm="HS256")
 
-def handle_valid_login(account):
+def handle_valid_login(request, account):
     update_last_login_time(account)
-    payload = jwt_payload_handler(account)
-    token = jwt_encode_handler(payload)
+    request.session['user_id'] = account.pk
 
     logger.debug("Successful login: {}".format(account))
     return JsonResponse({
         "is_allowed": True,
         "committee_id": account.cmtee_id,
         "email": account.email,
-        "token": str(token),
     }, status=200, safe=False)
 
+def get_logged_in_user(request):
+    return Account.objects.get(pk=request.session.get('user_id'))
 
 @api_view(["POST", "GET"])
 @authentication_classes([])
@@ -68,7 +68,7 @@ def authenticate_login(request):
     )  # Returns an account if the username is found and the password is valid
 
     if account:
-        return handle_valid_login(account)
+        return handle_valid_login(request, account)
     else:
         return handle_invalid_login(username)
 
@@ -79,7 +79,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Account.objects.all()
-        queryset = queryset.filter(self.request.user)
+        queryset = queryset.filter(get_logged_in_user(self.request))
         serializer_class = AccountSerializer(Account, many=True)
         return JsonResponse(serializer_class.data, safe=False)
 

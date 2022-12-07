@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from fecfiler.web_services.models import UploadSubmission, WebPrintSubmission
 from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.authentication.authenticate_login import get_logged_in_user
 
 
 class ReportIdSerializer(serializers.Serializer):
@@ -8,7 +9,8 @@ class ReportIdSerializer(serializers.Serializer):
 
     def validate(self, data):
         request = self.context["request"]
-        committee_id = request.user.cmtee_id
+        user = get_logged_in_user(request)
+        committee_id = user.cmtee_id
         f3x_summary_result = F3XSummary.objects.filter(
             id=data["report_id"], committee_account__committee_id=committee_id
         )

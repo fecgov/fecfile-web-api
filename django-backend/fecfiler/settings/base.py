@@ -34,12 +34,6 @@ E2E_TESTING_LOGIN = True
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
-OTP_MAX_RETRY = 20
-OTP_DIGIT = 6
-OTP_TIME_EXPIRY = 300
-OTP_TIMEOUT_TIME = 30
-OTP_DISABLE = True
-OTP_DEFAULT_PASSCODE = "111111"
 JWT_PASSWORD_EXPIRY = 1800
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -66,7 +60,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "rest_framework_simplejwt",
     "drf_spectacular",
     "corsheaders",
     "storages",
@@ -153,7 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# OIDC settings start
+# OpenID Connect settings start
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
@@ -231,7 +224,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
 #        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
@@ -239,12 +231,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-}
-
-JWT_AUTH = {
-    "JWT_ALLOW_REFRESH": True,
-    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
-    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
 }
 
 LOGGING = {

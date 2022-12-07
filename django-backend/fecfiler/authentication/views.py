@@ -1,5 +1,6 @@
 from django.views.generic import View
 from django.http import HttpResponseRedirect
+from .authenticate_login import get_logged_in_user
 
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
@@ -44,20 +45,21 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
     def get_queryset(self):
         queryset = Account.objects.annotate(
             name=Concat('last_name', Value(', '), 'first_name', output_field=CharField())
-        ).filter(cmtee_id=self.request.user.cmtee_id).all()
+        ).filter(cmtee_id=get_logged_in_user(self.request).cmtee_id).all()
 
         return queryset
 
 
 class LoginDotGovSuccessSpaRedirect(View):
     def get(self, request, *args, **kwargs):
+        user = get_logged_in_user(request)
         redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
         redirect.set_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
-                            request.user.cmtee_id,
+                            user.cmtee_id,
                             domain=FFAPI_COOKIE_DOMAIN,
                             secure=True)
         redirect.set_cookie(FFAPI_EMAIL_COOKIE_NAME,
-                            request.user.email,
+                            user.email,
                             domain=FFAPI_COOKIE_DOMAIN,
                             secure=True)
         return redirect

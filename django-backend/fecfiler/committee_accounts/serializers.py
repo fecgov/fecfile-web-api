@@ -1,4 +1,5 @@
 from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.authentication.authenticate_login import get_logged_in_user
 from rest_framework import serializers, relations
 import logging
 
@@ -20,7 +21,8 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         CommitteeAccount as the owner of the object
         """
         request = self.context["request"]
-        committee_id = request.user.cmtee_id
+        user = get_logged_in_user(request)
+        committee_id = user.cmtee_id
         committee = CommitteeAccount.objects.get(committee_id=committee_id)
         data["committee_account"] = committee.id
         return super().to_internal_value(data)
