@@ -27,7 +27,7 @@ class ContactSerializer(
         fields = [
             f.name
             for f in Contact._meta.get_fields()
-            if f.name not in ["deleted", "schatransaction",]
+            if f.name not in ["deleted", "schatransaction"]
         ]
         fields.append("transaction_count")
         read_only_fields = [

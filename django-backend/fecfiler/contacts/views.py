@@ -56,7 +56,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             max_allowed_results,
         )
 
-        query_params = urlencode({"q": q, "api_key": FEC_API_KEY,})
+        query_params = urlencode({"q": q, "api_key": FEC_API_KEY})
         url = "{url}?{query_params}".format(
             url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT, query_params=query_params
         )
