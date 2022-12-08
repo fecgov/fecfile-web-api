@@ -54,8 +54,14 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 15 * 60  # Inactivity timeout
+SESSION_COOKIE_AGE = 30 * 60  # Inactivity timeout
 SESSION_SAVE_EVERY_REQUEST = True
+
+URLS_TO_EXCLUDE_FROM_AUTH_CHECK = [
+    "/api/v1/user/login/authenticate",
+    "/api/v1/auth/login-redirect",
+    "/api/v1/auth/logout-redirect",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -90,6 +96,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "fecfiler.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
