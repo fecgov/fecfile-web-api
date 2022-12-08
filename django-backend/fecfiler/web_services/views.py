@@ -24,8 +24,6 @@ class WebServicesViewSet(viewsets.ViewSet):
     retrieve thier statuses and results
     """
 
-    permission_classes = []
-
     @action(
         detail=False,
         methods=["post"],

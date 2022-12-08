@@ -7,5 +7,5 @@ class AuthMiddleware:
     def __call__(self, request):
         if (request.session and request.session.get('user_id')):
             request.user = Account.objects.get(pk=request.session.get('user_id'))
-        
+
         return self.get_response(request)
