@@ -8,18 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ReportCodeLabel(models.Model):
-    label = models.TextField(null=True, blank=True)
-    report_code = models.TextField(null=True, blank=True, unique=True)
-
-    def __str__(self):
-        return self.label
-
-    class Meta:
-        db_table = "report_code_labels"
-        indexes = [models.Index(fields=["report_code"])]
-
-
 class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
@@ -48,14 +36,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     )
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
-    report_code = models.ForeignKey(
-        ReportCodeLabel,
-        models.SET_NULL,
-        null=True,
-        blank=True,
-        to_field="report_code",
-        db_column="report_code",
-    )
+    report_code = models.TextField(null=True, blank=True)
     election_code = models.TextField(null=True, blank=True)
     date_of_election = models.DateField(null=True, blank=True)
     state_of_election = models.TextField(null=True, blank=True)
