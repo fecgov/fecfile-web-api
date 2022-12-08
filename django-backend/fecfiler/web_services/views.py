@@ -12,7 +12,6 @@ from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
-from fecfiler.authentication.authenticate_login import get_logged_in_user
 
 import logging
 
@@ -24,6 +23,8 @@ class WebServicesViewSet(viewsets.ViewSet):
     A viewset that provides actions to start web service tasks and
     retrieve thier statuses and results
     """
+
+    permission_classes = []
 
     @action(
         detail=False,
@@ -53,8 +54,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Download the most recent .FEC created for a report
         Currently only useful for testing purposes
         """
-        user = get_logged_in_user(request)
-        committee_id = user.cmtee_id
+        committee_id = request.user.cmtee_id
         dot_fec_record = DotFEC.objects.filter(
             report__id=report_id, report__committee_account__committee_id=committee_id
         ).order_by("-file_name")

@@ -48,16 +48,6 @@ def handle_valid_login(request, account):
         "login_dot_gov": False,
     }, status=200, safe=False)
 
-def get_logged_in_user(request):
-    user_id = -1
-    if (request.user.pk):
-        user_id = request.user.pk
-    else:
-        user_id = request.session.get('user_id')
-
-    if (user_id and user_id >= 0):
-        return Account.objects.get(pk=user_id)
-
 @api_view(["POST", "GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -86,7 +76,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Account.objects.all()
-        queryset = queryset.filter(get_logged_in_user(self.request))
+        queryset = queryset.filter(self.request.user)
         serializer_class = AccountSerializer(Account, many=True)
         return JsonResponse(serializer_class.data, safe=False)
 

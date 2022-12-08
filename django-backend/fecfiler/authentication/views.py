@@ -1,6 +1,5 @@
 from django.views.generic import View
 from django.http import HttpResponseRedirect
-from .authenticate_login import get_logged_in_user
 
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
@@ -45,7 +44,7 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
     def get_queryset(self):
         queryset = Account.objects.annotate(
             name=Concat('last_name', Value(', '), 'first_name', output_field=CharField())
-        ).filter(cmtee_id=get_logged_in_user(self.request).cmtee_id).all()
+        ).filter(cmtee_id=self.request.user.cmtee_id).all()
 
         return queryset
 
