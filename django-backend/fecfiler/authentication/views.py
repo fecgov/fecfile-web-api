@@ -52,14 +52,14 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
 
 class LoginDotGovSuccessSpaRedirect(View):
     def get(self, request, *args, **kwargs):
-        user = get_logged_in_user(request)
+        request.session['user_id'] = request.user.pk
         redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
         redirect.set_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME,
-                            user.cmtee_id,
+                            request.user.cmtee_id,
                             domain=FFAPI_COOKIE_DOMAIN,
                             secure=True)
         redirect.set_cookie(FFAPI_EMAIL_COOKIE_NAME,
-                            user.email,
+                            request.user.email,
                             domain=FFAPI_COOKIE_DOMAIN,
                             secure=True)
         return redirect

@@ -22,6 +22,11 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         """
         request = self.context["request"]
         user = get_logged_in_user(request)
+        print(
+            '\n\n\n',
+            'Committee ID:', user.pk, user.cmtee_id,
+            '\n\n\n'
+        )
         committee_id = user.cmtee_id
         committee = CommitteeAccount.objects.get(committee_id=committee_id)
         data["committee_account"] = committee.id

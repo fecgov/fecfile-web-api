@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from fecfiler.settings import SECRET_KEY, E2E_TESTING_LOGIN
 from .models import Account
 from datetime import datetime
-from .token import jwt_payload_handler
 from rest_framework_simplejwt.tokens import RefreshToken
 import jwt
 from django.http import JsonResponse
@@ -46,10 +45,18 @@ def handle_valid_login(request, account):
         "is_allowed": True,
         "committee_id": account.cmtee_id,
         "email": account.email,
+        "login_dot_gov": False,
     }, status=200, safe=False)
 
 def get_logged_in_user(request):
-    return Account.objects.get(pk=request.session.get('user_id'))
+    user_id = -1
+    if (request.user.pk):
+        user_id = request.user.pk
+    else:
+        user_id = request.session.get('user_id')
+
+    if (user_id and user_id >= 0):
+        return Account.objects.get(pk=user_id)
 
 @api_view(["POST", "GET"])
 @authentication_classes([])

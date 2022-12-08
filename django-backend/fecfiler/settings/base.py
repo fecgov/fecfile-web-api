@@ -198,7 +198,7 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
 OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.token.login_dot_gov_logout"
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
-# OIDC settings end
+# OpenID Connect settings end
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
