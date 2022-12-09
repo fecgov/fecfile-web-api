@@ -20,7 +20,6 @@ DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-
 CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
@@ -33,7 +32,6 @@ E2E_TESTING_LOGIN = True
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
-JWT_PASSWORD_EXPIRY = 1800
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
@@ -71,8 +69,6 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "django_otp",
-    "django_otp.plugins.otp_totp",
     "fecfiler.triage",
 ]
 
