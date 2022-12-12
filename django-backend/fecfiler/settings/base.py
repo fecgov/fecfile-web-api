@@ -75,13 +75,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "fecfiler.authentication.middleware.AuthMiddleware"
+    #"fecfiler.authentication.middleware.AuthMiddleware"
 ]
 
 TEMPLATES = [
@@ -125,10 +125,10 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # OpenID Connect settings start
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
-)
+]
 
 OIDC_CREATE_USER = True
 OIDC_STORE_ID_TOKEN = True
