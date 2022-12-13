@@ -1,6 +1,6 @@
 from django.views.generic import View
 from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, login
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -206,6 +206,7 @@ def authenticate_login(request):
     )  # Returns an account if the username is found and the password is valid
 
     if account:
+        login(request, account)
         return handle_valid_login(account)
     else:
         return handle_invalid_login(username)
