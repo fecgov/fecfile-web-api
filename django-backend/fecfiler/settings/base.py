@@ -81,7 +81,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    #"fecfiler.authentication.middleware.AuthMiddleware"
 ]
 
 TEMPLATES = [
@@ -173,9 +172,9 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
 }
 
-OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.token.login_dot_gov_logout"
+OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 
-OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
+OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 # OpenID Connect settings end
 
 LANGUAGE_CODE = "en-us"
@@ -217,14 +216,9 @@ LOGGING = {
         "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
     },
     "handlers": {
-        "default": {
-            "class": "logging.StreamHandler",
-            "formatter": "standard",
-        },
+        "default": {"class": "logging.StreamHandler", "formatter": "standard",},
     },
-    "loggers": {
-        "": {"handlers": ["default"], "level": "INFO", "propagate": True},
-    },
+    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True},},
 }
 
 """Celery configurations
