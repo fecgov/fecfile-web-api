@@ -1,5 +1,5 @@
-from django.db import models, IntegrityError
-from psycopg2.errors import UniqueViolation
+from django.db import models
+from django.core.exceptions import ValidationError
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
@@ -26,9 +26,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     aggregation_group = models.TextField(null=True, blank=True)
 
     parent_transaction_content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE
+        ContentType, on_delete=models.CASCADE, null=True, blank=True
     )
-    parent_transaction_object_id = models.PositiveIntegerField()
+    parent_transaction_object_id = models.UUIDField(null=True, blank=True)
     parent_transaction = GenericForeignKey(
         "parent_transaction_content_type", "parent_transaction_object_id"
     )
@@ -37,7 +37,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     # TODO remove from model after refactoring .fec services
     filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(
-        null=True,
+        null=False,
         blank=False,
         unique=True,
         default=generate_fec_uid,
@@ -76,7 +76,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
         try:
-            super(Transaction, self).save(*args, **kwargs)
-        except IntegrityError:  # try using a new fec id if collision
+            super(Transaction, self).validate_unique()
+        except ValidationError:  # try using a new fec id if collision
             self.transaction_id = generate_fec_uid()
-            super(Transaction, self).save(*args, **kwargs)
+        super(Transaction, self).save(*args, **kwargs)

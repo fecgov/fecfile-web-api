@@ -7,6 +7,7 @@ from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 
 from .models import ScheduleATransaction
+from .serializers import ScheduleATransactionSerializer
 from django.db.models import TextField, Value, Q
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ from rest_framework import status
 logger = logging.getLogger(__name__)
 
 
-class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
+class ScheduleATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -25,7 +26,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = ScheduleATransaction.alias(
+    queryset = ScheduleATransaction.objects.alias(
         contributor_name=Coalesce(
             "contributor_organization_name",
             Concat(
@@ -37,7 +38,7 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
     ).all()
 
-    serializer_class = SchATransactionParentSerializer
+    serializer_class = ScheduleATransactionSerializer
     permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [

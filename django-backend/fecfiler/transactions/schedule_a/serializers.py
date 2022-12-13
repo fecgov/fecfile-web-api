@@ -13,43 +13,44 @@ from rest_framework.serializers import (
     DecimalField,
     ListSerializer,
     UUIDField,
+    CharField,
 )
 
 
 from .models import ScheduleATransaction
 
 logger = logging.getLogger(__name__)
+MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
+    {"transaction_type_identifier": ["No transaction_type_identifier provided"]}
+)
 
 
-class SchATransactionSerializer(
+class ScheduleATransactionSerializerBase(
     serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
 ):
-    parent_transaction_id = UUIDField(required=False, allow_null=True)
+    """id must be explicitly configured in order to have it in validated_data
+    https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
 
+    id = UUIDField(required=False)
+    transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
-
+    # maybe we can factor these out on the front end since we send the whole contact/memo_text object
     contact_id = UUIDField(required=False, allow_null=False)
     memo_text_id = UUIDField(required=False, allow_null=True)
 
     contact = ContactSerializer(allow_null=True, required=False)
     memo_text = MemoTextSerializer(allow_null=True, required=False)
 
+    """ These fields are generated in the query"""
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
-
     itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
         if not transaction_type:
-            raise ValidationError(
-                {
-                    "transaction_type_identifier": [
-                        "No transaction_type_identifier provided"
-                    ]
-                }
-            )
+            raise MISSING_TRANSACTION_TYPE_ERROR
         return transaction_type
 
     def validate(self, attrs):
@@ -60,13 +61,12 @@ class SchATransactionSerializer(
         return data
 
     class Meta:
-        model = SchATransaction
+        model = ScheduleATransaction
         fields = [
             f.name
-            for f in SchATransaction._meta.get_fields()
-            if f.name not in ["deleted", "schatransaction"]
+            for f in ScheduleATransaction._meta.get_fields()
+            if f.name not in ["deleted", "scheduleatransaction"]
         ] + [
-            "parent_transaction_id",
             "report_id",
             "contact_id",
             "memo_text_id",
@@ -83,9 +83,9 @@ class SchATransactionSerializer(
         ]
 
 
-class SchATransactionParentSerializer(SchATransactionSerializer):
+class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
     children = ListSerializer(
-        child=SchATransactionSerializer(),
+        child=ScheduleATransactionSerializerBase(),
         allow_null=True,
         allow_empty=True,
         required=False,
@@ -95,8 +95,8 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         ret = super().to_representation(instance)
 
         # Add child transactions to transaction.children field in JSON output
-        existing_children = SchATransaction.objects.filter(
-            parent_transaction_id=instance.id
+        existing_children = ScheduleATransaction.objects.filter(
+            parent_transaction_object_id=instance.id
         ).all()
         ret["children"] = map(self.to_representation, existing_children)
         return ret
@@ -106,8 +106,10 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
         # we need to ensure their object properties are UUIDs and not objects
         def insert_foreign_keys(transaction):
             transaction["report"] = transaction["report_id"]
-            if "parent_transaction_id" in transaction:
-                transaction["parent_transaction"] = transaction["parent_transaction_id"]
+            if "parent_transaction_object_id" in transaction:
+                transaction["parent_transaction"] = transaction[
+                    "parent_transaction_object_id"
+                ]
             return transaction
 
         if "children" in data:
@@ -121,32 +123,28 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
             for child in children:
-                child["parent_transaction_id"] = parent.id
+                child["parent_transaction_object_id"] = parent.id
                 self.create(child)
             return parent
 
-    def update(self, instance: SchATransaction, validated_data: dict):
+    def update(self, instance: ScheduleATransaction, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data)
             self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
 
-            existing_children = SchATransaction.objects.filter(
-                parent_transaction_id=instance.id
+            existing_children = ScheduleATransaction.objects.filter(
+                parent_transaction_object_id=instance.id
             ).all()
-            children_to_delete = [child.id for child in existing_children]
             for child in children:
                 try:
                     """this will not make multiple db calls because
                     the existing_children queryset is cached
                     """
                     existing_child = existing_children.get(id=child.get("id", None))
-                    children_to_delete.remove(existing_child.get("id", None))
                     self.update(existing_child, child)
-                except SchATransaction.DoesNotExist:
+                except ScheduleATransaction.DoesNotExist:
                     self.create(child)
-            print(f"children to delete: {children_to_delete}")
-            SchATransaction.objects.filter(id__in=children_to_delete).delete()
             return super().update(instance, validated_data)
 
     def create_or_update_contact(self, validated_data: dict):
@@ -180,13 +178,12 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             memo_object.delete()
             validated_data["memo_text_id"] = None
 
-    class Meta(SchATransactionSerializer.Meta):
+    class Meta(ScheduleATransactionSerializerBase.Meta):
         fields = [
             f.name
-            for f in SchATransaction._meta.get_fields()
-            if f.name not in ["deleted", "schatransaction"]
+            for f in ScheduleATransaction._meta.get_fields()
+            if f.name not in ["deleted", "scheduleatransaction"]
         ] + [
-            "parent_transaction_id",
             "parent_transaction",
             "report_id",
             "contact_id",

@@ -1,4 +1,4 @@
-from .models import Transaction
+from fecfiler.transactions.models import Transaction
 from django.db import models
 from .managers import ScheduleATransactionManager
 
@@ -47,3 +47,6 @@ class ScheduleATransaction(Transaction):
         return virtual_fields[field_name]
 
     objects = ScheduleATransactionManager()
+
+    class Meta:
+        app_label = "transactions"

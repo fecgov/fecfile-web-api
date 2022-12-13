@@ -21,7 +21,14 @@ class MemoTextSerializer(
         fields = [
             f.name
             for f in MemoText._meta.get_fields()
-            if f.name not in ["report", "deleted", "schatransaction"]
+            if f.name
+            not in [
+                "report",
+                "deleted",
+                "schatransaction",
+                "scheduleatransaction",
+                "schedulebtransaction",
+            ]
         ] + ["report_id"]
         read_only_fields = [
             "id",
@@ -33,5 +40,5 @@ class MemoTextSerializer(
 
     def get_back_reference_tran_id_number(self, memo_text_obj):
         transaction = get_from_sched_tables_by_uuid(memo_text_obj.transaction_uuid)
-        if (transaction):
+        if transaction:
             return transaction.transaction_id

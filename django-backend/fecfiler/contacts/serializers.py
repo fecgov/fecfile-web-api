@@ -30,6 +30,8 @@ class ContactSerializer(
             not in [
                 "deleted",
                 "schatransaction",
+                "scheduleatransaction",
+                "schedulebtransaction",
             ]
         ]
         read_only_fields = [
