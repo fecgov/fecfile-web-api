@@ -277,8 +277,8 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.permission_classes" title="fecfiler.contacts.views.ContactViewSet.permission_classes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></a></p></td>
+<td><p>Note that this ViewSet inherits from CommitteeOwnedViewSet The queryset will be further limmited by the user's committee in CommitteeOwnedViewSet's implementation of get_queryset()</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></p></td>
 <td><p></p></td>
@@ -594,6 +594,14 @@ will instead be performed lazily, the first time either
 <dd><p>Determine which renderer and media type to use render the response.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.permission_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewSet
+The queryset will be further limmited by the user’s committee
+in CommitteeOwnedViewSet’s implementation of get_queryset()</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.permission_denied">
 <span class="sig-name descname"><span class="pre">permission_denied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.permission_denied" title="Permalink to this definition">¶</a></dt>
@@ -609,10 +617,7 @@ will instead be performed lazily, the first time either
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.serializer_class">
 <span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.serializer_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewSet
-The queryset will be further limmited by the user’s committee
-in CommitteeOwnedViewSet’s implementation of get_queryset()</p>
-<p>alias of <a class="reference internal" href="fecfiler.contacts.serializers.ContactSerializer.html#fecfiler.contacts.serializers.ContactSerializer" title="fecfiler.contacts.serializers.ContactSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.contacts.serializers.ContactSerializer</span></code></a></p>
+<dd><p>alias of <a class="reference internal" href="fecfiler.contacts.serializers.ContactSerializer.html#fecfiler.contacts.serializers.ContactSerializer" title="fecfiler.contacts.serializers.ContactSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.contacts.serializers.ContactSerializer</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
