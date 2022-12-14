@@ -29,6 +29,7 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.from_db
       ~SchATransaction.full_clean
       ~SchATransaction.generate_unique_transaction_id
+      ~SchATransaction.get_constraints
       ~SchATransaction.get_deferred_fields
       ~SchATransaction.get_next_by_created
       ~SchATransaction.get_next_by_updated
@@ -43,6 +44,7 @@ fecfiler.scha\_transactions.models.SchATransaction
       ~SchATransaction.serializable_value
       ~SchATransaction.unique_error_message
       ~SchATransaction.update_parent_related_values
+      ~SchATransaction.validate_constraints
       ~SchATransaction.validate_unique
    
    

@@ -104,5 +104,6 @@ fecfiler.memo\_text.views.MemoTextViewSet
       ~MemoTextViewSet.suffix
       ~MemoTextViewSet.throttle_classes
       ~MemoTextViewSet.versioning_class
+      ~MemoTextViewSet.view_is_async
    
    

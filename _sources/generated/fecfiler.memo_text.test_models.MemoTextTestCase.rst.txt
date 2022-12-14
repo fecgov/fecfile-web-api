@@ -53,6 +53,7 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertListEqual
       ~MemoTextTestCase.assertLogs
       ~MemoTextTestCase.assertMultiLineEqual
+      ~MemoTextTestCase.assertNoLogs
       ~MemoTextTestCase.assertNotAlmostEqual
       ~MemoTextTestCase.assertNotAlmostEquals
       ~MemoTextTestCase.assertNotContains

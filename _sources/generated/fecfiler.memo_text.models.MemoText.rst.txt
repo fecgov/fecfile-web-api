@@ -30,6 +30,7 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.full_clean
       ~MemoText.generate_report_id
       ~MemoText.generate_unique_transaction_id
+      ~MemoText.get_constraints
       ~MemoText.get_deferred_fields
       ~MemoText.hard_delete
       ~MemoText.prepare_database_save
@@ -38,6 +39,7 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.save_base
       ~MemoText.serializable_value
       ~MemoText.unique_error_message
+      ~MemoText.validate_constraints
       ~MemoText.validate_unique
    
    

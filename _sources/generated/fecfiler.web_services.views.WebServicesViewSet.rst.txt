@@ -84,5 +84,6 @@ fecfiler.web\_services.views.WebServicesViewSet
       ~WebServicesViewSet.suffix
       ~WebServicesViewSet.throttle_classes
       ~WebServicesViewSet.versioning_class
+      ~WebServicesViewSet.view_is_async
    
    

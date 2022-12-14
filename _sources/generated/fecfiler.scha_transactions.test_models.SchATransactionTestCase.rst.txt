@@ -53,6 +53,7 @@ fecfiler.scha\_transactions.test\_models.SchATransactionTestCase
       ~SchATransactionTestCase.assertListEqual
       ~SchATransactionTestCase.assertLogs
       ~SchATransactionTestCase.assertMultiLineEqual
+      ~SchATransactionTestCase.assertNoLogs
       ~SchATransactionTestCase.assertNotAlmostEqual
       ~SchATransactionTestCase.assertNotAlmostEquals
       ~SchATransactionTestCase.assertNotContains

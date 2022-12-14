@@ -27,6 +27,7 @@ fecfiler.web\_services.models.WebPrintSubmission
       ~WebPrintSubmission.delete
       ~WebPrintSubmission.from_db
       ~WebPrintSubmission.full_clean
+      ~WebPrintSubmission.get_constraints
       ~WebPrintSubmission.get_deferred_fields
       ~WebPrintSubmission.get_next_by_created
       ~WebPrintSubmission.get_next_by_updated
@@ -41,6 +42,7 @@ fecfiler.web\_services.models.WebPrintSubmission
       ~WebPrintSubmission.save_state
       ~WebPrintSubmission.serializable_value
       ~WebPrintSubmission.unique_error_message
+      ~WebPrintSubmission.validate_constraints
       ~WebPrintSubmission.validate_unique
    
    

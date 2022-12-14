@@ -1,6 +1,0 @@
-fecfiler.authentication.token.verify\_token
-===========================================
-
-.. currentmodule:: fecfiler.authentication.token
-
-.. autofunction:: verify_token

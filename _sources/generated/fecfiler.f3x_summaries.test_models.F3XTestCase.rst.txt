@@ -53,6 +53,7 @@ fecfiler.f3x\_summaries.test\_models.F3XTestCase
       ~F3XTestCase.assertListEqual
       ~F3XTestCase.assertLogs
       ~F3XTestCase.assertMultiLineEqual
+      ~F3XTestCase.assertNoLogs
       ~F3XTestCase.assertNotAlmostEqual
       ~F3XTestCase.assertNotAlmostEquals
       ~F3XTestCase.assertNotContains

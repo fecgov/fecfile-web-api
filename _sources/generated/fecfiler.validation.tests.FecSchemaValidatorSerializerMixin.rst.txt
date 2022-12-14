@@ -53,6 +53,7 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertListEqual
       ~FecSchemaValidatorSerializerMixin.assertLogs
       ~FecSchemaValidatorSerializerMixin.assertMultiLineEqual
+      ~FecSchemaValidatorSerializerMixin.assertNoLogs
       ~FecSchemaValidatorSerializerMixin.assertNotAlmostEqual
       ~FecSchemaValidatorSerializerMixin.assertNotAlmostEquals
       ~FecSchemaValidatorSerializerMixin.assertNotContains

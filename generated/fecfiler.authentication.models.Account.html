@@ -78,8 +78,8 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_db</span></code>(db, field_names, values)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.full_clean" title="fecfiler.authentication.models.Account.full_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_clean</span></code></a>([exclude, validate_unique])</p></td>
-<td><p>Call clean_fields(), clean(), and validate_unique() on the model.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.full_clean" title="fecfiler.authentication.models.Account.full_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_clean</span></code></a>([exclude, validate_unique, ...])</p></td>
+<td><p>Call clean_fields(), clean(), validate_unique(), and validate_constraints() on the model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_permissions</span></code>([obj])</p></td>
 <td><p></p></td>
@@ -87,94 +87,100 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_by_natural_key</span></code>(username)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_deferred_fields" title="fecfiler.authentication.models.Account.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraints</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_deferred_fields" title="fecfiler.authentication.models.Account.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
 <td><p>Return a set containing names of deferred fields for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_email_field_name</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_email_field_name</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_name</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_name</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_group_permissions" title="fecfiler.authentication.models.Account.get_group_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_group_permissions</span></code></a>([obj])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_group_permissions" title="fecfiler.authentication.models.Account.get_group_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_group_permissions</span></code></a>([obj])</p></td>
 <td><p>Return a list of permission strings that this user has through their groups.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_created_at</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_created_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_date_joined</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_date_joined</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_last_login</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_last_login</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated_at</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created_at</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_date_joined</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_date_joined</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_last_login</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_last_login</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated_at</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_session_auth_hash" title="fecfiler.authentication.models.Account.get_session_auth_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_session_auth_hash</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_session_auth_hash" title="fecfiler.authentication.models.Account.get_session_auth_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_session_auth_hash</span></code></a>()</p></td>
 <td><p>Return an HMAC of the password field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_short_name</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_short_name</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_user_permissions" title="fecfiler.authentication.models.Account.get_user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_user_permissions</span></code></a>([obj])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_user_permissions" title="fecfiler.authentication.models.Account.get_user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_user_permissions</span></code></a>([obj])</p></td>
 <td><p>Return a list of permission strings that this user has directly.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_username" title="fecfiler.authentication.models.Account.get_username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_username</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.get_username" title="fecfiler.authentication.models.Account.get_username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_username</span></code></a>()</p></td>
 <td><p>Return the username for this User.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_module_perms" title="fecfiler.authentication.models.Account.has_module_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_module_perms</span></code></a>(app_label)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_module_perms" title="fecfiler.authentication.models.Account.has_module_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_module_perms</span></code></a>(app_label)</p></td>
 <td><p>Return True if the user has any permissions in the given app label.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_perm" title="fecfiler.authentication.models.Account.has_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_perm</span></code></a>(perm[, obj])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_perm" title="fecfiler.authentication.models.Account.has_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_perm</span></code></a>(perm[, obj])</p></td>
 <td><p>Return True if the user has the specified permission.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_perms" title="fecfiler.authentication.models.Account.has_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_perms</span></code></a>(perm_list[, obj])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_perms" title="fecfiler.authentication.models.Account.has_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_perms</span></code></a>(perm_list[, obj])</p></td>
 <td><p>Return True if the user has each of the specified permissions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_usable_password" title="fecfiler.authentication.models.Account.has_usable_password"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_usable_password</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.has_usable_password" title="fecfiler.authentication.models.Account.has_usable_password"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_usable_password</span></code></a>()</p></td>
 <td><p>Return False if set_unusable_password() has been called for this user.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">natural_key</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">natural_key</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_username</span></code>(username)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_username</span></code>(username)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.refresh_from_db" title="fecfiler.authentication.models.Account.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.refresh_from_db" title="fecfiler.authentication.models.Account.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.save" title="fecfiler.authentication.models.Account.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.save" title="fecfiler.authentication.models.Account.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.save_base" title="fecfiler.authentication.models.Account.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.save_base" title="fecfiler.authentication.models.Account.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
 <td><p>Handle the parts of saving which should be done only once per save, yet need to be done in raw saves, too.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.serializable_value" title="fecfiler.authentication.models.Account.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.serializable_value" title="fecfiler.authentication.models.Account.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
 <td><p>Return the value of the field name for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_password</span></code>(raw_password)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_password</span></code>(raw_password)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_unusable_password</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_unusable_password</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_constraints</span></code>([exclude])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.validate_unique" title="fecfiler.authentication.models.Account.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
@@ -226,7 +232,7 @@
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_active</span></code></p></td>
-<td><p></p></td>
+<td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.Account.is_anonymous" title="fecfiler.authentication.models.Account.is_anonymous"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_anonymous</span></code></a></p></td>
 <td><p>Always return False.</p></td>
@@ -279,16 +285,13 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tagline</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">totpdevice_set</span></code></p></td>
-<td><p>Accessor to the related objects manager on the reverse side of a many-to-one relation.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">updated_at</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">updated_at</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></p></td>
 <td><p>Accessor to the related objects manager on the forward and reverse sides of a many-to-many relation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 </tbody>
@@ -350,9 +353,10 @@ of all validation errors if any occur.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.authentication.models.Account.full_clean">
-<span class="sig-name descname"><span class="pre">full_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.Account.full_clean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call clean_fields(), clean(), and validate_unique() on the model.
-Raise a ValidationError for any errors that occur.</p>
+<span class="sig-name descname"><span class="pre">full_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.Account.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call clean_fields(), clean(), validate_unique(), and
+validate_constraints() on the model. Raise a ValidationError for any
+errors that occur.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -512,17 +516,13 @@ failed.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.authenticate_login.html">fecfiler.authentication.authenticate_login</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.authentication.models.html">fecfiler.authentication.models</a><ul class="current">
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.authentication.models.Account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.models.AccountManager.html">fecfiler.authentication.models.AccountManager</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.permissions.html">fecfiler.authentication.permissions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.serializers.html">fecfiler.authentication.serializers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_authentication.html">fecfiler.authentication.test_authentication</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_token.html">fecfiler.authentication.test_token</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.token.html">fecfiler.authentication.token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_views.html">fecfiler.authentication.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.urls.html">fecfiler.authentication.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.views.html">fecfiler.authentication.views</a></li>
 </ul>

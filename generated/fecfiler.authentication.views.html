@@ -15,7 +15,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.authentication.views.AccountViewSet" href="fecfiler.authentication.views.AccountViewSet.html" />
+    <link rel="next" title="fecfiler.authentication.views.authenticate_login" href="fecfiler.authentication.views.authenticate_login.html" />
     <link rel="prev" title="fecfiler.authentication.urls" href="fecfiler.authentication.urls.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,6 +35,33 @@
             
   <section id="module-fecfiler.authentication.views">
 <span id="fecfiler-authentication-views"></span><h1>fecfiler.authentication.views<a class="headerlink" href="#module-fecfiler.authentication.views" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.views.authenticate_login.html#fecfiler.authentication.views.authenticate_login" title="fecfiler.authentication.views.authenticate_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">authenticate_login</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.views.generate_username.html#fecfiler.authentication.views.generate_username" title="fecfiler.authentication.views.generate_username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_username</span></code></a>(uuid)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.views.handle_invalid_login.html#fecfiler.authentication.views.handle_invalid_login" title="fecfiler.authentication.views.handle_invalid_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_invalid_login</span></code></a>(username)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.views.handle_valid_login.html#fecfiler.authentication.views.handle_valid_login" title="fecfiler.authentication.views.handle_valid_login"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_valid_login</span></code></a>(account)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.views.login_dot_gov_logout.html#fecfiler.authentication.views.login_dot_gov_logout" title="fecfiler.authentication.views.login_dot_gov_logout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">login_dot_gov_logout</span></code></a>(request)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.views.update_last_login_time.html#fecfiler.authentication.views.update_last_login_time" title="fecfiler.authentication.views.update_last_login_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_last_login_time</span></code></a>(account)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -49,6 +76,9 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect.html#fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect" title="fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LoginDotGovSuccessSpaRedirect</span></code></a>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.authentication.views.LogoutView.html#fecfiler.authentication.views.LogoutView" title="fecfiler.authentication.views.LogoutView"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogoutView</span></code></a>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -76,18 +106,21 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.authenticate_login.html">fecfiler.authentication.authenticate_login</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.models.html">fecfiler.authentication.models</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.permissions.html">fecfiler.authentication.permissions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.serializers.html">fecfiler.authentication.serializers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_authentication.html">fecfiler.authentication.test_authentication</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_token.html">fecfiler.authentication.test_token</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.token.html">fecfiler.authentication.token</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.test_views.html">fecfiler.authentication.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.urls.html">fecfiler.authentication.urls</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.authentication.views</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.authenticate_login.html">fecfiler.authentication.views.authenticate_login</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.generate_username.html">fecfiler.authentication.views.generate_username</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.handle_invalid_login.html">fecfiler.authentication.views.handle_invalid_login</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.handle_valid_login.html">fecfiler.authentication.views.handle_valid_login</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.login_dot_gov_logout.html">fecfiler.authentication.views.login_dot_gov_logout</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.update_last_login_time.html">fecfiler.authentication.views.update_last_login_time</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.AccountViewSet.html">fecfiler.authentication.views.AccountViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.LoginDotGovSuccessLogoutSpaRedirect.html">fecfiler.authentication.views.LoginDotGovSuccessLogoutSpaRedirect</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect.html">fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.views.LogoutView.html">fecfiler.authentication.views.LogoutView</a></li>
 </ul>
 </li>
 </ul>
@@ -120,7 +153,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.authentication.html">fecfiler.authentication</a><ul>
       <li>Previous: <a href="fecfiler.authentication.urls.html" title="previous chapter">fecfiler.authentication.urls</a></li>
-      <li>Next: <a href="fecfiler.authentication.views.AccountViewSet.html" title="next chapter">fecfiler.authentication.views.AccountViewSet</a></li>
+      <li>Next: <a href="fecfiler.authentication.views.authenticate_login.html" title="next chapter">fecfiler.authentication.views.authenticate_login</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

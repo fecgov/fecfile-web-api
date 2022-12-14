@@ -53,6 +53,7 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertListEqual
       ~ContactViewSetTest.assertLogs
       ~ContactViewSetTest.assertMultiLineEqual
+      ~ContactViewSetTest.assertNoLogs
       ~ContactViewSetTest.assertNotAlmostEqual
       ~ContactViewSetTest.assertNotAlmostEquals
       ~ContactViewSetTest.assertNotContains

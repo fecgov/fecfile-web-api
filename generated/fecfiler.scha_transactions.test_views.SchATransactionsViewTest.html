@@ -96,11 +96,11 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFieldOutput" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFieldOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFieldOutput</span></code></a>(fieldclass, valid, invalid)</p></td>
 <td><p>Assert that a form field behaves correctly with various inputs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFormError</span></code></a>(response, form, field, errors)</p></td>
-<td><p>Assert that a form used to render the response has a specific field error.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFormError</span></code></a>(form, field, errors[, ...])</p></td>
+<td><p>Assert that a field named &quot;field&quot; on the given form object has specific errors.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFormsetError</span></code></a>(response, formset, ...[, ...])</p></td>
-<td><p>Assert that a formset used to render the response has a specific error.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFormsetError</span></code></a>(formset, form_index, ...)</p></td>
+<td><p>Similar to assertFormError() but for formsets.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertGreater" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertGreater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertGreater</span></code></a>(a, b[, msg])</p></td>
 <td><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p></td>
@@ -156,205 +156,208 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertMultiLineEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertMultiLineEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertMultiLineEqual</span></code></a>(first, second[, msg])</p></td>
 <td><p>Assert that two multi-line strings are equal.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEqual</span></code></a>(first, second[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNoLogs" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNoLogs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNoLogs</span></code></a>(logger[, level])</p></td>
+<td><p>Assert no messages are logged on the logger, with at least the given level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEqual</span></code></a>(first, second[, ...])</p></td>
 <td><p>Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero, or by comparing that the difference between the two objects is less than the given delta.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEquals</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEquals</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotContains" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotContains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotContains</span></code></a>(response, text[, ...])</p></td>
-<td><p>Assert that a response indicates that some content was retrieved successfully, (i.e., the HTTP status code was as expected) and that <code class="docutils literal notranslate"><span class="pre">text</span></code> doesn't occurs in the content of the response.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotContains" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotContains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotContains</span></code></a>(response, text[, ...])</p></td>
+<td><p>Assert that a response indicates that some content was retrieved successfully, (i.e., the HTTP status code was as expected) and that <code class="docutils literal notranslate"><span class="pre">text</span></code> doesn't occur in the content of the response.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEqual</span></code></a>(first, second[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEqual</span></code></a>(first, second[, msg])</p></td>
 <td><p>Fail if the two objects are equal as determined by the '!=' operator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEquals</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEquals</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIn" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIn</span></code></a>(member, container[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIn" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIn</span></code></a>(member, container[, msg])</p></td>
 <td><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIsInstance" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIsInstance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIsInstance</span></code></a>(obj, cls[, msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIsInstance" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotIsInstance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIsInstance</span></code></a>(obj, cls[, msg])</p></td>
 <td><p>Included for symmetry with assertIsInstance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegex</span></code></a>(text, unexpected_regex[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegex</span></code></a>(text, unexpected_regex[, msg])</p></td>
 <td><p>Fail the test if the text matches the regular expression.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegexpMatches</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegexpMatches</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNumQueries</span></code>(num[, func, using])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNumQueries</span></code>(num[, func, using])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertQuerysetEqual</span></code>(qs, values[, transform, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertQuerysetEqual</span></code>(qs, values[, transform, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaises" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaises"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaises</span></code></a>(expected_exception, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaises" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaises"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaises</span></code></a>(expected_exception, *args, **kwargs)</p></td>
 <td><p>Fail unless an exception of class expected_exception is raised by the callable when invoked with specified positional and keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesMessage" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesMessage</span></code></a>(expected_exception, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesMessage" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesMessage</span></code></a>(expected_exception, ...)</p></td>
 <td><p>Assert that expected_message is found in the message of a raised exception.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegex</span></code></a>(expected_exception, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRaisesRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegex</span></code></a>(expected_exception, ...)</p></td>
 <td><p>Asserts that the message in a raised exception matches a regex.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegexp</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegexp</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRedirects" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRedirects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRedirects</span></code></a>(response, expected_url[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRedirects" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRedirects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRedirects</span></code></a>(response, expected_url[, ...])</p></td>
 <td><p>Assert that a response redirected to a specific URL and that the redirect URL can be loaded.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegex</span></code></a>(text, expected_regex[, msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegex</span></code></a>(text, expected_regex[, msg])</p></td>
 <td><p>Fail the test unless the text matches the regular expression.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegexpMatches</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegexpMatches</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSequenceEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSequenceEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSequenceEqual</span></code></a>(seq1, seq2[, msg, seq_type])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSequenceEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSequenceEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSequenceEqual</span></code></a>(seq1, seq2[, msg, seq_type])</p></td>
 <td><p>An equality assertion for ordered sequences (like lists and tuples).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSetEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSetEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSetEqual</span></code></a>(set1, set2[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSetEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertSetEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSetEqual</span></code></a>(set1, set2[, msg])</p></td>
 <td><p>A set-specific equality assertion.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateNotUsed" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateNotUsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTemplateNotUsed</span></code></a>([response, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateNotUsed" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateNotUsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTemplateNotUsed</span></code></a>([response, ...])</p></td>
 <td><p>Assert that the template with the provided name was NOT used in rendering the response.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateUsed" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateUsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTemplateUsed</span></code></a>([response, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateUsed" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTemplateUsed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTemplateUsed</span></code></a>([response, ...])</p></td>
 <td><p>Assert that the template with the provided name was used in rendering the response.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTrue" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTrue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTrue</span></code></a>(expr[, msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTrue" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTrue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTrue</span></code></a>(expr[, msg])</p></td>
 <td><p>Check that the expression is true.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTupleEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTupleEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTupleEqual</span></code></a>(tuple1, tuple2[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTupleEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertTupleEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTupleEqual</span></code></a>(tuple1, tuple2[, msg])</p></td>
 <td><p>A tuple-specific equality assertion.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertURLEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertURLEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertURLEqual</span></code></a>(url1, url2[, msg_prefix])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertURLEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertURLEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertURLEqual</span></code></a>(url1, url2[, msg_prefix])</p></td>
 <td><p>Assert that two URLs are the same, ignoring the order of query string parameters except for parameters with the same name.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarns" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarns</span></code></a>(expected_warning, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarns" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarns</span></code></a>(expected_warning, *args, **kwargs)</p></td>
 <td><p>Fail unless a warning of class warnClass is triggered by the callable when invoked with specified positional and keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsMessage" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarnsMessage</span></code></a>(expected_warning, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsMessage" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarnsMessage</span></code></a>(expected_warning, ...)</p></td>
 <td><p>Same as assertRaisesMessage but for assertWarns() instead of assertRaises().</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarnsRegex</span></code></a>(expected_warning, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsRegex" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertWarnsRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarnsRegex</span></code></a>(expected_warning, ...)</p></td>
 <td><p>Asserts that the message in a triggered warning matches a regexp.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLEqual</span></code></a>(xml1, xml2[, msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLEqual</span></code></a>(xml1, xml2[, msg])</p></td>
 <td><p>Assert that two XML snippets are semantically the same.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLNotEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLNotEqual</span></code></a>(xml1, xml2[, msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLNotEqual" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertXMLNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLNotEqual</span></code></a>(xml1, xml2[, msg])</p></td>
 <td><p>Assert that two XML snippets are not semantically equivalent.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.captureOnCommitCallbacks" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.captureOnCommitCallbacks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">captureOnCommitCallbacks</span></code></a>(*[, using, execute])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.captureOnCommitCallbacks" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.captureOnCommitCallbacks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">captureOnCommitCallbacks</span></code></a>(*[, using, execute])</p></td>
 <td><p>Context manager to capture transaction.on_commit() callbacks.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">countTestCases</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">countTestCases</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.debug" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.debug"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.debug" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.debug"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug</span></code></a>()</p></td>
 <td><p>Perform the same as __call__(), without catching the exception.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultTestResult</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultTestResult</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doClassCleanups" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doClassCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doClassCleanups</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doClassCleanups" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doClassCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doClassCleanups</span></code></a>()</p></td>
 <td><p>Execute all class cleanup functions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doCleanups" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doCleanups</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doCleanups" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.doCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doCleanups</span></code></a>()</p></td>
 <td><p>Execute all cleanup functions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.fail" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>([msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.fail" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>([msg])</p></td>
 <td><p>Fail immediately, with the given message.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIf</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIf</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfAlmostEqual</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfAlmostEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfEqual</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnless</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnless</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessAlmostEqual</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessAlmostEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessEqual</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessRaises</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessRaises</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.modify_settings" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.modify_settings" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily applies changes a list setting and reverts back to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUp" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUp" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
 <td><p>Hook method for setting up the test fixture before exercising it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpClass" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpClass" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
 <td><p>Hook method for setting up class fixture before running tests in the class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpTestData" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpTestData" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
 <td><p>Load initial data for the TestCase.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.settings" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.settings" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily sets a setting and reverts to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.shortDescription" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.shortDescription" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
 <td><p>Returns a one-line description of the test, or None if no description has been provided.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.skipTest" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.skipTest" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
 <td><p>Skip this test.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.subTest" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.subTest" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
 <td><p>Return a context manager that will return the enclosed block of code in a subtest identified by the optional message and keyword parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDown" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDown" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the test fixture after testing it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDownClass" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDownClass" title="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_cmtee_contact</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_cmtee_contact</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_invalid_contact</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_invalid_contact</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_no_contact_id</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_no_contact_id</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_no_transaction</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_ind_contact_no_transaction</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_org_contact</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_create_org_contact</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_update_ind_contact</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_new_scha_transaction_update_ind_contact</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_is_paginated</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_is_paginated</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_only_from_one_report</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_only_from_one_report</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_view_url_exists_at_desired_location</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_view_url_exists_at_desired_location</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -520,20 +523,22 @@ raised error messages.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError">
-<span class="sig-name descname"><span class="pre">assertFormError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assert that a form used to render the response has a specific field
-error.</p>
+<span class="sig-name descname"><span class="pre">assertFormError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that a field named “field” on the given form object has specific
+errors.</p>
+<p>errors can be either a single error message or a list of errors
+messages. Using errors=[] test that the field has no errors.</p>
+<p>You can pass field=None to check the form’s non-field errors.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError">
-<span class="sig-name descname"><span class="pre">assertFormsetError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assert that a formset used to render the response has a specific error.</p>
-<p>For field errors, specify the <code class="docutils literal notranslate"><span class="pre">form_index</span></code> and the <code class="docutils literal notranslate"><span class="pre">field</span></code>.
-For non-field errors, specify the <code class="docutils literal notranslate"><span class="pre">form_index</span></code> and the <code class="docutils literal notranslate"><span class="pre">field</span></code> as
-None.
-For non-form errors, specify <code class="docutils literal notranslate"><span class="pre">form_index</span></code> as None and the <code class="docutils literal notranslate"><span class="pre">field</span></code>
-as None.</p>
+<span class="sig-name descname"><span class="pre">assertFormsetError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertFormsetError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to assertFormError() but for formsets.</p>
+<p>Use form_index=None to check the formset’s non-form errors (in that
+case, you must also use field=None).
+Otherwise use an integer to check the formset’s n-th form for errors.</p>
+<p>Other parameters are the same as assertFormError().</p>
 </dd></dl>
 
 <dl class="py method">
@@ -672,6 +677,13 @@ objects.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNoLogs">
+<span class="sig-name descname"><span class="pre">assertNoLogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNoLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert no messages are logged on the logger, with at least the
+given level.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual">
 <span class="sig-name descname"><span class="pre">assertNotAlmostEqual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">places</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fail if the two objects are equal as determined by their
@@ -688,7 +700,7 @@ as significant digits (measured from the most significant digit).</p>
 <span class="sig-name descname"><span class="pre">assertNotContains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.scha_transactions.test_views.SchATransactionsViewTest.assertNotContains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assert that a response indicates that some content was retrieved
 successfully, (i.e., the HTTP status code was as expected) and that
-<code class="docutils literal notranslate"><span class="pre">text</span></code> doesn’t occurs in the content of the response.</p>
+<code class="docutils literal notranslate"><span class="pre">text</span></code> doesn’t occur in the content of the response.</p>
 </dd></dl>
 
 <dl class="py method">

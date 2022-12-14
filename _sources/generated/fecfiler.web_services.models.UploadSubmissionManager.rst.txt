@@ -20,14 +20,33 @@ fecfiler.web\_services.models.UploadSubmissionManager
    .. autosummary::
    
       ~UploadSubmissionManager.__init__
+      ~UploadSubmissionManager.aaggregate
+      ~UploadSubmissionManager.abulk_create
+      ~UploadSubmissionManager.abulk_update
+      ~UploadSubmissionManager.acontains
+      ~UploadSubmissionManager.acount
+      ~UploadSubmissionManager.acreate
+      ~UploadSubmissionManager.aearliest
+      ~UploadSubmissionManager.aexists
+      ~UploadSubmissionManager.aexplain
+      ~UploadSubmissionManager.afirst
+      ~UploadSubmissionManager.aget
+      ~UploadSubmissionManager.aget_or_create
       ~UploadSubmissionManager.aggregate
+      ~UploadSubmissionManager.ain_bulk
+      ~UploadSubmissionManager.aiterator
+      ~UploadSubmissionManager.alast
+      ~UploadSubmissionManager.alatest
       ~UploadSubmissionManager.alias
       ~UploadSubmissionManager.all
       ~UploadSubmissionManager.annotate
+      ~UploadSubmissionManager.aupdate
+      ~UploadSubmissionManager.aupdate_or_create
       ~UploadSubmissionManager.bulk_create
       ~UploadSubmissionManager.bulk_update
       ~UploadSubmissionManager.check
       ~UploadSubmissionManager.complex_filter
+      ~UploadSubmissionManager.contains
       ~UploadSubmissionManager.contribute_to_class
       ~UploadSubmissionManager.count
       ~UploadSubmissionManager.create

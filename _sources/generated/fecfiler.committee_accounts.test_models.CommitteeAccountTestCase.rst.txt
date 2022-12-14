@@ -53,6 +53,7 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertListEqual
       ~CommitteeAccountTestCase.assertLogs
       ~CommitteeAccountTestCase.assertMultiLineEqual
+      ~CommitteeAccountTestCase.assertNoLogs
       ~CommitteeAccountTestCase.assertNotAlmostEqual
       ~CommitteeAccountTestCase.assertNotAlmostEquals
       ~CommitteeAccountTestCase.assertNotContains

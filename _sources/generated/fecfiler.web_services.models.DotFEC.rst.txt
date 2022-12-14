@@ -27,6 +27,7 @@ fecfiler.web\_services.models.DotFEC
       ~DotFEC.delete
       ~DotFEC.from_db
       ~DotFEC.full_clean
+      ~DotFEC.get_constraints
       ~DotFEC.get_deferred_fields
       ~DotFEC.prepare_database_save
       ~DotFEC.refresh_from_db
@@ -34,6 +35,7 @@ fecfiler.web\_services.models.DotFEC
       ~DotFEC.save_base
       ~DotFEC.serializable_value
       ~DotFEC.unique_error_message
+      ~DotFEC.validate_constraints
       ~DotFEC.validate_unique
    
    

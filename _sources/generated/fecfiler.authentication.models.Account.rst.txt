@@ -31,6 +31,7 @@ fecfiler.authentication.models.Account
       ~Account.full_clean
       ~Account.get_all_permissions
       ~Account.get_by_natural_key
+      ~Account.get_constraints
       ~Account.get_deferred_fields
       ~Account.get_email_field_name
       ~Account.get_full_name
@@ -61,6 +62,7 @@ fecfiler.authentication.models.Account
       ~Account.set_password
       ~Account.set_unusable_password
       ~Account.unique_error_message
+      ~Account.validate_constraints
       ~Account.validate_unique
    
    
@@ -101,7 +103,6 @@ fecfiler.authentication.models.Account
       ~Account.secret_key
       ~Account.status
       ~Account.tagline
-      ~Account.totpdevice_set
       ~Account.updated_at
       ~Account.user_permissions
       ~Account.username

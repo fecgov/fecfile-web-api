@@ -1,0 +1,6 @@
+fecfiler.authentication.views.authenticate\_login
+=================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: authenticate_login

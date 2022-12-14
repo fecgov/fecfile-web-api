@@ -81,5 +81,6 @@ fecfiler.web\_services.summary.views.SummaryViewSet
       ~SummaryViewSet.suffix
       ~SummaryViewSet.throttle_classes
       ~SummaryViewSet.versioning_class
+      ~SummaryViewSet.view_is_async
    
    

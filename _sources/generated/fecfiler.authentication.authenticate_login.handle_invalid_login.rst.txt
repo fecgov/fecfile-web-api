@@ -1,6 +1,0 @@
-fecfiler.authentication.authenticate\_login.handle\_invalid\_login
-==================================================================
-
-.. currentmodule:: fecfiler.authentication.authenticate_login
-
-.. autofunction:: handle_invalid_login

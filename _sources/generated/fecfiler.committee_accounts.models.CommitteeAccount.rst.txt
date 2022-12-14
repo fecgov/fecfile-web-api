@@ -27,6 +27,7 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.delete
       ~CommitteeAccount.from_db
       ~CommitteeAccount.full_clean
+      ~CommitteeAccount.get_constraints
       ~CommitteeAccount.get_deferred_fields
       ~CommitteeAccount.get_next_by_created
       ~CommitteeAccount.get_next_by_updated
@@ -39,6 +40,7 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.save_base
       ~CommitteeAccount.serializable_value
       ~CommitteeAccount.unique_error_message
+      ~CommitteeAccount.validate_constraints
       ~CommitteeAccount.validate_unique
    
    

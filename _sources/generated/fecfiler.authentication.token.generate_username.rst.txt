@@ -1,6 +1,0 @@
-fecfiler.authentication.token.generate\_username
-================================================
-
-.. currentmodule:: fecfiler.authentication.token
-
-.. autofunction:: generate_username

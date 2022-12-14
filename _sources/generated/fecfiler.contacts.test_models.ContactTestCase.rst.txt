@@ -53,6 +53,7 @@ fecfiler.contacts.test\_models.ContactTestCase
       ~ContactTestCase.assertListEqual
       ~ContactTestCase.assertLogs
       ~ContactTestCase.assertMultiLineEqual
+      ~ContactTestCase.assertNoLogs
       ~ContactTestCase.assertNotAlmostEqual
       ~ContactTestCase.assertNotAlmostEquals
       ~ContactTestCase.assertNotContains

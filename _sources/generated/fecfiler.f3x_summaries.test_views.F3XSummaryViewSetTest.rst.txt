@@ -53,6 +53,7 @@ fecfiler.f3x\_summaries.test\_views.F3XSummaryViewSetTest
       ~F3XSummaryViewSetTest.assertListEqual
       ~F3XSummaryViewSetTest.assertLogs
       ~F3XSummaryViewSetTest.assertMultiLineEqual
+      ~F3XSummaryViewSetTest.assertNoLogs
       ~F3XSummaryViewSetTest.assertNotAlmostEqual
       ~F3XSummaryViewSetTest.assertNotAlmostEquals
       ~F3XSummaryViewSetTest.assertNotContains

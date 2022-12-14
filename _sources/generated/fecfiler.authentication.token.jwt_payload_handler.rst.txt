@@ -1,6 +1,0 @@
-fecfiler.authentication.token.jwt\_payload\_handler
-===================================================
-
-.. currentmodule:: fecfiler.authentication.token
-
-.. autofunction:: jwt_payload_handler

@@ -53,6 +53,7 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertListEqual
       ~TasksTestCase.assertLogs
       ~TasksTestCase.assertMultiLineEqual
+      ~TasksTestCase.assertNoLogs
       ~TasksTestCase.assertNotAlmostEqual
       ~TasksTestCase.assertNotAlmostEquals
       ~TasksTestCase.assertNotContains

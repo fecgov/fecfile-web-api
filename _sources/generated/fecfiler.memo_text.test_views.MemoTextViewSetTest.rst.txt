@@ -53,6 +53,7 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertListEqual
       ~MemoTextViewSetTest.assertLogs
       ~MemoTextViewSetTest.assertMultiLineEqual
+      ~MemoTextViewSetTest.assertNoLogs
       ~MemoTextViewSetTest.assertNotAlmostEqual
       ~MemoTextViewSetTest.assertNotAlmostEquals
       ~MemoTextViewSetTest.assertNotContains

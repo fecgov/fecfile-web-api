@@ -20,14 +20,33 @@ fecfiler.scha\_transactions.managers.SchATransactionManager
    .. autosummary::
    
       ~SchATransactionManager.__init__
+      ~SchATransactionManager.aaggregate
+      ~SchATransactionManager.abulk_create
+      ~SchATransactionManager.abulk_update
+      ~SchATransactionManager.acontains
+      ~SchATransactionManager.acount
+      ~SchATransactionManager.acreate
+      ~SchATransactionManager.aearliest
+      ~SchATransactionManager.aexists
+      ~SchATransactionManager.aexplain
+      ~SchATransactionManager.afirst
+      ~SchATransactionManager.aget
+      ~SchATransactionManager.aget_or_create
       ~SchATransactionManager.aggregate
+      ~SchATransactionManager.ain_bulk
+      ~SchATransactionManager.aiterator
+      ~SchATransactionManager.alast
+      ~SchATransactionManager.alatest
       ~SchATransactionManager.alias
       ~SchATransactionManager.all
       ~SchATransactionManager.annotate
+      ~SchATransactionManager.aupdate
+      ~SchATransactionManager.aupdate_or_create
       ~SchATransactionManager.bulk_create
       ~SchATransactionManager.bulk_update
       ~SchATransactionManager.check
       ~SchATransactionManager.complex_filter
+      ~SchATransactionManager.contains
       ~SchATransactionManager.contribute_to_class
       ~SchATransactionManager.count
       ~SchATransactionManager.create

@@ -53,6 +53,7 @@ fecfiler.contacts.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.assertListEqual
       ~ContactSerializerTestCase.assertLogs
       ~ContactSerializerTestCase.assertMultiLineEqual
+      ~ContactSerializerTestCase.assertNoLogs
       ~ContactSerializerTestCase.assertNotAlmostEqual
       ~ContactSerializerTestCase.assertNotAlmostEquals
       ~ContactSerializerTestCase.assertNotContains

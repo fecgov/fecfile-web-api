@@ -1,0 +1,137 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.authentication.test\_views.AuthenticationTest
+======================================================
+
+.. currentmodule:: fecfiler.authentication.test_views
+
+.. autoclass:: AuthenticationTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AuthenticationTest.__init__
+      ~AuthenticationTest.addClassCleanup
+      ~AuthenticationTest.addCleanup
+      ~AuthenticationTest.addTypeEqualityFunc
+      ~AuthenticationTest.assertAlmostEqual
+      ~AuthenticationTest.assertAlmostEquals
+      ~AuthenticationTest.assertContains
+      ~AuthenticationTest.assertCountEqual
+      ~AuthenticationTest.assertDictContainsSubset
+      ~AuthenticationTest.assertDictEqual
+      ~AuthenticationTest.assertEqual
+      ~AuthenticationTest.assertEquals
+      ~AuthenticationTest.assertFalse
+      ~AuthenticationTest.assertFieldOutput
+      ~AuthenticationTest.assertFormError
+      ~AuthenticationTest.assertFormsetError
+      ~AuthenticationTest.assertGreater
+      ~AuthenticationTest.assertGreaterEqual
+      ~AuthenticationTest.assertHTMLEqual
+      ~AuthenticationTest.assertHTMLNotEqual
+      ~AuthenticationTest.assertIn
+      ~AuthenticationTest.assertInHTML
+      ~AuthenticationTest.assertIs
+      ~AuthenticationTest.assertIsInstance
+      ~AuthenticationTest.assertIsNone
+      ~AuthenticationTest.assertIsNot
+      ~AuthenticationTest.assertIsNotNone
+      ~AuthenticationTest.assertJSONEqual
+      ~AuthenticationTest.assertJSONNotEqual
+      ~AuthenticationTest.assertLess
+      ~AuthenticationTest.assertLessEqual
+      ~AuthenticationTest.assertListEqual
+      ~AuthenticationTest.assertLogs
+      ~AuthenticationTest.assertMultiLineEqual
+      ~AuthenticationTest.assertNoLogs
+      ~AuthenticationTest.assertNotAlmostEqual
+      ~AuthenticationTest.assertNotAlmostEquals
+      ~AuthenticationTest.assertNotContains
+      ~AuthenticationTest.assertNotEqual
+      ~AuthenticationTest.assertNotEquals
+      ~AuthenticationTest.assertNotIn
+      ~AuthenticationTest.assertNotIsInstance
+      ~AuthenticationTest.assertNotRegex
+      ~AuthenticationTest.assertNotRegexpMatches
+      ~AuthenticationTest.assertNumQueries
+      ~AuthenticationTest.assertQuerysetEqual
+      ~AuthenticationTest.assertRaises
+      ~AuthenticationTest.assertRaisesMessage
+      ~AuthenticationTest.assertRaisesRegex
+      ~AuthenticationTest.assertRaisesRegexp
+      ~AuthenticationTest.assertRedirects
+      ~AuthenticationTest.assertRegex
+      ~AuthenticationTest.assertRegexpMatches
+      ~AuthenticationTest.assertSequenceEqual
+      ~AuthenticationTest.assertSetEqual
+      ~AuthenticationTest.assertTemplateNotUsed
+      ~AuthenticationTest.assertTemplateUsed
+      ~AuthenticationTest.assertTrue
+      ~AuthenticationTest.assertTupleEqual
+      ~AuthenticationTest.assertURLEqual
+      ~AuthenticationTest.assertWarns
+      ~AuthenticationTest.assertWarnsMessage
+      ~AuthenticationTest.assertWarnsRegex
+      ~AuthenticationTest.assertXMLEqual
+      ~AuthenticationTest.assertXMLNotEqual
+      ~AuthenticationTest.assert_
+      ~AuthenticationTest.captureOnCommitCallbacks
+      ~AuthenticationTest.countTestCases
+      ~AuthenticationTest.debug
+      ~AuthenticationTest.defaultTestResult
+      ~AuthenticationTest.doClassCleanups
+      ~AuthenticationTest.doCleanups
+      ~AuthenticationTest.fail
+      ~AuthenticationTest.failIf
+      ~AuthenticationTest.failIfAlmostEqual
+      ~AuthenticationTest.failIfEqual
+      ~AuthenticationTest.failUnless
+      ~AuthenticationTest.failUnlessAlmostEqual
+      ~AuthenticationTest.failUnlessEqual
+      ~AuthenticationTest.failUnlessRaises
+      ~AuthenticationTest.id
+      ~AuthenticationTest.modify_settings
+      ~AuthenticationTest.run
+      ~AuthenticationTest.setUp
+      ~AuthenticationTest.setUpClass
+      ~AuthenticationTest.setUpTestData
+      ~AuthenticationTest.settings
+      ~AuthenticationTest.shortDescription
+      ~AuthenticationTest.skipTest
+      ~AuthenticationTest.subTest
+      ~AuthenticationTest.tearDown
+      ~AuthenticationTest.tearDownClass
+      ~AuthenticationTest.test_generate_username
+      ~AuthenticationTest.test_invalid_login
+      ~AuthenticationTest.test_login_dot_gov_logout_happy_path
+      ~AuthenticationTest.test_update_login_time
+      ~AuthenticationTest.test_valid_login
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AuthenticationTest.acc
+      ~AuthenticationTest.available_apps
+      ~AuthenticationTest.databases
+      ~AuthenticationTest.fixtures
+      ~AuthenticationTest.longMessage
+      ~AuthenticationTest.maxDiff
+      ~AuthenticationTest.reset_sequences
+      ~AuthenticationTest.serialized_rollback
+   
+   

@@ -53,6 +53,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_composer.DotFECSerializerTestCas
       ~DotFECSerializerTestCase.assertListEqual
       ~DotFECSerializerTestCase.assertLogs
       ~DotFECSerializerTestCase.assertMultiLineEqual
+      ~DotFECSerializerTestCase.assertNoLogs
       ~DotFECSerializerTestCase.assertNotAlmostEqual
       ~DotFECSerializerTestCase.assertNotAlmostEquals
       ~DotFECSerializerTestCase.assertNotContains

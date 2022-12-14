@@ -31,13 +31,9 @@ fecfiler.authentication
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.authentication.authenticate_login
    fecfiler.authentication.models
-   fecfiler.authentication.permissions
    fecfiler.authentication.serializers
-   fecfiler.authentication.test_authentication
-   fecfiler.authentication.test_token
-   fecfiler.authentication.token
+   fecfiler.authentication.test_views
    fecfiler.authentication.urls
    fecfiler.authentication.views
 

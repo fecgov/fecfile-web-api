@@ -20,14 +20,33 @@ fecfiler.authentication.models.AccountManager
    .. autosummary::
    
       ~AccountManager.__init__
+      ~AccountManager.aaggregate
+      ~AccountManager.abulk_create
+      ~AccountManager.abulk_update
+      ~AccountManager.acontains
+      ~AccountManager.acount
+      ~AccountManager.acreate
+      ~AccountManager.aearliest
+      ~AccountManager.aexists
+      ~AccountManager.aexplain
+      ~AccountManager.afirst
+      ~AccountManager.aget
+      ~AccountManager.aget_or_create
       ~AccountManager.aggregate
+      ~AccountManager.ain_bulk
+      ~AccountManager.aiterator
+      ~AccountManager.alast
+      ~AccountManager.alatest
       ~AccountManager.alias
       ~AccountManager.all
       ~AccountManager.annotate
+      ~AccountManager.aupdate
+      ~AccountManager.aupdate_or_create
       ~AccountManager.bulk_create
       ~AccountManager.bulk_update
       ~AccountManager.check
       ~AccountManager.complex_filter
+      ~AccountManager.contains
       ~AccountManager.contribute_to_class
       ~AccountManager.count
       ~AccountManager.create

@@ -1,0 +1,6 @@
+fecfiler.authentication.views.handle\_invalid\_login
+====================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: handle_invalid_login

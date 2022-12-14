@@ -53,6 +53,7 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.assertListEqual
       ~WebServiceStorageTestCase.assertLogs
       ~WebServiceStorageTestCase.assertMultiLineEqual
+      ~WebServiceStorageTestCase.assertNoLogs
       ~WebServiceStorageTestCase.assertNotAlmostEqual
       ~WebServiceStorageTestCase.assertNotAlmostEquals
       ~WebServiceStorageTestCase.assertNotContains

@@ -89,5 +89,6 @@ fecfiler.f3x\_summaries.views.ReportViewMixin
       ~ReportViewMixin.settings
       ~ReportViewMixin.throttle_classes
       ~ReportViewMixin.versioning_class
+      ~ReportViewMixin.view_is_async
    
    

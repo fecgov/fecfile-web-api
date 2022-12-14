@@ -73,49 +73,55 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_db</span></code>(db, field_names, values)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.full_clean" title="fecfiler.web_services.models.WebPrintSubmission.full_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_clean</span></code></a>([exclude, validate_unique])</p></td>
-<td><p>Call clean_fields(), clean(), and validate_unique() on the model.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.full_clean" title="fecfiler.web_services.models.WebPrintSubmission.full_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_clean</span></code></a>([exclude, validate_unique, ...])</p></td>
+<td><p>Call clean_fields(), clean(), validate_unique(), and validate_constraints() on the model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.get_deferred_fields" title="fecfiler.web_services.models.WebPrintSubmission.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraints</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.get_deferred_fields" title="fecfiler.web_services.models.WebPrintSubmission.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
 <td><p>Return a set containing names of deferred fields for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_created</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_created</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.refresh_from_db" title="fecfiler.web_services.models.WebPrintSubmission.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.refresh_from_db" title="fecfiler.web_services.models.WebPrintSubmission.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.save" title="fecfiler.web_services.models.WebPrintSubmission.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.save" title="fecfiler.web_services.models.WebPrintSubmission.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.save_base" title="fecfiler.web_services.models.WebPrintSubmission.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.save_base" title="fecfiler.web_services.models.WebPrintSubmission.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
 <td><p>Handle the parts of saving which should be done only once per save, yet need to be done in raw saves, too.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_error</span></code>(error)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_error</span></code>(error)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fec_response</span></code>(response_string)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_fec_response</span></code>(response_string)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_state</span></code>(new_state)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_state</span></code>(new_state)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.serializable_value" title="fecfiler.web_services.models.WebPrintSubmission.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.serializable_value" title="fecfiler.web_services.models.WebPrintSubmission.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
 <td><p>Return the value of the field name for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_constraints</span></code>([exclude])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.models.WebPrintSubmission.validate_unique" title="fecfiler.web_services.models.WebPrintSubmission.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
@@ -224,9 +230,10 @@ of all validation errors if any occur.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.web_services.models.WebPrintSubmission.full_clean">
-<span class="sig-name descname"><span class="pre">full_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.models.WebPrintSubmission.full_clean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call clean_fields(), clean(), and validate_unique() on the model.
-Raise a ValidationError for any errors that occur.</p>
+<span class="sig-name descname"><span class="pre">full_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.models.WebPrintSubmission.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call clean_fields(), clean(), validate_unique(), and
+validate_constraints() on the model. Raise a ValidationError for any
+errors that occur.</p>
 </dd></dl>
 
 <dl class="py method">

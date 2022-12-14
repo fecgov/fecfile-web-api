@@ -53,6 +53,7 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertListEqual
       ~SharedUtilitiesTestCase.assertLogs
       ~SharedUtilitiesTestCase.assertMultiLineEqual
+      ~SharedUtilitiesTestCase.assertNoLogs
       ~SharedUtilitiesTestCase.assertNotAlmostEqual
       ~SharedUtilitiesTestCase.assertNotAlmostEquals
       ~SharedUtilitiesTestCase.assertNotContains

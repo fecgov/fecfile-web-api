@@ -75,15 +75,11 @@ fecfiler.authentication.views.AccountViewSet
    
       ~AccountViewSet.allowed_methods
       ~AccountViewSet.authentication_classes
-      ~AccountViewSet.basename
       ~AccountViewSet.default_response_headers
-      ~AccountViewSet.description
-      ~AccountViewSet.detail
       ~AccountViewSet.filter_backends
       ~AccountViewSet.http_method_names
       ~AccountViewSet.lookup_field
       ~AccountViewSet.lookup_url_kwarg
-      ~AccountViewSet.name
       ~AccountViewSet.ordering
       ~AccountViewSet.ordering_fields
       ~AccountViewSet.paginator
@@ -93,8 +89,8 @@ fecfiler.authentication.views.AccountViewSet
       ~AccountViewSet.renderer_classes
       ~AccountViewSet.schema
       ~AccountViewSet.settings
-      ~AccountViewSet.suffix
       ~AccountViewSet.throttle_classes
       ~AccountViewSet.versioning_class
+      ~AccountViewSet.view_is_async
    
    

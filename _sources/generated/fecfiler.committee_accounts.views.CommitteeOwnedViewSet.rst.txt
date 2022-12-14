@@ -99,5 +99,6 @@ fecfiler.committee\_accounts.views.CommitteeOwnedViewSet
       ~CommitteeOwnedViewSet.settings
       ~CommitteeOwnedViewSet.throttle_classes
       ~CommitteeOwnedViewSet.versioning_class
+      ~CommitteeOwnedViewSet.view_is_async
    
    

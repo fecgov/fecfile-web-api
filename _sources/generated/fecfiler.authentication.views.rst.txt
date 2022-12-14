@@ -12,6 +12,18 @@ fecfiler.authentication.views
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      authenticate_login
+      generate_username
+      handle_invalid_login
+      handle_valid_login
+      login_dot_gov_logout
+      update_last_login_time
+   
    
 
    
@@ -25,6 +37,7 @@ fecfiler.authentication.views
       AccountViewSet
       LoginDotGovSuccessLogoutSpaRedirect
       LoginDotGovSuccessSpaRedirect
+      LogoutView
    
    
 

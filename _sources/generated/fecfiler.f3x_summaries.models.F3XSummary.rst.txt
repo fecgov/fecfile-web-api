@@ -27,6 +27,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.delete
       ~F3XSummary.from_db
       ~F3XSummary.full_clean
+      ~F3XSummary.get_constraints
       ~F3XSummary.get_deferred_fields
       ~F3XSummary.get_next_by_created
       ~F3XSummary.get_next_by_updated
@@ -39,6 +40,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.save_base
       ~F3XSummary.serializable_value
       ~F3XSummary.unique_error_message
+      ~F3XSummary.validate_constraints
       ~F3XSummary.validate_unique
    
    

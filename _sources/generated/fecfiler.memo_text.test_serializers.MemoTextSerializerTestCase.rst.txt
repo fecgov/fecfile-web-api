@@ -53,6 +53,7 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertListEqual
       ~MemoTextSerializerTestCase.assertLogs
       ~MemoTextSerializerTestCase.assertMultiLineEqual
+      ~MemoTextSerializerTestCase.assertNoLogs
       ~MemoTextSerializerTestCase.assertNotAlmostEqual
       ~MemoTextSerializerTestCase.assertNotAlmostEquals
       ~MemoTextSerializerTestCase.assertNotContains

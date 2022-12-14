@@ -20,14 +20,33 @@ fecfiler.web\_services.models.WebPrintSubmissionManager
    .. autosummary::
    
       ~WebPrintSubmissionManager.__init__
+      ~WebPrintSubmissionManager.aaggregate
+      ~WebPrintSubmissionManager.abulk_create
+      ~WebPrintSubmissionManager.abulk_update
+      ~WebPrintSubmissionManager.acontains
+      ~WebPrintSubmissionManager.acount
+      ~WebPrintSubmissionManager.acreate
+      ~WebPrintSubmissionManager.aearliest
+      ~WebPrintSubmissionManager.aexists
+      ~WebPrintSubmissionManager.aexplain
+      ~WebPrintSubmissionManager.afirst
+      ~WebPrintSubmissionManager.aget
+      ~WebPrintSubmissionManager.aget_or_create
       ~WebPrintSubmissionManager.aggregate
+      ~WebPrintSubmissionManager.ain_bulk
+      ~WebPrintSubmissionManager.aiterator
+      ~WebPrintSubmissionManager.alast
+      ~WebPrintSubmissionManager.alatest
       ~WebPrintSubmissionManager.alias
       ~WebPrintSubmissionManager.all
       ~WebPrintSubmissionManager.annotate
+      ~WebPrintSubmissionManager.aupdate
+      ~WebPrintSubmissionManager.aupdate_or_create
       ~WebPrintSubmissionManager.bulk_create
       ~WebPrintSubmissionManager.bulk_update
       ~WebPrintSubmissionManager.check
       ~WebPrintSubmissionManager.complex_filter
+      ~WebPrintSubmissionManager.contains
       ~WebPrintSubmissionManager.contribute_to_class
       ~WebPrintSubmissionManager.count
       ~WebPrintSubmissionManager.create

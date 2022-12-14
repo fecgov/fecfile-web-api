@@ -53,6 +53,7 @@ fecfiler.f3x\_summaries.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertListEqual
       ~F3XSerializerTestCase.assertLogs
       ~F3XSerializerTestCase.assertMultiLineEqual
+      ~F3XSerializerTestCase.assertNoLogs
       ~F3XSerializerTestCase.assertNotAlmostEqual
       ~F3XSerializerTestCase.assertNotAlmostEquals
       ~F3XSerializerTestCase.assertNotContains

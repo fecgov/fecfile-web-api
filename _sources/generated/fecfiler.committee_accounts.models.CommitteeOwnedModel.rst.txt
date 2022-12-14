@@ -27,6 +27,7 @@ fecfiler.committee\_accounts.models.CommitteeOwnedModel
       ~CommitteeOwnedModel.delete
       ~CommitteeOwnedModel.from_db
       ~CommitteeOwnedModel.full_clean
+      ~CommitteeOwnedModel.get_constraints
       ~CommitteeOwnedModel.get_deferred_fields
       ~CommitteeOwnedModel.prepare_database_save
       ~CommitteeOwnedModel.refresh_from_db
@@ -34,6 +35,7 @@ fecfiler.committee\_accounts.models.CommitteeOwnedModel
       ~CommitteeOwnedModel.save_base
       ~CommitteeOwnedModel.serializable_value
       ~CommitteeOwnedModel.unique_error_message
+      ~CommitteeOwnedModel.validate_constraints
       ~CommitteeOwnedModel.validate_unique
    
    

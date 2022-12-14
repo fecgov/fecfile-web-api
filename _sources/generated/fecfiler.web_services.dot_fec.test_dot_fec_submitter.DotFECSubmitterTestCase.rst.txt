@@ -53,6 +53,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCas
       ~DotFECSubmitterTestCase.assertListEqual
       ~DotFECSubmitterTestCase.assertLogs
       ~DotFECSubmitterTestCase.assertMultiLineEqual
+      ~DotFECSubmitterTestCase.assertNoLogs
       ~DotFECSubmitterTestCase.assertNotAlmostEqual
       ~DotFECSubmitterTestCase.assertNotAlmostEquals
       ~DotFECSubmitterTestCase.assertNotContains

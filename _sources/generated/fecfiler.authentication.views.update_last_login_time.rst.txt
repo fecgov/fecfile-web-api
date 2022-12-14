@@ -1,0 +1,6 @@
+fecfiler.authentication.views.update\_last\_login\_time
+=======================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: update_last_login_time

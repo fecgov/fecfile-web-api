@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.authentication.authenticate\_login.LogoutView
-======================================================
+fecfiler.authentication.views.LogoutView
+========================================
 
-.. currentmodule:: fecfiler.authentication.authenticate_login
+.. currentmodule:: fecfiler.authentication.views
 
 .. autoclass:: LogoutView
    :members:                                    
@@ -73,5 +73,6 @@ fecfiler.authentication.authenticate\_login.LogoutView
       ~LogoutView.settings
       ~LogoutView.throttle_classes
       ~LogoutView.versioning_class
+      ~LogoutView.view_is_async
    
    

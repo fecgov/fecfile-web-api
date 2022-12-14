@@ -27,6 +27,7 @@ fecfiler.f3x\_summaries.models.ReportMixin
       ~ReportMixin.delete
       ~ReportMixin.from_db
       ~ReportMixin.full_clean
+      ~ReportMixin.get_constraints
       ~ReportMixin.get_deferred_fields
       ~ReportMixin.prepare_database_save
       ~ReportMixin.refresh_from_db
@@ -34,6 +35,7 @@ fecfiler.f3x\_summaries.models.ReportMixin
       ~ReportMixin.save_base
       ~ReportMixin.serializable_value
       ~ReportMixin.unique_error_message
+      ~ReportMixin.validate_constraints
       ~ReportMixin.validate_unique
    
    

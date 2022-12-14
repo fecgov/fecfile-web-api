@@ -1,0 +1,6 @@
+fecfiler.authentication.views.generate\_username
+================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: generate_username

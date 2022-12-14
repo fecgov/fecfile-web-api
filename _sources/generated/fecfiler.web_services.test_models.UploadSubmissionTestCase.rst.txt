@@ -53,6 +53,7 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertListEqual
       ~UploadSubmissionTestCase.assertLogs
       ~UploadSubmissionTestCase.assertMultiLineEqual
+      ~UploadSubmissionTestCase.assertNoLogs
       ~UploadSubmissionTestCase.assertNotAlmostEqual
       ~UploadSubmissionTestCase.assertNotAlmostEquals
       ~UploadSubmissionTestCase.assertNotContains

@@ -28,6 +28,7 @@ fecfiler.contacts.models.Contact
       ~Contact.from_db
       ~Contact.full_clean
       ~Contact.get_candidate_office_display
+      ~Contact.get_constraints
       ~Contact.get_deferred_fields
       ~Contact.get_next_by_created
       ~Contact.get_next_by_updated
@@ -41,6 +42,7 @@ fecfiler.contacts.models.Contact
       ~Contact.save_base
       ~Contact.serializable_value
       ~Contact.unique_error_message
+      ~Contact.validate_constraints
       ~Contact.validate_unique
    
    

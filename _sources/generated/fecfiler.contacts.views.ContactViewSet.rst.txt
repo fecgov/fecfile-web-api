@@ -107,5 +107,6 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.suffix
       ~ContactViewSet.throttle_classes
       ~ContactViewSet.versioning_class
+      ~ContactViewSet.view_is_async
    
    

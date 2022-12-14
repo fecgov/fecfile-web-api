@@ -107,5 +107,6 @@ fecfiler.f3x\_summaries.views.F3XSummaryViewSet
       ~F3XSummaryViewSet.suffix
       ~F3XSummaryViewSet.throttle_classes
       ~F3XSummaryViewSet.versioning_class
+      ~F3XSummaryViewSet.view_is_async
    
    

@@ -1,0 +1,6 @@
+fecfiler.authentication.views.login\_dot\_gov\_logout
+=====================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: login_dot_gov_logout

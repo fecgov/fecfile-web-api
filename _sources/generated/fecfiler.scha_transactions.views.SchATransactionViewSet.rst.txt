@@ -106,5 +106,6 @@ fecfiler.scha\_transactions.views.SchATransactionViewSet
       ~SchATransactionViewSet.suffix
       ~SchATransactionViewSet.throttle_classes
       ~SchATransactionViewSet.versioning_class
+      ~SchATransactionViewSet.view_is_async
    
    

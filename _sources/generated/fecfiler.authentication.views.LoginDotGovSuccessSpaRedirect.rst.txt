@@ -36,5 +36,6 @@ fecfiler.authentication.views.LoginDotGovSuccessSpaRedirect
    .. autosummary::
    
       ~LoginDotGovSuccessSpaRedirect.http_method_names
+      ~LoginDotGovSuccessSpaRedirect.view_is_async
    
    
