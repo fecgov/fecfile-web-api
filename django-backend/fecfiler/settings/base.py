@@ -214,9 +214,9 @@ LOGGING = {
         "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
     },
     "handlers": {
-        "default": {"class": "logging.StreamHandler", "formatter": "standard",},
+        "default": {"class": "logging.StreamHandler", "formatter": "standard"},
     },
-    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True},},
+    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True}},
 }
 
 """Celery configurations
