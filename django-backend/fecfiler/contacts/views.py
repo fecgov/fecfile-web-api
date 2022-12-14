@@ -27,7 +27,6 @@ class ContactViewSet(CommitteeOwnedViewSet):
     """
 
     serializer_class = ContactSerializer
-    permission_classes = []
 
     """Note that this ViewSet inherits from CommitteeOwnedViewSet
     The queryset will be further limmited by the user's committee
