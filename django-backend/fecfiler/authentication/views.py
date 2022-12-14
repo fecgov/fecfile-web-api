@@ -99,13 +99,6 @@ class LoginDotGovSuccessLogoutSpaRedirect(View):
         return response
 
 
-class IsAccountOwner(permissions.BasePermission):
-    def has_object_permission(self, request, view, account):
-        if request.session.get("user_id"):
-            return account.pk == request.session.get("user_id")
-        return False
-
-
 def login_dot_gov_logout(request):
     client_id = OIDC_RP_CLIENT_ID
     post_logout_redirect_uri = LOGOUT_REDIRECT_URL
