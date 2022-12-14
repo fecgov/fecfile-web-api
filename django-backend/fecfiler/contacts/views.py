@@ -3,7 +3,7 @@ import re
 from urllib.parse import urlencode
 
 import requests
-from django.db.models import CharField, Q, Value
+from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
@@ -32,7 +32,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
-    queryset = Contact.objects.all().order_by("-created")
+    queryset = (
+        Contact.objects.annotate(transaction_count=Count("schatransaction"))
+        .all()
+        .order_by("-created")
+    )
 
     @action(detail=False)
     def committee_lookup(self, request):
@@ -51,12 +55,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             max_allowed_results,
         )
 
-        query_params = urlencode(
-            {
-                "q": q,
-                "api_key": FEC_API_KEY,
-            }
-        )
+        query_params = urlencode({"q": q, "api_key": FEC_API_KEY})
         url = "{url}?{query_params}".format(
             url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT, query_params=query_params
         )
@@ -71,8 +70,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .order_by("-committee_id")
         )
         fec_api_committees = json_results.get("results", [])
-        fec_api_committees = [fac for fac in fec_api_committees if not any(
-            fac["id"] == ffc["committee_id"] for ffc in fecfile_committees)]
+        fec_api_committees = [
+            fac
+            for fac in fec_api_committees
+            if not any(fac["id"] == ffc["committee_id"] for ffc in fecfile_committees)
+        ]
         fec_api_committees = fec_api_committees[:max_fec_results]
         fecfile_committees = fecfile_committees[:max_fecfile_results]
         return_value = {
