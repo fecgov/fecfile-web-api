@@ -45,7 +45,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 15 * 60  # Inactivity timeout
+SESSION_COOKIE_AGE = 30 * 60  # Inactivity timeout
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
@@ -198,7 +198,7 @@ STATICFILES_LOCATION = "static"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.IsAuthenticated",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
