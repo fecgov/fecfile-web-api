@@ -49,9 +49,9 @@
             "conduit_state": "test_string_value",
             "conduit_zip": "test_string_value",
             "memo_code": true,
-            "memo_text_description": "test_string_value",
             "reference_to_si_or_sl_system_code_that_identifies_the_account": "test_string_value",
-            "transaction_type_identifier": "INDV_REC"
+            "transaction_type_identifier": "INDV_REC",
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba"
         }
     }
 ]

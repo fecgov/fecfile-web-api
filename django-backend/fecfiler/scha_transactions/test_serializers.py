@@ -8,7 +8,12 @@ from .serializers import (SchATransactionParentSerializer,
 
 
 class SchATransactionTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries", "test_contacts"]
+    fixtures = [
+        "test_committee_accounts",
+        "test_f3x_summaries",
+        "test_contacts",
+        "test_memo_text"
+    ]
 
     def setUp(self):
         self.test_contact = {
@@ -24,6 +29,14 @@ class SchATransactionTestCase(TestCase):
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+        }
+
+        self.memo_text = {
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "transaction_id_number": "ABCDEF0123456789",
+            "filer_committee_id_number": "C00123456",
+            "rec_type": "",
+            "back_reference_sched_form_name": "",
         }
 
         self.valid_scha_transaction = {
@@ -46,6 +59,8 @@ class SchATransactionTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "memo_text": self.memo_text,
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
             "contact": self.test_contact.copy(),
         }
 
@@ -57,6 +72,8 @@ class SchATransactionTestCase(TestCase):
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "contact": self.test_contact.copy(),
+            "memo_text": self.memo_text,
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
         }
 
         self.missing_type_transaction = {
@@ -66,6 +83,8 @@ class SchATransactionTestCase(TestCase):
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "contact": self.test_contact.copy(),
+            "memo_text": self.memo_text,
+            "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -120,7 +139,9 @@ class SchATransactionTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
+        parent["memo_text"] = self.memo_text
         child["contribution_purpose_descrip"] = "updated child"
+        child["memo_text"] = self.memo_text
         parent["children"] = [child]
         parent["contact"] = self.test_contact.copy()
         child["contact"] = self.test_contact.copy()
