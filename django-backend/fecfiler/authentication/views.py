@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate, logout, login
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
-    action,
     api_view,
 )
 from fecfiler.settings import (
@@ -31,6 +30,42 @@ from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class AccountViewSet(GenericViewSet, ListModelMixin):
+    """
+        The Account ViewSet allows the user to retrieve the users in the same committee
+
+        The CommitteeOwnedViewset could not be inherited due to the different structure
+        of a user object versus other objects.
+            (IE - having a "cmtee_id" field instead of "committee_id")
+    """
+
+    serializer_class = AccountSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = [
+        "last_name",
+        "first_name",
+        "id",
+        "email",
+        "role",
+        "is_active",
+        "name",
+    ]
+    ordering = ["name"]
+
+    def get_queryset(self):
+        queryset = (
+            Account.objects.annotate(
+                name=Concat(
+                    "last_name", Value(", "), "first_name", output_field=CharField()
+                )
+            )
+            .filter(cmtee_id=self.request.user.cmtee_id)
+            .all()
+        )
+
+        return queryset
 
 
 def login_dot_gov_logout(request):
@@ -82,73 +117,32 @@ def handle_invalid_login(username):
     )
 
 
-class AccountViewSet(GenericViewSet, ListModelMixin):
-    """
-        The Account ViewSet allows the user to retrieve the users in the same committee
+@api_view(["GET"])
+def login_redirect(request):
+    request.session["user_id"] = request.user.pk
+    redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    redirect.set_cookie(
+        FFAPI_COMMITTEE_ID_COOKIE_NAME,
+        request.user.cmtee_id,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    redirect.set_cookie(
+        FFAPI_EMAIL_COOKIE_NAME,
+        request.user.email,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    return redirect
 
-        The CommitteeOwnedViewset could not be inherited due to the different structure
-        of a user object versus other objects.
-            (IE - having a "cmtee_id" field instead of "committee_id")
-    """
 
-    serializer_class = AccountSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "last_name",
-        "first_name",
-        "id",
-        "email",
-        "role",
-        "is_active",
-        "name",
-    ]
-    ordering = ["name"]
-
-    def get_queryset(self):
-        queryset = (
-            Account.objects.annotate(
-                name=Concat(
-                    "last_name", Value(", "), "first_name", output_field=CharField()
-                )
-            )
-            .filter(cmtee_id=self.request.user.cmtee_id)
-            .all()
-        )
-
-        return queryset
-
-    @action(detail=True, methods=["get"])
-    def login_redirect(self, request):
-        request.session["user_id"] = request.user.pk
-        redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        redirect.set_cookie(
-            FFAPI_COMMITTEE_ID_COOKIE_NAME,
-            request.user.cmtee_id,
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        redirect.set_cookie(
-            FFAPI_EMAIL_COOKIE_NAME,
-            request.user.email,
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        return redirect
-
-    @action(detail=True, methods=["post"])
-    def logout(self, request):
-        logout(request)
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
-
-    @action(detail=True, methods=["get"])
-    def logout_redirect(self, request):
-        response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        response.delete_cookie(
-            FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN
-        )
-        response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-        response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
-        return response
+@api_view(["GET"])
+def logout_redirect(request):
+    response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
+    return response
 
 
 @api_view(["POST", "GET"])
@@ -172,3 +166,11 @@ def authenticate_login(request):
         return handle_valid_login(account)
     else:
         return handle_invalid_login(username)
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+def authenticate_logout(request):
+    logout(request)
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
