@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, logout, login
+from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -118,6 +119,7 @@ def handle_invalid_login(username):
 
 
 @api_view(["GET"])
+@require_http_methods(["GET"])
 def login_redirect(request):
     request.session["user_id"] = request.user.pk
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
@@ -137,6 +139,7 @@ def login_redirect(request):
 
 
 @api_view(["GET"])
+@require_http_methods(["GET"])
 def logout_redirect(request):
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
     response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
@@ -145,9 +148,10 @@ def logout_redirect(request):
     return response
 
 
-@api_view(["POST", "GET"])
+@api_view(["GET", "POST"])
 @authentication_classes([])
 @permission_classes([])
+@require_http_methods(["GET", "POST"])
 def authenticate_login(request):
     if request.method == "GET":
         return JsonResponse({"endpoint_available": E2E_TESTING_LOGIN})
@@ -171,6 +175,7 @@ def authenticate_login(request):
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
+@require_http_methods(["GET"])
 def authenticate_logout(request):
     logout(request)
     return Response({}, status=status.HTTP_204_NO_CONTENT)
