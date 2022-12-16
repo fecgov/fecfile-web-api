@@ -63,6 +63,7 @@ class SchATransactionManager(SoftDeleteManager):
             "TRIBAL_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
             "PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+            "TRIBAL_NATIONAL_PARTY_RECOUNT_ACCOUNT",
         ]
         return Case(
             When(contribution_aggregate__lt=Value(Decimal(0)), then=Value(True)),
