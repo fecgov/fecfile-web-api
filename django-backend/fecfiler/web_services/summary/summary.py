@@ -11,7 +11,7 @@ class SummaryService:
     def calculate_summary(self):
         report_transactions = ScheduleATransaction.objects.filter(report=self.report)
         # just line 15
-        sa15_query = Q(form_type="SA15", memo_code=False)
+        sa15_query = Q(~Q(memo_code=True), form_type="SA15")
         line_15 = self._create_contribution_sum(sa15_query)
         summary = report_transactions.aggregate(line_15=line_15)
         return summary
