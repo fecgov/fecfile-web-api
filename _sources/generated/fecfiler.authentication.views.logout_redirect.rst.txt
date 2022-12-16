@@ -1,0 +1,6 @@
+fecfiler.authentication.views.logout\_redirect
+==============================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: logout_redirect

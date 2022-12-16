@@ -18,10 +18,13 @@ fecfiler.authentication.views
       :toctree:                                          
    
       authenticate_login
+      authenticate_logout
       generate_username
       handle_invalid_login
       handle_valid_login
       login_dot_gov_logout
+      login_redirect
+      logout_redirect
       update_last_login_time
    
    
@@ -35,9 +38,6 @@ fecfiler.authentication.views
       :template: custom-class-template.rst               
    
       AccountViewSet
-      LoginDotGovSuccessLogoutSpaRedirect
-      LoginDotGovSuccessSpaRedirect
-      LogoutView
    
    
 

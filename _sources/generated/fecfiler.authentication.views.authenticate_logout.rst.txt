@@ -1,0 +1,6 @@
+fecfiler.authentication.views.authenticate\_logout
+==================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: authenticate_logout
