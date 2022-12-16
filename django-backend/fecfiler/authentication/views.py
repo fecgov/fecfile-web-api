@@ -1,6 +1,6 @@
-from django.views.generic import View
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, logout, login
+from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -18,7 +18,7 @@ from fecfiler.settings import (
 )
 
 from rest_framework.response import Response
-from rest_framework import filters, permissions, views, status
+from rest_framework import filters, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin
 from django.db.models import Value, CharField
@@ -69,36 +69,6 @@ class AccountViewSet(GenericViewSet, ListModelMixin):
         return queryset
 
 
-class LoginDotGovSuccessSpaRedirect(View):
-    def get(self, request, *args, **kwargs):
-        request.session["user_id"] = request.user.pk
-        redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        redirect.set_cookie(
-            FFAPI_COMMITTEE_ID_COOKIE_NAME,
-            request.user.cmtee_id,
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        redirect.set_cookie(
-            FFAPI_EMAIL_COOKIE_NAME,
-            request.user.email,
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        return redirect
-
-
-class LoginDotGovSuccessLogoutSpaRedirect(View):
-    def get(self, request, *args, **kwargs):
-        response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        response.delete_cookie(
-            FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN
-        )
-        response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-        response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
-        return response
-
-
 def login_dot_gov_logout(request):
     client_id = OIDC_RP_CLIENT_ID
     post_logout_redirect_uri = LOGOUT_REDIRECT_URL
@@ -125,6 +95,17 @@ def update_last_login_time(account):
     account.save()
 
 
+def handle_valid_login(account):
+    update_last_login_time(account)
+
+    logger.debug("Successful login: {}".format(account))
+    return JsonResponse(
+        {"is_allowed": True, "committee_id": account.cmtee_id, "email": account.email},
+        status=200,
+        safe=False,
+    )
+
+
 def handle_invalid_login(username):
     logger.debug("Unauthorized login attempt: {}".format(username))
     return JsonResponse(
@@ -137,20 +118,40 @@ def handle_invalid_login(username):
     )
 
 
-def handle_valid_login(account):
-    update_last_login_time(account)
-
-    logger.debug("Successful login: {}".format(account))
-    return JsonResponse(
-        {"is_allowed": True, "committee_id": account.cmtee_id, "email": account.email},
-        status=200,
-        safe=False,
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def login_redirect(request):
+    request.session["user_id"] = request.user.pk
+    redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    redirect.set_cookie(
+        FFAPI_COMMITTEE_ID_COOKIE_NAME,
+        request.user.cmtee_id,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
     )
+    redirect.set_cookie(
+        FFAPI_EMAIL_COOKIE_NAME,
+        request.user.email,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    return redirect
 
 
-@api_view(["POST", "GET"])
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def logout_redirect(request):
+    response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
+    return response
+
+
+@api_view(["GET", "POST"])
 @authentication_classes([])
 @permission_classes([])
+@require_http_methods(["GET", "POST"])
 def authenticate_login(request):
     if request.method == "GET":
         return JsonResponse({"endpoint_available": E2E_TESTING_LOGIN})
@@ -171,9 +172,10 @@ def authenticate_login(request):
         return handle_invalid_login(username)
 
 
-class LogoutView(views.APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def post(self, request, format=None):
-        logout(request)
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+@require_http_methods(["GET"])
+def authenticate_logout(request):
+    logout(request)
+    return Response({}, status=status.HTTP_204_NO_CONTENT)
