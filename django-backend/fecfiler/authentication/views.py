@@ -119,6 +119,8 @@ def handle_invalid_login(username):
 
 
 @api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
 @require_http_methods(["GET"])
 def login_redirect(request):
     request.session["user_id"] = request.user.pk
@@ -139,6 +141,8 @@ def login_redirect(request):
 
 
 @api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
 @require_http_methods(["GET"])
 def logout_redirect(request):
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
