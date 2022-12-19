@@ -55,7 +55,6 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     )
 
     serializer_class = F3XSummarySerializer
-    permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",

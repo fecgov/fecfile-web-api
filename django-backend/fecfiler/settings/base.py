@@ -3,7 +3,6 @@ Django settings for the FECFile project.
 """
 
 import os
-import datetime
 import dj_database_url
 import requests
 
@@ -21,7 +20,6 @@ DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-
 CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
@@ -34,13 +32,6 @@ E2E_TESTING_LOGIN = True
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
-OTP_MAX_RETRY = 20
-OTP_DIGIT = 6
-OTP_TIME_EXPIRY = 300
-OTP_TIMEOUT_TIME = 30
-OTP_DISABLE = True
-OTP_DEFAULT_PASSCODE = "111111"
-JWT_PASSWORD_EXPIRY = 1800
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
@@ -54,7 +45,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 15 * 60  # Inactivity timeout
+SESSION_COOKIE_AGE = 30 * 60  # Inactivity timeout
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
@@ -79,8 +70,6 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "django_otp",
-    "django_otp.plugins.otp_totp",
     "fecfiler.triage",
 ]
 
@@ -135,29 +124,11 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
-
-# OIDC settings start
-AUTHENTICATION_BACKENDS = (
+# OpenID Connect settings start
+AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
-)
+]
 
 OIDC_CREATE_USER = True
 OIDC_STORE_ID_TOKEN = True
@@ -202,10 +173,10 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
     "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
 }
 
-OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.token.login_dot_gov_logout"
+OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 
-OIDC_USERNAME_ALGO = "fecfiler.authentication.token.generate_username"
-# OIDC settings end
+OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
+# OpenID Connect settings end
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
@@ -227,23 +198,14 @@ STATIC_ROOT = "static"
 STATICFILES_LOCATION = "static"
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-}
-
-JWT_AUTH = {
-    "JWT_ALLOW_REFRESH": True,
-    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=3600),
-    "JWT_PAYLOAD_HANDLER": "fecfiler.authentication.token.jwt_payload_handler",
 }
 
 LOGGING = {
@@ -253,14 +215,9 @@ LOGGING = {
         "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
     },
     "handlers": {
-        "default": {
-            "class": "logging.StreamHandler",
-            "formatter": "standard",
-        },
+        "default": {"class": "logging.StreamHandler", "formatter": "standard"},
     },
-    "loggers": {
-        "": {"handlers": ["default"], "level": "INFO", "propagate": True},
-    },
+    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True}},
 }
 
 """Celery configurations
