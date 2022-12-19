@@ -96,7 +96,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[3], "X")
         self.assertEqual(split_row[122], "381.00")
 
-    def test_serialize_scha_transaction(self):
+    def test_serialize_schedule_a_transaction(self):
         transaction_row = serialize_model_instance(
             "SchA", ScheduleATransaction, self.transaction
         )
