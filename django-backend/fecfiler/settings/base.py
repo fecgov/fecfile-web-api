@@ -45,7 +45,7 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 30  # Inactivity timeout
+SESSION_COOKIE_AGE = 30 * 60  # Inactivity timeout
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
