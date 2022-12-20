@@ -113,7 +113,9 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.tearDownClass
       ~AuthenticationTest.test_generate_username
       ~AuthenticationTest.test_invalid_login
+      ~AuthenticationTest.test_login_dot_gov_login_redirect
       ~AuthenticationTest.test_login_dot_gov_logout_happy_path
+      ~AuthenticationTest.test_login_dot_gov_logout_redirect
       ~AuthenticationTest.test_update_login_time
       ~AuthenticationTest.test_valid_login
    

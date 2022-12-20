@@ -19,6 +19,7 @@ fecfiler.authentication.views
    
       authenticate_login
       authenticate_logout
+      delete_user_logged_in_cookies
       generate_username
       handle_invalid_login
       handle_valid_login

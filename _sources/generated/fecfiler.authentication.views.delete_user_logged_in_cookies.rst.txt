@@ -1,0 +1,6 @@
+fecfiler.authentication.views.delete\_user\_logged\_in\_cookies
+===============================================================
+
+.. currentmodule:: fecfiler.authentication.views
+
+.. autofunction:: delete_user_logged_in_cookies

@@ -43,6 +43,7 @@ fecfiler
    fecfiler.shared
    fecfiler.triage
    fecfiler.urls
+   fecfiler.utils
    fecfiler.validation
    fecfiler.web_services
    fecfiler.wsgi

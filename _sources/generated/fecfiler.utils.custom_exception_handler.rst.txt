@@ -1,0 +1,6 @@
+fecfiler.utils.custom\_exception\_handler
+=========================================
+
+.. currentmodule:: fecfiler.utils
+
+.. autofunction:: custom_exception_handler
