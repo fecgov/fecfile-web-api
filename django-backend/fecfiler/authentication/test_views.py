@@ -1,12 +1,14 @@
 from unittest.mock import Mock
-
 from django.test import RequestFactory, TestCase
 from fecfiler.authentication.models import Account
 from fecfiler.authentication.views import (handle_invalid_login,
                                            handle_valid_login,
                                            update_last_login_time)
 
-from .views import generate_username, login_dot_gov_logout
+from .views import (generate_username,
+                    login_dot_gov_logout,
+                    login_redirect,
+                    logout_redirect)
 
 
 class AuthenticationTest(TestCase):
@@ -14,6 +16,7 @@ class AuthenticationTest(TestCase):
     acc = None
 
     def setUp(self):
+        self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
         self.acc = Account.objects.get(email="unit_tester@test.com")
 
@@ -31,6 +34,17 @@ class AuthenticationTest(TestCase):
                                   'client_id=None'
                                   '&post_logout_redirect_uri=None'
                                   '&state=test_state'))
+
+    def test_login_dot_gov_login_redirect(self):
+        request = self.factory.get("/")
+        request.user = self.user
+        request.session = {}
+        retval = login_redirect(request)
+        self.assertEqual(retval.status_code, 302)
+
+    def test_login_dot_gov_logout_redirect(self):
+        retval = logout_redirect(self.factory.get('/'))
+        self.assertEqual(retval.status_code, 302)
 
     def test_generate_username(self):
         test_uuid = 'test_uuid'
