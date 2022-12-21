@@ -6,141 +6,341 @@ import fecfiler.shared.utilities
 import uuid
 
 
+def copy_scha_transactions(apps, schema_editor):
+    try:
+        SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
+        ScheduleATransaction = apps.get_model(
+            "transactions", ScheduleATransaction
+        )  # noqa
+        transactions_to_copy = SchATransaction.objects.all().annotate(
+            conduit_street_1="conduit_street1", conduit_street_2="conduit_street2"
+        )
+        ScheduleATransaction.objects.bulk_create(transactions_to_copy)
+
+    except LookupError:
+        print("No SchATransaction table to copy")
+
+
 class Migration(migrations.Migration):
 
     initial = True
 
     dependencies = [
-        ('contacts', '0010_auto_20220915_1309'),
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('memo_text', '0009_memotext_report_level_memo'),
-        ('committee_accounts', '0005_rename_uuid_committeeaccount_id'),
-        ('f3x_summaries', '0026_auto_20221130_1459'),
+        ("contacts", "0010_auto_20220915_1309"),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("memo_text", "0009_memotext_report_level_memo"),
+        ("committee_accounts", "0005_rename_uuid_committeeaccount_id"),
+        ("f3x_summaries", "0026_auto_20221130_1459"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ScheduleBTransaction',
+            name="ScheduleBTransaction",
             fields=[
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('transaction_type_identifier', models.TextField(blank=True, null=True)),
-                ('aggregation_group', models.TextField(blank=True, null=True)),
-                ('parent_transaction_object_id', models.UUIDField(blank=True, null=True)),
-                ('form_type', models.TextField(blank=True, null=True)),
-                ('filer_committee_id_number', models.TextField(blank=True, null=True)),
-                ('transaction_id', models.TextField(default=fecfiler.shared.utilities.generate_fec_uid, unique=True)),
-                ('back_reference_tran_id_number', models.TextField(blank=True, null=True)),
-                ('back_reference_sched_name', models.TextField(blank=True, null=True)),
-                ('entity_type', models.TextField(blank=True, null=True)),
-                ('election_code', models.TextField(blank=True, null=True)),
-                ('election_other_description', models.TextField(blank=True, null=True)),
-                ('conduit_name', models.TextField(blank=True, null=True)),
-                ('conduit_street1', models.TextField(blank=True, null=True)),
-                ('conduit_street2', models.TextField(blank=True, null=True)),
-                ('conduit_city', models.TextField(blank=True, null=True)),
-                ('conduit_state', models.TextField(blank=True, null=True)),
-                ('conduit_zip', models.TextField(blank=True, null=True)),
-                ('memo_code', models.BooleanField(blank=True, default=False, null=True)),
-                ('memo_text_description', models.TextField(blank=True, null=True)),
-                ('reference_to_si_or_sl_system_code_that_identifies_the_account', models.TextField(blank=True, null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('payee_organization_name', models.TextField(blank=True, null=True)),
-                ('payee_last_name', models.TextField(blank=True, null=True)),
-                ('payee_first_name', models.TextField(blank=True, null=True)),
-                ('payee_middle_name', models.TextField(blank=True, null=True)),
-                ('payee_prefix', models.TextField(blank=True, null=True)),
-                ('payee_suffix', models.TextField(blank=True, null=True)),
-                ('payee_street_1', models.TextField(blank=True, null=True)),
-                ('payee_street_2', models.TextField(blank=True, null=True)),
-                ('payee_city', models.TextField(blank=True, null=True)),
-                ('payee_state', models.TextField(blank=True, null=True)),
-                ('payee_zip', models.TextField(blank=True, null=True)),
-                ('expenditure_date', models.DateField(blank=True, null=True)),
-                ('expenditure_amount', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('expenditure_purpose_descrip', models.TextField(blank=True, null=True)),
-                ('category_code', models.TextField(blank=True, null=True)),
-                ('benificiary_committee_fec_id', models.TextField(blank=True, null=True)),
-                ('benificiary_committee_name', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_fec_id', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_last_name', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_first_name', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_middle_name', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_prefix', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_office', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_state', models.TextField(blank=True, null=True)),
-                ('benificiary_candidate_district', models.TextField(blank=True, null=True)),
-                ('committee_account', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount')),
-                ('contact', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contacts.contact')),
-                ('memo_text', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='memo_text.memotext')),
-                ('parent_transaction_content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('report', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary')),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "transaction_type_identifier",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("aggregation_group", models.TextField(blank=True, null=True)),
+                (
+                    "parent_transaction_object_id",
+                    models.UUIDField(blank=True, null=True),
+                ),
+                ("form_type", models.TextField(blank=True, null=True)),
+                ("filer_committee_id_number", models.TextField(blank=True, null=True)),
+                (
+                    "transaction_id",
+                    models.TextField(
+                        default=fecfiler.shared.utilities.generate_fec_uid, unique=True
+                    ),
+                ),
+                (
+                    "back_reference_tran_id_number",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("back_reference_sched_name", models.TextField(blank=True, null=True)),
+                ("entity_type", models.TextField(blank=True, null=True)),
+                ("election_code", models.TextField(blank=True, null=True)),
+                ("election_other_description", models.TextField(blank=True, null=True)),
+                ("conduit_name", models.TextField(blank=True, null=True)),
+                ("conduit_street1", models.TextField(blank=True, null=True)),
+                ("conduit_street2", models.TextField(blank=True, null=True)),
+                ("conduit_city", models.TextField(blank=True, null=True)),
+                ("conduit_state", models.TextField(blank=True, null=True)),
+                ("conduit_zip", models.TextField(blank=True, null=True)),
+                (
+                    "memo_code",
+                    models.BooleanField(blank=True, default=False, null=True),
+                ),
+                ("memo_text_description", models.TextField(blank=True, null=True)),
+                (
+                    "reference_to_si_or_sl_system_code_that_identifies_the_account",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("payee_organization_name", models.TextField(blank=True, null=True)),
+                ("payee_last_name", models.TextField(blank=True, null=True)),
+                ("payee_first_name", models.TextField(blank=True, null=True)),
+                ("payee_middle_name", models.TextField(blank=True, null=True)),
+                ("payee_prefix", models.TextField(blank=True, null=True)),
+                ("payee_suffix", models.TextField(blank=True, null=True)),
+                ("payee_street_1", models.TextField(blank=True, null=True)),
+                ("payee_street_2", models.TextField(blank=True, null=True)),
+                ("payee_city", models.TextField(blank=True, null=True)),
+                ("payee_state", models.TextField(blank=True, null=True)),
+                ("payee_zip", models.TextField(blank=True, null=True)),
+                ("expenditure_date", models.DateField(blank=True, null=True)),
+                (
+                    "expenditure_amount",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "expenditure_purpose_descrip",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("category_code", models.TextField(blank=True, null=True)),
+                (
+                    "benificiary_committee_fec_id",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("benificiary_committee_name", models.TextField(blank=True, null=True)),
+                (
+                    "benificiary_candidate_fec_id",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_last_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_first_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_middle_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_prefix",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_suffix",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_office",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_state",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "benificiary_candidate_district",
+                    models.TextField(blank=True, null=True),
+                ),
+                (
+                    "committee_account",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="committee_accounts.committeeaccount",
+                    ),
+                ),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contacts.contact",
+                    ),
+                ),
+                (
+                    "memo_text",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="memo_text.memotext",
+                    ),
+                ),
+                (
+                    "parent_transaction_content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
+                (
+                    "report",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="f3x_summaries.f3xsummary",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='ScheduleATransaction',
+            name="ScheduleATransaction",
             fields=[
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('transaction_type_identifier', models.TextField(blank=True, null=True)),
-                ('aggregation_group', models.TextField(blank=True, null=True)),
-                ('parent_transaction_object_id', models.UUIDField(blank=True, null=True)),
-                ('form_type', models.TextField(blank=True, null=True)),
-                ('filer_committee_id_number', models.TextField(blank=True, null=True)),
-                ('transaction_id', models.TextField(default=fecfiler.shared.utilities.generate_fec_uid, unique=True)),
-                ('back_reference_tran_id_number', models.TextField(blank=True, null=True)),
-                ('back_reference_sched_name', models.TextField(blank=True, null=True)),
-                ('entity_type', models.TextField(blank=True, null=True)),
-                ('election_code', models.TextField(blank=True, null=True)),
-                ('election_other_description', models.TextField(blank=True, null=True)),
-                ('conduit_name', models.TextField(blank=True, null=True)),
-                ('conduit_street1', models.TextField(blank=True, null=True)),
-                ('conduit_street2', models.TextField(blank=True, null=True)),
-                ('conduit_city', models.TextField(blank=True, null=True)),
-                ('conduit_state', models.TextField(blank=True, null=True)),
-                ('conduit_zip', models.TextField(blank=True, null=True)),
-                ('memo_code', models.BooleanField(blank=True, default=False, null=True)),
-                ('memo_text_description', models.TextField(blank=True, null=True)),
-                ('reference_to_si_or_sl_system_code_that_identifies_the_account', models.TextField(blank=True, null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('contributor_organization_name', models.TextField(blank=True, null=True)),
-                ('contributor_last_name', models.TextField(blank=True, null=True)),
-                ('contributor_first_name', models.TextField(blank=True, null=True)),
-                ('contributor_middle_name', models.TextField(blank=True, null=True)),
-                ('contributor_prefix', models.TextField(blank=True, null=True)),
-                ('contributor_suffix', models.TextField(blank=True, null=True)),
-                ('contributor_street_1', models.TextField(blank=True, null=True)),
-                ('contributor_street_2', models.TextField(blank=True, null=True)),
-                ('contributor_city', models.TextField(blank=True, null=True)),
-                ('contributor_state', models.TextField(blank=True, null=True)),
-                ('contributor_zip', models.TextField(blank=True, null=True)),
-                ('contribution_date', models.DateField(blank=True, null=True)),
-                ('contribution_amount', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('contribution_purpose_descrip', models.TextField(blank=True, null=True)),
-                ('contributor_employer', models.TextField(blank=True, null=True)),
-                ('contributor_occupation', models.TextField(blank=True, null=True)),
-                ('donor_committee_fec_id', models.TextField(blank=True, null=True)),
-                ('donor_committee_name', models.TextField(blank=True, null=True)),
-                ('donor_candidate_fec_id', models.TextField(blank=True, null=True)),
-                ('donor_candidate_last_name', models.TextField(blank=True, null=True)),
-                ('donor_candidate_first_name', models.TextField(blank=True, null=True)),
-                ('donor_candidate_middle_name', models.TextField(blank=True, null=True)),
-                ('donor_candidate_prefix', models.TextField(blank=True, null=True)),
-                ('donor_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('donor_candidate_office', models.TextField(blank=True, null=True)),
-                ('donor_candidate_state', models.TextField(blank=True, null=True)),
-                ('donor_candidate_district', models.TextField(blank=True, null=True)),
-                ('committee_account', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount')),
-                ('contact', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contacts.contact')),
-                ('memo_text', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='memo_text.memotext')),
-                ('parent_transaction_content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('report', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='f3x_summaries.f3xsummary')),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "transaction_type_identifier",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("aggregation_group", models.TextField(blank=True, null=True)),
+                (
+                    "parent_transaction_object_id",
+                    models.UUIDField(blank=True, null=True),
+                ),
+                ("form_type", models.TextField(blank=True, null=True)),
+                ("filer_committee_id_number", models.TextField(blank=True, null=True)),
+                (
+                    "transaction_id",
+                    models.TextField(
+                        default=fecfiler.shared.utilities.generate_fec_uid, unique=True
+                    ),
+                ),
+                (
+                    "back_reference_tran_id_number",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("back_reference_sched_name", models.TextField(blank=True, null=True)),
+                ("entity_type", models.TextField(blank=True, null=True)),
+                ("election_code", models.TextField(blank=True, null=True)),
+                ("election_other_description", models.TextField(blank=True, null=True)),
+                ("conduit_name", models.TextField(blank=True, null=True)),
+                ("conduit_street1", models.TextField(blank=True, null=True)),
+                ("conduit_street2", models.TextField(blank=True, null=True)),
+                ("conduit_city", models.TextField(blank=True, null=True)),
+                ("conduit_state", models.TextField(blank=True, null=True)),
+                ("conduit_zip", models.TextField(blank=True, null=True)),
+                (
+                    "memo_code",
+                    models.BooleanField(blank=True, default=False, null=True),
+                ),
+                ("memo_text_description", models.TextField(blank=True, null=True)),
+                (
+                    "reference_to_si_or_sl_system_code_that_identifies_the_account",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "contributor_organization_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("contributor_last_name", models.TextField(blank=True, null=True)),
+                ("contributor_first_name", models.TextField(blank=True, null=True)),
+                ("contributor_middle_name", models.TextField(blank=True, null=True)),
+                ("contributor_prefix", models.TextField(blank=True, null=True)),
+                ("contributor_suffix", models.TextField(blank=True, null=True)),
+                ("contributor_street_1", models.TextField(blank=True, null=True)),
+                ("contributor_street_2", models.TextField(blank=True, null=True)),
+                ("contributor_city", models.TextField(blank=True, null=True)),
+                ("contributor_state", models.TextField(blank=True, null=True)),
+                ("contributor_zip", models.TextField(blank=True, null=True)),
+                ("contribution_date", models.DateField(blank=True, null=True)),
+                (
+                    "contribution_amount",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "contribution_purpose_descrip",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("contributor_employer", models.TextField(blank=True, null=True)),
+                ("contributor_occupation", models.TextField(blank=True, null=True)),
+                ("donor_committee_fec_id", models.TextField(blank=True, null=True)),
+                ("donor_committee_name", models.TextField(blank=True, null=True)),
+                ("donor_candidate_fec_id", models.TextField(blank=True, null=True)),
+                ("donor_candidate_last_name", models.TextField(blank=True, null=True)),
+                ("donor_candidate_first_name", models.TextField(blank=True, null=True)),
+                (
+                    "donor_candidate_middle_name",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("donor_candidate_prefix", models.TextField(blank=True, null=True)),
+                ("donor_candidate_suffix", models.TextField(blank=True, null=True)),
+                ("donor_candidate_office", models.TextField(blank=True, null=True)),
+                ("donor_candidate_state", models.TextField(blank=True, null=True)),
+                ("donor_candidate_district", models.TextField(blank=True, null=True)),
+                (
+                    "committee_account",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="committee_accounts.committeeaccount",
+                    ),
+                ),
+                (
+                    "contact",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contacts.contact",
+                    ),
+                ),
+                (
+                    "memo_text",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="memo_text.memotext",
+                    ),
+                ),
+                (
+                    "parent_transaction_content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
+                (
+                    "report",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="f3x_summaries.f3xsummary",
+                    ),
+                ),
             ],
         ),
+        migrations.RunPython(copy_scha_transactions),
     ]
