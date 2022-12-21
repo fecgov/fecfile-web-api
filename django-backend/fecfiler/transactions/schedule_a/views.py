@@ -2,12 +2,12 @@ import logging
 
 from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
-from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 
 from .models import ScheduleATransaction
 from .serializers import ScheduleATransactionSerializer
+from fecfiler.transactions.views import TransactionViewSetBase
 from django.db.models import TextField, Value, Q
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -16,7 +16,7 @@ from rest_framework import status
 logger = logging.getLogger(__name__)
 
 
-class ScheduleATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
+class ScheduleATransactionViewSet(TransactionViewSetBase):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -39,8 +39,6 @@ class ScheduleATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     ).all()
 
     serializer_class = ScheduleATransactionSerializer
-    permission_classes = []
-    filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "id",
         "transaction_type_identifier",
@@ -49,7 +47,6 @@ class ScheduleATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "memo_code",
         "contribution_amount",
     ]
-    ordering = ["-created"]
 
     @action(detail=False, methods=["get"])
     def previous(self, request):

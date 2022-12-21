@@ -1,12 +1,11 @@
 import logging
 
 from django.db import transaction
-from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.models import Contact
 from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.memo_text.serializers import MemoTextSerializer
-from fecfiler.validation import serializers
+from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     BooleanField,
@@ -17,41 +16,18 @@ from rest_framework.serializers import (
 )
 
 
-from .models import ScheduleATransaction
+from fecfiler.transactions.schedule_a.models import ScheduleATransaction
 
 logger = logging.getLogger(__name__)
-MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
-    {"transaction_type_identifier": ["No transaction_type_identifier provided"]}
-)
 
 
-class ScheduleATransactionSerializerBase(
-    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
-):
-    """id must be explicitly configured in order to have it in validated_data
-    https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
+class ScheduleATransactionSerializerBase(TransactionSerializerBase):
 
-    id = UUIDField(required=False)
-    transaction_id = CharField(required=False, allow_null=True)
-    report_id = UUIDField(required=True, allow_null=False)
-    # maybe we can factor these out on the front end since we send the whole contact/memo_text object
-    contact_id = UUIDField(required=False, allow_null=False)
-    memo_text_id = UUIDField(required=False, allow_null=True)
+    """These fields are generated in the query"""
 
-    contact = ContactSerializer(allow_null=True, required=False)
-    memo_text = MemoTextSerializer(allow_null=True, required=False)
-
-    """ These fields are generated in the query"""
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
-    itemized = BooleanField(read_only=True)
-
-    def get_schema_name(self, data):
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
-            raise MISSING_TRANSACTION_TYPE_ERROR
-        return transaction_type
 
     def validate(self, attrs):
         """Adds stub contribution_aggregate to pass validation"""
@@ -73,13 +49,6 @@ class ScheduleATransactionSerializerBase(
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
-        ]
-
-        read_only_fields = [
-            "id",
-            "deleted",
-            "created",
-            "updated",
         ]
 
 
