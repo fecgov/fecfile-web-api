@@ -10,11 +10,6 @@ def set_is_report_level_memo(apps, _):
         memo.save()
 
 
-def noop(_apps, _):
-    # Empty function for reversing the migration
-    pass
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -27,5 +22,5 @@ class Migration(migrations.Migration):
             name="is_report_level_memo",
             field=models.BooleanField(default=True),
         ),
-        migrations.RunPython(set_is_report_level_memo, noop),
+        migrations.RunPython(set_is_report_level_memo, migrations.RunPython.noop),
     ]

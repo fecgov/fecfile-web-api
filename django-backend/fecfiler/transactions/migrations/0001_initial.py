@@ -349,5 +349,5 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
-        migrations.RunPython(copy_scha_transactions),
+        migrations.RunPython(copy_scha_transactions, migrations.RunPython.noop),
     ]
