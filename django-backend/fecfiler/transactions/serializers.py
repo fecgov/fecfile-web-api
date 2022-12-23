@@ -5,7 +5,10 @@ from fecfiler.contacts.serializers import (
     ContactSerializer,
     LinkedContactSerializerMixin,
 )
-from fecfiler.memo_text.serializers import MemoTextSerializer
+from fecfiler.memo_text.serializers import (
+    MemoTextSerializer,
+    LinkedMemoTextSerializerMixin,
+)
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
@@ -22,6 +25,7 @@ MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
 
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
+    LinkedMemoTextSerializerMixin,
     serializers.FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):

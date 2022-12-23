@@ -87,7 +87,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
             for child in children:
@@ -97,7 +96,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
 
     def update(self, instance: ScheduleATransaction, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
 
             existing_children = ScheduleATransaction.objects.filter(
@@ -113,24 +111,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 except ScheduleATransaction.DoesNotExist:
                     self.create(child)
             return super().update(instance, validated_data)
-
-    def create_or_update_memo_text(self, validated_data: dict):
-        memo_data = validated_data.pop("memo_text", None)
-        tran_memo_text_id = validated_data.get("memo_text_id", None)
-        if memo_data:
-            memo_text, _ = MemoText.objects.update_or_create(
-                id=tran_memo_text_id,
-                defaults={
-                    "is_report_level_memo": False,
-                    "report_id": validated_data.get("report_id", None),
-                    **memo_data,
-                },
-            )
-            validated_data["memo_text_id"] = memo_text.id
-        elif tran_memo_text_id:
-            memo_object = MemoText.objects.get(id=tran_memo_text_id)
-            memo_object.delete()
-            validated_data["memo_text_id"] = None
 
     class Meta(ScheduleATransactionSerializerBase.Meta):
         fields = [
