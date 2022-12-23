@@ -1,8 +1,10 @@
 import logging
 
+from django.db import transaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import IntegerField
+from rest_framework.serializers import IntegerField, Serializer
+from rest_framework.exceptions import ValidationError
 
 from .models import Contact
 
@@ -53,3 +55,28 @@ class ContactSerializer(
         if "transaction_count" in data:
             del data["transaction_count"]
         return super().to_internal_value(data)
+
+
+class LinkedContactSerializerMixin(Serializer):
+    def create(self, validated_data: dict):
+        with transaction.atomic():
+            self.create_or_update(validated_data)
+            return super().create(validated_data)
+
+    def update(self, validated_data: dict):
+        with transaction.atomic():
+            self.create_or_update(validated_data)
+            return super().update(validated_data)
+
+    def create_or_update(self, validated_data: dict):
+        contact_data = validated_data.pop("contact", None)
+        contact_id = validated_data.get("contact_id", None)
+        if not contact_id:
+            if not contact_data:
+                raise ValidationError(
+                    {"contact_id": ["No contact or contact id provided"]}
+                )
+            contact: Contact = Contact.objects.create(**contact_data)
+            validated_data["contact_id"] = contact.id
+        else:
+            Contact.objects.filter(id=contact_id).update(**contact_data)

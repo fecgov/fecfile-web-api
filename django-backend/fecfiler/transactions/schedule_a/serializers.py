@@ -87,7 +87,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data)
             self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
             parent = super().create(validated_data)
@@ -98,7 +97,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
 
     def update(self, instance: ScheduleATransaction, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data)
             self.create_or_update_memo_text(validated_data)
             children = validated_data.pop("children", [])
 
@@ -115,19 +113,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 except ScheduleATransaction.DoesNotExist:
                     self.create(child)
             return super().update(instance, validated_data)
-
-    def create_or_update_contact(self, validated_data: dict):
-        contact_data = validated_data.pop("contact", None)
-        tran_contact_id = validated_data.get("contact_id", None)
-        if not tran_contact_id:
-            if not contact_data:
-                raise ValidationError(
-                    {"contact_id": ["No transaction contact or contact id provided"]}
-                )
-            contact: Contact = Contact.objects.create(**contact_data)
-            validated_data["contact_id"] = contact.id
-        else:
-            Contact.objects.filter(id=tran_contact_id).update(**contact_data)
 
     def create_or_update_memo_text(self, validated_data: dict):
         memo_data = validated_data.pop("memo_text", None)

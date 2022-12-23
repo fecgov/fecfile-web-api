@@ -1,7 +1,10 @@
 import logging
 
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.contacts.serializers import (
+    ContactSerializer,
+    LinkedContactSerializerMixin,
+)
 from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
@@ -18,7 +21,9 @@ MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
 
 
 class TransactionSerializerBase(
-    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
+    LinkedContactSerializerMixin,
+    serializers.FecSchemaValidatorSerializerMixin,
+    CommitteeOwnedSerializer,
 ):
     """id must be explicitly configured in order to have it in validated_data
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
