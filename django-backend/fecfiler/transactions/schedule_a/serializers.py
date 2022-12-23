@@ -70,21 +70,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
         ret["children"] = map(self.to_representation, existing_children)
         return ret
 
-    def to_internal_value(self, data):
-        # We are not saving report or parent_transaction objects so
-        # we need to ensure their object properties are UUIDs and not objects
-        def insert_foreign_keys(transaction):
-            transaction["report"] = transaction["report_id"]
-            if "parent_transaction_object_id" in transaction:
-                transaction["parent_transaction"] = transaction[
-                    "parent_transaction_object_id"
-                ]
-            return transaction
-
-        if "children" in data:
-            data["children"] = list(map(insert_foreign_keys, data["children"]))
-        return super().to_internal_value(data)
-
     def create(self, validated_data: dict):
         with transaction.atomic():
             children = validated_data.pop("children", [])
