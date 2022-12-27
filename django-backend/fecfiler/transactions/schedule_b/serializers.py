@@ -61,6 +61,8 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
         required=False,
     )
 
+    parent_transaction = ScheduleBTransactionSerializerBase()
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
