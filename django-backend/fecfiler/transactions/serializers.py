@@ -35,12 +35,6 @@ class TransactionSerializerBase(
     id = UUIDField(required=False)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
-    # maybe we can factor these out on the front end since we send the whole contact/memo_text object
-    contact_id = UUIDField(required=False, allow_null=False)
-    memo_text_id = UUIDField(required=False, allow_null=True)
-
-    contact = ContactSerializer(allow_null=True, required=False)
-    memo_text = MemoTextSerializer(allow_null=True, required=False)
 
     itemized = BooleanField(read_only=True)
 
@@ -64,6 +58,9 @@ class TransactionSerializerBase(
         if "children" in data:
             data["children"] = list(map(insert_foreign_keys, data["children"]))
         return super().to_internal_value(data)
+
+    def create(self, validated_data: dict):
+        return super().create(validated_data)
 
     class Meta:
         abstract = True

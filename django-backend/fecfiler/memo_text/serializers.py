@@ -46,17 +46,20 @@ class MemoTextSerializer(
 
 
 class LinkedMemoTextSerializerMixin(Serializer):
+    memo_text = MemoTextSerializer(allow_null=True, required=False)
+    memo_text_id = UUIDField(required=False, allow_null=True)
+
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update(validated_data)
+            self.create_or_update_memo(validated_data)
             return super().create(validated_data)
 
     def update(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update(validated_data)
+            self.create_or_update_memo(validated_data)
             return super().update(validated_data)
 
-    def create_or_update(self, validated_data: dict):
+    def create_or_update_memo(self, validated_data: dict):
         memo_data = validated_data.pop("memo_text", None)
         memo_text_id = validated_data.get("memo_text_id", None)
         if memo_data:

@@ -3,7 +3,7 @@ import logging
 from django.db import transaction
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
-from rest_framework.serializers import IntegerField, Serializer
+from rest_framework.serializers import IntegerField, Serializer, UUIDField
 from rest_framework.exceptions import ValidationError
 
 from .models import Contact
@@ -58,17 +58,20 @@ class ContactSerializer(
 
 
 class LinkedContactSerializerMixin(Serializer):
+    contact = ContactSerializer(allow_null=True, required=False)
+    contact_id = UUIDField(required=False, allow_null=False)
+
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update(validated_data)
+            self.create_or_update_contact(validated_data)
             return super().create(validated_data)
 
     def update(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update(validated_data)
+            self.create_or_update_contact(validated_data)
             return super().update(validated_data)
 
-    def create_or_update(self, validated_data: dict):
+    def create_or_update_contact(self, validated_data: dict):
         contact_data = validated_data.pop("contact", None)
         contact_id = validated_data.get("contact_id", None)
         if not contact_id:
