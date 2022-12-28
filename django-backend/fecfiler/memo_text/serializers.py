@@ -1,7 +1,7 @@
 from .models import MemoText
 from django.db import transaction
 from fecfiler.validation import serializers
-from rest_framework.serializers import UUIDField, SerializerMethodField, Serializer
+from rest_framework.serializers import UUIDField, SerializerMethodField, ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.shared.transactions import get_from_sched_tables_by_uuid
 import logging
@@ -45,7 +45,7 @@ class MemoTextSerializer(
             return transaction.transaction_id
 
 
-class LinkedMemoTextSerializerMixin(Serializer):
+class LinkedMemoTextSerializerMixin(ModelSerializer):
     memo_text = MemoTextSerializer(allow_null=True, required=False)
     memo_text_id = UUIDField(required=False, allow_null=True)
 
@@ -54,10 +54,10 @@ class LinkedMemoTextSerializerMixin(Serializer):
             self.create_or_update_memo(validated_data)
             return super().create(validated_data)
 
-    def update(self, validated_data: dict):
+    def update(self, instance, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_memo(validated_data)
-            return super().update(validated_data)
+            return super().update(instance, validated_data)
 
     def create_or_update_memo(self, validated_data: dict):
         memo_data = validated_data.pop("memo_text", None)

@@ -1,14 +1,8 @@
 import logging
 
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.contacts.serializers import (
-    ContactSerializer,
-    LinkedContactSerializerMixin,
-)
-from fecfiler.memo_text.serializers import (
-    MemoTextSerializer,
-    LinkedMemoTextSerializerMixin,
-)
+from fecfiler.contacts.serializers import LinkedContactSerializerMixin
+from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
@@ -58,9 +52,6 @@ class TransactionSerializerBase(
         if "children" in data:
             data["children"] = list(map(insert_foreign_keys, data["children"]))
         return super().to_internal_value(data)
-
-    def create(self, validated_data: dict):
-        return super().create(validated_data)
 
     class Meta:
         abstract = True
