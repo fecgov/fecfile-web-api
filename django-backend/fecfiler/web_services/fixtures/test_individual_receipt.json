@@ -1,6 +1,6 @@
 [
     {
-        "model": "scha_transactions.schatransaction",
+        "model": "transactions.scheduleatransaction",
         "fields": {
             "id": "e7880981-9ee7-486f-b288-7a607e4cd0dd",
             "form_type": "SA11AI",
@@ -43,8 +43,8 @@
             "donor_candidate_state": "test_string_value",
             "donor_candidate_district": "test_string_value",
             "conduit_name": "test_string_value",
-            "conduit_street1": "test_string_value",
-            "conduit_street2": "test_string_value",
+            "conduit_street_1": "test_string_value",
+            "conduit_street_2": "test_string_value",
             "conduit_city": "test_string_value",
             "conduit_state": "test_string_value",
             "conduit_zip": "test_string_value",
