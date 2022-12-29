@@ -28,6 +28,7 @@ urlpatterns = [
     ),
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.f3x_summaries.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.memo_text.urls")),
     re_path(BASE_V1_URL, include("fecfiler.transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.triage.urls")),
