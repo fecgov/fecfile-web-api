@@ -2,9 +2,6 @@ import logging
 
 from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.f3x_summaries.views import ReportViewMixin
-
 from .models import ScheduleATransaction
 from .serializers import ScheduleATransactionSerializer
 from fecfiler.transactions.views import TransactionViewSetBase

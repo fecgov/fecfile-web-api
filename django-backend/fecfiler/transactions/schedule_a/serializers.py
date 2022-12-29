@@ -1,19 +1,8 @@
 import logging
 
 from django.db import transaction
-from fecfiler.contacts.models import Contact
-from fecfiler.memo_text.models import MemoText
-from fecfiler.contacts.serializers import ContactSerializer
-from fecfiler.memo_text.serializers import MemoTextSerializer
 from fecfiler.transactions.serializers import TransactionSerializerBase
-from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import (
-    BooleanField,
-    DecimalField,
-    ListSerializer,
-    UUIDField,
-    CharField,
-)
+from rest_framework.serializers import DecimalField, ListSerializer
 
 
 from fecfiler.transactions.schedule_a.models import ScheduleATransaction

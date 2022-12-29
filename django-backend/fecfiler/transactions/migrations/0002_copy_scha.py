@@ -17,9 +17,9 @@ def copy_scha_transactions(apps, schema_editor):
 
     try:
         SchATransaction = apps.get_model("scha_transactions", "SchATransaction")  # noqa
-        ScheduleATransaction = apps.get_model(
+        ScheduleATransaction = apps.get_model(  # noqa
             "transactions", "ScheduleATransaction"
-        )  # noqa
+        )
         content_type = ContentType.objects.get(
             app_label="transactions", model="scheduleatransaction"
         )
