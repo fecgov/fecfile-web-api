@@ -18,28 +18,6 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.valid_schedule_a_transaction = {
-            "form_type": "SA11AI",
-            "filer_committee_id_number": "C00123456",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
-            "transaction_id": "ABCDEF0123456789",
-            "entity_type": "IND",
-            "contributor_organization_name": "John Smith Co",
-            "contributor_first_name": "John",
-            "contributor_last_name": "Smith",
-            "contributor_state": "AK",
-            "contributor_city": "Homer",
-            "contributor_zip": "1234",
-            "contributor_street_1": "1 Homer Spit Road",
-            "contribution_date": "2009-01-01",
-            "contribution_amount": 1234,
-            "aggregation_group": "GENERAL",
-            "contributor_occupation": "professional",
-            "contributor_employer": "boss",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
-        }
-
         self.new_contact = {
             "id": "9bb5c8b2-31f3-488f-84e1-a63b0133a000",
             "type": "IND",
@@ -62,6 +40,27 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "rec_type": "",
             "memo4000": "new memo text",
             "back_reference_sched_form_name": "",
+        }
+        self.valid_schedule_b_transaction = {
+            "form_type": "SB",
+            "filer_committee_id_number": "C00123456",
+            "transaction_type_identifier": "SchB",
+            "transaction_id": "ABCDEF0123456789",
+            "entity_type": "IND",
+            "payee_organization_name": "John Smith Co",
+            "payee_first_name": "John",
+            "payee_last_name": "Smith",
+            "payee_state": "AK",
+            "payee_city": "Homer",
+            "payee_zip": "1234",
+            "payee_street_1": "1 Homer Spit Road",
+            "contribution_date": "2009-01-01",
+            "contribution_amount": 1234,
+            "aggregation_group": "GENERAL",
+            "payee_occupation": "professional",
+            "payee_employer": "boss",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "contact": self.new_contact,
         }
 
         self.mock_request = Request(HttpRequest())
