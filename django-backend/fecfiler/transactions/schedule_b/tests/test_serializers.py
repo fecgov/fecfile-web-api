@@ -118,7 +118,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             transaction_type_identifier="EARMARK_RECEIPT"
         )[0]
         children = ScheduleBTransaction.objects.filter(
-            parent_transaction=parent_instance
+            parent_transaction_object_id=parent_instance.id
         )
         self.assertNotEqual(children.count(), 0)
 
