@@ -3,7 +3,6 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 from rest_framework.exceptions import ValidationError
 
-from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 
 
