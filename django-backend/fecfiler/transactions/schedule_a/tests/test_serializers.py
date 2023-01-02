@@ -118,8 +118,12 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent_instance = ScheduleATransaction.objects.filter(
             transaction_type_identifier="EARMARK_RECEIPT"
         )[0]
+        # below is not possible with ContentType relation
+        # children = ScheduleATransaction.objects.filter(
+        #     parent_transaction=parent_instance
+        # )
         children = ScheduleATransaction.objects.filter(
-            parent_transaction=parent_instance
+            parent_transaction_object_id=parent_instance.id
         )
         self.assertNotEqual(children.count(), 0)
 
@@ -145,7 +149,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             parent_instance, serializer.to_internal_value(parent)
         )
         children = ScheduleATransaction.objects.filter(
-            parent_transaction_id=parent_instance
+            parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
         self.assertEqual(children[1].contribution_purpose_descrip, "updated child")

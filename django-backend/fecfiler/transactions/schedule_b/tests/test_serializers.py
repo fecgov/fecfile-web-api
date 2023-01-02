@@ -70,11 +70,11 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_serializer = ScheduleBTransactionSerializerBase(
-            data=self.valid_schedule_a_transaction,
+            data=self.valid_schedule_b_transaction,
             context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
-        invalid_transaction = self.valid_schedule_a_transaction.copy()
+        invalid_transaction = self.valid_schedule_b_transaction.copy()
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["contributor_first_name"]
         invalid_serializer = ScheduleBTransactionSerializerBase(
@@ -86,7 +86,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])
 
     def test_no_transaction_type_identifier(self):
-        missing_type = self.valid_schedule_a_transaction.copy()
+        missing_type = self.valid_schedule_b_transaction.copy()
         del missing_type["transaction_type_identifier"]
         missing_type_serializer = ScheduleBTransactionSerializerBase(
             data=missing_type,
@@ -98,10 +98,10 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         )
 
     def test_parent(self):
-        parent = self.valid_schedule_a_transaction.copy()
+        parent = self.valid_schedule_b_transaction.copy()
         parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
         parent["contribution_purpose_descrip"] = "test"
-        child = self.valid_schedule_a_transaction.copy()
+        child = self.valid_schedule_b_transaction.copy()
         child["transaction_type_identifier"] = "EARMARK_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
@@ -132,8 +132,8 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         )
         self.assertEqual(parent_instance.contribution_purpose_descrip, "updated parent")
 
-        children = ScheduleBTransaction.objects.filter(
-            parent_transaction_id=parent_instance
+        children = ScheduleATransaction.objects.filter(
+            parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
 
@@ -143,8 +143,8 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
-        children = ScheduleBTransaction.objects.filter(
-            parent_transaction_id=parent_instance
+        children = ScheduleATransaction.objects.filter(
+            parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
         self.assertEqual(children[1].contribution_purpose_descrip, "updated child")
