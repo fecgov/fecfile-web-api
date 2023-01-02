@@ -54,8 +54,8 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_city": "Homer",
             "payee_zip": "1234",
             "payee_street_1": "1 Homer Spit Road",
-            "contribution_date": "2009-01-01",
-            "contribution_amount": 1234,
+            "expenditure_date": "2009-01-01",
+            "expenditure_amount": 1234,
             "aggregation_group": "GENERAL",
             "payee_occupation": "professional",
             "payee_employer": "boss",
@@ -99,11 +99,11 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
 
     def test_parent(self):
         parent = self.valid_schedule_b_transaction.copy()
-        parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
-        parent["contribution_purpose_descrip"] = "test"
+        parent["transaction_type_identifier"] = "SchB"
+        parent["expenditure_purpose_descrip"] = "test"
         child = self.valid_schedule_b_transaction.copy()
-        child["transaction_type_identifier"] = "EARMARK_MEMO"
-        child["contribution_purpose_descrip"] = "test"
+        child["transaction_type_identifier"] = "SchB"
+        child["expenditure_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
@@ -124,21 +124,23 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
 
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
-        parent["contribution_purpose_descrip"] = "updated parent"
-        child["contribution_purpose_descrip"] = "updated child"
+        parent["expenditure_purpose_descrip"] = "updated parent"
+        child["expenditure_purpose_descrip"] = "updated child"
         parent["children"] = [child]
+        parent["contact"] = self.test_contact.copy()
+        child["contact"] = self.test_contact.copy()
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
-        self.assertEqual(parent_instance.contribution_purpose_descrip, "updated parent")
+        self.assertEqual(parent_instance.expenditure_purpose_descrip, "updated parent")
 
         children = ScheduleATransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
-        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
+        self.assertEqual(children[0].expenditure_purpose_descrip, "updated child")
 
         child["id"] = None
-        child["contribution_purpose_descrip"] = "very new child"
+        child["expenditure_purpose_descrip"] = "very new child"
         parent["children"] = [child]
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
@@ -146,5 +148,5 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         children = ScheduleATransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
-        self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
-        self.assertEqual(children[1].contribution_purpose_descrip, "updated child")
+        self.assertEqual(children[0].expenditure_purpose_descrip, "very new child")
+        self.assertEqual(children[1].expenditure_purpose_descrip, "updated child")
