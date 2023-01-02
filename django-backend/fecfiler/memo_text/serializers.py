@@ -40,7 +40,7 @@ class MemoTextSerializer(
         ]
 
     def get_back_reference_tran_id_number(self, memo_text_obj):
-        transaction = get_related_transaction(memo_text_obj.transaction_uuid)
+        transaction = get_related_transaction(memo_text_obj)
         return transaction and transaction.transaction_id
 
 

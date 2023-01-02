@@ -15,6 +15,6 @@ def get_related_transaction(instance):
         if found_transaction:
             return found_transaction
         reverse_set = getattr(instance, f"{model_name}_set")
-        return reverse_set.first()
+        return reverse_set and reverse_set.first()
 
     return reduce(get_transaction_from_table, get_transaction_models(), None)
