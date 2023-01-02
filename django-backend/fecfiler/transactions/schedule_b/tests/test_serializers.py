@@ -134,7 +134,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         )
         self.assertEqual(parent_instance.expenditure_purpose_descrip, "updated parent")
 
-        children = ScheduleATransaction.objects.filter(
+        children = ScheduleBTransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[0].expenditure_purpose_descrip, "updated child")
@@ -145,7 +145,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
-        children = ScheduleATransaction.objects.filter(
+        children = ScheduleBTransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[0].expenditure_purpose_descrip, "very new child")
