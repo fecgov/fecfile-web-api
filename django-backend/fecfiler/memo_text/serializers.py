@@ -3,7 +3,7 @@ from django.db import transaction
 from fecfiler.validation import serializers
 from rest_framework.serializers import UUIDField, SerializerMethodField, ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.shared.transactions import get_from_sched_tables_by_uuid
+from fecfiler.transactions.utils import get_related_transaction
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,9 +40,8 @@ class MemoTextSerializer(
         ]
 
     def get_back_reference_tran_id_number(self, memo_text_obj):
-        transaction = get_from_sched_tables_by_uuid(memo_text_obj.transaction_uuid)
-        if transaction:
-            return transaction.transaction_id
+        transaction = get_related_transaction(memo_text_obj.transaction_uuid)
+        return transaction and transaction.transaction_id
 
 
 class LinkedMemoTextSerializerMixin(ModelSerializer):
