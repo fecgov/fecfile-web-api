@@ -153,5 +153,5 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         children = ScheduleATransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
-        self.assertEqual(children[0].contribution_purpose_descrip, "very new child")
-        self.assertEqual(children[1].contribution_purpose_descrip, "updated child")
+        self.assertEqual(children[1].contribution_purpose_descrip, "very new child")
+        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
