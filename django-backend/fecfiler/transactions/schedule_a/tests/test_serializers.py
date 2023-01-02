@@ -132,8 +132,8 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent["contribution_purpose_descrip"] = "updated parent"
         child["contribution_purpose_descrip"] = "updated child"
         parent["children"] = [child]
-        parent["contact"] = self.test_contact.copy()
-        child["contact"] = self.test_contact.copy()
+        parent["contact"] = self.new_contact.copy()
+        child["contact"] = self.new_contact.copy()
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )

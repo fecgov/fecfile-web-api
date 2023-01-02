@@ -76,14 +76,14 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_transaction = self.valid_schedule_b_transaction.copy()
         invalid_transaction["form_type"] = "invalidformtype"
-        del invalid_transaction["contributor_first_name"]
+        del invalid_transaction["payee_first_name"]
         invalid_serializer = ScheduleBTransactionSerializerBase(
             data=invalid_transaction,
             context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
-        self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])
+        self.assertIsNotNone(invalid_serializer.errors["payee_first_name"])
 
     def test_no_transaction_type_identifier(self):
         missing_type = self.valid_schedule_b_transaction.copy()
@@ -127,8 +127,8 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         parent["expenditure_purpose_descrip"] = "updated parent"
         child["expenditure_purpose_descrip"] = "updated child"
         parent["children"] = [child]
-        parent["contact"] = self.test_contact.copy()
-        child["contact"] = self.test_contact.copy()
+        parent["contact"] = self.new_contact.copy()
+        child["contact"] = self.new_contact.copy()
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
