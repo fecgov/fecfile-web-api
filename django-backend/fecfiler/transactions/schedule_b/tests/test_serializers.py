@@ -100,10 +100,10 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_schedule_b_transaction.copy()
         parent["transaction_type_identifier"] = "SchB"
-        parent["expenditure_purpose_descrip"] = "test"
+        parent["expenditure_purpose_descrip"] = "parent"
         child = self.valid_schedule_b_transaction.copy()
         child["transaction_type_identifier"] = "SchB"
-        child["expenditure_purpose_descrip"] = "test"
+        child["expenditure_purpose_descrip"] = "chile"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
@@ -115,7 +115,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
         parent_instance = ScheduleBTransaction.objects.filter(
-            transaction_type_identifier="EARMARK_RECEIPT"
+            expenditure_purpose_descrip="parent"
         )[0]
         children = ScheduleBTransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
@@ -139,7 +139,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         )
         self.assertEqual(children[0].expenditure_purpose_descrip, "updated child")
 
-        child["id"] = None
+        del child["id"]
         child["expenditure_purpose_descrip"] = "very new child"
         parent["children"] = [child]
         parent_instance = serializer.update(

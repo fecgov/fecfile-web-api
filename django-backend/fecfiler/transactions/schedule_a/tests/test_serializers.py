@@ -144,7 +144,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         )
         self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
 
-        child["id"] = None
+        del child["id"]
         child["contribution_purpose_descrip"] = "very new child"
         parent["children"] = [child]
         parent_instance = serializer.update(
