@@ -23,6 +23,15 @@ class ScheduleBTransaction(Transaction):
 
     expenditure_purpose_descrip = models.TextField(null=True, blank=True)
 
+    election_code = models.TextField(null=True, blank=True)
+    election_other_description = models.TextField(null=True, blank=True)
+    conduit_name = models.TextField(null=True, blank=True)
+    conduit_street_1 = models.TextField(null=True, blank=True)
+    conduit_street_2 = models.TextField(null=True, blank=True)
+    conduit_city = models.TextField(null=True, blank=True)
+    conduit_state = models.TextField(null=True, blank=True)
+    conduit_zip = models.TextField(null=True, blank=True)
+
     category_code = models.TextField(null=True, blank=True)
 
     benificiary_committee_fec_id = models.TextField(null=True, blank=True)
@@ -36,6 +45,11 @@ class ScheduleBTransaction(Transaction):
     benificiary_candidate_office = models.TextField(null=True, blank=True)
     benificiary_candidate_state = models.TextField(null=True, blank=True)
     benificiary_candidate_district = models.TextField(null=True, blank=True)
+
+    memo_text_description = models.TextField(null=True, blank=True)
+    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
+        null=True, blank=True
+    )
 
     @staticmethod
     def get_virtual_field(field_name):

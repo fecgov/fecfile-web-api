@@ -47,19 +47,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     # TODO remove from model after refactoring .fec services
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
-    election_code = models.TextField(null=True, blank=True)
-    election_other_description = models.TextField(null=True, blank=True)
-    conduit_name = models.TextField(null=True, blank=True)
-    conduit_street_1 = models.TextField(null=True, blank=True)
-    conduit_street_2 = models.TextField(null=True, blank=True)
-    conduit_city = models.TextField(null=True, blank=True)
-    conduit_state = models.TextField(null=True, blank=True)
-    conduit_zip = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
-    memo_text_description = models.TextField(null=True, blank=True)
-    reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
-        null=True, blank=True
-    )
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

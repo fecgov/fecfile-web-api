@@ -130,7 +130,8 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
-        child["contribution_purpose_descrip"] = "updated child"
+        updated_child_description = "updated child"
+        child["contribution_purpose_descrip"] = updated_child_description
         parent["children"] = [child]
         parent["contact"] = self.new_contact.copy()
         child["contact"] = self.new_contact.copy()
@@ -142,7 +143,9 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         children = ScheduleATransaction.objects.filter(
             parent_transaction_object_id=parent_instance.id
         )
-        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
+        self.assertEqual(
+            children[0].contribution_purpose_descrip, updated_child_description
+        )
 
         del child["id"]
         child["contribution_purpose_descrip"] = "very new child"
@@ -154,4 +157,3 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[1].contribution_purpose_descrip, "very new child")
-        self.assertEqual(children[0].contribution_purpose_descrip, "updated child")
