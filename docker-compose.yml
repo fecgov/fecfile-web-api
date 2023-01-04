@@ -4,7 +4,7 @@ services:
   db:
     build:
       context: './db'
-      dockerfile: ${DOCKERFILE:-Dockerfile}
+      dockerfile: ${DB_DOCKERFILE:-Dockerfile}
       args:
         ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
     image: fecfile-db
@@ -28,7 +28,7 @@ services:
   api-worker:
     build:
       context: './'
-      dockerfile: './Worker_Dockerfile'
+      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
@@ -63,7 +63,7 @@ services:
   api:
     build:
       context: './'
-      dockerfile: './Dockerfile'
+      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
     image: fecfile-api
     container_name: fecfile-api
     volumes:
