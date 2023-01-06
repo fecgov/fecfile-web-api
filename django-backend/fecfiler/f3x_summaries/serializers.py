@@ -52,6 +52,8 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
             not in [
                 "deleted",
                 "schatransaction",
+                "scheduleatransaction",
+                "schedulebtransaction",
                 "dotfec",
                 "memotext",
                 "uploadsubmission",

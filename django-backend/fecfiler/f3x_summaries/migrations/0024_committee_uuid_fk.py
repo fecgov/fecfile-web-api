@@ -12,10 +12,6 @@ def update_uuid(apps, schema_editor):
     F3XSummary.objects.update(committee_account=models.Subquery(committee_uuid))
 
 
-def noop():
-    pass
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -38,7 +34,7 @@ class Migration(migrations.Migration):
                 to="committee_accounts.CommitteeAccount",
             ),
         ),
-        migrations.RunPython(update_uuid, noop),
+        migrations.RunPython(update_uuid, migrations.RunPython.noop),
         migrations.RemoveField(
             model_name="f3xsummary",
             name="committee_account_old",

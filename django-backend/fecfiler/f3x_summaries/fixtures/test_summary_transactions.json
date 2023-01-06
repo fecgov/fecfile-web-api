@@ -1,7 +1,7 @@
 [
     {
         "comment": "SA15 transaction to count",
-        "model": "scha_transactions.schatransaction",
+        "model": "transactions.scheduleatransaction",
         "fields": {
             "id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
@@ -16,7 +16,7 @@
     },
     {
         "comment": "SA15 transaction to count",
-        "model": "scha_transactions.schatransaction",
+        "model": "transactions.scheduleatransaction",
         "fields": {
             "id": "0da3bad2-54ec-4a90-a37c-13ce4ec4e253",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
@@ -31,7 +31,7 @@
     },
     {
         "comment": "SA15 transaction to NOT count",
-        "model": "scha_transactions.schatransaction",
+        "model": "transactions.scheduleatransaction",
         "fields": {
             "id": "7e5df0bc-fe32-4639-8426-b31bd23c3de7",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
@@ -46,7 +46,7 @@
     },
     {
         "comment": "SA11AI transaction to NOT count with SA15",
-        "model": "scha_transactions.schatransaction",
+        "model": "transactions.scheduleatransaction",
         "fields": {
             "id": "f431efe8-9b5f-4539-b7e5-5ae3c32b4e28",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
