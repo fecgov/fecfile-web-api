@@ -118,6 +118,13 @@ def handle_invalid_login(username):
     )
 
 
+def delete_user_logged_in_cookies(response):
+    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
+
+
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
@@ -140,11 +147,10 @@ def login_redirect(request):
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
+@permission_classes([])
 def logout_redirect(request):
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
+    delete_user_logged_in_cookies(response)
     return response
 
 

@@ -33,6 +33,14 @@ class ContactViewSetTest(TestCase):
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
 
+    def test_committee_lookup_no_auth(self):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/committee_lookup")
+
+        response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
+
+        self.assertEqual(response.status_code, 403)
+
     @mock.patch("requests.get", side_effect=mocked_requests_get)
     def test_committee_lookup_no_q(self, mock_get):
         self.assertEqual(True, True)
