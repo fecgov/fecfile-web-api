@@ -43,7 +43,6 @@ class SchATransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     )
 
     serializer_class = SchATransactionParentSerializer
-    permission_classes = []
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "id",
