@@ -41,4 +41,5 @@ fecfiler.contacts.migrations
    fecfiler.contacts.migrations.0008_committee_fk_to_int
    fecfiler.contacts.migrations.0009_committee_uuid_fk
    fecfiler.contacts.migrations.0010_auto_20220915_1309
+   fecfiler.contacts.migrations.0011_alter_contact_id
 

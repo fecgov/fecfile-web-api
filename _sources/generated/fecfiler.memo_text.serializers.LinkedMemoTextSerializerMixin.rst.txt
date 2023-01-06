@@ -1,0 +1,79 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.serializers.LinkedMemoTextSerializerMixin
+=============================================================
+
+.. currentmodule:: fecfiler.memo_text.serializers
+
+.. autoclass:: LinkedMemoTextSerializerMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LinkedMemoTextSerializerMixin.__init__
+      ~LinkedMemoTextSerializerMixin.bind
+      ~LinkedMemoTextSerializerMixin.build_field
+      ~LinkedMemoTextSerializerMixin.build_nested_field
+      ~LinkedMemoTextSerializerMixin.build_property_field
+      ~LinkedMemoTextSerializerMixin.build_relational_field
+      ~LinkedMemoTextSerializerMixin.build_standard_field
+      ~LinkedMemoTextSerializerMixin.build_unknown_field
+      ~LinkedMemoTextSerializerMixin.build_url_field
+      ~LinkedMemoTextSerializerMixin.create
+      ~LinkedMemoTextSerializerMixin.create_or_update_memo
+      ~LinkedMemoTextSerializerMixin.fail
+      ~LinkedMemoTextSerializerMixin.get_attribute
+      ~LinkedMemoTextSerializerMixin.get_default
+      ~LinkedMemoTextSerializerMixin.get_default_field_names
+      ~LinkedMemoTextSerializerMixin.get_extra_kwargs
+      ~LinkedMemoTextSerializerMixin.get_field_names
+      ~LinkedMemoTextSerializerMixin.get_fields
+      ~LinkedMemoTextSerializerMixin.get_initial
+      ~LinkedMemoTextSerializerMixin.get_unique_for_date_validators
+      ~LinkedMemoTextSerializerMixin.get_unique_together_validators
+      ~LinkedMemoTextSerializerMixin.get_uniqueness_extra_kwargs
+      ~LinkedMemoTextSerializerMixin.get_validators
+      ~LinkedMemoTextSerializerMixin.get_value
+      ~LinkedMemoTextSerializerMixin.include_extra_kwargs
+      ~LinkedMemoTextSerializerMixin.is_valid
+      ~LinkedMemoTextSerializerMixin.many_init
+      ~LinkedMemoTextSerializerMixin.run_validation
+      ~LinkedMemoTextSerializerMixin.run_validators
+      ~LinkedMemoTextSerializerMixin.save
+      ~LinkedMemoTextSerializerMixin.to_internal_value
+      ~LinkedMemoTextSerializerMixin.to_representation
+      ~LinkedMemoTextSerializerMixin.update
+      ~LinkedMemoTextSerializerMixin.validate
+      ~LinkedMemoTextSerializerMixin.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LinkedMemoTextSerializerMixin.context
+      ~LinkedMemoTextSerializerMixin.data
+      ~LinkedMemoTextSerializerMixin.default_error_messages
+      ~LinkedMemoTextSerializerMixin.default_validators
+      ~LinkedMemoTextSerializerMixin.errors
+      ~LinkedMemoTextSerializerMixin.fields
+      ~LinkedMemoTextSerializerMixin.initial
+      ~LinkedMemoTextSerializerMixin.root
+      ~LinkedMemoTextSerializerMixin.serializer_field_mapping
+      ~LinkedMemoTextSerializerMixin.url_field_name
+      ~LinkedMemoTextSerializerMixin.validated_data
+      ~LinkedMemoTextSerializerMixin.validators
+   
+   

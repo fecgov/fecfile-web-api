@@ -1,6 +1,0 @@
-fecfiler.memo\_text.migrations.0006\_committee\_uuid\_fk.noop
-=============================================================
-
-.. currentmodule:: fecfiler.memo_text.migrations.0006_committee_uuid_fk
-
-.. autofunction:: noop

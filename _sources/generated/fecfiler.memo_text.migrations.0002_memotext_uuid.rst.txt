@@ -18,7 +18,6 @@ fecfiler.memo\_text.migrations.0002\_memotext\_uuid
       :toctree:                                          
    
       create_uuid
-      noop
    
    
 

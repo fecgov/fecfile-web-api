@@ -1,6 +1,0 @@
-fecfiler.web\_services.migrations.0011\_replace\_fk.noop
-========================================================
-
-.. currentmodule:: fecfiler.web_services.migrations.0011_replace_fk
-
-.. autofunction:: noop

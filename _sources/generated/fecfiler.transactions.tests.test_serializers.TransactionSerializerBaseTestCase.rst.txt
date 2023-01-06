@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
+===============================================================================
+
+.. currentmodule:: fecfiler.transactions.tests.test_serializers
+
+.. autoclass:: TransactionSerializerBaseTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionSerializerBaseTestCase.__init__
+      ~TransactionSerializerBaseTestCase.addClassCleanup
+      ~TransactionSerializerBaseTestCase.addCleanup
+      ~TransactionSerializerBaseTestCase.addTypeEqualityFunc
+      ~TransactionSerializerBaseTestCase.assertAlmostEqual
+      ~TransactionSerializerBaseTestCase.assertAlmostEquals
+      ~TransactionSerializerBaseTestCase.assertContains
+      ~TransactionSerializerBaseTestCase.assertCountEqual
+      ~TransactionSerializerBaseTestCase.assertDictContainsSubset
+      ~TransactionSerializerBaseTestCase.assertDictEqual
+      ~TransactionSerializerBaseTestCase.assertEqual
+      ~TransactionSerializerBaseTestCase.assertEquals
+      ~TransactionSerializerBaseTestCase.assertFalse
+      ~TransactionSerializerBaseTestCase.assertFieldOutput
+      ~TransactionSerializerBaseTestCase.assertFormError
+      ~TransactionSerializerBaseTestCase.assertFormsetError
+      ~TransactionSerializerBaseTestCase.assertGreater
+      ~TransactionSerializerBaseTestCase.assertGreaterEqual
+      ~TransactionSerializerBaseTestCase.assertHTMLEqual
+      ~TransactionSerializerBaseTestCase.assertHTMLNotEqual
+      ~TransactionSerializerBaseTestCase.assertIn
+      ~TransactionSerializerBaseTestCase.assertInHTML
+      ~TransactionSerializerBaseTestCase.assertIs
+      ~TransactionSerializerBaseTestCase.assertIsInstance
+      ~TransactionSerializerBaseTestCase.assertIsNone
+      ~TransactionSerializerBaseTestCase.assertIsNot
+      ~TransactionSerializerBaseTestCase.assertIsNotNone
+      ~TransactionSerializerBaseTestCase.assertJSONEqual
+      ~TransactionSerializerBaseTestCase.assertJSONNotEqual
+      ~TransactionSerializerBaseTestCase.assertLess
+      ~TransactionSerializerBaseTestCase.assertLessEqual
+      ~TransactionSerializerBaseTestCase.assertListEqual
+      ~TransactionSerializerBaseTestCase.assertLogs
+      ~TransactionSerializerBaseTestCase.assertMultiLineEqual
+      ~TransactionSerializerBaseTestCase.assertNoLogs
+      ~TransactionSerializerBaseTestCase.assertNotAlmostEqual
+      ~TransactionSerializerBaseTestCase.assertNotAlmostEquals
+      ~TransactionSerializerBaseTestCase.assertNotContains
+      ~TransactionSerializerBaseTestCase.assertNotEqual
+      ~TransactionSerializerBaseTestCase.assertNotEquals
+      ~TransactionSerializerBaseTestCase.assertNotIn
+      ~TransactionSerializerBaseTestCase.assertNotIsInstance
+      ~TransactionSerializerBaseTestCase.assertNotRegex
+      ~TransactionSerializerBaseTestCase.assertNotRegexpMatches
+      ~TransactionSerializerBaseTestCase.assertNumQueries
+      ~TransactionSerializerBaseTestCase.assertQuerysetEqual
+      ~TransactionSerializerBaseTestCase.assertRaises
+      ~TransactionSerializerBaseTestCase.assertRaisesMessage
+      ~TransactionSerializerBaseTestCase.assertRaisesRegex
+      ~TransactionSerializerBaseTestCase.assertRaisesRegexp
+      ~TransactionSerializerBaseTestCase.assertRedirects
+      ~TransactionSerializerBaseTestCase.assertRegex
+      ~TransactionSerializerBaseTestCase.assertRegexpMatches
+      ~TransactionSerializerBaseTestCase.assertSequenceEqual
+      ~TransactionSerializerBaseTestCase.assertSetEqual
+      ~TransactionSerializerBaseTestCase.assertTemplateNotUsed
+      ~TransactionSerializerBaseTestCase.assertTemplateUsed
+      ~TransactionSerializerBaseTestCase.assertTrue
+      ~TransactionSerializerBaseTestCase.assertTupleEqual
+      ~TransactionSerializerBaseTestCase.assertURLEqual
+      ~TransactionSerializerBaseTestCase.assertWarns
+      ~TransactionSerializerBaseTestCase.assertWarnsMessage
+      ~TransactionSerializerBaseTestCase.assertWarnsRegex
+      ~TransactionSerializerBaseTestCase.assertXMLEqual
+      ~TransactionSerializerBaseTestCase.assertXMLNotEqual
+      ~TransactionSerializerBaseTestCase.assert_
+      ~TransactionSerializerBaseTestCase.captureOnCommitCallbacks
+      ~TransactionSerializerBaseTestCase.countTestCases
+      ~TransactionSerializerBaseTestCase.debug
+      ~TransactionSerializerBaseTestCase.defaultTestResult
+      ~TransactionSerializerBaseTestCase.doClassCleanups
+      ~TransactionSerializerBaseTestCase.doCleanups
+      ~TransactionSerializerBaseTestCase.fail
+      ~TransactionSerializerBaseTestCase.failIf
+      ~TransactionSerializerBaseTestCase.failIfAlmostEqual
+      ~TransactionSerializerBaseTestCase.failIfEqual
+      ~TransactionSerializerBaseTestCase.failUnless
+      ~TransactionSerializerBaseTestCase.failUnlessAlmostEqual
+      ~TransactionSerializerBaseTestCase.failUnlessEqual
+      ~TransactionSerializerBaseTestCase.failUnlessRaises
+      ~TransactionSerializerBaseTestCase.id
+      ~TransactionSerializerBaseTestCase.modify_settings
+      ~TransactionSerializerBaseTestCase.run
+      ~TransactionSerializerBaseTestCase.setUp
+      ~TransactionSerializerBaseTestCase.setUpClass
+      ~TransactionSerializerBaseTestCase.setUpTestData
+      ~TransactionSerializerBaseTestCase.settings
+      ~TransactionSerializerBaseTestCase.shortDescription
+      ~TransactionSerializerBaseTestCase.skipTest
+      ~TransactionSerializerBaseTestCase.subTest
+      ~TransactionSerializerBaseTestCase.tearDown
+      ~TransactionSerializerBaseTestCase.tearDownClass
+      ~TransactionSerializerBaseTestCase.test_no_transaction_type_identifier
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionSerializerBaseTestCase.available_apps
+      ~TransactionSerializerBaseTestCase.databases
+      ~TransactionSerializerBaseTestCase.fixtures
+      ~TransactionSerializerBaseTestCase.longMessage
+      ~TransactionSerializerBaseTestCase.maxDiff
+      ~TransactionSerializerBaseTestCase.reset_sequences
+      ~TransactionSerializerBaseTestCase.serialized_rollback
+   
+   
