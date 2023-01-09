@@ -1,6 +1,0 @@
-fecfiler.f3x\_summaries.migrations.0018\_f3xsummary\_uuid.noop
-==============================================================
-
-.. currentmodule:: fecfiler.f3x_summaries.migrations.0018_f3xsummary_uuid
-
-.. autofunction:: noop

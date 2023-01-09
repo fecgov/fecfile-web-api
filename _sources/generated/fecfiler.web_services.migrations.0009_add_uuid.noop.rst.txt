@@ -1,6 +1,0 @@
-fecfiler.web\_services.migrations.0009\_add\_uuid.noop
-======================================================
-
-.. currentmodule:: fecfiler.web_services.migrations.0009_add_uuid
-
-.. autofunction:: noop

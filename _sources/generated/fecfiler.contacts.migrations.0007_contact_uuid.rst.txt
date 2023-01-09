@@ -18,7 +18,6 @@ fecfiler.contacts.migrations.0007\_contact\_uuid
       :toctree:                                          
    
       create_uuid
-      noop
    
    
 
