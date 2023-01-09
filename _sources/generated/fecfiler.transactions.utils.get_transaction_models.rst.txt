@@ -1,6 +1,0 @@
-fecfiler.transactions.utils.get\_transaction\_models
-====================================================
-
-.. currentmodule:: fecfiler.transactions.utils
-
-.. autofunction:: get_transaction_models

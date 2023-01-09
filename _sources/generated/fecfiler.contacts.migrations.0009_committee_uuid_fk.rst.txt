@@ -17,6 +17,7 @@ fecfiler.contacts.migrations.0009\_committee\_uuid\_fk
    .. autosummary::
       :toctree:                                          
    
+      noop
       update_uuid
    
    

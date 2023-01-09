@@ -23,7 +23,6 @@ fecfiler.contacts.serializers
       :template: custom-class-template.rst               
    
       ContactSerializer
-      LinkedContactSerializerMixin
    
    
 

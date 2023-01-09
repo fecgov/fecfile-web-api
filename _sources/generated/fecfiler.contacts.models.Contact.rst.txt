@@ -76,8 +76,6 @@ fecfiler.contacts.models.Contact
       ~Contact.pk
       ~Contact.prefix
       ~Contact.schatransaction_set
-      ~Contact.scheduleatransaction_set
-      ~Contact.schedulebtransaction_set
       ~Contact.state
       ~Contact.street_1
       ~Contact.street_2

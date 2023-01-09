@@ -1,0 +1,6 @@
+fecfiler.memo\_text.migrations.0002\_memotext\_uuid.noop
+========================================================
+
+.. currentmodule:: fecfiler.memo_text.migrations.0002_memotext_uuid
+
+.. autofunction:: noop

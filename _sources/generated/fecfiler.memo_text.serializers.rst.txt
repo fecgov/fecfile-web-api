@@ -22,7 +22,6 @@ fecfiler.memo\_text.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      LinkedMemoTextSerializerMixin
       MemoTextSerializer
    
    
