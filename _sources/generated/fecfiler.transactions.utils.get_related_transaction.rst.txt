@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.get\_related\_transaction
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: get_related_transaction

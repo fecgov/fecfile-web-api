@@ -1,6 +1,0 @@
-fecfiler.contacts.migrations.0007\_contact\_uuid.noop
-=====================================================
-
-.. currentmodule:: fecfiler.contacts.migrations.0007_contact_uuid
-
-.. autofunction:: noop

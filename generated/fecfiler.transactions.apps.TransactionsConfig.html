@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>fecfiler.transactions.apps.TransactionsConfig &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.transactions.migrations" href="fecfiler.transactions.migrations.html" />
+    <link rel="prev" title="fecfiler.transactions.apps" href="fecfiler.transactions.apps.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-transactions-apps-transactionsconfig">
+<h1>fecfiler.transactions.apps.TransactionsConfig<a class="headerlink" href="#fecfiler-transactions-apps-transactionsconfig" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.apps.</span></span><span class="sig-name descname"><span class="pre">TransactionsConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.apps.TransactionsConfig.__init__" title="fecfiler.transactions.apps.TransactionsConfig.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(app_name, app_module)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.apps.TransactionsConfig.create" title="fecfiler.transactions.apps.TransactionsConfig.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(entry)</p></td>
+<td><p>Factory that creates an app config from an entry in INSTALLED_APPS.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.apps.TransactionsConfig.get_model" title="fecfiler.transactions.apps.TransactionsConfig.get_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code></a>(model_name[, require_ready])</p></td>
+<td><p>Return the model with the given case-insensitive model_name.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.apps.TransactionsConfig.get_models" title="fecfiler.transactions.apps.TransactionsConfig.get_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_models</span></code></a>([include_auto_created, ...])</p></td>
+<td><p>Return an iterable of models.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_models</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.apps.TransactionsConfig.ready" title="fecfiler.transactions.apps.TransactionsConfig.ready"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ready</span></code></a>()</p></td>
+<td><p>Override this method in subclasses to run code when Django starts.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_auto_field</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory that creates an app config from an entry in INSTALLED_APPS.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig.get_model">
+<span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_ready</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the model with the given case-insensitive model_name.</p>
+<p>Raise LookupError if no model exists with this name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig.get_models">
+<span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_auto_created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_swapped</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig.get_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterable of models.</p>
+<p>By default, the following models aren’t included:</p>
+<ul class="simple">
+<li><p>auto-created models for many-to-many relations without
+an explicit intermediate table,</p></li>
+<li><p>models that have been swapped out.</p></li>
+</ul>
+<p>Set the corresponding keyword argument to True to include such models.
+Keyword arguments aren’t documented; they’re a private API.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.apps.TransactionsConfig.ready">
+<span class="sig-name descname"><span class="pre">ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.apps.TransactionsConfig.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method in subclasses to run code when Django starts.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.transactions.apps.TransactionsConfig</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.models.html">fecfiler.transactions.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_a.html">fecfiler.transactions.schedule_a</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_b.html">fecfiler.transactions.schedule_b</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.serializers.html">fecfiler.transactions.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.urls.html">fecfiler.transactions.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils.html">fecfiler.transactions.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.utils.html">fecfiler.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
+  <li><a href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a><ul>
+      <li>Previous: <a href="fecfiler.transactions.apps.html" title="previous chapter">fecfiler.transactions.apps</a></li>
+      <li>Next: <a href="fecfiler.transactions.migrations.html" title="next chapter">fecfiler.transactions.migrations</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.transactions.apps.TransactionsConfig.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
