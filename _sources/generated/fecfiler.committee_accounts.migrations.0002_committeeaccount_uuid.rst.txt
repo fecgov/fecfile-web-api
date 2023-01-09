@@ -18,6 +18,7 @@ fecfiler.committee\_accounts.migrations.0002\_committeeaccount\_uuid
       :toctree:                                          
    
       create_uuid
+      noop
    
    
 

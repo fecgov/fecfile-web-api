@@ -1,6 +1,0 @@
-fecfiler.transactions.migrations.0002\_copy\_scha.copy\_scha\_transactions
-==========================================================================
-
-.. currentmodule:: fecfiler.transactions.migrations.0002_copy_scha
-
-.. autofunction:: copy_scha_transactions

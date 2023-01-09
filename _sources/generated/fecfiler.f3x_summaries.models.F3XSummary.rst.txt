@@ -179,8 +179,6 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.qualified_committee
       ~F3XSummary.report_code
       ~F3XSummary.schatransaction_set
-      ~F3XSummary.scheduleatransaction_set
-      ~F3XSummary.schedulebtransaction_set
       ~F3XSummary.state
       ~F3XSummary.state_of_election
       ~F3XSummary.street_1
