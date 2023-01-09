@@ -17,6 +17,7 @@ fecfiler.memo\_text.migrations.0009\_memotext\_report\_level\_memo
    .. autosummary::
       :toctree:                                          
    
+      noop
       set_is_report_level_memo
    
    

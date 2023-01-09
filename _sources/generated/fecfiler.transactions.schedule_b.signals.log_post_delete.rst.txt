@@ -1,6 +1,0 @@
-fecfiler.transactions.schedule\_b.signals.log\_post\_delete
-===========================================================
-
-.. currentmodule:: fecfiler.transactions.schedule_b.signals
-
-.. autofunction:: log_post_delete

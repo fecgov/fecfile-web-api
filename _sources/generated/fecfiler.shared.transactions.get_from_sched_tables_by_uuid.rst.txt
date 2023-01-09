@@ -1,0 +1,6 @@
+fecfiler.shared.transactions.get\_from\_sched\_tables\_by\_uuid
+===============================================================
+
+.. currentmodule:: fecfiler.shared.transactions
+
+.. autofunction:: get_from_sched_tables_by_uuid
