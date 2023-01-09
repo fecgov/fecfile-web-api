@@ -1,0 +1,81 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.models.Transaction
+========================================
+
+.. currentmodule:: fecfiler.transactions.models
+
+.. autoclass:: Transaction
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Transaction.__init__
+      ~Transaction.check
+      ~Transaction.clean
+      ~Transaction.clean_fields
+      ~Transaction.date_error_message
+      ~Transaction.delete
+      ~Transaction.from_db
+      ~Transaction.full_clean
+      ~Transaction.get_constraints
+      ~Transaction.get_deferred_fields
+      ~Transaction.get_next_by_created
+      ~Transaction.get_next_by_updated
+      ~Transaction.get_previous_by_created
+      ~Transaction.get_previous_by_updated
+      ~Transaction.hard_delete
+      ~Transaction.prepare_database_save
+      ~Transaction.refresh_from_db
+      ~Transaction.save
+      ~Transaction.save_base
+      ~Transaction.serializable_value
+      ~Transaction.unique_error_message
+      ~Transaction.validate_constraints
+      ~Transaction.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Transaction.aggregation_group
+      ~Transaction.back_reference_sched_name
+      ~Transaction.back_reference_tran_id_number
+      ~Transaction.committee_account
+      ~Transaction.committee_account_id
+      ~Transaction.contact
+      ~Transaction.contact_id
+      ~Transaction.created
+      ~Transaction.deleted
+      ~Transaction.entity_type
+      ~Transaction.filer_committee_id_number
+      ~Transaction.form_type
+      ~Transaction.id
+      ~Transaction.memo_code
+      ~Transaction.memo_text
+      ~Transaction.memo_text_id
+      ~Transaction.parent_transaction
+      ~Transaction.parent_transaction_content_type
+      ~Transaction.parent_transaction_content_type_id
+      ~Transaction.parent_transaction_object_id
+      ~Transaction.pk
+      ~Transaction.report
+      ~Transaction.report_id
+      ~Transaction.transaction_id
+      ~Transaction.transaction_type_identifier
+      ~Transaction.updated
+   
+   

@@ -1,6 +1,0 @@
-fecfiler.f3x\_summaries.migrations.0024\_committee\_uuid\_fk.noop
-=================================================================
-
-.. currentmodule:: fecfiler.f3x_summaries.migrations.0024_committee_uuid_fk
-
-.. autofunction:: noop

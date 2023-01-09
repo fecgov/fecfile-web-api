@@ -41,6 +41,7 @@ fecfiler
    fecfiler.scha_transactions
    fecfiler.settings
    fecfiler.shared
+   fecfiler.transactions
    fecfiler.triage
    fecfiler.urls
    fecfiler.utils

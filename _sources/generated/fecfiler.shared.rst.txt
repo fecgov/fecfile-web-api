@@ -31,8 +31,6 @@ fecfiler.shared
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.shared.test_transactions
    fecfiler.shared.test_utilities
-   fecfiler.shared.transactions
    fecfiler.shared.utilities
 

@@ -17,7 +17,6 @@ fecfiler.f3x\_summaries.migrations.0024\_committee\_uuid\_fk
    .. autosummary::
       :toctree:                                          
    
-      noop
       update_uuid
    
    
