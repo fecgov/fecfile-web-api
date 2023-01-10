@@ -1,7 +1,7 @@
 from fecfiler.memo_text.models import MemoText
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.transactions.schedule_a.models import ScheduleATransaction
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_header, serialize_model_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE
@@ -31,7 +31,9 @@ def compose_f3x_summary(report_id, upload_submission_record_id):
 
 
 def compose_transactions(report_id):
-    transactions = SchATransaction.objects.filter(report_id=report_id, itemized=True)
+    transactions = ScheduleATransaction.objects.filter(
+        report_id=report_id, itemized=True
+    )
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
@@ -102,7 +104,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         transactions = compose_transactions(report_id)
         for transaction in transactions:
             serialized_transaction = serialize_model_instance(
-                "SchA", SchATransaction, transaction
+                "SchA", ScheduleATransaction, transaction
             )
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)

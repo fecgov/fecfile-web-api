@@ -6,7 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import F3XSummary
 from .report_codes.views import report_code_label_mapping
-from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.transactions.schedule_a.models import ScheduleATransaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
@@ -90,7 +90,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
             committee_account__committee_id=committee_id
         )
         report_count = reports.count()
-        transaction_count = SchATransaction.objects.filter(
+        transaction_count = ScheduleATransaction.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()
         memo_count = MemoText.objects.filter(

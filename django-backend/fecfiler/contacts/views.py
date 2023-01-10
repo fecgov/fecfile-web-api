@@ -33,7 +33,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
     queryset = (
-        Contact.objects.annotate(transaction_count=Count("schatransaction"))
+        Contact.objects.annotate(transaction_count=Count("scheduleatransaction"))
         .all()
         .order_by("-created")
     )
