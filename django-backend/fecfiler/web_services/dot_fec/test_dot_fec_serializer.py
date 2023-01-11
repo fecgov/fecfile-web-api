@@ -1,7 +1,6 @@
 from django.test import TestCase
 from .dot_fec_serializer import (
     serialize_field,
-    serialize_field2,
     serialize_instance,
     get_field_mappings,
 )
@@ -33,57 +32,57 @@ class DotFECSerializerTestCase(TestCase):
         ).first()
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
-    def test_serialize_field2(self):
+    def test_serialize_field(self):
         f3x_field_mappings = get_field_mappings("F3X")
         # TEXT
-        serialized_text = serialize_field2(
+        serialized_text = serialize_field(
             self.f3x, "treasurer_last_name", f3x_field_mappings
         )
         self.assertEquals(serialized_text, "Lastname")
-        serialized_text_undefined = serialize_field2(
+        serialized_text_undefined = serialize_field(
             F3XSummary(), "treasurer_last_name", f3x_field_mappings
         )
         self.assertEquals(serialized_text_undefined, "")
 
         # NUMERIC
-        serialized_numeric = serialize_field2(
+        serialized_numeric = serialize_field(
             self.f3x, "L6b_cash_on_hand_beginning_period", f3x_field_mappings
         )
         self.assertEqual(serialized_numeric, "6.00")
-        serialized_numeric_undefined = serialize_field2(
+        serialized_numeric_undefined = serialize_field(
             F3XSummary(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
         )
         self.assertEqual(serialized_numeric_undefined, "")
 
         # DECIMAL
         scha_field_mappings = get_field_mappings("SchA")
-        serialized_decimal = serialize_field2(
+        serialized_decimal = serialize_field(
             self.transaction, "contribution_amount", scha_field_mappings
         )
         self.assertEqual(serialized_decimal, "1234.56")
-        serialized_decimal_undefined = serialize_field2(
+        serialized_decimal_undefined = serialize_field(
             ScheduleATransaction(), "contribution_amount", scha_field_mappings
         )
         self.assertEqual(serialized_decimal_undefined, "")
 
         # DATE
-        serialzed_date = serialize_field2(self.f3x, "date_signed", f3x_field_mappings)
+        serialzed_date = serialize_field(self.f3x, "date_signed", f3x_field_mappings)
         self.assertEqual(serialzed_date, "20040729")
-        serialzed_date_undefined = serialize_field2(
+        serialzed_date_undefined = serialize_field(
             F3XSummary(), "date_signed", f3x_field_mappings
         )
         self.assertEqual(serialzed_date_undefined, "")
 
         # BOOLEAN
-        serialized_boolean_true = serialize_field2(
+        serialized_boolean_true = serialize_field(
             self.f3x, "change_of_address", f3x_field_mappings
         )
         self.assertEqual(serialized_boolean_true, "X")
-        serialized_boolean_false = serialize_field2(
+        serialized_boolean_false = serialize_field(
             self.f3x, "qualified_committee", f3x_field_mappings
         )
         self.assertEqual(serialized_boolean_false, "")
-        serialized_boolean_undefined = serialize_field2(
+        serialized_boolean_undefined = serialize_field(
             F3XSummary(), "qualified_committee", f3x_field_mappings
         )
         self.assertEqual(serialized_boolean_undefined, "")

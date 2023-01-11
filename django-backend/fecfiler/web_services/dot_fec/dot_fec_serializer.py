@@ -54,26 +54,16 @@ FIELD_SERIALIZERS = {
 }
 
 
-def serialize_field(model, model_instance, field_name):
+def serialize_field(instance, field_name, field_mappings):
     """Serialize field to string in FEC standard
     Args:
-        model (class): Django model class that `model_instance` is an
-        instance of.  We retrieve the field type from this model to determine
-        which serializer to use.
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.  In some cases when serializing a field we need to reference
         another field in the `model_instance`, so we pass it to the serializer.
         field_name (str): name of field to serialize
+        field_mappings: mapping of field to how-to-access it, including special
+        serializers to use
     """
-    try:
-        field = model._meta.get_field(field_name)
-    except FieldDoesNotExist:
-        field = model.get_virtual_field(field_name)
-    serializer = FIELD_SERIALIZERS.get(type(field), FIELD_SERIALIZERS[None])
-    return serializer(model_instance, field_name)
-
-
-def serialize_field2(instance, field_name, field_mappings):
     mapping = field_mappings[field_name]
     serializer_type = mapping.get("serializer", None)
     serializer = FIELD_SERIALIZERS[serializer_type]
@@ -90,7 +80,7 @@ def serialize_instance(schema_name, instance):
     column_sequences, row_length = extract_row_config(schema_name)
     field_mappings = get_field_mappings(schema_name)
     row = [
-        serialize_field2(instance, column_sequences[column_index + 1], field_mappings)
+        serialize_field(instance, column_sequences[column_index + 1], field_mappings)
         if (column_index + 1) in column_sequences
         else ""
         for column_index in range(0, row_length)
