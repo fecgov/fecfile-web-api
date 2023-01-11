@@ -80,29 +80,13 @@ def serialize_field2(instance, field_name, field_mappings):
     return serializer(instance, field_name)
 
 
-def serialize_model_instance(schema_name, model, model_instance):
+def serialize_instance(schema_name, instance):
     """Serialize model instance into row of FEC standard
     Args:
         schema_name (str): name of schema. the schema informas column layout
-        model (class): Django model class that `model_instance` is an
-        instance of.  We retrieve the field type from this model to determine
-        which serializer to use for each field.
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.
     """
-    column_sequences, row_length = extract_row_config(schema_name)
-    """NOTE: column_index + 1 because FEC schemas define column sequences
-    starting at 1"""
-    row = [
-        serialize_field(model, model_instance, column_sequences[column_index + 1])
-        if (column_index + 1) in column_sequences
-        else ""
-        for column_index in range(0, row_length)
-    ]
-    return chr(ascii.FS).join(row)
-
-
-def serialize_instance(schema_name, instance):
     column_sequences, row_length = extract_row_config(schema_name)
     field_mappings = get_field_mappings(schema_name)
     row = [
@@ -142,15 +126,3 @@ def extract_row_config(schema_name):
     }
     row_length = max(column_sequences.keys())
     return column_sequences, row_length
-
-
-def serialize_header(header):
-    column_sequences, row_length = extract_row_config("HDR")
-    row = [
-        str(header[column_sequences[column_index + 1]])
-        if (column_index + 1) in column_sequences
-        and header[column_sequences[column_index + 1]]
-        else ""
-        for column_index in range(0, row_length)
-    ]
-    return chr(ascii.FS).join(row)
