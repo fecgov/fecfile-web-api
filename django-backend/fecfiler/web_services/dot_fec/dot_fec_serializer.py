@@ -2,6 +2,8 @@ from django.db import models
 from django.core.exceptions import FieldDoesNotExist
 from fecfile_validate import validate
 from curses import ascii
+import os
+import json
 
 import logging
 
@@ -46,6 +48,8 @@ FIELD_SERIALIZERS = {
     models.BooleanField: boolean_serializer,
     models.DateField: date_serializer,
     models.ForeignKey: foreign_key_serializer,
+    "BOOLEAN": boolean_serializer,
+    "DATE": date_serializer,
     None: default_serializer,
 }
 
@@ -69,6 +73,13 @@ def serialize_field(model, model_instance, field_name):
     return serializer(model_instance, field_name)
 
 
+def serialize_field2(instance, field_name, field_mappings):
+    mapping = field_mappings[field_name]
+    serializer_type = mapping.get("serializer", None)
+    serializer = FIELD_SERIALIZERS[serializer_type]
+    return serializer(instance, field_name)
+
+
 def serialize_model_instance(schema_name, model, model_instance):
     """Serialize model instance into row of FEC standard
     Args:
@@ -89,6 +100,38 @@ def serialize_model_instance(schema_name, model, model_instance):
         for column_index in range(0, row_length)
     ]
     return chr(ascii.FS).join(row)
+
+
+def serialize_instance(schema_name, instance):
+    column_sequences, row_length = extract_row_config(schema_name)
+    field_mappings = get_field_mappings(schema_name)
+    row = [
+        serialize_field2(instance, column_sequences[column_index + 1], field_mappings)
+        if (column_index + 1) in column_sequences
+        else ""
+        for column_index in range(0, row_length)
+    ]
+    return chr(ascii.FS).join(row)
+
+
+def get_field_mappings(schema_name):
+    """Return field mappings as JSON object.
+    Field Mappings map fields in a schema to a way of accessing them
+    in the django instance
+
+    Args:
+        schema_name (str): name of schema to retrieve file for
+
+    Returns:
+        dict: JSON schema that matches the schema_name"""
+    mapping_file = f"{schema_name}.json"
+    mapping_path = os.path.join(
+        os.path.dirname(__file__), "schema_fields/", mapping_file
+    )
+    with open(mapping_path) as fp:
+        field_mappings = json.load(fp)
+
+    return field_mappings
 
 
 def extract_row_config(schema_name):
