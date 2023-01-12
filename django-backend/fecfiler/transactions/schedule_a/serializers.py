@@ -50,7 +50,7 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
     )
 
     parent_transaction = ScheduleATransactionSerializerBase(
-        allow_null=True, required=False
+        allow_null=True, required=False, read_only=True
     )
 
     def to_representation(self, instance):
