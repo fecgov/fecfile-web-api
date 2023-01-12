@@ -3,6 +3,7 @@ import logging
 from django.db import transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.serializers import DecimalField, ListSerializer
+from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
 
 
 from fecfiler.transactions.schedule_a.models import ScheduleATransaction
@@ -13,6 +14,8 @@ logger = logging.getLogger(__name__)
 class ScheduleATransactionSerializerBase(TransactionSerializerBase):
 
     """These fields are generated in the query"""
+
+    report = F3XSummarySerializer(read_only=True)
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -49,8 +52,10 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
         required=False,
     )
 
+    report = F3XSummarySerializer(read_only=True)
+
     parent_transaction = ScheduleATransactionSerializerBase(
-        allow_null=True, required=False
+        allow_null=True, required=False, read_only="True"
     )
 
     def to_representation(self, instance):
