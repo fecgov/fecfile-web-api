@@ -4,8 +4,7 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from fecfiler.transactions.managers import TransactionManager
 from fecfiler.transactions.schedule_a.models import ScheduleA
 import uuid
 import logging
@@ -55,6 +54,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     schedule_a = models.ForeignKey(
         ScheduleA, on_delete=models.CASCADE, null=True, blank=True
     )
+
+    objects = TransactionManager()
 
     def save(self, *args, **kwargs):
         if self.memo_text:

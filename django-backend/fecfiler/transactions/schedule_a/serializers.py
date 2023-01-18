@@ -1,7 +1,7 @@
 import logging
 
 from django.db import transaction
-from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.transactions.serializers import TransactionBaseSerializer
 from rest_framework.serializers import DecimalField, ListSerializer
 from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
 
@@ -11,7 +11,7 @@ from fecfiler.transactions.schedule_a.models import ScheduleATransaction
 logger = logging.getLogger(__name__)
 
 
-class ScheduleATransactionSerializerBase(TransactionSerializerBase):
+class ScheduleATransactionSerializerBase(TransactionBaseSerializer):
 
     """These fields are generated in the query"""
 
