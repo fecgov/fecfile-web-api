@@ -107,8 +107,13 @@ class Migration(migrations.Migration):
                 ),
                 ("aggregation_group", models.TextField(blank=True, null=True)),
                 (
-                    "parent_transaction_object_id",
-                    models.UUIDField(blank=True, null=True),
+                    "parent_transaction",
+                    models.ForeignKey(
+                        "transactions.transaction",
+                        on_delete=models.CASCADE,
+                        null=True,
+                        blank=True,
+                    ),
                 ),
                 ("form_type", models.TextField(blank=True, null=True)),
                 ("filer_committee_id_number", models.TextField(blank=True, null=True)),
@@ -152,15 +157,6 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="memo_text.memotext",
-                    ),
-                ),
-                (
-                    "parent_transaction_content_type",
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="contenttypes.contenttype",
                     ),
                 ),
                 (

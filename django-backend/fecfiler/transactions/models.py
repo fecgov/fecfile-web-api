@@ -25,13 +25,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
     aggregation_group = models.TextField(null=True, blank=True)
-
-    parent_transaction_content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, null=True, blank=True
-    )
-    parent_transaction_object_id = models.UUIDField(null=True, blank=True)
-    parent_transaction = GenericForeignKey(
-        "parent_transaction_content_type", "parent_transaction_object_id"
+    parent_transaction = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True
     )
 
     form_type = models.TextField(null=True, blank=True)
