@@ -3,8 +3,7 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
 from .models import SchATransaction
-from .serializers import (SchATransactionParentSerializer,
-                          SchATransactionSerializer)
+from .serializers_old import SchATransactionParentSerializer, SchATransactionSerializer
 
 
 class SchATransactionTestCase(TestCase):
@@ -12,7 +11,7 @@ class SchATransactionTestCase(TestCase):
         "test_committee_accounts",
         "test_f3x_summaries",
         "test_contacts",
-        "test_memo_text"
+        "test_memo_text",
     ]
 
     def setUp(self):
@@ -28,7 +27,7 @@ class SchATransactionTestCase(TestCase):
             "country": "Country",
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
         }
 
         self.memo_text = {
@@ -94,11 +93,13 @@ class SchATransactionTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_serializer = SchATransactionSerializer(
-            data=self.valid_scha_transaction, context={"request": self.mock_request},
+            data=self.valid_scha_transaction,
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = SchATransactionSerializer(
-            data=self.invalid_scha_transaction, context={"request": self.mock_request},
+            data=self.invalid_scha_transaction,
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -107,7 +108,8 @@ class SchATransactionTestCase(TestCase):
     def test_no_transaction_type_identifier(self):
 
         missing_type_serializer = SchATransactionSerializer(
-            data=self.missing_type_transaction, context={"request": self.mock_request},
+            data=self.missing_type_transaction,
+            context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
@@ -126,7 +128,8 @@ class SchATransactionTestCase(TestCase):
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = SchATransactionParentSerializer(
-            data=parent, context={"request": self.mock_request},
+            data=parent,
+            context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))

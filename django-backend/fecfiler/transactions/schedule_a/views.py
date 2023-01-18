@@ -3,7 +3,7 @@ import logging
 from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
 from .models import ScheduleATransaction
-from .serializers import ScheduleATransactionSerializer
+from .serializers_old import ScheduleATransactionSerializer
 from fecfiler.transactions.views import TransactionViewSetBase
 from django.db.models import TextField, Value, Q
 from rest_framework.decorators import action

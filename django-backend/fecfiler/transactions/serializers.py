@@ -8,6 +8,7 @@ from fecfiler.validation import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import BooleanField, UUIDField, CharField, DateField
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
 
 logger = logging.getLogger(__name__)
 MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
@@ -63,6 +64,8 @@ class TransactionSerializerBase(
     itemized = BooleanField(read_only=True)
     action_date = DateField(read_only=True)
 
+    schedule_a = ScheduleASerializer()
+
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
         if not transaction_type:
@@ -83,4 +86,5 @@ class TransactionSerializerBase(
             "itemized",
             "fields_to_validate",
             "action_date",
+            "schedule_a",
         ]

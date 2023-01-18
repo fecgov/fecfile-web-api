@@ -3,7 +3,7 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
 from fecfiler.transactions.schedule_a.models import ScheduleATransaction
-from fecfiler.transactions.schedule_a.serializers import (
+from fecfiler.transactions.schedule_a.serializers_old import (
     ScheduleATransactionSerializerBase,
     ScheduleATransactionSerializer,
 )
