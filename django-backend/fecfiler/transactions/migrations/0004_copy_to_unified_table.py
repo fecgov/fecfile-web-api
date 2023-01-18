@@ -20,11 +20,8 @@ def copy_scha_transactions(apps, schema_editor):
         transactions_to_copy = ScheduleATransaction.objects.all()
         for transaction in transactions_to_copy:
             transaction.schedule_a_id = transaction.id
-            del transaction.parent_transaction
             transaction.parent_transaction_id = transaction.parent_transaction_object_id
         ScheduleA.objects.bulk_create(transactions_to_copy)
-        for transaction in transactions_to_copy:
-            transaction.schedule_a_id = transaction.id
         Transaction.objects.bulk_create(transactions_to_copy)
     except LookupError:
         print("No ScheduleATransaction table to copy")
