@@ -71,9 +71,9 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 child["parent_transaction_object_id"] = parent.id
                 self.create(child)
 
-            # If this is a PARTICIPANT_MEMO being created, update the parent
+            # If this is a PARTNERSHIP_MEMO being created, update the parent
             # contribution_purpose_description which contains text that
-            # depends on whether the parent PARTICIPANT_RECEIPT has child
+            # depends on whether the parent PARTNERSHIP_RECEIPT has child
             # transactions
             if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
                 grandparent = ScheduleATransaction.objects.get(
