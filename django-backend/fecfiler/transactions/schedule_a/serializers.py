@@ -70,6 +70,24 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_object_id"] = parent.id
                 self.create(child)
+
+            # If this is a PARTICIPANT_MEMO being created, update the parent
+            # contribution_purpose_description which contains text that
+            # depends on whether the parent PARTICIPANT_RECEIPT has child
+            # transactions
+            if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
+                grandparent = ScheduleATransaction.objects.get(
+                    id=parent.parent_transaction_object_id
+                )
+                if (
+                    grandparent.contribution_purpose_descrip
+                    != "See Partnership Attribution below"
+                ):
+                    grandparent.contribution_purpose_descrip = (
+                        "See Partnership Attribution(s) below"
+                    )
+                    grandparent.save()
+
             return parent
 
     def update(self, instance: ScheduleATransaction, validated_data: dict):

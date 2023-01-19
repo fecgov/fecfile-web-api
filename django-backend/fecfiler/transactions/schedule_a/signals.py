@@ -15,12 +15,30 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=ScheduleATransaction)
-def log_post_save(sender, instance, created, **kwargs):
+def action_post_save(sender, instance, created, **kwargs):
     action = "updated"
     if created:
         action = "created"
     elif instance.deleted:
         action = "deleted"
+
+        # If the transaction being deleted is of type PARTNERSHIP_MEMO, update the
+        # contribution_purpose_descrip of the parent PARTNERSHIP_RECEIPT if the
+        # parent transaction becomes childless
+        if instance.transaction_type_identifier == "PARTNERSHIP_MEMO" and (
+            ScheduleATransaction.objects.filter(
+                parent_transaction_object_id=instance.parent_transaction_object_id
+            ).count()
+            == 0
+        ):
+            parent = ScheduleATransaction.objects.get(
+                id=instance.parent_transaction_object_id
+            )
+            parent.contribution_purpose_descrip = (
+                "Partnership attributions do not require itemization"
+            )
+            parent.save()
+
     logger.info(f"Schedule A Transaction: {instance.transaction_id} was {action}")
 
 
