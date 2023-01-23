@@ -165,8 +165,9 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "John Smith Co",
         )
 
-    def test_partnership_memo(self):
-        # Create parent transaction record and retreive and instance of it.
+    def test_partnership_receipt(self):
+        # First, test that the CPD of the receipt is changed when a child
+        # memo is created.
         parent = self.valid_schedule_a_transaction.copy()
         parent["transaction_type_identifier"] = "PARTNERSHIP_RECEIPT"
         parent["contribution_purpose_descrip"] = "this text will be replaced"
@@ -189,7 +190,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         serializer = ScheduleATransactionSerializer(
             data=child, context={"request": self.mock_request},
         )
-        serializer.create(serializer.to_internal_value(child))
+        child_instance = serializer.create(serializer.to_internal_value(child))
         parent_instance = ScheduleATransaction.objects.filter(
             id=parent_representation["id"]
         )[0]
@@ -198,3 +199,14 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "See Partnership Attribution(s) below",
         )
 
+        # Second, test that the CPD is reverted back to the no childred
+        # text for the CPD when the last child is deleted.
+        child_instance.deleted = "2016-06-22 19:10:25-07"
+        child_instance.save()
+        parent_instance = ScheduleATransaction.objects.filter(
+            id=parent_representation["id"]
+        )[0]
+        self.assertEqual(
+            parent_instance.contribution_purpose_descrip,
+            "Partnership attributions do not require itemization",
+        )
