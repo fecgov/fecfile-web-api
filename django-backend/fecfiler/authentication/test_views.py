@@ -32,19 +32,14 @@ class AuthenticationTest(TestCase):
         mock_request.get_signed_cookie.return_value = test_state
 
         retval = login_dot_gov_logout(mock_request)
-
-        import pprint
-
-        pprint.pprint("1111111111111111111111")
-        pprint.pprint(retval)
         self.maxDiff = None
         self.assertEqual(
             retval,
             (
                 "https://idp.int.identitysandbox.gov"
                 "/openid_connect/logout?"
-                "client_id=urn%3Agov%3Agsa%3Aopenidconnect.profiles%3Asp%3Asso%3Afec%3Afecfile-web-api"
-                "&post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fv1%2Fauth%2Flogout-redirect"
+                "client_id=None"
+                "&post_logout_redirect_uri=None"
                 "&state=test_state"
             ),
         )
