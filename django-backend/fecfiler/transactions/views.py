@@ -66,3 +66,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         serializer = self.get_serializer(previous_transaction)
         return Response(data=serializer.data)
+
+    def create(self, request):
+        response = {"message": "Create function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)

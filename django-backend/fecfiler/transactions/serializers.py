@@ -4,11 +4,19 @@ from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
-from fecfiler.validation import serializers
+from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import BooleanField, UUIDField, CharField, DateField
+from rest_framework.serializers import (
+    BooleanField,
+    UUIDField,
+    CharField,
+    DateField,
+    ModelSerializer,
+)
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
+from fecfiler.transactions.schedule_a.models import ScheduleA
+import json
+
 
 logger = logging.getLogger(__name__)
 MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
@@ -19,7 +27,7 @@ MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
 class TransactionBaseSerializer(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
-    serializers.FecSchemaValidatorSerializerMixin,
+    FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
     """id must be explicitly configured in order to have it in validated_data
@@ -48,10 +56,20 @@ class TransactionBaseSerializer(
         ]
 
 
+class ScheduleASerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleA._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleA
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
-    serializers.FecSchemaValidatorSerializerMixin,
+    FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
     """id must be explicitly configured in order to have it in validated_data
@@ -64,7 +82,7 @@ class TransactionSerializerBase(
     itemized = BooleanField(read_only=True)
     action_date = DateField(read_only=True)
 
-    schedule_a = ScheduleASerializer()
+    schedule_a = ScheduleASerializer(required=False)
 
     def get_schema_name(self, data):
         transaction_type = data.get("transaction_type_identifier", None)
@@ -72,19 +90,30 @@ class TransactionSerializerBase(
             raise MISSING_TRANSACTION_TYPE_ERROR
         return transaction_type
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        schedule_a = representation.pop("schedule_a")
+        for property in schedule_a:
+            if not representation.get(property):
+                representation[property] = schedule_a[property]
+        return representation
+
     class Meta:
         model = Transaction
 
-        fields = [
-            f.name
-            for f in Transaction._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ] + [
-            "report_id",
-            "contact_id",
-            "memo_text_id",
-            "itemized",
-            "fields_to_validate",
-            "action_date",
-            "schedule_a",
-        ]
+        def get_fields():
+            return [
+                f.name
+                for f in Transaction._meta.get_fields()
+                if f.name not in ["deleted", "transaction"]
+            ] + [
+                "report_id",
+                "contact_id",
+                "memo_text_id",
+                "itemized",
+                "fields_to_validate",
+                "action_date",
+                "schedule_a",
+            ]
+
+        fields = get_fields()

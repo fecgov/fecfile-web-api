@@ -4,10 +4,13 @@ from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
 from .models import ScheduleATransaction
 from .serializers_old import ScheduleATransactionSerializer
-from fecfiler.transactions.views import TransactionViewSetBase
+from .serializers import ScheduleATransactionNew
+from fecfiler.transactions.views import TransactionViewSetBase, TransactionViewSet
+from fecfiler.transactions.models import Transaction
 from django.db.models import TextField, Value, Q
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 
 logger = logging.getLogger(__name__)
@@ -76,3 +79,25 @@ class ScheduleATransactionViewSet(TransactionViewSetBase):
 
         serializer = self.get_serializer(previous_transaction)
         return Response(data=serializer.data)
+
+
+class ScheduleAViewSet(TransactionViewSet):
+    queryset = Transaction.objects.select_related("schedule_a").all()
+    serializer_class = ScheduleATransactionNew
+    ordering_fields = [
+        "id",
+        "transaction_type_identifier",
+        "contributor_name",
+        "contribution_date",
+        "memo_code",
+        "contribution_amount",
+    ]
+
+    def create(self, request):
+        return super(ModelViewSet, self).create(request)
+
+    def update(self, request, pk=None):
+        return super(ModelViewSet, self).update(request, pk)
+
+    def partial_update(self, request, pk=None):
+        return super(ModelViewSet, self).partial_update(request, pk)
