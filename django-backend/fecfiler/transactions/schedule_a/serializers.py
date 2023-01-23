@@ -75,13 +75,13 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             # contribution_purpose_description which contains text that
             # depends on whether the parent PARTNERSHIP_RECEIPT has child
             # transactions
-            PARTNERSHIP_RECEIPT_CPD = "See Partnership Attribution(s) below"
+            partnership_receipt_cpd = "See Partnership Attribution(s) below"
             if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
                 grandparent = ScheduleATransaction.objects.get(
                     id=parent.parent_transaction_object_id
                 )
-                if grandparent.contribution_purpose_descrip != PARTNERSHIP_RECEIPT_CPD:
-                    grandparent.contribution_purpose_descrip = PARTNERSHIP_RECEIPT_CPD
+                if grandparent.contribution_purpose_descrip != partnership_receipt_cpd:
+                    grandparent.contribution_purpose_descrip = partnership_receipt_cpd
                     grandparent.save()
 
             return parent
