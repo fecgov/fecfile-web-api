@@ -11,3 +11,4 @@ helloworld.db
 local_settings.py
 /env/
 .python-version
+*.python_history

@@ -90,9 +90,19 @@ class TransactionSerializerBase(
             raise MISSING_TRANSACTION_TYPE_ERROR
         return transaction_type
 
-    def to_representation(self, instance):
+    def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a")
+        if depth < 1:
+            if instance.parent_transaction:
+                representation["parent_transaction"] = self.to_representation(
+                    instance.parent_transaction, depth + 1
+                )
+            children = instance.transaction_set.all()
+            if children:
+                representation["children"] = [
+                    self.to_representation(child, depth + 1) for child in children
+                ]
         for property in schedule_a:
             if not representation.get(property):
                 representation[property] = schedule_a[property]
@@ -107,6 +117,7 @@ class TransactionSerializerBase(
                 for f in Transaction._meta.get_fields()
                 if f.name not in ["deleted", "transaction"]
             ] + [
+                "parent_transaction",
                 "report_id",
                 "contact_id",
                 "memo_text_id",
@@ -117,3 +128,8 @@ class TransactionSerializerBase(
             ]
 
         fields = get_fields()
+
+
+TransactionSerializerBase.parent_transaction = TransactionSerializerBase(
+    allow_null=True, required=False, read_only="True"
+)
