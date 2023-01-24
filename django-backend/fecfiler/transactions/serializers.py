@@ -33,6 +33,9 @@ class TransactionSerializerBase(
     itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
+        request = self.context.get("request", None)
+        if request and request.query_params.get("schema"):
+            return request.query_params.get("schema")
         transaction_type = data.get("transaction_type_identifier", None)
         if not transaction_type:
             raise MISSING_TRANSACTION_TYPE_ERROR
