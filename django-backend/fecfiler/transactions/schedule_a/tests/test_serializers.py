@@ -79,8 +79,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["contributor_first_name"]
         invalid_serializer = ScheduleATransactionSerializerBase(
-            data=invalid_transaction,
-            context={"request": self.mock_request},
+            data=invalid_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -90,8 +89,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         missing_type = self.valid_schedule_a_transaction.copy()
         del missing_type["transaction_type_identifier"]
         missing_type_serializer = ScheduleATransactionSerializerBase(
-            data=missing_type,
-            context={"request": self.mock_request},
+            data=missing_type, context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
@@ -110,8 +108,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = ScheduleATransactionSerializer(
-            data=parent,
-            context={"request": self.mock_request},
+            data=parent, context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
@@ -157,3 +154,59 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[1].contribution_purpose_descrip, "very new child")
+
+        # Test to_representation method
+        parent_representation = serializer.to_representation(parent_instance)
+        self.assertEqual(
+            parent_representation["transaction_type_identifier"], "EARMARK_RECEIPT"
+        )
+        self.assertEqual(
+            list(parent_representation["children"])[0]["contributor_organization_name"],
+            "John Smith Co",
+        )
+
+    def test_partnership_receipt(self):
+        # First, test that the CPD of the receipt is changed when a child
+        # memo is created.
+        parent = self.valid_schedule_a_transaction.copy()
+        parent["transaction_type_identifier"] = "PARTNERSHIP_RECEIPT"
+        parent["contribution_purpose_descrip"] = "this text will be replaced"
+        serializer = ScheduleATransactionSerializer(
+            data=parent, context={"request": self.mock_request},
+        )
+        serializer.create(serializer.to_internal_value(parent))
+        parent_instance = ScheduleATransaction.objects.filter(
+            transaction_type_identifier="PARTNERSHIP_RECEIPT"
+        )[0]
+        parent_representation = serializer.to_representation(parent_instance)
+        child = self.valid_schedule_a_transaction.copy()
+        child["transaction_type_identifier"] = "PARTNERSHIP_MEMO"
+        child["contribution_purpose_descrip"] = "test"
+        child["back_reference_sched_name"] = "test"
+        child["back_reference_tran_id_number"] = "test"
+        child["memo_code"] = True
+        child["parent"] = [parent_representation]
+        child["parent_transaction_object_id"] = parent_representation["id"]
+        serializer = ScheduleATransactionSerializer(
+            data=child, context={"request": self.mock_request},
+        )
+        child_instance = serializer.create(serializer.to_internal_value(child))
+        parent_instance = ScheduleATransaction.objects.filter(
+            id=parent_representation["id"]
+        )[0]
+        self.assertEqual(
+            parent_instance.contribution_purpose_descrip,
+            "See Partnership Attribution(s) below",
+        )
+
+        # Second, test that the CPD is reverted back to the no childred
+        # text for the CPD when the last child is deleted.
+        child_instance.deleted = "2016-06-22 19:10:25-07"
+        child_instance.save()
+        parent_instance = ScheduleATransaction.objects.filter(
+            id=parent_representation["id"]
+        )[0]
+        self.assertEqual(
+            parent_instance.contribution_purpose_descrip,
+            "Partnership attributions do not require itemization",
+        )

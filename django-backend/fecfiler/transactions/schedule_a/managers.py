@@ -71,6 +71,8 @@ class ScheduleATransactionManager(SoftDeleteManager):
             "PARTY_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "TRIBAL_NATIONAL_PARTY_RECOUNT_ACCOUNT",
             "UNREGISTERED_RECEIPT_FROM_PERSON",
+            "PARTNERSHIP_RECEIPT",
+            "PARTNERSHIP_MEMO",
         ]
         return Case(
             When(contribution_aggregate__lt=Value(Decimal(0)), then=Value(True)),
