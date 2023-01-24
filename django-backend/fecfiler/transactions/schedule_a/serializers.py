@@ -38,6 +38,7 @@ class ScheduleATransactionSerializerBase(TransactionSerializerBase):
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
 
@@ -104,6 +105,7 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
         depth = 1

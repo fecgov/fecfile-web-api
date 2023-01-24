@@ -12,8 +12,8 @@ from rest_framework.serializers import (
 )
 
 logger = logging.getLogger(__name__)
-MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
-    {"transaction_type_identifier": ["No transaction_type_identifier provided"]}
+MISSING_SCHEMA_NAME_ERROR = ValidationError(
+    {"schema_name": ["No schema_name provided"]}
 )
 
 
@@ -33,13 +33,10 @@ class TransactionSerializerBase(
     itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
-        request = self.context.get("request", None)
-        if request and request.query_params.get("schema"):
-            return request.query_params.get("schema")
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
-            raise MISSING_TRANSACTION_TYPE_ERROR
-        return transaction_type
+        schema_name = data.get("schema_name", None)
+        if not schema_name:
+            raise MISSING_SCHEMA_NAME_ERROR
+        return schema_name
 
     class Meta:
         abstract = True
