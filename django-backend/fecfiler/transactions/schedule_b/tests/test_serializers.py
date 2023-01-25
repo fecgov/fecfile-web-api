@@ -61,6 +61,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.new_contact,
+            "schema_name": "SchB",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -100,9 +101,11 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_schedule_b_transaction.copy()
         parent["transaction_type_identifier"] = "SchB"
+        parent["schema_name"] = "SchB"
         parent["expenditure_purpose_descrip"] = "parent"
         child = self.valid_schedule_b_transaction.copy()
         child["transaction_type_identifier"] = "SchB"
+        child["schema_name"] = "SchB"
         child["expenditure_purpose_descrip"] = "chile"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
@@ -125,8 +128,10 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["expenditure_purpose_descrip"] = "updated parent"
+        parent["schema_name"] = "SchB"
         updated_child_description = "updated child"
         child["expenditure_purpose_descrip"] = updated_child_description
+        child["schema_name"] = "SchB"
         parent["children"] = [child]
         parent["contact"] = self.new_contact.copy()
         child["contact"] = self.new_contact.copy()

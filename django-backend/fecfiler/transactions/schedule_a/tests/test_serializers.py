@@ -62,6 +62,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.new_contact,
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -99,9 +100,11 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_schedule_a_transaction.copy()
         parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["contribution_purpose_descrip"] = "test"
         child = self.valid_schedule_a_transaction.copy()
         child["transaction_type_identifier"] = "EARMARK_MEMO"
+        child["schema_name"] = "EARMARK_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
@@ -127,8 +130,10 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         updated_child_description = "updated child"
         child["contribution_purpose_descrip"] = updated_child_description
+        child["schema_name"] = "EARMARK_MEMO"
         parent["children"] = [child]
         parent["contact"] = self.new_contact.copy()
         child["contact"] = self.new_contact.copy()
@@ -170,6 +175,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         # memo is created.
         parent = self.valid_schedule_a_transaction.copy()
         parent["transaction_type_identifier"] = "PARTNERSHIP_RECEIPT"
+        parent["schema_name"] = "PARTNERSHIP_RECEIPT"
         parent["contribution_purpose_descrip"] = "this text will be replaced"
         serializer = ScheduleATransactionSerializer(
             data=parent, context={"request": self.mock_request},
@@ -181,6 +187,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent_representation = serializer.to_representation(parent_instance)
         child = self.valid_schedule_a_transaction.copy()
         child["transaction_type_identifier"] = "PARTNERSHIP_MEMO"
+        child["schema_name"] = "PARTNERSHIP_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
