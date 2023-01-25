@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import FieldDoesNotExist
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
 from curses import ascii

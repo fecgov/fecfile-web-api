@@ -16,7 +16,6 @@ from rest_framework.serializers import (
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
-import json
 
 
 logger = logging.getLogger(__name__)
