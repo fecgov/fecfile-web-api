@@ -21,6 +21,9 @@ class ScheduleATransactionNew(TransactionSerializerBase):
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
+    parent_transaction = TransactionSerializerBase(
+        allow_null=True, required=False, read_only="True"
+    )
 
     def create(self, validated_data: dict):
         schedule_a_data = get_model_data(validated_data, ScheduleA)

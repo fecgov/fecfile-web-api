@@ -12,6 +12,7 @@ from rest_framework.serializers import (
     CharField,
     DateField,
     ModelSerializer,
+    DecimalField,
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -76,11 +77,14 @@ class TransactionSerializerBase(
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
 
     id = UUIDField(required=False)
+    parent_transaction_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
     itemized = BooleanField(read_only=True)
     action_date = DateField(read_only=True)
+    action_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    action_aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
 
@@ -108,6 +112,9 @@ class TransactionSerializerBase(
                 representation[property] = schedule_a[property]
         return representation
 
+    def to_internal_value(self, data):
+        return super().to_internal_value(data)
+
     class Meta:
         model = Transaction
 
@@ -117,17 +124,20 @@ class TransactionSerializerBase(
                 for f in Transaction._meta.get_fields()
                 if f.name not in ["deleted", "transaction"]
             ] + [
-                "parent_transaction",
+                "parent_transaction_id",
                 "report_id",
                 "contact_id",
                 "memo_text_id",
                 "itemized",
                 "fields_to_validate",
                 "action_date",
+                "action_amount",
+                "action_aggregate",
                 "schedule_a",
             ]
 
         fields = get_fields()
+        read_only_fields = ["parent_transaction"]
 
 
 TransactionSerializerBase.parent_transaction = TransactionSerializerBase(
