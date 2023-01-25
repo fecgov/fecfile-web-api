@@ -3,7 +3,7 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
 from .models import SchATransaction
-from .serializers_old import SchATransactionParentSerializer, SchATransactionSerializer
+from .serializers import SchATransactionParentSerializer, SchATransactionSerializer
 
 
 class SchATransactionTestCase(TestCase):
