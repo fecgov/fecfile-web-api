@@ -171,23 +171,46 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         )
 
     def test_partnership_receipt(self):
+        parent_transaction_type_identifier = "PARTNERSHIP_RECEIPT"
+        parent_schema_name = "PARTNERSHIP_RECEIPT"
+        child_transaction_type_identifier = "PARTNERSHIP_MEMO"
+        child_schema_name = "PARTNERSHIP_MEMO"
+        expected_parent_cpd_with_children = "See Partnership Attribution(s) below"
+        expected_parent_cpd_with_no_children = "Partnership attributions do not require itemization"
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def do_test_parent_child_transaction_dynamic_cpd(
+        self, parent_transaction_type_identifier,
+        parent_schema_name,
+        child_transaction_type_identifier,
+        child_schema_name,
+        expected_parent_cpd_with_children,
+        expected_parent_cpd_with_no_children,
+    ):
         # First, test that the CPD of the receipt is changed when a child
         # memo is created.
         parent = self.valid_schedule_a_transaction.copy()
-        parent["transaction_type_identifier"] = "PARTNERSHIP_RECEIPT"
-        parent["schema_name"] = "PARTNERSHIP_RECEIPT"
+        parent["transaction_type_identifier"] = parent_transaction_type_identifier
+        parent["schema_name"] = parent_schema_name
         parent["contribution_purpose_descrip"] = "this text will be replaced"
         serializer = ScheduleATransactionSerializer(
             data=parent, context={"request": self.mock_request},
         )
         serializer.create(serializer.to_internal_value(parent))
         parent_instance = ScheduleATransaction.objects.filter(
-            transaction_type_identifier="PARTNERSHIP_RECEIPT"
+            transaction_type_identifier=parent_transaction_type_identifier
         )[0]
         parent_representation = serializer.to_representation(parent_instance)
         child = self.valid_schedule_a_transaction.copy()
-        child["transaction_type_identifier"] = "PARTNERSHIP_MEMO"
-        child["schema_name"] = "PARTNERSHIP_MEMO"
+        child["transaction_type_identifier"] = child_transaction_type_identifier
+        child["schema_name"] = child_schema_name
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
@@ -203,7 +226,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         )[0]
         self.assertEqual(
             parent_instance.contribution_purpose_descrip,
-            "See Partnership Attribution(s) below",
+            expected_parent_cpd_with_children,
         )
 
         # Second, test that the CPD is reverted back to the no childred
@@ -215,5 +238,5 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         )[0]
         self.assertEqual(
             parent_instance.contribution_purpose_descrip,
-            "Partnership attributions do not require itemization",
+            expected_parent_cpd_with_no_children,
         )
