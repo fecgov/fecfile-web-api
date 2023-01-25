@@ -49,7 +49,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         request = self.context.get("request", None)
         if request and request.query_params.get("schema"):
             self.schema_name = request.query_params.get("schema")
-        else:
+        elif "schema_name" in data:
             self.schema_name = data.get("schema_name", None)
         
         assert self.schema_name is not None, (
