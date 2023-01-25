@@ -57,6 +57,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     objects = TransactionManager()
 
+    @property
+    def children(self):
+        return self.transaction_set.all()
+
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id

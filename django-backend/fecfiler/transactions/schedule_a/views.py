@@ -4,7 +4,7 @@ from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
 from .models import ScheduleATransaction
 from .serializers_old import ScheduleATransactionSerializer
-from .serializers import ScheduleATransactionNew
+from .serializers import ScheduleATransactionSerializer as newSCHA
 from fecfiler.transactions.views import TransactionViewSetBase, TransactionViewSet
 from fecfiler.transactions.models import Transaction
 from django.db.models import TextField, Value, Q, F
@@ -99,7 +99,7 @@ class ScheduleAViewSet(TransactionViewSet):
         )
         .annotate(contribution_aggregate=F("action_aggregate"))
     )
-    serializer_class = ScheduleATransactionNew
+    serializer_class = newSCHA
     ordering_fields = [
         "id",
         "transaction_type_identifier",

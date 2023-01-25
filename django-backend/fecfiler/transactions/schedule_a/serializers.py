@@ -1,9 +1,11 @@
 import logging
 
+from django.db import transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField
+from rest_framework.serializers import ListSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ def get_model_data(data, model):
     }
 
 
-class ScheduleATransactionNew(TransactionSerializerBase):
+class ScheduleATransactionSerializerBase(TransactionSerializerBase):
 
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -25,28 +27,13 @@ class ScheduleATransactionNew(TransactionSerializerBase):
         allow_null=True, required=False, read_only="True"
     )
 
-    def create(self, validated_data: dict):
-        schedule_a_data = get_model_data(validated_data, ScheduleA)
-        schedule_a = ScheduleA.objects.create(**schedule_a_data)
-        transaction_data = validated_data.copy()
-        transaction_data["schedule_a_id"] = schedule_a.id
-        for key in schedule_a_data.keys():
-            if key != "id":
-                del transaction_data[key]
-        return super().create(transaction_data)
-
-    def update(self, instance, validated_data: dict):
-        for attr, value in validated_data.items():
-            if attr != "id":
-                setattr(instance.schedule_a, attr, value)
-        instance.schedule_a.save()
-        return super().update(instance, validated_data)
-
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
         transaction = TransactionSerializerBase(context=self.context).to_internal_value(
             data
         )
+        print(f"internal {internal}")
+        print(f"transaction {transaction}")
         internal.update(transaction)
         return internal
 
@@ -113,3 +100,66 @@ class ScheduleATransactionNew(TransactionSerializerBase):
     reference_to_si_or_sl_system_code_that_identifies_the_account = CharField(
         required=False, allow_null=True
     )
+
+
+class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
+
+    children = ListSerializer(
+        child=ScheduleATransactionSerializerBase(),
+        allow_null=True,
+        allow_empty=True,
+        required=False,
+    )
+
+    def create(self, validated_data: dict):
+        with transaction.atomic():
+            schedule_a_data = get_model_data(validated_data, ScheduleA)
+            schedule_a = ScheduleA.objects.create(**schedule_a_data)
+            transaction_data = validated_data.copy()
+            transaction_data["schedule_a_id"] = schedule_a.id
+            for key in schedule_a_data.keys():
+                if key != "id":
+                    del transaction_data[key]
+
+            children = transaction_data.pop("children", [])
+            if "parent_transaction_id" in transaction_data:
+                print(f"ahoy {transaction_data}")
+            else:
+                print(f"bummer {transaction_data}")
+            parent = super().create(transaction_data)
+            for child in children:
+                child["parent_transaction_id"] = parent.id
+                self.create(child)
+            return parent
+
+    def update(self, instance, validated_data: dict):
+        with transaction.atomic():
+            children = validated_data.pop("children", [])
+
+            for child in children:
+                try:
+                    existing_child = instance.children.get(id=child.get("id", None))
+                    self.update(existing_child, child)
+                except Transaction.DoesNotExist:
+                    self.create(child)
+
+            for attr, value in validated_data.items():
+                if attr != "id":
+                    setattr(instance.schedule_a, attr, value)
+            instance.schedule_a.save()
+            return super().update(instance, validated_data)
+
+    def to_representation(self, instance, depth=0):
+        print(f"to rep {instance}")
+        return super().to_representation(instance, depth)
+
+    class Meta(TransactionSerializerBase.Meta):
+        fields = (
+            TransactionSerializerBase.Meta.get_fields()
+            + [
+                f.name
+                for f in ScheduleA._meta.get_fields()
+                if f.name not in ["transaction"]
+            ]
+            + ["contribution_aggregate", "children"]
+        )
