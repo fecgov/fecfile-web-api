@@ -7,7 +7,7 @@ from .serializers_old import ScheduleATransactionSerializer
 from .serializers import ScheduleATransactionNew
 from fecfiler.transactions.views import TransactionViewSetBase, TransactionViewSet
 from fecfiler.transactions.models import Transaction
-from django.db.models import TextField, Value, Q
+from django.db.models import TextField, Value, Q, F
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -82,7 +82,23 @@ class ScheduleATransactionViewSet(TransactionViewSetBase):
 
 
 class ScheduleAViewSet(TransactionViewSet):
-    queryset = Transaction.objects.select_related("schedule_a").all()
+    queryset = (
+        Transaction.objects.select_related("schedule_a")
+        .alias(
+            contribution_amount=F("action_amount"),
+            contribution_date=F("action_date"),
+            contributor_name=Coalesce(
+                "schedule_a__contributor_organization_name",
+                Concat(
+                    "schedule_a__contributor_last_name",
+                    Value(", "),
+                    "schedule_a__contributor_first_name",
+                    output_field=TextField(),
+                ),
+            ),
+        )
+        .annotate(contribution_aggregate=F("action_aggregate"))
+    )
     serializer_class = ScheduleATransactionNew
     ordering_fields = [
         "id",
@@ -91,6 +107,7 @@ class ScheduleAViewSet(TransactionViewSet):
         "contribution_date",
         "memo_code",
         "contribution_amount",
+        "contribution_aggregate",
     ]
 
     def create(self, request):
