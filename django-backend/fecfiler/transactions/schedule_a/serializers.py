@@ -72,20 +72,28 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 child["parent_transaction_object_id"] = parent.id
                 self.create(child)
 
-            # If this is a PARTNERSHIP_MEMO being created, update the parent
-            # contribution_purpose_description which contains text that
-            # depends on whether the parent PARTNERSHIP_RECEIPT has child
+            # If this is one of severl specific memo types being created, 
+            # update the parent contribution_purpose_description which 
+            # contains text that depends on whether the parent has child
             # transactions
-            partnership_receipt_cpd = "See Partnership Attribution(s) below"
             if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
-                grandparent = ScheduleATransaction.objects.get(
-                    id=parent.parent_transaction_object_id
-                )
-                if grandparent.contribution_purpose_descrip != partnership_receipt_cpd:
-                    grandparent.contribution_purpose_descrip = partnership_receipt_cpd
-                    grandparent.save()
+                self.replace_grandparent_cpd("See Partnership Attribution(s) below")
+            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"):
+                self.replace_grandparent_cpd("Recount/Legal Proceedings Account (See Partnership Attribution(s) below)")
+            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"):
+                self.replace_grandparent_cpd("Headquarters Buildings Account (See Partnership Attribution(s) below)")
+            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"):
+                self.replace_grandparent_cpd("Pres. Nominating Convention Account (See Partnership Attribution(s) below)")
 
             return parent
+
+    def replace_grandparent_cpd(self, parent, cpd):
+        grandparent = ScheduleATransaction.objects.get(
+            id=parent.parent_transaction_object_id
+        )
+        if grandparent.contribution_purpose_descrip != cpd:
+            grandparent.contribution_purpose_descrip = cpd
+            grandparent.save()
 
     def update(self, instance: ScheduleATransaction, validated_data: dict):
         with transaction.atomic():
