@@ -22,6 +22,8 @@ fecfiler.transactions.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      ScheduleASerializer
+      TransactionBaseSerializer
       TransactionSerializerBase
    
    

@@ -52,8 +52,10 @@ fecfiler.transactions.models.Transaction
    .. autosummary::
    
       ~Transaction.aggregation_group
+      ~Transaction.all_objects
       ~Transaction.back_reference_sched_name
       ~Transaction.back_reference_tran_id_number
+      ~Transaction.children
       ~Transaction.committee_account
       ~Transaction.committee_account_id
       ~Transaction.contact
@@ -67,14 +69,16 @@ fecfiler.transactions.models.Transaction
       ~Transaction.memo_code
       ~Transaction.memo_text
       ~Transaction.memo_text_id
+      ~Transaction.objects
       ~Transaction.parent_transaction
-      ~Transaction.parent_transaction_content_type
-      ~Transaction.parent_transaction_content_type_id
-      ~Transaction.parent_transaction_object_id
+      ~Transaction.parent_transaction_id
       ~Transaction.pk
       ~Transaction.report
       ~Transaction.report_id
+      ~Transaction.schedule_a
+      ~Transaction.schedule_a_id
       ~Transaction.transaction_id
+      ~Transaction.transaction_set
       ~Transaction.transaction_type_identifier
       ~Transaction.updated
    

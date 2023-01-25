@@ -111,10 +111,11 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestC
       ~DotFECSerializerTestCase.subTest
       ~DotFECSerializerTestCase.tearDown
       ~DotFECSerializerTestCase.tearDownClass
-      ~DotFECSerializerTestCase.test_serialize_f3x_summary
+      ~DotFECSerializerTestCase.test_serialize_f3x_summary_instance
       ~DotFECSerializerTestCase.test_serialize_field
-      ~DotFECSerializerTestCase.test_serialize_report_level_memo
-      ~DotFECSerializerTestCase.test_serialize_schedule_a_transaction
+      ~DotFECSerializerTestCase.test_serialize_header_instance
+      ~DotFECSerializerTestCase.test_serialize_report_level_memo_instance
+      ~DotFECSerializerTestCase.test_serialize_schedule_a_transaction_instance
    
    
 

@@ -35,6 +35,7 @@ fecfiler.web\_services.dot\_fec
    fecfiler.web_services.dot_fec.dot_fec_serializer
    fecfiler.web_services.dot_fec.dot_fec_submitter
    fecfiler.web_services.dot_fec.output
+   fecfiler.web_services.dot_fec.schema_fields
    fecfiler.web_services.dot_fec.test_dot_fec_composer
    fecfiler.web_services.dot_fec.test_dot_fec_serializer
    fecfiler.web_services.dot_fec.test_dot_fec_submitter

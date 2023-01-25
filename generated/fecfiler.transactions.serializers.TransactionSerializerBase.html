@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fecfiler.transactions.tests" href="fecfiler.transactions.tests.html" />
-    <link rel="prev" title="fecfiler.transactions.serializers" href="fecfiler.transactions.serializers.html" />
+    <link rel="prev" title="fecfiler.transactions.serializers.TransactionBaseSerializer" href="fecfiler.transactions.serializers.TransactionBaseSerializer.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -156,9 +156,9 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_internal_value" title="fecfiler.transactions.serializers.TransactionSerializerBase.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
-<td><p>Extract committee_id from request to assign the corresponding CommitteeAccount as the owner of the object</p></td>
+<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_representation" title="fecfiler.transactions.serializers.TransactionSerializerBase.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_representation" title="fecfiler.transactions.serializers.TransactionSerializerBase.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance[, depth])</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
@@ -200,22 +200,25 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionSerializerBase.root" title="fecfiler.transactions.serializers.TransactionSerializerBase.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_transaction</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionSerializerBase.root" title="fecfiler.transactions.serializers.TransactionSerializerBase.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
 <td><p>Returns the top-level serializer for this field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -518,13 +521,12 @@ be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.serializers.TransactionSerializerBase.to_internal_value">
 <span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_internal_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract committee_id from request to assign the corresponding
-CommitteeAccount as the owner of the object</p>
+<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.serializers.TransactionSerializerBase.to_representation">
-<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_representation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.serializers.TransactionSerializerBase.to_representation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object instance -&gt; Dict of primitive datatypes.</p>
 </dd></dl>
 
@@ -590,15 +592,19 @@ have validation applied as normal.</p></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.managers.html">fecfiler.transactions.managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.models.html">fecfiler.transactions.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_a.html">fecfiler.transactions.schedule_a</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_b.html">fecfiler.transactions.schedule_b</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.serializers.html">fecfiler.transactions.serializers</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.serializers.ScheduleASerializer.html">fecfiler.transactions.serializers.ScheduleASerializer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.serializers.TransactionBaseSerializer.html">fecfiler.transactions.serializers.TransactionBaseSerializer</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.transactions.serializers.TransactionSerializerBase</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.transaction_base.html">fecfiler.transactions.transaction_base</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.urls.html">fecfiler.transactions.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils.html">fecfiler.transactions.utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a></li>
@@ -624,7 +630,7 @@ have validation applied as normal.</p></li>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
   <li><a href="fecfiler.transactions.serializers.html">fecfiler.transactions.serializers</a><ul>
-      <li>Previous: <a href="fecfiler.transactions.serializers.html" title="previous chapter">fecfiler.transactions.serializers</a></li>
+      <li>Previous: <a href="fecfiler.transactions.serializers.TransactionBaseSerializer.html" title="previous chapter">fecfiler.transactions.serializers.TransactionBaseSerializer</a></li>
       <li>Next: <a href="fecfiler.transactions.tests.html" title="next chapter">fecfiler.transactions.tests</a></li>
   </ul></li>
   </ul></li>

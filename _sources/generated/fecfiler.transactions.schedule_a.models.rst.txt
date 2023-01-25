@@ -22,6 +22,7 @@ fecfiler.transactions.schedule\_a.models
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      ScheduleA
       ScheduleATransaction
    
    

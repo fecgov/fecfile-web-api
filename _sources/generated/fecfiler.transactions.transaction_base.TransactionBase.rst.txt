@@ -1,0 +1,81 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.transaction\_base.TransactionBase
+=======================================================
+
+.. currentmodule:: fecfiler.transactions.transaction_base
+
+.. autoclass:: TransactionBase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionBase.__init__
+      ~TransactionBase.check
+      ~TransactionBase.clean
+      ~TransactionBase.clean_fields
+      ~TransactionBase.date_error_message
+      ~TransactionBase.delete
+      ~TransactionBase.from_db
+      ~TransactionBase.full_clean
+      ~TransactionBase.get_constraints
+      ~TransactionBase.get_deferred_fields
+      ~TransactionBase.get_next_by_created
+      ~TransactionBase.get_next_by_updated
+      ~TransactionBase.get_previous_by_created
+      ~TransactionBase.get_previous_by_updated
+      ~TransactionBase.hard_delete
+      ~TransactionBase.prepare_database_save
+      ~TransactionBase.refresh_from_db
+      ~TransactionBase.save
+      ~TransactionBase.save_base
+      ~TransactionBase.serializable_value
+      ~TransactionBase.unique_error_message
+      ~TransactionBase.validate_constraints
+      ~TransactionBase.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionBase.aggregation_group
+      ~TransactionBase.back_reference_sched_name
+      ~TransactionBase.back_reference_tran_id_number
+      ~TransactionBase.committee_account
+      ~TransactionBase.committee_account_id
+      ~TransactionBase.contact
+      ~TransactionBase.contact_id
+      ~TransactionBase.created
+      ~TransactionBase.deleted
+      ~TransactionBase.entity_type
+      ~TransactionBase.filer_committee_id_number
+      ~TransactionBase.form_type
+      ~TransactionBase.id
+      ~TransactionBase.memo_code
+      ~TransactionBase.memo_text
+      ~TransactionBase.memo_text_id
+      ~TransactionBase.parent_transaction
+      ~TransactionBase.parent_transaction_content_type
+      ~TransactionBase.parent_transaction_content_type_id
+      ~TransactionBase.parent_transaction_object_id
+      ~TransactionBase.pk
+      ~TransactionBase.report
+      ~TransactionBase.report_id
+      ~TransactionBase.transaction_id
+      ~TransactionBase.transaction_type_identifier
+      ~TransactionBase.updated
+   
+   

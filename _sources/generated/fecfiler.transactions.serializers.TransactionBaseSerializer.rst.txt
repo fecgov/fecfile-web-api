@@ -1,0 +1,84 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.serializers.TransactionBaseSerializer
+===========================================================
+
+.. currentmodule:: fecfiler.transactions.serializers
+
+.. autoclass:: TransactionBaseSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionBaseSerializer.__init__
+      ~TransactionBaseSerializer.bind
+      ~TransactionBaseSerializer.build_field
+      ~TransactionBaseSerializer.build_nested_field
+      ~TransactionBaseSerializer.build_property_field
+      ~TransactionBaseSerializer.build_relational_field
+      ~TransactionBaseSerializer.build_standard_field
+      ~TransactionBaseSerializer.build_unknown_field
+      ~TransactionBaseSerializer.build_url_field
+      ~TransactionBaseSerializer.create
+      ~TransactionBaseSerializer.create_or_update_contact
+      ~TransactionBaseSerializer.create_or_update_memo
+      ~TransactionBaseSerializer.fail
+      ~TransactionBaseSerializer.get_attribute
+      ~TransactionBaseSerializer.get_default
+      ~TransactionBaseSerializer.get_default_field_names
+      ~TransactionBaseSerializer.get_extra_kwargs
+      ~TransactionBaseSerializer.get_field_names
+      ~TransactionBaseSerializer.get_fields
+      ~TransactionBaseSerializer.get_foreign_key_fields
+      ~TransactionBaseSerializer.get_initial
+      ~TransactionBaseSerializer.get_schema_name
+      ~TransactionBaseSerializer.get_unique_for_date_validators
+      ~TransactionBaseSerializer.get_unique_together_validators
+      ~TransactionBaseSerializer.get_uniqueness_extra_kwargs
+      ~TransactionBaseSerializer.get_validation_candidate
+      ~TransactionBaseSerializer.get_validators
+      ~TransactionBaseSerializer.get_value
+      ~TransactionBaseSerializer.include_extra_kwargs
+      ~TransactionBaseSerializer.is_valid
+      ~TransactionBaseSerializer.many_init
+      ~TransactionBaseSerializer.run_validation
+      ~TransactionBaseSerializer.run_validators
+      ~TransactionBaseSerializer.save
+      ~TransactionBaseSerializer.to_internal_value
+      ~TransactionBaseSerializer.to_representation
+      ~TransactionBaseSerializer.update
+      ~TransactionBaseSerializer.validate
+      ~TransactionBaseSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionBaseSerializer.context
+      ~TransactionBaseSerializer.data
+      ~TransactionBaseSerializer.default_error_messages
+      ~TransactionBaseSerializer.default_validators
+      ~TransactionBaseSerializer.errors
+      ~TransactionBaseSerializer.fields
+      ~TransactionBaseSerializer.initial
+      ~TransactionBaseSerializer.root
+      ~TransactionBaseSerializer.schema_name
+      ~TransactionBaseSerializer.serializer_field_mapping
+      ~TransactionBaseSerializer.url_field_name
+      ~TransactionBaseSerializer.validated_data
+      ~TransactionBaseSerializer.validators
+   
+   

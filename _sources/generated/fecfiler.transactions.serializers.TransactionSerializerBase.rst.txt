@@ -74,6 +74,7 @@ fecfiler.transactions.serializers.TransactionSerializerBase
       ~TransactionSerializerBase.errors
       ~TransactionSerializerBase.fields
       ~TransactionSerializerBase.initial
+      ~TransactionSerializerBase.parent_transaction
       ~TransactionSerializerBase.root
       ~TransactionSerializerBase.schema_name
       ~TransactionSerializerBase.serializer_field_mapping

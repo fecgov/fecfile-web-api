@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.serializers.ScheduleASerializer
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.serializers
+
+.. autoclass:: ScheduleASerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleASerializer.__init__
+      ~ScheduleASerializer.bind
+      ~ScheduleASerializer.build_field
+      ~ScheduleASerializer.build_nested_field
+      ~ScheduleASerializer.build_property_field
+      ~ScheduleASerializer.build_relational_field
+      ~ScheduleASerializer.build_standard_field
+      ~ScheduleASerializer.build_unknown_field
+      ~ScheduleASerializer.build_url_field
+      ~ScheduleASerializer.create
+      ~ScheduleASerializer.fail
+      ~ScheduleASerializer.get_attribute
+      ~ScheduleASerializer.get_default
+      ~ScheduleASerializer.get_default_field_names
+      ~ScheduleASerializer.get_extra_kwargs
+      ~ScheduleASerializer.get_field_names
+      ~ScheduleASerializer.get_fields
+      ~ScheduleASerializer.get_initial
+      ~ScheduleASerializer.get_unique_for_date_validators
+      ~ScheduleASerializer.get_unique_together_validators
+      ~ScheduleASerializer.get_uniqueness_extra_kwargs
+      ~ScheduleASerializer.get_validators
+      ~ScheduleASerializer.get_value
+      ~ScheduleASerializer.include_extra_kwargs
+      ~ScheduleASerializer.is_valid
+      ~ScheduleASerializer.many_init
+      ~ScheduleASerializer.run_validation
+      ~ScheduleASerializer.run_validators
+      ~ScheduleASerializer.save
+      ~ScheduleASerializer.to_internal_value
+      ~ScheduleASerializer.to_representation
+      ~ScheduleASerializer.update
+      ~ScheduleASerializer.validate
+      ~ScheduleASerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleASerializer.context
+      ~ScheduleASerializer.data
+      ~ScheduleASerializer.default_error_messages
+      ~ScheduleASerializer.default_validators
+      ~ScheduleASerializer.errors
+      ~ScheduleASerializer.fields
+      ~ScheduleASerializer.initial
+      ~ScheduleASerializer.root
+      ~ScheduleASerializer.serializer_field_mapping
+      ~ScheduleASerializer.url_field_name
+      ~ScheduleASerializer.validated_data
+      ~ScheduleASerializer.validators
+   
+   

@@ -15,8 +15,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header.html" />
-    <link rel="prev" title="fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer" href="fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer.html" />
+    <link rel="next" title="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" />
+    <link rel="prev" title="fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings" href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -37,19 +37,17 @@
 <h1>fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field<a class="headerlink" href="#fecfiler-web-services-dot-fec-dot-fec-serializer-serialize-field" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field">
-<span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.dot_fec_serializer.</span></span><span class="sig-name descname"><span class="pre">serialize_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.dot_fec_serializer.</span></span><span class="sig-name descname"><span class="pre">serialize_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_mappings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize field to string in FEC standard
-:param model: Django model class that <cite>model_instance</cite> is an
-:type model: class
-:param instance of.  We retrieve the field type from this model to determine:
-:param which serializer to use.:
 :param model_instance: Instance of <cite>model</cite> that contains
 :type model_instance: django.db.models.Model
 :param field to serialize.  In some cases when serializing a field we need to reference:
 :param another field in the <cite>model_instance</cite>:
 :param so we pass it to the serializer.:
 :param field_name: name of field to serialize
-:type field_name: str</p>
+:type field_name: str
+:param field_mappings: mapping of field to how-to-access it, including special
+:param serializers to use:</p>
 </dd></dl>
 
 </section>
@@ -98,13 +96,14 @@
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.default_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.default_serializer</a></li>
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config.html">fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config</a></li>
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings.html">fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings</a></li>
 <li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_model_instance.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_model_instance</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_submitter.html">fecfiler.web_services.dot_fec.dot_fec_submitter</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.output.html">fecfiler.web_services.dot_fec.output</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.schema_fields.html">fecfiler.web_services.dot_fec.schema_fields</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.test_dot_fec_composer.html">fecfiler.web_services.dot_fec.test_dot_fec_composer</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.test_dot_fec_serializer.html">fecfiler.web_services.dot_fec.test_dot_fec_serializer</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.test_dot_fec_submitter.html">fecfiler.web_services.dot_fec.test_dot_fec_submitter</a></li>
@@ -141,8 +140,8 @@
   <li><a href="fecfiler.web_services.html">fecfiler.web_services</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.dot_fec_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer</a><ul>
-      <li>Previous: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer.html" title="previous chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.foreign_key_serializer</a></li>
-      <li>Next: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header.html" title="next chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_header</a></li>
+      <li>Previous: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings.html" title="previous chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings</a></li>
+      <li>Next: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" title="next chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

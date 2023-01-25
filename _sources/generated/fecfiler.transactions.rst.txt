@@ -32,12 +32,14 @@ fecfiler.transactions
    :recursive:
 
    fecfiler.transactions.apps
+   fecfiler.transactions.managers
    fecfiler.transactions.migrations
    fecfiler.transactions.models
    fecfiler.transactions.schedule_a
    fecfiler.transactions.schedule_b
    fecfiler.transactions.serializers
    fecfiler.transactions.tests
+   fecfiler.transactions.transaction_base
    fecfiler.transactions.urls
    fecfiler.transactions.utils
    fecfiler.transactions.views

@@ -185,6 +185,7 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.state_of_election
       ~F3XSummary.street_1
       ~F3XSummary.street_2
+      ~F3XSummary.transaction_set
       ~F3XSummary.treasurer_first_name
       ~F3XSummary.treasurer_last_name
       ~F3XSummary.treasurer_middle_name

@@ -28,6 +28,14 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_composer
 
    
    
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Header
+   
    
 
    

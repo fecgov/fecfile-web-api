@@ -83,6 +83,7 @@ fecfiler.contacts.models.Contact
       ~Contact.street_2
       ~Contact.suffix
       ~Contact.telephone
+      ~Contact.transaction_set
       ~Contact.type
       ~Contact.updated
       ~Contact.zip

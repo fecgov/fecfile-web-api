@@ -1,0 +1,106 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.managers.TransactionManager
+=================================================
+
+.. currentmodule:: fecfiler.transactions.managers
+
+.. autoclass:: TransactionManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionManager.__init__
+      ~TransactionManager.aaggregate
+      ~TransactionManager.abulk_create
+      ~TransactionManager.abulk_update
+      ~TransactionManager.acontains
+      ~TransactionManager.acount
+      ~TransactionManager.acreate
+      ~TransactionManager.aearliest
+      ~TransactionManager.aexists
+      ~TransactionManager.aexplain
+      ~TransactionManager.afirst
+      ~TransactionManager.aget
+      ~TransactionManager.aget_or_create
+      ~TransactionManager.aggregate
+      ~TransactionManager.ain_bulk
+      ~TransactionManager.aiterator
+      ~TransactionManager.alast
+      ~TransactionManager.alatest
+      ~TransactionManager.alias
+      ~TransactionManager.all
+      ~TransactionManager.annotate
+      ~TransactionManager.aupdate
+      ~TransactionManager.aupdate_or_create
+      ~TransactionManager.bulk_create
+      ~TransactionManager.bulk_update
+      ~TransactionManager.check
+      ~TransactionManager.complex_filter
+      ~TransactionManager.contains
+      ~TransactionManager.contribute_to_class
+      ~TransactionManager.count
+      ~TransactionManager.create
+      ~TransactionManager.dates
+      ~TransactionManager.datetimes
+      ~TransactionManager.db_manager
+      ~TransactionManager.deconstruct
+      ~TransactionManager.defer
+      ~TransactionManager.difference
+      ~TransactionManager.distinct
+      ~TransactionManager.earliest
+      ~TransactionManager.exclude
+      ~TransactionManager.exists
+      ~TransactionManager.explain
+      ~TransactionManager.extra
+      ~TransactionManager.filter
+      ~TransactionManager.first
+      ~TransactionManager.from_queryset
+      ~TransactionManager.get
+      ~TransactionManager.get_itemization_clause
+      ~TransactionManager.get_or_create
+      ~TransactionManager.get_queryset
+      ~TransactionManager.hard_delete
+      ~TransactionManager.in_bulk
+      ~TransactionManager.intersection
+      ~TransactionManager.iterator
+      ~TransactionManager.last
+      ~TransactionManager.latest
+      ~TransactionManager.none
+      ~TransactionManager.only
+      ~TransactionManager.order_by
+      ~TransactionManager.prefetch_related
+      ~TransactionManager.raw
+      ~TransactionManager.reverse
+      ~TransactionManager.select_for_update
+      ~TransactionManager.select_related
+      ~TransactionManager.union
+      ~TransactionManager.update
+      ~TransactionManager.update_or_create
+      ~TransactionManager.using
+      ~TransactionManager.values
+      ~TransactionManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionManager.auto_created
+      ~TransactionManager.creation_counter
+      ~TransactionManager.db
+      ~TransactionManager.use_in_migrations
+   
+   

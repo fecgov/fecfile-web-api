@@ -22,9 +22,9 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_serializer
       default_serializer
       extract_row_config
       foreign_key_serializer
+      get_field_mappings
       serialize_field
-      serialize_header
-      serialize_model_instance
+      serialize_instance
    
    
 
