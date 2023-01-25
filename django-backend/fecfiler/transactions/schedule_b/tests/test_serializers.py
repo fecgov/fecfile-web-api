@@ -86,16 +86,16 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["payee_first_name"])
 
-    def test_no_transaction_type_identifier(self):
+    def test_no_payee_first_name(self):
         missing_type = self.valid_schedule_b_transaction.copy()
-        del missing_type["transaction_type_identifier"]
+        del missing_type["payee_first_name"]
         missing_type_serializer = ScheduleBTransactionSerializerBase(
             data=missing_type,
             context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
-            missing_type_serializer.errors["transaction_type_identifier"]
+            missing_type_serializer.errors["payee_first_name"]
         )
 
     def test_parent(self):
