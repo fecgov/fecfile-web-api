@@ -3,7 +3,7 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 from rest_framework.exceptions import ValidationError
 
-from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.transactions.serializers import TransactionBaseSerializer
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -17,7 +17,7 @@ class TransactionSerializerBaseTestCase(TestCase):
 
     def test_no_transaction_type_identifier(self):
 
-        serializer = TransactionSerializerBase(
+        serializer = TransactionBaseSerializer(
             data=self.missing_type_transaction,
             context={"request": self.mock_request},
         )
