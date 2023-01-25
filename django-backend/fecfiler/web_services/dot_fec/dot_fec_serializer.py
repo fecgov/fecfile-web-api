@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import FieldDoesNotExist
 from fecfile_validate import validate
+from fecfiler.settings import BASE_DIR
 from curses import ascii
 import os
 import json
@@ -100,7 +101,7 @@ def get_field_mappings(schema_name):
         dict: JSON schema that matches the schema_name"""
     mapping_file = f"{schema_name}.json"
     mapping_path = os.path.join(
-        os.path.dirname(__file__), "schema_fields/", mapping_file
+        BASE_DIR, "web_services/dot_fec/schema_fields/", mapping_file
     )
     with open(mapping_path) as fp:
         field_mappings = json.load(fp)
