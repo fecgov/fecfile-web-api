@@ -6,5 +6,5 @@ class TransactionsConfig(AppConfig):
 
     def ready(self):
         # Implicitly connect a signal handlers decorated with @receiver.
-        from .schedule_a import signals  # noqa
+        from . import signals  # noqa
         from .schedule_b import signals  # noqa

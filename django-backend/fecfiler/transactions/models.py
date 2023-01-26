@@ -61,6 +61,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def children(self):
         return self.transaction_set.all()
 
+    @property
+    def schedule(self):
+        for schedule_key in ["schedule_a", "schedule_b"]:
+            if getattr(self, schedule_key, None):
+                return schedule_key
+        return None
+
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
