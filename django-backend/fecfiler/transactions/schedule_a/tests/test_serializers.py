@@ -188,6 +188,81 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             expected_parent_cpd_with_no_children
         )
 
+    def test_partnership_np_recount_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Recount/Legal Proceedings Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Recount/Legal Proceedings Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def test_partnership_np_headquarters_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Headquarters Buildings Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Headquarters Buildings Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def test_partnership_np_convention_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Pres. Nominating Convention Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Pres. Nominating Convention Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
     def do_test_parent_child_transaction_dynamic_cpd(
         self, parent_transaction_type_identifier,
         parent_schema_name,
