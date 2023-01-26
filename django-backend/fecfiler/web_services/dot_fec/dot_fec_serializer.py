@@ -1,4 +1,3 @@
-from django.db import models
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
 from curses import ascii
