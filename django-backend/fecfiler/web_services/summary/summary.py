@@ -1,5 +1,5 @@
 from decimal import Decimal
-from fecfiler.transactions.schedule_a.models import ScheduleATransaction
+from fecfiler.transactions.models import Transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 
@@ -9,7 +9,7 @@ class SummaryService:
         self.report = report
 
     def calculate_summary(self):
-        report_transactions = ScheduleATransaction.objects.filter(report=self.report)
+        report_transactions = Transaction.objects.filter(report=self.report)
         # just line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
         line_15 = self._create_contribution_sum(sa15_query)
@@ -18,6 +18,6 @@ class SummaryService:
 
     def _create_contribution_sum(self, query):
         return Coalesce(
-            Sum("contribution_amount", filter=query),
+            Sum("schedule_a__contribution_amount", filter=query),
             Decimal(0.0),
         )
