@@ -51,7 +51,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             self.schema_name = request.query_params.get("schema")
         elif "schema_name" in data:
             self.schema_name = data.get("schema_name", None)
-        
+
         assert self.schema_name is not None, (
             f"'{self.__class__.__name__}' should either include a "
             "`schema_name` attribute, or override the `get_schema_name()` method."

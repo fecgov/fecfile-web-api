@@ -176,7 +176,9 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         child_transaction_type_identifier = "PARTNERSHIP_MEMO"
         child_schema_name = "PARTNERSHIP_MEMO"
         expected_parent_cpd_with_children = "See Partnership Attribution(s) below"
-        expected_parent_cpd_with_no_children = "Partnership attributions do not require itemization"
+        expected_parent_cpd_with_no_children = (
+            "Partnership attributions do not require itemization"
+        )
         self.do_test_parent_child_transaction_dynamic_cpd(
             parent_transaction_type_identifier,
             parent_schema_name,
