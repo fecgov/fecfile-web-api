@@ -48,6 +48,8 @@ class ScheduleATransactionManager(SoftDeleteManager):
             "PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
             "PAC_NATIONAL_PARTY_RECOUNT_ACCOUNT",
             "PAC_RECOUNT_RECEIPT",
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT",
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO",
             "PARTY_RECOUNT_RECEIPT",
             "BUSINESS_LABOR_NON_CONTRIBUTION_ACCOUNT",
             "JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT",
@@ -70,6 +72,8 @@ class ScheduleATransactionManager(SoftDeleteManager):
             "PARTY_NATIONAL_PARTY_CONVENTION_ACCOUNT",
             "TRIBAL_NATIONAL_PARTY_RECOUNT_ACCOUNT",
             "UNREGISTERED_RECEIPT_FROM_PERSON",
+            "PARTNERSHIP_RECEIPT",
+            "PARTNERSHIP_MEMO",
         ]
         return Case(
             When(contribution_aggregate__lt=Value(Decimal(0)), then=Value(True)),

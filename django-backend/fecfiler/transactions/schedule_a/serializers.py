@@ -38,6 +38,7 @@ class ScheduleATransactionSerializerBase(TransactionSerializerBase):
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
 
@@ -70,7 +71,42 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_object_id"] = parent.id
                 self.create(child)
+
+            # If this is one of severl specific memo types being created,
+            # update the parent contribution_purpose_description which
+            # contains text that depends on whether the parent has child
+            # transactions
+            cpd = None
+            partnership_attr_clause = (
+                "See Partnership Attribution(s) below"
+            )
+            if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
+                cpd = partnership_attr_clause
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
+            ):
+                cpd = f"Recount/Legal Proceedings Account ({partnership_attr_clause})"
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
+            ):
+                cpd = f"Headquarters Buildings Account ({partnership_attr_clause})"
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
+            ):
+                cpd = f"Pres. Nominating Convention Account ({partnership_attr_clause})"
+
+            if cpd:
+                self.replace_grandparent_cpd(parent, cpd)
+
             return parent
+
+    def replace_grandparent_cpd(self, parent, cpd):
+        grandparent = ScheduleATransaction.objects.get(
+            id=parent.parent_transaction_object_id
+        )
+        if grandparent.contribution_purpose_descrip != cpd:
+            grandparent.contribution_purpose_descrip = cpd
+            grandparent.save()
 
     def update(self, instance: ScheduleATransaction, validated_data: dict):
         with transaction.atomic():
@@ -104,6 +140,7 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
         depth = 1

@@ -62,6 +62,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.new_contact,
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -79,8 +80,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["contributor_first_name"]
         invalid_serializer = ScheduleATransactionSerializerBase(
-            data=invalid_transaction,
-            context={"request": self.mock_request},
+            data=invalid_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -90,8 +90,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         missing_type = self.valid_schedule_a_transaction.copy()
         del missing_type["transaction_type_identifier"]
         missing_type_serializer = ScheduleATransactionSerializerBase(
-            data=missing_type,
-            context={"request": self.mock_request},
+            data=missing_type, context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
@@ -101,17 +100,18 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_schedule_a_transaction.copy()
         parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["contribution_purpose_descrip"] = "test"
         child = self.valid_schedule_a_transaction.copy()
         child["transaction_type_identifier"] = "EARMARK_MEMO"
+        child["schema_name"] = "EARMARK_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = ScheduleATransactionSerializer(
-            data=parent,
-            context={"request": self.mock_request},
+            data=parent, context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
@@ -130,8 +130,10 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         updated_child_description = "updated child"
         child["contribution_purpose_descrip"] = updated_child_description
+        child["schema_name"] = "EARMARK_MEMO"
         parent["children"] = [child]
         parent["contact"] = self.new_contact.copy()
         child["contact"] = self.new_contact.copy()
@@ -157,3 +159,161 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             parent_transaction_object_id=parent_instance.id
         )
         self.assertEqual(children[1].contribution_purpose_descrip, "very new child")
+
+        # Test to_representation method
+        parent_representation = serializer.to_representation(parent_instance)
+        self.assertEqual(
+            parent_representation["transaction_type_identifier"], "EARMARK_RECEIPT"
+        )
+        self.assertEqual(
+            list(parent_representation["children"])[0]["contributor_organization_name"],
+            "John Smith Co",
+        )
+
+    def test_partnership_receipt(self):
+        parent_transaction_type_identifier = "PARTNERSHIP_RECEIPT"
+        parent_schema_name = "PARTNERSHIP_RECEIPT"
+        child_transaction_type_identifier = "PARTNERSHIP_MEMO"
+        child_schema_name = "PARTNERSHIP_MEMO"
+        expected_parent_cpd_with_children = "See Partnership Attribution(s) below"
+        expected_parent_cpd_with_no_children = (
+            "Partnership attributions do not require itemization"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def test_partnership_np_recount_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Recount/Legal Proceedings Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Recount/Legal Proceedings Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def test_partnership_np_headquarters_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Headquarters Buildings Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Headquarters Buildings Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def test_partnership_np_convention_account(self):
+        parent_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT"
+        )
+        parent_schema_name = "PARTNERSHIP_NATIONAL_PARTY_RECEIPTS"
+        child_transaction_type_identifier = (
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
+        )
+        child_schema_name = "PARTNERSHIP_NATIONAL_PARTY_MEMOS"
+        expected_parent_cpd_with_children = (
+            "Pres. Nominating Convention Account (See Partnership Attribution(s) below)"
+        )
+        expected_parent_cpd_with_no_children = (
+            "Pres. Nominating Convention Account "
+            "(Partnership attributions do not require itemization)"
+        )
+        self.do_test_parent_child_transaction_dynamic_cpd(
+            parent_transaction_type_identifier,
+            parent_schema_name,
+            child_transaction_type_identifier,
+            child_schema_name,
+            expected_parent_cpd_with_children,
+            expected_parent_cpd_with_no_children
+        )
+
+    def do_test_parent_child_transaction_dynamic_cpd(
+        self, parent_transaction_type_identifier,
+        parent_schema_name,
+        child_transaction_type_identifier,
+        child_schema_name,
+        expected_parent_cpd_with_children,
+        expected_parent_cpd_with_no_children,
+    ):
+        # First, test that the CPD of the receipt is changed when a child
+        # memo is created.
+        parent = self.valid_schedule_a_transaction.copy()
+        parent["transaction_type_identifier"] = parent_transaction_type_identifier
+        parent["schema_name"] = parent_schema_name
+        parent["contribution_purpose_descrip"] = "this text will be replaced"
+        serializer = ScheduleATransactionSerializer(
+            data=parent, context={"request": self.mock_request},
+        )
+        serializer.create(serializer.to_internal_value(parent))
+        parent_instance = ScheduleATransaction.objects.filter(
+            transaction_type_identifier=parent_transaction_type_identifier
+        )[0]
+        parent_representation = serializer.to_representation(parent_instance)
+        child = self.valid_schedule_a_transaction.copy()
+        child["transaction_type_identifier"] = child_transaction_type_identifier
+        child["schema_name"] = child_schema_name
+        child["contribution_purpose_descrip"] = "test"
+        child["back_reference_sched_name"] = "test"
+        child["back_reference_tran_id_number"] = "test"
+        child["memo_code"] = True
+        child["parent"] = [parent_representation]
+        child["parent_transaction_object_id"] = parent_representation["id"]
+        serializer = ScheduleATransactionSerializer(
+            data=child, context={"request": self.mock_request},
+        )
+        child_instance = serializer.create(serializer.to_internal_value(child))
+        parent_instance = ScheduleATransaction.objects.filter(
+            id=parent_representation["id"]
+        )[0]
+        self.assertEqual(
+            parent_instance.contribution_purpose_descrip,
+            expected_parent_cpd_with_children,
+        )
+
+        # Second, test that the CPD is reverted back to the no childred
+        # text for the CPD when the last child is deleted.
+        child_instance.deleted = "2016-06-22 19:10:25-07"
+        child_instance.save()
+        parent_instance = ScheduleATransaction.objects.filter(
+            id=parent_representation["id"]
+        )[0]
+        self.assertEqual(
+            parent_instance.contribution_purpose_descrip,
+            expected_parent_cpd_with_no_children,
+        )
