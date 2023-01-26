@@ -72,18 +72,30 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 child["parent_transaction_object_id"] = parent.id
                 self.create(child)
 
-            # If this is one of severl specific memo types being created, 
-            # update the parent contribution_purpose_description which 
+            # If this is one of severl specific memo types being created,
+            # update the parent contribution_purpose_description which
             # contains text that depends on whether the parent has child
             # transactions
+            cpd = None
             if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
-                self.replace_grandparent_cpd(parent, "See Partnership Attribution(s) below")
-            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"):
-                self.replace_grandparent_cpd(parent, "Recount/Legal Proceedings Account (See Partnership Attribution(s) below)")
-            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"):
-                self.replace_grandparent_cpd(parent, "Headquarters Buildings Account (See Partnership Attribution(s) below)")
-            elif parent.transaction_type_identifier == ("PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"):
-                self.replace_grandparent_cpd(parent, "Pres. Nominating Convention Account (See Partnership Attribution(s) below)")
+                cpd = "See Partnership Attribution(s) below"
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
+            ):
+                cpd = "Recount/Legal Proceedings Account " \
+                      "(See Partnership Attribution(s) below)"
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
+            ):
+                cpd = "Headquarters Buildings Account " \
+                      "(See Partnership Attribution(s) below)"
+            elif parent.transaction_type_identifier == (
+                "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
+            ):
+                cpd = "Pres. Nominating Convention Account " \
+                      "(See Partnership Attribution(s) below)"
+            if cpd:
+                self.replace_grandparent_cpd(parent, cpd)
 
             return parent
 
