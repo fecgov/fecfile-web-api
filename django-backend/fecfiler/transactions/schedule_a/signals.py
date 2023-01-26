@@ -22,17 +22,30 @@ def action_post_save(sender, instance, created, **kwargs):
     elif instance.deleted:
         action = "deleted"
 
-        # If the transaction being deleted is one of several specific memo types, 
-        # update the contribution_purpose_descrip of the parent if the parent 
+        # If the transaction being deleted is one of several specific memo types,
+        # update the contribution_purpose_descrip of the parent if the parent
         # transaction becomes childless
+        cpd = None
+        partnership_attr_clause = (
+            "Partnership attributions do not require itemization"
+        )
         if instance.transaction_type_identifier == "PARTNERSHIP_MEMO":
-            update_cpb_if_last_child(instance, "Partnership attributions do not require itemization")
-        elif instance.transaction_type_identifier == "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO":
-            update_cpb_if_last_child(instance, "Recount/Legal Proceedings Account (Partnership attributions do not require itemization)")
-        elif instance.transaction_type_identifier == "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO":
-            update_cpb_if_last_child(instance, "Headquarters Buildings Account (Partnership attributions do not require itemization)")
-        elif instance.transaction_type_identifier == "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO":
-            update_cpb_if_last_child(instance, "Pres. Nominating Convention Account (Partnership attributions do not require itemization)")
+            cpd = partnership_attr_clause
+        elif instance.transaction_type_identifier == (
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
+        ):
+            cpd = f"Recount/Legal Proceedings Account ({partnership_attr_clause})"
+        elif instance.transaction_type_identifier == (
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
+        ):
+            cpd = f"Headquarters Buildings Account ({partnership_attr_clause})"
+        elif instance.transaction_type_identifier == (
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
+        ):
+            cpd = f"Pres. Nominating Convention Account ({partnership_attr_clause})"
+
+        if cpd:
+            update_cpb_if_last_child(instance, cpd)
 
     logger.info(f"Schedule A Transaction: {instance.transaction_id} was {action}")
 
