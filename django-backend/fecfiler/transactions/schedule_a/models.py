@@ -58,3 +58,10 @@ class ScheduleA(models.Model):
 
     class Meta:
         app_label = "transactions"
+
+
+class ScheduleATransaction(models.Model):
+    """stub class until we can figure out how to make migrations run without old models"""
+
+    class Meta:
+        app_label = "transactions"
