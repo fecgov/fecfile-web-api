@@ -11,11 +11,7 @@ django-cors-headers==3.13.0
 django-storages==1.13.1
 djangorestframework==3.14.0
 drf-spectacular==0.24.2
-<<<<<<< HEAD
 git+https://github.com/fecgov/fecfile-validate@49c8a4610ac42cd533533b65075c1074976595ba#egg=fecfile_validate&subdirectory=fecfile_validate_python
-=======
-git+https://github.com/fecgov/fecfile-validate@49c8a4610ac42cd533533b65075c1074976595ba#egg=fecfile_validate&subdirectory=fecfile_validate_python
->>>>>>> origin/feature/656-partnership-national-party-recount-account
 GitPython==3.1.30
 gunicorn==20.1.0
 Jinja2==3.1.2
