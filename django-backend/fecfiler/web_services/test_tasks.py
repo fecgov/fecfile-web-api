@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
 from fecfiler.f3x_summaries.models import F3XSummary
-from fecfiler.transactions.schedule_a.models import ScheduleATransaction
+from fecfiler.transactions.models import Transaction
 from .models import (
     DotFEC,
     FECStatus,
@@ -26,7 +26,7 @@ class TasksTestCase(TestCase):
         self.f3x = F3XSummary.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
-        self.transaction = ScheduleATransaction.objects.filter(
+        self.transaction = Transaction.objects.filter(
             id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
         ).first()
 

@@ -1,13 +1,16 @@
 from django.test import TestCase
+import datetime
 from .dot_fec_serializer import (
     serialize_field,
     serialize_instance,
     get_field_mappings,
+    get_value_from_path,
 )
 from .dot_fec_composer import Header
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.memo_text.models import MemoText
-from fecfiler.transactions.schedule_a.models import ScheduleATransaction
+from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.schedule_a.models import ScheduleA
 from curses import ascii
 
 
@@ -24,7 +27,7 @@ class DotFECSerializerTestCase(TestCase):
         self.f3x = F3XSummary.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
-        self.transaction = ScheduleATransaction.objects.filter(
+        self.transaction = Transaction.objects.filter(
             id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
         ).first()
         self.report_level_memo_text = MemoText.objects.filter(
@@ -60,8 +63,10 @@ class DotFECSerializerTestCase(TestCase):
             self.transaction, "contribution_amount", scha_field_mappings
         )
         self.assertEqual(serialized_decimal, "1234.56")
+        transaction = Transaction()
+        transaction.schedule_a = ScheduleA()
         serialized_decimal_undefined = serialize_field(
-            ScheduleATransaction(), "contribution_amount", scha_field_mappings
+            transaction, "contribution_amount", scha_field_mappings
         )
         self.assertEqual(serialized_decimal_undefined, "")
 
@@ -117,3 +122,13 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[2], "8.4")
         self.assertEqual(split_row[3], "FECFile Online")
         self.assertEqual(split_row[4], "0.0.1")
+
+    def test_get_value_from_path(self):
+        form_type = get_value_from_path(self.transaction, "form_type")
+        self.assertEqual(form_type, "SA11AI")
+        contribution_date = get_value_from_path(
+            self.transaction, "schedule_a.contribution_date"
+        )
+        self.assertEqual(contribution_date, datetime.date(2020, 4, 19))
+        bogus_value = get_value_from_path(self.transaction, "not.real.path")
+        self.assertIsNone(bogus_value)

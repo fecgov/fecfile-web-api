@@ -5,47 +5,122 @@
     "back_reference_tran_id_number": {},
     "back_reference_sched_name": {},
     "entity_type": {},
-    "contributor_organization_name": {},
-    "contributor_last_name": {},
-    "contributor_first_name": {},
-    "contributor_middle_name": {},
-    "contributor_prefix": {},
-    "contributor_suffix": {},
-    "contributor_street_1": {},
-    "contributor_street_2": {},
-    "contributor_city": {},
-    "contributor_state": {},
-    "contributor_zip": {},
-    "election_code": {},
-    "election_other_description": {},
-    "contribution_date": {
-        "serializer": "DATE"
+    "contributor_organization_name": {
+        "path": "schedule_a.contributor_organization_name"
     },
-    "contribution_amount": {},
-    "contribution_aggregate": {},
-    "contribution_purpose_descrip": {},
-    "contributor_employer": {},
-    "contributor_occupation": {},
-    "donor_committee_fec_id": {},
-    "donor_committee_name": {},
-    "donor_candidate_fec_id": {},
-    "donor_candidate_last_name": {},
-    "donor_candidate_first_name": {},
-    "donor_candidate_middle_name": {},
-    "donor_candidate_prefix": {},
-    "donor_candidate_suffix": {},
-    "donor_candidate_office": {},
-    "donor_candidate_state": {},
-    "donor_candidate_district": {},
-    "conduit_name": {},
-    "conduit_street_1": {},
-    "conduit_street_2": {},
-    "conduit_city": {},
-    "conduit_state": {},
-    "conduit_zip": {},
+    "contributor_last_name": {
+        "path": "schedule_a.contributor_last_name"
+    },
+    "contributor_first_name": {
+        "path": "schedule_a.contributor_first_name"
+    },
+    "contributor_middle_name": {
+        "path": "schedule_a.contributor_middle_name"
+    },
+    "contributor_prefix": {
+        "path": "schedule_a.contributor_prefix"
+    },
+    "contributor_suffix": {
+        "path": "schedule_a.contributor_suffix"
+    },
+    "contributor_street_1": {
+        "path": "schedule_a.contributor_street_1"
+    },
+    "contributor_street_2": {
+        "path": "schedule_a.contributor_street_2"
+    },
+    "contributor_city": {
+        "path": "schedule_a.contributor_city"
+    },
+    "contributor_state": {
+        "path": "schedule_a.contributor_state"
+    },
+    "contributor_zip": {
+        "path": "schedule_a.contributor_zip"
+    },
+    "election_code": {
+        "path": "schedule_a.election_code"
+    },
+    "election_other_description": {
+        "path": "schedule_a.election_other_description"
+    },
+    "contribution_date": {
+        "serializer": "DATE",
+        "path": "schedule_a.contribution_date"
+    },
+    "contribution_amount": {
+        "path": "schedule_a.contribution_amount"
+    },
+    "contribution_aggregate": {
+        "path": "schedule_a.contribution_aggregate"
+    },
+    "contribution_purpose_descrip": {
+        "path": "schedule_a.contribution_purpose_descrip"
+    },
+    "contributor_employer": {
+        "path": "schedule_a.contributor_employer"
+    },
+    "contributor_occupation": {
+        "path": "schedule_a.contributor_occupation"
+    },
+    "donor_committee_fec_id": {
+        "path": "schedule_a.donor_committee_fec_id"
+    },
+    "donor_committee_name": {
+        "path": "schedule_a.donor_committee_name"
+    },
+    "donor_candidate_fec_id": {
+        "path": "schedule_a.donor_candidate_fec_id"
+    },
+    "donor_candidate_last_name": {
+        "path": "schedule_a.donor_candidate_last_name"
+    },
+    "donor_candidate_first_name": {
+        "path": "schedule_a.donor_candidate_first_name"
+    },
+    "donor_candidate_middle_name": {
+        "path": "schedule_a.donor_candidate_middle_name"
+    },
+    "donor_candidate_prefix": {
+        "path": "schedule_a.donor_candidate_prefix"
+    },
+    "donor_candidate_suffix": {
+        "path": "schedule_a.donor_candidate_suffix"
+    },
+    "donor_candidate_office": {
+        "path": "schedule_a.donor_candidate_office"
+    },
+    "donor_candidate_state": {
+        "path": "schedule_a.donor_candidate_state"
+    },
+    "donor_candidate_district": {
+        "path": "schedule_a.donor_candidate_district"
+    },
+    "conduit_name": {
+        "path": "schedule_a.conduit_name"
+    },
+    "conduit_street_1": {
+        "path": "schedule_a.conduit_street_1"
+    },
+    "conduit_street_2": {
+        "path": "schedule_a.conduit_street_2"
+    },
+    "conduit_city": {
+        "path": "schedule_a.conduit_city"
+    },
+    "conduit_state": {
+        "path": "schedule_a.conduit_state"
+    },
+    "conduit_zip": {
+        "path": "schedule_a.conduit_zip"
+    },
     "memo_code": {
         "serializer": "BOOLEAN"
     },
-    "memo_text_description": {},
-    "reference_to_si_or_sl_system_code_that_identifies_the_account": {}
+    "memo_text_description": {
+        "path": "schedule_a.memo_text_description"
+    },
+    "reference_to_si_or_sl_system_code_that_identifies_the_account": {
+        "path": "schedule_a.reference_to_si_or_sl_system_code_that_identifies_the_account"
+    }
 }
