@@ -29,6 +29,7 @@ class MemoTextSerializer(
                 "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
+                "transaction",
             ]
         ] + ["report_id"]
         read_only_fields = [
