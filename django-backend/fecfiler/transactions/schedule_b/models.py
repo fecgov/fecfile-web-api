@@ -1,8 +1,8 @@
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.transaction_base import TransactionBase
 from django.db import models
 
 
-class ScheduleBTransaction(Transaction):
+class ScheduleBTransaction(TransactionBase):
 
     payee_organization_name = models.TextField(null=True, blank=True)
     payee_last_name = models.TextField(null=True, blank=True)

@@ -42,6 +42,7 @@ class ContactSerializer(
                 "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
+                "transaction",
             ]
         ]
         fields.append("transaction_count")
