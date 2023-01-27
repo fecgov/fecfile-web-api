@@ -131,30 +131,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
 
-            # If this is one of severl specific memo types being created,
-            # update the parent contribution_purpose_description which
-            # contains text that depends on whether the parent has child
-            # transactions
-            cpd = None
-            partnership_attr_clause = "See Partnership Attribution(s) below"
-            if parent.transaction_type_identifier == "PARTNERSHIP_MEMO":
-                cpd = partnership_attr_clause
-            elif parent.transaction_type_identifier == (
-                "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_ACCOUNT_MEMO"
-            ):
-                cpd = f"Recount/Legal Proceedings Account ({partnership_attr_clause})"
-            elif parent.transaction_type_identifier == (
-                "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT_MEMO"
-            ):
-                cpd = f"Headquarters Buildings Account ({partnership_attr_clause})"
-            elif parent.transaction_type_identifier == (
-                "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_ACCOUNT_MEMO"
-            ):
-                cpd = f"Pres. Nominating Convention Account ({partnership_attr_clause})"
-
-            if cpd:
-                self.replace_grandparent_cpd(parent, cpd)
-
             return parent
 
     def update(self, instance, validated_data: dict):

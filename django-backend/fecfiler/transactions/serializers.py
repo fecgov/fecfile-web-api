@@ -88,10 +88,10 @@ class TransactionSerializerBase(
     schedule_a = ScheduleASerializer(required=False)
 
     def get_schema_name(self, data):
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
-            raise MISSING_TRANSACTION_TYPE_ERROR
-        return transaction_type
+        schema_name = data.get("schema_name", None)
+        if not schema_name:
+            raise MISSING_SCHEMA_NAME_ERROR
+        return schema_name
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
