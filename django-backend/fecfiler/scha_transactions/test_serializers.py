@@ -61,6 +61,7 @@ class SchATransactionTestCase(TestCase):
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
             "contact": self.test_contact.copy(),
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.invalid_scha_transaction = {
@@ -73,6 +74,7 @@ class SchATransactionTestCase(TestCase):
             "contact": self.test_contact.copy(),
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.missing_type_transaction = {
@@ -84,6 +86,7 @@ class SchATransactionTestCase(TestCase):
             "contact": self.test_contact.copy(),
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -119,9 +122,11 @@ class SchATransactionTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_scha_transaction.copy()
         parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["contribution_purpose_descrip"] = "test"
         child = self.valid_scha_transaction.copy()
         child["transaction_type_identifier"] = "EARMARK_MEMO"
+        child["schema_name"] = "EARMARK_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
@@ -142,8 +147,10 @@ class SchATransactionTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["memo_text"] = self.memo_text
         child["contribution_purpose_descrip"] = "updated child"
+        child["schema_name"] = "EARMARK_MEMO"
         child["memo_text"] = self.memo_text
         parent["children"] = [child]
         parent["contact"] = self.test_contact.copy()

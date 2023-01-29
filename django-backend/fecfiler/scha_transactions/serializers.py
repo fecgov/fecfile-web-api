@@ -41,16 +41,16 @@ class SchATransactionSerializer(
     itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
+        schema_name = data.get("schema_name", None)
+        if not schema_name:
             raise ValidationError(
                 {
-                    "transaction_type_identifier": [
-                        "No transaction_type_identifier provided"
+                    "schema_name": [
+                        "No schema_name provided1"
                     ]
                 }
             )
-        return transaction_type
+        return schema_name
 
     def validate(self, attrs):
         """Adds stub contribution_aggregate to pass validation"""
@@ -73,6 +73,7 @@ class SchATransactionSerializer(
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
         read_only_fields = [
@@ -195,6 +196,7 @@ class SchATransactionParentSerializer(SchATransactionSerializer):
             "contribution_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
         depth = 1

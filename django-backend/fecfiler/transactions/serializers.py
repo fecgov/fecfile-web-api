@@ -19,8 +19,8 @@ from fecfiler.transactions.schedule_a.models import ScheduleA
 
 
 logger = logging.getLogger(__name__)
-MISSING_TRANSACTION_TYPE_ERROR = ValidationError(
-    {"transaction_type_identifier": ["No transaction_type_identifier provided"]}
+MISSING_SCHEMA_NAME_ERROR = ValidationError(
+    {"schema_name": ["No schema_name provided"]}
 )
 
 
@@ -40,10 +40,10 @@ class TransactionBaseSerializer(
     itemized = BooleanField(read_only=True)
 
     def get_schema_name(self, data):
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
-            raise MISSING_TRANSACTION_TYPE_ERROR
-        return transaction_type
+        schema_name = data.get("schema_name", None)
+        if not schema_name:
+            raise MISSING_SCHEMA_NAME_ERROR
+        return schema_name
 
     class Meta:
         abstract = True
@@ -88,10 +88,10 @@ class TransactionSerializerBase(
     schedule_a = ScheduleASerializer(required=False)
 
     def get_schema_name(self, data):
-        transaction_type = data.get("transaction_type_identifier", None)
-        if not transaction_type:
-            raise MISSING_TRANSACTION_TYPE_ERROR
-        return transaction_type
+        schema_name = data.get("schema_name", None)
+        if not schema_name:
+            raise MISSING_SCHEMA_NAME_ERROR
+        return schema_name
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
@@ -129,6 +129,7 @@ class TransactionSerializerBase(
                 "memo_text_id",
                 "itemized",
                 "fields_to_validate",
+                "schema_name",
                 "action_date",
                 "action_amount",
                 "action_aggregate",

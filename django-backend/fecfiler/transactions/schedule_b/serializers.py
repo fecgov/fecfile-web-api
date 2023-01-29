@@ -41,6 +41,7 @@ class ScheduleBTransactionSerializerBase(TransactionBaseSerializer):
             "expenditure_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
 
@@ -108,6 +109,7 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
             "expenditure_aggregate",
             "itemized",
             "fields_to_validate",
+            "schema_name",
         ]
 
         depth = 1

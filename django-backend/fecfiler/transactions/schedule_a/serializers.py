@@ -130,6 +130,7 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
+
             return parent
 
     def update(self, instance, validated_data: dict):

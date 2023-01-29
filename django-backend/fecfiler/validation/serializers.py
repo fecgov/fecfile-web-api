@@ -2,11 +2,15 @@ from datetime import date
 from rest_framework import serializers
 from fecfile_validate import validate
 from rest_framework import exceptions
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import CharField, ListField
 from functools import reduce
 import logging
 
 logger = logging.getLogger(__name__)
+MISSING_SCHEMA_NAME_ERROR = ValidationError(
+    {"schema_name": ["No schema_name provided"]}
+)
 
 
 class FecSchemaValidatorSerializerMixin(serializers.Serializer):
@@ -23,7 +27,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     """
 
-    schema_name = None
+    schema_name = CharField(write_only=True, default=None)
 
     fields_to_validate = ListField(child=CharField(), write_only=True, default=[])
 
@@ -45,6 +49,8 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         request = self.context.get("request", None)
         if request and request.query_params.get("schema"):
             self.schema_name = request.query_params.get("schema")
+        elif "schema_name" in data:
+            self.schema_name = data.get("schema_name", None)
 
         assert self.schema_name is not None, (
             f"'{self.__class__.__name__}' should either include a "
@@ -85,10 +91,12 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     def create(self, validated_data):
         validated_data.pop("fields_to_validate", None)
+        validated_data.pop("schema_name", None)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         validated_data.pop("fields_to_validate", None)
+        validated_data.pop("schema_name", None)
         return super().update(instance, validated_data)
 
     def validate(self, data):
