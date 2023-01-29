@@ -111,7 +111,7 @@ fecfiler.transactions.schedule\_b.tests.test\_serializers.ScheduleBTransactionSe
       ~ScheduleBTransactionSerializerBaseTestCase.subTest
       ~ScheduleBTransactionSerializerBaseTestCase.tearDown
       ~ScheduleBTransactionSerializerBaseTestCase.tearDownClass
-      ~ScheduleBTransactionSerializerBaseTestCase.test_no_transaction_type_identifier
+      ~ScheduleBTransactionSerializerBaseTestCase.test_no_payee_first_name
       ~ScheduleBTransactionSerializerBaseTestCase.test_parent
       ~ScheduleBTransactionSerializerBaseTestCase.test_serializer_validate
    

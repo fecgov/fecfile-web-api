@@ -59,7 +59,6 @@ fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.fields
       ~FecSchemaValidatorSerializerMixin.initial
       ~FecSchemaValidatorSerializerMixin.root
-      ~FecSchemaValidatorSerializerMixin.schema_name
       ~FecSchemaValidatorSerializerMixin.validated_data
       ~FecSchemaValidatorSerializerMixin.validators
    

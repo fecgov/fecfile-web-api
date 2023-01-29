@@ -75,7 +75,6 @@ fecfiler.scha\_transactions.serializers.SchATransactionParentSerializer
       ~SchATransactionParentSerializer.fields
       ~SchATransactionParentSerializer.initial
       ~SchATransactionParentSerializer.root
-      ~SchATransactionParentSerializer.schema_name
       ~SchATransactionParentSerializer.serializer_field_mapping
       ~SchATransactionParentSerializer.url_field_name
       ~SchATransactionParentSerializer.validated_data

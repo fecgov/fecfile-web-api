@@ -73,7 +73,6 @@ fecfiler.scha\_transactions.serializers.SchATransactionSerializer
       ~SchATransactionSerializer.fields
       ~SchATransactionSerializer.initial
       ~SchATransactionSerializer.root
-      ~SchATransactionSerializer.schema_name
       ~SchATransactionSerializer.serializer_field_mapping
       ~SchATransactionSerializer.url_field_name
       ~SchATransactionSerializer.validated_data

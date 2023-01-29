@@ -74,7 +74,6 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.fields
       ~ContactSerializer.initial
       ~ContactSerializer.root
-      ~ContactSerializer.schema_name
       ~ContactSerializer.serializer_field_mapping
       ~ContactSerializer.url_field_name
       ~ContactSerializer.validated_data
