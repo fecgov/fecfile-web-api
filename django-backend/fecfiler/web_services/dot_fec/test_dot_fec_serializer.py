@@ -5,7 +5,7 @@ from .dot_fec_serializer import (
 )
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.memo_text.models import MemoText
-from fecfiler.scha_transactions.models import SchATransaction
+from fecfiler.transactions.schedule_a.models import ScheduleATransaction
 from curses import ascii
 
 
@@ -15,14 +15,14 @@ class DotFECSerializerTestCase(TestCase):
         "test_f3x_summaries",
         "test_individual_receipt",
         "test_memo_text",
-        "test_memo_text"
+        "test_memo_text",
     ]
 
     def setUp(self):
         self.f3x = F3XSummary.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
-        self.transaction = SchATransaction.objects.filter(
+        self.transaction = ScheduleATransaction.objects.filter(
             id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
         ).first()
         self.report_level_memo_text = MemoText.objects.filter(
@@ -50,11 +50,11 @@ class DotFECSerializerTestCase(TestCase):
 
         # DECIMAL
         serialized_decimal = serialize_field(
-            SchATransaction, self.transaction, "contribution_amount"
+            ScheduleATransaction, self.transaction, "contribution_amount"
         )
         self.assertEqual(serialized_decimal, "1234.56")
         serialized_decimal_undefined = serialize_field(
-            SchATransaction, SchATransaction(), "contribution_amount"
+            ScheduleATransaction, ScheduleATransaction(), "contribution_amount"
         )
         self.assertEqual(serialized_decimal_undefined, "")
 
@@ -96,9 +96,9 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[3], "X")
         self.assertEqual(split_row[122], "381.00")
 
-    def test_serialize_scha_transaction(self):
+    def test_serialize_schedule_a_transaction(self):
         transaction_row = serialize_model_instance(
-            "SchA", SchATransaction, self.transaction
+            "SchA", ScheduleATransaction, self.transaction
         )
         split_row = transaction_row.split(chr(ascii.FS))
         self.assertEqual(split_row[0], "SA11AI")
