@@ -75,8 +75,11 @@ fecfiler.transactions.models.Transaction
       ~Transaction.pk
       ~Transaction.report
       ~Transaction.report_id
+      ~Transaction.schedule
       ~Transaction.schedule_a
       ~Transaction.schedule_a_id
+      ~Transaction.schedule_b
+      ~Transaction.schedule_b_id
       ~Transaction.transaction_id
       ~Transaction.transaction_set
       ~Transaction.transaction_type_identifier

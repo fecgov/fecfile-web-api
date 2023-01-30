@@ -34,7 +34,6 @@ fecfiler.transactions.schedule\_a
    fecfiler.transactions.schedule_a.managers
    fecfiler.transactions.schedule_a.models
    fecfiler.transactions.schedule_a.serializers
-   fecfiler.transactions.schedule_a.signals
    fecfiler.transactions.schedule_a.tests
    fecfiler.transactions.schedule_a.views
 

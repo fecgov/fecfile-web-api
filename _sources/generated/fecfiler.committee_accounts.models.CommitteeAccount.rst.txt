@@ -62,8 +62,6 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.objects
       ~CommitteeAccount.pk
       ~CommitteeAccount.schatransaction_set
-      ~CommitteeAccount.scheduleatransaction_set
-      ~CommitteeAccount.schedulebtransaction_set
       ~CommitteeAccount.transaction_set
       ~CommitteeAccount.updated
    

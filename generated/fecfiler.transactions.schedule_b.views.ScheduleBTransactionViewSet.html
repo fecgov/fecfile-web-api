@@ -38,12 +38,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.schedule_b.views.</span></span><span class="sig-name descname"><span class="pre">ScheduleBTransactionViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.transactions.views.TransactionViewSetBase.html#fecfiler.transactions.views.TransactionViewSetBase" title="fecfiler.transactions.views.TransactionViewSetBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.transactions.views.TransactionViewSetBase</span></code></a></p>
-<p>This viewset automatically provides <cite>list</cite>, <cite>create</cite>, <cite>retrieve</cite>,
-<cite>update</cite> and <cite>destroy</cite> actions.</p>
-<p>Note that this ViewSet inherits from CommitteeOwnedViewSet
-The queryset will be further limmited by the user’s committee
-in CommitteeOwnedViewSet’s implementation of get_queryset()</p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.transactions.views.TransactionViewSet.html#fecfiler.transactions.views.TransactionViewSet" title="fecfiler.transactions.views.TransactionViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.transactions.views.TransactionViewSet</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.__init__" title="Permalink to this definition">¶</a></dt>
@@ -73,7 +68,7 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.check_throttles" title="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code>(request, *args, **kwargs)</p></td>
@@ -181,7 +176,7 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.paginate_queryset" title="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
 <td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.perform_authentication" title="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
@@ -220,7 +215,7 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.throttled" title="fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -678,7 +673,6 @@ while bieng in the same group for aggregation</p>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_b.managers.html">fecfiler.transactions.schedule_b.managers</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_b.models.html">fecfiler.transactions.schedule_b.models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_b.serializers.html">fecfiler.transactions.schedule_b.serializers</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_b.signals.html">fecfiler.transactions.schedule_b.signals</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_b.tests.html">fecfiler.transactions.schedule_b.tests</a></li>
 <li class="toctree-l5 current"><a class="reference internal" href="fecfiler.transactions.schedule_b.views.html">fecfiler.transactions.schedule_b.views</a><ul class="current">
 <li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.transactions.schedule_b.views.ScheduleBTransactionViewSet</a></li>
@@ -687,10 +681,9 @@ while bieng in the same group for aggregation</p>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.serializers.html">fecfiler.transactions.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.signals.html">fecfiler.transactions.signals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.transaction_base.html">fecfiler.transactions.transaction_base</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.urls.html">fecfiler.transactions.urls</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils.html">fecfiler.transactions.utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a></li>
 </ul>
 </li>

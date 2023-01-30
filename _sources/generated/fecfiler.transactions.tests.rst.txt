@@ -32,5 +32,4 @@ fecfiler.transactions.tests
    :recursive:
 
    fecfiler.transactions.tests.test_serializers
-   fecfiler.transactions.tests.test_utils
 

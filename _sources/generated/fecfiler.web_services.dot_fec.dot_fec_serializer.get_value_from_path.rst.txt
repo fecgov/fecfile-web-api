@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_serializer.get\_value\_from\_path
+===========================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_serializer
+
+.. autofunction:: get_value_from_path

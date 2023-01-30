@@ -35,4 +35,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0002_copy_scha
    fecfiler.transactions.migrations.0003_schedulea_transaction
    fecfiler.transactions.migrations.0004_copy_to_unified_table
+   fecfiler.transactions.migrations.0005_scheduleb_delete_schedulebtransaction_and_more
 

@@ -1,0 +1,6 @@
+fecfiler.transactions.signals.log\_post\_save
+=============================================
+
+.. currentmodule:: fecfiler.transactions.signals
+
+.. autofunction:: log_post_save

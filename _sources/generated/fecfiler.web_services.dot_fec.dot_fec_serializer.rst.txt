@@ -21,8 +21,8 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_serializer
       date_serializer
       default_serializer
       extract_row_config
-      foreign_key_serializer
       get_field_mappings
+      get_value_from_path
       serialize_field
       serialize_instance
    
