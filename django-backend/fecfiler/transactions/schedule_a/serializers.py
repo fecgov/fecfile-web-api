@@ -122,10 +122,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                     del transaction_data[key]
 
             children = transaction_data.pop("children", [])
-            if "parent_transaction_id" in transaction_data:
-                print(f"ahoy {transaction_data}")
-            else:
-                print(f"bummer {transaction_data}")
             parent = super().create(transaction_data)
             for child in children:
                 child["parent_transaction_id"] = parent.id
@@ -149,10 +145,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
             return super().update(instance, validated_data)
-
-    def to_representation(self, instance, depth=0):
-        print(f"to rep {instance}")
-        return super().to_representation(instance, depth)
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (

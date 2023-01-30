@@ -6,6 +6,7 @@ from fecfiler.f3x_summaries.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager
 from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.transactions.schedule_b.models import ScheduleB
 import uuid
 import logging
 
@@ -54,12 +55,22 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     schedule_a = models.ForeignKey(
         ScheduleA, on_delete=models.CASCADE, null=True, blank=True
     )
+    schedule_b = models.ForeignKey(
+        ScheduleB, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     objects = TransactionManager()
 
     @property
     def children(self):
         return self.transaction_set.all()
+
+    @property
+    def schedule(self):
+        for schedule_key in ["schedule_a", "schedule_b"]:
+            if getattr(self, schedule_key, None):
+                return schedule_key
+        return None
 
     def save(self, *args, **kwargs):
         if self.memo_text:

@@ -24,38 +24,6 @@ MISSING_SCHEMA_NAME_ERROR = ValidationError(
 )
 
 
-class TransactionBaseSerializer(
-    LinkedContactSerializerMixin,
-    LinkedMemoTextSerializerMixin,
-    FecSchemaValidatorSerializerMixin,
-    CommitteeOwnedSerializer,
-):
-    """id must be explicitly configured in order to have it in validated_data
-    https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
-
-    id = UUIDField(required=False)
-    transaction_id = CharField(required=False, allow_null=True)
-    report_id = UUIDField(required=True, allow_null=False)
-
-    itemized = BooleanField(read_only=True)
-
-    def get_schema_name(self, data):
-        schema_name = data.get("schema_name", None)
-        if not schema_name:
-            raise MISSING_SCHEMA_NAME_ERROR
-        return schema_name
-
-    class Meta:
-        abstract = True
-
-        read_only_fields = [
-            "id",
-            "deleted",
-            "created",
-            "updated",
-        ]
-
-
 class ScheduleASerializer(ModelSerializer):
     class Meta:
         fields = [

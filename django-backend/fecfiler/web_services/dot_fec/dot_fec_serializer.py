@@ -1,4 +1,3 @@
-from django.db import models
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
 from curses import ascii
@@ -12,31 +11,33 @@ logger = logging.getLogger(__name__)
 CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
 
 
-def boolean_serializer(model_instance, field_name):
-    return "X" if getattr(model_instance, field_name, None) else ""
+def get_value_from_path(object, path):
+    split_path = path if isinstance(path, list) else path.split(".")
+    value = getattr(object, split_path[0], None)
+    if len(split_path) > 1:
+        return get_value_from_path(
+            value,
+            split_path[1:],
+        )
+    return value
 
 
-def date_serializer(model_instance, field_name):
-    date = getattr(model_instance, field_name, None)
+def boolean_serializer(model_instance, field_name, mapping):
+    value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
+    return "X" if value else ""
+
+
+def date_serializer(model_instance, field_name, mapping):
+    date = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return date.strftime("%Y%m%d") if date else ""
 
 
-def foreign_key_serializer(model_instance, field_name):
-    """returns value of foreign key rather than the object it points to
-    For example: we have a foreign key for `report_code`.  django stores the key
-    in `report_code_id` and joins the `report_code_label` row into `report_code`.
-    Because we just want to write the key ("Q1" or something) we have to add "_id"
-    to the field name.
-    """
-    return getattr(model_instance, field_name + "_id") or ""
-
-
-def default_serializer(model_instance, field_name):
+def default_serializer(model_instance, field_name, mapping):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
     "None", thus the falsy condition
     """
-    value = getattr(model_instance, field_name)
+    value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return str(value) if value else ""
 
 
@@ -45,9 +46,6 @@ Pass the model instance and field name into the serializer to
 get a string representation in the FEC standard
 """
 FIELD_SERIALIZERS = {
-    models.BooleanField: boolean_serializer,
-    models.DateField: date_serializer,
-    models.ForeignKey: foreign_key_serializer,
     "BOOLEAN": boolean_serializer,
     "DATE": date_serializer,
     None: default_serializer,
@@ -67,7 +65,7 @@ def serialize_field(instance, field_name, field_mappings):
     mapping = field_mappings[field_name]
     serializer_type = mapping.get("serializer", None)
     serializer = FIELD_SERIALIZERS[serializer_type]
-    return serializer(instance, field_name)
+    return serializer(instance, field_name, mapping)
 
 
 def serialize_instance(schema_name, instance):
