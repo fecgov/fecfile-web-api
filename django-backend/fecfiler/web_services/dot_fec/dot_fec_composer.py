@@ -80,7 +80,7 @@ class Header:
         self.soft_name = soft_name
         self.soft_ver = soft_ver
         self.rpt_id = rpt_id
-        self.rpt_number = (rpt_number,)
+        self.rpt_number = rpt_number
         self.hdrcomment = hdrcomment
 
 
