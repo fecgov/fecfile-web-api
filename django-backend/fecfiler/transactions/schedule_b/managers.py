@@ -1,1 +1,1 @@
-over_two_hundred_types = []
+over_two_hundred_types = ["OPERATING_EXPENDITURE"]
