@@ -37,7 +37,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
     queryset = (
         Contact.objects
         .annotate(transaction_count=Count("transaction"))
-        .annotate(sort_name=Concat(
+        .alias(sort_name=Concat(
             "name",
             "last_name",
             Value(" "),

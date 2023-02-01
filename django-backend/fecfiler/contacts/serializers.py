@@ -59,8 +59,6 @@ class ContactSerializer(
         # delivered to the front end.
         if "transaction_count" in data:
             del data["transaction_count"]
-        if "sort_name" in data:
-            del data["sort_name"]
         return super().to_internal_value(data)
 
 
