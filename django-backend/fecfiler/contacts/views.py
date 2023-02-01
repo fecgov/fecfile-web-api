@@ -35,13 +35,16 @@ class ContactViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        Contact.objects.annotate(transaction_count=Count("transaction"))
+        Contact.objects
+        .annotate(transaction_count=Count("transaction"))
+        .annotate(sort_name=Concat("name", "last_name", Value(" "), "first_name", output_field=CharField()))
         .all()
     )
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
-        "name",
+        "sort_name",
+        "first_name"
         "type",
         "employer",
         "occupation",

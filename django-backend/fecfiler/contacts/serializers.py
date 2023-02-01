@@ -55,10 +55,12 @@ class ContactSerializer(
         ]
 
     def to_internal_value(self, data):
-        # Remove the transactin_count because it is an annotated field
+        # Remove transaction_count and sort_name because they are annotated fields
         # delivered to the front end.
         if "transaction_count" in data:
             del data["transaction_count"]
+        if "sort_name" in data:
+            del data["sort_name"]
         return super().to_internal_value(data)
 
 
