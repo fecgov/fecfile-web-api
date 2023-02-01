@@ -44,7 +44,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     ordering_fields = [
         "sort_name",
-        "first_name"
+        "first_name",
         "type",
         "employer",
         "occupation",
