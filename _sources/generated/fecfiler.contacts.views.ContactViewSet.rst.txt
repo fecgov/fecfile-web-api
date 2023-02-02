@@ -97,6 +97,8 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.lookup_field
       ~ContactViewSet.lookup_url_kwarg
       ~ContactViewSet.name
+      ~ContactViewSet.ordering
+      ~ContactViewSet.ordering_fields
       ~ContactViewSet.paginator
       ~ContactViewSet.parser_classes
       ~ContactViewSet.permission_classes
