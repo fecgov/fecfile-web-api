@@ -2,6 +2,9 @@ from fecfiler.soft_delete.managers import SoftDeleteManager
 from fecfiler.transactions.schedule_a.managers import (
     over_two_hundred_types as schedule_a_over_two_hundred_types,
 )
+from fecfiler.transactions.schedule_b.managers import (
+    over_two_hundred_types as schedule_b_over_two_hundred_types,
+)
 from django.db.models.functions import Coalesce
 from django.db.models import OuterRef, Subquery, Sum, Q, Case, When, Value, BooleanField
 from decimal import Decimal
@@ -18,12 +21,10 @@ class TransactionManager(SoftDeleteManager):
             .get_queryset()
             .annotate(
                 action_date=Coalesce(
-                    "schedule_a__contribution_date",
-                    None,  # , "schedule_b__expenditure_date"
+                    "schedule_a__contribution_date", "schedule_b__expenditure_date",
                 ),
                 action_amount=Coalesce(
-                    "schedule_a__contribution_amount",
-                    None,  # , "schedule_b__expenditure_amount"
+                    "schedule_a__contribution_amount", "schedule_b__expenditure_amount",
                 ),
             )
         )
@@ -31,8 +32,7 @@ class TransactionManager(SoftDeleteManager):
         contact_clause = Q(contact_id=OuterRef("contact_id"))
         year_clause = Q(action_date__year=OuterRef("action_date__year"))
         date_clause = Q(action_date__lt=OuterRef("action_date")) | Q(
-            action_date=OuterRef("action_date"),
-            created__lte=OuterRef("created"),
+            action_date=OuterRef("action_date"), created__lte=OuterRef("created"),
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
 
@@ -49,7 +49,7 @@ class TransactionManager(SoftDeleteManager):
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types  # + schedule_b_over_two_hundred_types
+            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
             When(action_aggregate__lt=Value(Decimal(0)), then=Value(True)),

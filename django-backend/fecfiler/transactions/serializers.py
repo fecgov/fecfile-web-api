@@ -16,6 +16,7 @@ from rest_framework.serializers import (
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.transactions.schedule_b.models import ScheduleB
 
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,16 @@ class ScheduleASerializer(ModelSerializer):
             if f.name not in ["deleted", "transaction"]
         ]
         model = ScheduleA
+
+
+class ScheduleBSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleB._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleB
 
 
 class TransactionSerializerBase(
@@ -54,6 +65,7 @@ class TransactionSerializerBase(
     action_aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
+    schedule_b = ScheduleBSerializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
@@ -63,7 +75,8 @@ class TransactionSerializerBase(
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
-        schedule_a = representation.pop("schedule_a")
+        schedule_a = representation.pop("schedule_a") or []
+        schedule_b = representation.pop("schedule_b") or []
         if depth < 1:
             if instance.parent_transaction:
                 representation["parent_transaction"] = self.to_representation(
@@ -77,6 +90,9 @@ class TransactionSerializerBase(
         for property in schedule_a:
             if not representation.get(property):
                 representation[property] = schedule_a[property]
+        for property in schedule_b:
+            if not representation.get(property):
+                representation[property] = schedule_b[property]
         return representation
 
     def to_internal_value(self, data):
@@ -102,6 +118,7 @@ class TransactionSerializerBase(
                 "action_amount",
                 "action_aggregate",
                 "schedule_a",
+                "schedule_b",
             ]
 
         fields = get_fields()
