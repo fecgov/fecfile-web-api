@@ -26,7 +26,7 @@ class ScheduleBTransactionViewSet(TransactionViewSet):
                 ),
             ),
         )
-        .annotate(expenditure_aggregate=F("action_aggregate"))
+        .annotate(aggregate_amount=F("action_aggregate"))
     )
     serializer_class = ScheduleBTransactionSerializer
     ordering_fields = [
@@ -36,7 +36,7 @@ class ScheduleBTransactionViewSet(TransactionViewSet):
         "expenditure_date",
         "memo_code",
         "expenditure_amount",
-        "expenditure_aggregate",
+        "aggregate_amount",
     ]
 
     def create(self, request):
