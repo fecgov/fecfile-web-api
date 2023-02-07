@@ -12,4 +12,4 @@ RUN useradd nxgu --no-create-home --home /opt/nxg_fec && chown -R nxgu:nxgu /opt
 USER nxgu
 
 EXPOSE 8080
-ENTRYPOINT ["/bin/sh", "-c", "python wait_for_db.py && python manage.py migrate && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w 10 -t 200 --reload"]
+ENTRYPOINT ["/bin/sh", "-c", "python wait_for_db.py && python manage.py migrate && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w 10 --reload"]
