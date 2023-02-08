@@ -51,6 +51,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "id",
         "transaction_type_identifier",
         "memo_code",
+        "name",
+        "date",
+        "amount",
+        "aggregate",
     ]
     ordering = ["-created"]
 
