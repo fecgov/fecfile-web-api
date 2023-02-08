@@ -30,9 +30,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MockCommitteeDetail',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False,
+                 primary_key=True, serialize=False, unique=True)),
                 ('affiliated_committee_name', models.TextField(blank=True, null=True)),
-                ('candidate_ids', django.contrib.postgres.fields.ArrayField(base_field=models.TextField(), blank=True, null=True, size=None)),
+                ('candidate_ids', django.contrib.postgres.fields.ArrayField(
+                    base_field=models.TextField(), blank=True, null=True, size=None)),
                 ('city', models.TextField(blank=True, null=True)),
                 ('committee_id', models.TextField(unique=True)),
                 ('committee_type', models.TextField(blank=True, null=True)),
@@ -50,7 +52,8 @@ class Migration(migrations.Migration):
                 ('custodian_street_1', models.TextField(blank=True, null=True)),
                 ('custodian_street_2', models.TextField(blank=True, null=True)),
                 ('custodian_zip', models.TextField(blank=True, null=True)),
-                ('cycles', django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), blank=True, null=True, size=None)),
+                ('cycles', django.contrib.postgres.fields.ArrayField(
+                    base_field=models.IntegerField(), blank=True, null=True, size=None)),
                 ('designation', models.TextField(blank=True, null=True)),
                 ('designation_full', models.TextField(blank=True, null=True)),
                 ('email', models.TextField(blank=True, null=True)),
