@@ -60,9 +60,9 @@ class TransactionSerializerBase(
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
     itemized = BooleanField(read_only=True)
-    action_date = DateField(read_only=True)
-    action_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    action_aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    date = DateField(read_only=True)
+    amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -87,12 +87,17 @@ class TransactionSerializerBase(
                 representation["children"] = [
                     self.to_representation(child, depth + 1) for child in children
                 ]
-        for property in schedule_a:
-            if not representation.get(property):
-                representation[property] = schedule_a[property]
-        for property in schedule_b:
-            if not representation.get(property):
-                representation[property] = schedule_b[property]
+
+        if schedule_a:
+            representation["contribution_aggregate"] = representation.get("aggregate")
+            for property in schedule_a:
+                if not representation.get(property):
+                    representation[property] = schedule_a[property]
+        if schedule_b:
+            representation["aggregate_amount"] = representation.get("aggregate")
+            for property in schedule_b:
+                if not representation.get(property):
+                    representation[property] = schedule_b[property]
         return representation
 
     def to_internal_value(self, data):
@@ -114,9 +119,9 @@ class TransactionSerializerBase(
                 "itemized",
                 "fields_to_validate",
                 "schema_name",
-                "action_date",
-                "action_amount",
-                "action_aggregate",
+                "date",
+                "amount",
+                "aggregate",
                 "schedule_a",
                 "schedule_b",
             ]

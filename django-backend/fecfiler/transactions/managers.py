@@ -20,30 +20,33 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
-                action_date=Coalesce(
-                    "schedule_a__contribution_date", "schedule_b__expenditure_date",
+                date=Coalesce(
+                    "schedule_a__contribution_date",
+                    "schedule_b__expenditure_date",
                 ),
-                action_amount=Coalesce(
-                    "schedule_a__contribution_amount", "schedule_b__expenditure_amount",
+                amount=Coalesce(
+                    "schedule_a__contribution_amount",
+                    "schedule_b__expenditure_amount",
                 ),
             )
         )
 
         contact_clause = Q(contact_id=OuterRef("contact_id"))
-        year_clause = Q(action_date__year=OuterRef("action_date__year"))
-        date_clause = Q(action_date__lt=OuterRef("action_date")) | Q(
-            action_date=OuterRef("action_date"), created__lte=OuterRef("created"),
+        year_clause = Q(date__year=OuterRef("date__year"))
+        date_clause = Q(date__lt=OuterRef("date")) | Q(
+            date=OuterRef("date"),
+            created__lte=OuterRef("created"),
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
 
         aggregate_clause = (
             queryset.filter(contact_clause, year_clause, date_clause, group_clause)
             .values("committee_account_id")
-            .annotate(aggregate=Sum("action_amount"))
+            .annotate(aggregate=Sum("amount"))
             .values("aggregate")
         )
         return queryset.annotate(
-            action_aggregate=Subquery(aggregate_clause),
+            aggregate=Subquery(aggregate_clause),
             itemized=self.get_itemization_clause(),
         )
 
@@ -52,10 +55,10 @@ class TransactionManager(SoftDeleteManager):
             schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
-            When(action_aggregate__lt=Value(Decimal(0)), then=Value(True)),
+            When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
-                then=Q(action_aggregate__gt=Value(Decimal(200))),
+                then=Q(aggregate__gt=Value(Decimal(200))),
             ),
             default=Value(True),
             output_field=BooleanField(),

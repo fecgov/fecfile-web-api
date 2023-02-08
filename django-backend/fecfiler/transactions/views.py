@@ -41,26 +41,26 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         while bieng in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
         contact_id = request.query_params.get("contact_id", None)
-        action_date = request.query_params.get("action_date", None)
+        date = request.query_params.get("date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
-        if not (contact_id and action_date):
+        if not (contact_id and date):
             return Response(
-                "Please provide contact_id and action_date in query params.",
+                "Please provide contact_id and date in query params.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        action_date = datetime.fromisoformat(action_date)
+        date = datetime.fromisoformat(date)
 
         previous_transaction = (
             self.get_queryset()
             .filter(
                 ~Q(id=transaction_id or None),
                 Q(contact_id=contact_id),
-                Q(action_date__year=action_date.year),
-                Q(action_date__lte=action_date),
+                Q(date__year=date.year),
+                Q(date__lte=date),
                 Q(aggregation_group=aggregation_group),
             )
-            .order_by("-action_date", "-created")
+            .order_by("-date", "-created")
             .first()
         )
 

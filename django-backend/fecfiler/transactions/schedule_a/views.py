@@ -14,8 +14,8 @@ class ScheduleATransactionViewSet(TransactionViewSet):
     queryset = (
         Transaction.objects.select_related("schedule_a")
         .alias(
-            contribution_amount=F("action_amount"),
-            contribution_date=F("action_date"),
+            contribution_amount=F("amount"),
+            contribution_date=F("date"),
             contributor_name=Coalesce(
                 "schedule_a__contributor_organization_name",
                 Concat(
@@ -26,7 +26,7 @@ class ScheduleATransactionViewSet(TransactionViewSet):
                 ),
             ),
         )
-        .annotate(contribution_aggregate=F("action_aggregate"))
+        .annotate(contribution_aggregate=F("aggregate"))
     )
     serializer_class = ScheduleATransactionSerializer
     ordering_fields = [
