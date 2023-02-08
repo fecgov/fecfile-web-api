@@ -5,7 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.fields import TextField
+from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
@@ -24,7 +26,24 @@ class TransactionViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
 
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects.all().alias(
+        name=Coalesce(
+            Coalesce(
+                "schedule_b__payee_organization_name",
+                "schedule_a__contributor_organization_name",
+            ),
+            Concat(
+                Coalesce(
+                    "schedule_b__payee_last_name", "schedule_a__contributor_last_name"
+                ),
+                Value(", "),
+                Coalesce(
+                    "schedule_b__payee_first_name", "schedule_a__contributor_first_name"
+                ),
+                output_field=TextField(),
+            ),
+        )
+    )
     serializer_class = TransactionSerializerBase
     filter_backends = [filters.OrderingFilter]
 
