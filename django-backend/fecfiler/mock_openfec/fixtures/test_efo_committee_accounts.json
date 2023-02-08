@@ -1,0 +1,26 @@
+[
+{
+    "model": "mock_openfec.mockcommitteedetail",
+    "pk": "7db86f42-a427-458c-a429-b114d014fc6a",
+    "fields": {
+        "committee_id": "C00100230",
+        "name": "TEST_COMMITTEE_NAME5"
+    }
+},
+{
+    "model": "mock_openfec.mockcommitteedetail",
+    "pk": "82161cef-d98e-4be5-94c2-38d9a7d0f5b4",
+    "fields": {
+        "committee_id": "C00100289",
+        "name": "TEST_COMMITTEE_NAME10"
+    }
+},
+{
+    "model": "mock_openfec.mockcommitteedetail",
+    "pk": "97d5857d-c4b5-4537-8b6c-79327d0927f7",
+    "fields": {
+        "committee_id": "C00100297",
+        "name": "TEST_COMMITTEE_NAME11"
+    }
+}
+]

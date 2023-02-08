@@ -34,6 +34,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.triage.urls")),
     re_path(BASE_V1_URL, include("fecfiler.authentication.urls")),
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.mock_openfec.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
 ]

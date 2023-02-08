@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "fecfiler.validation",
     "fecfiler.web_services",
     "fecfiler.triage",
+    "fecfiler.mock_openfec"
 ]
 
 MIDDLEWARE = [
