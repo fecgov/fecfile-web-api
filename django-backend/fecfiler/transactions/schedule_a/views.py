@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class ScheduleATransactionViewSet(TransactionViewSet):
     queryset = (
         Transaction.objects.select_related("schedule_a")
+        .filter(schedule_a__isnull=False)
         .alias(
             contribution_amount=F("amount"),
             contribution_date=F("date"),
