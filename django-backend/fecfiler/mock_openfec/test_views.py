@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from fecfiler.authentication.models import Account
-from ..views import MockCommitteeDetailViewSet, MockRecentFilingsViewSet
+from .views import MockCommitteeDetailViewSet, MockRecentFilingsViewSet
 from unittest.mock import Mock, patch
 
 

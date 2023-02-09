@@ -1,26 +1,74 @@
 [
-{
-    "model": "mock_openfec.mockcommitteedetail",
-    "pk": "7db86f42-a427-458c-a429-b114d014fc6a",
-    "fields": {
-        "committee_id": "C00100230",
-        "name": "TEST_COMMITTEE_NAME5"
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "11029f26-e854-48f2-ac83-9c1978c31708",
+        "fields": {
+            "committee_id": "C00100214",
+            "name": "TEST_COMMITTEE_NAME3"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "51ffcff4-61d7-4777-b3e0-87120f62c15d",
+        "fields": {
+            "committee_id": "C00100222",
+            "name": "TEST_COMMITTEE_NAME4"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "7db86f42-a427-458c-a429-b114d014fc6a",
+        "fields": {
+            "committee_id": "C00100230",
+            "name": "TEST_COMMITTEE_NAME5"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "745f4c27-5427-48af-9e6f-cd4060a74436",
+        "fields": {
+            "committee_id": "C00100248",
+            "name": "TEST_COMMITTEE_NAME6"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "f55ca9a1-388d-4b19-973c-843a0d3918e3",
+        "fields": {
+            "committee_id": "C00100255",
+            "name": "TEST_COMMITTEE_NAME7"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "65e35495-bf0b-4907-a852-e1e63dbe5421",
+        "fields": {
+            "committee_id": "C00100263",
+            "name": "TEST_COMMITTEE_NAME8"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "0163f78a-8ff2-49d7-a3f2-a170669cf503",
+        "fields": {
+            "committee_id": "C00100271",
+            "name": "TEST_COMMITTEE_NAME9"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "82161cef-d98e-4be5-94c2-38d9a7d0f5b4",
+        "fields": {
+            "committee_id": "C00100289",
+            "name": "TEST_COMMITTEE_NAME10"
+        }
+    },
+    {
+        "model": "mock_openfec.mockcommitteedetail",
+        "pk": "97d5857d-c4b5-4537-8b6c-79327d0927f7",
+        "fields": {
+            "committee_id": "C00100297",
+            "name": "TEST_COMMITTEE_NAME11"
+        }
     }
-},
-{
-    "model": "mock_openfec.mockcommitteedetail",
-    "pk": "82161cef-d98e-4be5-94c2-38d9a7d0f5b4",
-    "fields": {
-        "committee_id": "C00100289",
-        "name": "TEST_COMMITTEE_NAME10"
-    }
-},
-{
-    "model": "mock_openfec.mockcommitteedetail",
-    "pk": "97d5857d-c4b5-4537-8b6c-79327d0927f7",
-    "fields": {
-        "committee_id": "C00100297",
-        "name": "TEST_COMMITTEE_NAME11"
-    }
-}
 ]
