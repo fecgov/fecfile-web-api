@@ -71,7 +71,7 @@ INSTALLED_APPS = [
     "fecfiler.validation",
     "fecfiler.web_services",
     "fecfiler.triage",
-    "fecfiler.mock_openfec"
+    "fecfiler.openfec"
 ]
 
 MIDDLEWARE = [
@@ -255,3 +255,6 @@ AWS_REGION = env.get_credential("AWS_REGION")
 FEC_API = env.get_credential("FEC_API")
 FEC_API_KEY = env.get_credential("FEC_API_KEY")
 FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
+FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = env.get_credential(
+    "FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE"
+)
