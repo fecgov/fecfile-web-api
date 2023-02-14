@@ -26,7 +26,7 @@ class TransactionSerializerBaseTestCase(TestCase):
 
         self.assertEquals(
             serializer.get_schema_name(
-                {"transaction_type_identifier": "INDIVIDUAL_RECEIPT"}
+                {"schema_name": "INDIVIDUAL_RECEIPT"}
             ),
             "INDIVIDUAL_RECEIPT",
         )

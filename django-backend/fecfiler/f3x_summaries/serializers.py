@@ -54,6 +54,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
+                "transaction",
                 "dotfec",
                 "memotext",
                 "uploadsubmission",

@@ -9,6 +9,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import FEC_API_COMMITTEE_LOOKUP_ENDPOINT, FEC_API_KEY
 from rest_framework.decorators import action
+from rest_framework import filters
 
 from .models import Contact
 from .serializers import ContactSerializer
@@ -32,11 +33,30 @@ class ContactViewSet(CommitteeOwnedViewSet):
     The queryset will be further limmited by the user's committee
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
+
     queryset = (
-        Contact.objects.annotate(transaction_count=Count("scheduleatransaction"))
+        Contact.objects
+        .annotate(transaction_count=Count("transaction"))
+        .alias(sort_name=Concat(
+            "name",
+            "last_name",
+            Value(" "),
+            "first_name",
+            output_field=CharField())
+        )
         .all()
-        .order_by("-created")
     )
+    filter_backends = [filters.OrderingFilter]
+
+    ordering_fields = [
+        "sort_name",
+        "first_name",
+        "type",
+        "employer",
+        "occupation",
+        "id",
+    ]
+    ordering = ["-created"]
 
     @action(detail=False)
     def committee_lookup(self, request):

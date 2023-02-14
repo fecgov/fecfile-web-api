@@ -1,13 +1,21 @@
 [
     {
         "comment": "SA15 transaction to count",
-        "model": "transactions.scheduleatransaction",
+        "model": "transactions.schedulea",
         "fields": {
             "id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+            "contribution_amount": 1234.56
+        }
+    },
+    {
+        "comment": "SA15 transaction to count",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+            "schedule_a_id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "form_type": "SA15",
-            "contribution_amount": 1234.56,
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -16,13 +24,21 @@
     },
     {
         "comment": "SA15 transaction to count",
-        "model": "transactions.scheduleatransaction",
+        "model": "transactions.schedulea",
         "fields": {
             "id": "0da3bad2-54ec-4a90-a37c-13ce4ec4e253",
+            "contribution_amount": 891.23
+        }
+    },
+    {
+        "comment": "SA15 transaction to count",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "0da3bad2-54ec-4a90-a37c-13ce4ec4e253",
+            "schedule_a_id": "0da3bad2-54ec-4a90-a37c-13ce4ec4e253",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "form_type": "SA15",
-            "contribution_amount": 891.23,
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -31,13 +47,21 @@
     },
     {
         "comment": "SA15 transaction to NOT count",
-        "model": "transactions.scheduleatransaction",
+        "model": "transactions.schedulea",
         "fields": {
             "id": "7e5df0bc-fe32-4639-8426-b31bd23c3de7",
+            "contribution_amount": 10000.23
+        }
+    },
+    {
+        "comment": "SA15 transaction to NOT count",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "7e5df0bc-fe32-4639-8426-b31bd23c3de7",
+            "schedule_a_id": "7e5df0bc-fe32-4639-8426-b31bd23c3de7",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "form_type": "SA15",
-            "contribution_amount": 10000.23,
             "memo_code": true,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -46,13 +70,21 @@
     },
     {
         "comment": "SA11AI transaction to NOT count with SA15",
-        "model": "transactions.scheduleatransaction",
+        "model": "transactions.schedulea",
         "fields": {
             "id": "f431efe8-9b5f-4539-b7e5-5ae3c32b4e28",
+            "contribution_amount": 10000.23
+        }
+    },
+    {
+        "comment": "SA11AI transaction to NOT count with SA15",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "f431efe8-9b5f-4539-b7e5-5ae3c32b4e28",
+            "schedule_a_id": "f431efe8-9b5f-4539-b7e5-5ae3c32b4e28",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "form_type": "SA11AI",
-            "contribution_amount": 10000.23,
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",

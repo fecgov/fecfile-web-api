@@ -3,8 +3,7 @@ from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
 from .models import SchATransaction
-from .serializers import (SchATransactionParentSerializer,
-                          SchATransactionSerializer)
+from .serializers import SchATransactionParentSerializer, SchATransactionSerializer
 
 
 class SchATransactionTestCase(TestCase):
@@ -12,7 +11,7 @@ class SchATransactionTestCase(TestCase):
         "test_committee_accounts",
         "test_f3x_summaries",
         "test_contacts",
-        "test_memo_text"
+        "test_memo_text",
     ]
 
     def setUp(self):
@@ -28,7 +27,7 @@ class SchATransactionTestCase(TestCase):
             "country": "Country",
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
         }
 
         self.memo_text = {
@@ -62,6 +61,7 @@ class SchATransactionTestCase(TestCase):
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
             "contact": self.test_contact.copy(),
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.invalid_scha_transaction = {
@@ -74,6 +74,7 @@ class SchATransactionTestCase(TestCase):
             "contact": self.test_contact.copy(),
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.missing_type_transaction = {
@@ -85,6 +86,7 @@ class SchATransactionTestCase(TestCase):
             "contact": self.test_contact.copy(),
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "INDIVIDUAL_RECEIPT",
         }
 
         self.mock_request = Request(HttpRequest())
@@ -94,11 +96,13 @@ class SchATransactionTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_serializer = SchATransactionSerializer(
-            data=self.valid_scha_transaction, context={"request": self.mock_request},
+            data=self.valid_scha_transaction,
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = SchATransactionSerializer(
-            data=self.invalid_scha_transaction, context={"request": self.mock_request},
+            data=self.invalid_scha_transaction,
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -107,7 +111,8 @@ class SchATransactionTestCase(TestCase):
     def test_no_transaction_type_identifier(self):
 
         missing_type_serializer = SchATransactionSerializer(
-            data=self.missing_type_transaction, context={"request": self.mock_request},
+            data=self.missing_type_transaction,
+            context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(
@@ -117,16 +122,19 @@ class SchATransactionTestCase(TestCase):
     def test_parent(self):
         parent = self.valid_scha_transaction.copy()
         parent["transaction_type_identifier"] = "EARMARK_RECEIPT"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["contribution_purpose_descrip"] = "test"
         child = self.valid_scha_transaction.copy()
         child["transaction_type_identifier"] = "EARMARK_MEMO"
+        child["schema_name"] = "EARMARK_MEMO"
         child["contribution_purpose_descrip"] = "test"
         child["back_reference_sched_name"] = "test"
         child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = SchATransactionParentSerializer(
-            data=parent, context={"request": self.mock_request},
+            data=parent,
+            context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
@@ -139,8 +147,10 @@ class SchATransactionTestCase(TestCase):
         parent = parent_instance.__dict__.copy()
         child = children[0].__dict__.copy()
         parent["contribution_purpose_descrip"] = "updated parent"
+        parent["schema_name"] = "EARMARK_RECEIPT"
         parent["memo_text"] = self.memo_text
         child["contribution_purpose_descrip"] = "updated child"
+        child["schema_name"] = "EARMARK_MEMO"
         child["memo_text"] = self.memo_text
         parent["children"] = [child]
         parent["contact"] = self.test_contact.copy()

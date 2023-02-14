@@ -1,9 +1,9 @@
 from fecfiler.memo_text.models import MemoText
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.transactions.schedule_a.models import ScheduleATransaction
+from fecfiler.transactions.models import Transaction
 from django.core.exceptions import ObjectDoesNotExist
-from .dot_fec_serializer import serialize_header, serialize_model_instance, CRLF_STR
+from .dot_fec_serializer import serialize_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE
 
 import logging
@@ -31,9 +31,7 @@ def compose_f3x_summary(report_id, upload_submission_record_id):
 
 
 def compose_transactions(report_id):
-    transactions = ScheduleATransaction.objects.filter(
-        report_id=report_id, itemized=True
-    )
+    transactions = Transaction.objects.filter(report_id=report_id, itemized=True)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
@@ -64,17 +62,30 @@ def compose_report_level_memos(report_id):
         return []
 
 
+class Header:
+    def __init__(
+        self,
+        record_type,
+        ef_type,
+        fec_version,
+        soft_name,
+        soft_ver,
+        rpt_id=None,
+        rpt_number=None,
+        hdrcomment=None,
+    ):
+        self.record_type = record_type
+        self.ef_type = ef_type
+        self.fec_version = fec_version
+        self.soft_name = soft_name
+        self.soft_ver = soft_ver
+        self.rpt_id = rpt_id
+        self.rpt_number = rpt_number
+        self.hdrcomment = hdrcomment
+
+
 def compose_header():
-    return {
-        "record_type": "HDR",
-        "ef_type": "FEC",
-        "fec_version": "8.4",
-        "soft_name": "FECFile Online",
-        "soft_ver": "0.0.1",
-        "rpt_id": None,
-        "rpt_number": None,
-        "hdrcomment": None,
-    }
+    return Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
 
 def add_row_to_content(content, row):
@@ -90,22 +101,20 @@ def compose_dot_fec(report_id, upload_submission_record_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
         header = compose_header()
-        header_row = serialize_header(header)
+        header_row = serialize_instance("HDR", header)
         logger.debug("Serialized HDR:")
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
         f3x_summary = compose_f3x_summary(report_id, upload_submission_record_id)
-        f3x_summary_row = serialize_model_instance("F3X", F3XSummary, f3x_summary)
+        f3x_summary_row = serialize_instance("F3X", f3x_summary)
         logger.debug("Serialized Report Summary:")
         logger.debug(f3x_summary_row)
         file_content = add_row_to_content(file_content, f3x_summary_row)
 
         transactions = compose_transactions(report_id)
         for transaction in transactions:
-            serialized_transaction = serialize_model_instance(
-                "SchA", ScheduleATransaction, transaction
-            )
+            serialized_transaction = serialize_instance("SchA", transaction)
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
             file_content = add_row_to_content(file_content, serialized_transaction)
@@ -113,15 +122,14 @@ def compose_dot_fec(report_id, upload_submission_record_id):
                 memo = transaction.memo_text
                 memo.back_reference_tran_id_number = transaction.transaction_id
                 memo.back_reference_sched_name = transaction.form_type
-                serialized_memo = serialize_model_instance("Text", MemoText, memo)
+                serialized_memo = serialize_instance("Text", memo)
                 logger.debug("Serialized Memo:")
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
         report_level_memos = compose_report_level_memos(report_id)
         report_level_memo_rows = [
-            serialize_model_instance("Text", MemoText, memo)
-            for memo in report_level_memos
+            serialize_instance("Text", memo) for memo in report_level_memos
         ]
         for memo in report_level_memo_rows:
             logger.debug("Serialized Report Level Memo:")

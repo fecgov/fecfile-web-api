@@ -1,7 +1,8 @@
-from django.db import models
-from django.core.exceptions import FieldDoesNotExist
 from fecfile_validate import validate
+from fecfiler.settings import BASE_DIR
 from curses import ascii
+import os
+import json
 
 import logging
 
@@ -10,31 +11,33 @@ logger = logging.getLogger(__name__)
 CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
 
 
-def boolean_serializer(model_instance, field_name):
-    return "X" if getattr(model_instance, field_name, None) else ""
+def get_value_from_path(object, path):
+    split_path = path if isinstance(path, list) else path.split(".")
+    value = getattr(object, split_path[0], None)
+    if len(split_path) > 1:
+        return get_value_from_path(
+            value,
+            split_path[1:],
+        )
+    return value
 
 
-def date_serializer(model_instance, field_name):
-    date = getattr(model_instance, field_name, None)
+def boolean_serializer(model_instance, field_name, mapping):
+    value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
+    return "X" if value else ""
+
+
+def date_serializer(model_instance, field_name, mapping):
+    date = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return date.strftime("%Y%m%d") if date else ""
 
 
-def foreign_key_serializer(model_instance, field_name):
-    """returns value of foreign key rather than the object it points to
-    For example: we have a foreign key for `report_code`.  django stores the key
-    in `report_code_id` and joins the `report_code_label` row into `report_code`.
-    Because we just want to write the key ("Q1" or something) we have to add "_id"
-    to the field name.
-    """
-    return getattr(model_instance, field_name + "_id") or ""
-
-
-def default_serializer(model_instance, field_name):
+def default_serializer(model_instance, field_name, mapping):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
     "None", thus the falsy condition
     """
-    value = getattr(model_instance, field_name)
+    value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return str(value) if value else ""
 
 
@@ -43,52 +46,64 @@ Pass the model instance and field name into the serializer to
 get a string representation in the FEC standard
 """
 FIELD_SERIALIZERS = {
-    models.BooleanField: boolean_serializer,
-    models.DateField: date_serializer,
-    models.ForeignKey: foreign_key_serializer,
+    "BOOLEAN": boolean_serializer,
+    "DATE": date_serializer,
     None: default_serializer,
 }
 
 
-def serialize_field(model, model_instance, field_name):
+def serialize_field(instance, field_name, field_mappings):
     """Serialize field to string in FEC standard
     Args:
-        model (class): Django model class that `model_instance` is an
-        instance of.  We retrieve the field type from this model to determine
-        which serializer to use.
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.  In some cases when serializing a field we need to reference
         another field in the `model_instance`, so we pass it to the serializer.
         field_name (str): name of field to serialize
+        field_mappings: mapping of field to how-to-access it, including special
+        serializers to use
     """
-    try:
-        field = model._meta.get_field(field_name)
-    except FieldDoesNotExist:
-        field = model.get_virtual_field(field_name)
-    serializer = FIELD_SERIALIZERS.get(type(field), FIELD_SERIALIZERS[None])
-    return serializer(model_instance, field_name)
+    mapping = field_mappings[field_name]
+    serializer_type = mapping.get("serializer", None)
+    serializer = FIELD_SERIALIZERS[serializer_type]
+    return serializer(instance, field_name, mapping)
 
 
-def serialize_model_instance(schema_name, model, model_instance):
+def serialize_instance(schema_name, instance):
     """Serialize model instance into row of FEC standard
     Args:
         schema_name (str): name of schema. the schema informas column layout
-        model (class): Django model class that `model_instance` is an
-        instance of.  We retrieve the field type from this model to determine
-        which serializer to use for each field.
         model_instance (django.db.models.Model): Instance of `model` that contains
         field to serialize.
     """
     column_sequences, row_length = extract_row_config(schema_name)
-    """NOTE: column_index + 1 because FEC schemas define column sequences
-    starting at 1"""
+    field_mappings = get_field_mappings(schema_name)
     row = [
-        serialize_field(model, model_instance, column_sequences[column_index + 1])
+        serialize_field(instance, column_sequences[column_index + 1], field_mappings)
         if (column_index + 1) in column_sequences
         else ""
         for column_index in range(0, row_length)
     ]
     return chr(ascii.FS).join(row)
+
+
+def get_field_mappings(schema_name):
+    """Return field mappings as JSON object.
+    Field Mappings map fields in a schema to a way of accessing them
+    in the django instance
+
+    Args:
+        schema_name (str): name of schema to retrieve file for
+
+    Returns:
+        dict: JSON schema that matches the schema_name"""
+    mapping_file = f"{schema_name}.json"
+    mapping_path = os.path.join(
+        BASE_DIR, "web_services/dot_fec/schema_fields/", mapping_file
+    )
+    with open(mapping_path) as fp:
+        field_mappings = json.load(fp)
+
+    return field_mappings
 
 
 def extract_row_config(schema_name):
@@ -99,15 +114,3 @@ def extract_row_config(schema_name):
     }
     row_length = max(column_sequences.keys())
     return column_sequences, row_length
-
-
-def serialize_header(header):
-    column_sequences, row_length = extract_row_config("HDR")
-    row = [
-        str(header[column_sequences[column_index + 1]])
-        if (column_index + 1) in column_sequences
-        and header[column_sequences[column_index + 1]]
-        else ""
-        for column_index in range(0, row_length)
-    ]
-    return chr(ascii.FS).join(row)

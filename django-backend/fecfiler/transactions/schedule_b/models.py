@@ -1,9 +1,15 @@
-from fecfiler.transactions.models import Transaction
 from django.db import models
+import uuid
 
 
-class ScheduleBTransaction(Transaction):
-
+class ScheduleB(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
     payee_organization_name = models.TextField(null=True, blank=True)
     payee_last_name = models.TextField(null=True, blank=True)
     payee_first_name = models.TextField(null=True, blank=True)
@@ -50,15 +56,6 @@ class ScheduleBTransaction(Transaction):
     reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
         null=True, blank=True
     )
-
-    @staticmethod
-    def get_virtual_field(field_name):
-        virtual_fields = {
-            "semi_annual_refunded_bundled": models.DecimalField(
-                max_digits=11, decimal_places=2
-            )
-        }
-        return virtual_fields[field_name]
 
     class Meta:
         app_label = "transactions"

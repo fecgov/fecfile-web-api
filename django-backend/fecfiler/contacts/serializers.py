@@ -42,6 +42,7 @@ class ContactSerializer(
                 "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
+                "transaction",
             ]
         ]
         fields.append("transaction_count")
@@ -54,7 +55,7 @@ class ContactSerializer(
         ]
 
     def to_internal_value(self, data):
-        # Remove the transactin_count because it is an annotated field
+        # Remove the transaction_count because it is an annotated field
         # delivered to the front end.
         if "transaction_count" in data:
             del data["transaction_count"]

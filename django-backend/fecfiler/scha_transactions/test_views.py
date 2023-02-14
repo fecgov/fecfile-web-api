@@ -69,6 +69,7 @@ class SchATransactionsViewTest(TestCase):
             "back_reference_sched_form_name": "",
         },
         "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+        "schema_name": "OTHER_RECEIPT",
     }
 
     def setUp(self):
@@ -244,6 +245,7 @@ class SchATransactionsViewTest(TestCase):
             "contact_id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "OTHER_RECEIPT",
         }
         response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)
@@ -283,6 +285,7 @@ class SchATransactionsViewTest(TestCase):
             "contact_id": "5720a518-6486-4062-944f-aa0c4cbe4073",
             "memo_text": self.memo_text,
             "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
+            "schema_name": "OTHER_RECEIPT",
         }
         response = client.post(self.test_endpoint, data, format="json")
         self.assertEqual(response.status_code, 201)

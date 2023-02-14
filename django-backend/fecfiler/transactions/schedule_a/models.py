@@ -1,10 +1,15 @@
-from fecfiler.transactions.models import Transaction
 from django.db import models
-from .managers import ScheduleATransactionManager
+import uuid
 
 
-class ScheduleATransaction(Transaction):
-
+class ScheduleA(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
     contributor_organization_name = models.TextField(null=True, blank=True)
     contributor_last_name = models.TextField(null=True, blank=True)
     contributor_first_name = models.TextField(null=True, blank=True)
@@ -51,16 +56,12 @@ class ScheduleATransaction(Transaction):
         null=True, blank=True
     )
 
-    @staticmethod
-    def get_virtual_field(field_name):
-        virtual_fields = {
-            "contribution_aggregate": models.DecimalField(
-                max_digits=11, decimal_places=2
-            )
-        }
-        return virtual_fields[field_name]
+    class Meta:
+        app_label = "transactions"
 
-    objects = ScheduleATransactionManager()
+
+class ScheduleATransaction(models.Model):
+    """stub class until we can figure out how to make migrations run without old models"""
 
     class Meta:
         app_label = "transactions"
