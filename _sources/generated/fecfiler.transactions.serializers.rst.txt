@@ -23,6 +23,7 @@ fecfiler.transactions.serializers
       :template: custom-class-template.rst               
    
       ScheduleASerializer
+      ScheduleBSerializer
       TransactionSerializerBase
    
    
