@@ -20,9 +20,7 @@ def get_model_data(data, model):
 
 class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
 
-    expenditure_aggregate = DecimalField(
-        max_digits=11, decimal_places=2, read_only=True
-    )
+    aggregate_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     parent_transaction = TransactionSerializerBase(
         allow_null=True, required=False, read_only="True"
     )
@@ -36,10 +34,10 @@ class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
         return internal
 
     def validate(self, data):
-        """Adds stub expenditure_aggregate to pass validation"""
-        data["expenditure_aggregate"] = 0
+        """Adds stub aggregate_amount to pass validation"""
+        data["aggregate_amount"] = 0
         validated_data = super().validate(data)
-        del validated_data["expenditure_aggregate"]
+        del validated_data["aggregate_amount"]
         return validated_data
 
     class Meta(TransactionSerializerBase.Meta):
@@ -50,7 +48,7 @@ class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
                 for f in ScheduleB._meta.get_fields()
                 if f.name not in ["transaction"]
             ]
-            + ["expenditure_aggregate"]
+            + ["aggregate_amount"]
         )
 
     payee_organization_name = CharField(required=False, allow_null=True)
@@ -152,5 +150,5 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
                 for f in ScheduleB._meta.get_fields()
                 if f.name not in ["transaction"]
             ]
-            + ["expenditure_aggregate", "children"]
+            + ["aggregate_amount", "children"]
         )
