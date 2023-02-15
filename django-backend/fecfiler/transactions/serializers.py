@@ -16,6 +16,7 @@ from rest_framework.serializers import (
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.transactions.schedule_b.models import ScheduleB
 
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,16 @@ class ScheduleASerializer(ModelSerializer):
         model = ScheduleA
 
 
+class ScheduleBSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleB._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleB
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -49,11 +60,12 @@ class TransactionSerializerBase(
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
     itemized = BooleanField(read_only=True)
-    action_date = DateField(read_only=True)
-    action_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    action_aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    date = DateField(read_only=True)
+    amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
+    schedule_b = ScheduleBSerializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
@@ -63,7 +75,8 @@ class TransactionSerializerBase(
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
-        schedule_a = representation.pop("schedule_a")
+        schedule_a = representation.pop("schedule_a") or []
+        schedule_b = representation.pop("schedule_b") or []
         if depth < 1:
             if instance.parent_transaction:
                 representation["parent_transaction"] = self.to_representation(
@@ -74,9 +87,17 @@ class TransactionSerializerBase(
                 representation["children"] = [
                     self.to_representation(child, depth + 1) for child in children
                 ]
-        for property in schedule_a:
-            if not representation.get(property):
-                representation[property] = schedule_a[property]
+
+        if schedule_a:
+            representation["contribution_aggregate"] = representation.get("aggregate")
+            for property in schedule_a:
+                if not representation.get(property):
+                    representation[property] = schedule_a[property]
+        if schedule_b:
+            representation["aggregate_amount"] = representation.get("aggregate")
+            for property in schedule_b:
+                if not representation.get(property):
+                    representation[property] = schedule_b[property]
         return representation
 
     def to_internal_value(self, data):
@@ -98,10 +119,11 @@ class TransactionSerializerBase(
                 "itemized",
                 "fields_to_validate",
                 "schema_name",
-                "action_date",
-                "action_amount",
-                "action_aggregate",
+                "date",
+                "amount",
+                "aggregate",
                 "schedule_a",
+                "schedule_b",
             ]
 
         fields = get_fields()
