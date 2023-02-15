@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 class ScheduleBTransactionViewSet(TransactionViewSet):
     queryset = (
         Transaction.objects.select_related("schedule_b")
+        .filter(schedule_b__isnull=False)
         .alias(
-            expenditure_amount=F("action_amount"),
-            expenditure_date=F("action_date"),
+            expenditure_amount=F("amount"),
+            expenditure_date=F("date"),
             payee_name=Coalesce(
                 "schedule_b__payee_organization_name",
                 Concat(
@@ -26,7 +27,7 @@ class ScheduleBTransactionViewSet(TransactionViewSet):
                 ),
             ),
         )
-        .annotate(expenditure_aggregate=F("action_aggregate"))
+        .annotate(aggregate_amount=F("aggregate"))
     )
     serializer_class = ScheduleBTransactionSerializer
     ordering_fields = [
@@ -36,7 +37,7 @@ class ScheduleBTransactionViewSet(TransactionViewSet):
         "expenditure_date",
         "memo_code",
         "expenditure_amount",
-        "expenditure_aggregate",
+        "aggregate_amount",
     ]
 
     def create(self, request):

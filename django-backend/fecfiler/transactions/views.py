@@ -5,7 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.fields import TextField
+from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
@@ -24,7 +26,24 @@ class TransactionViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
 
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects.all().alias(
+        name=Coalesce(
+            Coalesce(
+                "schedule_b__payee_organization_name",
+                "schedule_a__contributor_organization_name",
+            ),
+            Concat(
+                Coalesce(
+                    "schedule_b__payee_last_name", "schedule_a__contributor_last_name"
+                ),
+                Value(", "),
+                Coalesce(
+                    "schedule_b__payee_first_name", "schedule_a__contributor_first_name"
+                ),
+                output_field=TextField(),
+            ),
+        )
+    )
     serializer_class = TransactionSerializerBase
     filter_backends = [filters.OrderingFilter]
 
@@ -32,6 +51,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "id",
         "transaction_type_identifier",
         "memo_code",
+        "name",
+        "date",
+        "amount",
+        "aggregate",
     ]
     ordering = ["-created"]
 
@@ -41,26 +64,26 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         while bieng in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
         contact_id = request.query_params.get("contact_id", None)
-        action_date = request.query_params.get("action_date", None)
+        date = request.query_params.get("date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
-        if not (contact_id and action_date):
+        if not (contact_id and date):
             return Response(
-                "Please provide contact_id and action_date in query params.",
+                "Please provide contact_id and date in query params.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        action_date = datetime.fromisoformat(action_date)
+        date = datetime.fromisoformat(date)
 
         previous_transaction = (
             self.get_queryset()
             .filter(
                 ~Q(id=transaction_id or None),
                 Q(contact_id=contact_id),
-                Q(action_date__year=action_date.year),
-                Q(action_date__lte=action_date),
+                Q(date__year=date.year),
+                Q(date__lte=date),
                 Q(aggregation_group=aggregation_group),
             )
-            .order_by("-action_date", "-created")
+            .order_by("-date", "-created")
             .first()
         )
 
