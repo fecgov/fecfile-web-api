@@ -8,6 +8,8 @@ from fecfiler.transactions.schedule_b.managers import (
 from django.db.models.functions import Coalesce
 from django.db.models import OuterRef, Subquery, Sum, Q, Case, When, Value, BooleanField
 from decimal import Decimal
+from enum import Enum
+from django.db.models import Value as V
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -20,6 +22,10 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
+                schedule=Case(
+                    When(schedule_a__isnull=False, then=Schedule.A.value),
+                    When(schedule_b__isnull=False, then=Schedule.B.value),
+                ),
                 date=Coalesce(
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
@@ -48,7 +54,7 @@ class TransactionManager(SoftDeleteManager):
         return queryset.annotate(
             aggregate=Subquery(aggregate_clause),
             itemized=self.get_itemization_clause(),
-        )
+        ).order_by("schedule", "form_type", "created")
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
@@ -63,3 +69,9 @@ class TransactionManager(SoftDeleteManager):
             default=Value(True),
             output_field=BooleanField(),
         )
+
+
+class Schedule(Enum):
+    A = V("A")
+    B = V("B")
+    C = V("C")

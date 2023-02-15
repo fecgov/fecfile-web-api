@@ -1,0 +1,190 @@
+[
+    {
+        "model": "contacts.contact",
+        "pk": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "type": "IND",
+            "last_name": "2",
+            "first_name": "2",
+            "street_1": "2",
+            "city": "2",
+            "state": "AL",
+            "zip": "2",
+            "employer": "2",
+            "occupation": "2",
+            "country": "USA",
+            "created": "2023-02-15T13:34:58.927Z",
+            "updated": "2023-02-15T13:34:58.927Z"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "type": "IND",
+            "last_name": "1",
+            "first_name": "1",
+            "street_1": "1",
+            "city": "1",
+            "state": "AL",
+            "zip": "1",
+            "employer": "1",
+            "occupation": "1",
+            "country": "USA",
+            "created": "2023-02-13T21:39:44.579Z",
+            "updated": "2023-02-13T21:39:44.579Z"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "type": "ORG",
+            "name": "o",
+            "street_1": "o",
+            "city": "o",
+            "state": "AL",
+            "zip": "o",
+            "country": "USA",
+            "created": "2023-02-15T13:41:38.382Z",
+            "updated": "2023-02-15T13:41:38.382Z"
+        }
+    },
+    {
+        "model": "transactions.schedulea",
+        "pk": "040db72d-47b0-4357-abc2-023ff47d6b60",
+        "fields": {
+            "contributor_last_name": "1",
+            "contributor_first_name": "1",
+            "contributor_street_1": "1",
+            "contributor_city": "1",
+            "contributor_state": "AL",
+            "contributor_zip": "1",
+            "contribution_date": "2023-02-15",
+            "contribution_amount": "2222.00",
+            "contributor_employer": "1",
+            "contributor_occupation": "1"
+        }
+    },
+    {
+        "model": "transactions.schedulea",
+        "pk": "369e9fa2-3274-47d8-9388-7294a3fdda79",
+        "fields": {
+            "contributor_last_name": "2",
+            "contributor_first_name": "2",
+            "contributor_street_1": "2",
+            "contributor_city": "2",
+            "contributor_state": "AL",
+            "contributor_zip": "2",
+            "contribution_date": "2023-02-15",
+            "contribution_amount": "3333.00",
+            "contributor_employer": "2",
+            "contributor_occupation": "2"
+        }
+    },
+    {
+        "model": "transactions.schedulea",
+        "pk": "59919889-4175-4bb1-b8ef-e7fc711fca17",
+        "fields": {
+            "contributor_last_name": "1",
+            "contributor_first_name": "1",
+            "contributor_street_1": "1",
+            "contributor_city": "1",
+            "contributor_state": "AL",
+            "contributor_zip": "1",
+            "contribution_date": "2023-02-15",
+            "contribution_amount": "4444.00",
+            "contributor_employer": "1",
+            "contributor_occupation": "1"
+        }
+    },
+    {
+        "model": "transactions.scheduleb",
+        "pk": "40fd8084-79a6-41ab-94ca-5418a7b9370f",
+        "fields": {
+            "payee_organization_name": "o",
+            "payee_street_1": "o",
+            "payee_city": "o",
+            "payee_state": "AL",
+            "payee_zip": "o",
+            "expenditure_date": "2023-02-15",
+            "expenditure_amount": "1111.00",
+            "expenditure_purpose_descrip": "asdf"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "08b51835-9dbe-46dd-991a-884c704a8b5a",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "transaction_type_identifier": "OPERATING_EXPENDITURE",
+            "aggregation_group": "GENERAL_DISBURSEMENT",
+            "form_type": "SB21b",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "7BB494D6212F24577209",
+            "entity_type": "ORG",
+            "created": "2023-02-15T01:00:00.000Z",
+            "updated": "2023-02-15T01:00:00.000Z",
+            "contact": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
+            "schedule_b": "40fd8084-79a6-41ab-94ca-5418a7b9370f"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "daf9f7da-294d-49f1-bdd8-084297ac3c77",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "transaction_type_identifier": "OTHER_RECEIPT",
+            "aggregation_group": "OTHER_RECEIPTS",
+            "form_type": "SA17",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "99BB870CC34FFBCD4402",
+            "entity_type": "IND",
+            "created": "2023-02-15T02:00:00.000Z",
+            "updated": "2023-02-15T02:00:00.000Z",
+            "contact": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
+            "schedule_a": "040db72d-47b0-4357-abc2-023ff47d6b60"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "ece72317-1596-4ef1-a1aa-c4386b8d4f1c",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+            "aggregation_group": "GENERAL",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "CF74ABC4934C931EEFED",
+            "entity_type": "IND",
+            "created": "2023-02-15T03:00:00.000Z",
+            "updated": "2023-02-15T03:00:00.000Z",
+            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "schedule_a": "369e9fa2-3274-47d8-9388-7294a3fdda79"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "6fedede3-8727-495f-8106-3f971408bc94",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+            "aggregation_group": "GENERAL",
+            "form_type": "SA11AI",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "4684809BEC793A557596",
+            "entity_type": "IND",
+            "created": "2023-02-01T04:00:00.000Z",
+            "updated": "2023-02-01T04:00:00.000Z",
+            "contact": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
+            "schedule_a": "59919889-4175-4bb1-b8ef-e7fc711fca17"
+        }
+    }
+]

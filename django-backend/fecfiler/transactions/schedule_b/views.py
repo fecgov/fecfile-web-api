@@ -4,6 +4,7 @@ from django.db.models.functions import Coalesce, Concat
 from .serializers import ScheduleBTransactionSerializer
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.managers import Schedule
 from django.db.models import TextField, Value, F
 from rest_framework.viewsets import ModelViewSet
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 class ScheduleBTransactionViewSet(TransactionViewSet):
     queryset = (
         Transaction.objects.select_related("schedule_b")
-        .filter(schedule_b__isnull=False)
+        .filter(schedule=Schedule.B.value)
         .alias(
             expenditure_amount=F("amount"),
             expenditure_date=F("date"),

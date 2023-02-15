@@ -4,7 +4,7 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
-from fecfiler.transactions.managers import TransactionManager
+from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 import uuid
@@ -65,11 +65,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def children(self):
         return self.transaction_set.all()
 
-    @property
-    def schedule(self):
-        for schedule_key in ["schedule_a", "schedule_b"]:
+    def get_schedule(self):
+        schedule_map = {
+            "schedule_a": Schedule.A,
+            "schedule_b": Schedule.B,
+            "schedule_c": Schedule.C,
+        }
+        for schedule_key in schedule_map:
             if getattr(self, schedule_key, None):
-                return schedule_key
+                return schedule_map[schedule_key]
         return None
 
     def save(self, *args, **kwargs):
