@@ -7,7 +7,11 @@ from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.settings import FEC_API_COMMITTEE_LOOKUP_ENDPOINT, FEC_API_KEY
+from fecfiler.settings import (
+    FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
+    FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
+    FEC_API_KEY
+)
 from rest_framework.decorators import action
 from rest_framework import filters
 
@@ -57,6 +61,52 @@ class ContactViewSet(CommitteeOwnedViewSet):
         "id",
     ]
     ordering = ["-created"]
+
+    @action(detail=False)
+    def candidate_lookup(self, request):
+        q = request.GET.get("q")
+        if q is None:
+            return HttpResponseBadRequest()
+
+        max_fec_results = self.get_int_param_value(
+            request, "max_fec_results", default_max_fec_results, max_allowed_results
+        )
+
+        max_fecfile_results = self.get_int_param_value(
+            request,
+            "max_fecfile_results",
+            default_max_fecfile_results,
+            max_allowed_results,
+        )
+
+        query_params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        url = "{url}?{query_params}".format(
+            url=FEC_API_CANDIDATE_LOOKUP_ENDPOINT, query_params=query_params
+        )
+        json_results = requests.get(url).json()
+
+        fecfile_candidates = list(
+            self.get_queryset()
+            .filter(
+                Q(type="CAN") & (Q(candidate_id__icontains=q) | Q(name__icontains=q))
+            )
+            .values()
+            .order_by("-candidate_id")
+        )
+        fec_api_candidates = json_results.get("results", [])
+        fec_api_candidates = [
+            fac
+            for fac in fec_api_candidates
+            if not any(fac["id"] == ffc["candidate_id"] for ffc in fecfile_candidates)
+        ]
+        fec_api_candidates = fec_api_candidates[:max_fec_results]
+        fecfile_candidates = fecfile_candidates[:max_fecfile_results]
+        return_value = {
+            "fec_api_candidates": fec_api_candidates,
+            "fecfile_candidates": fecfile_candidates,
+        }
+
+        return JsonResponse(return_value)
 
     @action(detail=False)
     def committee_lookup(self, request):
