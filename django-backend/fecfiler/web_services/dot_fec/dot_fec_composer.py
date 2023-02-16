@@ -2,6 +2,7 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE
@@ -97,6 +98,12 @@ def add_row_to_content(content, row):
     return (content or "") + str(row) + CRLF_STR
 
 
+def get_schema_name(schedule):
+    return {Schedule.A.value.value: "SchA", Schedule.B.value.value: "SchB"}.get(
+        schedule
+    )
+
+
 def compose_dot_fec(report_id, upload_submission_record_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
@@ -114,7 +121,9 @@ def compose_dot_fec(report_id, upload_submission_record_id):
 
         transactions = compose_transactions(report_id)
         for transaction in transactions:
-            serialized_transaction = serialize_instance("SchA", transaction)
+            serialized_transaction = serialize_instance(
+                get_schema_name(transaction.schedule), transaction
+            )
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
             temporary_order_key = f"(For Testing: {' l->' if transaction.parent_transaction else ''} {transaction.schedule}, Line-Number: {transaction.form_type}, Created: {transaction.created})"
