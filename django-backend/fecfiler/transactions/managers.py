@@ -19,7 +19,7 @@ from django.db.models import (
 )
 from decimal import Decimal
 from enum import Enum
-from django.db.models import Value as V
+from django.db.models import Value
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -117,6 +117,6 @@ class TransactionManager(SoftDeleteManager):
 
 
 class Schedule(Enum):
-    A = V("A")
-    B = V("B")
-    C = V("C")
+    A = Value("A")
+    B = Value("B")
+    C = Value("C")

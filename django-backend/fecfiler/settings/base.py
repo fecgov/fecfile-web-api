@@ -243,8 +243,10 @@ FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
 TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
-"""OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra info for testing purposes
-WARNING: This will BREAK submitting to fec because it will no longer conform to spec"""
+"""OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra 
+info for testing purposes
+WARNING: This will BREAK submitting to fec because it will no longer conform to spec
+"""
 OUTPUT_TEST_INFO_IN_DOT_FEC = env.get_credential("OUTPUT_TEST_INFO_IN_DOT_FEC")
 
 AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")

@@ -106,7 +106,11 @@ def get_schema_name(schedule):
 
 def get_test_info_prefix(transaction):
     if OUTPUT_TEST_INFO_IN_DOT_FEC:
-        return f"(For Testing: {' l->' if transaction.parent_transaction else ''} {transaction.schedule}, Line-Number: {transaction.form_type}, Created: {transaction.created})"
+        return (
+            f"(For Testing: {' l->' if transaction.parent_transaction else ''}"
+            f" {transaction.schedule}, Line-Number: {transaction.form_type},"
+            f" Created: {transaction.created})"
+        )
     return ""
 
 
