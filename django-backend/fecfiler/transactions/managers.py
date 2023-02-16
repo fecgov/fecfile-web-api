@@ -19,7 +19,6 @@ from django.db.models import (
 )
 from decimal import Decimal
 from enum import Enum
-from django.db.models import Value
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
