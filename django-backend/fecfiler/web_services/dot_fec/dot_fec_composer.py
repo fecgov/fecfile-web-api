@@ -5,7 +5,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
-from fecfiler.settings import FILE_AS_TEST_COMMITTEE
+from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
 
 import logging
 
@@ -104,6 +104,12 @@ def get_schema_name(schedule):
     )
 
 
+def get_test_info_prefix(transaction):
+    if OUTPUT_TEST_INFO_IN_DOT_FEC:
+        return f"(For Testing: {' l->' if transaction.parent_transaction else ''} {transaction.schedule}, Line-Number: {transaction.form_type}, Created: {transaction.created})"
+    return ""
+
+
 def compose_dot_fec(report_id, upload_submission_record_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
@@ -126,9 +132,9 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             )
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
-            temporary_order_key = f"(For Testing: {' l->' if transaction.parent_transaction else ''} {transaction.schedule}, Line-Number: {transaction.form_type}, Created: {transaction.created})"
+            test_info_prefix = get_test_info_prefix(transaction)
             file_content = add_row_to_content(
-                file_content, temporary_order_key + serialized_transaction
+                file_content, test_info_prefix + serialized_transaction
             )
             if transaction.memo_text:
                 memo = transaction.memo_text

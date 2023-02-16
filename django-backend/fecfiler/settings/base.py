@@ -206,7 +206,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    'EXCEPTION_HANDLER': 'fecfiler.utils.custom_exception_handler',
+    "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
 LOGGING = {
@@ -243,6 +243,9 @@ FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
 TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
+"""OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra info for testing purposes
+WARNING: This will BREAK submitting to fec because it will no longer conform to spec"""
+OUTPUT_TEST_INFO_IN_DOT_FEC = env.get_credential("OUTPUT_TEST_INFO_IN_DOT_FEC")
 
 AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
