@@ -117,7 +117,10 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             serialized_transaction = serialize_instance("SchA", transaction)
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
-            file_content = add_row_to_content(file_content, serialized_transaction)
+            temporary_order_key = f"(For Testing: {' l->' if transaction.parent_transaction else ''} {transaction.schedule}, Line-Number: {transaction.form_type}, Created: {transaction.created})"
+            file_content = add_row_to_content(
+                file_content, temporary_order_key + serialized_transaction
+            )
             if transaction.memo_text:
                 memo = transaction.memo_text
                 memo.back_reference_tran_id_number = transaction.transaction_id
