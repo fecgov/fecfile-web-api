@@ -1,9 +1,7 @@
 from django.test import TestCase
-from fecfiler.authentication.models import Account
-from rest_framework.request import HttpRequest, Request
-from rest_framework.exceptions import ValidationError
 
 from fecfiler.transactions.models import Transaction, Schedule
+import uuid
 
 
 class TransactionManagerTestCase(TestCase):
@@ -22,11 +20,17 @@ class TransactionManagerTestCase(TestCase):
         self.assertEqual(transaction_one.form_type, "SA11AI")
         transaction_two = transactions[1]
         self.assertEqual(transaction_two.schedule, Schedule.A.value.value)
-        self.assertEqual(transaction_two.form_type, "SA11AI")
-        self.assertLess(transaction_one.created, transaction_two.created)
+        self.assertEqual(
+            transaction_two.parent_transaction_id,
+            uuid.UUID("6fedede3-8727-495f-8106-3f971408bc94"),
+        )
         transaction_three = transactions[2]
         self.assertEqual(transaction_three.schedule, Schedule.A.value.value)
-        self.assertEqual(transaction_three.form_type, "SA17")
+        self.assertEqual(transaction_three.form_type, "SA11AI")
+        self.assertLess(transaction_one.created, transaction_three.created)
         transaction_four = transactions[3]
-        self.assertEqual(transaction_four.schedule, Schedule.B.value.value)
-        self.assertEqual(transaction_four.form_type, "SB21b")
+        self.assertEqual(transaction_four.schedule, Schedule.A.value.value)
+        self.assertEqual(transaction_four.form_type, "SA17")
+        transaction_five = transactions[4]
+        self.assertEqual(transaction_five.schedule, Schedule.B.value.value)
+        self.assertEqual(transaction_five.form_type, "SB21b")

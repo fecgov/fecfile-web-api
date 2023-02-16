@@ -5,8 +5,18 @@ from fecfiler.transactions.schedule_a.managers import (
 from fecfiler.transactions.schedule_b.managers import (
     over_two_hundred_types as schedule_b_over_two_hundred_types,
 )
-from django.db.models.functions import Coalesce
-from django.db.models import OuterRef, Subquery, Sum, Q, Case, When, Value, BooleanField
+from django.db.models.functions import Coalesce, Concat
+from django.db.models import (
+    OuterRef,
+    Subquery,
+    Sum,
+    Q,
+    Case,
+    When,
+    Value,
+    BooleanField,
+    TextField,
+)
 from decimal import Decimal
 from enum import Enum
 from django.db.models import Value as V
@@ -51,10 +61,45 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("amount"))
             .values("aggregate")
         )
-        return queryset.annotate(
-            aggregate=Subquery(aggregate_clause),
-            itemized=self.get_itemization_clause(),
-        ).order_by("schedule", "form_type", "created")
+        return (
+            queryset.annotate(
+                aggregate=Subquery(aggregate_clause),
+                itemized=self.get_itemization_clause(),
+            )
+            .alias(
+                order_key=Case(
+                    When(
+                        parent_transaction__isnull=False,
+                        then=Concat(
+                            Case(
+                                When(
+                                    parent_transaction__schedule_a__isnull=False,
+                                    then=Schedule.A.value,
+                                ),
+                                When(
+                                    parent_transaction__schedule_b__isnull=False,
+                                    then=Schedule.B.value,
+                                ),
+                            ),
+                            "parent_transaction__form_type",
+                            "parent_transaction__created",
+                            "schedule",
+                            "form_type",
+                            "created",
+                            output_field=TextField(),
+                        ),
+                    ),
+                    default=Concat(
+                        "schedule",
+                        "form_type",
+                        "created",
+                        output_field=TextField(),
+                    ),
+                    output_field=TextField(),
+                ),
+            )
+            .order_by("order_key")
+        )
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
