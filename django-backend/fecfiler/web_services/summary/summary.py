@@ -13,11 +13,14 @@ class SummaryService:
         # just line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
         line_15 = self._create_contribution_sum(sa15_query)
-        summary = report_transactions.aggregate(line_15=line_15)
+        # line 12
+        sa12_query = Q(~Q(memo_code=True), form_type="SA12")
+        line_12 = self._create_contribution_sum(sa12_query)
+        summary = report_transactions.aggregate(line_15=line_15, line_12=line_12)
         return summary
 
     def _create_contribution_sum(self, query):
         return Coalesce(
-            Sum("schedule_a__contribution_amount", filter=query),
+            Sum("amount", filter=query),
             Decimal(0.0),
         )
