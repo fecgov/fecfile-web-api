@@ -87,7 +87,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             .first()
         )
 
-        if previous_transaction.id:
+        if previous_transaction:
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
