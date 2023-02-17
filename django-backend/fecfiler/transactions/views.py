@@ -87,8 +87,12 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             .first()
         )
 
-        serializer = self.get_serializer(previous_transaction)
-        return Response(data=serializer.data)
+        if previous_transaction.id:
+            serializer = self.get_serializer(previous_transaction)
+            return Response(data=serializer.data)
+
+        response = {"message": "No previous transaction found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}
