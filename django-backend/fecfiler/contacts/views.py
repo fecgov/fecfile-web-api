@@ -85,10 +85,30 @@ class ContactViewSet(CommitteeOwnedViewSet):
         )
         json_results = requests.get(url).json()
 
+        tokens = list(filter(None, re.split("[^\\w+]", q)))
+        term = (".*" + ".* .*".join(tokens) + ".*").lower()
         fecfile_candidates = list(
             self.get_queryset()
+            .annotate(
+                full_name_fwd=Lower(
+                    Concat(
+                        "first_name", Value(" "), "last_name", output_field=CharField()
+                    )
+                )
+            )
+            .annotate(
+                full_name_bwd=Lower(
+                    Concat(
+                        "last_name", Value(" "), "first_name", output_field=CharField()
+                    )
+                )
+            )
             .filter(
-                Q(type="CAN") & (Q(candidate_id__icontains=q) | Q(name__icontains=q))
+                Q(type="CAN")
+                & (
+                    Q(candidate_id__icontains=q)
+                    | (Q(full_name_fwd__regex=term) | Q(full_name_bwd__regex=term))
+                )
             )
             .values()
             .order_by("-candidate_id")
