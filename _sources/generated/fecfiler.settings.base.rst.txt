@@ -15,6 +15,7 @@ fecfiler.settings.base
    
       LOGGING
       CELERY_WORKER_STORAGE
+      WEBPRINT_EMAIL
       AWS_REGION
    
    

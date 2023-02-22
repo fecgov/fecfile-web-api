@@ -31,5 +31,6 @@ fecfiler.transactions.tests
    :template: custom-module-template.rst                 
    :recursive:
 
+   fecfiler.transactions.tests.test_manager
    fecfiler.transactions.tests.test_serializers
 

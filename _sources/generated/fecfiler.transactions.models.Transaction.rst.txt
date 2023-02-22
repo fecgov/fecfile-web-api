@@ -33,6 +33,7 @@ fecfiler.transactions.models.Transaction
       ~Transaction.get_next_by_updated
       ~Transaction.get_previous_by_created
       ~Transaction.get_previous_by_updated
+      ~Transaction.get_schedule
       ~Transaction.hard_delete
       ~Transaction.prepare_database_save
       ~Transaction.refresh_from_db
@@ -75,7 +76,6 @@ fecfiler.transactions.models.Transaction
       ~Transaction.pk
       ~Transaction.report
       ~Transaction.report_id
-      ~Transaction.schedule
       ~Transaction.schedule_a
       ~Transaction.schedule_a_id
       ~Transaction.schedule_b

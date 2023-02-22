@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_composer.get\_test\_info\_prefix
+==========================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_composer
+
+.. autofunction:: get_test_info_prefix

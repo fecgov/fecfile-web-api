@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
     
-fecfiler.transactions.managers
-==============================
+fecfiler.transactions.tests.test\_manager
+=========================================
 
-.. automodule:: fecfiler.transactions.managers
+.. automodule:: fecfiler.transactions.tests.test_manager
   
    
    
@@ -22,8 +22,7 @@ fecfiler.transactions.managers
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      Schedule
-      TransactionManager
+      TransactionManagerTestCase
    
    
 

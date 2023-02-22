@@ -23,6 +23,8 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_composer
       compose_header
       compose_report_level_memos
       compose_transactions
+      get_schema_name
+      get_test_info_prefix
    
    
 

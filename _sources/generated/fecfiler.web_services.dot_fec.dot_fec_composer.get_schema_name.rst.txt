@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_composer.get\_schema\_name
+====================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_composer
+
+.. autofunction:: get_schema_name

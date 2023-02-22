@@ -1,0 +1,6 @@
+fecfiler.settings.base.WEBPRINT\_EMAIL
+======================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: WEBPRINT_EMAIL

@@ -1,0 +1,30 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.managers.Schedule
+=======================================
+
+.. currentmodule:: fecfiler.transactions.managers
+
+.. autoclass:: Schedule
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Schedule.A
+      ~Schedule.B
+      ~Schedule.C
+   
+   

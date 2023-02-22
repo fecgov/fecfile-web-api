@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.tests.test\_manager.TransactionManagerTestCase
+====================================================================
+
+.. currentmodule:: fecfiler.transactions.tests.test_manager
+
+.. autoclass:: TransactionManagerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionManagerTestCase.__init__
+      ~TransactionManagerTestCase.addClassCleanup
+      ~TransactionManagerTestCase.addCleanup
+      ~TransactionManagerTestCase.addTypeEqualityFunc
+      ~TransactionManagerTestCase.assertAlmostEqual
+      ~TransactionManagerTestCase.assertAlmostEquals
+      ~TransactionManagerTestCase.assertContains
+      ~TransactionManagerTestCase.assertCountEqual
+      ~TransactionManagerTestCase.assertDictContainsSubset
+      ~TransactionManagerTestCase.assertDictEqual
+      ~TransactionManagerTestCase.assertEqual
+      ~TransactionManagerTestCase.assertEquals
+      ~TransactionManagerTestCase.assertFalse
+      ~TransactionManagerTestCase.assertFieldOutput
+      ~TransactionManagerTestCase.assertFormError
+      ~TransactionManagerTestCase.assertFormsetError
+      ~TransactionManagerTestCase.assertGreater
+      ~TransactionManagerTestCase.assertGreaterEqual
+      ~TransactionManagerTestCase.assertHTMLEqual
+      ~TransactionManagerTestCase.assertHTMLNotEqual
+      ~TransactionManagerTestCase.assertIn
+      ~TransactionManagerTestCase.assertInHTML
+      ~TransactionManagerTestCase.assertIs
+      ~TransactionManagerTestCase.assertIsInstance
+      ~TransactionManagerTestCase.assertIsNone
+      ~TransactionManagerTestCase.assertIsNot
+      ~TransactionManagerTestCase.assertIsNotNone
+      ~TransactionManagerTestCase.assertJSONEqual
+      ~TransactionManagerTestCase.assertJSONNotEqual
+      ~TransactionManagerTestCase.assertLess
+      ~TransactionManagerTestCase.assertLessEqual
+      ~TransactionManagerTestCase.assertListEqual
+      ~TransactionManagerTestCase.assertLogs
+      ~TransactionManagerTestCase.assertMultiLineEqual
+      ~TransactionManagerTestCase.assertNoLogs
+      ~TransactionManagerTestCase.assertNotAlmostEqual
+      ~TransactionManagerTestCase.assertNotAlmostEquals
+      ~TransactionManagerTestCase.assertNotContains
+      ~TransactionManagerTestCase.assertNotEqual
+      ~TransactionManagerTestCase.assertNotEquals
+      ~TransactionManagerTestCase.assertNotIn
+      ~TransactionManagerTestCase.assertNotIsInstance
+      ~TransactionManagerTestCase.assertNotRegex
+      ~TransactionManagerTestCase.assertNotRegexpMatches
+      ~TransactionManagerTestCase.assertNumQueries
+      ~TransactionManagerTestCase.assertQuerysetEqual
+      ~TransactionManagerTestCase.assertRaises
+      ~TransactionManagerTestCase.assertRaisesMessage
+      ~TransactionManagerTestCase.assertRaisesRegex
+      ~TransactionManagerTestCase.assertRaisesRegexp
+      ~TransactionManagerTestCase.assertRedirects
+      ~TransactionManagerTestCase.assertRegex
+      ~TransactionManagerTestCase.assertRegexpMatches
+      ~TransactionManagerTestCase.assertSequenceEqual
+      ~TransactionManagerTestCase.assertSetEqual
+      ~TransactionManagerTestCase.assertTemplateNotUsed
+      ~TransactionManagerTestCase.assertTemplateUsed
+      ~TransactionManagerTestCase.assertTrue
+      ~TransactionManagerTestCase.assertTupleEqual
+      ~TransactionManagerTestCase.assertURLEqual
+      ~TransactionManagerTestCase.assertWarns
+      ~TransactionManagerTestCase.assertWarnsMessage
+      ~TransactionManagerTestCase.assertWarnsRegex
+      ~TransactionManagerTestCase.assertXMLEqual
+      ~TransactionManagerTestCase.assertXMLNotEqual
+      ~TransactionManagerTestCase.assert_
+      ~TransactionManagerTestCase.captureOnCommitCallbacks
+      ~TransactionManagerTestCase.countTestCases
+      ~TransactionManagerTestCase.debug
+      ~TransactionManagerTestCase.defaultTestResult
+      ~TransactionManagerTestCase.doClassCleanups
+      ~TransactionManagerTestCase.doCleanups
+      ~TransactionManagerTestCase.fail
+      ~TransactionManagerTestCase.failIf
+      ~TransactionManagerTestCase.failIfAlmostEqual
+      ~TransactionManagerTestCase.failIfEqual
+      ~TransactionManagerTestCase.failUnless
+      ~TransactionManagerTestCase.failUnlessAlmostEqual
+      ~TransactionManagerTestCase.failUnlessEqual
+      ~TransactionManagerTestCase.failUnlessRaises
+      ~TransactionManagerTestCase.id
+      ~TransactionManagerTestCase.modify_settings
+      ~TransactionManagerTestCase.run
+      ~TransactionManagerTestCase.setUp
+      ~TransactionManagerTestCase.setUpClass
+      ~TransactionManagerTestCase.setUpTestData
+      ~TransactionManagerTestCase.settings
+      ~TransactionManagerTestCase.shortDescription
+      ~TransactionManagerTestCase.skipTest
+      ~TransactionManagerTestCase.subTest
+      ~TransactionManagerTestCase.tearDown
+      ~TransactionManagerTestCase.tearDownClass
+      ~TransactionManagerTestCase.test_order_of_transactions
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionManagerTestCase.available_apps
+      ~TransactionManagerTestCase.databases
+      ~TransactionManagerTestCase.fixtures
+      ~TransactionManagerTestCase.longMessage
+      ~TransactionManagerTestCase.maxDiff
+      ~TransactionManagerTestCase.reset_sequences
+      ~TransactionManagerTestCase.serialized_rollback
+   
+   
