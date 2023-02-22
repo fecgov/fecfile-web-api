@@ -1,0 +1,123 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "transaction_id": {},
+    "back_reference_tran_id_number": {},
+    "back_reference_sched_name": {},
+    "entity_type": {},
+    "payee_organization_name": {
+        "path": "schedule_b.payee_organization_name"
+    },
+    "payee_last_name": {
+        "path": "schedule_b.payee_last_name"
+    },
+    "payee_first_name": {
+        "path": "schedule_b.payee_first_name"
+    },
+    "payee_middle_name": {
+        "path": "schedule_b.payee_middle_name"
+    },
+    "payee_prefix": {
+        "path": "schedule_b.payee_prefix"
+    },
+    "payee_suffix": {
+        "path": "schedule_b.payee_suffix"
+    },
+    "payee_street_1": {
+        "path": "schedule_b.payee_street_1"
+    },
+    "payee_street_2": {
+        "path": "schedule_b.payee_street_2"
+    },
+    "payee_city": {
+        "path": "schedule_b.payee_city"
+    },
+    "payee_state": {
+        "path": "schedule_b.payee_state"
+    },
+    "payee_zip": {
+        "path": "schedule_b.payee_zip"
+    },
+    "election_code": {
+        "path": "schedule_b.election_code"
+    },
+    "election_other_description": {
+        "path": "schedule_b.election_other_description"
+    },
+    "expenditure_date": {
+        "serializer": "DATE",
+        "path": "schedule_b.expenditure_date"
+    },
+    "expenditure_amount": {
+        "path": "schedule_b.expenditure_amount"
+    },
+    "semi_annual_refunded_bundled_amt": {
+        "path": "schedule_b.semi_annual_refunded_bundled_amt"
+    },
+    "expenditure_purpose_descrip": {
+        "path": "schedule_b.expenditure_purpose_descrip"
+    },
+    "category_code": {
+        "path": "schedule_b.category_code"
+    },
+    "beneficiary_committee_fec_id": {
+        "path": "schedule_b.beneficiary_committee_fec_id"
+    },
+    "beneficiary_committee_name": {
+        "path": "schedule_b.beneficiary_committee_name"
+    },
+    "beneficiary_candidate_fec_id": {
+        "path": "schedule_b.beneficiary_candidate_fec_id"
+    },
+    "beneficiary_candidate_last_name": {
+        "path": "schedule_b.beneficiary_candidate_last_name"
+    },
+    "beneficiary_candidate_first_name": {
+        "path": "schedule_b.beneficiary_candidate_first_name"
+    },
+    "beneficiary_candidate_middle_name": {
+        "path": "schedule_b.beneficiary_candidate_middle_name"
+    },
+    "beneficiary_candidate_prefix": {
+        "path": "schedule_b.beneficiary_candidate_prefix"
+    },
+    "beneficiary_candidate_suffix": {
+        "path": "schedule_b.beneficiary_candidate_suffix"
+    },
+    "beneficiary_candidate_office": {
+        "path": "schedule_b.beneficiary_candidate_office"
+    },
+    "beneficiary_candidate_state": {
+        "path": "schedule_b.beneficiary_candidate_state"
+    },
+    "beneficiary_candidate_district": {
+        "path": "schedule_b.beneficiary_candidate_district"
+    },
+    "conduit_name": {
+        "path": "schedule_b.conduit_name"
+    },
+    "conduit_street_1": {
+        "path": "schedule_b.conduit_street_1"
+    },
+    "conduit_street_2": {
+        "path": "schedule_b.conduit_street_2"
+    },
+    "conduit_city": {
+        "path": "schedule_b.conduit_city"
+    },
+    "conduit_state": {
+        "path": "schedule_b.conduit_state"
+    },
+    "conduit_zip": {
+        "path": "schedule_b.conduit_zip"
+    },
+    "memo_code": {
+        "serializer": "BOOLEAN"
+    },
+    "memo_text_description": {
+        "path": "schedule_b.memo_text_description"
+    },
+    "reference_to_si_or_sl_system_code_that_identifies_the_account": {
+        "path": "schedule_b.reference_to_si_or_sl_system_code_that_identifies_the_account"
+    }
+}
