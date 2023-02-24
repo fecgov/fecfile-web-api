@@ -10,7 +10,7 @@ from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
-    FEC_API_KEY
+    FEC_API_KEY,
 )
 from rest_framework.decorators import action
 from rest_framework import filters
@@ -39,14 +39,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        Contact.objects
-        .annotate(transaction_count=Count("transaction"))
-        .alias(sort_name=Concat(
-            "name",
-            "last_name",
-            Value(" "),
-            "first_name",
-            output_field=CharField())
+        Contact.objects.annotate(transaction_count=Count("transaction"))
+        .alias(
+            sort_name=Concat(
+                "name", "last_name", Value(" "), "first_name", output_field=CharField()
+            )
         )
         .all()
     )
@@ -79,11 +76,10 @@ class ContactViewSet(CommitteeOwnedViewSet):
             max_allowed_results,
         )
 
-        query_params = urlencode({"q": q, "api_key": FEC_API_KEY})
-        url = "{url}?{query_params}".format(
-            url=FEC_API_CANDIDATE_LOOKUP_ENDPOINT, query_params=query_params
-        )
-        json_results = requests.get(url).json()
+        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        json_results = requests.get(
+            FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
+        ).json()
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
@@ -145,11 +141,10 @@ class ContactViewSet(CommitteeOwnedViewSet):
             max_allowed_results,
         )
 
-        query_params = urlencode({"q": q, "api_key": FEC_API_KEY})
-        url = "{url}?{query_params}".format(
-            url=FEC_API_COMMITTEE_LOOKUP_ENDPOINT, query_params=query_params
-        )
-        json_results = requests.get(url).json()
+        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        json_results = requests.get(
+            FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
+        ).json()
 
         fecfile_committees = list(
             self.get_queryset()
