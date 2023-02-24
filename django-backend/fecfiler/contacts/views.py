@@ -23,6 +23,10 @@ logger = logging.getLogger(__name__)
 default_max_fec_results = 10
 default_max_fecfile_results = 10
 max_allowed_results = 100
+NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharField())
+NAME_REVERSED_CLAUSE = Concat(
+    "last_name", Value(" "), "first_name", output_field=CharField()
+)
 
 
 class ContactViewSet(CommitteeOwnedViewSet):
@@ -77,18 +81,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fecfile_candidates = list(
             self.get_queryset()
             .annotate(
-                full_name_fwd=Lower(
-                    Concat(
-                        "first_name", Value(" "), "last_name", output_field=CharField()
-                    )
-                )
-            )
-            .annotate(
-                full_name_bwd=Lower(
-                    Concat(
-                        "last_name", Value(" "), "first_name", output_field=CharField()
-                    )
-                )
+                full_name_fwd=Lower(NAME_CLAUSE),
+                full_name_bwd=Lower(NAME_REVERSED_CLAUSE),
             )
             .filter(
                 Q(type="CAN")
@@ -165,18 +159,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fecfile_individuals = list(
             self.get_queryset()
             .annotate(
-                full_name_fwd=Lower(
-                    Concat(
-                        "first_name", Value(" "), "last_name", output_field=CharField()
-                    )
-                )
-            )
-            .annotate(
-                full_name_bwd=Lower(
-                    Concat(
-                        "last_name", Value(" "), "first_name", output_field=CharField()
-                    )
-                )
+                full_name_fwd=Lower(NAME_CLAUSE),
+                full_name_bwd=Lower(NAME_REVERSED_CLAUSE),
             )
             .filter(
                 Q(type="IND")
