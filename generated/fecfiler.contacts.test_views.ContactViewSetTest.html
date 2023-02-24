@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fecfiler.contacts.urls" href="fecfiler.contacts.urls.html" />
-    <link rel="prev" title="fecfiler.contacts.test_views.mocked_requests_get" href="fecfiler.contacts.test_views.mocked_requests_get.html" />
+    <link rel="prev" title="fecfiler.contacts.test_views.mocked_requests_get_committees" href="fecfiler.contacts.test_views.mocked_requests_get_committees.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -330,25 +330,34 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.test_views.ContactViewSetTest.tearDownClass" title="fecfiler.contacts.test_views.ContactViewSetTest.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_happy_path</span></code>(mock_get)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_candidate_lookup_happy_path</span></code>(mock_get)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_no_auth</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_candidate_lookup_no_auth</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_no_q</span></code>(mock_get)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_candidate_lookup_no_q</span></code>(mock_get)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_individual_lookup_happy_path</span></code>(mock_get)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_happy_path</span></code>(mock_get)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_individual_lookup_no_q</span></code>(mock_get)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_no_auth</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_organization_lookup_happy_path</span></code>(mock_get)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_lookup_no_q</span></code>(mock_get)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_organization_lookup_no_q</span></code>(mock_get)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_individual_lookup_happy_path</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_individual_lookup_no_q</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_organization_lookup_happy_path</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_organization_lookup_no_q</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1104,7 +1113,8 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.test_models.html">fecfiler.contacts.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.test_serializers.html">fecfiler.contacts.test_serializers</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.contacts.test_views.html">fecfiler.contacts.test_views</a><ul class="current">
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.contacts.test_views.mocked_requests_get.html">fecfiler.contacts.test_views.mocked_requests_get</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.contacts.test_views.mocked_requests_get_candidates.html">fecfiler.contacts.test_views.mocked_requests_get_candidates</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.contacts.test_views.mocked_requests_get_committees.html">fecfiler.contacts.test_views.mocked_requests_get_committees</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.contacts.test_views.ContactViewSetTest</a></li>
 </ul>
 </li>
@@ -1139,7 +1149,7 @@ block, allowing further test code to be executed.</p>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.contacts.html">fecfiler.contacts</a><ul>
   <li><a href="fecfiler.contacts.test_views.html">fecfiler.contacts.test_views</a><ul>
-      <li>Previous: <a href="fecfiler.contacts.test_views.mocked_requests_get.html" title="previous chapter">fecfiler.contacts.test_views.mocked_requests_get</a></li>
+      <li>Previous: <a href="fecfiler.contacts.test_views.mocked_requests_get_committees.html" title="previous chapter">fecfiler.contacts.test_views.mocked_requests_get_committees</a></li>
       <li>Next: <a href="fecfiler.contacts.urls.html" title="next chapter">fecfiler.contacts.urls</a></li>
   </ul></li>
   </ul></li>

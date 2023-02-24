@@ -1,0 +1,6 @@
+fecfiler.contacts.test\_views.mocked\_requests\_get\_committees
+===============================================================
+
+.. currentmodule:: fecfiler.contacts.test_views
+
+.. autofunction:: mocked_requests_get_committees

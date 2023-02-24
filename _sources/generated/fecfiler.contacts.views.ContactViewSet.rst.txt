@@ -21,6 +21,7 @@ fecfiler.contacts.views.ContactViewSet
    
       ~ContactViewSet.__init__
       ~ContactViewSet.as_view
+      ~ContactViewSet.candidate_lookup
       ~ContactViewSet.check_object_permissions
       ~ContactViewSet.check_permissions
       ~ContactViewSet.check_throttles
@@ -40,6 +41,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.get_extra_actions
       ~ContactViewSet.get_format_suffix
       ~ContactViewSet.get_int_param_value
+      ~ContactViewSet.get_max_results
       ~ContactViewSet.get_object
       ~ContactViewSet.get_paginated_response
       ~ContactViewSet.get_parser_context

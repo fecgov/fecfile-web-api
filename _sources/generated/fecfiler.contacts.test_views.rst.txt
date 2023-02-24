@@ -17,7 +17,8 @@ fecfiler.contacts.test\_views
    .. autosummary::
       :toctree:                                          
    
-      mocked_requests_get
+      mocked_requests_get_candidates
+      mocked_requests_get_committees
    
    
 
