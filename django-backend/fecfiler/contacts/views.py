@@ -65,16 +65,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fec_results = self.get_int_param_value(
-            request, "max_fec_results", default_max_fec_results, max_allowed_results
-        )
-
-        max_fecfile_results = self.get_int_param_value(
-            request,
-            "max_fecfile_results",
-            default_max_fecfile_results,
-            max_allowed_results,
-        )
+        max_fecfile_results, max_fec_results = self.get_results_config(request)
 
         params = urlencode({"q": q, "api_key": FEC_API_KEY})
         json_results = requests.get(
@@ -130,16 +121,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fec_results = self.get_int_param_value(
-            request, "max_fec_results", default_max_fec_results, max_allowed_results
-        )
-
-        max_fecfile_results = self.get_int_param_value(
-            request,
-            "max_fecfile_results",
-            default_max_fecfile_results,
-            max_allowed_results,
-        )
+        max_fecfile_results, max_fec_results = self.get_results_config(request)
 
         params = urlencode({"q": q, "api_key": FEC_API_KEY})
         json_results = requests.get(
@@ -178,12 +160,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
 
-        max_fecfile_results = self.get_int_param_value(
-            request,
-            "max_fecfile_results",
-            default_max_fecfile_results,
-            max_allowed_results,
-        )
+        max_fecfile_results, _ = self.get_results_config(request)
 
         fecfile_individuals = list(
             self.get_queryset()
@@ -220,12 +197,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fecfile_results = self.get_int_param_value(
-            request,
-            "max_fecfile_results",
-            default_max_fecfile_results,
-            max_allowed_results,
-        )
+        max_fecfile_results, _ = self.get_results_config(request)
 
         fecfile_organizations = list(
             self.get_queryset()
@@ -248,3 +220,16 @@ class ContactViewSet(CommitteeOwnedViewSet):
                     return param_int_val
                 return max_param_value
         return default_param_value
+
+    def get_max_results(self, request):
+        max_fecfile_results = self.get_int_param_value(
+            request,
+            "max_fecfile_results",
+            default_max_fecfile_results,
+            max_allowed_results,
+        )
+
+        max_fec_results = self.get_int_param_value(
+            request, "max_fec_results", default_max_fec_results, max_allowed_results
+        )
+        return max_fecfile_results, max_fec_results
