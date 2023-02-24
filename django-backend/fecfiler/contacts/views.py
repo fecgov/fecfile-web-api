@@ -69,7 +69,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fecfile_results, max_fec_results = self.get_results_config(request)
+        max_fecfile_results, max_fec_results = self.get_max_results(request)
 
         params = urlencode({"q": q, "api_key": FEC_API_KEY})
         json_results = requests.get(
@@ -115,7 +115,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fecfile_results, max_fec_results = self.get_results_config(request)
+        max_fecfile_results, max_fec_results = self.get_max_results(request)
 
         params = urlencode({"q": q, "api_key": FEC_API_KEY})
         json_results = requests.get(
@@ -154,7 +154,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
 
-        max_fecfile_results, _ = self.get_results_config(request)
+        max_fecfile_results, _ = self.get_max_results(request)
 
         fecfile_individuals = list(
             self.get_queryset()
@@ -181,7 +181,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         if q is None:
             return HttpResponseBadRequest()
 
-        max_fecfile_results, _ = self.get_results_config(request)
+        max_fecfile_results, _ = self.get_max_results(request)
 
         fecfile_organizations = list(
             self.get_queryset()
