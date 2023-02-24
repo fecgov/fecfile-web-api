@@ -31,6 +31,7 @@ def calculate_summary(report_id):
     summary = summary_service.calculate_summary()
     report.L15_offsets_to_operating_expenditures_refunds_period = summary["line_15"]
     report.L37_offsets_to_operating_expenditures_period = summary["line_15"]
+    report.L12_transfers_from_affiliated_other_party_cmtes_period = summary["line_12"]
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id

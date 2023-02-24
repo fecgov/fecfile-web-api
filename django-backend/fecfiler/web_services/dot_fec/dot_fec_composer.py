@@ -2,9 +2,10 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
-from fecfiler.settings import FILE_AS_TEST_COMMITTEE
+from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
 
 import logging
 
@@ -97,6 +98,22 @@ def add_row_to_content(content, row):
     return (content or "") + str(row) + CRLF_STR
 
 
+def get_schema_name(schedule):
+    return {Schedule.A.value.value: "SchA", Schedule.B.value.value: "SchB"}.get(
+        schedule
+    )
+
+
+def get_test_info_prefix(transaction):
+    if OUTPUT_TEST_INFO_IN_DOT_FEC:
+        return (
+            f"(For Testing: {' l->' if transaction.parent_transaction else ''}"
+            f" {transaction.schedule}, Line-Number: {transaction.form_type},"
+            f" Created: {transaction.created})"
+        )
+    return ""
+
+
 def compose_dot_fec(report_id, upload_submission_record_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
@@ -114,10 +131,15 @@ def compose_dot_fec(report_id, upload_submission_record_id):
 
         transactions = compose_transactions(report_id)
         for transaction in transactions:
-            serialized_transaction = serialize_instance("SchA", transaction)
+            serialized_transaction = serialize_instance(
+                get_schema_name(transaction.schedule), transaction
+            )
             logger.debug("Serialized Transaction:")
             logger.debug(serialized_transaction)
-            file_content = add_row_to_content(file_content, serialized_transaction)
+            test_info_prefix = get_test_info_prefix(transaction)
+            file_content = add_row_to_content(
+                file_content, test_info_prefix + serialized_transaction
+            )
             if transaction.memo_text:
                 memo = transaction.memo_text
                 memo.back_reference_tran_id_number = transaction.transaction_id
