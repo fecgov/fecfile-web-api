@@ -1,0 +1,6 @@
+fecfiler.openfec.views.get\_test\_efo\_mock\_committee\_accounts
+================================================================
+
+.. currentmodule:: fecfiler.openfec.views
+
+.. autofunction:: get_test_efo_mock_committee_accounts

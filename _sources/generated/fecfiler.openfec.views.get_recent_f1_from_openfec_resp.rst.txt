@@ -1,0 +1,6 @@
+fecfiler.openfec.views.get\_recent\_f1\_from\_openfec\_resp
+===========================================================
+
+.. currentmodule:: fecfiler.openfec.views
+
+.. autofunction:: get_recent_f1_from_openfec_resp

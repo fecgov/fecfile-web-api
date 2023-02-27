@@ -1,0 +1,136 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.openfec.test\_views.OpenfecViewSetTest
+===============================================
+
+.. currentmodule:: fecfiler.openfec.test_views
+
+.. autoclass:: OpenfecViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OpenfecViewSetTest.__init__
+      ~OpenfecViewSetTest.addClassCleanup
+      ~OpenfecViewSetTest.addCleanup
+      ~OpenfecViewSetTest.addTypeEqualityFunc
+      ~OpenfecViewSetTest.assertAlmostEqual
+      ~OpenfecViewSetTest.assertAlmostEquals
+      ~OpenfecViewSetTest.assertContains
+      ~OpenfecViewSetTest.assertCountEqual
+      ~OpenfecViewSetTest.assertDictContainsSubset
+      ~OpenfecViewSetTest.assertDictEqual
+      ~OpenfecViewSetTest.assertEqual
+      ~OpenfecViewSetTest.assertEquals
+      ~OpenfecViewSetTest.assertFalse
+      ~OpenfecViewSetTest.assertFieldOutput
+      ~OpenfecViewSetTest.assertFormError
+      ~OpenfecViewSetTest.assertFormsetError
+      ~OpenfecViewSetTest.assertGreater
+      ~OpenfecViewSetTest.assertGreaterEqual
+      ~OpenfecViewSetTest.assertHTMLEqual
+      ~OpenfecViewSetTest.assertHTMLNotEqual
+      ~OpenfecViewSetTest.assertIn
+      ~OpenfecViewSetTest.assertInHTML
+      ~OpenfecViewSetTest.assertIs
+      ~OpenfecViewSetTest.assertIsInstance
+      ~OpenfecViewSetTest.assertIsNone
+      ~OpenfecViewSetTest.assertIsNot
+      ~OpenfecViewSetTest.assertIsNotNone
+      ~OpenfecViewSetTest.assertJSONEqual
+      ~OpenfecViewSetTest.assertJSONNotEqual
+      ~OpenfecViewSetTest.assertLess
+      ~OpenfecViewSetTest.assertLessEqual
+      ~OpenfecViewSetTest.assertListEqual
+      ~OpenfecViewSetTest.assertLogs
+      ~OpenfecViewSetTest.assertMultiLineEqual
+      ~OpenfecViewSetTest.assertNoLogs
+      ~OpenfecViewSetTest.assertNotAlmostEqual
+      ~OpenfecViewSetTest.assertNotAlmostEquals
+      ~OpenfecViewSetTest.assertNotContains
+      ~OpenfecViewSetTest.assertNotEqual
+      ~OpenfecViewSetTest.assertNotEquals
+      ~OpenfecViewSetTest.assertNotIn
+      ~OpenfecViewSetTest.assertNotIsInstance
+      ~OpenfecViewSetTest.assertNotRegex
+      ~OpenfecViewSetTest.assertNotRegexpMatches
+      ~OpenfecViewSetTest.assertNumQueries
+      ~OpenfecViewSetTest.assertQuerysetEqual
+      ~OpenfecViewSetTest.assertRaises
+      ~OpenfecViewSetTest.assertRaisesMessage
+      ~OpenfecViewSetTest.assertRaisesRegex
+      ~OpenfecViewSetTest.assertRaisesRegexp
+      ~OpenfecViewSetTest.assertRedirects
+      ~OpenfecViewSetTest.assertRegex
+      ~OpenfecViewSetTest.assertRegexpMatches
+      ~OpenfecViewSetTest.assertSequenceEqual
+      ~OpenfecViewSetTest.assertSetEqual
+      ~OpenfecViewSetTest.assertTemplateNotUsed
+      ~OpenfecViewSetTest.assertTemplateUsed
+      ~OpenfecViewSetTest.assertTrue
+      ~OpenfecViewSetTest.assertTupleEqual
+      ~OpenfecViewSetTest.assertURLEqual
+      ~OpenfecViewSetTest.assertWarns
+      ~OpenfecViewSetTest.assertWarnsMessage
+      ~OpenfecViewSetTest.assertWarnsRegex
+      ~OpenfecViewSetTest.assertXMLEqual
+      ~OpenfecViewSetTest.assertXMLNotEqual
+      ~OpenfecViewSetTest.assert_
+      ~OpenfecViewSetTest.captureOnCommitCallbacks
+      ~OpenfecViewSetTest.countTestCases
+      ~OpenfecViewSetTest.debug
+      ~OpenfecViewSetTest.defaultTestResult
+      ~OpenfecViewSetTest.doClassCleanups
+      ~OpenfecViewSetTest.doCleanups
+      ~OpenfecViewSetTest.fail
+      ~OpenfecViewSetTest.failIf
+      ~OpenfecViewSetTest.failIfAlmostEqual
+      ~OpenfecViewSetTest.failIfEqual
+      ~OpenfecViewSetTest.failUnless
+      ~OpenfecViewSetTest.failUnlessAlmostEqual
+      ~OpenfecViewSetTest.failUnlessEqual
+      ~OpenfecViewSetTest.failUnlessRaises
+      ~OpenfecViewSetTest.id
+      ~OpenfecViewSetTest.modify_settings
+      ~OpenfecViewSetTest.run
+      ~OpenfecViewSetTest.setUp
+      ~OpenfecViewSetTest.setUpClass
+      ~OpenfecViewSetTest.setUpTestData
+      ~OpenfecViewSetTest.settings
+      ~OpenfecViewSetTest.shortDescription
+      ~OpenfecViewSetTest.skipTest
+      ~OpenfecViewSetTest.subTest
+      ~OpenfecViewSetTest.tearDown
+      ~OpenfecViewSetTest.tearDownClass
+      ~OpenfecViewSetTest.test_get_committee_no_override
+      ~OpenfecViewSetTest.test_get_committee_override_data_not_found
+      ~OpenfecViewSetTest.test_get_committee_override_happy_path
+      ~OpenfecViewSetTest.test_get_filings_happy_path
+      ~OpenfecViewSetTest.test_get_filings_invalid_resp
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OpenfecViewSetTest.available_apps
+      ~OpenfecViewSetTest.databases
+      ~OpenfecViewSetTest.fixtures
+      ~OpenfecViewSetTest.longMessage
+      ~OpenfecViewSetTest.maxDiff
+      ~OpenfecViewSetTest.reset_sequences
+      ~OpenfecViewSetTest.serialized_rollback
+   
+   

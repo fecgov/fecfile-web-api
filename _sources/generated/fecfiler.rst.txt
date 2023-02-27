@@ -37,6 +37,7 @@ fecfiler
    fecfiler.contacts
    fecfiler.f3x_summaries
    fecfiler.memo_text
+   fecfiler.openfec
    fecfiler.s3
    fecfiler.scha_transactions
    fecfiler.settings

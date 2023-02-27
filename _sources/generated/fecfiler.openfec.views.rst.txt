@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.openfec.views
+======================
+
+.. automodule:: fecfiler.openfec.views
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_recent_f1_from_openfec_resp
+      get_test_efo_mock_committee_account
+      get_test_efo_mock_committee_accounts
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      OpenfecViewSet
+   
+   
+
+   
+   
+   
+
+
+

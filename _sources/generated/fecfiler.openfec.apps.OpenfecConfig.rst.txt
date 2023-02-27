@@ -1,0 +1,40 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.openfec.apps.OpenfecConfig
+===================================
+
+.. currentmodule:: fecfiler.openfec.apps
+
+.. autoclass:: OpenfecConfig
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OpenfecConfig.__init__
+      ~OpenfecConfig.create
+      ~OpenfecConfig.get_model
+      ~OpenfecConfig.get_models
+      ~OpenfecConfig.import_models
+      ~OpenfecConfig.ready
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OpenfecConfig.default_auto_field
+      ~OpenfecConfig.name
+   
+   
