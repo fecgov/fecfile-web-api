@@ -1,0 +1,47 @@
+[
+    {
+        "committee_id": "C00100214",
+        "name": "TEST_COMMITTEE_NAME3",
+        "committee_type_full": "TEST_COMMITTEE_TYPE3"
+    },
+    {
+        "committee_id": "C00100222",
+        "name": "TEST_COMMITTEE_NAME4",
+        "committee_type_full": "TEST_COMMITTEE_TYPE4"
+    },
+    {
+        "committee_id": "C00100230",
+        "name": "TEST_COMMITTEE_NAME5",
+        "committee_type_full": "TEST_COMMITTEE_TYPE5"
+    },
+    {
+        "committee_id": "C00100248",
+        "name": "TEST_COMMITTEE_NAME6",
+        "committee_type_full": "TEST_COMMITTEE_TYPE6"
+    },
+    {
+        "committee_id": "C00100255",
+        "name": "TEST_COMMITTEE_NAME7",
+        "committee_type_full": "TEST_COMMITTEE_TYPE7"
+    },
+    {
+        "committee_id": "C00100263",
+        "name": "TEST_COMMITTEE_NAME8",
+        "committee_type_full": "TEST_COMMITTEE_TYPE8"
+    },
+    {
+        "committee_id": "C00100271",
+        "name": "TEST_COMMITTEE_NAME9",
+        "committee_type_full": "TEST_COMMITTEE_TYPE9"
+    },
+    {
+        "committee_id": "C00100289",
+        "name": "TEST_COMMITTEE_NAME10",
+        "committee_type_full": "TEST_COMMITTEE_TYPE10"
+    },
+    {
+        "committee_id": "C00100297",
+        "name": "TEST_COMMITTEE_NAME11",
+        "committee_type_full": "TEST_COMMITTEE_TYPE11"
+    }
+]
