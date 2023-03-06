@@ -29,9 +29,16 @@ def calculate_summary(report_id):
     report.save()
     summary_service = SummaryService(report)
     summary = summary_service.calculate_summary()
+    report.L11ai_itemized_period = summary["line_11ai"]
+    report.L11aii_unitemized_period = summary["line_11aii"]
+    report.L11aiii_total_period = summary["line_11aiii"]
+    report.L11b_political_party_committees_period = summary["line_11b"]
+    report.L11c_other_political_committees_pacs_period = summary["line_11c"]
+    report.L11d_total_contributions_period = summary["line_11d"]
     report.L15_offsets_to_operating_expenditures_refunds_period = summary["line_15"]
     report.L37_offsets_to_operating_expenditures_period = summary["line_15"]
     report.L12_transfers_from_affiliated_other_party_cmtes_period = summary["line_12"]
+    report.L33_total_contributions_period = summary["line_33"]
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id
