@@ -16,7 +16,10 @@ class SummaryService:
         # line 12
         sa12_query = Q(~Q(memo_code=True), form_type="SA12")
         line_12 = self._create_contribution_sum(sa12_query)
-        summary = report_transactions.aggregate(line_15=line_15, line_12=line_12)
+        # line 17
+        sa17_query = Q(~Q(memo_code=True), form_type="SA17")
+        line_17 = self._create_contribution_sum(sa17_query)
+        summary = report_transactions.aggregate(line_15=line_15, line_12=line_12, line_17=line_17)
         return summary
 
     def _create_contribution_sum(self, query):
