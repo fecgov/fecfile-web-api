@@ -2,10 +2,8 @@ import logging
 
 from django.db import transaction
 from fecfiler.transactions.schedule_c.models import ScheduleC
-from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField, BooleanField
-from rest_framework.serializers import ListSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +17,6 @@ def get_model_data(data, model):
 
 
 class ScheduleCTransactionSerializerBase(TransactionSerializerBase):
-
-    parent_transaction = TransactionSerializerBase(
-        allow_null=True, required=False, read_only="True"
-    )
-
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
         transaction = TransactionSerializerBase(context=self.context).to_internal_value(
@@ -37,12 +30,26 @@ class ScheduleCTransactionSerializerBase(TransactionSerializerBase):
         validated_data = super().validate(data)
         return validated_data
 
-    class Meta(TransactionSerializerBase.Meta):
-        fields = TransactionSerializerBase.Meta.get_fields() + [
-            f.name
-            for f in ScheduleC._meta.get_fields()
-            if f.name not in ["transaction"]
-        ]
+    def create(self, validated_data: dict):
+        with transaction.atomic():
+            schedule_c_data = get_model_data(validated_data, ScheduleC)
+            schedule_c = ScheduleC.objects.create(**schedule_c_data)
+            transaction_data = validated_data.copy()
+            transaction_data["schedule_c_id"] = schedule_c.id
+            for key in schedule_c_data.keys():
+                if key != "id":
+                    del transaction_data[key]
+
+            schedule_c_transaction = super().create(transaction_data)
+            return schedule_c_transaction
+
+    def update(self, instance, validated_data: dict):
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                if attr != "id":
+                    setattr(instance.schedule_c, attr, value)
+            instance.schedule_c.save()
+            return super().update(instance, validated_data)
 
     receipt_line_number = CharField(required=False, allow_null=True)
     lender_organization_name = CharField(required=False, allow_null=True)
@@ -84,57 +91,9 @@ class ScheduleCTransactionSerializerBase(TransactionSerializerBase):
     lender_candidate_district = CharField(required=False, allow_null=True)
     memo_text_description = CharField(required=False, allow_null=True)
 
-
-class ScheduleCTransactionSerializer(ScheduleCTransactionSerializerBase):
-
-    children = ListSerializer(
-        child=ScheduleCTransactionSerializerBase(),
-        allow_null=True,
-        allow_empty=True,
-        required=False,
-    )
-
-    def create(self, validated_data: dict):
-        with transaction.atomic():
-            schedule_c_data = get_model_data(validated_data, ScheduleC)
-            schedule_c = ScheduleC.objects.create(**schedule_c_data)
-            transaction_data = validated_data.copy()
-            transaction_data["schedule_c_id"] = schedule_c.id
-            for key in schedule_c_data.keys():
-                if key != "id":
-                    del transaction_data[key]
-
-            children = transaction_data.pop("children", [])
-            parent = super().create(transaction_data)
-            for child in children:
-                child["parent_transaction_id"] = parent.id
-                self.create(child)
-            return parent
-
-    def update(self, instance, validated_data: dict):
-        with transaction.atomic():
-            children = validated_data.pop("children", [])
-
-            for child in children:
-                try:
-                    existing_child = instance.children.get(id=child.get("id", None))
-                    self.update(existing_child, child)
-                except Transaction.DoesNotExist:
-                    self.create(child)
-
-            for attr, value in validated_data.items():
-                if attr != "id":
-                    setattr(instance.schedule_c, attr, value)
-            instance.schedule_c.save()
-            return super().update(instance, validated_data)
-
     class Meta(TransactionSerializerBase.Meta):
-        fields = (
-            TransactionSerializerBase.Meta.get_fields()
-            + [
-                f.name
-                for f in ScheduleC._meta.get_fields()
-                if f.name not in ["transaction"]
-            ]
-            + ["aggregate_amount", "children"]
-        )
+        fields = TransactionSerializerBase.Meta.get_fields() + [
+            f.name
+            for f in ScheduleC._meta.get_fields()
+            if f.name not in ["transaction"]
+        ]
