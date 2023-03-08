@@ -389,14 +389,18 @@ class ReportMixin(models.Model):
         if self.report:
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
-            report_year = report_date.year
+            if report_date != None:
+                report_year = report_date.year
 
-            reports_to_flag_for_recalculation = F3XSummary.objects.filter(
-                committee_account=committee,
-                coverage_from_date__year=report_year,
-                coverage_from_date__gte=report_date,
-                upload_submission=None
-            )
+                reports_to_flag_for_recalculation = F3XSummary.objects.filter(
+                    committee_account=committee,
+                    coverage_from_date__year=report_year,
+                    coverage_from_date__gte=report_date,
+                    upload_submission=None
+                )
+            else:
+                reports_to_flag_for_recalculation = [self.report]
+
             for report in reports_to_flag_for_recalculation:
                 report.calculation_status = None
                 report.save()
