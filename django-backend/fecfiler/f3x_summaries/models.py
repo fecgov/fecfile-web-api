@@ -389,7 +389,7 @@ class ReportMixin(models.Model):
         if self.report:
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
-            if report_date != None:
+            if report_date is not None:
                 report_year = report_date.year
 
                 reports_to_flag_for_recalculation = F3XSummary.objects.filter(

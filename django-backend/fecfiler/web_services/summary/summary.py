@@ -1,11 +1,11 @@
 from decimal import Decimal
-from fecfiler.f3x_summaries.models import F3XSummary
 from fecfiler.transactions.models import Transaction
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class SummaryService:
     def __init__(self, report) -> None:
