@@ -12,3 +12,4 @@ local_settings.py
 /env/
 .python-version
 *.python_history
+*.bash_history
