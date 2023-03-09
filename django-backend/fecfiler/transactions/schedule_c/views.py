@@ -14,10 +14,8 @@ logger = logging.getLogger(__name__)
 class ScheduleCTransactionViewSet(TransactionViewSet):
     queryset = (
         Transaction.objects.select_related("schedule_c")
-        .filter(schedule=Schedule.B.value)
+        .filter(schedule=Schedule.C.value)
         .alias(
-            # expenditure_amount=F("amount"),
-            # expenditure_date=F("date"),
             lender_name=Coalesce(
                 "schedule_c__lender_organization_name",
                 Concat(
@@ -28,7 +26,6 @@ class ScheduleCTransactionViewSet(TransactionViewSet):
                 ),
             ),
         )
-        # .annotate(aggregate_amount=F("aggregate"))
     )
     serializer_class = ScheduleCTransactionSerializer
     ordering_fields = [

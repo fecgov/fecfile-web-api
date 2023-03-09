@@ -16,7 +16,7 @@ def get_model_data(data, model):
     }
 
 
-class ScheduleCTransactionSerializerBase(TransactionSerializerBase):
+class ScheduleCTransactionSerializer(TransactionSerializerBase):
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
         transaction = TransactionSerializerBase(context=self.context).to_internal_value(
