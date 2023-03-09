@@ -5,7 +5,7 @@ from .serializers import ScheduleCTransactionSerializer
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
-from django.db.models import TextField, Value, F
+from django.db.models import TextField, Value
 from rest_framework.viewsets import ModelViewSet
 
 logger = logging.getLogger(__name__)

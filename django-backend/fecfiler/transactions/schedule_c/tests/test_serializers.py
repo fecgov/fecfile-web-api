@@ -2,7 +2,6 @@ from django.test import TestCase
 from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
-from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c.serializers import (
     ScheduleCTransactionSerializer,
 )
