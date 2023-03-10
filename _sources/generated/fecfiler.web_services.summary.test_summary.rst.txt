@@ -22,7 +22,7 @@ fecfiler.web\_services.summary.test\_summary
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      F3XSerializerTestCase
+      F3XSummaryTestCase
    
    
 
