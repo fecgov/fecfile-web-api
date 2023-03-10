@@ -29,6 +29,7 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(
             summary["line_33"], round(Decimal(3.33 + 10000.23 + 444.44 + 555.55), 2)
         )
+        self.assertEqual(summary["line_17"], Decimal("1000.00"))
 
     def test_report_with_no_transactions(self):
         f3x = F3XSummary.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")

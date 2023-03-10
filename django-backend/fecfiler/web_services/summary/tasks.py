@@ -39,6 +39,7 @@ def calculate_summary(report_id):
     report.L37_offsets_to_operating_expenditures_period = summary["line_15"]
     report.L12_transfers_from_affiliated_other_party_cmtes_period = summary["line_12"]
     report.L33_total_contributions_period = summary["line_33"]
+    report.L17_other_federal_receipts_dividends_period = summary["line_17"]
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id
