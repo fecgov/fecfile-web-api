@@ -216,7 +216,7 @@
         }
     },
     {
-        "comment": "SA15 transaction to not count in Column B",
+        "comment": "SA15 transaction after report dates; should not count in Column B",
         "model": "transactions.schedulea",
         "fields": {
             "id": "a12aefe8-9b5f-4539-b7e5-170000000004",
@@ -225,7 +225,7 @@
         }
     },
     {
-        "comment": "SA15 transaction to not count in Column B",
+        "comment": "SA15 transaction after report dates; should not count in Column B",
         "model": "transactions.transaction",
         "fields": {
             "id": "a12aefe8-9b5f-4539-b7e5-170000000004",
@@ -240,7 +240,7 @@
         }
     },
     {
-        "comment": "SA15 transaction to count in Column B",
+        "comment": "SA15 transaction before report dates; should count in Column B",
         "model": "transactions.schedulea",
         "fields": {
             "id": "a12aefe8-9b5f-4539-b7e5-170000000004",
@@ -249,7 +249,7 @@
         }
     },
     {
-        "comment": "SA15 transaction to count in Column B",
+        "comment": "SA15 transaction before report dates; should count in Column B",
         "model": "transactions.transaction",
         "fields": {
             "id": "a12aefe8-9b5f-4539-b7e5-170000000004",
