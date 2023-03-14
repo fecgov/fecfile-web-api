@@ -17,6 +17,7 @@ from rest_framework.serializers import (
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
+from fecfiler.transactions.schedule_c.models import ScheduleC
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,16 @@ class ScheduleBSerializer(ModelSerializer):
         model = ScheduleB
 
 
+class ScheduleCSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleC._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleC
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -66,6 +77,7 @@ class TransactionSerializerBase(
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
+    schedule_c = ScheduleCSerializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
