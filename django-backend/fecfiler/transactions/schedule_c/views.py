@@ -1,44 +1,38 @@
 import logging
 
 from django.db.models.functions import Coalesce, Concat
-from .serializers import ScheduleBTransactionSerializer
+from .serializers import ScheduleCTransactionSerializer
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
-from django.db.models import TextField, Value, F
+from django.db.models import TextField, Value
 from rest_framework.viewsets import ModelViewSet
 
 logger = logging.getLogger(__name__)
 
 
-class ScheduleBTransactionViewSet(TransactionViewSet):
+class ScheduleCTransactionViewSet(TransactionViewSet):
     queryset = (
-        Transaction.objects.select_related("schedule_b")
-        .filter(schedule=Schedule.B.value)
+        Transaction.objects.select_related("schedule_c")
+        .filter(schedule=Schedule.C.value)
         .alias(
-            expenditure_amount=F("amount"),
-            expenditure_date=F("date"),
-            payee_name=Coalesce(
-                "schedule_b__payee_organization_name",
+            lender_name=Coalesce(
+                "schedule_c__lender_organization_name",
                 Concat(
-                    "schedule_b__payee_last_name",
+                    "schedule_c__lender_last_name",
                     Value(", "),
-                    "schedule_b__payee_first_name",
+                    "schedule_c__lender_first_name",
                     output_field=TextField(),
                 ),
             ),
         )
-        .annotate(aggregate_amount=F("aggregate"))
     )
-    serializer_class = ScheduleBTransactionSerializer
+    serializer_class = ScheduleCTransactionSerializer
     ordering_fields = [
         "id",
         "transaction_type_identifier",
-        "payee_name",
-        "expenditure_date",
+        "lender_name",
         "memo_code",
-        "expenditure_amount",
-        "aggregate_amount",
     ]
 
     def create(self, request):

@@ -6,7 +6,35 @@ from ..authentication.models import Account
 from .views import ContactViewSet
 
 
-def mocked_requests_get(*args, **kwargs):
+def mocked_requests_get_candidates(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    return MockResponse(
+        {
+            "results": [
+                {
+                    "name": "BIDEN, JOE R",
+                    "id": "P60012143",
+                    "office_sought": "P"
+                },
+                {
+                    "name": "BIDEN, JR., JOSEPH R.",
+                    "id": "P60012465",
+                    "office_sought": "P"
+                },
+            ]
+        },
+        200,
+    )
+
+
+def mocked_requests_get_committees(*args, **kwargs):
     class MockResponse:
         def __init__(self, json_data, status_code):
             self.json_data = json_data
@@ -33,6 +61,52 @@ class ContactViewSetTest(TestCase):
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
 
+    def test_candidate_lookup_no_auth(self):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/candidate_lookup")
+
+        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
+
+        self.assertEqual(response.status_code, 403)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    def test_candidate_lookup_no_q(self, mock_get):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/candidate_lookup")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    def test_candidate_lookup_happy_path(self, mock_get):
+        self.assertEqual(True, True)
+        request = self.factory.get("/api/v1/contacts/candidate_lookup?"
+                                   "q=test&max_fecfile_results=5&max_fec_results=5")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
+
+        expected_json = {
+            "fec_api_candidates": [
+                {
+                    "name": "BIDEN, JOE R",
+                    "id": "P60012143",
+                    "office_sought": "P"
+                },
+                {
+                    "name": "BIDEN, JR., JOSEPH R.",
+                    "id": "P60012465",
+                    "office_sought": "P"
+                },
+            ],
+            "fecfile_candidates": [],
+        }
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
+
     def test_committee_lookup_no_auth(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
@@ -41,7 +115,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_no_q(self, mock_get):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
@@ -51,7 +125,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
+    @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup?"
@@ -71,8 +145,7 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
-    def test_individual_lookup_no_q(self, mock_get):
+    def test_individual_lookup_no_q(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/individual_lookup")
         request.user = self.user
@@ -81,8 +154,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
-    def test_individual_lookup_happy_path(self, mock_get):
+    def test_individual_lookup_happy_path(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/individual_lookup?"
                                    "q=Lastname&max_fecfile_results=5")
@@ -97,8 +169,7 @@ class ContactViewSetTest(TestCase):
         self.assertIn(expected_json_fragment,
                       str(response.content, encoding="utf8"))
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
-    def test_organization_lookup_no_q(self, mock_get):
+    def test_organization_lookup_no_q(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/organization_lookup")
         request.user = self.user
@@ -107,8 +178,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get)
-    def test_organization_lookup_happy_path(self, mock_get):
+    def test_organization_lookup_happy_path(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/organization_lookup?"
                                    "q=test&max_fecfile_results=5")
