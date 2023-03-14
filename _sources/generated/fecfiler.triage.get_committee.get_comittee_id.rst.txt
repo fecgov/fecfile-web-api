@@ -1,6 +1,0 @@
-fecfiler.triage.get\_committee.get\_comittee\_id
-================================================
-
-.. currentmodule:: fecfiler.triage.get_committee
-
-.. autofunction:: get_comittee_id

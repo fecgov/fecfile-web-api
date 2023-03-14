@@ -43,7 +43,6 @@ fecfiler
    fecfiler.settings
    fecfiler.shared
    fecfiler.transactions
-   fecfiler.triage
    fecfiler.urls
    fecfiler.utils
    fecfiler.validation
