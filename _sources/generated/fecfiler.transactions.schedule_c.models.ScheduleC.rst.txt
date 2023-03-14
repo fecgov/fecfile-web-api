@@ -1,0 +1,87 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c.models.ScheduleC
+==================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c.models
+
+.. autoclass:: ScheduleC
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC.__init__
+      ~ScheduleC.check
+      ~ScheduleC.clean
+      ~ScheduleC.clean_fields
+      ~ScheduleC.date_error_message
+      ~ScheduleC.delete
+      ~ScheduleC.from_db
+      ~ScheduleC.full_clean
+      ~ScheduleC.get_constraints
+      ~ScheduleC.get_deferred_fields
+      ~ScheduleC.prepare_database_save
+      ~ScheduleC.refresh_from_db
+      ~ScheduleC.save
+      ~ScheduleC.save_base
+      ~ScheduleC.serializable_value
+      ~ScheduleC.unique_error_message
+      ~ScheduleC.validate_constraints
+      ~ScheduleC.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC.election_code
+      ~ScheduleC.election_other_description
+      ~ScheduleC.id
+      ~ScheduleC.lender_candidate_district
+      ~ScheduleC.lender_candidate_first_name
+      ~ScheduleC.lender_candidate_id_number
+      ~ScheduleC.lender_candidate_last_name
+      ~ScheduleC.lender_candidate_middle_name
+      ~ScheduleC.lender_candidate_office
+      ~ScheduleC.lender_candidate_prefix
+      ~ScheduleC.lender_candidate_state
+      ~ScheduleC.lender_candidate_suffix
+      ~ScheduleC.lender_city
+      ~ScheduleC.lender_committee_id_number
+      ~ScheduleC.lender_first_name
+      ~ScheduleC.lender_last_name
+      ~ScheduleC.lender_middle_name
+      ~ScheduleC.lender_organization_name
+      ~ScheduleC.lender_prefix
+      ~ScheduleC.lender_state
+      ~ScheduleC.lender_street_1
+      ~ScheduleC.lender_street_2
+      ~ScheduleC.lender_suffix
+      ~ScheduleC.lender_zip
+      ~ScheduleC.loan_amount
+      ~ScheduleC.loan_balance
+      ~ScheduleC.loan_due_date
+      ~ScheduleC.loan_incurred_date
+      ~ScheduleC.loan_interest_rate
+      ~ScheduleC.loan_payment_to_date
+      ~ScheduleC.memo_text_description
+      ~ScheduleC.objects
+      ~ScheduleC.personal_funds
+      ~ScheduleC.pk
+      ~ScheduleC.receipt_line_number
+      ~ScheduleC.secured
+      ~ScheduleC.transaction_set
+   
+   

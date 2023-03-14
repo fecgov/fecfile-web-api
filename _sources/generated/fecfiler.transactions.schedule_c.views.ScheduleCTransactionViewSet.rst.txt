@@ -1,0 +1,111 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c.views.ScheduleCTransactionViewSet
+===================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c.views
+
+.. autoclass:: ScheduleCTransactionViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleCTransactionViewSet.__init__
+      ~ScheduleCTransactionViewSet.as_view
+      ~ScheduleCTransactionViewSet.check_object_permissions
+      ~ScheduleCTransactionViewSet.check_permissions
+      ~ScheduleCTransactionViewSet.check_throttles
+      ~ScheduleCTransactionViewSet.create
+      ~ScheduleCTransactionViewSet.destroy
+      ~ScheduleCTransactionViewSet.determine_version
+      ~ScheduleCTransactionViewSet.dispatch
+      ~ScheduleCTransactionViewSet.filter_queryset
+      ~ScheduleCTransactionViewSet.finalize_response
+      ~ScheduleCTransactionViewSet.get_authenticate_header
+      ~ScheduleCTransactionViewSet.get_authenticators
+      ~ScheduleCTransactionViewSet.get_content_negotiator
+      ~ScheduleCTransactionViewSet.get_exception_handler
+      ~ScheduleCTransactionViewSet.get_exception_handler_context
+      ~ScheduleCTransactionViewSet.get_extra_action_url_map
+      ~ScheduleCTransactionViewSet.get_extra_actions
+      ~ScheduleCTransactionViewSet.get_format_suffix
+      ~ScheduleCTransactionViewSet.get_object
+      ~ScheduleCTransactionViewSet.get_paginated_response
+      ~ScheduleCTransactionViewSet.get_parser_context
+      ~ScheduleCTransactionViewSet.get_parsers
+      ~ScheduleCTransactionViewSet.get_permissions
+      ~ScheduleCTransactionViewSet.get_queryset
+      ~ScheduleCTransactionViewSet.get_renderer_context
+      ~ScheduleCTransactionViewSet.get_renderers
+      ~ScheduleCTransactionViewSet.get_serializer
+      ~ScheduleCTransactionViewSet.get_serializer_class
+      ~ScheduleCTransactionViewSet.get_serializer_context
+      ~ScheduleCTransactionViewSet.get_success_headers
+      ~ScheduleCTransactionViewSet.get_throttles
+      ~ScheduleCTransactionViewSet.get_view_description
+      ~ScheduleCTransactionViewSet.get_view_name
+      ~ScheduleCTransactionViewSet.handle_exception
+      ~ScheduleCTransactionViewSet.http_method_not_allowed
+      ~ScheduleCTransactionViewSet.initial
+      ~ScheduleCTransactionViewSet.initialize_request
+      ~ScheduleCTransactionViewSet.list
+      ~ScheduleCTransactionViewSet.options
+      ~ScheduleCTransactionViewSet.paginate_queryset
+      ~ScheduleCTransactionViewSet.partial_update
+      ~ScheduleCTransactionViewSet.perform_authentication
+      ~ScheduleCTransactionViewSet.perform_content_negotiation
+      ~ScheduleCTransactionViewSet.perform_create
+      ~ScheduleCTransactionViewSet.perform_destroy
+      ~ScheduleCTransactionViewSet.perform_update
+      ~ScheduleCTransactionViewSet.permission_denied
+      ~ScheduleCTransactionViewSet.previous
+      ~ScheduleCTransactionViewSet.raise_uncaught_exception
+      ~ScheduleCTransactionViewSet.retrieve
+      ~ScheduleCTransactionViewSet.reverse_action
+      ~ScheduleCTransactionViewSet.setup
+      ~ScheduleCTransactionViewSet.throttled
+      ~ScheduleCTransactionViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleCTransactionViewSet.allowed_methods
+      ~ScheduleCTransactionViewSet.authentication_classes
+      ~ScheduleCTransactionViewSet.basename
+      ~ScheduleCTransactionViewSet.default_response_headers
+      ~ScheduleCTransactionViewSet.description
+      ~ScheduleCTransactionViewSet.detail
+      ~ScheduleCTransactionViewSet.filter_backends
+      ~ScheduleCTransactionViewSet.http_method_names
+      ~ScheduleCTransactionViewSet.lookup_field
+      ~ScheduleCTransactionViewSet.lookup_url_kwarg
+      ~ScheduleCTransactionViewSet.name
+      ~ScheduleCTransactionViewSet.ordering
+      ~ScheduleCTransactionViewSet.ordering_fields
+      ~ScheduleCTransactionViewSet.paginator
+      ~ScheduleCTransactionViewSet.parser_classes
+      ~ScheduleCTransactionViewSet.permission_classes
+      ~ScheduleCTransactionViewSet.queryset
+      ~ScheduleCTransactionViewSet.renderer_classes
+      ~ScheduleCTransactionViewSet.schema
+      ~ScheduleCTransactionViewSet.settings
+      ~ScheduleCTransactionViewSet.suffix
+      ~ScheduleCTransactionViewSet.throttle_classes
+      ~ScheduleCTransactionViewSet.versioning_class
+      ~ScheduleCTransactionViewSet.view_is_async
+   
+   

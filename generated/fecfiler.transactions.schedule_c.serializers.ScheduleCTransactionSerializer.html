@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.transactions.schedule_c.tests" href="fecfiler.transactions.schedule_c.tests.html" />
+    <link rel="prev" title="fecfiler.transactions.schedule_c.serializers.get_model_data" href="fecfiler.transactions.schedule_c.serializers.get_model_data.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-transactions-schedule-c-serializers-schedulectransactionserializer">
+<h1>fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer<a class="headerlink" href="#fecfiler-transactions-schedule-c-serializers-schedulectransactionserializer" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.schedule_c.serializers.</span></span><span class="sig-name descname"><span class="pre">ScheduleCTransactionSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.transactions.serializers.TransactionSerializerBase.html#fecfiler.transactions.serializers.TransactionSerializerBase" title="fecfiler.transactions.serializers.TransactionSerializerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.transactions.serializers.TransactionSerializerBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.__init__" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([instance, data])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.bind" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.bind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bind</span></code></a>(field_name, parent)</p></td>
+<td><p>Initializes the field name and parent for the field instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_field</span></code></a>(field_name, info, model_class, ...)</p></td>
+<td><p>Return a two tuple of (cls, kwargs) to build a serializer field with.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_nested_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_nested_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_nested_field</span></code></a>(field_name, ...)</p></td>
+<td><p>Create nested fields for forward and reverse relationships.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_property_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_property_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_property_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Create a read only field for model methods and properties.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_relational_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_relational_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_relational_field</span></code></a>(field_name, relation_info)</p></td>
+<td><p>Create fields for forward and reverse relationships.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_standard_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_standard_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_standard_field</span></code></a>(field_name, model_field)</p></td>
+<td><p>Create regular model fields.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_unknown_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_unknown_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_unknown_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Raise an error on any unknown fields.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_url_field" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_url_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_url_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Create a field representing the object's own URL.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(validated_data)</p></td>
+<td><p>We have a bit of extra checking around this in order to provide descriptive messages when something goes wrong, but this method is essentially just:</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_contact</span></code>(validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_memo</span></code>(validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
+<td><p>A helper method that simply raises a validation error.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
+<td><p>Given the <em>outgoing</em> object instance, return the primitive value that should be used for this field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default</span></code></a>()</p></td>
+<td><p>Return the default value to use when validating data if no input is provided for this field.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_field_names</span></code></a>(declared_fields, ...)</p></td>
+<td><p>Return the default list of field names that will be used if the <cite>Meta.fields</cite> option is not specified.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_kwargs</span></code></a>()</p></td>
+<td><p>Return a dictionary mapping field names to a dictionary of additional keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_field_names</span></code></a>(declared_fields, info)</p></td>
+<td><p>Returns the list of all field names that should be created when instantiating this serializer class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
+<td><p>Return the dict of field names -&gt; field instances that should be used for <cite>self.fields</cite> when instantiating the serializer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_foreign_key_fields</span></code></a>()</p></td>
+<td><p>Returns a dictionary of foreign key fields</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
+<td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_schema_name" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_schema_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schema_name</span></code></a>(data)</p></td>
+<td><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_for_date_validators" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_for_date_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_for_date_validators</span></code></a>()</p></td>
+<td><p>Determine a default set of validators for the following constraints:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_together_validators" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_together_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_validators</span></code></a>()</p></td>
+<td><p>Determine a default set of validators for any unique_together constraints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_uniqueness_extra_kwargs" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_uniqueness_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_uniqueness_extra_kwargs</span></code></a>(field_names, ...)</p></td>
+<td><p>Return any additional field options that need to be included as a result of uniqueness constraints on the model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validation_candidate" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validation_candidate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validation_candidate</span></code></a>(data)</p></td>
+<td><p>Returns a copy of data where foreign key fields are replaced with the underlying foreign key field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validators" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
+<td><p>Determine the set of validators to use when instantiating serializer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_value" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
+<td><p>Given the <em>incoming</em> primitive data, return the value for this field that should be validated and transformed to a native value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.include_extra_kwargs" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.include_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">include_extra_kwargs</span></code></a>(kwargs, extra_kwargs)</p></td>
+<td><p>Include any 'extra_kwargs' that have been included for this field, possibly removing any incompatible existing keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>(*[, raise_exception])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.many_init" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This method implements the creation of a <cite>ListSerializer</cite> parent class when <cite>many=True</cite> is used.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validation" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
+<td><p>We override the default <cite>run_validation</cite>, because the validation performed by validators and the <cite>.validate()</cite> method should be coerced into an error dictionary with a 'non_fields_error' key.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validators" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
+<td><p>Add read_only fields with defaults to value before running validators.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_internal_value" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_representation" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance[, depth])</p></td>
+<td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
+<td><p>Adds stub aggregate_amount to pass validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate_empty_values" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<td><p>Validate empty values, and either:</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.context" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">context</span></code></a></p></td>
+<td><p>Returns the context as passed to the root serializer on initialization.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_error_messages</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_validators</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">errors</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code></a></p></td>
+<td><p>field_instance}.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent_transaction</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.root" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
+<td><p>Returns the top-level serializer for this field.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.bind">
+<span class="sig-name descname"><span class="pre">bind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the field name and parent for the field instance.
+Called when a field is added to the parent serializer instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_field">
+<span class="sig-name descname"><span class="pre">build_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_depth</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a two tuple of (cls, kwargs) to build a serializer field with.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_nested_field">
+<span class="sig-name descname"><span class="pre">build_nested_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_depth</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_nested_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create nested fields for forward and reverse relationships.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_property_field">
+<span class="sig-name descname"><span class="pre">build_property_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_property_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a read only field for model methods and properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_relational_field">
+<span class="sig-name descname"><span class="pre">build_relational_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_relational_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create fields for forward and reverse relationships.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_standard_field">
+<span class="sig-name descname"><span class="pre">build_standard_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_field</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_standard_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create regular model fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_unknown_field">
+<span class="sig-name descname"><span class="pre">build_unknown_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_unknown_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an error on any unknown fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_url_field">
+<span class="sig-name descname"><span class="pre">build_url_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.build_url_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a field representing the object’s own URL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.context">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>We have a bit of extra checking around this in order to provide
+descriptive messages when something goes wrong, but this method is
+essentially just:</p>
+<blockquote>
+<div><p>return ExampleModel.objects.create(<a href="#id1"><span class="problematic" id="id2">**</span></a>validated_data)</p>
+</div></blockquote>
+<p>If there are many to many fields present on the instance then they
+cannot be set until the model is instantiated, in which case the
+implementation is like so:</p>
+<blockquote>
+<div><p>example_relationship = validated_data.pop(‘example_relationship’)
+instance = ExampleModel.objects.create(<a href="#id3"><span class="problematic" id="id4">**</span></a>validated_data)
+instance.example_relationship = example_relationship
+return instance</p>
+</div></blockquote>
+<p>The default implementation also does not handle nested relationships.
+If you want to support writable nested relationships you’ll need
+to write an explicit <cite>.create()</cite> method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.default_empty_html">
+<span class="sig-name descname"><span class="pre">default_empty_html</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.default_empty_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.fields.empty</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail">
+<span class="sig-name descname"><span class="pre">fail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper method that simply raises a validation error.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>field_instance}.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>A dictionary of {field_name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute">
+<span class="sig-name descname"><span class="pre">get_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the <em>outgoing</em> object instance, return the primitive value
+that should be used for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default">
+<span class="sig-name descname"><span class="pre">get_default</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default value to use when validating data if no input
+is provided for this field.</p>
+<p>If a default has not been set for this field then this will simply
+raise <cite>SkipField</cite>, indicating that no value should be set in the
+validated data for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names">
+<span class="sig-name descname"><span class="pre">get_default_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the default list of field names that will be used if the
+<cite>Meta.fields</cite> option is not specified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs">
+<span class="sig-name descname"><span class="pre">get_extra_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary mapping field names to a dictionary of
+additional keyword arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names">
+<span class="sig-name descname"><span class="pre">get_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of all field names that should be created when
+instantiating this serializer class. This is based on the default
+set of fields, but also takes into account the <cite>Meta.fields</cite> or
+<cite>Meta.exclude</cite> options if they have been specified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields">
+<span class="sig-name descname"><span class="pre">get_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dict of field names -&gt; field instances that should be
+used for <cite>self.fields</cite> when instantiating the serializer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields">
+<span class="sig-name descname"><span class="pre">get_foreign_key_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of foreign key fields</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial">
+<span class="sig-name descname"><span class="pre">get_initial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value to use when the field is being returned as a primitive
+value, without any object instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_schema_name">
+<span class="sig-name descname"><span class="pre">get_schema_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_schema_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the schema name to retrieve the correct schema from fecfile_validate</p>
+<p>You need to either define <cite>schema_name</cite>, set the query parameter ‘schema’,
+or overide this function to provide the <cite>validate</cite> function with a schema</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – data being serialized.  May contain information needed to determine
+what schema you want to use</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>schema name that can be passed to
+<a href="#id5"><span class="problematic" id="id6">:py:function:`fecfile_validate.validate`</span></a> that will
+match a schema defined in the package</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_for_date_validators">
+<span class="sig-name descname"><span class="pre">get_unique_for_date_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_for_date_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a default set of validators for the following constraints:</p>
+<ul class="simple">
+<li><p>unique_for_date</p></li>
+<li><p>unique_for_month</p></li>
+<li><p>unique_for_year</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_together_validators">
+<span class="sig-name descname"><span class="pre">get_unique_together_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_unique_together_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine a default set of validators for any unique_together constraints.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_uniqueness_extra_kwargs">
+<span class="sig-name descname"><span class="pre">get_uniqueness_extra_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_uniqueness_extra_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return any additional field options that need to be included as a
+result of uniqueness constraints on the model. This is returned as
+a two-tuple of:</p>
+<p>(‘dict of updated extra kwargs’, ‘mapping of hidden fields’)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validation_candidate">
+<span class="sig-name descname"><span class="pre">get_validation_candidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validation_candidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of data where foreign key fields are replaced with the
+underlying foreign key field. Also dates and datetimes will be replaced
+with iso8601 strings</p>
+<dl class="simple">
+<dt>Example:  the f3x table is related to the report code label table by the</dt><dd><p>report code field.  DRF gives us the whole
+<code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.f3x_summaries.models.ReportCodeLabel</span></code> object.
+for validating purposes, we just want the report code.  With the
+foreign_key_fields mapping defined in Meta, we replace the foreign-key-
+related object with the key only.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validators">
+<span class="sig-name descname"><span class="pre">get_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the set of validators to use when instantiating serializer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the <em>incoming</em> primitive data, return the value for this field
+that should be validated and transformed to a native value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.include_extra_kwargs">
+<span class="sig-name descname"><span class="pre">include_extra_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.include_extra_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Include any ‘extra_kwargs’ that have been included for this field,
+possibly removing any incompatible existing keyword arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.many_init">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">many_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.many_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method implements the creation of a <cite>ListSerializer</cite> parent
+class when <cite>many=True</cite> is used. You can customize it if you need to
+control which keyword arguments are passed to the parent, and
+which are passed to the child.</p>
+<p>Note that we’re over-cautious in passing most arguments to both parent
+and child classes in order to try to cover the general case. If you’re
+overriding this method you’ll probably want something much simpler, eg:</p>
+<p>&#64;classmethod
+def many_init(cls, <a href="#id7"><span class="problematic" id="id8">*</span></a>args, <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs):</p>
+<blockquote>
+<div><p>kwargs[‘child’] = cls()
+return CustomListSerializer(<a href="#id11"><span class="problematic" id="id12">*</span></a>args, <a href="#id13"><span class="problematic" id="id14">**</span></a>kwargs)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.root">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">root</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the top-level serializer for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validation">
+<span class="sig-name descname"><span class="pre">run_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>We override the default <cite>run_validation</cite>, because the validation
+performed by validators and the <cite>.validate()</cite> method should
+be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validators">
+<span class="sig-name descname"><span class="pre">run_validators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.run_validators" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add read_only fields with defaults to value before running validators.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.serializer_related_to_field">
+<span class="sig-name descname"><span class="pre">serializer_related_to_field</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.serializer_related_to_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.relations.SlugRelatedField</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.serializer_url_field">
+<span class="sig-name descname"><span class="pre">serializer_url_field</span></span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.serializer_url_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">rest_framework.relations.HyperlinkedIdentityField</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_internal_value">
+<span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_internal_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_representation">
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.to_representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object instance -&gt; Dict of primitive datatypes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds stub aggregate_amount to pass validation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate_empty_values">
+<span class="sig-name descname"><span class="pre">validate_empty_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate_empty_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate empty values, and either:</p>
+<ul class="simple">
+<li><p>Raise <cite>ValidationError</cite>, indicating invalid data.</p></li>
+<li><p>Raise <cite>SkipField</cite>, indicating that the field should be ignored.</p></li>
+<li><p>Return (True, data), indicating an empty value that should be
+returned without any further validation being applied.</p></li>
+<li><p>Return (False, data), indicating a non-empty value, that should
+have validation applied as normal.</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.scha_transactions.html">fecfiler.scha_transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.managers.html">fecfiler.transactions.managers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.models.html">fecfiler.transactions.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_a.html">fecfiler.transactions.schedule_a</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_b.html">fecfiler.transactions.schedule_b</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.schedule_c.html">fecfiler.transactions.schedule_c</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.models.html">fecfiler.transactions.schedule_c.models</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="fecfiler.transactions.schedule_c.serializers.html">fecfiler.transactions.schedule_c.serializers</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.serializers.get_model_data.html">fecfiler.transactions.schedule_c.serializers.get_model_data</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.tests.html">fecfiler.transactions.schedule_c.tests</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.html">fecfiler.transactions.schedule_c.views</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.serializers.html">fecfiler.transactions.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.signals.html">fecfiler.transactions.signals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.urls.html">fecfiler.transactions.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.triage.html">fecfiler.triage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.utils.html">fecfiler.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
+  <li><a href="fecfiler.transactions.schedule_c.html">fecfiler.transactions.schedule_c</a><ul>
+  <li><a href="fecfiler.transactions.schedule_c.serializers.html">fecfiler.transactions.schedule_c.serializers</a><ul>
+      <li>Previous: <a href="fecfiler.transactions.schedule_c.serializers.get_model_data.html" title="previous chapter">fecfiler.transactions.schedule_c.serializers.get_model_data</a></li>
+      <li>Next: <a href="fecfiler.transactions.schedule_c.tests.html" title="next chapter">fecfiler.transactions.schedule_c.tests</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
