@@ -77,8 +77,8 @@ class SummaryService:
         # build summary
         summary = ytd_transactions.aggregate(
             line_15=line_15,
-            line_37=line_15
         )
+        summary["line_37"] = summary["line_15"]
 
         return summary
 
