@@ -24,6 +24,7 @@ class F3XSerializerTestCase(TestCase):
         f3x = F3XSummary.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
+        self.assertEqual(summary["b"]["line_12"], Decimal("1312.12"))
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
 
     def test_report_with_no_transactions(self):
