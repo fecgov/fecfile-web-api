@@ -7,6 +7,7 @@ from fecfiler.f3x_summaries.models import F3XSummary
 class F3XSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
+        "test_contacts",
         "test_f3x_summaries",
         "test_summary_transactions",
     ]
