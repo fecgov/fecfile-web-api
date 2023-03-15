@@ -36,6 +36,16 @@ class F3XSummaryTestCase(TestCase):
         f3x = F3XSummary.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
+
+        # self.assertEqual(summary["b"]["line_11ai"], Decimal("10100.23"))
+        # self.assertEqual(summary["b"]["line_11aii"], Decimal("103.33"))
+        # self.assertEqual(summary["b"]["line_11aiii"], round(Decimal(103.33 + 10100.23), 2))
+        self.assertEqual(summary["b"]["line_11b"], Decimal("544.44"))
+        self.assertEqual(summary["b"]["line_11c"], Decimal("655.55"))
+        self.assertEqual(
+            summary["b"]["line_11d"], round(Decimal(103.33 + 10100.23 + 544.44 + 655.55 - 203.33), 2)
+        )
+
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
 
     def test_report_with_no_transactions(self):
