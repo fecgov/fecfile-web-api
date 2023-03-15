@@ -40,6 +40,7 @@ def calculate_summary(report_id):
     report.L12_transfers_from_affiliated_other_party_cmtes_period = summary["a"][
         "line_12"
     ]
+    report.L12_transfers_from_affiliated_other_party_cmtes_ytd = summary["b"]["line_12"]
     report.L15_offsets_to_operating_expenditures_refunds_period = summary["a"][
         "line_15"
     ]
