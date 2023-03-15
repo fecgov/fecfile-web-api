@@ -393,10 +393,10 @@ class ReportMixin(models.Model):
                 report_year = report_date.year
 
                 reports_to_flag_for_recalculation = F3XSummary.objects.filter(
+                    ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
                     committee_account=committee,
                     coverage_from_date__year=report_year,
                     coverage_from_date__gte=report_date,
-                    upload_submission=None
                 )
             else:
                 reports_to_flag_for_recalculation = [self.report]

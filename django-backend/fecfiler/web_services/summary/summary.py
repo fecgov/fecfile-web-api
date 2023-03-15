@@ -93,13 +93,13 @@ class SummaryService:
             line_11b=line_11b,
             line_11c=line_11c,
             line_15=line_15,
-            line_37=line_15
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
         )
         summary["line_33"] = summary["line_11d"]
+        summary["line_37"] = summary["line_15"]
 
         return summary
 
