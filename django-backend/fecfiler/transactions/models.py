@@ -7,6 +7,7 @@ from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
+from fecfiler.transactions.schedule_c.models import ScheduleC
 import uuid
 import logging
 
@@ -57,6 +58,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     schedule_b = models.ForeignKey(
         ScheduleB, on_delete=models.CASCADE, null=True, blank=True
+    )
+    schedule_c = models.ForeignKey(
+        ScheduleC, on_delete=models.CASCADE, null=True, blank=True
     )
 
     objects = TransactionManager()
