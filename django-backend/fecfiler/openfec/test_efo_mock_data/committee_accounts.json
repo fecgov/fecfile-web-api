@@ -241,5 +241,32 @@
         "custodian_zip": "12345",
         "custodian_name_title": "test_title11",
         "custodian_phone": "8175212197"
+    },
+    {
+        "committee_id": "C00100362",
+        "name": "Committee to elect Test Account1",
+        "committee_type_full": "PAC - Nonqualified",
+        "street_1": "123 Main Street",
+        "city": "Nashville",
+        "state": "TN",
+        "zip": "37206",
+        "email": "fakeemail@testaccount.com",
+        "treasurer_name_1": "Sarah",
+        "treasurer_name_2": "Jarrett",
+        "treasurer_street_1": "1313 Jarrett Drive",
+        "treasurer_city": "Springfield",
+        "treasurer_state": "TN",
+        "treasurer_zip": "37172",
+        "treasurer_name_title": "CFO",
+        "treasurer_phone": "8175212197",
+        "custodian_name_full": "Mitchell, Scott",
+        "custodian_name_1": "Scott",
+        "custodian_name_2": "Mitchell",
+        "custodian_street_1": "321 Charlotte Avenue",
+        "custodian_city": "Nashville",
+        "custodian_state": "TN",
+        "custodian_zip": "37208",
+        "custodian_name_title": "President",
+        "custodian_phone": "8175212197"
     }
 ]
