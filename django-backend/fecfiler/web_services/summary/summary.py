@@ -73,10 +73,14 @@ class SummaryService:
         # line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
         line_15 = self._create_contribution_sum(sa15_query)
+        # line 17
+        sa17_query = Q(~Q(memo_code=True), form_type="SA17")
+        line_17 = self._create_contribution_sum(sa17_query)
 
         # build summary
         summary = ytd_transactions.aggregate(
             line_15=line_15,
+            line_17=line_17
         )
         summary["line_37"] = summary["line_15"]
 

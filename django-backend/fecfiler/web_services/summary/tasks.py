@@ -45,6 +45,7 @@ def calculate_summary(report_id):
     ]
     report.L15_offsets_to_operating_expenditures_refunds_ytd = summary["b"]["line_15"]
     report.L17_other_federal_receipts_dividends_period = summary["a"]["line_17"]
+    report.L17_other_federal_receipts_dividends_ytd = summary["b"]["line_17"]
     report.L33_total_contributions_period = summary["a"]["line_33"]
     report.L37_offsets_to_operating_expenditures_period = summary["a"]["line_37"]
     report.L37_offsets_to_operating_expenditures_ytd = summary["b"]["line_37"]
