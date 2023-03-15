@@ -111,7 +111,8 @@ fecfiler.web\_services.summary.test\_summary.F3XSummaryTestCase
       ~F3XSummaryTestCase.subTest
       ~F3XSummaryTestCase.tearDown
       ~F3XSummaryTestCase.tearDownClass
-      ~F3XSummaryTestCase.test_calculate_summary
+      ~F3XSummaryTestCase.test_calculate_summary_column_a
+      ~F3XSummaryTestCase.test_calculate_summary_column_b
       ~F3XSummaryTestCase.test_report_with_no_transactions
    
    
