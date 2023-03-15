@@ -20,17 +20,17 @@ class F3XSummaryViewSetTest(TestCase):
         expected_json = [
             {
                 "coverage_from_date": "2005-01-30",
-                "coverage_through_date": "2005-01-30",
+                "coverage_through_date": "2005-02-28",
                 "report_code": "Q1",
             },
             {
                 "coverage_from_date": "2006-01-30",
-                "coverage_through_date": "2006-01-30",
+                "coverage_through_date": "2006-02-28",
                 "report_code": "MY",
             },
             {
                 "coverage_from_date": "2007-01-30",
-                "coverage_through_date": "2007-01-30",
+                "coverage_through_date": "2007-02-28",
                 "report_code": "12C",
             },
         ]
