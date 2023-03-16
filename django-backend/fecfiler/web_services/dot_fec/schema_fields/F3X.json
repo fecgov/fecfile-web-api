@@ -3,7 +3,7 @@
     "filer_committee_id_number": {},
     "committee_name": {},
     "change_of_address": {
-        "serializer": "BOOLEAN"
+        "serializer": "BOOLEAN_X"
     },
     "street_1": {},
     "street_2": {},
@@ -23,7 +23,7 @@
         "serializer": "DATE"
     },
     "qualified_committee": {
-        "serializer": "BOOLEAN"
+        "serializer": "BOOLEAN_X"
     },
     "treasurer_last_name": {},
     "treasurer_first_name": {},
