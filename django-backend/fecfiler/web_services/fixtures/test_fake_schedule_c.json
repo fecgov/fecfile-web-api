@@ -1,0 +1,48 @@
+[
+    {
+        "model": "transactions.schedulec",
+        "fields": {
+            "lender_organization_name": "test_string_value",
+            "lender_last_name": "test_string_value",
+            "lender_first_name": "test_string_value",
+            "secured": true,
+            "personal_funds": false
+        },
+        "pk": "57b95c3a-f7bc-4c36-a3fd-66bb52976eec"
+    },
+    {
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "57b95c3a-f7bc-4c36-a3fd-66bb52976eec",
+            "schedule_c": "57b95c3a-f7bc-4c36-a3fd-66bb52976eec",
+            "form_type": "SC/10",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "C56123456789-1234",
+            "transaction_type_identifier": "TEST_TID",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "transactions.schedulec",
+        "fields": {
+            "lender_organization_name": "test_string_value2",
+            "lender_last_name": "test_string_value2",
+            "lender_first_name": "test_string_value2"
+        },
+        "pk": "3fce473a-7939-4733-a0a8-298d16a058cd"
+    },
+    {
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "3fce473a-7939-4733-a0a8-298d16a058cd",
+            "schedule_c": "3fce473a-7939-4733-a0a8-298d16a058cd",
+            "form_type": "SC/10",
+            "filer_committee_id_number": "C00123456",
+            "transaction_id": "C56123456788-1234",
+            "transaction_type_identifier": "TEST_TID",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]
