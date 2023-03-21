@@ -1,8 +1,5 @@
 from .models import F3XSummary
-from rest_framework.serializers import (
-    EmailField,
-    CharField,
-)
+from rest_framework.serializers import EmailField, CharField, ValidationError
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
@@ -10,6 +7,10 @@ from fecfiler.web_services.serializers import (
 )
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 import logging
+
+COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
+    {"report_code": ["Collision with existing report_code and year"]}
+)
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,22 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
     report_code_label = CharField(
         read_only=True,
     )
+
+    def save(self, **kwargs):
+        """Raise a ValidationError if an F3X with the same report code
+        exists for the same year
+        """
+        request = self.context["request"]
+        committee_id = request.user.cmtee_id
+        number_of_collisions = F3XSummary.objects.filter(
+            committee_account__committee_id=committee_id,
+            coverage_from_date__year=self.validated_data["coverage_from_date"].year,
+            report_code=self.validated_data["report_code"],
+        ).count()
+        if number_of_collisions is 0:
+            return super(F3XSummarySerializer, self).save(**kwargs)
+        else:
+            raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
     class Meta:
         model = F3XSummary
