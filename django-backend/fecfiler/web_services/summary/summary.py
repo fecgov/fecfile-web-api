@@ -82,9 +82,15 @@ class SummaryService:
         # line 11c
         sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
         line_11c = self._create_contribution_sum(sa11c_query)
+        # line 12
+        sa12_query = Q(~Q(memo_code=True), form_type="SA12")
+        line_12 = self._create_contribution_sum(sa12_query)
         # line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
         line_15 = self._create_contribution_sum(sa15_query)
+        # line 17
+        sa17_query = Q(~Q(memo_code=True), form_type="SA17")
+        line_17 = self._create_contribution_sum(sa17_query)
 
         # build summary
         summary = ytd_transactions.aggregate(
@@ -92,7 +98,9 @@ class SummaryService:
             line_11aii=line_11aii,
             line_11b=line_11b,
             line_11c=line_11c,
+            line_12=line_12,
             line_15=line_15,
+            line_17=line_17
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (

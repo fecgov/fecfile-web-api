@@ -17,6 +17,7 @@ from rest_framework.serializers import (
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
+from fecfiler.transactions.schedule_c.models import ScheduleC
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,16 @@ class ScheduleBSerializer(ModelSerializer):
         model = ScheduleB
 
 
+class ScheduleCSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleC._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleC
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -66,6 +77,7 @@ class TransactionSerializerBase(
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
+    schedule_c = ScheduleCSerializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
@@ -77,6 +89,7 @@ class TransactionSerializerBase(
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
+        schedule_c = representation.pop("schedule_c") or []
         if depth < 1:
             if instance.parent_transaction:
                 representation["parent_transaction"] = self.to_representation(
@@ -98,6 +111,10 @@ class TransactionSerializerBase(
             for property in schedule_b:
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
+        if schedule_c:
+            for property in schedule_c:
+                if not representation.get(property):
+                    representation[property] = schedule_c[property]
         return representation
 
     def to_internal_value(self, data):
@@ -124,6 +141,7 @@ class TransactionSerializerBase(
                 "aggregate",
                 "schedule_a",
                 "schedule_b",
+                "schedule_c",
             ]
 
         fields = get_fields()

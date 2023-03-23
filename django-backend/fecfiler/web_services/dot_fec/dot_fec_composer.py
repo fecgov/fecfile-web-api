@@ -99,7 +99,11 @@ def add_row_to_content(content, row):
 
 
 def get_schema_name(schedule):
-    return {Schedule.A.value.value: "SchA", Schedule.B.value.value: "SchB"}.get(
+    return {
+        Schedule.A.value.value: "SchA",
+        Schedule.B.value.value: "SchB",
+        Schedule.C.value.value: "SchC"
+    }.get(
         schedule
     )
 

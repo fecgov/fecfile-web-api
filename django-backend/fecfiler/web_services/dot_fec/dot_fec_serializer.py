@@ -22,9 +22,18 @@ def get_value_from_path(object, path):
     return value
 
 
-def boolean_serializer(model_instance, field_name, mapping):
+def boolean_x_serializer(model_instance, field_name, mapping):
     value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return "X" if value else ""
+
+
+def boolean_yn_serializer(model_instance, field_name, mapping):
+    value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
+    if value is True:
+        return "Y"
+    if value is False:
+        return "N"
+    return ""
 
 
 def date_serializer(model_instance, field_name, mapping):
@@ -46,7 +55,8 @@ Pass the model instance and field name into the serializer to
 get a string representation in the FEC standard
 """
 FIELD_SERIALIZERS = {
-    "BOOLEAN": boolean_serializer,
+    "BOOLEAN_X": boolean_x_serializer,
+    "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
     None: default_serializer,
 }

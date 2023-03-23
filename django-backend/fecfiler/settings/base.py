@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "fecfiler.triage",
     "fecfiler.openfec",
 ]
 
