@@ -39,11 +39,15 @@ class F3XSummaryTestCase(TestCase):
 
         # self.assertEqual(summary["b"]["line_11ai"], Decimal("10100.23"))
         # self.assertEqual(summary["b"]["line_11aii"], Decimal("103.33"))
-        # self.assertEqual(summary["b"]["line_11aiii"], round(Decimal(103.33 + 10100.23), 2))
+        # self.assertEqual(
+        #   summary["b"]["line_11aiii"],
+        #   round(Decimal(103.33 + 10100.23), 2)
+        # )
         self.assertEqual(summary["b"]["line_11b"], Decimal("544.44"))
         self.assertEqual(summary["b"]["line_11c"], Decimal("655.55"))
         self.assertEqual(
-            summary["b"]["line_11d"], round(Decimal(103.33 + 10100.23 + 544.44 + 655.55 - 203.33), 2)
+            summary["b"]["line_11d"],
+            round(Decimal(103.33 + 10100.23 + 544.44 + 655.55 - 203.33), 2)
         )
 
         self.assertEqual(summary["b"]["line_12"], Decimal("1312.12"))
