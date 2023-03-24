@@ -1,4 +1,5 @@
 from .models import F3XSummary
+from django.db.models import Q
 from rest_framework.serializers import EmailField, CharField, ValidationError
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
@@ -51,6 +52,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         request = self.context["request"]
         committee_id = request.user.cmtee_id
         number_of_collisions = F3XSummary.objects.filter(
+            ~Q(id=(self.instance or F3XSummary()).id),
             committee_account__committee_id=committee_id,
             coverage_from_date__year=self.validated_data["coverage_from_date"].year,
             report_code=self.validated_data["report_code"],
