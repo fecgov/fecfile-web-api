@@ -57,7 +57,7 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
             coverage_from_date__year=self.validated_data["coverage_from_date"].year,
             report_code=self.validated_data["report_code"],
         ).count()
-        if number_of_collisions is 0:
+        if number_of_collisions == 0:
             return super(F3XSummarySerializer, self).save(**kwargs)
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
