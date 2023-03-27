@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.transactions.models import Transaction
 from .summary import SummaryService
 
 
@@ -17,19 +18,19 @@ class F3XSummaryTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
         self.assertEqual(summary["a"]["line_11ai"], Decimal("10000.23"))
-        self.assertEqual(summary["a"]["line_11aii"], Decimal("3.33"))
-        self.assertEqual(summary["a"]["line_11aiii"], round(Decimal(3.33 + 10000.23), 2))
+        self.assertEqual(summary["a"]["line_11aii"], Decimal("3.77"))
+        self.assertEqual(summary["a"]["line_11aiii"], round(Decimal(3.77 + 10000.23), 2))
         self.assertEqual(summary["a"]["line_11b"], Decimal("444.44"))
         self.assertEqual(summary["a"]["line_11c"], Decimal("555.55"))
         self.assertEqual(
-            summary["a"]["line_11d"], round(Decimal(3.33 + 10000.23 + 444.44 + 555.55), 2)
+            summary["a"]["line_11d"], round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2)
         )
         self.assertEqual(summary["a"]["line_12"], Decimal("1212.12"))
         self.assertEqual(summary["a"]["line_15"], Decimal("2125.79"))
         self.assertEqual(summary["a"]["line_15"], summary["a"]["line_37"])
         self.assertEqual(summary["a"]["line_17"], Decimal("1000.00"))
         self.assertEqual(
-            summary["a"]["line_33"], round(Decimal(3.33 + 10000.23 + 444.44 + 555.55), 2)
+            summary["a"]["line_33"], round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2)
         )
 
     def test_calculate_summary_column_b(self):
@@ -37,17 +38,20 @@ class F3XSummaryTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
 
-        # self.assertEqual(summary["b"]["line_11ai"], Decimal("10100.23"))
-        # self.assertEqual(summary["b"]["line_11aii"], Decimal("103.33"))
-        # self.assertEqual(
-        #   summary["b"]["line_11aiii"],
-        #   round(Decimal(103.33 + 10100.23), 2)
-        # )
+        t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
+        self.assertEqual(t.itemized, False)
+
+        self.assertEqual(summary["b"]["line_11ai"], Decimal("10000.23"))
+        self.assertEqual(summary["b"]["line_11aii"], Decimal("103.77"))
+        self.assertEqual(
+           summary["b"]["line_11aiii"],
+           Decimal(10104.00)
+        )
         self.assertEqual(summary["b"]["line_11b"], Decimal("544.44"))
         self.assertEqual(summary["b"]["line_11c"], Decimal("655.55"))
         self.assertEqual(
             summary["b"]["line_11d"],
-            round(Decimal(103.33 + 10100.23 + 544.44 + 655.55 - 203.33), 2)
+            round(Decimal(10104.00 + 544.44 + 655.55), 2)
         )
 
         self.assertEqual(summary["b"]["line_12"], Decimal("1312.12"))
