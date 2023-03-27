@@ -70,7 +70,7 @@ class SummaryService:
             date__lte=report_date,
         )
 
-        logger.info(f"Transaction count: {len(list(ytd_transactions))}" )
+        logger.info(f"Transaction count: {len(list(ytd_transactions))}")
         logger.info(f"{committee}, {report_date}, {report_year}")
 
         # line 11ai
