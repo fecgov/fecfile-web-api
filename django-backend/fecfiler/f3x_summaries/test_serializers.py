@@ -1,6 +1,5 @@
 from django.test import TestCase
 from .serializers import F3XSummarySerializer, COVERAGE_DATE_REPORT_CODE_COLLISION
-from .models import F3XSummary
 from fecfiler.authentication.models import Account
 from rest_framework.request import Request, HttpRequest
 
