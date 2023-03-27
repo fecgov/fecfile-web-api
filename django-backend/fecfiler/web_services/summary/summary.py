@@ -70,9 +70,6 @@ class SummaryService:
             date__lte=report_date,
         )
 
-        logger.info(f"Transaction count: {len(list(ytd_transactions))}")
-        logger.info(f"{committee}, {report_date}, {report_year}")
-
         # line 11ai
         sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
         line_11ai = self._create_contribution_sum(sa11ai_query)
