@@ -67,8 +67,11 @@ class SummaryService:
         ytd_transactions = Transaction.objects.filter(
             committee_account=committee,
             date__year=report_year,
-            date__lt=report_date,
+            date__lte=report_date,
         )
+
+        logger.info(f"Transaction count: {len(list(ytd_transactions))}" )
+        logger.info(f"{committee}, {report_date}, {report_year}")
 
         # line 11ai
         sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
