@@ -112,6 +112,7 @@ fecfiler.f3x\_summaries.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.tearDown
       ~F3XSerializerTestCase.tearDownClass
       ~F3XSerializerTestCase.test_serializer_validate
+      ~F3XSerializerTestCase.test_used_report_code
    
    
 
