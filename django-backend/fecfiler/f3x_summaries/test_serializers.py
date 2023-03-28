@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .serializers import F3XSummarySerializer
+from .serializers import F3XSummarySerializer, COVERAGE_DATE_REPORT_CODE_COLLISION
 from fecfiler.authentication.models import Account
 from rest_framework.request import Request, HttpRequest
 
@@ -10,13 +10,14 @@ class F3XSerializerTestCase(TestCase):
     def setUp(self):
         self.valid_f3x_summary = {
             "form_type": "F3XN",
-            "filer_committee_id_number": "C00123456",
+            "filer_committee_id_number": "C00277616",
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
+            "coverage_from_date": "2023-01-01",
+            "coverage_through_date": "2023-01-01",
+            "report_code": "Q1",
             "date_signed": "2022-01-01",
-            "upload_submission": {
-                "fec_status": " ACCEPTED"
-            }
+            "upload_submission": {"fec_status": " ACCEPTED"},
         }
 
         self.invalid_f3x_summary = {
@@ -43,3 +44,19 @@ class F3XSerializerTestCase(TestCase):
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])
+
+    def test_used_report_code(self):
+        valid_serializer = F3XSummarySerializer(
+            data=self.valid_f3x_summary,
+            context={"request": self.mock_request},
+        )
+        valid_serializer.is_valid()
+        valid_serializer.save()
+        valid_serializer = F3XSummarySerializer(
+            data=self.valid_f3x_summary,
+            context={"request": self.mock_request},
+        )
+        valid_serializer.is_valid()
+        self.assertRaises(
+            type(COVERAGE_DATE_REPORT_CODE_COLLISION), valid_serializer.save
+        )
