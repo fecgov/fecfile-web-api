@@ -31,7 +31,6 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.memo_text.urls")),
     re_path(BASE_V1_URL, include("fecfiler.transactions.urls")),
-    re_path(BASE_V1_URL, include("fecfiler.triage.urls")),
     re_path(BASE_V1_URL, include("fecfiler.authentication.urls")),
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),
     re_path(BASE_V1_URL, include("fecfiler.openfec.urls")),

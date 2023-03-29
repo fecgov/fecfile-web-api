@@ -20,7 +20,7 @@ class DotFECSerializerTestCase(TestCase):
         "test_f3x_summaries",
         "test_individual_receipt",
         "test_memo_text",
-        "test_memo_text",
+        "test_fake_schedule_c",
     ]
 
     def setUp(self):
@@ -30,6 +30,12 @@ class DotFECSerializerTestCase(TestCase):
         self.transaction = Transaction.objects.filter(
             id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
         ).first()
+        self.schc_transaction1 = Transaction.objects.filter(
+            id="57b95c3a-f7bc-4c36-a3fd-66bb52976eec"
+        ).first()
+        self.schc_transaction2 = Transaction.objects.filter(
+            id="3fce473a-7939-4733-a0a8-298d16a058cd"
+        ).first()
         self.report_level_memo_text = MemoText.objects.filter(
             id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d"
         ).first()
@@ -37,6 +43,7 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_serialize_field(self):
         f3x_field_mappings = get_field_mappings("F3X")
+        schc_field_mappings = get_field_mappings("SchC")
         # TEXT
         serialized_text = serialize_field(
             self.f3x, "treasurer_last_name", f3x_field_mappings
@@ -78,19 +85,34 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.assertEqual(serialzed_date_undefined, "")
 
-        # BOOLEAN
-        serialized_boolean_true = serialize_field(
+        # BOOLEAN_X
+        serialized_boolean_x_true = serialize_field(
             self.f3x, "change_of_address", f3x_field_mappings
         )
-        self.assertEqual(serialized_boolean_true, "X")
-        serialized_boolean_false = serialize_field(
+        self.assertEqual(serialized_boolean_x_true, "X")
+        serialized_boolean_x_false = serialize_field(
             self.f3x, "qualified_committee", f3x_field_mappings
         )
-        self.assertEqual(serialized_boolean_false, "")
-        serialized_boolean_undefined = serialize_field(
+        self.assertEqual(serialized_boolean_x_false, "")
+        serialized_boolean_x_undefined = serialize_field(
             F3XSummary(), "qualified_committee", f3x_field_mappings
         )
-        self.assertEqual(serialized_boolean_undefined, "")
+        self.assertEqual(serialized_boolean_x_undefined, "")
+
+        # BOOLEAN_YN
+        serialized_boolean_yn_true = serialize_field(
+            self.schc_transaction1, "secured", schc_field_mappings
+        )
+        self.assertEqual(serialized_boolean_yn_true, "Y")
+        serialized_boolean_yn_false = serialize_field(
+            self.schc_transaction1, "personal_funds", schc_field_mappings
+        )
+        self.assertEqual(serialized_boolean_yn_false, "N")
+        serialized_boolean_yn_undefined = serialize_field(
+            self.schc_transaction2, "personal_funds", schc_field_mappings
+        )
+        # N Because model has default=False, otherwise would be ''
+        self.assertEqual(serialized_boolean_yn_undefined, "N")
 
     def test_serialize_f3x_summary_instance(self):
         summary_row = serialize_instance("F3X", self.f3x)
