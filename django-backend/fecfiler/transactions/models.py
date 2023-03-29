@@ -89,3 +89,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         except ValidationError:  # try using a new fec id if collision
             self.transaction_id = generate_fec_uid()
         super(Transaction, self).save(*args, **kwargs)
+
+    class Meta:
+        indexes = [models.Index(fields=["form_type"])]
