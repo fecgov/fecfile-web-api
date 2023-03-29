@@ -12,6 +12,9 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name='transaction',
-            index=models.Index(fields=['form_type'], name='transaction_form_ty_4e50e4_idx'),
+            index=models.Index(
+                fields=['form_type'],
+                name='transaction_form_ty_4e50e4_idx'
+            ),
         ),
     ]
