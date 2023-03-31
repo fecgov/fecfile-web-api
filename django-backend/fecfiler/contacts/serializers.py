@@ -87,4 +87,13 @@ class LinkedContactSerializerMixin(ModelSerializer):
             contact: Contact = Contact.objects.create(**contact_data)
             validated_data["contact_id"] = contact.id
         else:
-            Contact.objects.filter(id=contact_id).update(**contact_data)
+            contact_id_query_set = Contact.objects.filter(id=contact_id)
+            contact = contact_id_query_set.first()
+            update_found = False
+            for attr in contact_data:
+                if not getattr(contact, attr) == contact_data[attr]:
+                    update_found = True
+                    break
+            if update_found:
+                contact_id_query_set.update(**contact_data)
+                self.contact_updated = True

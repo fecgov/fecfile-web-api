@@ -1,8 +1,10 @@
 import logging
+from uuid import UUID
 
 from django.db import transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.schedule_a.tasks import update_future_transaction_contacts
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField
 from rest_framework.serializers import ListSerializer
@@ -127,10 +129,15 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
 
+            if hasattr(self, 'contact_updated') and self.contact_updated:
+                self.execute_update_future_transaction_contacts_task(
+                    validated_data.get('contact_id'), schedule_a_data
+                )
             return parent
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            schedule_a_data = get_model_data(validated_data, ScheduleA)
             children = validated_data.pop("children", [])
 
             for child in children:
@@ -144,7 +151,15 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
-            return super().update(instance, validated_data)
+            updated = super().update(instance, validated_data)
+            if hasattr(self, 'contact_updated') and self.contact_updated:
+                self.execute_update_future_transaction_contacts_task(
+                    validated_data.get('contact_id'), schedule_a_data
+                )
+            return updated
+
+    def execute_update_future_transaction_contacts_task(self, contact_id: UUID, scha_transaction: dict):
+        update_future_transaction_contacts.s(contact_id, scha_transaction).apply_async(retry=False)
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (
