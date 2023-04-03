@@ -14,6 +14,8 @@ from .models import Contact
 
 logger = logging.getLogger(__name__)
 
+contact_updated_flag = 'contact_updated'
+
 
 class ContactSerializer(
     serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
@@ -96,4 +98,4 @@ class LinkedContactSerializerMixin(ModelSerializer):
                     break
             if update_found:
                 contact_id_query_set.update(**contact_data)
-                self.contact_updated = True
+                setattr(self, contact_updated_flag, True)

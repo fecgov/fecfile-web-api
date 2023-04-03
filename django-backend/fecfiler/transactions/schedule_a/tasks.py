@@ -8,9 +8,11 @@ from fecfiler.transactions.schedule_a.models import ScheduleA
 @shared_task
 def update_future_transaction_contacts(
     contact_id: UUID,
-    data: dict,
+    schedule_a_data: dict,
 ):
-    contribution_date = datetime.fromisoformat(data.get('contribution_date'))
+    contribution_date = datetime.fromisoformat(
+        schedule_a_data.get('contribution_date')
+    )
     attributes_to_update = [
         'contributor_organization_name',
         'contributor_last_name',
@@ -35,5 +37,8 @@ def update_future_transaction_contacts(
     )
     for scha_transaction in scha_transactions:
         for attribute in attributes_to_update:
-            setattr(scha_transaction, attribute, data.get(attribute))
+            setattr(
+                scha_transaction, attribute,
+                schedule_a_data.get(attribute)
+            )
     ScheduleA.objects.bulk_update(scha_transactions, attributes_to_update, 50)

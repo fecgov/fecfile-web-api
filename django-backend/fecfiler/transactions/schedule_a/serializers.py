@@ -8,6 +8,7 @@ from fecfiler.transactions.schedule_a.tasks import update_future_transaction_con
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField
 from rest_framework.serializers import ListSerializer
+from fecfiler.contacts.serializers import contact_updated_flag
 
 logger = logging.getLogger(__name__)
 
@@ -128,11 +129,9 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
-
-            if hasattr(self, 'contact_updated') and self.contact_updated:
-                self.execute_update_future_transaction_contacts_task(
-                    validated_data.get('contact_id'), schedule_a_data
-                )
+            self.execute_update_future_transaction_contacts_task_if_needed(
+                validated_data.get('contact_id'), schedule_a_data
+            )
             return parent
 
     def update(self, instance, validated_data: dict):
@@ -152,14 +151,18 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
             updated = super().update(instance, validated_data)
-            if hasattr(self, 'contact_updated') and self.contact_updated:
-                self.execute_update_future_transaction_contacts_task(
-                    validated_data.get('contact_id'), schedule_a_data
-                )
+            self.execute_update_future_transaction_contacts_task_if_needed(
+                validated_data.get('contact_id'), schedule_a_data
+            )
             return updated
 
-    def execute_update_future_transaction_contacts_task(self, contact_id: UUID, scha_transaction: dict):
-        update_future_transaction_contacts.s(contact_id, scha_transaction).apply_async(retry=False)
+    def execute_update_future_transaction_contacts_task_if_needed(
+        self, contact_id: UUID, scha_transaction: dict
+    ):
+        if hasattr(self, contact_updated_flag) and getattr(self, contact_updated_flag):
+            update_future_transaction_contacts.s(
+                contact_id, scha_transaction
+            ).apply_async(retry=False)
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (
