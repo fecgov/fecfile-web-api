@@ -93,7 +93,7 @@ class LinkedContactSerializerMixin(ModelSerializer):
             contact = contact_id_query_set.first()
             update_found = False
             for attr in contact_data:
-                if not getattr(contact, attr) == contact_data[attr]:
+                if getattr(contact, attr) != contact_data[attr]:
                     update_found = True
                     break
             if update_found:
