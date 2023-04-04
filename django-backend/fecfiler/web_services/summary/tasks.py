@@ -50,27 +50,25 @@ def calculate_summary(report_id):
     report.L11d_total_contributions_period = summary["a"]["line_11d"]
     report.L11d_total_contributions_ytd = summary["b"]["line_11d"]
     # line 12
-    report.L12_transfers_from_affiliated_other_party_cmtes_period = summary[
-        "a"
-    ]["line_12"]
-    # line 15
-    report.L15_offsets_to_operating_expenditures_refunds_period = summary["a"]["line_15"]
     report.L12_transfers_from_affiliated_other_party_cmtes_period = summary["a"][
         "line_12"
     ]
     report.L12_transfers_from_affiliated_other_party_cmtes_ytd = summary["b"]["line_12"]
+    # line 15
     report.L15_offsets_to_operating_expenditures_refunds_period = summary["a"][
         "line_15"
     ]
     report.L15_offsets_to_operating_expenditures_refunds_ytd = summary["b"]["line_15"]
     # line 17
     report.L17_other_federal_receipts_dividends_period = summary["a"]["line_17"]
-    # line 33
     report.L17_other_federal_receipts_dividends_ytd = summary["b"]["line_17"]
+    # line 33
     report.L33_total_contributions_period = summary["a"]["line_33"]
+    report.L33_total_contributions_ytd = summary["b"]["line_33"]
     # line 37
     report.L37_offsets_to_operating_expenditures_period = summary["a"]["line_37"]
     report.L37_offsets_to_operating_expenditures_ytd = summary["b"]["line_37"]
+
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id
