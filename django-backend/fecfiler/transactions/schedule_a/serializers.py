@@ -1,16 +1,34 @@
 import logging
-from uuid import UUID
 
 from django.db import transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.schedule_a.tasks import update_future_transaction_contacts
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField
 from rest_framework.serializers import ListSerializer
-from fecfiler.contacts.serializers import contact_updated_flag
 
 logger = logging.getLogger(__name__)
+
+
+transaction_contact_attributes = [
+    'contributor_organization_name',
+    'contributor_last_name',
+    'contributor_first_name',
+    'contributor_middle_name',
+    'contributor_prefix',
+    'contributor_suffix',
+    'contributor_street_1',
+    'contributor_street_2',
+    'contributor_city',
+    'contributor_state',
+    'contributor_zip',
+    'contributor_employer',
+    'contributor_occupation',
+    'donor_committee_fec_id',
+    'donor_committee_name',
+]
+
+transaction_date_attribute_name = 'contribution_date'
 
 
 def get_model_data(data, model):
@@ -129,8 +147,12 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
-            self.execute_update_future_transaction_contacts_task_if_needed(
-                validated_data.get('contact_id'), schedule_a_data
+            super().update_future_schedule_contacts_if_needed(
+                validated_data.get('contact_id'),
+                schedule_a,
+                transaction_contact_attributes,
+                schedule_a_data,
+                transaction_date_attribute_name
             )
             return parent
 
@@ -151,18 +173,14 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
             updated = super().update(instance, validated_data)
-            self.execute_update_future_transaction_contacts_task_if_needed(
-                validated_data.get('contact_id'), schedule_a_data
+            super().update_future_schedule_contacts_if_needed(
+                validated_data.get('contact_id'),
+                instance.schedule_a,
+                transaction_contact_attributes,
+                schedule_a_data,
+                transaction_date_attribute_name
             )
             return updated
-
-    def execute_update_future_transaction_contacts_task_if_needed(
-        self, contact_id: UUID, scha_transaction: dict
-    ):
-        if hasattr(self, contact_updated_flag) and getattr(self, contact_updated_flag):
-            update_future_transaction_contacts.s(
-                contact_id, scha_transaction
-            ).apply_async(retry=False)
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (

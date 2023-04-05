@@ -1,5 +1,8 @@
 import logging
 
+from uuid import UUID
+from datetime import datetime
+
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
@@ -119,6 +122,25 @@ class TransactionSerializerBase(
 
     def to_internal_value(self, data):
         return super().to_internal_value(data)
+
+    def update_future_schedule_contacts_if_needed(
+        self, contact_id: UUID, schedule_model,
+        schedule_contact_attributes, update_data: dict,
+        transaction_date_attribute_name: str,
+    ):
+        schedule_contact_updates: dict = {}
+        for attribute in schedule_contact_attributes:
+            schedule_contact_updates[attribute] = update_data.get(attribute, None)
+        if schedule_contact_updates:
+            transaction_date = datetime.fromisoformat(
+                str(update_data.get(transaction_date_attribute_name))
+            )
+            transaction_date_gte = transaction_date_attribute_name + '__gte'
+            schedule_model.__class__.objects.filter(
+                transaction__contact_id=contact_id,
+                **{transaction_date_gte: transaction_date},
+                transaction__report__upload_submission__isnull=True,
+            ) .update(**schedule_contact_updates)
 
     class Meta:
         model = Transaction
