@@ -33,6 +33,21 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
         }
 
+        self.updated_contact = {
+            "id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "type": "IND",
+            "last_name": "Lastname",
+            "first_name": "Firstname",
+            "street_1": "Street",
+            "city": "City",
+            "state": "State",
+            "zip": "12345678",
+            "country": "Country",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+        }        
+
         self.new_memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
@@ -61,6 +76,30 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.new_contact,
+            "schema_name": "SchB",
+        }
+
+        self.update_contact_schedule_b_transaction = {
+            "form_type": "SB",
+            "filer_committee_id_number": "C00123456",
+            "transaction_type_identifier": "SchB",
+            "transaction_id": "ABCDEF0123456789",
+            "entity_type": "IND",
+            "payee_organization_name": "John Smith Co",
+            "payee_first_name": "John",
+            "payee_last_name": "Lastname__UPDATED",
+            "payee_state": "AK",
+            "payee_city": "Homer",
+            "payee_zip": "1234",
+            "payee_street_1": "1 Homer Spit Road",
+            "expenditure_date": "2009-01-01",
+            "expenditure_amount": 1234,
+            "aggregation_group": "GENERAL",
+            "payee_occupation": "professional",
+            "payee_employer": "boss",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "contact": self.new_contact,
+            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "schema_name": "SchB",
         }
 
@@ -169,3 +208,26 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             ).schedule_b.expenditure_purpose_descrip,
             updated_child_description,
         )
+
+    def test_transaction_contact_updated(self):
+        transaction = self.update_contact_schedule_b_transaction.copy()
+        serializer = ScheduleBTransactionSerializer(
+            data=transaction,
+            context={"request": self.mock_request},
+        )
+        self.assertTrue(serializer.is_valid(raise_exception=True))
+        serializer.create(serializer.to_internal_value(transaction))
+        created_instance = Transaction.objects.filter(
+            schedule_b__payee_last_name="Lastname__UPDATED"
+        )
+        self.assertNotEqual(created_instance.count(), 0)
+
+        updated_transaction = self.update_contact_schedule_b_transaction.copy()
+        updated_transaction['payee_last_name'] = "Lastname__UPDATED2"
+        serializer.update(
+            created_instance[0], serializer.to_internal_value(updated_transaction)
+        )
+        updated_instance = Transaction.objects.filter(
+            schedule_b__payee_last_name="Lastname__UPDATED2"
+        )
+        self.assertNotEqual(updated_instance.count(), 0)  
