@@ -46,7 +46,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
-        }        
+        }
 
         self.new_memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
@@ -230,4 +230,4 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         updated_instance = Transaction.objects.filter(
             schedule_b__payee_last_name="Lastname__UPDATED2"
         )
-        self.assertNotEqual(updated_instance.count(), 0)  
+        self.assertNotEqual(updated_instance.count(), 0)
