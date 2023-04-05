@@ -6,6 +6,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from rest_framework.fields import DecimalField, CharField, DateField
 from rest_framework.serializers import ListSerializer
+from fecfiler.contacts.serializers import contact_updated_flag
 
 logger = logging.getLogger(__name__)
 
@@ -147,13 +148,14 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
-            super().update_future_schedule_contacts_if_needed(
-                validated_data.get('contact_id'),
-                schedule_a,
-                transaction_contact_attributes,
-                schedule_a_data,
-                transaction_date_attribute_name
-            )
+            if getattr(self, contact_updated_flag, None):
+                super().update_future_schedule_contacts(
+                    validated_data.get('contact_id'),
+                    schedule_a,
+                    transaction_contact_attributes,
+                    schedule_a_data,
+                    transaction_date_attribute_name
+                )
             return parent
 
     def update(self, instance, validated_data: dict):
@@ -173,13 +175,14 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
             updated = super().update(instance, validated_data)
-            super().update_future_schedule_contacts_if_needed(
-                validated_data.get('contact_id'),
-                instance.schedule_a,
-                transaction_contact_attributes,
-                schedule_a_data,
-                transaction_date_attribute_name
-            )
+            if getattr(self, contact_updated_flag, None):
+                super().update_future_schedule_contacts(
+                    validated_data.get('contact_id'),
+                    instance.schedule_a,
+                    transaction_contact_attributes,
+                    schedule_a_data,
+                    transaction_date_attribute_name
+                )
             return updated
 
     class Meta(TransactionSerializerBase.Meta):

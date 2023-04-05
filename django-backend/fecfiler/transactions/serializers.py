@@ -123,7 +123,7 @@ class TransactionSerializerBase(
     def to_internal_value(self, data):
         return super().to_internal_value(data)
 
-    def update_future_schedule_contacts_if_needed(
+    def update_future_schedule_contacts(
         self, contact_id: UUID, schedule_model,
         schedule_contact_attributes, update_data: dict,
         transaction_date_attribute_name: str,
@@ -140,7 +140,7 @@ class TransactionSerializerBase(
                 transaction__contact_id=contact_id,
                 **{transaction_date_gte: transaction_date},
                 transaction__report__upload_submission__isnull=True,
-            ) .update(**schedule_contact_updates)
+            ).update(**schedule_contact_updates)
 
     class Meta:
         model = Transaction
