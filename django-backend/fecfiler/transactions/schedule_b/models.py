@@ -40,17 +40,17 @@ class ScheduleB(models.Model):
 
     category_code = models.TextField(null=True, blank=True)
 
-    benificiary_committee_fec_id = models.TextField(null=True, blank=True)
-    benificiary_committee_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_fec_id = models.TextField(null=True, blank=True)
-    benificiary_candidate_last_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_first_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_middle_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_prefix = models.TextField(null=True, blank=True)
-    benificiary_candidate_suffix = models.TextField(null=True, blank=True)
-    benificiary_candidate_office = models.TextField(null=True, blank=True)
-    benificiary_candidate_state = models.TextField(null=True, blank=True)
-    benificiary_candidate_district = models.TextField(null=True, blank=True)
+    beneficiary_committee_fec_id = models.TextField(null=True, blank=True)
+    beneficiary_committee_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_fec_id = models.TextField(null=True, blank=True)
+    beneficiary_candidate_last_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_first_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_middle_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_prefix = models.TextField(null=True, blank=True)
+    beneficiary_candidate_suffix = models.TextField(null=True, blank=True)
+    beneficiary_candidate_office = models.TextField(null=True, blank=True)
+    beneficiary_candidate_state = models.TextField(null=True, blank=True)
+    beneficiary_candidate_district = models.TextField(null=True, blank=True)
 
     memo_text_description = models.TextField(null=True, blank=True)
     reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(

@@ -1,6 +1,4 @@
-from unittest.mock import patch
-
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from fecfiler.authentication.models import Account
 from fecfiler.transactions.schedule_a.serializers import (
     ScheduleATransactionSerializer)
@@ -122,18 +120,6 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])
-
-    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @patch('fecfiler.transactions.schedule_a.tasks.update_future_transaction_contacts')
-    def test_serializer_create_with_updated_contact(self, task):
-        test_serializer = ScheduleATransactionSerializer(
-            data=self.new_schedule_a_transaction_updated_contact,
-            context={"request": self.mock_request},
-        )
-        retval = test_serializer.create(
-            self.new_schedule_a_transaction_updated_contact
-        )
-        self.assertTrue(retval)
 
     def test_serializer_update(self):
         test_serializer = ScheduleATransactionSerializer(

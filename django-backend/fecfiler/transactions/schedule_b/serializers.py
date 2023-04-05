@@ -9,6 +9,25 @@ from rest_framework.serializers import ListSerializer
 
 logger = logging.getLogger(__name__)
 
+transaction_contact_attributes = [
+    'payee_organization_name',
+    'payee_last_name',
+    'payee_first_name',
+    'payee_middle_name',
+    'payee_prefix',
+    'payee_suffix',
+    'payee_street_1',
+    'payee_street_2',
+    'payee_city',
+    'payee_state',
+    'payee_zip',
+    'beneficiary_committee_fec_id',
+    'beneficiary_committee_fec_id',
+    'beneficiary_committee_name',
+]
+
+transaction_date_attribute_name = 'expenditure_date'
+
 
 def get_model_data(data, model):
     return {
@@ -81,17 +100,17 @@ class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
 
     category_code = CharField(required=False, allow_null=True)
 
-    benificiary_committee_fec_id = CharField(required=False, allow_null=True)
-    benificiary_committee_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_fec_id = CharField(required=False, allow_null=True)
-    benificiary_candidate_last_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_first_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_middle_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_prefix = CharField(required=False, allow_null=True)
-    benificiary_candidate_suffix = CharField(required=False, allow_null=True)
-    benificiary_candidate_office = CharField(required=False, allow_null=True)
-    benificiary_candidate_state = CharField(required=False, allow_null=True)
-    benificiary_candidate_district = CharField(required=False, allow_null=True)
+    beneficiary_committee_fec_id = CharField(required=False, allow_null=True)
+    beneficiary_committee_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_fec_id = CharField(required=False, allow_null=True)
+    beneficiary_candidate_last_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_first_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_middle_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_prefix = CharField(required=False, allow_null=True)
+    beneficiary_candidate_suffix = CharField(required=False, allow_null=True)
+    beneficiary_candidate_office = CharField(required=False, allow_null=True)
+    beneficiary_candidate_state = CharField(required=False, allow_null=True)
+    beneficiary_candidate_district = CharField(required=False, allow_null=True)
 
     memo_text_description = CharField(required=False, allow_null=True)
     reference_to_si_or_sl_system_code_that_identifies_the_account = CharField(
@@ -123,10 +142,18 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
+            super().update_future_schedule_contacts_if_needed(
+                validated_data.get('contact_id'),
+                schedule_b,
+                transaction_contact_attributes,
+                schedule_b_data,
+                transaction_date_attribute_name
+            )
             return parent
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            schedule_b_data = get_model_data(validated_data, ScheduleB)
             children = validated_data.pop("children", [])
 
             for child in children:
@@ -140,7 +167,15 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_b, attr, value)
             instance.schedule_b.save()
-            return super().update(instance, validated_data)
+            updated = super().update(instance, validated_data)
+            super().update_future_schedule_contacts_if_needed(
+                validated_data.get('contact_id'),
+                instance.schedule_b,
+                transaction_contact_attributes,
+                schedule_b_data,
+                transaction_date_attribute_name
+            )
+            return updated
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (
