@@ -3,6 +3,7 @@ from fecfiler.authentication.models import Account
 from fecfiler.transactions.schedule_a.serializers import (
     ScheduleATransactionSerializer)
 from rest_framework.request import HttpRequest, Request
+from fecfiler.transactions.models import Transaction
 
 
 class ScheduleATransactionSerializerBaseTestCase(TestCase):
@@ -75,20 +76,20 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contact": self.new_contact,
             "schema_name": "SchA",
         }
-        self.new_schedule_a_transaction_updated_contact = {
+        self.update_contact_schedule_a_transaction = {
             "form_type": "SA",
             "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SchA",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
             "contributor_organization_name": "John Smith Co",
-            "contributor_last_name": "John",
+            "contributor_last_name": "TEST_LAST_NAME",
             "contributor_first_name": "Smith",
             "contributor_state": "AK",
             "contributor_city": "Homer",
             "contributor_zip": "1234",
             "contributor_street_1": "1 Homer Spit Road",
-            "contribution_date": "2009-01-01",
+            "contribution_date": "2024-01-01",
             "contribution_amount": 1234,
             "aggregation_group": "GENERAL",
             "contributor_occupation": "professional",
@@ -121,9 +122,26 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])
 
-    def test_serializer_update(self):
-        test_serializer = ScheduleATransactionSerializer(
-            data=self.new_schedule_a_transaction_updated_contact,
+    def test_transaction_contact_updated(self):
+        transaction = self.update_contact_schedule_a_transaction.copy()
+        serializer = ScheduleATransactionSerializer(
+            data=transaction,
             context={"request": self.mock_request},
         )
-        self.assertTrue(test_serializer.is_valid(raise_exception=True))
+        self.assertTrue(serializer.is_valid(raise_exception=True))
+        serializer.create(serializer.to_internal_value(transaction))
+        created_instance = Transaction.objects.filter(
+            schedule_a__contributor_last_name="TEST_LAST_NAME"
+        )
+        self.assertEqual(created_instance.count(), 1)
+
+        updated_transaction = self.update_contact_schedule_a_transaction.copy()
+        updated_transaction['contributor_last_name'] = "TEST_LAST_NAME_UPDATED"
+        serializer.update(
+            created_instance[0], serializer.to_internal_value(updated_transaction)
+        )
+        updated_instance = Transaction.objects.filter(
+            schedule_a__contributor_last_name="TEST_LAST_NAME_UPDATED"
+        )
+        self.assertEqual(updated_instance.count(), 1)
+

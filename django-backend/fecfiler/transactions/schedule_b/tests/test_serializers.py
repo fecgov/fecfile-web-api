@@ -87,7 +87,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "entity_type": "IND",
             "payee_organization_name": "John Smith Co",
             "payee_first_name": "John",
-            "payee_last_name": "Lastname__UPDATED",
+            "payee_last_name": "TEST_LAST_NAME",
             "payee_state": "AK",
             "payee_city": "Homer",
             "payee_zip": "1234",
@@ -218,16 +218,16 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(transaction))
         created_instance = Transaction.objects.filter(
-            schedule_b__payee_last_name="Lastname__UPDATED"
+            schedule_b__payee_last_name="TEST_LAST_NAME"
         )
-        self.assertNotEqual(created_instance.count(), 0)
+        self.assertEqual(created_instance.count(), 1)
 
         updated_transaction = self.update_contact_schedule_b_transaction.copy()
-        updated_transaction['payee_last_name'] = "Lastname__UPDATED2"
+        updated_transaction['payee_last_name'] = "TEST_LAST_NAME_UPDATED"
         serializer.update(
             created_instance[0], serializer.to_internal_value(updated_transaction)
         )
         updated_instance = Transaction.objects.filter(
-            schedule_b__payee_last_name="Lastname__UPDATED2"
+            schedule_b__payee_last_name="TEST_LAST_NAME_UPDATED"
         )
-        self.assertNotEqual(updated_instance.count(), 0)
+        self.assertEqual(updated_instance.count(), 1)
