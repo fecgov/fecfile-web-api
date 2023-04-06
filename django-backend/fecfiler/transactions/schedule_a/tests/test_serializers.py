@@ -144,4 +144,3 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             schedule_a__contributor_last_name="TEST_LAST_NAME_UPDATED"
         )
         self.assertEqual(updated_instance.count(), 1)
-
