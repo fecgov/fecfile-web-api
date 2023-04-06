@@ -14,6 +14,8 @@ from fecfiler.settings import (
 )
 from rest_framework.decorators import action
 from rest_framework import filters
+from rest_framework.serializers import ListField
+from rest_framework.viewsets import mixins, GenericViewSet
 
 from .models import Contact
 from .serializers import ContactSerializer
@@ -217,3 +219,37 @@ class ContactViewSet(CommitteeOwnedViewSet):
             request, "max_fec_results", default_max_fec_results, max_allowed_results
         )
         return max_fecfile_results, max_fec_results
+
+
+class DeletedContactsVeiwSet(
+    CommitteeOwnedViewSet,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    serializer_class = ContactSerializer
+
+    queryset = (
+        Contact.all_objects.filter(deleted__isnull=False)
+        .alias(
+            sort_name=Concat(
+                "name", "last_name", Value(" "), "first_name", output_field=CharField()
+            )
+        )
+        .all()
+    )
+    filter_backends = [filters.OrderingFilter]
+
+    ordering_fields = [
+        "sort_name",
+        "first_name",
+        "type",
+        "employer",
+        "occupation",
+        "id",
+    ]
+    ordering = ["-created"]
+
+    @action(detail=False, methods=["post"], serializer_class=ListField)
+    def restore_contacts(self, request, pk=None):
+        list = self.get_object()
+        print(f"ahoy {list}")
