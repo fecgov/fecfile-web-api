@@ -48,8 +48,6 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_amount",
                     "schedule_b__expenditure_amount",
                 ),
-            )
-            .annotate(
                 effective_amount=ExpressionWrapper(
                     Case(
                         When(
