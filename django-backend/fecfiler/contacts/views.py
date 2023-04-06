@@ -13,8 +13,8 @@ from fecfiler.settings import (
     FEC_API_KEY,
 )
 from rest_framework.decorators import action
-from rest_framework import filters
-from rest_framework.serializers import ListField
+from rest_framework import filters, status
+from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 
 from .models import Contact
@@ -249,7 +249,16 @@ class DeletedContactsVeiwSet(
     ]
     ordering = ["-created"]
 
-    @action(detail=False, methods=["post"], serializer_class=ListField)
-    def restore_contacts(self, request, pk=None):
-        list = self.get_object()
-        print(f"ahoy {list}")
+    @action(detail=False, methods=["post"])
+    def restore(self, request):
+        ids_to_restore = request.data
+        contacts = self.queryset.filter(id__in=ids_to_restore)
+        if len(ids_to_restore) != contacts.count():
+            return Response(
+                "Contact Ids are invalid",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        for contact in contacts:
+            contact.deleted = None
+            contact.save()
+        return Response(ids_to_restore)
