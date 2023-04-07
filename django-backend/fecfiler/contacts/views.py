@@ -221,10 +221,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         return max_fecfile_results, max_fec_results
 
 
-class DeletedContactsVeiwSet(
-    CommitteeOwnedViewSet,
-    mixins.ListModelMixin,
-    GenericViewSet,
+class DeletedContactsViewSet(
+    CommitteeOwnedViewSet, mixins.ListModelMixin, GenericViewSet,
 ):
     serializer_class = ContactSerializer
 
@@ -255,8 +253,7 @@ class DeletedContactsVeiwSet(
         contacts = self.queryset.filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
-                "Contact Ids are invalid",
-                status=status.HTTP_400_BAD_REQUEST,
+                "Contact Ids are invalid", status=status.HTTP_400_BAD_REQUEST,
             )
         for contact in contacts:
             contact.deleted = None

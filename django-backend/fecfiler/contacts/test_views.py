@@ -3,7 +3,7 @@ from unittest import mock
 from django.test import RequestFactory, TestCase
 
 from ..authentication.models import Account
-from .views import ContactViewSet, DeletedContactsVeiwSet
+from .views import ContactViewSet, DeletedContactsViewSet
 from .models import Contact
 from rest_framework.test import force_authenticate
 
@@ -186,7 +186,7 @@ class ContactViewSetTest(TestCase):
             "application/json",
         )
         force_authenticate(request, self.user)
-        response = DeletedContactsVeiwSet.as_view({"post": "restore"})(request)
+        response = DeletedContactsViewSet.as_view({"post": "restore"})(request)
         self.assertEqual(response.status_code, 400)
 
     def test_restore(self):
@@ -208,6 +208,6 @@ class ContactViewSetTest(TestCase):
             "application/json",
         )
         force_authenticate(request, self.user)
-        response = DeletedContactsVeiwSet.as_view({"post": "restore"})(request)
+        response = DeletedContactsViewSet.as_view({"post": "restore"})(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
