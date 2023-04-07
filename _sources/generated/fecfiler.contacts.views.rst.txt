@@ -23,6 +23,7 @@ fecfiler.contacts.views
       :template: custom-class-template.rst               
    
       ContactViewSet
+      DeletedContactsViewSet
    
    
 

@@ -121,6 +121,8 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.test_individual_lookup_no_q
       ~ContactViewSetTest.test_organization_lookup_happy_path
       ~ContactViewSetTest.test_organization_lookup_no_q
+      ~ContactViewSetTest.test_restore
+      ~ContactViewSetTest.test_restore_no_match
    
    
 
