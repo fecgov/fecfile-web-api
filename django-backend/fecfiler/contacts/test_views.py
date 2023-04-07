@@ -5,7 +5,6 @@ from django.test import RequestFactory, TestCase
 from ..authentication.models import Account
 from .views import ContactViewSet, DeletedContactsVeiwSet
 from .models import Contact
-from rest_framework.request import Request, HttpRequest
 from rest_framework.test import force_authenticate
 
 
