@@ -3,7 +3,10 @@ from unittest import mock
 from django.test import RequestFactory, TestCase
 
 from ..authentication.models import Account
-from .views import ContactViewSet
+from .views import ContactViewSet, DeletedContactsVeiwSet
+from .models import Contact
+from rest_framework.request import Request, HttpRequest
+from rest_framework.test import force_authenticate
 
 
 def mocked_requests_get_candidates(*args, **kwargs):
@@ -18,15 +21,11 @@ def mocked_requests_get_candidates(*args, **kwargs):
     return MockResponse(
         {
             "results": [
-                {
-                    "name": "BIDEN, JOE R",
-                    "id": "P60012143",
-                    "office_sought": "P"
-                },
+                {"name": "BIDEN, JOE R", "id": "P60012143", "office_sought": "P"},
                 {
                     "name": "BIDEN, JR., JOSEPH R.",
                     "id": "P60012465",
-                    "office_sought": "P"
+                    "office_sought": "P",
                 },
             ]
         },
@@ -62,7 +61,6 @@ class ContactViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     def test_candidate_lookup_no_auth(self):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/candidate_lookup")
 
         response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
@@ -71,7 +69,6 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_no_q(self, mock_get):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/candidate_lookup")
         request.user = self.user
 
@@ -81,24 +78,21 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
-        self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/contacts/candidate_lookup?"
-                                   "q=test&max_fecfile_results=5&max_fec_results=5")
+        request = self.factory.get(
+            "/api/v1/contacts/candidate_lookup?"
+            "q=test&max_fecfile_results=5&max_fec_results=5"
+        )
         request.user = self.user
 
         response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
 
         expected_json = {
             "fec_api_candidates": [
-                {
-                    "name": "BIDEN, JOE R",
-                    "id": "P60012143",
-                    "office_sought": "P"
-                },
+                {"name": "BIDEN, JOE R", "id": "P60012143", "office_sought": "P"},
                 {
                     "name": "BIDEN, JR., JOSEPH R.",
                     "id": "P60012465",
-                    "office_sought": "P"
+                    "office_sought": "P",
                 },
             ],
             "fecfile_candidates": [],
@@ -108,7 +102,6 @@ class ContactViewSetTest(TestCase):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_committee_lookup_no_auth(self):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
@@ -117,7 +110,6 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_no_q(self, mock_get):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/committee_lookup")
         request.user = self.user
 
@@ -127,9 +119,10 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
-        self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/contacts/committee_lookup?"
-                                   "q=test&max_fecfile_results=5&max_fec_results=5")
+        request = self.factory.get(
+            "/api/v1/contacts/committee_lookup?"
+            "q=test&max_fecfile_results=5&max_fec_results=5"
+        )
         request.user = self.user
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
@@ -146,7 +139,6 @@ class ContactViewSetTest(TestCase):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_individual_lookup_no_q(self):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/individual_lookup")
         request.user = self.user
 
@@ -155,22 +147,19 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_individual_lookup_happy_path(self):
-        self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/contacts/individual_lookup?"
-                                   "q=Lastname&max_fecfile_results=5")
+        request = self.factory.get(
+            "/api/v1/contacts/individual_lookup?" "q=Lastname&max_fecfile_results=5"
+        )
         request.user = self.user
 
         response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
 
-        expected_json_fragment = ("\"last_name\": \"Lastname\", \"first_name\": "
-                                  "\"Firstname\"")
+        expected_json_fragment = '"last_name": "Lastname", "first_name": ' '"Firstname"'
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(expected_json_fragment,
-                      str(response.content, encoding="utf8"))
+        self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
     def test_organization_lookup_no_q(self):
-        self.assertEqual(True, True)
         request = self.factory.get("/api/v1/contacts/organization_lookup")
         request.user = self.user
 
@@ -179,15 +168,47 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_organization_lookup_happy_path(self):
-        self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/contacts/organization_lookup?"
-                                   "q=test&max_fecfile_results=5")
+        request = self.factory.get(
+            "/api/v1/contacts/organization_lookup?" "q=test&max_fecfile_results=5"
+        )
         request.user = self.user
 
         response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
 
-        expected_json_fragment = ("\"name\": \"test name contains TestOrgName1\"")
+        expected_json_fragment = '"name": "test name contains TestOrgName1"'
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(expected_json_fragment,
-                      str(response.content, encoding="utf8"))
+        self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
+
+    def test_restore_no_match(self):
+        request = self.factory.post(
+            "/api/v1/contacts-deleted/restore",
+            ["a5061946-0000-0000-82f6-f1782c333d70"],
+            "application/json",
+        )
+        force_authenticate(request, self.user)
+        response = DeletedContactsVeiwSet.as_view({"post": "restore"})(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_restore(self):
+        contact = Contact.objects.create(
+            id="a5061946-0000-0000-82f6-f1782c333d70",
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+        )
+        contact.delete()
+        deleted_contact = Contact.all_objects.get(
+            id="a5061946-0000-0000-82f6-f1782c333d70"
+        )
+        self.assertIsNotNone(deleted_contact.deleted)
+        request = self.factory.post(
+            "/api/v1/contacts-deleted/restore",
+            ["a5061946-0000-0000-82f6-f1782c333d70"],
+            "application/json",
+        )
+        force_authenticate(request, self.user)
+        response = DeletedContactsVeiwSet.as_view({"post": "restore"})(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
