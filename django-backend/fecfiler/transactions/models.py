@@ -69,7 +69,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def children(self):
         return self.transaction_set.all()
 
-    def get_schedule(self):
+    def get_schedule_name(self):
         schedule_map = {
             "schedule_a": Schedule.A,
             "schedule_b": Schedule.B,
@@ -79,6 +79,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             if getattr(self, schedule_key, None):
                 return schedule_map[schedule_key]
         return None
+
+    def get_schedule(self):
+        for schedule_key in ["schedule_a", "schedule_b", "schedule_c"]:
+            if getattr(self, schedule_key, None):
+                return getattr(self, schedule_key)
+
+    def get_date(self):
+        return self.get_schedule().get_date()
 
     def save(self, *args, **kwargs):
         if self.memo_text:

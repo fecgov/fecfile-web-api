@@ -57,5 +57,25 @@ class ScheduleB(models.Model):
         null=True, blank=True
     )
 
+    def get_date(self):
+        return self.expenditure_date
+
+    def update_with_contact(self, contact):
+        self.payee_organization_name = contact.name
+        self.payee_last_name = contact.last_name
+        self.payee_first_name = contact.first_name
+        self.payee_middle_name = contact.middle_name
+        self.payee_prefix = contact.prefix
+        self.payee_suffix = contact.suffix
+        self.payee_street_1 = contact.street_1
+        self.payee_street_2 = contact.street_2
+        self.payee_city = contact.city
+        self.payee_state = contact.state
+        self.payee_zip = contact.zip
+        self.payee_employer = contact.employer
+        self.payee_occupation = contact.occupation
+        self.beneficiary_committee_fec_id = contact.committee_id
+        self.save()
+
     class Meta:
         app_label = "transactions"

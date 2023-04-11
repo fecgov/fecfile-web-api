@@ -22,12 +22,12 @@ def log_post_save(sender, instance, created, **kwargs):
     elif instance.deleted:
         action = "deleted"
     logger.info(
-        f"{instance.get_schedule()} Transaction: {instance.transaction_id} was {action}"
+        f"{instance.get_schedule_name()} Transaction: {instance.transaction_id} was {action}"
     )
 
 
 @receiver(post_delete, sender=Transaction)
 def log_post_delete(sender, instance, **kwargs):
     logger.info(
-        f"{instance.get_schedule()} Transaction: {instance.transaction_id} was deleted"
+        f"{instance.get_schedule_name()} Transaction: {instance.transaction_id} was deleted"
     )

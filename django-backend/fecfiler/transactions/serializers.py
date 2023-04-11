@@ -9,6 +9,7 @@ from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 from rest_framework.serializers import (
     BooleanField,
     UUIDField,
@@ -17,6 +18,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     DecimalField,
 )
+from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -123,24 +125,16 @@ class TransactionSerializerBase(
     def to_internal_value(self, data):
         return super().to_internal_value(data)
 
-    def update_future_schedule_contacts(
-        self, contact_id: UUID, schedule_model,
-        schedule_contact_attributes, update_data: dict,
-        transaction_date_attribute_name: str,
-    ):
-        schedule_contact_updates: dict = {}
-        for attribute in schedule_contact_attributes:
-            schedule_contact_updates[attribute] = update_data.get(attribute, None)
-        if schedule_contact_updates:
-            transaction_date = datetime.fromisoformat(
-                str(update_data.get(transaction_date_attribute_name))
-            )
-            transaction_date_gte = transaction_date_attribute_name + '__gte'
-            schedule_model.__class__.objects.filter(
-                transaction__contact_id=contact_id,
-                **{transaction_date_gte: transaction_date},
-                transaction__report__upload_submission__isnull=True,
-            ).update(**schedule_contact_updates)
+    def propagate_contact_info(self, transaction):
+        contact = Contact.objects.get(id=transaction.contact_id)
+        subsequent_transactions = Transaction.objects.filter(
+            ~Q(id=transaction.id),
+            contact=contact,
+            date__gte=transaction.get_date(),
+        )
+        for subsequent_transaction in subsequent_transactions:
+            subsequent_transaction.get_schedule().update_with_contact(contact)
+            subsequent_transaction.save()
 
     class Meta:
         model = Transaction
