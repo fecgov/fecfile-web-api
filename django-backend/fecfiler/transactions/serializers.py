@@ -1,14 +1,10 @@
 import logging
 
-from uuid import UUID
-from datetime import datetime
-
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-from fecfiler.web_services.models import FECSubmissionState
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 from rest_framework.serializers import (

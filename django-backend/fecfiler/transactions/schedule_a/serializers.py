@@ -130,7 +130,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
-            schedule_a_data = get_model_data(validated_data, ScheduleA)
             children = validated_data.pop("children", [])
 
             for child in children:
