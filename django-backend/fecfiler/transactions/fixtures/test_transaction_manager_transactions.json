@@ -132,6 +132,36 @@
         }
     },
     {
+        "model": "transactions.schedulea",
+        "pk": "aaaaaaaa-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "contributor_last_name": "2",
+            "contributor_first_name": "2",
+            "contributor_street_1": "2",
+            "contributor_city": "2",
+            "contributor_state": "AL",
+            "contributor_zip": "2",
+            "contribution_date": "2023-02-15",
+            "contribution_amount": "5555.00",
+            "contributor_employer": "2",
+            "contributor_occupation": "2"
+        }
+    },
+    {
+        "model": "transactions.scheduleb",
+        "pk": "bbbbbbbb-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "payee_last_name": "2",
+            "payee_first_name": "2",
+            "payee_street_1": "2",
+            "payee_city": "2",
+            "payee_state": "AL",
+            "payee_zip": "2",
+            "expenditure_date": "2023-02-16",
+            "expenditure_amount": "1111.00"
+        }
+    },
+    {
         "model": "transactions.transaction",
         "pk": "08b51835-9dbe-46dd-991a-884c704a8b5a",
         "fields": {
@@ -220,6 +250,73 @@
             "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "43219fa2-3274-47d8-9388-7294a3fd4321",
             "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94"
+        }
+    },
+    {
+        "model": "f3x_summaries.f3xsummary",
+        "fields": {
+            "id": "735db943-9446-462a-9be0-c820baadb622",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "form_type": "F3XN",
+            "filer_committee_id_number": "C12345678",
+            "committee_name": "test_string_value",
+            "change_of_address": true,
+            "street_1": "test_string_value",
+            "street_2": "test_string_value",
+            "city": "test_string_value",
+            "state": "test_string_value",
+            "zip": "test_string_value",
+            "report_code": "12C",
+            "election_code": "test_string_value",
+            "date_of_election": "2007-01-30",
+            "state_of_election": "test_string_value",
+            "coverage_from_date": "2007-01-30",
+            "coverage_through_date": "2007-02-28",
+            "qualified_committee": false,
+            "treasurer_last_name": "Lastname",
+            "treasurer_first_name": "Firstname",
+            "treasurer_middle_name": "test_string_value",
+            "treasurer_prefix": "test_string_value",
+            "treasurer_suffix": "test_string_value",
+            "date_signed": "2006-07-29",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "aaaaaaaa-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_type_identifier": "INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+            "aggregation_group": "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+            "form_type": "SA17",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "A346ABC4934C931EHQAC",
+            "entity_type": "IND",
+            "created": "2023-02-01T01:00:00.000Z",
+            "updated": "2023-02-01T01:00:00.000Z",
+            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "schedule_a": "aaaaaaaa-3274-47d8-9388-7294a3fd4321"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "bbbbbbbb-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_type_identifier": "INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT",
+            "aggregation_group": "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+            "form_type": "SB21B",
+            "filer_committee_id_number": "C00601211",
+            "transaction_id": "A346ABC4934C931OHQAC",
+            "entity_type": "IND",
+            "created": "2023-01-01T01:00:00.000Z",
+            "updated": "2023-01-01T01:00:00.000Z",
+            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "schedule_b": "bbbbbbbb-3274-47d8-9388-7294a3fd4321"
         }
     }
 ]
