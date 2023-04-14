@@ -28,12 +28,14 @@ fecfiler.transactions.models.Transaction
       ~Transaction.from_db
       ~Transaction.full_clean
       ~Transaction.get_constraints
+      ~Transaction.get_date
       ~Transaction.get_deferred_fields
       ~Transaction.get_next_by_created
       ~Transaction.get_next_by_updated
       ~Transaction.get_previous_by_created
       ~Transaction.get_previous_by_updated
       ~Transaction.get_schedule
+      ~Transaction.get_schedule_name
       ~Transaction.hard_delete
       ~Transaction.prepare_database_save
       ~Transaction.refresh_from_db

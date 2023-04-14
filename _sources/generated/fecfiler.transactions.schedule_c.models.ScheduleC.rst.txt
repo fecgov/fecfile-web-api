@@ -28,6 +28,7 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.from_db
       ~ScheduleC.full_clean
       ~ScheduleC.get_constraints
+      ~ScheduleC.get_date
       ~ScheduleC.get_deferred_fields
       ~ScheduleC.prepare_database_save
       ~ScheduleC.refresh_from_db
@@ -35,6 +36,7 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.save_base
       ~ScheduleC.serializable_value
       ~ScheduleC.unique_error_message
+      ~ScheduleC.update_with_contact
       ~ScheduleC.validate_constraints
       ~ScheduleC.validate_unique
    

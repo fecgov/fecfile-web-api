@@ -50,6 +50,7 @@ fecfiler.transactions.schedule\_a.serializers.ScheduleATransactionSerializerBase
       ~ScheduleATransactionSerializerBase.include_extra_kwargs
       ~ScheduleATransactionSerializerBase.is_valid
       ~ScheduleATransactionSerializerBase.many_init
+      ~ScheduleATransactionSerializerBase.propagate_contact_info
       ~ScheduleATransactionSerializerBase.run_validation
       ~ScheduleATransactionSerializerBase.run_validators
       ~ScheduleATransactionSerializerBase.save

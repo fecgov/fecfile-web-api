@@ -112,6 +112,8 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.tearDown
       ~TransactionSerializerBaseTestCase.tearDownClass
       ~TransactionSerializerBaseTestCase.test_no_transaction_type_identifier
+      ~TransactionSerializerBaseTestCase.test_propagation_existing_transaction
+      ~TransactionSerializerBaseTestCase.test_propagation_new_transaction
    
    
 

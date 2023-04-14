@@ -38,4 +38,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0005_scheduleb_delete_schedulebtransaction_and_more
    fecfiler.transactions.migrations.0006_schedulec_and_more
    fecfiler.transactions.migrations.0007_create_index_on_form_type
+   fecfiler.transactions.migrations.0008_rename_benificiary_candidate_district_scheduleb_beneficiary_candidate_district_and_more
 
