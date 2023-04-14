@@ -40,22 +40,42 @@ class ScheduleB(models.Model):
 
     category_code = models.TextField(null=True, blank=True)
 
-    benificiary_committee_fec_id = models.TextField(null=True, blank=True)
-    benificiary_committee_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_fec_id = models.TextField(null=True, blank=True)
-    benificiary_candidate_last_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_first_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_middle_name = models.TextField(null=True, blank=True)
-    benificiary_candidate_prefix = models.TextField(null=True, blank=True)
-    benificiary_candidate_suffix = models.TextField(null=True, blank=True)
-    benificiary_candidate_office = models.TextField(null=True, blank=True)
-    benificiary_candidate_state = models.TextField(null=True, blank=True)
-    benificiary_candidate_district = models.TextField(null=True, blank=True)
+    beneficiary_committee_fec_id = models.TextField(null=True, blank=True)
+    beneficiary_committee_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_fec_id = models.TextField(null=True, blank=True)
+    beneficiary_candidate_last_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_first_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_middle_name = models.TextField(null=True, blank=True)
+    beneficiary_candidate_prefix = models.TextField(null=True, blank=True)
+    beneficiary_candidate_suffix = models.TextField(null=True, blank=True)
+    beneficiary_candidate_office = models.TextField(null=True, blank=True)
+    beneficiary_candidate_state = models.TextField(null=True, blank=True)
+    beneficiary_candidate_district = models.TextField(null=True, blank=True)
 
     memo_text_description = models.TextField(null=True, blank=True)
     reference_to_si_or_sl_system_code_that_identifies_the_account = models.TextField(
         null=True, blank=True
     )
+
+    def get_date(self):
+        return self.expenditure_date
+
+    def update_with_contact(self, contact):
+        self.payee_organization_name = contact.name
+        self.payee_last_name = contact.last_name
+        self.payee_first_name = contact.first_name
+        self.payee_middle_name = contact.middle_name
+        self.payee_prefix = contact.prefix
+        self.payee_suffix = contact.suffix
+        self.payee_street_1 = contact.street_1
+        self.payee_street_2 = contact.street_2
+        self.payee_city = contact.city
+        self.payee_state = contact.state
+        self.payee_zip = contact.zip
+        self.payee_employer = contact.employer
+        self.payee_occupation = contact.occupation
+        self.beneficiary_committee_fec_id = contact.committee_id
+        self.save()
 
     class Meta:
         app_label = "transactions"
