@@ -112,6 +112,7 @@ fecfiler.transactions.tests.test\_manager.TransactionManagerTestCase
       ~TransactionManagerTestCase.tearDown
       ~TransactionManagerTestCase.tearDownClass
       ~TransactionManagerTestCase.test_order_of_transactions
+      ~TransactionManagerTestCase.test_refund_aggregation
    
    
 

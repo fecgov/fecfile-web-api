@@ -66,6 +66,7 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.first
       ~TransactionManager.from_queryset
       ~TransactionManager.get
+      ~TransactionManager.get_amount_clause
       ~TransactionManager.get_itemization_clause
       ~TransactionManager.get_or_create
       ~TransactionManager.get_queryset
