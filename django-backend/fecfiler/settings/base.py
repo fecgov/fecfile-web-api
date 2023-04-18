@@ -29,10 +29,6 @@ CSRF_TRUSTED_ORIGINS = [
 # Set to True until we're ready to deprecate the old login
 E2E_TESTING_LOGIN = True
 
-
-LOGIN_TIMEOUT_TIME = 15
-LOGIN_MAX_RETRY = 3
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 
@@ -45,7 +41,9 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = 30 * 60  # Inactivity timeout
+SESSION_COOKIE_AGE = int(env.get_credential(
+    "SESSION_COOKIE_AGE", str(30 * 60)  # Inactivity timeout
+))
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [

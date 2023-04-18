@@ -13,7 +13,9 @@ from fecfiler.settings import (
     FEC_API_KEY,
 )
 from rest_framework.decorators import action
-from rest_framework import filters
+from rest_framework import filters, status
+from rest_framework.response import Response
+from rest_framework.viewsets import mixins, GenericViewSet
 
 from .models import Contact
 from .serializers import ContactSerializer
@@ -217,3 +219,43 @@ class ContactViewSet(CommitteeOwnedViewSet):
             request, "max_fec_results", default_max_fec_results, max_allowed_results
         )
         return max_fecfile_results, max_fec_results
+
+
+class DeletedContactsViewSet(
+    CommitteeOwnedViewSet, mixins.ListModelMixin, GenericViewSet,
+):
+    serializer_class = ContactSerializer
+
+    queryset = (
+        Contact.all_objects.filter(deleted__isnull=False)
+        .alias(
+            sort_name=Concat(
+                "name", "last_name", Value(" "), "first_name", output_field=CharField()
+            )
+        )
+        .all()
+    )
+    filter_backends = [filters.OrderingFilter]
+
+    ordering_fields = [
+        "sort_name",
+        "first_name",
+        "type",
+        "employer",
+        "occupation",
+        "id",
+    ]
+    ordering = ["-created"]
+
+    @action(detail=False, methods=["post"])
+    def restore(self, request):
+        ids_to_restore = request.data
+        contacts = self.queryset.filter(id__in=ids_to_restore)
+        if len(ids_to_restore) != contacts.count():
+            return Response(
+                "Contact Ids are invalid", status=status.HTTP_400_BAD_REQUEST,
+            )
+        for contact in contacts:
+            contact.deleted = None
+            contact.save()
+        return Response(ids_to_restore)

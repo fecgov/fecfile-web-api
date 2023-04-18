@@ -67,9 +67,21 @@ class SummaryService:
         ytd_transactions = Transaction.objects.filter(
             committee_account=committee,
             date__year=report_year,
-            date__lt=report_date,
+            date__lte=report_date,
         )
 
+        # line 11ai
+        sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
+        line_11ai = self._create_contribution_sum(sa11ai_query)
+        # line 11aii
+        sa11aii_query = Q(~Q(memo_code=True), itemized=False, form_type="SA11AI")
+        line_11aii = self._create_contribution_sum(sa11aii_query)
+        # line 11b
+        sa11b_query = Q(~Q(memo_code=True), form_type="SA11B")
+        line_11b = self._create_contribution_sum(sa11b_query)
+        # line 11c
+        sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
+        line_11c = self._create_contribution_sum(sa11c_query)
         # line 12
         sa12_query = Q(~Q(memo_code=True), form_type="SA12")
         line_12 = self._create_contribution_sum(sa12_query)
@@ -82,10 +94,19 @@ class SummaryService:
 
         # build summary
         summary = ytd_transactions.aggregate(
+            line_11ai=line_11ai,
+            line_11aii=line_11aii,
+            line_11b=line_11b,
+            line_11c=line_11c,
             line_12=line_12,
             line_15=line_15,
             line_17=line_17
         )
+        summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
+        summary["line_11d"] = (
+            summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
+        )
+        summary["line_33"] = summary["line_11d"]
         summary["line_37"] = summary["line_15"]
 
         return summary
