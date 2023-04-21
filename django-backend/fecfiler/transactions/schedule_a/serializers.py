@@ -126,7 +126,6 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
             for child in children:
                 child["parent_transaction_id"] = parent.id
                 self.create(child)
-
             return parent
 
     def update(self, instance, validated_data: dict):
@@ -144,7 +143,13 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_a, attr, value)
             instance.schedule_a.save()
-            return super().update(instance, validated_data)
+            updated = super().update(instance, validated_data)
+            return updated
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        super().propagate_contact_info(instance)
+        return instance
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (

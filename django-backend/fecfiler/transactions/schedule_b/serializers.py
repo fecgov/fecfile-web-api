@@ -81,17 +81,17 @@ class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
 
     category_code = CharField(required=False, allow_null=True)
 
-    benificiary_committee_fec_id = CharField(required=False, allow_null=True)
-    benificiary_committee_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_fec_id = CharField(required=False, allow_null=True)
-    benificiary_candidate_last_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_first_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_middle_name = CharField(required=False, allow_null=True)
-    benificiary_candidate_prefix = CharField(required=False, allow_null=True)
-    benificiary_candidate_suffix = CharField(required=False, allow_null=True)
-    benificiary_candidate_office = CharField(required=False, allow_null=True)
-    benificiary_candidate_state = CharField(required=False, allow_null=True)
-    benificiary_candidate_district = CharField(required=False, allow_null=True)
+    beneficiary_committee_fec_id = CharField(required=False, allow_null=True)
+    beneficiary_committee_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_fec_id = CharField(required=False, allow_null=True)
+    beneficiary_candidate_last_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_first_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_middle_name = CharField(required=False, allow_null=True)
+    beneficiary_candidate_prefix = CharField(required=False, allow_null=True)
+    beneficiary_candidate_suffix = CharField(required=False, allow_null=True)
+    beneficiary_candidate_office = CharField(required=False, allow_null=True)
+    beneficiary_candidate_state = CharField(required=False, allow_null=True)
+    beneficiary_candidate_district = CharField(required=False, allow_null=True)
 
     memo_text_description = CharField(required=False, allow_null=True)
     reference_to_si_or_sl_system_code_that_identifies_the_account = CharField(
@@ -141,6 +141,11 @@ class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
                     setattr(instance.schedule_b, attr, value)
             instance.schedule_b.save()
             return super().update(instance, validated_data)
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        super().propagate_contact_info(instance)
+        return instance
 
     class Meta(TransactionSerializerBase.Meta):
         fields = (
