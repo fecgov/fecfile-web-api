@@ -6,7 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transactions', '0008_rename_benificiary_candidate_district_scheduleb_beneficiary_candidate_district_and_more'),
+        ('transactions', '0008_rename_benificiary_candidate_district_scheduleb_'
+                         'beneficiary_candidate_district_and_more'),
     ]
 
     operations = [
