@@ -67,6 +67,7 @@ fecfiler.transactions.models.Transaction
       ~Transaction.deleted
       ~Transaction.entity_type
       ~Transaction.filer_committee_id_number
+      ~Transaction.force_itemized
       ~Transaction.form_type
       ~Transaction.id
       ~Transaction.memo_code
