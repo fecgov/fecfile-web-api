@@ -45,6 +45,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
+    force_itemized = models.BooleanField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
