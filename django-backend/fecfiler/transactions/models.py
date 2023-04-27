@@ -69,7 +69,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def children(self):
         return self.transaction_set.all()
 
-    def get_schedule(self):
+    def get_schedule_name(self):
         schedule_map = {
             "schedule_a": Schedule.A,
             "schedule_b": Schedule.B,
@@ -80,6 +80,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
                 return schedule_map[schedule_key]
         return None
 
+    def get_schedule(self):
+        for schedule_key in ["schedule_a", "schedule_b", "schedule_c"]:
+            if getattr(self, schedule_key, None):
+                return getattr(self, schedule_key)
+
+    def get_date(self):
+        return self.get_schedule().get_date()
+
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
@@ -89,3 +97,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         except ValidationError:  # try using a new fec id if collision
             self.transaction_id = generate_fec_uid()
         super(Transaction, self).save(*args, **kwargs)
+
+    class Meta:
+        indexes = [models.Index(fields=["form_type"])]

@@ -6,6 +6,7 @@ from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from rest_framework.exceptions import ValidationError
+from django.db.models import Q
 from rest_framework.serializers import (
     BooleanField,
     UUIDField,
@@ -14,6 +15,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     DecimalField,
 )
+from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -89,6 +91,7 @@ class TransactionSerializerBase(
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
+        schedule_c = representation.pop("schedule_c") or []
         if depth < 1:
             if instance.parent_transaction:
                 representation["parent_transaction"] = self.to_representation(
@@ -110,10 +113,26 @@ class TransactionSerializerBase(
             for property in schedule_b:
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
+        if schedule_c:
+            for property in schedule_c:
+                if not representation.get(property):
+                    representation[property] = schedule_c[property]
         return representation
 
     def to_internal_value(self, data):
         return super().to_internal_value(data)
+
+    def propagate_contact_info(self, transaction):
+        contact = Contact.objects.get(id=transaction.contact_id)
+        subsequent_transactions = Transaction.objects.filter(
+            ~Q(id=transaction.id),
+            Q(Q(report__upload_submission__isnull=True)),
+            contact=contact,
+            date__gte=transaction.get_date(),
+        )
+        for subsequent_transaction in subsequent_transactions:
+            subsequent_transaction.get_schedule().update_with_contact(contact)
+            subsequent_transaction.save()
 
     class Meta:
         model = Transaction
@@ -136,6 +155,7 @@ class TransactionSerializerBase(
                 "aggregate",
                 "schedule_a",
                 "schedule_b",
+                "schedule_c",
             ]
 
         fields = get_fields()

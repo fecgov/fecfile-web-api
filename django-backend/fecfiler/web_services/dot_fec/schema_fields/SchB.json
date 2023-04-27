@@ -112,7 +112,7 @@
         "path": "schedule_b.conduit_zip"
     },
     "memo_code": {
-        "serializer": "BOOLEAN"
+        "serializer": "BOOLEAN_X"
     },
     "memo_text_description": {
         "path": "schedule_b.memo_text_description"

@@ -59,6 +59,26 @@ class ScheduleA(models.Model):
     class Meta:
         app_label = "transactions"
 
+    def get_date(self):
+        return self.contribution_date
+
+    def update_with_contact(self, contact):
+        self.contributor_organization_name = contact.name
+        self.contributor_last_name = contact.last_name
+        self.contributor_first_name = contact.first_name
+        self.contributor_middle_name = contact.middle_name
+        self.contributor_prefix = contact.prefix
+        self.contributor_suffix = contact.suffix
+        self.contributor_street_1 = contact.street_1
+        self.contributor_street_2 = contact.street_2
+        self.contributor_city = contact.city
+        self.contributor_state = contact.state
+        self.contributor_zip = contact.zip
+        self.contributor_employer = contact.employer
+        self.contributor_occupation = contact.occupation
+        self.donor_committee_fec_id = contact.committee_id
+        self.save()
+
 
 class ScheduleATransaction(models.Model):
     """stub class until we can figure out how to make migrations run without old models"""

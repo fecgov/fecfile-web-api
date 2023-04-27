@@ -11,14 +11,17 @@ from django.db.models import (
     Subquery,
     Sum,
     Q,
+    F,
     Case,
     When,
     Value,
     BooleanField,
     TextField,
+    DecimalField,
 )
 from decimal import Decimal
 from enum import Enum
+from .schedule_b.managers import refunds as schedule_b_refunds
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -43,6 +46,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_amount",
                     "schedule_b__expenditure_amount",
                 ),
+                effective_amount=self.get_amount_clause(),
             )
         )
 
@@ -57,7 +61,7 @@ class TransactionManager(SoftDeleteManager):
         aggregate_clause = (
             queryset.filter(contact_clause, year_clause, date_clause, group_clause)
             .values("committee_account_id")
-            .annotate(aggregate=Sum("amount"))
+            .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
         return (
@@ -112,6 +116,16 @@ class TransactionManager(SoftDeleteManager):
             ),
             default=Value(True),
             output_field=BooleanField(),
+        )
+
+    def get_amount_clause(self):
+        return Case(
+            When(
+                transaction_type_identifier__in=schedule_b_refunds,
+                then=F("amount") * Value(Decimal(-1)),
+            ),
+            default="amount",
+            output_field=DecimalField(),
         )
 
 
