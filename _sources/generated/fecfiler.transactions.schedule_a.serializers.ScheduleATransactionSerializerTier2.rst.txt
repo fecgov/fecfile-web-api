@@ -1,0 +1,85 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_a.serializers.ScheduleATransactionSerializerTier2
+=================================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_a.serializers
+
+.. autoclass:: ScheduleATransactionSerializerTier2
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleATransactionSerializerTier2.__init__
+      ~ScheduleATransactionSerializerTier2.bind
+      ~ScheduleATransactionSerializerTier2.build_field
+      ~ScheduleATransactionSerializerTier2.build_nested_field
+      ~ScheduleATransactionSerializerTier2.build_property_field
+      ~ScheduleATransactionSerializerTier2.build_relational_field
+      ~ScheduleATransactionSerializerTier2.build_standard_field
+      ~ScheduleATransactionSerializerTier2.build_unknown_field
+      ~ScheduleATransactionSerializerTier2.build_url_field
+      ~ScheduleATransactionSerializerTier2.create
+      ~ScheduleATransactionSerializerTier2.create_or_update_contact
+      ~ScheduleATransactionSerializerTier2.create_or_update_memo
+      ~ScheduleATransactionSerializerTier2.fail
+      ~ScheduleATransactionSerializerTier2.get_attribute
+      ~ScheduleATransactionSerializerTier2.get_default
+      ~ScheduleATransactionSerializerTier2.get_default_field_names
+      ~ScheduleATransactionSerializerTier2.get_extra_kwargs
+      ~ScheduleATransactionSerializerTier2.get_field_names
+      ~ScheduleATransactionSerializerTier2.get_fields
+      ~ScheduleATransactionSerializerTier2.get_foreign_key_fields
+      ~ScheduleATransactionSerializerTier2.get_initial
+      ~ScheduleATransactionSerializerTier2.get_schema_name
+      ~ScheduleATransactionSerializerTier2.get_unique_for_date_validators
+      ~ScheduleATransactionSerializerTier2.get_unique_together_validators
+      ~ScheduleATransactionSerializerTier2.get_uniqueness_extra_kwargs
+      ~ScheduleATransactionSerializerTier2.get_validation_candidate
+      ~ScheduleATransactionSerializerTier2.get_validators
+      ~ScheduleATransactionSerializerTier2.get_value
+      ~ScheduleATransactionSerializerTier2.include_extra_kwargs
+      ~ScheduleATransactionSerializerTier2.is_valid
+      ~ScheduleATransactionSerializerTier2.many_init
+      ~ScheduleATransactionSerializerTier2.propagate_contact_info
+      ~ScheduleATransactionSerializerTier2.run_validation
+      ~ScheduleATransactionSerializerTier2.run_validators
+      ~ScheduleATransactionSerializerTier2.save
+      ~ScheduleATransactionSerializerTier2.to_internal_value
+      ~ScheduleATransactionSerializerTier2.to_representation
+      ~ScheduleATransactionSerializerTier2.update
+      ~ScheduleATransactionSerializerTier2.validate
+      ~ScheduleATransactionSerializerTier2.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleATransactionSerializerTier2.context
+      ~ScheduleATransactionSerializerTier2.data
+      ~ScheduleATransactionSerializerTier2.default_error_messages
+      ~ScheduleATransactionSerializerTier2.default_validators
+      ~ScheduleATransactionSerializerTier2.errors
+      ~ScheduleATransactionSerializerTier2.fields
+      ~ScheduleATransactionSerializerTier2.initial
+      ~ScheduleATransactionSerializerTier2.parent_transaction
+      ~ScheduleATransactionSerializerTier2.root
+      ~ScheduleATransactionSerializerTier2.serializer_field_mapping
+      ~ScheduleATransactionSerializerTier2.url_field_name
+      ~ScheduleATransactionSerializerTier2.validated_data
+      ~ScheduleATransactionSerializerTier2.validators
+   
+   
