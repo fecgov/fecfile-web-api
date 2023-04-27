@@ -99,7 +99,7 @@ class ScheduleATransactionSerializerBase(TransactionSerializerBase):
     )
 
 
-class ScheduleATransactionSerializerTeir2(ScheduleATransactionSerializerBase):
+class ScheduleATransactionSerializerTier2(ScheduleATransactionSerializerBase):
     children = ListSerializer(
         child=ScheduleATransactionSerializerBase(),
         allow_null=True,
@@ -159,9 +159,9 @@ class ScheduleATransactionSerializerTeir2(ScheduleATransactionSerializerBase):
         depth = 2
 
 
-class ScheduleATransactionSerializer(ScheduleATransactionSerializerTeir2):
+class ScheduleATransactionSerializer(ScheduleATransactionSerializerTier2):
     children = ListSerializer(
-        child=ScheduleATransactionSerializerTeir2(),
+        child=ScheduleATransactionSerializerTier2(),
         allow_null=True,
         allow_empty=True,
         required=False,
