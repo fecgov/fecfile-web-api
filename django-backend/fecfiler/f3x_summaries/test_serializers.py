@@ -12,6 +12,7 @@ class F3XSerializerTestCase(TestCase):
             "form_type": "F3XN",
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
+            "filer_committee_id_number": "C00123456",
             "coverage_from_date": "2023-01-01",
             "coverage_through_date": "2023-01-01",
             "report_code": "Q1",

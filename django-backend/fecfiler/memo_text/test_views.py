@@ -30,6 +30,7 @@ class MemoTextViewSetTest(TestCase):
         data = {
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "rec_type": "TEXT",
+            "filer_committee_id_number": "C12345678",
             "back_reference_sched_form_name": "F3XN",
             "text4000": "test_new_text",
             "back_reference_tran_id_number": None,
@@ -47,6 +48,7 @@ class MemoTextViewSetTest(TestCase):
         data = {
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
             "rec_type": "TEXT",
+            "filer_committee_id_number": "C12345678",
             "back_reference_sched_form_name": "F3XN",
             "text4000": "test_existing_text",
             "back_reference_tran_id_number": None,

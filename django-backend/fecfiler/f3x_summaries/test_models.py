@@ -1,5 +1,6 @@
 from django.test import TestCase
 from .models import F3XSummary
+from datetime import datetime
 
 
 class F3XTestCase(TestCase):
@@ -22,7 +23,7 @@ class F3XTestCase(TestCase):
         self.valid_f3x_summary.save()
         f3x_summary_from_db = F3XSummary.objects.get(date_signed="2022-01-01")
         self.assertIsInstance(f3x_summary_from_db, F3XSummary)
-        self.assertEquals(f3x_summary_from_db.date_signed, "2022-01-01")
+        self.assertEquals(f3x_summary_from_db.date_signed, datetime.date("2022-01-01"))
         f3x_summary_from_db.delete()
         self.assertRaises(
             F3XSummary.DoesNotExist,
@@ -31,7 +32,9 @@ class F3XTestCase(TestCase):
         )
 
         soft_deleted_f3x_summary = F3XSummary.all_objects.get(date_signed="2022-01-01")
-        self.assertEquals(soft_deleted_f3x_summary.date_signed, "2022-01-01")
+        self.assertEquals(
+            soft_deleted_f3x_summary.date_signed, datetime.date("2022-01-01")
+        )
         self.assertIsNotNone(soft_deleted_f3x_summary.deleted)
         soft_deleted_f3x_summary.hard_delete()
         self.assertRaises(

@@ -63,6 +63,7 @@ class SchATransactionsViewTest(TestCase):
         "memo_text": {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
+            "filer_committee_id_number": "C00345678",
             "rec_type": "",
             "back_reference_sched_form_name": "",
         },
@@ -83,6 +84,7 @@ class SchATransactionsViewTest(TestCase):
         self.memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
+            "filer_committee_id_number": "C00345678",
             "rec_type": "",
             "back_reference_sched_form_name": "",
         }
@@ -173,6 +175,7 @@ class SchATransactionsViewTest(TestCase):
             "contribution_date": "2022-10-07",
             "entity_type": "IND",
             "form_type": "SA17",
+            "filer_committee_id_number": "C00345678",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
@@ -233,6 +236,7 @@ class SchATransactionsViewTest(TestCase):
             "contribution_date": "2022-10-07",
             "entity_type": "COM",
             "form_type": "SA17",
+            "filer_committee_id_number": "C12345678",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
@@ -272,6 +276,7 @@ class SchATransactionsViewTest(TestCase):
             "contribution_date": "2022-10-07",
             "entity_type": "ORG",
             "form_type": "SA17",
+            "filer_committee_id_number": "C00345678",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id": "C8758663365855FEAC76",
