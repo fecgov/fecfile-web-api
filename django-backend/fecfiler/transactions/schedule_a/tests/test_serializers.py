@@ -1,7 +1,6 @@
 from django.test import TestCase
 from fecfiler.authentication.models import Account
-from fecfiler.transactions.schedule_a.serializers import (
-    ScheduleATransactionSerializer)
+from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
 from rest_framework.request import HttpRequest, Request
 from fecfiler.transactions.models import Transaction
 
@@ -49,14 +48,12 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.new_memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "memo4000": "new memo text",
             "back_reference_sched_form_name": "",
         }
         self.valid_schedule_a_transaction = {
             "form_type": "SA",
-            "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SchA",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
@@ -78,7 +75,6 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         }
         self.update_contact_schedule_a_transaction = {
             "form_type": "SA",
-            "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SchA",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
@@ -136,7 +132,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.assertEqual(created_instance.count(), 1)
 
         updated_transaction = self.update_contact_schedule_a_transaction.copy()
-        updated_transaction['contributor_last_name'] = "TEST_LAST_NAME_UPDATED"
+        updated_transaction["contributor_last_name"] = "TEST_LAST_NAME_UPDATED"
         serializer.update(
             created_instance[0], serializer.to_internal_value(updated_transaction)
         )

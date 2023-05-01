@@ -19,7 +19,6 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         unique=True,
     )
     rec_type = models.TextField(null=True, blank=True)
-    filer_committee_id_number = models.TextField(null=True, blank=True)
     is_report_level_memo = models.BooleanField(null=False, blank=False, default=True)
     transaction_id_number = models.TextField(null=True, blank=True)
     transaction_uuid = models.TextField(null=True, blank=True)

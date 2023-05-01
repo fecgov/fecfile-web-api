@@ -30,7 +30,10 @@ class MemoTextSerializer(
                 "schedulebtransaction",
                 "transaction",
             ]
-        ] + ["report_id"]
+        ] + [
+            "report_id",
+            "fields_to_validate",
+        ]
         read_only_fields = [
             "id",
             "deleted",

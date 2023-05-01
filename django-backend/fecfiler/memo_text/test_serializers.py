@@ -10,7 +10,6 @@ class MemoTextSerializerTestCase(TestCase):
     def setUp(self):
         self.valid_memo_text = {
             "back_reference_sched_form_name": "F3XN",
-            "filer_committee_id_number": "C00601211",
             "rec_type": "TEXT",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "text4000": "tessst4",
@@ -20,7 +19,6 @@ class MemoTextSerializerTestCase(TestCase):
 
         self.invalid_memo_text = {
             "back_reference_sched_form_name": "F3XN",
-            "filer_committee_id_number": "C00601211",
             "rec_type": "Invalid_rec_type",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "text4000": "tessst4",

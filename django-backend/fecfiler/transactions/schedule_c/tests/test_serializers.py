@@ -34,14 +34,12 @@ class ScheduleCTransactionSerializerTestCase(TestCase):
         self.new_memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "memo4000": "new memo text",
             "back_reference_sched_form_name": "",
         }
         self.valid_schedule_c_transaction = {
             "form_type": "SC/10",
-            "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SCHEDULE_C",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",

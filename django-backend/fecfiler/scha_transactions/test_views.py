@@ -55,7 +55,6 @@ class SchATransactionsViewTest(TestCase):
         "aggregation_group": "OTHER_RECEIPTS",
         "contribution_date": "2022-10-07",
         "entity_type": "IND",
-        "filer_committee_id_number": "C00601211",
         "form_type": "SA17",
         "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
         "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
@@ -64,7 +63,6 @@ class SchATransactionsViewTest(TestCase):
         "memo_text": {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "back_reference_sched_form_name": "",
         },
@@ -85,7 +83,6 @@ class SchATransactionsViewTest(TestCase):
         self.memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "back_reference_sched_form_name": "",
         }
@@ -175,7 +172,6 @@ class SchATransactionsViewTest(TestCase):
             "contribution_amount": "12.00",
             "contribution_date": "2022-10-07",
             "entity_type": "IND",
-            "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
@@ -236,7 +232,6 @@ class SchATransactionsViewTest(TestCase):
             "contribution_amount": "12.00",
             "contribution_date": "2022-10-07",
             "entity_type": "COM",
-            "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
@@ -276,7 +271,6 @@ class SchATransactionsViewTest(TestCase):
             "contribution_amount": "12.00",
             "contribution_date": "2022-10-07",
             "entity_type": "ORG",
-            "filer_committee_id_number": "C00601211",
             "form_type": "SA17",
             "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
