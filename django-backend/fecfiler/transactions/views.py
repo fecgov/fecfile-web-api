@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import filters
+from rest_framework import filters, pagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,6 +15,11 @@ from fecfiler.transactions.serializers import TransactionSerializerBase
 
 
 logger = logging.getLogger(__name__)
+
+
+class TransactionListPagination(pagination.PageNumberPagination):
+    page_size = 5
+    page_size_query_param = "page_size"
 
 
 class TransactionViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
@@ -45,6 +50,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
     )
     serializer_class = TransactionSerializerBase
+    pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
