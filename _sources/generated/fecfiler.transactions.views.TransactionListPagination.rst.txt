@@ -1,0 +1,55 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.views.TransactionListPagination
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autoclass:: TransactionListPagination
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionListPagination.__init__
+      ~TransactionListPagination.get_html_context
+      ~TransactionListPagination.get_next_link
+      ~TransactionListPagination.get_page_number
+      ~TransactionListPagination.get_page_size
+      ~TransactionListPagination.get_paginated_response
+      ~TransactionListPagination.get_paginated_response_schema
+      ~TransactionListPagination.get_previous_link
+      ~TransactionListPagination.get_results
+      ~TransactionListPagination.get_schema_fields
+      ~TransactionListPagination.get_schema_operation_parameters
+      ~TransactionListPagination.paginate_queryset
+      ~TransactionListPagination.to_html
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionListPagination.display_page_controls
+      ~TransactionListPagination.invalid_page_message
+      ~TransactionListPagination.last_page_strings
+      ~TransactionListPagination.max_page_size
+      ~TransactionListPagination.page_query_description
+      ~TransactionListPagination.page_query_param
+      ~TransactionListPagination.page_size
+      ~TransactionListPagination.page_size_query_description
+      ~TransactionListPagination.page_size_query_param
+      ~TransactionListPagination.template
+   
+   

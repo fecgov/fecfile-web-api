@@ -22,6 +22,7 @@ fecfiler.transactions.views
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      TransactionListPagination
       TransactionViewSet
       TransactionViewSetBase
    
