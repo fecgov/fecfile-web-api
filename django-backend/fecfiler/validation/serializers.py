@@ -108,6 +108,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             pattern
         """
         fields_to_validate = data.pop("fields_to_validate", [])
+        print(f"ahoy{fields_to_validate}")
         request = self.context.get("request", None)
         if request and not fields_to_validate:
             fields_to_validate_str = request.query_params.get("fields_to_validate")

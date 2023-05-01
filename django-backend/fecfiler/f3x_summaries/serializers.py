@@ -79,5 +79,5 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "uploadsubmission",
                 "webprintsubmission",
             ]
-        ] + ["report_status", "report_code_label"]
+        ] + ["report_status", "report_code_label", "fields_to_validate"]
         read_only_fields = ["id", "deleted", "created", "updated"]

@@ -15,6 +15,14 @@ class MemoTextSerializerTestCase(TestCase):
             "text4000": "tessst4",
             "transaction_id_number": "REPORT_MEMO_TEXT_3",
             "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "fields_to_validate": [
+                "back_reference_sched_form_name",
+                "rec_type",
+                "report_id",
+                "text4000",
+                "transaction_id_number",
+                "committee_account",
+            ],
         }
 
         self.invalid_memo_text = {
