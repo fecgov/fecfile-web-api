@@ -50,7 +50,12 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "transaction_id_number": "ABCDEF0123456789",
             "rec_type": "",
             "memo4000": "new memo text",
-            "back_reference_sched_form_name": "",
+            "fields_to_validate": [
+                "report_id",
+                "transaction_id_number",
+                "rec_type",
+                "memo4000",
+            ],
         }
         self.valid_schedule_a_transaction = {
             "form_type": "SA",

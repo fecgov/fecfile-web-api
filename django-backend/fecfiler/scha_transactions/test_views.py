@@ -56,16 +56,22 @@ class SchATransactionsViewTest(TestCase):
         "contribution_date": "2022-10-07",
         "entity_type": "IND",
         "form_type": "SA17",
+        "filer_committee_id_number": "C00601211",
         "report": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
         "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
         "transaction_id": "C8758663365855FEAC76",
         "transaction_type_identifier": "OTHER_RECEIPT",
+        "filer_committee_id_number": "C00345678",
         "memo_text": {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
             "filer_committee_id_number": "C00345678",
             "rec_type": "",
-            "back_reference_sched_form_name": "",
+            "fields_to_validate": [
+                "report_id",
+                "transaction_id_number",
+                "rec_type",
+            ],
         },
         "memo_text_id": "a12321aa-a11a-b22b-c33c-abc123321cba",
         "schema_name": "OTHER_RECEIPT",
@@ -86,7 +92,11 @@ class SchATransactionsViewTest(TestCase):
             "transaction_id_number": "ABCDEF0123456789",
             "filer_committee_id_number": "C00345678",
             "rec_type": "",
-            "back_reference_sched_form_name": "",
+            "fields_to_validate": [
+                "report_id",
+                "transaction_id_number",
+                "rec_type",
+            ],
         }
 
         self.user = Account.objects.get(cmtee_id="C12345678")

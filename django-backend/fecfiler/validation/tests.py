@@ -15,6 +15,7 @@ class FecSchemaValidatorSerializerMixin(TestCase):
     def setUp(self):
         self.valid_f3x_summary = {
             "form_type": "F3XN",
+            "filer_committee_id_number": "C00123456",
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
             "date_signed": "2022-01-01",
