@@ -43,18 +43,15 @@ class SchATransactionSerializer(
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
         if not schema_name:
-            raise ValidationError(
-                {
-                    "schema_name": [
-                        "No schema_name provided1"
-                    ]
-                }
-            )
+            raise ValidationError({"schema_name": ["No schema_name provided1"]})
         return schema_name
 
     def validate(self, attrs):
         """Adds stub contribution_aggregate to pass validation"""
         attrs["contribution_aggregate"] = 0
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore", ["filer_committee_id_number"]
+        )
         data = super().validate(attrs)
         del data["contribution_aggregate"]
         return data

@@ -35,11 +35,6 @@ class SchATransactionTestCase(TestCase):
             "transaction_id_number": "ABCDEF0123456789",
             "rec_type": "",
             "back_reference_sched_form_name": "",
-            "fields_to_validate": [
-                "report_id",
-                "transaction_id_number",
-                "rec_type",
-            ],
         }
 
         self.valid_scha_transaction = {

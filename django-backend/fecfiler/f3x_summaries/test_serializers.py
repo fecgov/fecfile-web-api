@@ -17,16 +17,6 @@ class F3XSerializerTestCase(TestCase):
             "report_code": "Q1",
             "date_signed": "2022-01-01",
             "upload_submission": {"fec_status": " ACCEPTED"},
-            "fields_to_validate": [
-                "form_type",
-                "treasurer_last_name",
-                "treasurer_first_name",
-                "coverage_from_date",
-                "coverage_through_date",
-                "report_code",
-                "date_signed",
-                "upload_submission",
-            ],
         }
 
         self.invalid_f3x_summary = {

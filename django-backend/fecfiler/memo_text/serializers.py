@@ -46,6 +46,12 @@ class MemoTextSerializer(
         transaction = memo_text_obj.transaction_set.first()
         return transaction and transaction.transaction_id
 
+    def validate(self, data):
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore", ["filer_committee_id_number"]
+        )
+        return super().validate(data)
+
 
 class LinkedMemoTextSerializerMixin(ModelSerializer):
     memo_text = MemoTextSerializer(allow_null=True, required=False)

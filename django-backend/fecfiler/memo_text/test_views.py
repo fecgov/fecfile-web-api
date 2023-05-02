@@ -63,16 +63,6 @@ class MemoTextViewSetTest(TestCase):
             "committee_account": "735db943-9446-462a-9be0-c820baadb622",
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
-            "fields_to_validate": [
-                "report_id",
-                "rec_type",
-                "back_reference_sched_form_name",
-                "text4000",
-                "back_reference_tran_id_number",
-                "committee_account",
-                "transaction_id_number",
-                "transaction_uuid",
-            ],
         }
         response = client.post("/api/v1/memo-text/", data, format="json")
         self.assertEqual(response.status_code, 201)
