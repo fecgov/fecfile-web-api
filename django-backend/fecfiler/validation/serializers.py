@@ -89,6 +89,13 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
         foreign_key_fields = getattr(meta, "foreign_key_fields", None)
         return dict(foreign_key_fields) if foreign_key_fields else {}
 
+    def ignore_fields(self, errors):
+        """Returns copy of errors without fields to ignore"""
+        fields_to_ignore = self.context.get("fields_to_ignore", None)
+        if fields_to_ignore:
+            return list(filter(lambda f: f.path not in fields_to_ignore, errors))
+        return errors
+
     def create(self, validated_data):
         validated_data.pop("fields_to_validate", None)
         validated_data.pop("schema_name", None)
@@ -120,13 +127,14 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             self.get_validation_candidate(data),
             fields_to_validate,
         )
-        if validation_result.errors:
+        errors = self.ignore_fields(validation_result.errors)
+        if errors:
 
             def collect_error(all_errors, error):
                 all_errors[error.path] = error.message
                 return all_errors
 
-            translated_errors = reduce(collect_error, validation_result.errors, {})
+            translated_errors = reduce(collect_error, errors, {})
             logger.warning(
                 f"{self.__class__.__name__}: Failed validation {list(translated_errors)}"
             )

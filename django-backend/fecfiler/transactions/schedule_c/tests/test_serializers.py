@@ -30,19 +30,6 @@ class ScheduleCTransactionSerializerTestCase(TestCase):
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
         }
-
-        self.new_memo_text = {
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "transaction_id_number": "ABCDEF0123456789",
-            "rec_type": "",
-            "memo4000": "new memo text",
-            "fields_to_validate": [
-                "report_id",
-                "transaction_id_number",
-                "rec_type",
-                "memo4000",
-            ],
-        }
         self.valid_schedule_c_transaction = {
             "form_type": "SC/10",
             "transaction_type_identifier": "SCHEDULE_C",
