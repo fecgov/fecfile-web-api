@@ -30,18 +30,14 @@ class MemoTextViewSetTest(TestCase):
         data = {
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "rec_type": "TEXT",
-            "back_reference_sched_form_name": "F3XN",
             "text4000": "test_new_text",
-            "back_reference_tran_id_number": None,
             "committee_account": "735db943-9446-462a-9be0-c820baadb622",
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
             "fields_to_validate": [
                 "report_id",
                 "rec_type",
-                "back_reference_sched_form_name",
                 "text4000",
-                "back_reference_tran_id_number",
                 "committee_account",
                 "transaction_id_number",
                 "transaction_uuid",
@@ -57,9 +53,7 @@ class MemoTextViewSetTest(TestCase):
         data = {
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
             "rec_type": "TEXT",
-            "back_reference_sched_form_name": "F3XN",
             "text4000": "test_existing_text",
-            "back_reference_tran_id_number": None,
             "committee_account": "735db943-9446-462a-9be0-c820baadb622",
             "transaction_id_number": "id_number",
             "transaction_uuid": None,

@@ -8,7 +8,6 @@ class MemoTextTestCase(TestCase):
 
     def setUp(self):
         self.valid_memo_text = MemoText(
-            back_reference_sched_form_name="F3XN",
             id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
             rec_type="TEXT",
             text4000="tessst4",

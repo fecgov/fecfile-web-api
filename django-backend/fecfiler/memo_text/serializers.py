@@ -14,8 +14,6 @@ class MemoTextSerializer(
     schema_name = "Text"
     report_id = UUIDField(required=True, allow_null=False)
 
-    back_reference_tran_id_number = SerializerMethodField()
-
     class Meta:
         model = MemoText
         fields = [
@@ -39,16 +37,16 @@ class MemoTextSerializer(
             "deleted",
             "created",
             "updated",
-            "back_reference_tran_id_number",
         ]
-
-    def get_back_reference_tran_id_number(self, memo_text_obj):
-        transaction = memo_text_obj.transaction_set.first()
-        return transaction and transaction.transaction_id
 
     def validate(self, data):
         self.context["fields_to_ignore"] = self.context.get(
-            "fields_to_ignore", ["filer_committee_id_number"]
+            "fields_to_ignore",
+            [
+                "filer_committee_id_number",
+                "back_reference_sched_form_name",
+                "back_reference_tran_id_number",
+            ],
         )
         return super().validate(data)
 
