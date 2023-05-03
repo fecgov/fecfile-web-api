@@ -36,10 +36,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         unique=True,
         default=generate_fec_uid,
     )
-    # TODO remove from model after refactoring .fec services
-    back_reference_tran_id_number = models.TextField(null=True, blank=True)
-    # TODO remove from model after refactoring .fec services
-    back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
 

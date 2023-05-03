@@ -140,8 +140,6 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         child["transaction_type_identifier"] = "SchB"
         child["schema_name"] = "SchB"
         child["expenditure_purpose_descrip"] = "chile"
-        child["back_reference_sched_name"] = "test"
-        child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = ScheduleBTransactionSerializer(
