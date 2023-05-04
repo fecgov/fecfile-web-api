@@ -87,21 +87,49 @@ class TransactionSerializerBase(
             raise MISSING_SCHEMA_NAME_ERROR
         return schema_name
 
-    def to_representation(self, instance, depth=0):
+    def to_representation(self, instance):
+        root = self.to_representation_helper(instance)
+        parent_instance = instance.parent_transaction
+        parent_root = None
+        print(instance.transaction_id)
+        if (parent_instance):
+            parent_root = self.to_representation_helper(parent_instance)
+            parent_head = parent_root
+            if parent_instance.parent_transaction:
+                print("HEY LISTEN!!!!!!!!")
+                print("Root:", instance.id)
+                print("Parent:", parent_instance.id)
+                print("Grandparent:", parent_instance.parent_transaction)
+            parent_instance = parent_instance.parent_transaction
+            while parent_instance:
+                parent = self.to_representation_helper(parent_instance)
+                parent_head['parent_transaction'] = parent
+                parent_head = parent
+                parent_instance = parent_instance.parent_transaction
+
+        if parent_root:
+            root['parent_transaction'] = parent_root
+
+        return root
+
+
+    def to_representation_helper(self, instance, parent=None):
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
         schedule_c = representation.pop("schedule_c") or []
-        if depth < 2:
-            if instance.parent_transaction:
-                representation["parent_transaction"] = self.to_representation(
-                    instance.parent_transaction, depth + 1
-                )
-            children = instance.transaction_set.all()
-            if children:
-                representation["children"] = [
-                    self.to_representation(child, depth + 1) for child in children
-                ]
+
+        """
+        if parent == None and instance.parent_transaction:
+            representation["parent_transaction"] = self.to_representation(
+                instance.parent_transaction, depth + 1
+            )
+        children = instance.transaction_set.all()
+        if children:
+            representation["children"] = [
+                self.to_representation(child, depth + 1) for child in children
+            ]
+        """
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
