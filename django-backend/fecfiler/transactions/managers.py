@@ -109,6 +109,7 @@ class TransactionManager(SoftDeleteManager):
             schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
+            When(force_itemized__isnull=False, then=F("force_itemized")),
             When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
