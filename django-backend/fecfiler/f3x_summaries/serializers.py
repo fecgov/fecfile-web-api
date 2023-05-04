@@ -62,6 +62,12 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
+    def validate(self, data):
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore", ["filer_committee_id_number"]
+        )
+        return super().validate(data)
+
     class Meta:
         model = F3XSummary
         fields = [
@@ -79,5 +85,5 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
                 "uploadsubmission",
                 "webprintsubmission",
             ]
-        ] + ["report_status", "report_code_label"]
+        ] + ["report_status", "report_code_label", "fields_to_validate"]
         read_only_fields = ["id", "deleted", "created", "updated"]

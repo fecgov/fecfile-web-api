@@ -39,6 +39,8 @@ class DotFECSerializerTestCase(TestCase):
         self.report_level_memo_text = MemoText.objects.filter(
             id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d"
         ).first()
+        self.report_level_memo_text.filer_committee_id_number = "C00601211"
+        self.report_level_memo_text.back_reference_sched_form_name = "F3XN"
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
     def test_serialize_field(self):
