@@ -1,7 +1,7 @@
 from .models import MemoText
 from django.db import transaction
 from fecfiler.validation import serializers
-from rest_framework.serializers import UUIDField, SerializerMethodField, ModelSerializer
+from rest_framework.serializers import UUIDField, ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 import logging
 
