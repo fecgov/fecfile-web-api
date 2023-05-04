@@ -32,6 +32,7 @@ fecfiler.validation.tests.MockF3XSerializerClass
       ~MockF3XSerializerClass.get_validation_candidate
       ~MockF3XSerializerClass.get_validators
       ~MockF3XSerializerClass.get_value
+      ~MockF3XSerializerClass.ignore_fields
       ~MockF3XSerializerClass.is_valid
       ~MockF3XSerializerClass.many_init
       ~MockF3XSerializerClass.run_validation

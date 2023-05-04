@@ -37,7 +37,7 @@
 <h1>fecfiler.memo_text.models.MemoText<a class="headerlink" href="#fecfiler-memo-text-models-memotext" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.memo_text.models.MemoText">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.memo_text.models.</span></span><span class="sig-name descname"><span class="pre">MemoText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deleted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee_account</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filer_committee_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_report_level_memo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_tran_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">back_reference_sched_form_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text4000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.models.MemoText" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.memo_text.models.</span></span><span class="sig-name descname"><span class="pre">MemoText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deleted</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee_account</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rec_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_report_level_memo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_id_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text4000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.memo_text.models.MemoText" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.soft_delete.models.SoftDeleteModel</span></code>, <a class="reference internal" href="fecfiler.committee_accounts.models.CommitteeOwnedModel.html#fecfiler.committee_accounts.models.CommitteeOwnedModel" title="fecfiler.committee_accounts.models.CommitteeOwnedModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.models.CommitteeOwnedModel</span></code></a>, <a class="reference internal" href="fecfiler.f3x_summaries.models.ReportMixin.html#fecfiler.f3x_summaries.models.ReportMixin" title="fecfiler.f3x_summaries.models.ReportMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">fecfiler.f3x_summaries.models.ReportMixin</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.memo_text.models.MemoText.__init__">
@@ -129,12 +129,6 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_objects</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_sched_form_name</span></code></p></td>
-<td><p>A wrapper for a deferred-loading field.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_reference_tran_id_number</span></code></p></td>
-<td><p>A wrapper for a deferred-loading field.</p></td>
-</tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">committee_account</span></code></p></td>
 <td><p>Accessor to the related object on the forward side of a many-to-one or one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p></td>
 </tr>
@@ -144,43 +138,40 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleted</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filer_committee_id_number</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_report_level_memo</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_report_level_memo</span></code></p></td>
-<td><p>A wrapper for a deferred-loading field.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">objects</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">objects</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pk</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pk</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rec_type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rec_type</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></p></td>
 <td><p>Accessor to the related object on the forward side of a many-to-one or one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_id</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_id</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schatransaction_set</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schatransaction_set</span></code></p></td>
 <td><p>Accessor to the related objects manager on the reverse side of a many-to-one relation.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">text4000</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">text4000</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_id_number</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_id_number</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_set</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_set</span></code></p></td>
 <td><p>Accessor to the related objects manager on the reverse side of a many-to-one relation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_uuid</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transaction_uuid</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 </tbody>

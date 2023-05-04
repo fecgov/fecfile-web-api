@@ -51,12 +51,9 @@ fecfiler.memo\_text.models.MemoText
    .. autosummary::
    
       ~MemoText.all_objects
-      ~MemoText.back_reference_sched_form_name
-      ~MemoText.back_reference_tran_id_number
       ~MemoText.committee_account
       ~MemoText.committee_account_id
       ~MemoText.deleted
-      ~MemoText.filer_committee_id_number
       ~MemoText.id
       ~MemoText.is_report_level_memo
       ~MemoText.objects

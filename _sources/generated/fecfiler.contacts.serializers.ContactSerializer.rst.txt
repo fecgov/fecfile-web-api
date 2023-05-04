@@ -45,6 +45,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.get_validation_candidate
       ~ContactSerializer.get_validators
       ~ContactSerializer.get_value
+      ~ContactSerializer.ignore_fields
       ~ContactSerializer.include_extra_kwargs
       ~ContactSerializer.is_valid
       ~ContactSerializer.many_init

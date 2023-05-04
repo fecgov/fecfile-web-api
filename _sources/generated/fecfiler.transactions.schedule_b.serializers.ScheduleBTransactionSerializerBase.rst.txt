@@ -47,6 +47,7 @@ fecfiler.transactions.schedule\_b.serializers.ScheduleBTransactionSerializerBase
       ~ScheduleBTransactionSerializerBase.get_validation_candidate
       ~ScheduleBTransactionSerializerBase.get_validators
       ~ScheduleBTransactionSerializerBase.get_value
+      ~ScheduleBTransactionSerializerBase.ignore_fields
       ~ScheduleBTransactionSerializerBase.include_extra_kwargs
       ~ScheduleBTransactionSerializerBase.is_valid
       ~ScheduleBTransactionSerializerBase.many_init

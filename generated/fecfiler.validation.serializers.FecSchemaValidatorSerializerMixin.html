@@ -107,34 +107,37 @@ match a schema defined in the package</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_value" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
 <td><p>Given the <em>incoming</em> primitive data, return the value for this field that should be validated and transformed to a native value.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>(*[, raise_exception])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.ignore_fields" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.ignore_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ignore_fields</span></code></a>(errors)</p></td>
+<td><p>Returns copy of errors without fields to ignore</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>(*[, raise_exception])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.many_init" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.many_init" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
 <td><p>This method implements the creation of a <cite>ListSerializer</cite> parent class when <cite>many=True</cite> is used.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validation" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validation" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
 <td><p>We override the default <cite>run_validation</cite>, because the validation performed by validators and the <cite>.validate()</cite> method should be coerced into an error dictionary with a 'non_fields_error' key.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validators" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validators" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
 <td><p>Add read_only fields with defaults to value before running validators.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_internal_value" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_internal_value" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
 <td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_representation" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_representation" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
 <td><p>Overrides Django Rest Framework's Serializer validate to validate with fecfile_validate rules.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate_empty_values" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate_empty_values" title="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
 <td><p>Validate empty values, and either:</p></td>
 </tr>
 </tbody>
@@ -299,6 +302,12 @@ related object with the key only.</p>
 <span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.get_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the <em>incoming</em> primitive data, return the value for this field
 that should be validated and transformed to a native value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.ignore_fields">
+<span class="sig-name descname"><span class="pre">ignore_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin.ignore_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns copy of errors without fields to ignore</p>
 </dd></dl>
 
 <dl class="py method">

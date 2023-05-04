@@ -47,6 +47,7 @@ fecfiler.transactions.schedule\_a.serializers.ScheduleATransactionSerializerTier
       ~ScheduleATransactionSerializerTier2.get_validation_candidate
       ~ScheduleATransactionSerializerTier2.get_validators
       ~ScheduleATransactionSerializerTier2.get_value
+      ~ScheduleATransactionSerializerTier2.ignore_fields
       ~ScheduleATransactionSerializerTier2.include_extra_kwargs
       ~ScheduleATransactionSerializerTier2.is_valid
       ~ScheduleATransactionSerializerTier2.many_init

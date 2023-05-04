@@ -32,6 +32,7 @@ fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.get_validation_candidate
       ~FecSchemaValidatorSerializerMixin.get_validators
       ~FecSchemaValidatorSerializerMixin.get_value
+      ~FecSchemaValidatorSerializerMixin.ignore_fields
       ~FecSchemaValidatorSerializerMixin.is_valid
       ~FecSchemaValidatorSerializerMixin.many_init
       ~FecSchemaValidatorSerializerMixin.run_validation

@@ -47,6 +47,7 @@ fecfiler.scha\_transactions.serializers.SchATransactionParentSerializer
       ~SchATransactionParentSerializer.get_validation_candidate
       ~SchATransactionParentSerializer.get_validators
       ~SchATransactionParentSerializer.get_value
+      ~SchATransactionParentSerializer.ignore_fields
       ~SchATransactionParentSerializer.include_extra_kwargs
       ~SchATransactionParentSerializer.is_valid
       ~SchATransactionParentSerializer.many_init

@@ -47,6 +47,7 @@ fecfiler.transactions.serializers.TransactionSerializerBase
       ~TransactionSerializerBase.get_validation_candidate
       ~TransactionSerializerBase.get_validators
       ~TransactionSerializerBase.get_value
+      ~TransactionSerializerBase.ignore_fields
       ~TransactionSerializerBase.include_extra_kwargs
       ~TransactionSerializerBase.is_valid
       ~TransactionSerializerBase.many_init

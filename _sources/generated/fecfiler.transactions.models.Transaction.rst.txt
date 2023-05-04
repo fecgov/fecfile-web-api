@@ -56,8 +56,6 @@ fecfiler.transactions.models.Transaction
    
       ~Transaction.aggregation_group
       ~Transaction.all_objects
-      ~Transaction.back_reference_sched_name
-      ~Transaction.back_reference_tran_id_number
       ~Transaction.children
       ~Transaction.committee_account
       ~Transaction.committee_account_id
@@ -66,7 +64,6 @@ fecfiler.transactions.models.Transaction
       ~Transaction.created
       ~Transaction.deleted
       ~Transaction.entity_type
-      ~Transaction.filer_committee_id_number
       ~Transaction.force_itemized
       ~Transaction.form_type
       ~Transaction.id

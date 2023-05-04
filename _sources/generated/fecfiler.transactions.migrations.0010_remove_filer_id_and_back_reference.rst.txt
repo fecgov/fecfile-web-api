@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0010\_remove\_filer\_id\_and\_back\_reference
+==============================================================================
+
+.. automodule:: fecfiler.transactions.migrations.0010_remove_filer_id_and_back_reference
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.memo\_text.migrations.0011\_remove\_memotext\_back\_reference\_sched\_form\_name\_and\_more.Migration
+==============================================================================================================
+
+.. currentmodule:: fecfiler.memo_text.migrations.0011_remove_memotext_back_reference_sched_form_name_and_more
+
+.. autoclass:: Migration
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Migration.__init__
+      ~Migration.apply
+      ~Migration.mutate_state
+      ~Migration.suggest_name
+      ~Migration.unapply
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Migration.atomic
+      ~Migration.dependencies
+      ~Migration.initial
+      ~Migration.operations
+      ~Migration.replaces
+      ~Migration.run_before
+   
+   

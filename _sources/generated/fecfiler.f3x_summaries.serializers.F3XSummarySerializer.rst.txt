@@ -45,6 +45,7 @@ fecfiler.f3x\_summaries.serializers.F3XSummarySerializer
       ~F3XSummarySerializer.get_validation_candidate
       ~F3XSummarySerializer.get_validators
       ~F3XSummarySerializer.get_value
+      ~F3XSummarySerializer.ignore_fields
       ~F3XSummarySerializer.include_extra_kwargs
       ~F3XSummarySerializer.is_valid
       ~F3XSummarySerializer.many_init
