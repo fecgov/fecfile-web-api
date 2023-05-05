@@ -92,7 +92,7 @@ class TransactionSerializerBase(
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
         schedule_c = representation.pop("schedule_c") or []
-        print(depth)
+        # print(depth)
         if depth < 2:
             if direction != -1:
                 if instance.parent_transaction:
@@ -106,8 +106,8 @@ class TransactionSerializerBase(
                         self.to_representation(child, depth + 1, direction=-1) for child in children
                     ]
 
-        if direction == 0:
-            print("I'm a root call to to_representation!", instance.transaction_id)
+        # if direction == 0:
+        #     print("I'm a root call to to_representation!", instance.transaction_id)
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
