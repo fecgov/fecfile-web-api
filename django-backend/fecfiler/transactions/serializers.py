@@ -93,8 +93,7 @@ class TransactionSerializerBase(
         schedule_b = representation.pop("schedule_b") or []
         schedule_c = representation.pop("schedule_c") or []
         if depth < 2:
-            if direction != -1:
-                if instance.parent_transaction:
+            if instance.parent_transaction and direction != -1:
                     representation["parent_transaction"] = self.to_representation(
                         instance.parent_transaction, depth + 1, direction=1
                     )
