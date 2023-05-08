@@ -45,20 +45,17 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "country": "Country",
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
         }
 
         self.new_memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
             "memo4000": "new memo text",
-            "back_reference_sched_form_name": "",
         }
         self.valid_schedule_b_transaction = {
             "form_type": "SB",
-            "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SchB",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
@@ -81,7 +78,6 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
 
         self.update_contact_schedule_b_transaction = {
             "form_type": "SB",
-            "filer_committee_id_number": "C00123456",
             "transaction_type_identifier": "SchB",
             "transaction_id": "ABCDEF0123456789",
             "entity_type": "IND",
@@ -133,9 +129,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
-        self.assertIsNotNone(
-            missing_type_serializer.errors["payee_first_name"]
-        )
+        self.assertIsNotNone(missing_type_serializer.errors["payee_first_name"])
 
     def test_parent(self):
         parent = self.valid_schedule_b_transaction.copy()
@@ -146,8 +140,6 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         child["transaction_type_identifier"] = "SchB"
         child["schema_name"] = "SchB"
         child["expenditure_purpose_descrip"] = "chile"
-        child["back_reference_sched_name"] = "test"
-        child["back_reference_tran_id_number"] = "test"
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = ScheduleBTransactionSerializer(
@@ -223,7 +215,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.assertEqual(created_instance.count(), 1)
 
         updated_transaction = self.update_contact_schedule_b_transaction.copy()
-        updated_transaction['payee_last_name'] = "TEST_LAST_NAME_UPDATED"
+        updated_transaction["payee_last_name"] = "TEST_LAST_NAME_UPDATED"
         serializer.update(
             created_instance[0], serializer.to_internal_value(updated_transaction)
         )

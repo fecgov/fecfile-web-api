@@ -33,9 +33,7 @@ class SchATransactionTestCase(TestCase):
         self.memo_text = {
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "transaction_id_number": "ABCDEF0123456789",
-            "filer_committee_id_number": "C00123456",
             "rec_type": "",
-            "back_reference_sched_form_name": "",
         }
 
         self.valid_scha_transaction = {
@@ -109,7 +107,6 @@ class SchATransactionTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["contributor_first_name"])
 
     def test_no_transaction_type_identifier(self):
-
         missing_type_serializer = SchATransactionSerializer(
             data=self.missing_type_transaction,
             context={"request": self.mock_request},

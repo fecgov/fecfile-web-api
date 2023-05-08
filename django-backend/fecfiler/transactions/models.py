@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
-
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -31,18 +30,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
 
     form_type = models.TextField(null=True, blank=True)
-    # TODO remove from model after refactoring .fec services
-    filer_committee_id_number = models.TextField(null=True, blank=True)
     transaction_id = models.TextField(
         null=False,
         blank=False,
         unique=True,
         default=generate_fec_uid,
     )
-    # TODO remove from model after refactoring .fec services
-    back_reference_tran_id_number = models.TextField(null=True, blank=True)
-    # TODO remove from model after refactoring .fec services
-    back_reference_sched_name = models.TextField(null=True, blank=True)
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
     force_itemized = models.BooleanField(null=True, blank=True)
