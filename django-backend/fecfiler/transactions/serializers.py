@@ -94,9 +94,9 @@ class TransactionSerializerBase(
         schedule_c = representation.pop("schedule_c") or []
         if depth < 2:
             if instance.parent_transaction and direction != -1:
-                    representation["parent_transaction"] = self.to_representation(
-                        instance.parent_transaction, depth + 1, direction=1
-                    )
+                representation["parent_transaction"] = self.to_representation(
+                    instance.parent_transaction, depth + 1, direction=1
+                )
             if direction != 1:
                 children = instance.transaction_set.all()
                 if children:
