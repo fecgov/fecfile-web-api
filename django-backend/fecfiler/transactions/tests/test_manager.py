@@ -34,3 +34,7 @@ class TransactionManagerTestCase(TestCase):
         transaction_five = transactions[4]
         self.assertEqual(transaction_five.schedule, Schedule.B.value.value)
         self.assertEqual(transaction_five.form_type, "SB21b")
+
+    def test_refund_aggregation(self):
+        refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
+        self.assertEqual(refund.aggregate, 4444)

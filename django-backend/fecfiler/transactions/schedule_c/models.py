@@ -50,5 +50,25 @@ class ScheduleC(models.Model):
     lender_candidate_district = models.TextField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
 
+    def get_date(self):
+        return self.transaction.report.through_date
+
+    def update_with_contact(self, contact):
+        self.lender_organization_name = contact.name
+        self.lender_last_name = contact.last_name
+        self.lender_first_name = contact.first_name
+        self.lender_middle_name = contact.middle_name
+        self.lender_prefix = contact.prefix
+        self.lender_suffix = contact.suffix
+        self.lender_street_1 = contact.street_1
+        self.lender_street_2 = contact.street_2
+        self.lender_city = contact.city
+        self.lender_state = contact.state
+        self.lender_zip = contact.zip
+        self.lender_employer = contact.employer
+        self.lender_occupation = contact.occupation
+        self.lender_committee_fec_id = contact.committee_id
+        self.save()
+
     class Meta:
         app_label = "transactions"

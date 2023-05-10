@@ -18,7 +18,6 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
-    ExpressionWrapper
 )
 from decimal import Decimal
 from enum import Enum
@@ -30,7 +29,6 @@ but are called different names"""
 
 class TransactionManager(SoftDeleteManager):
     def get_queryset(self):
-        refunds = schedule_b_refunds
 
         queryset = (
             super()
@@ -48,22 +46,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_amount",
                     "schedule_b__expenditure_amount",
                 ),
-                effective_amount=ExpressionWrapper(
-                    Case(
-                        When(
-                            transaction_type_identifier__in=refunds,
-                            then=ExpressionWrapper(
-                                F('amount') * -1.0,
-                                output_field=DecimalField()
-                            )
-                        ),
-                        default=ExpressionWrapper(
-                            F('amount'),
-                            output_field=DecimalField()
-                        )
-                    ),
-                    output_field=DecimalField()
-                )
+                effective_amount=self.get_amount_clause(),
             )
         )
 
@@ -126,6 +109,7 @@ class TransactionManager(SoftDeleteManager):
             schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
+            When(force_itemized__isnull=False, then=F("force_itemized")),
             When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
@@ -133,6 +117,16 @@ class TransactionManager(SoftDeleteManager):
             ),
             default=Value(True),
             output_field=BooleanField(),
+        )
+
+    def get_amount_clause(self):
+        return Case(
+            When(
+                transaction_type_identifier__in=schedule_b_refunds,
+                then=F("amount") * Value(Decimal(-1)),
+            ),
+            default="amount",
+            output_field=DecimalField(),
         )
 
 
