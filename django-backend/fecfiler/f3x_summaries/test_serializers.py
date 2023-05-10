@@ -10,7 +10,6 @@ class F3XSerializerTestCase(TestCase):
     def setUp(self):
         self.valid_f3x_summary = {
             "form_type": "F3XN",
-            "filer_committee_id_number": "C00277616",
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
             "coverage_from_date": "2023-01-01",

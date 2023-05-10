@@ -134,6 +134,12 @@ class TransactionSerializerBase(
             subsequent_transaction.get_schedule().update_with_contact(contact)
             subsequent_transaction.save()
 
+    def validate(self, data):
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore", ["filer_committee_id_number"]
+        )
+        return super().validate(data)
+
     class Meta:
         model = Transaction
 
