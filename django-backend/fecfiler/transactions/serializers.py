@@ -20,6 +20,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from rest_framework.serializers import ListSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -87,24 +88,19 @@ class TransactionSerializerBase(
             raise MISSING_SCHEMA_NAME_ERROR
         return schema_name
 
-    def to_representation(self, instance, depth=0, direction=0):
+    def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
         schedule_c = representation.pop("schedule_c") or []
-        if depth < 2:
-            if instance.parent_transaction and direction != -1:
-                representation["parent_transaction"] = self.to_representation(
-                    instance.parent_transaction, depth + 1, direction=1
-                )
-            if direction != 1:
-                children = instance.transaction_set.all()
-                if children:
-                    representation["children"] = [
-                        self.to_representation(
-                            child, depth + 1, direction=-1
-                        ) for child in children
-                    ]
+        if (
+            not hasattr(representation, "children")
+            and depth < 2
+            and instance.children.count() > 0
+        ):
+            representation["children"] = [
+                self.to_representation(child, depth + 1) for child in instance.children
+            ]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
@@ -144,7 +140,12 @@ class TransactionSerializerBase(
             return [
                 f.name
                 for f in Transaction._meta.get_fields()
-                if f.name not in ["deleted", "transaction"]
+                if f.name
+                not in [
+                    "deleted",
+                    "transaction",
+                    "parent_transaction",
+                ]
             ] + [
                 "parent_transaction_id",
                 "report_id",
@@ -159,12 +160,16 @@ class TransactionSerializerBase(
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
+                "children",
             ]
 
         fields = get_fields()
         read_only_fields = ["parent_transaction"]
 
 
-TransactionSerializerBase.parent_transaction = TransactionSerializerBase(
-    allow_null=True, required=False, read_only="True"
+TransactionSerializerBase.children = ListSerializer(
+    child=TransactionSerializerBase(),
+    allow_null=True,
+    allow_empty=True,
+    required=False,
 )
