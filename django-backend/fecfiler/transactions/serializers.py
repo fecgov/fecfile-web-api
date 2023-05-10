@@ -20,7 +20,6 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
-from rest_framework.serializers import ListSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -160,16 +159,7 @@ class TransactionSerializerBase(
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
-                "children",
             ]
 
         fields = get_fields()
         read_only_fields = ["parent_transaction"]
-
-
-TransactionSerializerBase.children = ListSerializer(
-    child=TransactionSerializerBase(),
-    allow_null=True,
-    allow_empty=True,
-    required=False,
-)
