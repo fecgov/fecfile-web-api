@@ -26,4 +26,4 @@ static3==0.7.0
 django-otp==1.1.4
 git+https://github.com/fecgov/mozilla-django-oidc.git@main#egg=mozilla_django_oidc
 zeep==4.2.1
-django-cprofile-middleware==1.0.5
+
