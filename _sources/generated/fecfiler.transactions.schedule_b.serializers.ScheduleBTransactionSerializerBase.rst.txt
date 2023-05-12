@@ -76,7 +76,6 @@ fecfiler.transactions.schedule\_b.serializers.ScheduleBTransactionSerializerBase
       ~ScheduleBTransactionSerializerBase.errors
       ~ScheduleBTransactionSerializerBase.fields
       ~ScheduleBTransactionSerializerBase.initial
-      ~ScheduleBTransactionSerializerBase.parent_transaction
       ~ScheduleBTransactionSerializerBase.root
       ~ScheduleBTransactionSerializerBase.serializer_field_mapping
       ~ScheduleBTransactionSerializerBase.url_field_name
