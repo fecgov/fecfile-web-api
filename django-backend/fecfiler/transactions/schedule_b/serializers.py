@@ -19,11 +19,7 @@ def get_model_data(data, model):
 
 
 class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
-
     aggregate_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    parent_transaction = TransactionSerializerBase(
-        allow_null=True, required=False, read_only="True"
-    )
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
@@ -100,7 +96,6 @@ class ScheduleBTransactionSerializerBase(TransactionSerializerBase):
 
 
 class ScheduleBTransactionSerializer(ScheduleBTransactionSerializerBase):
-
     children = ListSerializer(
         child=ScheduleBTransactionSerializerBase(),
         allow_null=True,
