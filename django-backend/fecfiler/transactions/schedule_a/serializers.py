@@ -22,9 +22,6 @@ class ScheduleATransactionSerializerBase(TransactionSerializerBase):
     contribution_aggregate = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
-    parent_transaction = TransactionSerializerBase(
-        allow_null=True, required=False, read_only="True"
-    )
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
