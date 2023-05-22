@@ -107,6 +107,15 @@ class SummaryService:
         # line 17
         sa17_query = Q(~Q(memo_code=True), form_type="SA17")
         line_17 = self._create_contribution_sum(sa17_query)
+        # line 28a
+        sb28a_query = Q(~Q(memo_code=True), form_type="SB28A")
+        line_28a = self._create_expenditure_sum(sb28a_query)
+        # line 28b
+        sb28b_query = Q(~Q(memo_code=True), form_type="SB28B")
+        line_28b = self._create_expenditure_sum(sb28b_query)
+        # line 28c
+        sb28c_query = Q(~Q(memo_code=True), form_type="SB28C")
+        line_28c = self._create_expenditure_sum(sb28c_query)
 
         # build summary
         summary = ytd_transactions.aggregate(
@@ -116,13 +125,20 @@ class SummaryService:
             line_11c=line_11c,
             line_12=line_12,
             line_15=line_15,
-            line_17=line_17
+            line_17=line_17,
+            line_28a=line_28a,
+            line_28b=line_28b,
+            line_28c=line_28c,
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
         )
+        summary["line_28d"] = (
+            summary["line_28a"] + summary["line_28b"] + summary["line_28c"]
+        )
         summary["line_33"] = summary["line_11d"]
+        summary["line_34"] = summary["line_28d"]
         summary["line_37"] = summary["line_15"]
 
         return summary
