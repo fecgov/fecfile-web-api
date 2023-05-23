@@ -9,7 +9,7 @@ class F3XSerializerTestCase(TestCase):
         "test_committee_accounts",
         "test_contacts",
         "test_f3x_summaries",
-        "test_summary_transactions",
+        "test_schedulea_summary_transactions",
     ]
 
     def test_summary_task(self):
