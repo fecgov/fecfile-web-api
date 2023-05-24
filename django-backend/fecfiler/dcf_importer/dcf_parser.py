@@ -1,10 +1,5 @@
 import argparse
 
-
-# This tool is used to poke around at the contents of DCf files, but parts of it my prove
-# useful when it comes time to start writing the actual importing system
-
-
 parser = argparse.ArgumentParser(
     description=""
     "This script is a simple tool I've thrown together to poke at the format of DCF files"
@@ -35,7 +30,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 VERBOSE = args.verbose  # Controls whether or not checks for minor errors are run
-DEBUG = args.debug  	# If true, script will print its state in great detail as it runs
+DEBUG = args.debug      # If true, script will print its state in great detail as it runs
 DCF_FILENAME = args.dcf_filename
 ROW_TYPE = args.row_type
 COL_NUMBERS = args.col_numbers
@@ -43,30 +38,30 @@ COL_NUMBERS = args.col_numbers
 
 # Merges extra columns that were made when a comma was included in a quotation
 def get_sanitized_row(line, row_number):
-    outLine = []
+    sanitized_line = []
     while len(line) > 0:
         val = line.pop(0)
         if val == "":
-            outLine.append("")
+            sanitized_line.append("")
             continue
 
         if val[0] == '"' and len(line) > 0:
-            val += ","+line.pop(0)
+            val += "," + line.pop(0)
             while val[-1] != '"' and len(line) > 0:
-                val += ","+line.pop(0)
+                val += "," + line.pop(0)
 
         if '"' in val and VERBOSE:
             print(f"{row_number}: {val}")
 
-        outLine.append(val)
-    return outLine
+        sanitized_line.append(val)
+    return sanitized_line
 
 
 file = open(DCF_FILENAME)
 lines = []
 for line in file:
     if line and "," in line:
-    	lines.append(get_sanitized_row(line.split(","), len(lines)+1))
+        lines.append(get_sanitized_row(line.split(","), len(lines)+1))
 file.close()
 
 print(DCF_FILENAME)
@@ -103,7 +98,7 @@ for type in col_counts:
         print(f"        {count} Columns occurs {col_counts[type][count]} times")
 
 
-print(f"Looking for descents in ID sequence:")
+print("Looking for descents in ID sequence:")
 highest = 0
 ids = {}
 for i in range(1, len(lines)):
@@ -122,14 +117,14 @@ for i in range(1, len(lines)):
     if id < highest:
         print(f"    Row {i} - ID value lowered from {highest} to {id}!")
 
-print(f"Looking for duplicate ID's:")
+print("Looking for duplicate ID's:")
 for id in ids.keys():
     count, rows = ids[id]
     if count > 1:
         print(f"    Duplicate found - ID {id} found on rows {str(rows)}")
 
 if ROW_TYPE != None:
-    print(f"Looking for rows that start with {ROW_TYPE} - Columns {','.join(COL_NUMBERS)}")
+    print(f"Looking for rows beginning with {ROW_TYPE} - Columns {','.join(COL_NUMBERS)}")
     for i in range(len(lines)):
         line = lines[i]
         row_type = line[0]
