@@ -61,7 +61,7 @@ file = open(DCF_FILENAME)
 lines = []
 for line in file:
     if line and "," in line:
-        lines.append(get_sanitized_row(line.split(","), len(lines)+1))
+        lines.append(get_sanitized_row(line.split(","), len(lines) + 1))
 file.close()
 
 print(DCF_FILENAME)
@@ -123,7 +123,7 @@ for id in ids.keys():
     if count > 1:
         print(f"    Duplicate found - ID {id} found on rows {str(rows)}")
 
-if ROW_TYPE != None:
+if ROW_TYPE is not None:
     print(f"Looking for rows beginning with {ROW_TYPE} - Columns {','.join(COL_NUMBERS)}")
     for i in range(len(lines)):
         line = lines[i]
