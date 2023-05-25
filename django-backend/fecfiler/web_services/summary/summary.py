@@ -23,25 +23,34 @@ class SummaryService:
         report_transactions = Transaction.objects.filter(report=self.report)
         # line 11ai
         sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
-        line_11ai = self._create_contribution_sum(sa11ai_query)
+        line_11ai = self._create_amount_sum(sa11ai_query)
         # line 11aii
         sa11aii_query = Q(~Q(memo_code=True), itemized=False, form_type="SA11AI")
-        line_11aii = self._create_contribution_sum(sa11aii_query)
+        line_11aii = self._create_amount_sum(sa11aii_query)
         # line 11b
         sa11b_query = Q(~Q(memo_code=True), form_type="SA11B")
-        line_11b = self._create_contribution_sum(sa11b_query)
+        line_11b = self._create_amount_sum(sa11b_query)
         # line 11c
         sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
-        line_11c = self._create_contribution_sum(sa11c_query)
+        line_11c = self._create_amount_sum(sa11c_query)
         # line 12
         sa12_query = Q(~Q(memo_code=True), form_type="SA12")
-        line_12 = self._create_contribution_sum(sa12_query)
+        line_12 = self._create_amount_sum(sa12_query)
         # line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
-        line_15 = self._create_contribution_sum(sa15_query)
+        line_15 = self._create_amount_sum(sa15_query)
         # line 17
         sa17_query = Q(~Q(memo_code=True), form_type="SA17")
-        line_17 = self._create_contribution_sum(sa17_query)
+        line_17 = self._create_amount_sum(sa17_query)
+        # line 28a
+        sb28a_query = Q(~Q(memo_code=True), form_type="SB28A")
+        line_28a = self._create_amount_sum(sb28a_query)
+        # line 28b
+        sb28b_query = Q(~Q(memo_code=True), form_type="SB28B")
+        line_28b = self._create_amount_sum(sb28b_query)
+        # line 28c
+        sb28c_query = Q(~Q(memo_code=True), form_type="SB28C")
+        line_28c = self._create_amount_sum(sb28c_query)
         summary = report_transactions.aggregate(
             line_11ai=line_11ai,
             line_11aii=line_11aii,
@@ -50,13 +59,20 @@ class SummaryService:
             line_12=line_12,
             line_15=line_15,
             line_17=line_17,
+            line_28a=line_28a,
+            line_28b=line_28b,
+            line_28c=line_28c,
             line_37=line_15
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
         )
+        summary["line_28d"] = (
+            summary["line_28a"] + summary["line_28b"] + summary["line_28c"]
+        )
         summary["line_33"] = summary["line_11d"]
+        summary["line_34"] = summary["line_28d"]
         return summary
 
     def calculate_summary_column_b(self):
@@ -72,25 +88,34 @@ class SummaryService:
 
         # line 11ai
         sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
-        line_11ai = self._create_contribution_sum(sa11ai_query)
+        line_11ai = self._create_amount_sum(sa11ai_query)
         # line 11aii
         sa11aii_query = Q(~Q(memo_code=True), itemized=False, form_type="SA11AI")
-        line_11aii = self._create_contribution_sum(sa11aii_query)
+        line_11aii = self._create_amount_sum(sa11aii_query)
         # line 11b
         sa11b_query = Q(~Q(memo_code=True), form_type="SA11B")
-        line_11b = self._create_contribution_sum(sa11b_query)
+        line_11b = self._create_amount_sum(sa11b_query)
         # line 11c
         sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
-        line_11c = self._create_contribution_sum(sa11c_query)
+        line_11c = self._create_amount_sum(sa11c_query)
         # line 12
         sa12_query = Q(~Q(memo_code=True), form_type="SA12")
-        line_12 = self._create_contribution_sum(sa12_query)
+        line_12 = self._create_amount_sum(sa12_query)
         # line 15
         sa15_query = Q(~Q(memo_code=True), form_type="SA15")
-        line_15 = self._create_contribution_sum(sa15_query)
+        line_15 = self._create_amount_sum(sa15_query)
         # line 17
         sa17_query = Q(~Q(memo_code=True), form_type="SA17")
-        line_17 = self._create_contribution_sum(sa17_query)
+        line_17 = self._create_amount_sum(sa17_query)
+        # line 28a
+        sb28a_query = Q(~Q(memo_code=True), form_type="SB28A")
+        line_28a = self._create_amount_sum(sb28a_query)
+        # line 28b
+        sb28b_query = Q(~Q(memo_code=True), form_type="SB28B")
+        line_28b = self._create_amount_sum(sb28b_query)
+        # line 28c
+        sb28c_query = Q(~Q(memo_code=True), form_type="SB28C")
+        line_28c = self._create_amount_sum(sb28c_query)
 
         # build summary
         summary = ytd_transactions.aggregate(
@@ -100,18 +125,25 @@ class SummaryService:
             line_11c=line_11c,
             line_12=line_12,
             line_15=line_15,
-            line_17=line_17
+            line_17=line_17,
+            line_28a=line_28a,
+            line_28b=line_28b,
+            line_28c=line_28c,
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
         )
+        summary["line_28d"] = (
+            summary["line_28a"] + summary["line_28b"] + summary["line_28c"]
+        )
         summary["line_33"] = summary["line_11d"]
+        summary["line_34"] = summary["line_28d"]
         summary["line_37"] = summary["line_15"]
 
         return summary
 
-    def _create_contribution_sum(self, query):
+    def _create_amount_sum(self, query):
         return Coalesce(
             Sum("amount", filter=query),
             Decimal(0.0),

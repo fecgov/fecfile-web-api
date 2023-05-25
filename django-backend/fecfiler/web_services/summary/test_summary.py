@@ -9,7 +9,8 @@ class F3XSummaryTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_f3x_summaries",
-        "test_summary_transactions",
+        "test_schedulea_summary_transactions",
+        "test_scheduleb_summary_transactions",
         "test_contacts",
     ]
 
@@ -29,8 +30,17 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(summary["a"]["line_15"], Decimal("2125.79"))
         self.assertEqual(summary["a"]["line_15"], summary["a"]["line_37"])
         self.assertEqual(summary["a"]["line_17"], Decimal("1000.00"))
+        self.assertEqual(summary["a"]["line_28a"], Decimal("101.50"))
+        self.assertEqual(summary["a"]["line_28b"], Decimal("201.50"))
+        self.assertEqual(summary["a"]["line_28c"], Decimal("301.50"))
+        self.assertEqual(
+            summary["a"]["line_28d"], round(Decimal(101.50 + 201.50 + 301.50), 2)
+        )
         self.assertEqual(
             summary["a"]["line_33"], round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2)
+        )
+        self.assertEqual(
+            summary["a"]["line_34"], round(Decimal(101.50 + 201.50 + 301.50), 2)
         )
 
     def test_calculate_summary_column_b(self):
@@ -57,6 +67,21 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(summary["b"]["line_12"], Decimal("1312.12"))
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
         self.assertEqual(summary["b"]["line_17"], Decimal("1100.00"))
+        self.assertEqual(summary["b"]["line_28a"], Decimal("1101.50"))
+        self.assertEqual(summary["b"]["line_28b"], Decimal("2201.50"))
+        self.assertEqual(summary["b"]["line_28c"], Decimal("3301.50"))
+        self.assertEqual(
+            summary["b"]["line_28d"],
+            round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
+        )
+        self.assertEqual(
+            summary["b"]["line_33"],
+            round(Decimal(10104.00 + 544.44 + 655.55), 2)
+        )
+        self.assertEqual(
+            summary["b"]["line_34"],
+            round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
+        )
 
     def test_report_with_no_transactions(self):
         f3x = F3XSummary.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
