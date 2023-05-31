@@ -162,7 +162,7 @@ class TransactionSerializerBase(
             return [
                 f.name
                 for f in Transaction._meta.get_fields()
-                if f.name not in ["deleted", "transaction", "parent_transaction",]
+                if f.name not in ["deleted", "transaction", "parent_transaction"]
             ] + [
                 "parent_transaction_id",
                 "report_id",
