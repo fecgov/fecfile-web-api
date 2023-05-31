@@ -26,9 +26,11 @@ class ScheduleC1TransactionSerializer(TransactionSerializerBase):
         return internal
 
     def validate(self, data):
-        """Adds stub aggregate_amount to pass validation"""
-        validated_data = super().validate(data)
-        return validated_data
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore",
+            ["filer_committee_id_number", "back_reference_tran_id_number",],
+        )
+        return super().validate(data)
 
     def create(self, validated_data: dict):
         with transaction.atomic():
