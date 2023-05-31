@@ -102,10 +102,8 @@ def get_schema_name(schedule):
     return {
         Schedule.A.value.value: "SchA",
         Schedule.B.value.value: "SchB",
-        Schedule.C.value.value: "SchC"
-    }.get(
-        schedule
-    )
+        Schedule.C.value.value: "SchC",
+    }.get(schedule)
 
 
 def get_test_info_prefix(transaction):
@@ -146,21 +144,23 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             )
             if transaction.memo_text:
                 memo = transaction.memo_text
+                memo.filer_committee_id_number = (
+                    FILE_AS_TEST_COMMITTEE or memo.committee_account.committee_id
+                )
                 memo.back_reference_tran_id_number = transaction.transaction_id
-                memo.back_reference_sched_name = transaction.form_type
+                memo.back_reference_sched_form_name = transaction.form_type
                 serialized_memo = serialize_instance("Text", memo)
                 logger.debug("Serialized Memo:")
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
         report_level_memos = compose_report_level_memos(report_id)
-        report_level_memo_rows = [
-            serialize_instance("Text", memo) for memo in report_level_memos
-        ]
-        for memo in report_level_memo_rows:
+        for memo in report_level_memos:
+            memo.back_reference_sched_form_name = f3x_summary.form_type
+            serialized_memo = serialize_instance("Text", memo)
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
-            file_content = add_row_to_content(file_content, memo)
+            file_content = add_row_to_content(file_content, serialized_memo)
 
         return file_content
     except Exception as error:
