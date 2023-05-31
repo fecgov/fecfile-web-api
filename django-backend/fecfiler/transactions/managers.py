@@ -39,12 +39,10 @@ class TransactionManager(SoftDeleteManager):
                     When(schedule_b__isnull=False, then=Schedule.B.value),
                 ),
                 date=Coalesce(
-                    "schedule_a__contribution_date",
-                    "schedule_b__expenditure_date",
+                    "schedule_a__contribution_date", "schedule_b__expenditure_date",
                 ),
                 amount=Coalesce(
-                    "schedule_a__contribution_amount",
-                    "schedule_b__expenditure_amount",
+                    "schedule_a__contribution_amount", "schedule_b__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -53,8 +51,7 @@ class TransactionManager(SoftDeleteManager):
         contact_clause = Q(contact_id=OuterRef("contact_id"))
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
-            date=OuterRef("date"),
-            created__lte=OuterRef("created"),
+            date=OuterRef("date"), created__lte=OuterRef("created"),
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
 
@@ -93,10 +90,7 @@ class TransactionManager(SoftDeleteManager):
                         ),
                     ),
                     default=Concat(
-                        "schedule",
-                        "form_type",
-                        "created",
-                        output_field=TextField(),
+                        "schedule", "form_type", "created", output_field=TextField(),
                     ),
                     output_field=TextField(),
                 ),
@@ -134,3 +128,4 @@ class Schedule(Enum):
     A = Value("A")
     B = Value("B")
     C = Value("C")
+    C2 = Value("C2")
