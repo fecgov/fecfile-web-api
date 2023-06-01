@@ -68,7 +68,7 @@ class ScheduleC1(models.Model):
     authorized_date_signed = models.DateField(null=True, blank=True)
 
     def get_date(self):
-        return self.transaction.report.through_date
+        return self.loan_incurred_date
 
     def update_with_contact(self, contact):
         self.lender_organization_name = contact.name
