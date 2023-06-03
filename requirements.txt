@@ -11,7 +11,7 @@ django-cors-headers==3.13.0
 django-storages==1.13.1
 djangorestframework==3.14.0
 drf-spectacular==0.24.2
-git+https://github.com/fecgov/fecfile-validate@18b3cd57e3fa5803d539a5b3e7a6c9354b6af793#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@eac700955e89c598c5b599690d25645292f64b00#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.30
 gunicorn==20.1.0
 Jinja2==3.1.2
