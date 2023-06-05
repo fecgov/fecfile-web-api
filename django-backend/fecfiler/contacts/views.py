@@ -45,12 +45,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        Contact.objects.annotate(contact_1_transaction_count=Count("contact_1_transaction_set"))
-        .alias(
-            sort_name=Concat(
-                "name", "last_name", Value(" "), "first_name", output_field=CharField()
-            )
-        ).annotate(contact_2_transaction_count=Count("contact_2_transaction_set"))
+        Contact.objects.annotate(transaction_count=Count("transaction"))
         .alias(
             sort_name=Concat(
                 "name", "last_name", Value(" "), "first_name", output_field=CharField()
