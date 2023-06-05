@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("transactions", "0010_remove_filer_id_and_back_reference"),
+        ("transactions", "0011_schedulec1_and_more"),
     ]
 
     operations = [
