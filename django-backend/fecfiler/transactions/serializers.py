@@ -20,6 +20,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from fecfiler.transactions.schedule_c1.models import ScheduleC1
 
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,16 @@ class ScheduleCSerializer(ModelSerializer):
         model = ScheduleC
 
 
+class ScheduleC1Serializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleC1._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+        model = ScheduleC1
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -80,6 +91,7 @@ class TransactionSerializerBase(
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
     schedule_c = ScheduleCSerializer(required=False)
+    schedule_c1 = ScheduleC1Serializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
@@ -92,6 +104,7 @@ class TransactionSerializerBase(
         schedule_a = representation.pop("schedule_a") or []
         schedule_b = representation.pop("schedule_b") or []
         schedule_c = representation.pop("schedule_c") or []
+        schedule_c1 = representation.pop("schedule_c1") or []
         if (
             not hasattr(representation, "children")
             and depth < 2
@@ -115,6 +128,10 @@ class TransactionSerializerBase(
             for property in schedule_c:
                 if not representation.get(property):
                     representation[property] = schedule_c[property]
+        if schedule_c1:
+            for property in schedule_c1:
+                if not representation.get(property):
+                    representation[property] = schedule_c1[property]
         return representation
 
     def to_internal_value(self, data):
@@ -145,12 +162,7 @@ class TransactionSerializerBase(
             return [
                 f.name
                 for f in Transaction._meta.get_fields()
-                if f.name
-                not in [
-                    "deleted",
-                    "transaction",
-                    "parent_transaction",
-                ]
+                if f.name not in ["deleted", "transaction", "parent_transaction"]
             ] + [
                 "parent_transaction_id",
                 "report_id",
@@ -165,6 +177,7 @@ class TransactionSerializerBase(
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
+                "schedule_c1",
             ]
 
         fields = get_fields()
