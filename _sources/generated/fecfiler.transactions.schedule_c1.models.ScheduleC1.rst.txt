@@ -1,0 +1,100 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c1.models.ScheduleC1
+====================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c1.models
+
+.. autoclass:: ScheduleC1
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC1.__init__
+      ~ScheduleC1.check
+      ~ScheduleC1.clean
+      ~ScheduleC1.clean_fields
+      ~ScheduleC1.date_error_message
+      ~ScheduleC1.delete
+      ~ScheduleC1.from_db
+      ~ScheduleC1.full_clean
+      ~ScheduleC1.get_constraints
+      ~ScheduleC1.get_date
+      ~ScheduleC1.get_deferred_fields
+      ~ScheduleC1.prepare_database_save
+      ~ScheduleC1.refresh_from_db
+      ~ScheduleC1.save
+      ~ScheduleC1.save_base
+      ~ScheduleC1.serializable_value
+      ~ScheduleC1.unique_error_message
+      ~ScheduleC1.update_with_contact
+      ~ScheduleC1.validate_constraints
+      ~ScheduleC1.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC1.account_city
+      ~ScheduleC1.account_state
+      ~ScheduleC1.account_street_1
+      ~ScheduleC1.account_street_2
+      ~ScheduleC1.account_zip
+      ~ScheduleC1.authorized_date_signed
+      ~ScheduleC1.authorized_first_name
+      ~ScheduleC1.authorized_last_name
+      ~ScheduleC1.authorized_middle_name
+      ~ScheduleC1.authorized_prefix
+      ~ScheduleC1.authorized_suffix
+      ~ScheduleC1.authorized_title
+      ~ScheduleC1.basis_of_loan_description
+      ~ScheduleC1.collateral
+      ~ScheduleC1.collateral_value_amount
+      ~ScheduleC1.credit_amount_this_draw
+      ~ScheduleC1.dep_acct_auth_date_presidential
+      ~ScheduleC1.depository_account_established_date
+      ~ScheduleC1.desc_collateral
+      ~ScheduleC1.desc_specification_of_the_above
+      ~ScheduleC1.estimated_value
+      ~ScheduleC1.future_income
+      ~ScheduleC1.id
+      ~ScheduleC1.ind_name_account_location
+      ~ScheduleC1.lender_city
+      ~ScheduleC1.lender_organization_name
+      ~ScheduleC1.lender_state
+      ~ScheduleC1.lender_street_1
+      ~ScheduleC1.lender_street_2
+      ~ScheduleC1.lender_zip
+      ~ScheduleC1.loan_amount
+      ~ScheduleC1.loan_due_date
+      ~ScheduleC1.loan_incurred_date
+      ~ScheduleC1.loan_interest_rate
+      ~ScheduleC1.loan_originally_incurred_date
+      ~ScheduleC1.loan_restructured
+      ~ScheduleC1.objects
+      ~ScheduleC1.others_liable
+      ~ScheduleC1.perfected_interest
+      ~ScheduleC1.pk
+      ~ScheduleC1.total_balance
+      ~ScheduleC1.transaction_set
+      ~ScheduleC1.treasurer_date_signed
+      ~ScheduleC1.treasurer_first_name
+      ~ScheduleC1.treasurer_last_name
+      ~ScheduleC1.treasurer_middle_name
+      ~ScheduleC1.treasurer_prefix
+      ~ScheduleC1.treasurer_suffix
+   
+   

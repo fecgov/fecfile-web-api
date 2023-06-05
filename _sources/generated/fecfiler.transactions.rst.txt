@@ -38,6 +38,7 @@ fecfiler.transactions
    fecfiler.transactions.schedule_a
    fecfiler.transactions.schedule_b
    fecfiler.transactions.schedule_c
+   fecfiler.transactions.schedule_c1
    fecfiler.transactions.serializers
    fecfiler.transactions.signals
    fecfiler.transactions.tests

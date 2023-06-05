@@ -41,4 +41,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0008_rename_benificiary_candidate_district_scheduleb_beneficiary_candidate_district_and_more
    fecfiler.transactions.migrations.0009_add_force_itemized
    fecfiler.transactions.migrations.0010_remove_filer_id_and_back_reference
+   fecfiler.transactions.migrations.0011_schedulec1_and_more
 
