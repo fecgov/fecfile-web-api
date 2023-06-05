@@ -84,7 +84,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             self.get_queryset()
             .filter(
                 ~Q(id=transaction_id or None),
-                Q(contact_id=contact_id),
+                Q(contact_1_id=contact_id),
                 Q(date__year=date.year),
                 Q(date__lte=date),
                 Q(aggregation_group=aggregation_group),

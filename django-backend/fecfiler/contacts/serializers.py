@@ -25,8 +25,11 @@ class ContactSerializer(
         CAN="Candidate",
     )
 
-    # Contains the number of transactions linked to the contact
-    transaction_count = IntegerField(required=False)
+    # Contains the number of transactions linked to the contact as contact_1
+    contact_1_transaction_count = IntegerField(required=False)
+    
+    # Contains the number of transactions linked to the contact as contact_2
+    contact_2_transaction_count = IntegerField(required=False)
 
     def get_schema_name(self, data):
         return f"Contact_{self.contact_value[data.get('type', None)]}"
@@ -45,26 +48,30 @@ class ContactSerializer(
                 "transaction",
             ]
         ]
-        fields.append("transaction_count")
+        fields.append("contact_1_transaction_count")
+        fields.append("contact_2_transaction_count")
         read_only_fields = [
             "uuid",
             "deleted",
             "created",
             "updated",
-            "transaction_count",
+            "contact_1_transaction_count",
+            "contact_2_transaction_count",
         ]
 
     def to_internal_value(self, data):
-        # Remove the transaction_count because it is an annotated field
+        # Remove the contact_1_transaction_count and contact_2_transaction_count because it is an annotated field
         # delivered to the front end.
-        if "transaction_count" in data:
-            del data["transaction_count"]
+        if "contact_1_transaction_count" in data:
+            del data["contact_1_transaction_count"]
+        if "contact_2_transaction_count" in data:
+            del data["contact_2_transaction_count"]
         return super().to_internal_value(data)
 
 
 class LinkedContactSerializerMixin(ModelSerializer):
     contact = ContactSerializer(allow_null=True, required=False)
-    contact_id = UUIDField(required=False, allow_null=False)
+    contact_1_id = UUIDField(required=False, allow_null=False)
 
     def create(self, validated_data: dict):
         with transaction.atomic():
@@ -78,13 +85,13 @@ class LinkedContactSerializerMixin(ModelSerializer):
 
     def create_or_update_contact(self, validated_data: dict):
         contact_data = validated_data.pop("contact", None)
-        contact_id = validated_data.get("contact_id", None)
-        if not contact_id:
+        contact_1_id = validated_data.get("contact_1_id", None)
+        if not contact_1_id:
             if not contact_data:
                 raise ValidationError(
-                    {"contact_id": ["No contact or contact id provided"]}
+                    {"contact_1_id": ["No contact or contact id provided"]}
                 )
             contact: Contact = Contact.objects.create(**contact_data)
-            validated_data["contact_id"] = contact.id
+            validated_data["contact_1_id"] = contact.id
         else:
-            Contact.objects.filter(id=contact_id).update(**contact_data)
+            Contact.objects.filter(id=contact_1_id).update(**contact_data)

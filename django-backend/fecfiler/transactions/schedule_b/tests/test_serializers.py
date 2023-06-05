@@ -95,7 +95,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.new_contact,
-            "contact_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
+            "contact_1_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "schema_name": "SchB",
         }
 

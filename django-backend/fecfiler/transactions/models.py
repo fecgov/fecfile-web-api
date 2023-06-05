@@ -42,7 +42,18 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    contact = models.ForeignKey("contacts.Contact", on_delete=models.CASCADE, null=True)
+    contact_1 = models.ForeignKey(
+        "contacts.Contact",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='contact_1_transaction_set'
+    )
+    contact_2 = models.ForeignKey(
+        "contacts.Contact",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='contact_2_transaction_set'
+    )
     memo_text = models.ForeignKey(
         "memo_text.MemoText", on_delete=models.CASCADE, null=True
     )

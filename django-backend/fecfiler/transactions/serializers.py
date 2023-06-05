@@ -121,7 +121,7 @@ class TransactionSerializerBase(
         return super().to_internal_value(data)
 
     def propagate_contact_info(self, transaction):
-        contact = Contact.objects.get(id=transaction.contact_id)
+        contact = Contact.objects.get(id=transaction.contact_1_id)
         subsequent_transactions = Transaction.objects.filter(
             ~Q(id=transaction.id),
             Q(Q(report__upload_submission__isnull=True)),
@@ -154,7 +154,8 @@ class TransactionSerializerBase(
             ] + [
                 "parent_transaction_id",
                 "report_id",
-                "contact_id",
+                "contact_1_id",
+                "contact_2_id",
                 "memo_text_id",
                 "itemized",
                 "fields_to_validate",

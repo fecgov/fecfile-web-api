@@ -91,7 +91,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact": self.updated_contact,
-            "contact_id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1_id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schema_name": "SchA",
         }
 
