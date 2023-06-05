@@ -26,6 +26,7 @@ fecfiler.transactions.managers.Schedule
       ~Schedule.A
       ~Schedule.B
       ~Schedule.C
+      ~Schedule.C2
       ~Schedule.C1
    
    

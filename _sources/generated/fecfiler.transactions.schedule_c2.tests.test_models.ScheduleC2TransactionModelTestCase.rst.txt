@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c2.tests.test\_models.ScheduleC2TransactionModelTestCase
+========================================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c2.tests.test_models
+
+.. autoclass:: ScheduleC2TransactionModelTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC2TransactionModelTestCase.__init__
+      ~ScheduleC2TransactionModelTestCase.addClassCleanup
+      ~ScheduleC2TransactionModelTestCase.addCleanup
+      ~ScheduleC2TransactionModelTestCase.addTypeEqualityFunc
+      ~ScheduleC2TransactionModelTestCase.assertAlmostEqual
+      ~ScheduleC2TransactionModelTestCase.assertAlmostEquals
+      ~ScheduleC2TransactionModelTestCase.assertContains
+      ~ScheduleC2TransactionModelTestCase.assertCountEqual
+      ~ScheduleC2TransactionModelTestCase.assertDictContainsSubset
+      ~ScheduleC2TransactionModelTestCase.assertDictEqual
+      ~ScheduleC2TransactionModelTestCase.assertEqual
+      ~ScheduleC2TransactionModelTestCase.assertEquals
+      ~ScheduleC2TransactionModelTestCase.assertFalse
+      ~ScheduleC2TransactionModelTestCase.assertFieldOutput
+      ~ScheduleC2TransactionModelTestCase.assertFormError
+      ~ScheduleC2TransactionModelTestCase.assertFormsetError
+      ~ScheduleC2TransactionModelTestCase.assertGreater
+      ~ScheduleC2TransactionModelTestCase.assertGreaterEqual
+      ~ScheduleC2TransactionModelTestCase.assertHTMLEqual
+      ~ScheduleC2TransactionModelTestCase.assertHTMLNotEqual
+      ~ScheduleC2TransactionModelTestCase.assertIn
+      ~ScheduleC2TransactionModelTestCase.assertInHTML
+      ~ScheduleC2TransactionModelTestCase.assertIs
+      ~ScheduleC2TransactionModelTestCase.assertIsInstance
+      ~ScheduleC2TransactionModelTestCase.assertIsNone
+      ~ScheduleC2TransactionModelTestCase.assertIsNot
+      ~ScheduleC2TransactionModelTestCase.assertIsNotNone
+      ~ScheduleC2TransactionModelTestCase.assertJSONEqual
+      ~ScheduleC2TransactionModelTestCase.assertJSONNotEqual
+      ~ScheduleC2TransactionModelTestCase.assertLess
+      ~ScheduleC2TransactionModelTestCase.assertLessEqual
+      ~ScheduleC2TransactionModelTestCase.assertListEqual
+      ~ScheduleC2TransactionModelTestCase.assertLogs
+      ~ScheduleC2TransactionModelTestCase.assertMultiLineEqual
+      ~ScheduleC2TransactionModelTestCase.assertNoLogs
+      ~ScheduleC2TransactionModelTestCase.assertNotAlmostEqual
+      ~ScheduleC2TransactionModelTestCase.assertNotAlmostEquals
+      ~ScheduleC2TransactionModelTestCase.assertNotContains
+      ~ScheduleC2TransactionModelTestCase.assertNotEqual
+      ~ScheduleC2TransactionModelTestCase.assertNotEquals
+      ~ScheduleC2TransactionModelTestCase.assertNotIn
+      ~ScheduleC2TransactionModelTestCase.assertNotIsInstance
+      ~ScheduleC2TransactionModelTestCase.assertNotRegex
+      ~ScheduleC2TransactionModelTestCase.assertNotRegexpMatches
+      ~ScheduleC2TransactionModelTestCase.assertNumQueries
+      ~ScheduleC2TransactionModelTestCase.assertQuerysetEqual
+      ~ScheduleC2TransactionModelTestCase.assertRaises
+      ~ScheduleC2TransactionModelTestCase.assertRaisesMessage
+      ~ScheduleC2TransactionModelTestCase.assertRaisesRegex
+      ~ScheduleC2TransactionModelTestCase.assertRaisesRegexp
+      ~ScheduleC2TransactionModelTestCase.assertRedirects
+      ~ScheduleC2TransactionModelTestCase.assertRegex
+      ~ScheduleC2TransactionModelTestCase.assertRegexpMatches
+      ~ScheduleC2TransactionModelTestCase.assertSequenceEqual
+      ~ScheduleC2TransactionModelTestCase.assertSetEqual
+      ~ScheduleC2TransactionModelTestCase.assertTemplateNotUsed
+      ~ScheduleC2TransactionModelTestCase.assertTemplateUsed
+      ~ScheduleC2TransactionModelTestCase.assertTrue
+      ~ScheduleC2TransactionModelTestCase.assertTupleEqual
+      ~ScheduleC2TransactionModelTestCase.assertURLEqual
+      ~ScheduleC2TransactionModelTestCase.assertWarns
+      ~ScheduleC2TransactionModelTestCase.assertWarnsMessage
+      ~ScheduleC2TransactionModelTestCase.assertWarnsRegex
+      ~ScheduleC2TransactionModelTestCase.assertXMLEqual
+      ~ScheduleC2TransactionModelTestCase.assertXMLNotEqual
+      ~ScheduleC2TransactionModelTestCase.assert_
+      ~ScheduleC2TransactionModelTestCase.captureOnCommitCallbacks
+      ~ScheduleC2TransactionModelTestCase.countTestCases
+      ~ScheduleC2TransactionModelTestCase.debug
+      ~ScheduleC2TransactionModelTestCase.defaultTestResult
+      ~ScheduleC2TransactionModelTestCase.doClassCleanups
+      ~ScheduleC2TransactionModelTestCase.doCleanups
+      ~ScheduleC2TransactionModelTestCase.fail
+      ~ScheduleC2TransactionModelTestCase.failIf
+      ~ScheduleC2TransactionModelTestCase.failIfAlmostEqual
+      ~ScheduleC2TransactionModelTestCase.failIfEqual
+      ~ScheduleC2TransactionModelTestCase.failUnless
+      ~ScheduleC2TransactionModelTestCase.failUnlessAlmostEqual
+      ~ScheduleC2TransactionModelTestCase.failUnlessEqual
+      ~ScheduleC2TransactionModelTestCase.failUnlessRaises
+      ~ScheduleC2TransactionModelTestCase.id
+      ~ScheduleC2TransactionModelTestCase.modify_settings
+      ~ScheduleC2TransactionModelTestCase.run
+      ~ScheduleC2TransactionModelTestCase.setUp
+      ~ScheduleC2TransactionModelTestCase.setUpClass
+      ~ScheduleC2TransactionModelTestCase.setUpTestData
+      ~ScheduleC2TransactionModelTestCase.settings
+      ~ScheduleC2TransactionModelTestCase.shortDescription
+      ~ScheduleC2TransactionModelTestCase.skipTest
+      ~ScheduleC2TransactionModelTestCase.subTest
+      ~ScheduleC2TransactionModelTestCase.tearDown
+      ~ScheduleC2TransactionModelTestCase.tearDownClass
+      ~ScheduleC2TransactionModelTestCase.test_model_contact_assignment
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC2TransactionModelTestCase.available_apps
+      ~ScheduleC2TransactionModelTestCase.databases
+      ~ScheduleC2TransactionModelTestCase.fixtures
+      ~ScheduleC2TransactionModelTestCase.longMessage
+      ~ScheduleC2TransactionModelTestCase.maxDiff
+      ~ScheduleC2TransactionModelTestCase.reset_sequences
+      ~ScheduleC2TransactionModelTestCase.serialized_rollback
+   
+   

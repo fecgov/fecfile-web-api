@@ -1,0 +1,69 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c2.models.ScheduleC2
+====================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c2.models
+
+.. autoclass:: ScheduleC2
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC2.__init__
+      ~ScheduleC2.check
+      ~ScheduleC2.clean
+      ~ScheduleC2.clean_fields
+      ~ScheduleC2.date_error_message
+      ~ScheduleC2.delete
+      ~ScheduleC2.from_db
+      ~ScheduleC2.full_clean
+      ~ScheduleC2.get_constraints
+      ~ScheduleC2.get_date
+      ~ScheduleC2.get_deferred_fields
+      ~ScheduleC2.prepare_database_save
+      ~ScheduleC2.refresh_from_db
+      ~ScheduleC2.save
+      ~ScheduleC2.save_base
+      ~ScheduleC2.serializable_value
+      ~ScheduleC2.unique_error_message
+      ~ScheduleC2.update_with_contact
+      ~ScheduleC2.validate_constraints
+      ~ScheduleC2.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC2.guaranteed_amount
+      ~ScheduleC2.guarantor_city
+      ~ScheduleC2.guarantor_employer
+      ~ScheduleC2.guarantor_first_name
+      ~ScheduleC2.guarantor_last_name
+      ~ScheduleC2.guarantor_middle_name
+      ~ScheduleC2.guarantor_occupation
+      ~ScheduleC2.guarantor_prefix
+      ~ScheduleC2.guarantor_state
+      ~ScheduleC2.guarantor_street_1
+      ~ScheduleC2.guarantor_street_2
+      ~ScheduleC2.guarantor_suffix
+      ~ScheduleC2.guarantor_zip
+      ~ScheduleC2.id
+      ~ScheduleC2.objects
+      ~ScheduleC2.pk
+      ~ScheduleC2.transaction_set
+   
+   

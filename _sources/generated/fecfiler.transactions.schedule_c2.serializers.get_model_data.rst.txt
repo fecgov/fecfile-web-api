@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_c2.serializers.get\_model\_data
+===============================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c2.serializers
+
+.. autofunction:: get_model_data

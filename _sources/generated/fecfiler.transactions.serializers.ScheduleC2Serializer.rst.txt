@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.serializers.ScheduleC2Serializer
+======================================================
+
+.. currentmodule:: fecfiler.transactions.serializers
+
+.. autoclass:: ScheduleC2Serializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC2Serializer.__init__
+      ~ScheduleC2Serializer.bind
+      ~ScheduleC2Serializer.build_field
+      ~ScheduleC2Serializer.build_nested_field
+      ~ScheduleC2Serializer.build_property_field
+      ~ScheduleC2Serializer.build_relational_field
+      ~ScheduleC2Serializer.build_standard_field
+      ~ScheduleC2Serializer.build_unknown_field
+      ~ScheduleC2Serializer.build_url_field
+      ~ScheduleC2Serializer.create
+      ~ScheduleC2Serializer.fail
+      ~ScheduleC2Serializer.get_attribute
+      ~ScheduleC2Serializer.get_default
+      ~ScheduleC2Serializer.get_default_field_names
+      ~ScheduleC2Serializer.get_extra_kwargs
+      ~ScheduleC2Serializer.get_field_names
+      ~ScheduleC2Serializer.get_fields
+      ~ScheduleC2Serializer.get_initial
+      ~ScheduleC2Serializer.get_unique_for_date_validators
+      ~ScheduleC2Serializer.get_unique_together_validators
+      ~ScheduleC2Serializer.get_uniqueness_extra_kwargs
+      ~ScheduleC2Serializer.get_validators
+      ~ScheduleC2Serializer.get_value
+      ~ScheduleC2Serializer.include_extra_kwargs
+      ~ScheduleC2Serializer.is_valid
+      ~ScheduleC2Serializer.many_init
+      ~ScheduleC2Serializer.run_validation
+      ~ScheduleC2Serializer.run_validators
+      ~ScheduleC2Serializer.save
+      ~ScheduleC2Serializer.to_internal_value
+      ~ScheduleC2Serializer.to_representation
+      ~ScheduleC2Serializer.update
+      ~ScheduleC2Serializer.validate
+      ~ScheduleC2Serializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC2Serializer.context
+      ~ScheduleC2Serializer.data
+      ~ScheduleC2Serializer.default_error_messages
+      ~ScheduleC2Serializer.default_validators
+      ~ScheduleC2Serializer.errors
+      ~ScheduleC2Serializer.fields
+      ~ScheduleC2Serializer.initial
+      ~ScheduleC2Serializer.root
+      ~ScheduleC2Serializer.serializer_field_mapping
+      ~ScheduleC2Serializer.url_field_name
+      ~ScheduleC2Serializer.validated_data
+      ~ScheduleC2Serializer.validators
+   
+   
