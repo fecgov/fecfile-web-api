@@ -32,13 +32,14 @@ class ScheduleATransactionViewSet(TransactionViewSet):
     )
     serializer_class = ScheduleATransactionSerializer
     ordering_fields = [
-        "id",
+        "form_type",
         "transaction_type_identifier",
         "contributor_name",
         "contribution_date",
         "memo_code",
         "contribution_amount",
         "contribution_aggregate",
+        "created",
     ]
 
     def create(self, request):
