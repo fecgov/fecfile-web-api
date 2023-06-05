@@ -128,4 +128,5 @@ class Schedule(Enum):
     A = Value("A")
     B = Value("B")
     C = Value("C")
-    C2 = Value("C2")
+    C2 = Value("C1")
+    C1 = Value("C2")

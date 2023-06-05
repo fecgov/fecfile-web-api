@@ -8,6 +8,7 @@ from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 import uuid
 import logging
@@ -54,6 +55,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     schedule_c = models.ForeignKey(
         ScheduleC, on_delete=models.CASCADE, null=True, blank=True
     )
+    schedule_c1 = models.ForeignKey(
+        ScheduleC1, on_delete=models.CASCADE, null=True, blank=True
+    )
     schedule_c2 = models.ForeignKey(
         ScheduleC2, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -69,6 +73,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             "schedule_a": Schedule.A,
             "schedule_b": Schedule.B,
             "schedule_c": Schedule.C,
+            "schedule_c1": Schedule.C1,
             "schedule_c2": Schedule.C2,
         }
         for schedule_key in schedule_map:
@@ -77,7 +82,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         return None
 
     def get_schedule(self):
-        for schedule_key in ["schedule_a", "schedule_b", "schedule_c", "schedule_c2"]:
+        for schedule_key in [
+            "schedule_a",
+            "schedule_b",
+            "schedule_c",
+            "schedule_c1",
+            "schedule_c2",
+        ]:
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
