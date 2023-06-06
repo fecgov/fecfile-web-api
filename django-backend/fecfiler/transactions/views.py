@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,6 +13,8 @@ from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
+from fecfiler.transactions.schedule_b.serializers import ScheduleBTransactionSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -99,6 +102,44 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=["post", "put"], url_path=r"save-pair")
+    def save_pair(self, request, pk=None):
+        """Handle the saving of a strictly parent/child pair whose parent
+        is a Schedule A and child is a Schedule B.
+
+        The child is removed from the parent and saved separately with the
+        parent_transaction_id so that each schedule serializer can handle
+        just its specific schedule fields and rules
+        """
+        schedule_a_data = request.data
+        schedule_b_data = request.data["children"][0]
+        schedule_a_data["children"] = []
+
+        schedule_a_serializer = ScheduleATransactionSerializer(data=schedule_a_data)
+        schedule_a_serializer.context["request"] = request
+        schedule_b_serializer = ScheduleBTransactionSerializer(data=schedule_b_data)
+        schedule_b_serializer.context["request"] = request
+
+        if schedule_a_serializer.is_valid() and schedule_b_serializer.is_valid():
+            with transaction.atomic():
+                schedule_a = schedule_a_serializer.save(
+                    **schedule_a_serializer.validated_data
+                )
+                schedule_b_serializer.validated_data[
+                    "parent_transaction_id"
+                ] = schedule_a.id
+                schedule_b_serializer.validated_data[
+                    "contact_id"
+                ] = schedule_a.contact_id
+                schedule_b_serializer.save(**schedule_b_serializer.validated_data)
+
+            return Response(ScheduleATransactionSerializer(schedule_a).data)
+
+        return Response(
+            schedule_a_serializer.errors.update(schedule_b_serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}
