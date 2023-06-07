@@ -1,0 +1,151 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "transaction_id": {},
+    "entity_type": {},
+    "lender_organization_name": {
+        "path": "schedule_c1.lender_organization_name"
+    },
+    "lender_street_1": {
+        "path": "schedule_c1.lender_street_1"
+    },
+    "lender_street_2": {
+        "path": "schedule_c1.lender_street_2"
+    },
+    "lender_city": {
+        "path": "schedule_c1.lender_city"
+    },
+    "lender_state": {
+        "path": "schedule_c1.lender_state"
+    },
+    "lender_zip": {
+        "path": "schedule_c1.lender_zip"
+    },
+    "loan_amount": {
+        "path": "schedule_c1.loan_amount"
+    },
+    "loan_interest_rate": {
+        "path": "schedule_c1.loan_interest_rate"
+    },
+    "loan_incurred_date": {
+        "serializer": "DATE",
+        "path": "schedule_c1.loan_incurred_date"
+    },
+    "loan_due_date": {
+        "serializer": "DATE",
+        "path": "schedule_c1.loan_due_date"
+    },
+    "loan_restructured": {
+        "serializer": "BOOLEAN_YN",
+        "path": "schedule_c1.loan_restructured"
+    },
+    "loan_originally_incurred_date": {
+        "serializer": "DATE",
+        "path": "schedule_c1.loan_originally_incurred_date"
+    },
+    "credit_amount_this_draw": {
+        "path": "schedule_c1.credit_amount_this_draw"
+    },
+    "total_balance": {
+        "path": "schedule_c1.total_balance"
+    },
+    "others_liable": {
+        "serializer": "BOOLEAN_YN",
+        "path": "schedule_c1.others_liable"
+    },
+    "collateral": {
+        "serializer": "BOOLEAN_YN",
+        "path": "schedule_c1.collateral"
+    },
+    "desc_collateral": {
+        "path": "schedule_c1.desc_collateral"
+    },
+    "collateral_value_amount": {
+        "path": "schedule_c1.collateral_value_amount"
+    },
+    "perfected_interest": {
+        "serializer": "BOOLEAN_YN",
+        "path": "schedule_c1.perfected_interest"
+    },
+    "future_income": {
+        "serializer": "BOOLEAN_YN",
+        "path": "schedule_c1.future_income"
+    },
+    "desc_specification_of_the_above": {
+        "path": "schedule_c1.desc_specification_of_the_above"
+    },
+    "estimated_value": {
+        "path": "schedule_c1.estimated_value"
+    },
+    "depository_account_established_date": {
+        "serializer": "DATE",
+        "path": "schedule_c1.depository_account_established_date"
+    },
+    "ind_name_account_location": {
+        "path": "schedule_c1.ind_name_account_location"
+    },
+    "account_street_1": {
+        "path": "schedule_c1.account_street_1"
+    },
+    "account_street_2": {
+        "path": "schedule_c1.account_street_2"
+    },
+    "account_city": {
+        "path": "schedule_c1.account_city"
+    },
+    "account_state": {
+        "path": "schedule_c1.account_state"
+    },
+    "account_zip": {
+        "path": "schedule_c1.account_zip"
+    },
+    "dep_acct_auth_date_presidential": {
+        "serializer": "DATE",
+        "path": "schedule_c1.dep_acct_auth_date_presidential"
+    },
+    "basis_of_loan_description": {
+        "path": "schedule_c1.basis_of_loan_description"
+    },
+    "treasurer_last_name": {
+        "path": "schedule_c1.treasurer_last_name"
+    },
+    "treasurer_first_name": {
+        "path": "schedule_c1.treasurer_first_name"
+    },
+    "treasurer_middle_name": {
+        "path": "schedule_c1.treasurer_middle_name"
+    },
+    "treasurer_prefix": {
+        "path": "schedule_c1.treasurer_prefix"
+    },
+    "treasurer_suffix": {
+        "path": "schedule_c1.treasurer_suffix"
+    },
+    "treasurer_date_signed": {
+        "serializer": "DATE",
+        "path": "schedule_c1.treasurer_date_signed"
+    },
+    "authorized_last_name": {
+        "path": "schedule_c1.authorized_last_name"
+    },
+    "authorized_first_name": {
+        "path": "schedule_c1.authorized_first_name"
+    },
+    "authorized_middle_name": {
+        "path": "schedule_c1.authorized_middle_name"
+    },
+    "authorized_prefix": {
+        "path": "schedule_c1.authorized_prefix"
+    },
+    "authorized_suffix": {
+        "path": "schedule_c1.authorized_suffix"
+    },
+    "authorized_title": {
+        "path": "schedule_c1.authorized_title"
+    },
+    "authorized_date_signed": {
+        "serializer": "DATE",
+        "path": "schedule_c1.authorized_date_signed"
+    }
+
+}

@@ -1,0 +1,45 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "transaction_id": {},
+    "entity_type": {},
+    "guarantor_last_name": {
+        "path": "schedule_c2.guarantor_last_name"
+    },
+    "guarantor_first_name": {
+        "path": "schedule_c2.guarantor_first_name"
+    },
+    "guarantor_middle_name": {
+        "path": "schedule_c2.guarantor_middle_name"
+    },
+    "guarantor_prefix": {
+        "path": "schedule_c2.guarantor_prefix"
+    },
+    "guarantor_suffix": {
+        "path": "schedule_c2.guarantor_suffix"
+    },
+    "guarantor_street_1": {
+        "path": "schedule_c2.guarantor_street_1"
+    },
+    "guarantor_street_2": {
+        "path": "schedule_c2.guarantor_street_2"
+    },
+    "guarantor_city": {
+        "path": "schedule_c2.guarantor_city"
+    },
+    "guarantor_state": {
+        "path": "schedule_c2.guarantor_state"
+    },
+    "guarantor_zip": {
+        "path": "schedule_c2.guarantor_zip"
+    },
+    "guarantor_employer": {
+        "path": "schedule_c2.guarantor_employer"
+    },
+    "guarantor_occupation": {
+        "path": "schedule_c2.guarantor_occupation"
+    },
+    "guaranteed_amount": {
+        "path": "schedule_c2.guaranteed_amount"
+    }
+}
