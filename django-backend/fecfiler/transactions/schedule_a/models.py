@@ -62,8 +62,12 @@ class ScheduleA(models.Model):
     def get_date(self):
         return self.contribution_date
 
+    def get_transaction(self):
+        return self.transactions_set.first()
+
     def update_with_contact(self, contact):
-        if contact.id == self.contact_1_id:
+        transaction = self.get_transaction()
+        if contact.id == transaction.contact_1_id:
             self.contributor_organization_name = contact.name
             self.contributor_last_name = contact.last_name
             self.contributor_first_name = contact.first_name
@@ -78,7 +82,8 @@ class ScheduleA(models.Model):
             self.contributor_employer = contact.employer
             self.contributor_occupation = contact.occupation
             self.donor_committee_fec_id = contact.committee_id
-        if contact.id == self.contact_2_id:
+        if contact.id == transaction.contact_2_id:
+            self.donor_candidate_fec_id = contact.fec
             self.donor_candidate_last_name = contact.last_name
             self.donor_candidate_first_name = contact.first_name
             self.donor_candidate_middle_name = contact.middle_name

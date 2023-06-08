@@ -60,21 +60,36 @@ class ScheduleB(models.Model):
     def get_date(self):
         return self.expenditure_date
 
+    def get_transaction(self):
+        return self.transactions_set.first()
+
     def update_with_contact(self, contact):
-        self.payee_organization_name = contact.name
-        self.payee_last_name = contact.last_name
-        self.payee_first_name = contact.first_name
-        self.payee_middle_name = contact.middle_name
-        self.payee_prefix = contact.prefix
-        self.payee_suffix = contact.suffix
-        self.payee_street_1 = contact.street_1
-        self.payee_street_2 = contact.street_2
-        self.payee_city = contact.city
-        self.payee_state = contact.state
-        self.payee_zip = contact.zip
-        self.payee_employer = contact.employer
-        self.payee_occupation = contact.occupation
-        self.beneficiary_committee_fec_id = contact.committee_id
+        transaction = self.get_transaction()
+        if contact.id == transaction.contact_1_id:
+            self.payee_organization_name = contact.name
+            self.payee_last_name = contact.last_name
+            self.payee_first_name = contact.first_name
+            self.payee_middle_name = contact.middle_name
+            self.payee_prefix = contact.prefix
+            self.payee_suffix = contact.suffix
+            self.payee_street_1 = contact.street_1
+            self.payee_street_2 = contact.street_2
+            self.payee_city = contact.city
+            self.payee_state = contact.state
+            self.payee_zip = contact.zip
+            self.payee_employer = contact.employer
+            self.payee_occupation = contact.occupation
+            self.beneficiary_committee_fec_id = contact.committee_id
+        if contact.id == transaction.contact_2_id:
+            self.beneficiary_candidate_first_name = contact.first_name
+            self.beneficiary_candidate_last_name = contact.last_name
+            self.beneficiary_candidate_middle_name = contact.middle_name
+            self.beneficiary_candidate_prefix = contact.prefix
+            self.beneficiary_candidate_suffix = contact.suffix
+            self.beneficiary_candidate_fec_id = contact.candidate_id
+            self.beneficiary_candidate_office = contact.candidate_office
+            self.beneficiary_candidate_state = contact.candidate_state
+            self.beneficiary_candidate_district = contact.candidate_district
         self.save()
 
     class Meta:
