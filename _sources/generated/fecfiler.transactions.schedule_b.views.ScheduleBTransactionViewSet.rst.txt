@@ -25,6 +25,7 @@ fecfiler.transactions.schedule\_b.views.ScheduleBTransactionViewSet
       ~ScheduleBTransactionViewSet.check_permissions
       ~ScheduleBTransactionViewSet.check_throttles
       ~ScheduleBTransactionViewSet.create
+      ~ScheduleBTransactionViewSet.create_pair
       ~ScheduleBTransactionViewSet.destroy
       ~ScheduleBTransactionViewSet.determine_version
       ~ScheduleBTransactionViewSet.dispatch
@@ -74,6 +75,7 @@ fecfiler.transactions.schedule\_b.views.ScheduleBTransactionViewSet
       ~ScheduleBTransactionViewSet.setup
       ~ScheduleBTransactionViewSet.throttled
       ~ScheduleBTransactionViewSet.update
+      ~ScheduleBTransactionViewSet.update_pair
    
    
 

@@ -25,6 +25,7 @@ fecfiler.transactions.schedule\_c.views.ScheduleCTransactionViewSet
       ~ScheduleCTransactionViewSet.check_permissions
       ~ScheduleCTransactionViewSet.check_throttles
       ~ScheduleCTransactionViewSet.create
+      ~ScheduleCTransactionViewSet.create_pair
       ~ScheduleCTransactionViewSet.destroy
       ~ScheduleCTransactionViewSet.determine_version
       ~ScheduleCTransactionViewSet.dispatch
@@ -74,6 +75,7 @@ fecfiler.transactions.schedule\_c.views.ScheduleCTransactionViewSet
       ~ScheduleCTransactionViewSet.setup
       ~ScheduleCTransactionViewSet.throttled
       ~ScheduleCTransactionViewSet.update
+      ~ScheduleCTransactionViewSet.update_pair
    
    
 

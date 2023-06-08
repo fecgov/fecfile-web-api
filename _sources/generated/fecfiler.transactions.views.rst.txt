@@ -12,6 +12,13 @@ fecfiler.transactions.views
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      save_transaction_pair
+   
    
 
    

@@ -1,0 +1,6 @@
+fecfiler.transactions.views.save\_transaction\_pair
+===================================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: save_transaction_pair
