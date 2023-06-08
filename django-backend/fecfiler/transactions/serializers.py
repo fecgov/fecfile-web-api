@@ -120,16 +120,19 @@ class TransactionSerializerBase(
     def to_internal_value(self, data):
         return super().to_internal_value(data)
 
-    def propagate_contact_info(self, transaction):
+    def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
+        contact_2 = Contact.objects.find(id=transaction.contact_2_id)
+
+    def propagate_contact(self, transaction, contact):
         subsequent_transactions = Transaction.objects.filter(
             ~Q(id=transaction.id),
             Q(Q(report__upload_submission__isnull=True)),
-            contact_1=contact_1,
+            Q(Q(contact_1=contact) | Q(contact_2=contact)),
             date__gte=transaction.get_date(),
         )
         for subsequent_transaction in subsequent_transactions:
-            subsequent_transaction.get_schedule().update_with_contact(contact_1)
+            subsequent_transaction.get_schedule().update_with_contact(contact)
             subsequent_transaction.save()
 
     def validate(self, data):

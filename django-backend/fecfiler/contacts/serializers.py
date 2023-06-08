@@ -65,26 +65,30 @@ class ContactSerializer(
 class LinkedContactSerializerMixin(ModelSerializer):
     contact_1 = ContactSerializer(allow_null=True, required=False)
     contact_1_id = UUIDField(required=False, allow_null=False)
+    contact_2 = ContactSerializer(allow_null=True, required=False)
+    contact_2_id = UUIDField(required=False, allow_null=True)
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data)
+            self.create_or_update_contact(validated_data, "contact_1")
+            self.create_or_update_contact(validated_data, "contact_2")
             return super().create(validated_data)
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data)
+            self.create_or_update_contact(validated_data, "contact_1")
+            self.create_or_update_contact(validated_data, "contact_2")
             return super().update(instance, validated_data)
 
-    def create_or_update_contact(self, validated_data: dict):
-        contact_data = validated_data.pop("contact_1", None)
-        contact_1_id = validated_data.get("contact_1_id", None)
-        if not contact_1_id:
+    def create_or_update_contact(self, validated_data: dict, contact_key):
+        contact_data = validated_data.pop(contact_key, None)
+        contact_id = validated_data.get(contact_key + "_id", None)
+        if not contact_id:
             if not contact_data:
                 raise ValidationError(
                     {"contact_id": ["No contact or contact id provided"]}
                 )
             contact: Contact = Contact.objects.create(**contact_data)
-            validated_data["contact_id"] = contact.id
+            validated_data[contact_key + "_id"] = contact.id
         else:
-            Contact.objects.filter(id=contact_1_id).update(**contact_data)
+            Contact.objects.filter(id=contact_id).update(**contact_data)
