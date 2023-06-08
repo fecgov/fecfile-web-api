@@ -63,20 +63,30 @@ class ScheduleA(models.Model):
         return self.contribution_date
 
     def update_with_contact(self, contact):
-        self.contributor_organization_name = contact.name
-        self.contributor_last_name = contact.last_name
-        self.contributor_first_name = contact.first_name
-        self.contributor_middle_name = contact.middle_name
-        self.contributor_prefix = contact.prefix
-        self.contributor_suffix = contact.suffix
-        self.contributor_street_1 = contact.street_1
-        self.contributor_street_2 = contact.street_2
-        self.contributor_city = contact.city
-        self.contributor_state = contact.state
-        self.contributor_zip = contact.zip
-        self.contributor_employer = contact.employer
-        self.contributor_occupation = contact.occupation
-        self.donor_committee_fec_id = contact.committee_id
+        if contact.id == self.contact_1_id:
+            self.contributor_organization_name = contact.name
+            self.contributor_last_name = contact.last_name
+            self.contributor_first_name = contact.first_name
+            self.contributor_middle_name = contact.middle_name
+            self.contributor_prefix = contact.prefix
+            self.contributor_suffix = contact.suffix
+            self.contributor_street_1 = contact.street_1
+            self.contributor_street_2 = contact.street_2
+            self.contributor_city = contact.city
+            self.contributor_state = contact.state
+            self.contributor_zip = contact.zip
+            self.contributor_employer = contact.employer
+            self.contributor_occupation = contact.occupation
+            self.donor_committee_fec_id = contact.committee_id
+        if contact.id == self.contact_2_id:
+            self.donor_candidate_last_name = contact.last_name
+            self.donor_candidate_first_name = contact.first_name
+            self.donor_candidate_middle_name = contact.middle_name
+            self.donor_candidate_prefix = contact.prefix
+            self.donor_candidate_suffix = contact.suffix
+            self.donor_candidate_office = contact.candidate_office
+            self.donor_candidate_state = contact.candidate_state
+            self.donor_candidate_district = contact.candidate_district
         self.save()
 
 
