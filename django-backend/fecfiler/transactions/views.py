@@ -24,6 +24,9 @@ def save_transaction_pair(request):
     """Handle the saving of a strictly parent/child pair whose parent
     is a Schedule A and child is a Schedule B.
 
+    IMPORTANT: The Schedule B transaction contact info will be overriden by the
+    contact info in the Schedule A transaction
+
     The child is removed from the parent and saved separately with the
     parent_transaction_id so that each schedule serializer can handle
     just its specific schedule fields and validation rules
@@ -45,7 +48,9 @@ def save_transaction_pair(request):
         if schedule_a_serializer.is_valid():
             schedule_a = schedule_a_serializer.save()
             schedule_b_data["parent_transaction_id"] = schedule_a.id
+            # Assign contact in the Schedule A to the Schedule B
             schedule_b_data["contact_id"] = schedule_a.contact_id
+            schedule_b_data["contact"] = schedule_a_data["contact"]
 
             if "id" in schedule_b_data:
                 schedule_b = Transaction.objects.get(pk=schedule_b_data["id"])
