@@ -63,7 +63,7 @@ class ScheduleA(models.Model):
         return self.contribution_date
 
     def get_transaction(self):
-        return self.transactions_set.first()
+        return self.transaction_set.first()
 
     def update_with_contact(self, contact):
         transaction = self.get_transaction()
@@ -83,7 +83,7 @@ class ScheduleA(models.Model):
             self.contributor_occupation = contact.occupation
             self.donor_committee_fec_id = contact.committee_id
         if contact.id == transaction.contact_2_id:
-            self.donor_candidate_fec_id = contact.fec
+            self.donor_candidate_fec_id = contact.candidate_id
             self.donor_candidate_last_name = contact.last_name
             self.donor_candidate_first_name = contact.first_name
             self.donor_candidate_middle_name = contact.middle_name

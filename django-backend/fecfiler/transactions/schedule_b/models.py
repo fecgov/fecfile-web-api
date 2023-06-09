@@ -61,7 +61,7 @@ class ScheduleB(models.Model):
         return self.expenditure_date
 
     def get_transaction(self):
-        return self.transactions_set.first()
+        return self.transaction_set.first()
 
     def update_with_contact(self, contact):
         transaction = self.get_transaction()
