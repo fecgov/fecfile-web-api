@@ -24,7 +24,6 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.mock_request.user = user
 
     def test_no_transaction_type_identifier(self):
-
         serializer = TransactionSerializerBase(
             data=self.missing_type_transaction,
             context={"request": self.mock_request},
@@ -44,7 +43,7 @@ class TransactionSerializerBaseTestCase(TestCase):
                 "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
-                "contact": {
+                "contact_1": {
                     "id": "00000000-6486-4062-944f-aa0c4cbe4073",
                     "type": "ORG",
                     "name": "new name",
@@ -91,7 +90,7 @@ class TransactionSerializerBaseTestCase(TestCase):
                 "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
                 "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
                 "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
-                "contact": {
+                "contact_1": {
                     "id": "00000000-6486-4062-944f-aa0c4cbe4073",
                     "type": "ORG",
                     "name": "orignial name",

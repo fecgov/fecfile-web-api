@@ -21,7 +21,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         self.new_contact = {
             "id": "9bb5c8b2-31f3-488f-84e1-a63b0133a000",
             "type": "IND",
-            "last_name": "Contact",
+            "last_name": "contact_1",
             "first_name": "New",
             "street_1": "Street",
             "city": "City",
@@ -72,7 +72,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_occupation": "professional",
             "payee_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact": self.new_contact,
+            "contact_1": self.new_contact,
             "schema_name": "SchB",
         }
 
@@ -94,7 +94,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
             "payee_occupation": "professional",
             "payee_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact": self.new_contact,
+            "contact_1": self.new_contact,
             "contact_1_id": "a5061946-93ef-47f4-82f6-f1782c333d70",
             "schema_name": "SchB",
         }
@@ -165,8 +165,8 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         child["expenditure_purpose_descrip"] = updated_child_description
         child["schema_name"] = "SchB"
         parent["children"] = [child]
-        parent["contact"] = self.new_contact.copy()
-        child["contact"] = self.new_contact.copy()
+        parent["contact_1"] = self.new_contact.copy()
+        child["contact_1"] = self.new_contact.copy()
         parent_instance = serializer.update(
             parent_instance, serializer.to_internal_value(parent)
         )
