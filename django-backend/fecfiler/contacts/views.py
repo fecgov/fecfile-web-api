@@ -3,7 +3,7 @@ import re
 from urllib.parse import urlencode
 
 import requests
-from django.db.models import CharField, Q, Value, Count, Sum
+from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
