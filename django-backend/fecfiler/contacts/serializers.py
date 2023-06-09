@@ -43,6 +43,8 @@ class ContactSerializer(
                 "scheduleatransaction",
                 "schedulebtransaction",
                 "transaction",
+                "contact_1_transaction_set",
+                "contact_2_transaction_set",
             ]
         ]
         fields.append("transaction_count")
@@ -71,16 +73,19 @@ class LinkedContactSerializerMixin(ModelSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data, "contact_1")
-            self.create_or_update_contact(validated_data, "contact_2")
+            if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
+                self.create_or_update_contact(validated_data, "contact_2")
             return super().create(validated_data)
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data, "contact_1")
-            self.create_or_update_contact(validated_data, "contact_2")
+            if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
+                self.create_or_update_contact(validated_data, "contact_2")
             return super().update(instance, validated_data)
 
     def create_or_update_contact(self, validated_data: dict, contact_key):
+        print(f"AHOY: {validated_data}")
         contact_data = validated_data.pop(contact_key, None)
         contact_id = validated_data.get(contact_key + "_id", None)
         if not contact_id:

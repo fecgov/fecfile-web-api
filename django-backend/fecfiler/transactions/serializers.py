@@ -123,7 +123,7 @@ class TransactionSerializerBase(
     def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
         self.propagate_contact(transaction, contact_1)
-        contact_2 = Contact.objects.find(id=transaction.contact_2_id)
+        contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
         if contact_2:
             self.propagate_contact(transaction, contact_2)
 
