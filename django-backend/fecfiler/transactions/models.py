@@ -45,11 +45,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     contact_1 = models.ForeignKey(
         "contacts.Contact",
         on_delete=models.CASCADE,
+        related_name="contact_1_transaction_set",
         null=True,
     )
     contact_2 = models.ForeignKey(
         "contacts.Contact",
         on_delete=models.CASCADE,
+        related_name="contact_1_transaction_set",
         null=True,
     )
     memo_text = models.ForeignKey(
