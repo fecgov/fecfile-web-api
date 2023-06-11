@@ -51,7 +51,8 @@ fecfiler.transactions.serializers.TransactionSerializerBase
       ~TransactionSerializerBase.include_extra_kwargs
       ~TransactionSerializerBase.is_valid
       ~TransactionSerializerBase.many_init
-      ~TransactionSerializerBase.propagate_contact_info
+      ~TransactionSerializerBase.propagate_contact
+      ~TransactionSerializerBase.propagate_contacts
       ~TransactionSerializerBase.run_validation
       ~TransactionSerializerBase.run_validators
       ~TransactionSerializerBase.save

@@ -81,7 +81,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.create" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(validated_data)</p></td>
 <td><p>We have a bit of extra checking around this in order to provide descriptive messages when something goes wrong, but this method is essentially just:</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_contact</span></code>(validated_data)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_contact</span></code>(validated_data, ...)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_memo</span></code>(validated_data)</p></td>
@@ -147,31 +147,34 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.many_init" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.many_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">many_init</span></code></a>(*args, **kwargs)</p></td>
 <td><p>This method implements the creation of a <cite>ListSerializer</cite> parent class when <cite>many=True</cite> is used.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_contact_info</span></code>(transaction)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_contact</span></code>(transaction, contact)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validation" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate_contacts</span></code>(transaction)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validation" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validation</span></code></a>([data])</p></td>
 <td><p>We override the default <cite>run_validation</cite>, because the validation performed by validators and the <cite>.validate()</cite> method should be coerced into an error dictionary with a 'non_fields_error' key.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validators" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validators" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.run_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_validators</span></code></a>(value)</p></td>
 <td><p>Add read_only fields with defaults to value before running validators.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_internal_value" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_internal_value" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
 <td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_representation" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance[, depth])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_representation" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance[, depth])</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
 <td><p>Adds stub aggregate_amount to pass validation</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate_empty_values" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate_empty_values" title="fecfiler.transactions.schedule_b.serializers.ScheduleBTransactionSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
 <td><p>Validate empty values, and either:</p></td>
 </tr>
 </tbody>

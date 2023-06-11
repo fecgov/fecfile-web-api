@@ -59,8 +59,10 @@ fecfiler.transactions.models.Transaction
       ~Transaction.children
       ~Transaction.committee_account
       ~Transaction.committee_account_id
-      ~Transaction.contact
-      ~Transaction.contact_id
+      ~Transaction.contact_1
+      ~Transaction.contact_1_id
+      ~Transaction.contact_2
+      ~Transaction.contact_2_id
       ~Transaction.created
       ~Transaction.deleted
       ~Transaction.entity_type

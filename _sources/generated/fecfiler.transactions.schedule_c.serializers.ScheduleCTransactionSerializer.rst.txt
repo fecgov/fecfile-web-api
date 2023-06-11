@@ -51,7 +51,8 @@ fecfiler.transactions.schedule\_c.serializers.ScheduleCTransactionSerializer
       ~ScheduleCTransactionSerializer.include_extra_kwargs
       ~ScheduleCTransactionSerializer.is_valid
       ~ScheduleCTransactionSerializer.many_init
-      ~ScheduleCTransactionSerializer.propagate_contact_info
+      ~ScheduleCTransactionSerializer.propagate_contact
+      ~ScheduleCTransactionSerializer.propagate_contacts
       ~ScheduleCTransactionSerializer.run_validation
       ~ScheduleCTransactionSerializer.run_validators
       ~ScheduleCTransactionSerializer.save

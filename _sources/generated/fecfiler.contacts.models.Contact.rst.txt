@@ -62,6 +62,8 @@ fecfiler.contacts.models.Contact
       ~Contact.committee_account
       ~Contact.committee_account_id
       ~Contact.committee_id
+      ~Contact.contact_1_transaction_set
+      ~Contact.contact_2_transaction_set
       ~Contact.country
       ~Contact.created
       ~Contact.deleted
@@ -81,7 +83,6 @@ fecfiler.contacts.models.Contact
       ~Contact.street_2
       ~Contact.suffix
       ~Contact.telephone
-      ~Contact.transaction_set
       ~Contact.type
       ~Contact.updated
       ~Contact.zip
