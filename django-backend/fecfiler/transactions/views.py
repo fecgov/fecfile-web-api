@@ -49,8 +49,8 @@ def save_transaction_pair(request):
             schedule_a = schedule_a_serializer.save()
             schedule_b_data["parent_transaction_id"] = schedule_a.id
             # Assign contact in the Schedule A to the Schedule B
-            schedule_b_data["contact_id"] = schedule_a.contact_id
-            schedule_b_data["contact"] = schedule_a_data["contact"]
+            schedule_b_data["contact_1_id"] = schedule_a.contact_1_id
+            schedule_b_data["contact_1"] = schedule_a_data["contact_1"]
 
             if "id" in schedule_b_data:
                 schedule_b = Transaction.objects.get(pk=schedule_b_data["id"])
@@ -130,12 +130,12 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         """Retrieves transaction that comes before this transactions,
         while bieng in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
-        contact_id = request.query_params.get("contact_id", None)
+        contact_1_id = request.query_params.get("contact_1_id", None)
         date = request.query_params.get("date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
-        if not (contact_id and date):
+        if not (contact_1_id and date):
             return Response(
-                "Please provide contact_id and date in query params.",
+                "Please provide contact_1_id and date in query params.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -145,7 +145,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             self.get_queryset()
             .filter(
                 ~Q(id=transaction_id or None),
-                Q(contact_id=contact_id),
+                Q(contact_1_id=contact_1_id),
                 Q(date__year=date.year),
                 Q(date__lte=date),
                 Q(aggregation_group=aggregation_group),

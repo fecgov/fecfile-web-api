@@ -45,7 +45,10 @@ class ContactViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        Contact.objects.annotate(transaction_count=Count("transaction"))
+        Contact.objects.annotate(
+            transaction_count=Count("contact_1_transaction_set")
+            + Count("contact_2_transaction_set")
+        )
         .alias(
             sort_name=Concat(
                 "name", "last_name", Value(" "), "first_name", output_field=CharField()
@@ -222,7 +225,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewSet, mixins.ListModelMixin, GenericViewSet,
+    CommitteeOwnedViewSet,
+    mixins.ListModelMixin,
+    GenericViewSet,
 ):
     serializer_class = ContactSerializer
 
@@ -253,7 +258,8 @@ class DeletedContactsViewSet(
         contacts = self.queryset.filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
-                "Contact Ids are invalid", status=status.HTTP_400_BAD_REQUEST,
+                "Contact Ids are invalid",
+                status=status.HTTP_400_BAD_REQUEST,
             )
         for contact in contacts:
             contact.deleted = None

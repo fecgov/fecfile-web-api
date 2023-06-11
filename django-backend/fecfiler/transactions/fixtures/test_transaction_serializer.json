@@ -42,7 +42,7 @@
             "updated": "2022-02-09T00:00:01.000Z",
             "transaction_type_identifier": "OFFSET_TO_OPEX",
             "schedule_a_id": "12345678-0000-0000-0000-9509df48e1aa",
-            "contact_id": "00000000-6486-4062-944f-aa0c4cbe4073"
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073"
         }
     },
     {
@@ -72,7 +72,7 @@
             "updated": "2022-02-09T00:00:02.000Z",
             "transaction_type_identifier": "OFFSET_TO_OPEX",
             "schedule_b_id": "87654321-0000-0000-0000-9509df48e1aa",
-            "contact_id": "00000000-6486-4062-944f-aa0c4cbe4073"
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073"
         }
     },
     {
@@ -102,7 +102,7 @@
             "updated": "2022-02-09T00:00:03.000Z",
             "transaction_type_identifier": "OFFSET_TO_OPEX",
             "schedule_a_id": "33333333-0000-0000-0000-9509df48e1aa",
-            "contact_id": "00000000-6486-4062-944f-aa0c4cbe4073"
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073"
         }
     }
 ]

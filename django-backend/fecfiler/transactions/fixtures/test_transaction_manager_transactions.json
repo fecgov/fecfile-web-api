@@ -174,7 +174,7 @@
             "entity_type": "ORG",
             "created": "2023-02-15T01:00:00.000Z",
             "updated": "2023-02-15T01:00:00.000Z",
-            "contact": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
+            "contact_1": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
             "schedule_b": "40fd8084-79a6-41ab-94ca-5418a7b9370f"
         }
     },
@@ -191,7 +191,7 @@
             "entity_type": "IND",
             "created": "2023-02-15T02:00:00.000Z",
             "updated": "2023-02-15T02:00:00.000Z",
-            "contact": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
+            "contact_1": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
             "schedule_a": "040db72d-47b0-4357-abc2-023ff47d6b60"
         }
     },
@@ -208,7 +208,7 @@
             "entity_type": "IND",
             "created": "2023-02-15T03:00:00.000Z",
             "updated": "2023-02-15T03:00:00.000Z",
-            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "369e9fa2-3274-47d8-9388-7294a3fdda79"
         }
     },
@@ -225,7 +225,7 @@
             "entity_type": "IND",
             "created": "2023-02-01T04:00:00.000Z",
             "updated": "2023-02-01T04:00:00.000Z",
-            "contact": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
+            "contact_1": "b3828bd8-04ad-4182-bdf6-7c27d2f05a11",
             "schedule_a": "59919889-4175-4bb1-b8ef-e7fc711fca17"
         }
     },
@@ -242,7 +242,7 @@
             "entity_type": "IND",
             "created": "2023-02-15T05:00:00.000Z",
             "updated": "2023-02-15T05:00:00.000Z",
-            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "43219fa2-3274-47d8-9388-7294a3fd4321",
             "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94"
         }
@@ -290,7 +290,7 @@
             "entity_type": "IND",
             "created": "2023-02-01T01:00:00.000Z",
             "updated": "2023-02-01T01:00:00.000Z",
-            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "aaaaaaaa-3274-47d8-9388-7294a3fd4321"
         }
     },
@@ -307,7 +307,7 @@
             "entity_type": "IND",
             "created": "2023-01-01T01:00:00.000Z",
             "updated": "2023-01-01T01:00:00.000Z",
-            "contact": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_b": "bbbbbbbb-3274-47d8-9388-7294a3fd4321"
         }
     }

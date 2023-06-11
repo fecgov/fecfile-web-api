@@ -48,7 +48,7 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-        contact_clause = Q(contact_id=OuterRef("contact_id"))
+        contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
             date=OuterRef("date"), created__lte=OuterRef("created"),
