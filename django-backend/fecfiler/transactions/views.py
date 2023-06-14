@@ -45,7 +45,7 @@ def save_transaction_pair(request):
 
     with transaction.atomic():
         schedule_a_serializer.context["request"] = request
-        if schedule_a_serializer.is_valid():
+        if schedule_a_serializer.is_valid(raise_exception=True):
             schedule_a = schedule_a_serializer.save()
             schedule_b_data["parent_transaction_id"] = schedule_a.id
             # Assign contact in the Schedule A to the Schedule B
@@ -63,19 +63,11 @@ def save_transaction_pair(request):
                 )
 
             schedule_b_serializer.context["request"] = request
-            if schedule_b_serializer.is_valid():
+            if schedule_b_serializer.is_valid(raise_exception=True):
                 schedule_b_serializer.save()
 
                 # Both A and B saves were successful, return parent transaction
                 return Response(ScheduleATransactionSerializer(schedule_a).data)
-            else:
-                return Response(
-                    schedule_b_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                )
-        else:
-            return Response(
-                schedule_a_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
