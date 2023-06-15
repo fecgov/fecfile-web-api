@@ -14,55 +14,26 @@ class SummaryService:
     def calculate_summary(self):
         summary = {
             "a": self.calculate_summary_column_a(),
-            "b": self.calculate_summary_column_b()
+            "b": self.calculate_summary_column_b(),
         }
 
         return summary
 
     def calculate_summary_column_a(self):
         report_transactions = Transaction.objects.filter(report=self.report)
-        # line 11ai
-        sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
-        line_11ai = self._create_amount_sum(sa11ai_query)
-        # line 11aii
-        sa11aii_query = Q(~Q(memo_code=True), itemized=False, form_type="SA11AI")
-        line_11aii = self._create_amount_sum(sa11aii_query)
-        # line 11b
-        sa11b_query = Q(~Q(memo_code=True), form_type="SA11B")
-        line_11b = self._create_amount_sum(sa11b_query)
-        # line 11c
-        sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
-        line_11c = self._create_amount_sum(sa11c_query)
-        # line 12
-        sa12_query = Q(~Q(memo_code=True), form_type="SA12")
-        line_12 = self._create_amount_sum(sa12_query)
-        # line 15
-        sa15_query = Q(~Q(memo_code=True), form_type="SA15")
-        line_15 = self._create_amount_sum(sa15_query)
-        # line 17
-        sa17_query = Q(~Q(memo_code=True), form_type="SA17")
-        line_17 = self._create_amount_sum(sa17_query)
-        # line 28a
-        sb28a_query = Q(~Q(memo_code=True), form_type="SB28A")
-        line_28a = self._create_amount_sum(sb28a_query)
-        # line 28b
-        sb28b_query = Q(~Q(memo_code=True), form_type="SB28B")
-        line_28b = self._create_amount_sum(sb28b_query)
-        # line 28c
-        sb28c_query = Q(~Q(memo_code=True), form_type="SB28C")
-        line_28c = self._create_amount_sum(sb28c_query)
         summary = report_transactions.aggregate(
-            line_11ai=line_11ai,
-            line_11aii=line_11aii,
-            line_11b=line_11b,
-            line_11c=line_11c,
-            line_12=line_12,
-            line_15=line_15,
-            line_17=line_17,
-            line_28a=line_28a,
-            line_28b=line_28b,
-            line_28c=line_28c,
-            line_37=line_15
+            line_11ai=self.get_line("SA11AI", True),
+            line_11aii=self.get_line("SA11AI", False),
+            line_11b=self.get_line("SA11B"),
+            line_11c=self.get_line("SA11C"),
+            line_12=self.get_line("SA12"),
+            line_15=self.get_line("SA15"),
+            line_16=self.get_line("SA16"),
+            line_17=self.get_line("SA17"),
+            line_22=self.get_line("SA22"),
+            line_28a=self.get_line("SB28A"),
+            line_28b=self.get_line("SB28B"),
+            line_28c=self.get_line("SB28C"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -73,6 +44,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_37"] = summary["line_15"]
         return summary
 
     def calculate_summary_column_b(self):
@@ -86,49 +58,20 @@ class SummaryService:
             date__lte=report_date,
         )
 
-        # line 11ai
-        sa11ai_query = Q(~Q(memo_code=True), itemized=True, form_type="SA11AI")
-        line_11ai = self._create_amount_sum(sa11ai_query)
-        # line 11aii
-        sa11aii_query = Q(~Q(memo_code=True), itemized=False, form_type="SA11AI")
-        line_11aii = self._create_amount_sum(sa11aii_query)
-        # line 11b
-        sa11b_query = Q(~Q(memo_code=True), form_type="SA11B")
-        line_11b = self._create_amount_sum(sa11b_query)
-        # line 11c
-        sa11c_query = Q(~Q(memo_code=True), form_type="SA11C")
-        line_11c = self._create_amount_sum(sa11c_query)
-        # line 12
-        sa12_query = Q(~Q(memo_code=True), form_type="SA12")
-        line_12 = self._create_amount_sum(sa12_query)
-        # line 15
-        sa15_query = Q(~Q(memo_code=True), form_type="SA15")
-        line_15 = self._create_amount_sum(sa15_query)
-        # line 17
-        sa17_query = Q(~Q(memo_code=True), form_type="SA17")
-        line_17 = self._create_amount_sum(sa17_query)
-        # line 28a
-        sb28a_query = Q(~Q(memo_code=True), form_type="SB28A")
-        line_28a = self._create_amount_sum(sb28a_query)
-        # line 28b
-        sb28b_query = Q(~Q(memo_code=True), form_type="SB28B")
-        line_28b = self._create_amount_sum(sb28b_query)
-        # line 28c
-        sb28c_query = Q(~Q(memo_code=True), form_type="SB28C")
-        line_28c = self._create_amount_sum(sb28c_query)
-
         # build summary
         summary = ytd_transactions.aggregate(
-            line_11ai=line_11ai,
-            line_11aii=line_11aii,
-            line_11b=line_11b,
-            line_11c=line_11c,
-            line_12=line_12,
-            line_15=line_15,
-            line_17=line_17,
-            line_28a=line_28a,
-            line_28b=line_28b,
-            line_28c=line_28c,
+            line_11ai=self.get_line("SA11AI", True),
+            line_11aii=self.get_line("SA11AI", False),
+            line_11b=self.get_line("SA11B"),
+            line_11c=self.get_line("SA11C"),
+            line_12=self.get_line("SA12"),
+            line_15=self.get_line("SA15"),
+            line_16=self.get_line("SA16"),
+            line_17=self.get_line("SA17"),
+            line_22=self.get_line("SA22"),
+            line_28a=self.get_line("SB28A"),
+            line_28b=self.get_line("SB28B"),
+            line_28c=self.get_line("SB28C"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -143,8 +86,10 @@ class SummaryService:
 
         return summary
 
-    def _create_amount_sum(self, query):
-        return Coalesce(
-            Sum("amount", filter=query),
-            Decimal(0.0),
+    def get_line(self, form_type, itemized=None):
+        query = (
+            Q(~Q(memo_code=True), itemized=itemized, form_type=form_type)
+            if itemized != None
+            else Q(~Q(memo_code=True), form_type=form_type)
         )
+        return Coalesce(Sum("amount", filter=query), Decimal(0.0))
