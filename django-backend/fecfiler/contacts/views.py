@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import requests
 from django.db.models import CharField, Q, Value, Count
-from django.db.models.functions import Concat, Lower
+from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import (
@@ -47,12 +47,13 @@ class ContactViewSet(CommitteeOwnedViewSet):
     queryset = (
         Contact.objects.annotate(
             transaction_count=Count("contact_1_transaction_set")
-            + Count("contact_2_transaction_set")
+            + Count("contact_2_transaction_set"),
         )
         .alias(
             sort_name=Concat(
                 "name", "last_name", Value(" "), "first_name", output_field=CharField()
-            )
+            ),
+            sort_fec_id=Coalesce("committee_id", "candidate_id"),
         )
         .all()
     )
@@ -64,6 +65,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
         "type",
         "employer",
         "occupation",
+        "sort_fec_id",
         "id",
     ]
     ordering = ["-created"]
