@@ -198,6 +198,19 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
         return JsonResponse(return_value)
 
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"fec_id_is_unique/(?P<fec_id>[^/.]{0,9})",
+    )
+    def fec_id_is_unique(self, request, fec_id):
+        matches = (
+            self.get_queryset()
+            .filter(Q(candidate_id=fec_id) | Q(committee_id=fec_id))
+            .count()
+        )
+        return Response(matches is 0)
+
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
