@@ -209,7 +209,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .filter(Q(candidate_id=fec_id) | Q(committee_id=fec_id))
             .count()
         )
-        return Response(matches is 0)
+        return Response(matches == 0)
 
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int

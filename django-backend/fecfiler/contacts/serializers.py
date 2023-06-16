@@ -43,7 +43,7 @@ class ContactSerializer(
             )
             .count()
         )
-        if matches is not 0:
+        if matches != 0:
             raise ValidationError({"fec_id": ["FEC Ids must be unique"]})
         return super().validate(data)
 
