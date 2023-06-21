@@ -88,151 +88,154 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.dispatch" title="fecfiler.contacts.views.ContactViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.filter_queryset" title="fecfiler.contacts.views.ContactViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fec_id_is_unique</span></code>(request, fec_id)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.filter_queryset" title="fecfiler.contacts.views.ContactViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.finalize_response" title="fecfiler.contacts.views.ContactViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.finalize_response" title="fecfiler.contacts.views.ContactViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticate_header" title="fecfiler.contacts.views.ContactViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticate_header" title="fecfiler.contacts.views.ContactViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticators" title="fecfiler.contacts.views.ContactViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticators" title="fecfiler.contacts.views.ContactViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_content_negotiator" title="fecfiler.contacts.views.ContactViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_content_negotiator" title="fecfiler.contacts.views.ContactViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_exception_handler" title="fecfiler.contacts.views.ContactViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_exception_handler" title="fecfiler.contacts.views.ContactViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
 <td><p>Returns the exception handler that this view uses.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_exception_handler_context" title="fecfiler.contacts.views.ContactViewSet.get_exception_handler_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler_context</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_exception_handler_context" title="fecfiler.contacts.views.ContactViewSet.get_exception_handler_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler_context</span></code></a>()</p></td>
 <td><p>Returns a dict that is passed through to EXCEPTION_HANDLER, as the <cite>context</cite> argument.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_extra_action_url_map" title="fecfiler.contacts.views.ContactViewSet.get_extra_action_url_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_action_url_map</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_extra_action_url_map" title="fecfiler.contacts.views.ContactViewSet.get_extra_action_url_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_action_url_map</span></code></a>()</p></td>
 <td><p>Build a map of {names: urls} for the extra actions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_extra_actions" title="fecfiler.contacts.views.ContactViewSet.get_extra_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_actions</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_extra_actions" title="fecfiler.contacts.views.ContactViewSet.get_extra_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_actions</span></code></a>()</p></td>
 <td><p>Get the methods that are marked as an extra ViewSet <cite>&#64;action</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_format_suffix" title="fecfiler.contacts.views.ContactViewSet.get_format_suffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_format_suffix</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_format_suffix" title="fecfiler.contacts.views.ContactViewSet.get_format_suffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_format_suffix</span></code></a>(**kwargs)</p></td>
 <td><p>Determine if the request includes a '.json' style format suffix</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_int_param_value</span></code>(request, param_name, ...)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_int_param_value</span></code>(request, param_name, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_results</span></code>(request)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_results</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_object" title="fecfiler.contacts.views.ContactViewSet.get_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_object</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_object" title="fecfiler.contacts.views.ContactViewSet.get_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_object</span></code></a>()</p></td>
 <td><p>Returns the object the view is displaying.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_paginated_response" title="fecfiler.contacts.views.ContactViewSet.get_paginated_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_paginated_response</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_paginated_response" title="fecfiler.contacts.views.ContactViewSet.get_paginated_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_paginated_response</span></code></a>(data)</p></td>
 <td><p>Return a paginated style <cite>Response</cite> object for the given output data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_parser_context" title="fecfiler.contacts.views.ContactViewSet.get_parser_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser_context</span></code></a>(http_request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_parser_context" title="fecfiler.contacts.views.ContactViewSet.get_parser_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser_context</span></code></a>(http_request)</p></td>
 <td><p>Returns a dict that is passed through to Parser.parse(), as the <cite>parser_context</cite> keyword argument.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_parsers" title="fecfiler.contacts.views.ContactViewSet.get_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parsers</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_parsers" title="fecfiler.contacts.views.ContactViewSet.get_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parsers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of parsers that this view can use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_permissions" title="fecfiler.contacts.views.ContactViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_permissions" title="fecfiler.contacts.views.ContactViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of permissions that this view requires.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_queryset" title="fecfiler.contacts.views.ContactViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_queryset" title="fecfiler.contacts.views.ContactViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
 <td><p>Get the list of items for this view.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_renderer_context" title="fecfiler.contacts.views.ContactViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_renderer_context" title="fecfiler.contacts.views.ContactViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
 <td><p>Returns a dict that is passed through to Renderer.render(), as the <cite>renderer_context</cite> keyword argument.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_renderers" title="fecfiler.contacts.views.ContactViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_renderers" title="fecfiler.contacts.views.ContactViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of renderers that this view can use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer" title="fecfiler.contacts.views.ContactViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer" title="fecfiler.contacts.views.ContactViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Return the serializer instance that should be used for validating and deserializing input, and for serializing output.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer_class" title="fecfiler.contacts.views.ContactViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer_class" title="fecfiler.contacts.views.ContactViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
 <td><p>Return the class to use for the serializer.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer_context" title="fecfiler.contacts.views.ContactViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_serializer_context" title="fecfiler.contacts.views.ContactViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
 <td><p>Extra context provided to the serializer class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_throttles" title="fecfiler.contacts.views.ContactViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_throttles" title="fecfiler.contacts.views.ContactViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_view_description" title="fecfiler.contacts.views.ContactViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_view_description" title="fecfiler.contacts.views.ContactViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
 <td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_view_name" title="fecfiler.contacts.views.ContactViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_view_name" title="fecfiler.contacts.views.ContactViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
 <td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.handle_exception" title="fecfiler.contacts.views.ContactViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.handle_exception" title="fecfiler.contacts.views.ContactViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
 <td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.http_method_not_allowed" title="fecfiler.contacts.views.ContactViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.http_method_not_allowed" title="fecfiler.contacts.views.ContactViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">individual_lookup</span></code>(request)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">individual_lookup</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.initial" title="fecfiler.contacts.views.ContactViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.initial" title="fecfiler.contacts.views.ContactViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.initialize_request" title="fecfiler.contacts.views.ContactViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.initialize_request" title="fecfiler.contacts.views.ContactViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.options" title="fecfiler.contacts.views.ContactViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.options" title="fecfiler.contacts.views.ContactViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">organization_lookup</span></code>(request)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">organization_lookup</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.paginate_queryset" title="fecfiler.contacts.views.ContactViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.paginate_queryset" title="fecfiler.contacts.views.ContactViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
 <td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.perform_authentication" title="fecfiler.contacts.views.ContactViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.perform_authentication" title="fecfiler.contacts.views.ContactViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
 <td><p>Perform authentication on the incoming request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.perform_content_negotiation" title="fecfiler.contacts.views.ContactViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.perform_content_negotiation" title="fecfiler.contacts.views.ContactViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
 <td><p>Determine which renderer and media type to use render the response.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_create</span></code>(serializer)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_create</span></code>(serializer)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_destroy</span></code>(instance)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_destroy</span></code>(instance)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_update</span></code>(serializer)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_update</span></code>(serializer)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.permission_denied" title="fecfiler.contacts.views.ContactViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.permission_denied" title="fecfiler.contacts.views.ContactViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
 <td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.reverse_action" title="fecfiler.contacts.views.ContactViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.reverse_action" title="fecfiler.contacts.views.ContactViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.setup" title="fecfiler.contacts.views.ContactViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.setup" title="fecfiler.contacts.views.ContactViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.throttled" title="fecfiler.contacts.views.ContactViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.throttled" title="fecfiler.contacts.views.ContactViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
