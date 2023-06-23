@@ -49,8 +49,9 @@ def save_transaction_pair(request):
             schedule_a = schedule_a_serializer.save()
             schedule_b_data["parent_transaction_id"] = schedule_a.id
             # Assign contact in the Schedule A to the Schedule B
-            schedule_b_data["contact_1_id"] = schedule_a.contact_1_id
-            schedule_b_data["contact_1"] = schedule_a_data["contact_1"]
+            if schedule_b_data.pop("use_parent_contact", None):
+                schedule_b_data["contact_1_id"] = schedule_a.contact_1_id
+                schedule_b_data["contact_1"] = schedule_a_data["contact_1"]
 
             if "id" in schedule_b_data:
                 schedule_b = Transaction.objects.get(pk=schedule_b_data["id"])
@@ -83,7 +84,6 @@ class TransactionViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
 
 
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
-
     queryset = Transaction.objects.all().alias(
         name=Coalesce(
             Coalesce(
