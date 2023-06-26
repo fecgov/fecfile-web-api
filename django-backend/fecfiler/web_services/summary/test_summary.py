@@ -71,7 +71,7 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
         self.assertEqual(summary["b"]["line_16"], Decimal("116.00"))
         self.assertEqual(summary["b"]["line_17"], Decimal("1100.00"))
-        self.assertEqual(summary["a"]["line_21b"], Decimal("250.00"))
+        self.assertEqual(summary["b"]["line_21b"], Decimal("250.00"))
         self.assertEqual(summary["b"]["line_28a"], Decimal("1101.50"))
         self.assertEqual(summary["b"]["line_28b"], Decimal("2201.50"))
         self.assertEqual(summary["b"]["line_28c"], Decimal("3301.50"))
