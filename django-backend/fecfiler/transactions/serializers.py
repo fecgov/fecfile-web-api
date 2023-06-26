@@ -91,6 +91,7 @@ class TransactionSerializerBase(
 
     id = UUIDField(required=False)
     parent_transaction_id = UUIDField(required=False, allow_null=True)
+    use_parent_contact = BooleanField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
@@ -188,6 +189,7 @@ class TransactionSerializerBase(
                 if f.name not in ["deleted", "transaction", "parent_transaction"]
             ] + [
                 "parent_transaction_id",
+                "use_parent_contact",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",

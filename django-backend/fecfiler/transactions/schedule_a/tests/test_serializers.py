@@ -9,9 +9,8 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_f3x_summaries",
-        "test_contacts",
+        "test_transaction_serializer",
         "test_memo_text",
-        "test_transaction_manager_transactions",
     ]
 
     def setUp(self):
@@ -31,7 +30,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         }
 
         self.updated_contact = {
-            "id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "id": "00000000-6486-4062-944f-aa0c4cbe4073",
             "type": "IND",
             "last_name": "contact_1",
             "first_name": "Updated",
@@ -91,7 +90,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_1": self.updated_contact,
-            "contact_1_id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
             "schema_name": "SchA",
         }
 
