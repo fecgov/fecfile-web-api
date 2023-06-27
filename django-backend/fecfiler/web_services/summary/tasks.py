@@ -63,9 +63,6 @@ def calculate_summary(report_id):
     # line 17
     report.L17_other_federal_receipts_dividends_period = a["line_17"]
     report.L17_other_federal_receipts_dividends_ytd = b["line_17"]
-    # line 21b
-    report.L21b_other_federal_operating_expenditures_period = a["line_21b"]
-    report.L21b_other_federal_operating_expenditures_ytd = b["line_21b"]
     # line 22
     report.L22_transfers_to_affiliated_other_party_cmtes_period = a["line_22"]
     report.L22_transfers_to_affiliated_other_party_cmtes_ytd = b["line_22"]
