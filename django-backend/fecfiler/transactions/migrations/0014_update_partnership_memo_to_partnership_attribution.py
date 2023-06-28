@@ -40,7 +40,6 @@ def reverse_ttis(apps, schema_editor): # noqa
             transaction.save()
 
 
-
 class Migration(migrations.Migration):
     dependencies = [
         ("transactions", "0013_remove_contact_add_contact_1_contact_2"),
