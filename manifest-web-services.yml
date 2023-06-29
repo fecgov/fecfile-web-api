@@ -4,7 +4,7 @@ applications:
     instances: 1
     stack: cflinuxfs3
     buildpacks:
-      - python_buildpack
+      - https://github.com/cloudfoundry/python-buildpack.git
     memory: 1G
     no-route: true
     health-check-type: process
