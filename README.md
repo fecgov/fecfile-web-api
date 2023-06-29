@@ -60,14 +60,14 @@ _Special Note:_ If the fecfile-validate repo was updated, the commit of the upda
 ### Create a feature branch
 
 Using git-flow extensions:
-`    git flow feature start feature_branch
-   `
+`   git flow feature start feature_branch
+  `
 
 Without the git-flow extensions:
-`    git checkout develop
+`   git checkout develop
     git pull
     git checkout -b feature/feature_branch develop
-   `
+  `
 
 - Developer creates a GitHub PR when ready to merge to `develop` branch
 - Reviewer reviews and merges feature branch into `develop` via GitHub
@@ -123,7 +123,6 @@ git push --set-upstream origin hotfix/my-fix
 - (If commits were made to release/sprint-#) Developer creates a PR in GitHub to merge release/sprint-# branch into the `develop` branch
 - Reviewer approves PR and merges into `develop`
 - Delete release/sprint-# branch
-- In GitHub, go to `Code -> tags -> releases -> Draft a new release`
 - Publish a new release using tag sprint-#, be sure to Auto-generate release notes
   - On Github, click on "Code" tab, then the "tags" link, then the "Releases" toggle
   - Click the button "Draft a new release"
