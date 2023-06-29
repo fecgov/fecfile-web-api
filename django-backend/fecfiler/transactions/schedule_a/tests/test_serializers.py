@@ -18,7 +18,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.new_contact = {
             "id": "9bb5c8b2-31f3-488f-84e1-a63b0133a000",
             "type": "IND",
-            "last_name": "Contact",
+            "last_name": "contact_1",
             "first_name": "New",
             "street_1": "Street",
             "city": "City",
@@ -33,7 +33,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         self.updated_contact = {
             "id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "type": "IND",
-            "last_name": "Contact",
+            "last_name": "contact_1",
             "first_name": "Updated",
             "street_1": "Street",
             "city": "City",
@@ -69,7 +69,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact": self.new_contact,
+            "contact_1": self.new_contact,
             "schema_name": "SchA",
         }
         self.update_contact_schedule_a_transaction = {
@@ -90,8 +90,8 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
             "contributor_occupation": "professional",
             "contributor_employer": "boss",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact": self.updated_contact,
-            "contact_id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
+            "contact_1": self.updated_contact,
+            "contact_1_id": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schema_name": "SchA",
         }
 

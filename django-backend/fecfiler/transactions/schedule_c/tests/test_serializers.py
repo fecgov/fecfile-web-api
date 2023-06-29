@@ -19,7 +19,7 @@ class ScheduleCTransactionSerializerTestCase(TestCase):
         self.new_contact = {
             "id": "9bb5c8b2-31f3-488f-84e1-a63b0133a000",
             "type": "IND",
-            "last_name": "Contact",
+            "last_name": "contact_1",
             "first_name": "New",
             "street_1": "Street",
             "city": "City",
@@ -43,7 +43,7 @@ class ScheduleCTransactionSerializerTestCase(TestCase):
             "lender_zip": "1234",
             "lender_street_1": "1 Homer Spit Road",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "contact": self.new_contact,
+            "contact_1": self.new_contact,
             "schema_name": "SchC",
         }
 

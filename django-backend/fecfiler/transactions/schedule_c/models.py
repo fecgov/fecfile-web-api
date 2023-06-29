@@ -53,21 +53,37 @@ class ScheduleC(models.Model):
     def get_date(self):
         return self.transaction.report.through_date
 
+    def get_transaction(self):
+        return self.transaction_set.first()
+
     def update_with_contact(self, contact):
-        self.lender_organization_name = contact.name
-        self.lender_last_name = contact.last_name
-        self.lender_first_name = contact.first_name
-        self.lender_middle_name = contact.middle_name
-        self.lender_prefix = contact.prefix
-        self.lender_suffix = contact.suffix
-        self.lender_street_1 = contact.street_1
-        self.lender_street_2 = contact.street_2
-        self.lender_city = contact.city
-        self.lender_state = contact.state
-        self.lender_zip = contact.zip
-        self.lender_employer = contact.employer
-        self.lender_occupation = contact.occupation
-        self.lender_committee_fec_id = contact.committee_id
+        transaction = self.get_transaction()
+        if contact.id == transaction.contact_1_id:
+            self.lender_organization_name = contact.name
+            self.lender_last_name = contact.last_name
+            self.lender_first_name = contact.first_name
+            self.lender_middle_name = contact.middle_name
+            self.lender_prefix = contact.prefix
+            self.lender_suffix = contact.suffix
+            self.lender_street_1 = contact.street_1
+            self.lender_street_2 = contact.street_2
+            self.lender_city = contact.city
+            self.lender_state = contact.state
+            self.lender_zip = contact.zip
+            self.lender_employer = contact.employer
+            self.lender_occupation = contact.occupation
+            self.lender_committee_fec_id = contact.committee_id
+
+        if contact.id == transaction.contact_2_id:
+            self.lender_candidate_first_name = contact.first_name
+            self.lender_candidate_last_name = contact.last_name
+            self.lender_candidate_middle_name = contact.middle_name
+            self.lender_candidate_prefix = contact.prefix
+            self.lender_candidate_suffix = contact.suffix
+            self.lender_candidate_id_number = contact.candidate_id
+            self.lender_candidate_office = contact.candidate_office
+            self.lender_candidate_state = contact.candidate_state
+            self.lender_candidate_district = contact.candidate_district
         self.save()
 
     class Meta:

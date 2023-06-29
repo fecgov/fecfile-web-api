@@ -140,7 +140,7 @@ class ScheduleATransactionSerializerTier2(ScheduleATransactionSerializerBase):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        super().propagate_contact_info(instance)
+        super().propagate_contacts(instance)
         return instance
 
     class Meta(TransactionSerializerBase.Meta):
