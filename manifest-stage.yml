@@ -6,7 +6,7 @@ applications:
       - route: fecfile-web-api-stage.app.cloud.gov
     stack: cflinuxfs3
     buildpacks:
-      - python_buildpack
+      - https://github.com/cloudfoundry/python-buildpack.git
     command: bin/run-api.sh
     memory: 1G
     services:
