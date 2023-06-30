@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0015\_update\_partnership\_memo\_to\_partnership\_attribution.reverse\_ttis
+============================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0015_update_partnership_memo_to_partnership_attribution
+
+.. autofunction:: reverse_ttis
