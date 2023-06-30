@@ -31,6 +31,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         "self", on_delete=models.CASCADE, null=True, blank=True
     )
 
+    # The _form_type value in the db may or may not be correct based on whether
+    # the transaction is itemized or not. For some transactions, the form_type
+    # value depends on its itemization status (e.g. SA11AI/SA11AII). The
+    # db _form_type value for these transactions holds the "is itemized" line
+    # number which is then dynamically updated to its true value in the manager
+    # query in a Just-In-Time fashion.
     _form_type = models.TextField(null=True, blank=True)
 
     @property
