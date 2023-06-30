@@ -44,4 +44,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0011_schedulec1_and_more
    fecfiler.transactions.migrations.0012_schedulec2_and_more
    fecfiler.transactions.migrations.0013_remove_contact_add_contact_1_contact_2
+   fecfiler.transactions.migrations.0014_update_partnership_memo_to_partnership_attribution
 
