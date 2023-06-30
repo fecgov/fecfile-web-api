@@ -158,6 +158,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         child = children[0].__dict__.copy()
         child.update(children[0].schedule_b.__dict__)
         child["id"] = children[0].id
+        child["form_type"] = children[0].form_type
         parent["expenditure_purpose_descrip"] = "updated parent"
         parent["schema_name"] = "SchB"
         updated_child_description = "updated child"

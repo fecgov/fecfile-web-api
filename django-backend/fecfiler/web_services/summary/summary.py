@@ -88,8 +88,8 @@ class SummaryService:
 
     def get_line(self, form_type, itemized=None):
         query = (
-            Q(~Q(memo_code=True), itemized=itemized, form_type=form_type)
+            Q(~Q(memo_code=True), itemized=itemized, _form_type=form_type)
             if itemized is not None
-            else Q(~Q(memo_code=True), form_type=form_type)
+            else Q(~Q(memo_code=True), _form_type=form_type)
         )
         return Coalesce(Sum("amount", filter=query), Decimal(0.0))
