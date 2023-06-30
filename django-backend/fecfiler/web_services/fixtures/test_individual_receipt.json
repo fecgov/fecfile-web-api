@@ -46,7 +46,7 @@
         "fields": {
             "id": "e7880981-9ee7-486f-b288-7a607e4cd0dd",
             "schedule_a": "e7880981-9ee7-486f-b288-7a607e4cd0dd",
-            "form_type": "SA11AI",
+            "_form_type": "SA11AI",
             "transaction_id": "A56123456789-1234",
             "entity_type": "IND",
             "created": "2022-02-09T00:00:00.000Z",
