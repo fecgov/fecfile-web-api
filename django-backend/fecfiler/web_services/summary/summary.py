@@ -30,7 +30,6 @@ class SummaryService:
             line_15=self.get_line("SA15"),
             line_16=self.get_line("SA16"),
             line_17=self.get_line("SA17"),
-            line_21b=self.get_line("SB21B"),
             line_22=self.get_line("SB22"),
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
@@ -69,7 +68,6 @@ class SummaryService:
             line_15=self.get_line("SA15"),
             line_16=self.get_line("SA16"),
             line_17=self.get_line("SA17"),
-            line_21b=self.get_line("SB21B"),
             line_22=self.get_line("SB22"),
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
@@ -90,8 +88,8 @@ class SummaryService:
 
     def get_line(self, form_type, itemized=None):
         query = (
-            Q(~Q(memo_code=True), itemized=itemized, form_type=form_type)
+            Q(~Q(memo_code=True), itemized=itemized, _form_type=form_type)
             if itemized is not None
-            else Q(~Q(memo_code=True), form_type=form_type)
+            else Q(~Q(memo_code=True), _form_type=form_type)
         )
         return Coalesce(Sum("amount", filter=query), Decimal(0.0))
