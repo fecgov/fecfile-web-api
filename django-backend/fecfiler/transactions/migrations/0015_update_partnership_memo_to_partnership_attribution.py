@@ -16,7 +16,7 @@ ttis_to_change = {
 }
 
 
-def update_ttis(apps, schema_editor): # noqa
+def update_ttis(apps, schema_editor):  # noqa
     Transaction = apps.get_model("transactions", "Transaction")  # noqa
     for transaction in Transaction.objects.all():
         keys = list(ttis_to_change.keys())
@@ -25,7 +25,8 @@ def update_ttis(apps, schema_editor): # noqa
             transaction.transaction_type_identifier = new_tti
             transaction.save()
 
-def reverse_ttis(apps, schema_editor): # noqa
+
+def reverse_ttis(apps, schema_editor):  # noqa
     reverse_ttis_to_change = {}
     for key in ttis_to_change:
         value = ttis_to_change[key]
@@ -42,9 +43,7 @@ def reverse_ttis(apps, schema_editor): # noqa
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("transactions", "0013_remove_contact_add_contact_1_contact_2"),
+        ("transactions", "0014_rename_form_field"),
     ]
 
-    operations = [
-        migrations.RunPython(update_ttis, reverse_code=reverse_ttis)
-    ]
+    operations = [migrations.RunPython(update_ttis, reverse_code=reverse_ttis)]
