@@ -41,6 +41,7 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(
             summary["a"]["line_28d"], round(Decimal(101.50 + 201.50 + 301.50), 2)
         )
+        self.assertEqual(summary["a"]["line_29"], Decimal("201.50"))
         self.assertEqual(
             summary["a"]["line_33"],
             round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2),
@@ -76,6 +77,7 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(
             summary["b"]["line_28d"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
         )
+        self.assertEqual(summary["b"]["line_29"], Decimal("1201.50"))
         self.assertEqual(
             summary["b"]["line_33"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
         )
