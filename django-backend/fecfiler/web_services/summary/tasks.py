@@ -84,6 +84,9 @@ def calculate_summary(report_id):
     # line 34
     report.L34_total_contribution_refunds_period = a["line_34"]
     report.L34_total_contribution_refunds_ytd = b["line_34"]
+    # line 35
+    report.L35_net_contributions_period = a["line_35"]
+    report.L35_net_contributions_ytd = b["line_35"]
     # line 37
     report.L37_offsets_to_operating_expenditures_period = a["line_37"]
     report.L37_offsets_to_operating_expenditures_ytd = b["line_37"]

@@ -44,6 +44,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
         return summary
 
@@ -82,6 +83,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
 
         return summary
