@@ -68,15 +68,15 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
     loan_amount = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
-    loan_payment_to_date = CharField(required=False, allow_null=True)
+    loan_payment_to_date = DecimalField(
+        required=False, allow_null=True, max_digits=11, decimal_places=2
+    )
     loan_balance = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
     loan_incurred_date = DateField(required=False, allow_null=True)
-    loan_due_date = DateField(required=False, allow_null=True)
-    loan_interest_rate = DecimalField(
-        required=False, allow_null=True, max_digits=14, decimal_places=14
-    )
+    loan_due_date = CharField(required=False, allow_null=True)
+    loan_interest_rate = CharField(required=False, allow_null=True)
     secured = BooleanField(required=False, allow_null=True, default=False)
     personal_funds = BooleanField(required=False, allow_null=True, default=False)
     lender_committee_id_number = CharField(required=False, allow_null=True)
