@@ -68,6 +68,7 @@ class TransactionManager(SoftDeleteManager):
             .annotate(
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
+                    When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
                     default=F("_form_type"),
                     output_field=TextField(),
                 )
