@@ -9,7 +9,7 @@ from fecfiler.transactions.views import save_transaction_pair
 class TransactionViewsTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = Account.objects.get(email="test1@test.com")
+        self.user = Account.objects.get(email="test@fec.gov")
 
     def test_save_new_transaction_pair(self):
         # payload = json.load(
