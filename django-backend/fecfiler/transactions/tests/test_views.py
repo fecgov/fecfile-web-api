@@ -32,4 +32,3 @@ class TransactionViewsTestCase(TestCase):
         response = save_transaction_pair(request)
         self.assertEqual("John", response.data["contributor_first_name"])
         self.assertEqual("Smith", response.data["contributor_last_name"])
-

@@ -30,9 +30,6 @@ logger = logging.getLogger(__name__)
 def save_transaction_pair(request):
     """Handle the saving of a strictly parent/child pair.
 
-    IMPORTANT: The child transaction contact info will be overriden by the
-    contact info in the parent transaction
-
     The child is removed from the parent and saved separately with the
     parent_transaction_id so that each schedule serializer can handle
     just its specific schedule fields and validation rules
@@ -41,25 +38,16 @@ def save_transaction_pair(request):
     schedule_2_data = request.data["children"][0]
     schedule_1_data["children"] = []
 
-    serializer_1 = ScheduleATransactionSerializer
-    serializer_2 = ScheduleATransactionSerializer
+    serializers = dict(
+        A=ScheduleATransactionSerializer,
+        B=ScheduleBTransactionSerializer,
+        C=ScheduleCTransactionSerializer,
+        C1=ScheduleC1TransactionSerializer,
+        C2=ScheduleC2TransactionSerializer,
+    )
 
-    if schedule_1_data["transactionType"]["scheduleId"] == "B":
-        serializer_1 = ScheduleBTransactionSerializer
-    if schedule_1_data["transactionType"]["scheduleId"] == "C":
-        serializer_1 = ScheduleCTransactionSerializer
-    if schedule_1_data["transactionType"]["scheduleId"] == "C1":
-        serializer_1 = ScheduleC1TransactionSerializer
-    if schedule_1_data["transactionType"]["scheduleId"] == "C2":
-        serializer_1 = ScheduleC2TransactionSerializer
-    if schedule_2_data["transactionType"]["scheduleId"] == "B":
-        serializer_2 = ScheduleBTransactionSerializer
-    if schedule_2_data["transactionType"]["scheduleId"] == "C":
-        serializer_2 = ScheduleCTransactionSerializer
-    if schedule_2_data["transactionType"]["scheduleId"] == "C1":
-        serializer_2 = ScheduleC1TransactionSerializer
-    if schedule_2_data["transactionType"]["scheduleId"] == "C2":
-        serializer_2 = ScheduleC2TransactionSerializer
+    serializer_1 = serializers.get(schedule_1_data.get("schedule_id"))
+    serializer_2 = serializers.get(schedule_2_data.get("schedule_id"))
 
     if "id" in schedule_1_data:
         schedule_1 = Transaction.objects.get(pk=schedule_1_data["id"])
@@ -72,7 +60,6 @@ def save_transaction_pair(request):
         if schedule_1_serializer.is_valid(raise_exception=True):
             schedule_1 = schedule_1_serializer.save()
             schedule_2_data["parent_transaction_id"] = schedule_1.id
-            # Assign contact in the Schedule A to the Schedule B
             if schedule_2_data.pop("use_parent_contact", None):
                 schedule_2_data["contact_1_id"] = schedule_1.contact_1_id
                 schedule_2_data["contact_1"] = schedule_1_data["contact_1"]
@@ -87,7 +74,7 @@ def save_transaction_pair(request):
             if schedule_2_serializer.is_valid(raise_exception=True):
                 schedule_2_serializer.save()
 
-                # Both A and B saves were successful, return parent transaction
+                # Both 1 and 2 saves were successful, return parent transaction
                 return Response(serializer_1(schedule_1).data)
 
 
