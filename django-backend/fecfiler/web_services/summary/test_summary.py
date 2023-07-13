@@ -20,16 +20,21 @@ class F3XSummaryTestCase(TestCase):
         summary = summary_service.calculate_summary()
         self.assertEqual(summary["a"]["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary["a"]["line_11aii"], Decimal("3.77"))
-        self.assertEqual(summary["a"]["line_11aiii"], round(Decimal(3.77 + 10000.23), 2))
+        self.assertEqual(
+            summary["a"]["line_11aiii"], round(Decimal(3.77 + 10000.23), 2)
+        )
         self.assertEqual(summary["a"]["line_11b"], Decimal("444.44"))
         self.assertEqual(summary["a"]["line_11c"], Decimal("555.55"))
         self.assertEqual(
-            summary["a"]["line_11d"], round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2)
+            summary["a"]["line_11d"],
+            round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2),
         )
         self.assertEqual(summary["a"]["line_12"], Decimal("1212.12"))
         self.assertEqual(summary["a"]["line_15"], Decimal("2125.79"))
         self.assertEqual(summary["a"]["line_15"], summary["a"]["line_37"])
+        self.assertEqual(summary["a"]["line_16"], Decimal("16.00"))
         self.assertEqual(summary["a"]["line_17"], Decimal("1000.00"))
+        self.assertEqual(summary["a"]["line_22"], Decimal("22.00"))
         self.assertEqual(summary["a"]["line_28a"], Decimal("101.50"))
         self.assertEqual(summary["a"]["line_28b"], Decimal("201.50"))
         self.assertEqual(summary["a"]["line_28c"], Decimal("301.50"))
@@ -37,7 +42,8 @@ class F3XSummaryTestCase(TestCase):
             summary["a"]["line_28d"], round(Decimal(101.50 + 201.50 + 301.50), 2)
         )
         self.assertEqual(
-            summary["a"]["line_33"], round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2)
+            summary["a"]["line_33"],
+            round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2),
         )
         self.assertEqual(
             summary["a"]["line_34"], round(Decimal(101.50 + 201.50 + 301.50), 2)
@@ -53,34 +59,28 @@ class F3XSummaryTestCase(TestCase):
 
         self.assertEqual(summary["b"]["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary["b"]["line_11aii"], Decimal("103.77"))
-        self.assertEqual(
-            summary["b"]["line_11aiii"],
-            Decimal(10104.00)
-        )
+        self.assertEqual(summary["b"]["line_11aiii"], Decimal(10104.00))
         self.assertEqual(summary["b"]["line_11b"], Decimal("544.44"))
         self.assertEqual(summary["b"]["line_11c"], Decimal("655.55"))
         self.assertEqual(
-            summary["b"]["line_11d"],
-            round(Decimal(10104.00 + 544.44 + 655.55), 2)
+            summary["b"]["line_11d"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
         )
 
         self.assertEqual(summary["b"]["line_12"], Decimal("1312.12"))
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
+        self.assertEqual(summary["b"]["line_16"], Decimal("116.00"))
         self.assertEqual(summary["b"]["line_17"], Decimal("1100.00"))
         self.assertEqual(summary["b"]["line_28a"], Decimal("1101.50"))
         self.assertEqual(summary["b"]["line_28b"], Decimal("2201.50"))
         self.assertEqual(summary["b"]["line_28c"], Decimal("3301.50"))
         self.assertEqual(
-            summary["b"]["line_28d"],
-            round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
+            summary["b"]["line_28d"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
         )
         self.assertEqual(
-            summary["b"]["line_33"],
-            round(Decimal(10104.00 + 544.44 + 655.55), 2)
+            summary["b"]["line_33"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
         )
         self.assertEqual(
-            summary["b"]["line_34"],
-            round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
+            summary["b"]["line_34"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
         )
 
     def test_report_with_no_transactions(self):
