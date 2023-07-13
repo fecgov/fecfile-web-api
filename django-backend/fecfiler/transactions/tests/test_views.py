@@ -14,7 +14,7 @@ class TransactionViewsTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = Account.objects.first()
+        self.user = Account()
         self.user.cmtee_id = "C00601211"
 
     def test_save_new_transaction_pair(self):
