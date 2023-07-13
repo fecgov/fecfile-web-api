@@ -4,9 +4,9 @@ applications:
     instances: 2
     routes:
       - route: fecfile-web-api-dev.app.cloud.gov
-    stack: cflinuxfs3
+    stack: cflinuxfs4
     buildpacks:
-      - https://github.com/cloudfoundry/python-buildpack.git
+      - python_buildpack
     command: bin/run-api.sh
     memory: 1G
     services:
