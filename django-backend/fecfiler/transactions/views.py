@@ -13,6 +13,7 @@ from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.f3x_summaries.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBTransactionSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCTransactionSerializer
@@ -62,7 +63,9 @@ def save_transaction_pair(request):
             schedule_2_data["parent_transaction_id"] = schedule_1.id
             if schedule_2_data.pop("use_parent_contact", None):
                 schedule_2_data["contact_1_id"] = schedule_1.contact_1_id
-                schedule_2_data["contact_1"] = schedule_1_data["contact_1"]
+                schedule_2_data["contact_1"] = ContactSerializer().to_representation(
+                    schedule_1.contact_1
+                )
 
             if "id" in schedule_2_data:
                 schedule_2 = Transaction.objects.get(pk=schedule_2_data["id"])
