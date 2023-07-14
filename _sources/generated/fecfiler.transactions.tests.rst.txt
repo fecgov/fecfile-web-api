@@ -33,4 +33,5 @@ fecfiler.transactions.tests
 
    fecfiler.transactions.tests.test_manager
    fecfiler.transactions.tests.test_serializers
+   fecfiler.transactions.tests.test_views
 
