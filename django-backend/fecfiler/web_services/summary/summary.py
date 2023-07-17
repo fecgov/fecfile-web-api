@@ -56,9 +56,7 @@ class SummaryService:
         report_year = report_date.year
 
         ytd_transactions = Transaction.objects.filter(
-            committee_account=committee,
-            date__year=report_year,
-            date__lte=report_date,
+            committee_account=committee, date__year=report_year, date__lte=report_date,
         )
 
         # build summary
@@ -75,11 +73,8 @@ class SummaryService:
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
-<<<<<<< HEAD
             line_29=self.get_line("SB29"),
-=======
             line_30b=self.get_line("SB30B"),
->>>>>>> develop
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
