@@ -36,12 +36,19 @@ class TransactionManager(SoftDeleteManager):
                 schedule=Case(
                     When(schedule_a__isnull=False, then=Schedule.A.value),
                     When(schedule_b__isnull=False, then=Schedule.B.value),
+                    When(schedule_c__isnull=False, then=Schedule.C.value),
+                    When(schedule_c1__isnull=False, then=Schedule.C1.value),
+                    When(schedule_c1__isnull=False, then=Schedule.C2.value),
                 ),
                 date=Coalesce(
-                    "schedule_a__contribution_date", "schedule_b__expenditure_date"
+                    "schedule_a__contribution_date",
+                    "schedule_b__expenditure_date",
+                    "schedule_c__loan_incurred_date",
                 ),
                 amount=Coalesce(
-                    "schedule_a__contribution_amount", "schedule_b__expenditure_amount"
+                    "schedule_a__contribution_amount",
+                    "schedule_b__expenditure_amount",
+                    "schedule_c__loan_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -68,6 +75,7 @@ class TransactionManager(SoftDeleteManager):
             .annotate(
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
+                    When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
                     default=F("_form_type"),
                     output_field=TextField(),
                 )

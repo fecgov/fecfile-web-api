@@ -2,9 +2,9 @@
 applications:
   - name: fecfile-web-services
     instances: 1
-    stack: cflinuxfs3
+    stack: cflinuxfs4
     buildpacks:
-      - https://github.com/cloudfoundry/python-buildpack.git
+      - python_buildpack
     memory: 1G
     no-route: true
     health-check-type: process

@@ -35,6 +35,7 @@ class SummaryService:
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
             line_29=self.get_line("SB29"),
+            line_30b=self.get_line("SB30B"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -45,6 +46,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
         return summary
 
@@ -73,7 +75,11 @@ class SummaryService:
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
+<<<<<<< HEAD
             line_29=self.get_line("SB29"),
+=======
+            line_30b=self.get_line("SB30B"),
+>>>>>>> develop
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -84,6 +90,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
 
         return summary
