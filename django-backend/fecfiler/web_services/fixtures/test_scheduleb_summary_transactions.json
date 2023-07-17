@@ -287,6 +287,16 @@
             "transaction_type_identifier": "REFUND_PAC_CONTRIBUTION"
         }
     },
+
+    {
+        "comment": "SB29 transaction to count",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "7927ac8e-2c42-4517-b2dd-6a4992aea20e",
+            "expenditure_amount": 201.50,
+            "expenditure_date": "2005-02-01"
+        }
+    },
     {
         "comment": "SB30B transaction to count",
         "model": "transactions.scheduleb",
@@ -294,6 +304,30 @@
             "id": "7f9ab4a5-d8bf-468b-aa67-0aec0f81cd19",
             "expenditure_amount": 102.25,
             "expenditure_date": "2005-02-01"
+        }
+    },
+    {
+        "comment": "SB29 transaction to count with SB29",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "2bee49fc-a330-4d81-a9bf-75577da31ede",
+            "schedule_b_id": "7927ac8e-2c42-4517-b2dd-6a4992aea20e",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "_form_type": "SB29",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "OTHER_DISBURSEMENT"
+        }
+    },
+    {
+        "comment": "SB29 transaction to count in column B",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "4da0a4c2-a93f-4e9a-b07b-d2217174b1bc",
+            "expenditure_amount": 1000.00,
+            "expenditure_date": "2005-01-01"
         }
     },
     {
@@ -321,6 +355,30 @@
         }
     },
     {
+        "comment": "SB29 transaction to count in column B",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "bf4607d1-c7c7-43bd-9cef-8d1348c39555",
+            "schedule_b_id": "4da0a4c2-a93f-4e9a-b07b-d2217174b1bc",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB29",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "OTHER_DISBURSEMENT"
+        }
+    },
+    {
+        "comment": "SB29 transaction to not count in column B",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "e4d32986-fec0-4059-aedf-0737c2e0cecf",
+            "expenditure_amount": 500.00,
+            "expenditure_date": "2005-03-01"
+        }
+    },
+    {
         "comment": "SB30B transaction to count in column B",
         "model": "transactions.transaction",
         "fields": {
@@ -342,6 +400,21 @@
             "id": "fd07efc0-c64e-4684-816f-4763c543bc0e",
             "expenditure_amount": 600.00,
             "expenditure_date": "2005-03-01"
+        }
+    },
+    {
+        "comment": "SB29 transaction to not count in column B",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "5eb52f7c-f06b-4b7d-80f1-d23e512ae9b4",
+            "schedule_b_id": "e4d32986-fec0-4059-aedf-0737c2e0cecf",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB29",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "OTHER_DISBURSEMENT"
         }
     },
     {

@@ -78,6 +78,9 @@ def calculate_summary(report_id):
     # line 28d
     report.L28d_total_contributions_refunds_period = a["line_28d"]
     report.L28d_total_contributions_refunds_ytd = b["line_28d"]
+    # line 29
+    report.L29_other_disbursements_period = a["line_29"]
+    report.L29_other_disbursements_ytd = b["line_29"]
     # line 30b
     report.L30b_nonallocable_fed_election_activity_period = a["line_30b"]
     report.L30b_nonallocable_fed_election_activity_ytd = b["line_30b"]
