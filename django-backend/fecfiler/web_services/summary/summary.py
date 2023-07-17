@@ -34,6 +34,7 @@ class SummaryService:
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
+            line_30b=self.get_line("SB30B"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -73,6 +74,7 @@ class SummaryService:
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
+            line_30b=self.get_line("SB30B"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (

@@ -1,5 +1,77 @@
 [
     {
+        "comment": "SB22 transaction before report dates; should count in Column B",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-220000000001",
+            "expenditure_amount": 100,
+            "expenditure_date": "2005-01-01"
+        }
+    },
+    {
+        "comment": "SB22 transaction before report dates; should count in Column B",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-220000000001",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000001",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB22",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
+        "comment": "SB22 transaction within report dates; should count in Column A",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-220000000002",
+            "expenditure_amount": 22,
+            "expenditure_date": "2005-02-01"
+        }
+    },
+    {
+        "comment": "SB22 transaction before report dates; should count in Column A",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-220000000002",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000002",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "_form_type": "SB22",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
+        "comment": "SB22 transaction after report dates; should not count",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-220000000003",
+            "expenditure_amount": 1000,
+            "expenditure_date": "2005-05-01"
+        }
+    },
+    {
+        "comment": "SB22 transaction after report dates; should not count",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-220000000003",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000003",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB22",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
         "comment": "SB28A transaction to count",
         "model": "transactions.scheduleb",
         "fields": {
@@ -216,75 +288,75 @@
         }
     },
     {
-        "comment": "SB22 transaction before report dates; should count in Column B",
+        "comment": "SB30B transaction to count",
         "model": "transactions.scheduleb",
         "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-220000000001",
-            "expenditure_amount": 100,
-            "expenditure_date": "2005-01-01"
-        }
-    },
-    {
-        "comment": "SB22 transaction before report dates; should count in Column B",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-220000000001",
-            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000001",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SB22",
-            "memo_code": false,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
-        }
-    },
-    {
-        "comment": "SB22 transaction within report dates; should count in Column A",
-        "model": "transactions.scheduleb",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-220000000002",
-            "expenditure_amount": 22,
+            "id": "7f9ab4a5-d8bf-468b-aa67-0aec0f81cd19",
+            "expenditure_amount": 102.25,
             "expenditure_date": "2005-02-01"
         }
     },
     {
-        "comment": "SB22 transaction before report dates; should count in Column A",
+        "comment": "SB30B transaction to count with SB30B",
         "model": "transactions.transaction",
         "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-220000000002",
-            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000002",
+            "id": "723a29a2-f82e-4b65-8579-27bce2e053ef",
+            "schedule_b_id": "7f9ab4a5-d8bf-468b-aa67-0aec0f81cd19",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SB22",
+            "_form_type": "SB30B",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+            "transaction_type_identifier": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT"
         }
     },
     {
-        "comment": "SB22 transaction after report dates; should not count",
+        "comment": "SB30B transaction to count in column B",
         "model": "transactions.scheduleb",
         "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-220000000003",
-            "expenditure_amount": 1000,
-            "expenditure_date": "2005-05-01"
+            "id": "f692c52e-5eb2-47f8-80e3-07cf84941890",
+            "expenditure_amount": 1000.00,
+            "expenditure_date": "2005-01-01"
         }
     },
     {
-        "comment": "SB22 transaction after report dates; should not count",
+        "comment": "SB30B transaction to count in column B",
         "model": "transactions.transaction",
         "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-220000000003",
-            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-220000000003",
+            "id": "4d90edac-0ed3-4b3d-8e1a-f709d9662aef",
+            "schedule_b_id": "f692c52e-5eb2-47f8-80e3-07cf84941890",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SB22",
+            "_form_type": "SB30B",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+            "transaction_type_identifier": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT"
+        }
+    },
+    {
+        "comment": "SB30B transaction to not count in column B",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "fd07efc0-c64e-4684-816f-4763c543bc0e",
+            "expenditure_amount": 600.00,
+            "expenditure_date": "2005-03-01"
+        }
+    },
+    {
+        "comment": "SB30B transaction to not count in column B",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "b7c59316-72b9-4653-8666-d45292be708e",
+            "schedule_b_id": "fd07efc0-c64e-4684-816f-4763c543bc0e",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB30B",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT"
         }
     }
 ]
