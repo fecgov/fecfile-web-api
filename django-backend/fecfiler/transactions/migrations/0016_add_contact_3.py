@@ -15,6 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transaction',
             name='contact_3',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_3_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='contact_3_transaction_set',
+                to='contacts.contact'
+            ),
         )
     ]
