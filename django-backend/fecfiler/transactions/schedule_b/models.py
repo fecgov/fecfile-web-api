@@ -90,6 +90,9 @@ class ScheduleB(models.Model):
             self.beneficiary_candidate_office = contact.candidate_office
             self.beneficiary_candidate_state = contact.candidate_state
             self.beneficiary_candidate_district = contact.candidate_district
+        if contact.id == transaction.contact_3_id:
+            self.beneficiary_committee_name = contact.name
+            self.beneficiary_committee_fec_id = contact.committee_id
         self.save()
 
     class Meta:
