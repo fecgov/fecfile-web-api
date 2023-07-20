@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('contacts', '0011_alter_contact_id'),
-        ('transactions', '0015_update_partnership_memo_to_partnership_attribution'),
+        ('transactions', '0016_update_schedulec_fields'),
     ]
 
     operations = [
