@@ -34,6 +34,7 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(summary["a"]["line_15"], summary["a"]["line_37"])
         self.assertEqual(summary["a"]["line_16"], Decimal("16.00"))
         self.assertEqual(summary["a"]["line_17"], Decimal("1000.00"))
+        self.assertEqual(summary["a"]["line_21b"], Decimal("150.00"))
         self.assertEqual(summary["a"]["line_22"], Decimal("22.00"))
         self.assertEqual(summary["a"]["line_28a"], Decimal("101.50"))
         self.assertEqual(summary["a"]["line_28b"], Decimal("201.50"))
@@ -41,6 +42,8 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(
             summary["a"]["line_28d"], round(Decimal(101.50 + 201.50 + 301.50), 2)
         )
+        self.assertEqual(summary["a"]["line_29"], Decimal("201.50"))
+        self.assertEqual(summary["a"]["line_30b"], Decimal("102.25"))
         self.assertEqual(
             summary["a"]["line_33"],
             round(Decimal(3.77 + 10000.23 + 444.44 + 555.55), 2),
@@ -49,9 +52,13 @@ class F3XSummaryTestCase(TestCase):
             summary["a"]["line_34"], round(Decimal(101.50 + 201.50 + 301.50), 2)
         )
         self.assertEqual(
-            summary["a"]["line_35"], round(Decimal(
-                (3.77 + 10000.23 + 444.44 + 555.55) - (101.50 + 201.50 + 301.50)
-            ), 2)
+            summary["a"]["line_35"],
+            round(
+                Decimal(
+                    (3.77 + 10000.23 + 444.44 + 555.55) - (101.50 + 201.50 + 301.50)
+                ),
+                2,
+            ),
         )
 
     def test_calculate_summary_column_b(self):
@@ -75,12 +82,15 @@ class F3XSummaryTestCase(TestCase):
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
         self.assertEqual(summary["b"]["line_16"], Decimal("116.00"))
         self.assertEqual(summary["b"]["line_17"], Decimal("1100.00"))
+        self.assertEqual(summary["b"]["line_21b"], Decimal("250.00"))
         self.assertEqual(summary["b"]["line_28a"], Decimal("1101.50"))
         self.assertEqual(summary["b"]["line_28b"], Decimal("2201.50"))
         self.assertEqual(summary["b"]["line_28c"], Decimal("3301.50"))
         self.assertEqual(
             summary["b"]["line_28d"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
         )
+        self.assertEqual(summary["b"]["line_29"], Decimal("1201.50"))
+        self.assertEqual(summary["b"]["line_30b"], Decimal("1102.25"))
         self.assertEqual(
             summary["b"]["line_33"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
         )
@@ -88,9 +98,10 @@ class F3XSummaryTestCase(TestCase):
             summary["b"]["line_34"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
         )
         self.assertEqual(
-            summary["b"]["line_35"], round(Decimal(
-                (10104.00 + 544.44 + 655.55) - (1101.50 + 2201.50 + 3301.50)
-            ), 2)
+            summary["b"]["line_35"],
+            round(
+                Decimal((10104.00 + 544.44 + 655.55) - (1101.50 + 2201.50 + 3301.50)), 2
+            ),
         )
 
     def test_report_with_no_transactions(self):
