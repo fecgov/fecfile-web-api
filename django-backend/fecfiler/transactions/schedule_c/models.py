@@ -72,7 +72,7 @@ class ScheduleC(models.Model):
             self.lender_zip = contact.zip
             self.lender_employer = contact.employer
             self.lender_occupation = contact.occupation
-            self.lender_committee_fec_id = contact.committee_id
+            self.lender_committee_id_number = contact.committee_id
 
         if contact.id == transaction.contact_2_id:
             self.lender_candidate_first_name = contact.first_name
