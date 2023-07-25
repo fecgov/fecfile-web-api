@@ -1,11 +1,11 @@
 from unittest import mock
 
 from django.test import RequestFactory, TestCase
+from rest_framework.test import force_authenticate
 
 from ..authentication.models import Account
-from .views import ContactViewSet, DeletedContactsViewSet
 from .models import Contact
-from rest_framework.test import force_authenticate
+from .views import ContactViewSet, DeletedContactsViewSet
 
 
 def mocked_requests_get_candidates(*args, **kwargs):
@@ -178,6 +178,26 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
+
+    def test_fec_id_is_unique_no_fec_id(self):
+        request = self.factory.get("/api/v1/contacts/fec_id_is_unique")
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "fec_id_is_unique"})(request)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_fec_id_is_unique_happy_path(self):
+        request = self.factory.get(
+            "/api/v1/contacts/fec_id_is_unique?fec_id=test_fec_id"
+            "&contact_id=a5061946-93ef-47f4-82f6-f1782c333d70"
+        )
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "fec_id_is_unique"})(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data)
 
     def test_restore_no_match(self):
         request = self.factory.post(
