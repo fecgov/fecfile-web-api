@@ -78,7 +78,6 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
 
-
     class Meta(TransactionSerializerBase.Meta):
         fields = TransactionSerializerBase.Meta.get_fields() + [
             f.name
