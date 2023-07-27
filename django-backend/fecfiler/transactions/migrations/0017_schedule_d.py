@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='ScheduleD',
             fields=[
                 (
-                    'id', 
+                    'id',
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
