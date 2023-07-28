@@ -1,0 +1,57 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "transaction_id": {},
+    "receipt_line_number": {
+        "path": "schedule_d.receipt_line_number"
+    },
+    "entity_type": {},
+    "creditor_organization_name": {
+        "path": "schedule_d.creditor_organization_name"
+    },
+    "creditor_last_name": {
+        "path": "schedule_d.creditor_last_name"
+    },
+    "creditor_first_name": {
+        "path": "schedule_d.creditor_first_name"
+    },
+    "creditor_middle_name": {
+        "path": "schedule_d.creditor_middle_name"
+    },
+    "creditor_prefix": {
+        "path": "schedule_d.creditor_prefix"
+    },
+    "creditor_suffix": {
+        "path": "schedule_d.creditor_suffix"
+    },
+    "creditor_street_1": {
+        "path": "schedule_d.creditor_street_1"
+    },
+    "creditor_street_2": {
+        "path": "schedule_d.creditor_street_2"
+    },
+    "creditor_city": {
+        "path": "schedule_d.creditor_city"
+    },
+    "creditor_state": {
+        "path": "schedule_d.creditor_state"
+    },
+    "creditor_zip": {
+        "path": "schedule_d.creditor_zip"
+    },
+    "purpose_of_debt_or_obligation": {
+        "path": "schedule_d.purpose_of_debt_or_obligation"
+    },
+    "beginning_balance": {
+        "path": "schedule_d.beginning_balance"
+    },
+    "incurred_amount": {
+        "path": "schedule_d.incurred_amount"
+    },
+    "payment_amount": {
+        "path": "schedule_d.payment_amount"
+    },
+    "balance_at_close": {
+        "path": "schedule_d.balance_at_close"
+    }
+}
