@@ -10,6 +10,7 @@ from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
+from fecfiler.transactions.schedule_d.models import ScheduleD
 import uuid
 import logging
 
@@ -87,6 +88,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     schedule_c2 = models.ForeignKey(
         ScheduleC2, on_delete=models.CASCADE, null=True, blank=True
     )
+    schedule_d = models.ForeignKey(
+        ScheduleD, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     objects = TransactionManager()
 
@@ -101,6 +105,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             "schedule_c": Schedule.C,
             "schedule_c1": Schedule.C1,
             "schedule_c2": Schedule.C2,
+            "schedule_d": Schedule.D
         }
         for schedule_key in schedule_map:
             if getattr(self, schedule_key, None):
@@ -114,6 +119,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             "schedule_c",
             "schedule_c1",
             "schedule_c2",
+            "schedule_d"
         ]:
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)

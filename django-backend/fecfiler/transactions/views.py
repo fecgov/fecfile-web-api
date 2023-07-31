@@ -23,6 +23,9 @@ from fecfiler.transactions.schedule_c1.serializers import (
 from fecfiler.transactions.schedule_c2.serializers import (
     ScheduleC2TransactionSerializer,
 )
+from fecfiler.transactions.schedule_d.serializers import (
+    ScheduleDTransactionSerializer
+)
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +48,7 @@ def save_transaction_pair(request):
         C=ScheduleCTransactionSerializer,
         C1=ScheduleC1TransactionSerializer,
         C2=ScheduleC2TransactionSerializer,
+        D=ScheduleDTransactionSerializer
     )
 
     serializer_1 = serializers.get(schedule_1_data.get("schedule_id"))
