@@ -104,7 +104,8 @@ def get_schema_name(schedule):
         Schedule.B.value.value: "SchB",
         Schedule.C.value.value: "SchC",
         Schedule.C1.value.value: "SchC1",
-        Schedule.C2.value.value: "SchC2"
+        Schedule.C2.value.value: "SchC2",
+        Schedule.D.value.value: "SchD"
     }.get(schedule)
 
 
