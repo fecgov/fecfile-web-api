@@ -88,6 +88,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.schedule_c2
       ~Transaction.schedule_c2_id
       ~Transaction.schedule_c_id
+      ~Transaction.schedule_d
+      ~Transaction.schedule_d_id
       ~Transaction.transaction_id
       ~Transaction.transaction_set
       ~Transaction.transaction_type_identifier

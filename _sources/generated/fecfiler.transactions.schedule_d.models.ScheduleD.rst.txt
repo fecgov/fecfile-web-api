@@ -1,0 +1,74 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_d.models.ScheduleD
+==================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_d.models
+
+.. autoclass:: ScheduleD
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleD.__init__
+      ~ScheduleD.check
+      ~ScheduleD.clean
+      ~ScheduleD.clean_fields
+      ~ScheduleD.date_error_message
+      ~ScheduleD.delete
+      ~ScheduleD.from_db
+      ~ScheduleD.full_clean
+      ~ScheduleD.get_constraints
+      ~ScheduleD.get_date
+      ~ScheduleD.get_deferred_fields
+      ~ScheduleD.get_transaction
+      ~ScheduleD.prepare_database_save
+      ~ScheduleD.refresh_from_db
+      ~ScheduleD.save
+      ~ScheduleD.save_base
+      ~ScheduleD.serializable_value
+      ~ScheduleD.unique_error_message
+      ~ScheduleD.update_with_contact
+      ~ScheduleD.validate_constraints
+      ~ScheduleD.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleD.balance_at_close
+      ~ScheduleD.beginning_balance
+      ~ScheduleD.creditor_city
+      ~ScheduleD.creditor_first_name
+      ~ScheduleD.creditor_last_name
+      ~ScheduleD.creditor_middle_name
+      ~ScheduleD.creditor_organization_name
+      ~ScheduleD.creditor_prefix
+      ~ScheduleD.creditor_state
+      ~ScheduleD.creditor_street_1
+      ~ScheduleD.creditor_street_2
+      ~ScheduleD.creditor_suffix
+      ~ScheduleD.creditor_zip
+      ~ScheduleD.id
+      ~ScheduleD.incurred_amount
+      ~ScheduleD.objects
+      ~ScheduleD.payment_amount
+      ~ScheduleD.pk
+      ~ScheduleD.purpose_of_debt_or_obligation
+      ~ScheduleD.receipt_line_number
+      ~ScheduleD.transaction_set
+   
+   

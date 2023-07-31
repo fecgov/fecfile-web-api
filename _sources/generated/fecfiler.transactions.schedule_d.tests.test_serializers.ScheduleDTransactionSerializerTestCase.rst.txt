@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_d.tests.test\_serializers.ScheduleDTransactionSerializerTestCase
+================================================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_d.tests.test_serializers
+
+.. autoclass:: ScheduleDTransactionSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleDTransactionSerializerTestCase.__init__
+      ~ScheduleDTransactionSerializerTestCase.addClassCleanup
+      ~ScheduleDTransactionSerializerTestCase.addCleanup
+      ~ScheduleDTransactionSerializerTestCase.addTypeEqualityFunc
+      ~ScheduleDTransactionSerializerTestCase.assertAlmostEqual
+      ~ScheduleDTransactionSerializerTestCase.assertAlmostEquals
+      ~ScheduleDTransactionSerializerTestCase.assertContains
+      ~ScheduleDTransactionSerializerTestCase.assertCountEqual
+      ~ScheduleDTransactionSerializerTestCase.assertDictContainsSubset
+      ~ScheduleDTransactionSerializerTestCase.assertDictEqual
+      ~ScheduleDTransactionSerializerTestCase.assertEqual
+      ~ScheduleDTransactionSerializerTestCase.assertEquals
+      ~ScheduleDTransactionSerializerTestCase.assertFalse
+      ~ScheduleDTransactionSerializerTestCase.assertFieldOutput
+      ~ScheduleDTransactionSerializerTestCase.assertFormError
+      ~ScheduleDTransactionSerializerTestCase.assertFormsetError
+      ~ScheduleDTransactionSerializerTestCase.assertGreater
+      ~ScheduleDTransactionSerializerTestCase.assertGreaterEqual
+      ~ScheduleDTransactionSerializerTestCase.assertHTMLEqual
+      ~ScheduleDTransactionSerializerTestCase.assertHTMLNotEqual
+      ~ScheduleDTransactionSerializerTestCase.assertIn
+      ~ScheduleDTransactionSerializerTestCase.assertInHTML
+      ~ScheduleDTransactionSerializerTestCase.assertIs
+      ~ScheduleDTransactionSerializerTestCase.assertIsInstance
+      ~ScheduleDTransactionSerializerTestCase.assertIsNone
+      ~ScheduleDTransactionSerializerTestCase.assertIsNot
+      ~ScheduleDTransactionSerializerTestCase.assertIsNotNone
+      ~ScheduleDTransactionSerializerTestCase.assertJSONEqual
+      ~ScheduleDTransactionSerializerTestCase.assertJSONNotEqual
+      ~ScheduleDTransactionSerializerTestCase.assertLess
+      ~ScheduleDTransactionSerializerTestCase.assertLessEqual
+      ~ScheduleDTransactionSerializerTestCase.assertListEqual
+      ~ScheduleDTransactionSerializerTestCase.assertLogs
+      ~ScheduleDTransactionSerializerTestCase.assertMultiLineEqual
+      ~ScheduleDTransactionSerializerTestCase.assertNoLogs
+      ~ScheduleDTransactionSerializerTestCase.assertNotAlmostEqual
+      ~ScheduleDTransactionSerializerTestCase.assertNotAlmostEquals
+      ~ScheduleDTransactionSerializerTestCase.assertNotContains
+      ~ScheduleDTransactionSerializerTestCase.assertNotEqual
+      ~ScheduleDTransactionSerializerTestCase.assertNotEquals
+      ~ScheduleDTransactionSerializerTestCase.assertNotIn
+      ~ScheduleDTransactionSerializerTestCase.assertNotIsInstance
+      ~ScheduleDTransactionSerializerTestCase.assertNotRegex
+      ~ScheduleDTransactionSerializerTestCase.assertNotRegexpMatches
+      ~ScheduleDTransactionSerializerTestCase.assertNumQueries
+      ~ScheduleDTransactionSerializerTestCase.assertQuerysetEqual
+      ~ScheduleDTransactionSerializerTestCase.assertRaises
+      ~ScheduleDTransactionSerializerTestCase.assertRaisesMessage
+      ~ScheduleDTransactionSerializerTestCase.assertRaisesRegex
+      ~ScheduleDTransactionSerializerTestCase.assertRaisesRegexp
+      ~ScheduleDTransactionSerializerTestCase.assertRedirects
+      ~ScheduleDTransactionSerializerTestCase.assertRegex
+      ~ScheduleDTransactionSerializerTestCase.assertRegexpMatches
+      ~ScheduleDTransactionSerializerTestCase.assertSequenceEqual
+      ~ScheduleDTransactionSerializerTestCase.assertSetEqual
+      ~ScheduleDTransactionSerializerTestCase.assertTemplateNotUsed
+      ~ScheduleDTransactionSerializerTestCase.assertTemplateUsed
+      ~ScheduleDTransactionSerializerTestCase.assertTrue
+      ~ScheduleDTransactionSerializerTestCase.assertTupleEqual
+      ~ScheduleDTransactionSerializerTestCase.assertURLEqual
+      ~ScheduleDTransactionSerializerTestCase.assertWarns
+      ~ScheduleDTransactionSerializerTestCase.assertWarnsMessage
+      ~ScheduleDTransactionSerializerTestCase.assertWarnsRegex
+      ~ScheduleDTransactionSerializerTestCase.assertXMLEqual
+      ~ScheduleDTransactionSerializerTestCase.assertXMLNotEqual
+      ~ScheduleDTransactionSerializerTestCase.assert_
+      ~ScheduleDTransactionSerializerTestCase.captureOnCommitCallbacks
+      ~ScheduleDTransactionSerializerTestCase.countTestCases
+      ~ScheduleDTransactionSerializerTestCase.debug
+      ~ScheduleDTransactionSerializerTestCase.defaultTestResult
+      ~ScheduleDTransactionSerializerTestCase.doClassCleanups
+      ~ScheduleDTransactionSerializerTestCase.doCleanups
+      ~ScheduleDTransactionSerializerTestCase.fail
+      ~ScheduleDTransactionSerializerTestCase.failIf
+      ~ScheduleDTransactionSerializerTestCase.failIfAlmostEqual
+      ~ScheduleDTransactionSerializerTestCase.failIfEqual
+      ~ScheduleDTransactionSerializerTestCase.failUnless
+      ~ScheduleDTransactionSerializerTestCase.failUnlessAlmostEqual
+      ~ScheduleDTransactionSerializerTestCase.failUnlessEqual
+      ~ScheduleDTransactionSerializerTestCase.failUnlessRaises
+      ~ScheduleDTransactionSerializerTestCase.id
+      ~ScheduleDTransactionSerializerTestCase.modify_settings
+      ~ScheduleDTransactionSerializerTestCase.run
+      ~ScheduleDTransactionSerializerTestCase.setUp
+      ~ScheduleDTransactionSerializerTestCase.setUpClass
+      ~ScheduleDTransactionSerializerTestCase.setUpTestData
+      ~ScheduleDTransactionSerializerTestCase.settings
+      ~ScheduleDTransactionSerializerTestCase.shortDescription
+      ~ScheduleDTransactionSerializerTestCase.skipTest
+      ~ScheduleDTransactionSerializerTestCase.subTest
+      ~ScheduleDTransactionSerializerTestCase.tearDown
+      ~ScheduleDTransactionSerializerTestCase.tearDownClass
+      ~ScheduleDTransactionSerializerTestCase.test_no_creditor_first_name
+      ~ScheduleDTransactionSerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleDTransactionSerializerTestCase.available_apps
+      ~ScheduleDTransactionSerializerTestCase.databases
+      ~ScheduleDTransactionSerializerTestCase.fixtures
+      ~ScheduleDTransactionSerializerTestCase.longMessage
+      ~ScheduleDTransactionSerializerTestCase.maxDiff
+      ~ScheduleDTransactionSerializerTestCase.reset_sequences
+      ~ScheduleDTransactionSerializerTestCase.serialized_rollback
+   
+   
