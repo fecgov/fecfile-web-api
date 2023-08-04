@@ -29,7 +29,6 @@ but are called different names"""
 
 class TransactionManager(SoftDeleteManager):
     def get_queryset(self):
-
         queryset = (
             super()
             .get_queryset()
@@ -37,12 +36,19 @@ class TransactionManager(SoftDeleteManager):
                 schedule=Case(
                     When(schedule_a__isnull=False, then=Schedule.A.value),
                     When(schedule_b__isnull=False, then=Schedule.B.value),
+                    When(schedule_c__isnull=False, then=Schedule.C.value),
+                    When(schedule_c1__isnull=False, then=Schedule.C1.value),
+                    When(schedule_c1__isnull=False, then=Schedule.C2.value),
                 ),
                 date=Coalesce(
-                    "schedule_a__contribution_date", "schedule_b__expenditure_date",
+                    "schedule_a__contribution_date",
+                    "schedule_b__expenditure_date",
+                    "schedule_c__loan_incurred_date",
                 ),
                 amount=Coalesce(
-                    "schedule_a__contribution_amount", "schedule_b__expenditure_amount",
+                    "schedule_a__contribution_amount",
+                    "schedule_b__expenditure_amount",
+                    "schedule_c__loan_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -51,7 +57,7 @@ class TransactionManager(SoftDeleteManager):
         contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
-            date=OuterRef("date"), created__lte=OuterRef("created"),
+            date=OuterRef("date"), created__lte=OuterRef("created")
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
 
@@ -65,6 +71,14 @@ class TransactionManager(SoftDeleteManager):
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
                 itemized=self.get_itemization_clause(),
+            )
+            .annotate(
+                form_type=Case(
+                    When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
+                    When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
+                    default=F("_form_type"),
+                    output_field=TextField(),
+                )
             )
             .alias(
                 order_key=Case(
@@ -81,16 +95,16 @@ class TransactionManager(SoftDeleteManager):
                                     then=Schedule.B.value,
                                 ),
                             ),
-                            "parent_transaction__form_type",
+                            "parent_transaction___form_type",
                             "parent_transaction__created",
                             "schedule",
-                            "form_type",
+                            "_form_type",
                             "created",
                             output_field=TextField(),
                         ),
                     ),
                     default=Concat(
-                        "schedule", "form_type", "created", output_field=TextField(),
+                        "schedule", "_form_type", "created", output_field=TextField()
                     ),
                     output_field=TextField(),
                 ),

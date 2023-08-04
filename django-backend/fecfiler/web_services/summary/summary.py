@@ -30,10 +30,13 @@ class SummaryService:
             line_15=self.get_line("SA15"),
             line_16=self.get_line("SA16"),
             line_17=self.get_line("SA17"),
+            line_21b=self.get_line("SB21B"),
             line_22=self.get_line("SB22"),
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
+            line_29=self.get_line("SB29"),
+            line_30b=self.get_line("SB30B"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -44,6 +47,7 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
         return summary
 
@@ -53,9 +57,7 @@ class SummaryService:
         report_year = report_date.year
 
         ytd_transactions = Transaction.objects.filter(
-            committee_account=committee,
-            date__year=report_year,
-            date__lte=report_date,
+            committee_account=committee, date__year=report_year, date__lte=report_date,
         )
 
         # build summary
@@ -68,10 +70,13 @@ class SummaryService:
             line_15=self.get_line("SA15"),
             line_16=self.get_line("SA16"),
             line_17=self.get_line("SA17"),
+            line_21b=self.get_line("SB21B"),
             line_22=self.get_line("SB22"),
             line_28a=self.get_line("SB28A"),
             line_28b=self.get_line("SB28B"),
             line_28c=self.get_line("SB28C"),
+            line_29=self.get_line("SB29"),
+            line_30b=self.get_line("SB30B"),
         )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
@@ -82,14 +87,15 @@ class SummaryService:
         )
         summary["line_33"] = summary["line_11d"]
         summary["line_34"] = summary["line_28d"]
+        summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
 
         return summary
 
     def get_line(self, form_type, itemized=None):
         query = (
-            Q(~Q(memo_code=True), itemized=itemized, form_type=form_type)
+            Q(~Q(memo_code=True), itemized=itemized, _form_type=form_type)
             if itemized is not None
-            else Q(~Q(memo_code=True), form_type=form_type)
+            else Q(~Q(memo_code=True), _form_type=form_type)
         )
         return Coalesce(Sum("amount", filter=query), Decimal(0.0))

@@ -91,10 +91,10 @@ class TransactionSerializerBase(
 
     id = UUIDField(required=False)
     parent_transaction_id = UUIDField(required=False, allow_null=True)
-    use_parent_contact = BooleanField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
+    form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -150,10 +150,16 @@ class TransactionSerializerBase(
             for property in schedule_c2:
                 if not representation.get(property):
                     representation[property] = schedule_c2[property]
+
+        representation["form_type"] = instance.form_type
+
         return representation
 
     def to_internal_value(self, data):
-        return super().to_internal_value(data)
+        internal_value = super().to_internal_value(data)
+        if internal_value.get("form_type"):
+            internal_value["_form_type"] = internal_value["form_type"]
+        return internal_value
 
     def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
@@ -189,11 +195,11 @@ class TransactionSerializerBase(
                 if f.name not in ["deleted", "transaction", "parent_transaction"]
             ] + [
                 "parent_transaction_id",
-                "use_parent_contact",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
                 "memo_text_id",
+                "form_type",
                 "itemized",
                 "fields_to_validate",
                 "schema_name",

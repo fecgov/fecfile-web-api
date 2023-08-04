@@ -63,6 +63,9 @@ def calculate_summary(report_id):
     # line 17
     report.L17_other_federal_receipts_dividends_period = a["line_17"]
     report.L17_other_federal_receipts_dividends_ytd = b["line_17"]
+    # line 21b
+    report.L21b_other_federal_operating_expenditures_period = a["line_21b"]
+    report.L21b_other_federal_operating_expenditures_ytd = b["line_21b"]
     # line 22
     report.L22_transfers_to_affiliated_other_party_cmtes_period = a["line_22"]
     report.L22_transfers_to_affiliated_other_party_cmtes_ytd = b["line_22"]
@@ -78,12 +81,21 @@ def calculate_summary(report_id):
     # line 28d
     report.L28d_total_contributions_refunds_period = a["line_28d"]
     report.L28d_total_contributions_refunds_ytd = b["line_28d"]
+    # line 29
+    report.L29_other_disbursements_period = a["line_29"]
+    report.L29_other_disbursements_ytd = b["line_29"]
+    # line 30b
+    report.L30b_nonallocable_fed_election_activity_period = a["line_30b"]
+    report.L30b_nonallocable_fed_election_activity_ytd = b["line_30b"]
     # line 33
     report.L33_total_contributions_period = a["line_33"]
     report.L33_total_contributions_ytd = b["line_33"]
     # line 34
     report.L34_total_contribution_refunds_period = a["line_34"]
     report.L34_total_contribution_refunds_ytd = b["line_34"]
+    # line 35
+    report.L35_net_contributions_period = a["line_35"]
+    report.L35_net_contributions_ytd = b["line_35"]
     # line 37
     report.L37_offsets_to_operating_expenditures_period = a["line_37"]
     report.L37_offsets_to_operating_expenditures_ytd = b["line_37"]

@@ -27,15 +27,15 @@ class ScheduleC(models.Model):
     loan_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    loan_payment_to_date = models.TextField(null=True, blank=True)
+    loan_payment_to_date = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     loan_balance = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
     loan_incurred_date = models.DateField(null=True, blank=True)
-    loan_due_date = models.DateField(null=True, blank=True)
-    loan_interest_rate = models.DecimalField(
-        null=True, blank=True, max_digits=14, decimal_places=14
-    )
+    loan_due_date = models.TextField(null=True, blank=True)
+    loan_interest_rate = models.TextField(null=True, blank=True)
     secured = models.BooleanField(null=True, blank=True, default=False)
     personal_funds = models.BooleanField(null=True, blank=True, default=False)
     lender_committee_id_number = models.TextField(null=True, blank=True)
@@ -72,7 +72,7 @@ class ScheduleC(models.Model):
             self.lender_zip = contact.zip
             self.lender_employer = contact.employer
             self.lender_occupation = contact.occupation
-            self.lender_committee_fec_id = contact.committee_id
+            self.lender_committee_id_number = contact.committee_id
 
         if contact.id == transaction.contact_2_id:
             self.lender_candidate_first_name = contact.first_name

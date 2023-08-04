@@ -31,9 +31,24 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         "self", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    form_type = models.TextField(null=True, blank=True)
+    # The _form_type value in the db may or may not be correct based on whether
+    # the transaction is itemized or not. For some transactions, the form_type
+    # value depends on its itemization status (e.g. SA11AI/SA11AII). The
+    # db _form_type value for these transactions holds the "is itemized" line
+    # number which is then dynamically updated to its true value in the manager
+    # query in a Just-In-Time fashion.
+    _form_type = models.TextField(null=True, blank=True)
+
+    @property
+    def form_type(self):
+        return self._form_type
+
+    @form_type.setter
+    def form_type(self, value):
+        self._form_type = value
+
     transaction_id = models.TextField(
-        null=False, blank=False, unique=True, default=generate_fec_uid,
+        null=False, blank=False, unique=True, default=generate_fec_uid
     )
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
@@ -117,4 +132,4 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         super(Transaction, self).save(*args, **kwargs)
 
     class Meta:
-        indexes = [models.Index(fields=["form_type"])]
+        indexes = [models.Index(fields=["_form_type"])]
