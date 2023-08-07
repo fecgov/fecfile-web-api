@@ -15,7 +15,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ScheduleE',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
+                (
+                    'id',
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True
+                    )
+                ),
                 ('payee_organization_name', models.TextField(blank=True, null=True)),
                 ('payee_last_name', models.TextField(blank=True, null=True)),
                 ('payee_first_name', models.TextField(blank=True, null=True)),
@@ -28,11 +37,30 @@ class Migration(migrations.Migration):
                 ('payee_state', models.TextField(blank=True, null=True)),
                 ('payee_zip', models.TextField(blank=True, null=True)),
                 ('election_code', models.TextField(blank=True, null=True)),
-                ('election_other_description', models.TextField(blank=True, null=True)),
+                (
+                    'election_other_description',
+                    models.TextField(blank=True, null=True)
+                ),
                 ('dissemination_date', models.DateField(blank=True, null=True)),
-                ('expenditure_amount', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
+                (
+                    'expenditure_amount',
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=11,
+                        null=True
+                    )
+                ),
                 ('disbursement_date', models.DateField(blank=True, null=True)),
-                ('calendar_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
+                (
+                    'calendar_ytd',
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        max_digits=11,
+                        null=True
+                    )
+                ),
                 ('expenditure_purpose_descrip', models.TextField(blank=True, null=True)),
                 ('category_code', models.TextField(blank=True, null=True)),
                 ('payee_cmtte_fec_id_number', models.TextField(blank=True, null=True)),
@@ -58,6 +86,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transaction',
             name='schedule_e',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='transactions.schedulee'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE, to='transactions.schedulee'
+            ),
         ),
     ]
