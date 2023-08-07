@@ -40,6 +40,7 @@ class TransactionManager(SoftDeleteManager):
                     When(schedule_c1__isnull=False, then=Schedule.C1.value),
                     When(schedule_c1__isnull=False, then=Schedule.C2.value),
                     When(schedule_d__isnull=False, then=Schedule.D.value),
+                    When(schedule_e__isnull=False, then=Schedule.E.value)
                 ),
                 date=Coalesce(
                     "schedule_a__contribution_date",
@@ -146,3 +147,4 @@ class Schedule(Enum):
     C2 = Value("C1")
     C1 = Value("C2")
     D = Value("D")
+    E = Value("E")
