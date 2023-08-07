@@ -28,6 +28,7 @@ fecfiler.transactions.serializers
       ScheduleC2Serializer
       ScheduleCSerializer
       ScheduleDSerializer
+      ScheduleESerializer
       TransactionSerializerBase
    
    

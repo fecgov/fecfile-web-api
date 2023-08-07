@@ -1,0 +1,94 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_e.models.ScheduleE
+==================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_e.models
+
+.. autoclass:: ScheduleE
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleE.__init__
+      ~ScheduleE.check
+      ~ScheduleE.clean
+      ~ScheduleE.clean_fields
+      ~ScheduleE.date_error_message
+      ~ScheduleE.delete
+      ~ScheduleE.from_db
+      ~ScheduleE.full_clean
+      ~ScheduleE.get_constraints
+      ~ScheduleE.get_date
+      ~ScheduleE.get_deferred_fields
+      ~ScheduleE.get_transaction
+      ~ScheduleE.prepare_database_save
+      ~ScheduleE.refresh_from_db
+      ~ScheduleE.save
+      ~ScheduleE.save_base
+      ~ScheduleE.serializable_value
+      ~ScheduleE.unique_error_message
+      ~ScheduleE.update_with_contact
+      ~ScheduleE.validate_constraints
+      ~ScheduleE.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleE.calendar_ytd
+      ~ScheduleE.category_code
+      ~ScheduleE.completing_first_name
+      ~ScheduleE.completing_last_name
+      ~ScheduleE.completing_middle_name
+      ~ScheduleE.completing_prefix
+      ~ScheduleE.completing_suffix
+      ~ScheduleE.date_signed
+      ~ScheduleE.disbursement_date
+      ~ScheduleE.dissemination_date
+      ~ScheduleE.election_code
+      ~ScheduleE.election_other_description
+      ~ScheduleE.expenditure_amount
+      ~ScheduleE.expenditure_purpose_descrip
+      ~ScheduleE.id
+      ~ScheduleE.memo_text_description
+      ~ScheduleE.objects
+      ~ScheduleE.payee_city
+      ~ScheduleE.payee_cmtte_fec_id_number
+      ~ScheduleE.payee_first_name
+      ~ScheduleE.payee_last_name
+      ~ScheduleE.payee_middle_name
+      ~ScheduleE.payee_organization_name
+      ~ScheduleE.payee_prefix
+      ~ScheduleE.payee_state
+      ~ScheduleE.payee_street_1
+      ~ScheduleE.payee_street_2
+      ~ScheduleE.payee_suffix
+      ~ScheduleE.payee_zip
+      ~ScheduleE.pk
+      ~ScheduleE.so_candidate_district
+      ~ScheduleE.so_candidate_first_name
+      ~ScheduleE.so_candidate_id_number
+      ~ScheduleE.so_candidate_last_name
+      ~ScheduleE.so_candidate_office
+      ~ScheduleE.so_candidate_prefix
+      ~ScheduleE.so_candidate_state
+      ~ScheduleE.so_candidate_suffix
+      ~ScheduleE.so_candinate_middle_name
+      ~ScheduleE.support_oppose_code
+      ~ScheduleE.transaction_set
+   
+   
