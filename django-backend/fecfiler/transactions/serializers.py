@@ -90,6 +90,7 @@ class ScheduleDSerializer(ModelSerializer):
             if f.name not in ["deleted", "transaction"]
         ]
 
+
 class ScheduleESerializer(ModelSerializer):
     class Meta:
         fields = [
