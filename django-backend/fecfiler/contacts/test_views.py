@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.test import RequestFactory, TestCase
 from rest_framework.test import force_authenticate
+import uuid
 
 from ..authentication.models import Account
 from .models import Contact
@@ -131,7 +132,37 @@ class ContactViewSetTest(TestCase):
                 {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
                 {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
             ],
-            "fecfile_committees": [],
+            "fecfile_committees": [
+                {
+                    "deleted": None,
+                    "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+                    "id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
+                    "type": "COM",
+                    "candidate_id": None,
+                    "committee_id": "test_fec_id",
+                    "name": "test name contains TestComName1",
+                    "last_name": None,
+                    "first_name": None,
+                    "middle_name": None,
+                    "prefix": None,
+                    "suffix": None,
+                    "street_1": "Street",
+                    "street_2": None,
+                    "city": "City",
+                    "state": "State",
+                    "zip": "12345678",
+                    "employer": None,
+                    "occupation": None,
+                    "candidate_office": None,
+                    "candidate_state": None,
+                    "candidate_district": None,
+                    "telephone": None,
+                    "country": "Country",
+                    "created": "2022-02-09T00:00:00Z",
+                    "updated": "2022-02-09T00:00:00Z",
+                    "transaction_count": 0,
+                }
+            ],
         }
 
         self.assertEqual(response.status_code, 200)
@@ -179,25 +210,37 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
-    def test_fec_id_is_unique_no_fec_id(self):
-        request = self.factory.get("/api/v1/contacts/fec_id_is_unique")
+    def test_get_contact_id_no_fec_id(self):
+        request = self.factory.get("/api/v1/contacts/get_contact_id/")
         request.user = self.user
 
-        response = ContactViewSet.as_view({"get": "fec_id_is_unique"})(request)
+        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
 
         self.assertEqual(response.status_code, 400)
 
-    def test_fec_id_is_unique_happy_path(self):
+    def test_get_contact_id_finds_contact(self):
         request = self.factory.get(
-            "/api/v1/contacts/fec_id_is_unique?fec_id=test_fec_id"
-            "&contact_id=a5061946-93ef-47f4-82f6-f1782c333d70"
+            "/api/v1/contacts/get_contact_id/?fec_id=test_fec_id"
         )
         request.user = self.user
 
-        response = ContactViewSet.as_view({"get": "fec_id_is_unique"})(request)
+        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.data)
+        self.assertEqual(
+            response.data, uuid.UUID("a03a141a-d2df-402c-93c6-e705ec6007f3")
+        )
+
+    def test_get_contact_id_no_match(self):
+        request = self.factory.get(
+            "/api/v1/contacts/get_contact_id/?fec_id=id_that_doesnt_exist"
+        )
+        request.user = self.user
+
+        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, "")
 
     def test_restore_no_match(self):
         request = self.factory.post(

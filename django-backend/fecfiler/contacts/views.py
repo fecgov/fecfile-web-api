@@ -201,19 +201,16 @@ class ContactViewSet(CommitteeOwnedViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
-    def fec_id_is_unique(self, request):
+    def get_contact_id(self, request):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:
             return HttpResponseBadRequest()
-        contact_id = request.GET.get("contact_id")
-
-        qs = self.get_queryset().filter(Q(candidate_id=fec_id) | Q(committee_id=fec_id))
-        if contact_id:
-            qs = qs.filter(~Q(id=contact_id))
-        matches = (
-            qs.count()
+        match = (
+            self.get_queryset()
+            .filter(Q(candidate_id=fec_id) | Q(committee_id=fec_id))
+            .first()
         )
-        return Response(matches == 0)
+        return Response(match.id if match else "")
 
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
