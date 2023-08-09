@@ -3,7 +3,7 @@ from django.test.client import RequestFactory
 from fecfiler.authentication.models import Account
 import json
 
-from fecfiler.transactions.views import save_transaction_pair
+from fecfiler.transactions.views import save_transaction
 
 
 class TransactionViewsTestCase(TestCase):
@@ -22,13 +22,13 @@ class TransactionViewsTestCase(TestCase):
             open("fecfiler/transactions/fixtures/payload_transaction_pair.json")
         )
         request = self.factory.post(
-            "/api/v1/transactions/save-pair",
+            "/api/v1/transactions/save",
             json.dumps(payload),
             content_type="application/json",
         )
         request.user = self.user
         request.data = payload
         request.query_params = {}
-        response = save_transaction_pair(request)
+        response = save_transaction(request)
         self.assertEqual("John", response.data["contributor_first_name"])
         self.assertEqual("Smith", response.data["contributor_last_name"])

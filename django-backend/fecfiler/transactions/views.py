@@ -1,6 +1,6 @@
 import logging
 
-from django.db import transaction
+from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,27 +23,23 @@ from fecfiler.transactions.schedule_c1.serializers import (
 from fecfiler.transactions.schedule_c2.serializers import (
     ScheduleC2TransactionSerializer,
 )
-from fecfiler.transactions.schedule_d.serializers import (
-    ScheduleDTransactionSerializer
-)
-from fecfiler.transactions.schedule_e.serializers import (
-    ScheduleETransactionSerializer
-)
+from fecfiler.transactions.schedule_d.serializers import ScheduleDTransactionSerializer
+from fecfiler.transactions.schedule_e.serializers import ScheduleETransactionSerializer
 
 
 logger = logging.getLogger(__name__)
 
 
-def save_transaction_pair(request):
+def save_transaction(request):
     """Handle the saving of a strictly parent/child pair.
 
     The child is removed from the parent and saved separately with the
     parent_transaction_id so that each schedule serializer can handle
     just its specific schedule fields and validation rules
     """
-    schedule_1_data = request.data
-    schedule_2_data = request.data["children"][0]
-    schedule_1_data["children"] = []
+    transaction_data = request.data
+    children_data = request.data["children"]
+    transaction_data["children"] = []
 
     serializers = dict(
         A=ScheduleATransactionSerializer,
@@ -52,41 +48,56 @@ def save_transaction_pair(request):
         C1=ScheduleC1TransactionSerializer,
         C2=ScheduleC2TransactionSerializer,
         D=ScheduleDTransactionSerializer,
-        E=ScheduleETransactionSerializer
+        E=ScheduleETransactionSerializer,
     )
 
-    serializer_1 = serializers.get(schedule_1_data.get("schedule_id"))
-    serializer_2 = serializers.get(schedule_2_data.get("schedule_id"))
+    schedule_serializer = serializers.get(transaction_data.get("schedule_id"))
 
-    if "id" in schedule_1_data:
-        schedule_1 = Transaction.objects.get(pk=schedule_1_data["id"])
-        schedule_1_serializer = serializer_1(schedule_1, data=schedule_1_data)
+    if "id" in transaction_data:
+        transaction_obj = Transaction.objects.get(pk=transaction_data["id"])
+        transaction_serializer = schedule_serializer(
+            transaction_obj, data=transaction_data
+        )
     else:
-        schedule_1_serializer = serializer_1(data=schedule_1_data)
+        transaction_serializer = schedule_serializer(data=transaction_data)
 
-    with transaction.atomic():
-        schedule_1_serializer.context["request"] = request
-        if schedule_1_serializer.is_valid(raise_exception=True):
-            schedule_1 = schedule_1_serializer.save()
-            schedule_2_data["parent_transaction_id"] = schedule_1.id
-            if schedule_2_data.pop("use_parent_contact", None):
-                schedule_2_data["contact_1_id"] = schedule_1.contact_1_id
-                schedule_2_data["contact_1"] = ContactSerializer().to_representation(
-                    schedule_1.contact_1
+    with db_transaction.atomic():
+        transaction_serializer.context["request"] = request
+        if transaction_serializer.is_valid(raise_exception=True):
+            transaction_obj = transaction_serializer.save()
+
+            for child_transaction_data in children_data:
+                child_transaction_data["parent_transaction_id"] = transaction_obj.id
+                if child_transaction_data.pop("use_parent_contact", None):
+                    child_transaction_data[
+                        "contact_1_id"
+                    ] = transaction_obj.contact_1_id
+                    child_transaction_data[
+                        "contact_1"
+                    ] = ContactSerializer().to_representation(transaction_obj.contact_1)
+
+                child_schedule_serializer = serializers.get(
+                    child_transaction_data.get("schedule_id")
                 )
 
-            if "id" in schedule_2_data:
-                schedule_2 = Transaction.objects.get(pk=schedule_2_data["id"])
-                schedule_2_serializer = serializer_2(schedule_2, data=schedule_2_data)
-            else:
-                schedule_2_serializer = serializer_2(data=schedule_2_data)
+                if "id" in child_transaction_data:
+                    child_transaction_obj = Transaction.objects.get(
+                        pk=child_transaction_data["id"]
+                    )
+                    child_transaction_serializer = child_schedule_serializer(
+                        child_transaction_obj, data=child_transaction_data
+                    )
+                else:
+                    child_transaction_serializer = child_schedule_serializer(
+                        data=child_transaction_data
+                    )
 
-            schedule_2_serializer.context["request"] = request
-            if schedule_2_serializer.is_valid(raise_exception=True):
-                schedule_2_serializer.save()
+                child_transaction_serializer.context["request"] = request
+                if child_transaction_serializer.is_valid(raise_exception=True):
+                    child_transaction_serializer.save()
 
-                # Both 1 and 2 saves were successful, return parent transaction
-                return Response(serializer_1(schedule_1).data)
+            # All parent and child transaction saves were successful, return parent transaction
+            return Response(schedule_serializer(transaction_obj).data)
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
@@ -171,13 +182,13 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=["post"], url_path=r"save-pair")
-    def create_pair(self, request):
-        return save_transaction_pair(request)
+    @action(detail=False, methods=["post"], url_path=r"save")
+    def create_transaction(self, request):
+        return save_transaction(request)
 
-    @action(detail=False, methods=["put"], url_path=r"save-pair/(?P<pk>[^/.]+)")
-    def update_pair(self, request, pk=None):
-        return save_transaction_pair(request)
+    @action(detail=False, methods=["put"], url_path=r"save/(?P<pk>[^/.]+)")
+    def update_transaction(self, request, pk=None):
+        return save_transaction(request)
 
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}
