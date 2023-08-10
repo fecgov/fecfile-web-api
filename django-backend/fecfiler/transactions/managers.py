@@ -18,6 +18,8 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    ForeignKey,
+    CASCADE
 )
 from decimal import Decimal
 from enum import Enum
@@ -69,11 +71,57 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
+
+
+        get_root_transaction = Subquery(queryset.filter(id=Case(
+                When(
+                    parent_transaction__isnull=False,
+                    then=Case(
+                        When(
+                                parent_transaction__parent_transaction__isnull=False,
+                                then=F("parent_transaction__parent_transaction__id")
+                        ),
+                        default=F("parent_transaction__id")
+                    )
+                ),
+                default=OuterRef("id"),
+                output_field=ForeignKey(to="id", on_delete=CASCADE)
+            )).values("id"))
+        itemization_query = Subquery(
+            queryset.annotate(aggregate=Subquery(aggregate_clause),itemized=self.get_itemization_clause()).filter(id=get_root_transaction).values("itemized")
+        )
+
+
+
+
+
+        """
+        itemized_clause = (
+            queryset.prefetch_related()
+            .annotate(root_transaction_id=Case(
+                When(
+                    parent_transaction__isnull=False,
+                    then=Case(
+                        When(
+                                parent_transaction__parent_transaction__isnull=False,
+                                then=F("parent_transaction__parent_transaction__id")
+                        ),
+                        default=F("parent_transaction__id")
+                    )
+                ),
+                default=F("id"),
+                output_field=ForeignKey(to="id", on_delete=CASCADE)
+            ))
+            .annotate(itemized=self.get_itemization_clause())
+        )
+        """
+
         return (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
-                itemized=self.get_itemization_clause(),
+                itemized=itemization_query,
             )
+
             .annotate(
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
