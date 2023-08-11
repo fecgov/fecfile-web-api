@@ -96,7 +96,8 @@ def save_transaction(request):
                 if child_transaction_serializer.is_valid(raise_exception=True):
                     child_transaction_serializer.save()
 
-            # All parent and child transaction saves were successful, return parent transaction
+            # All parent and child transaction saves were successful, return
+            # parent transaction
             return Response(schedule_serializer(transaction_obj).data)
 
 
