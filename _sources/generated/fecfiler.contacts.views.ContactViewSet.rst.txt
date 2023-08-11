@@ -30,11 +30,11 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.destroy
       ~ContactViewSet.determine_version
       ~ContactViewSet.dispatch
-      ~ContactViewSet.fec_id_is_unique
       ~ContactViewSet.filter_queryset
       ~ContactViewSet.finalize_response
       ~ContactViewSet.get_authenticate_header
       ~ContactViewSet.get_authenticators
+      ~ContactViewSet.get_contact_id
       ~ContactViewSet.get_content_negotiator
       ~ContactViewSet.get_exception_handler
       ~ContactViewSet.get_exception_handler_context

@@ -117,6 +117,9 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.test_committee_lookup_happy_path
       ~ContactViewSetTest.test_committee_lookup_no_auth
       ~ContactViewSetTest.test_committee_lookup_no_q
+      ~ContactViewSetTest.test_get_contact_id_finds_contact
+      ~ContactViewSetTest.test_get_contact_id_no_fec_id
+      ~ContactViewSetTest.test_get_contact_id_no_match
       ~ContactViewSetTest.test_individual_lookup_happy_path
       ~ContactViewSetTest.test_individual_lookup_no_q
       ~ContactViewSetTest.test_organization_lookup_happy_path

@@ -88,20 +88,20 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.dispatch" title="fecfiler.contacts.views.ContactViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fec_id_is_unique</span></code>(request, fec_id)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.filter_queryset" title="fecfiler.contacts.views.ContactViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.filter_queryset" title="fecfiler.contacts.views.ContactViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.finalize_response" title="fecfiler.contacts.views.ContactViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.finalize_response" title="fecfiler.contacts.views.ContactViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticate_header" title="fecfiler.contacts.views.ContactViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticate_header" title="fecfiler.contacts.views.ContactViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticators" title="fecfiler.contacts.views.ContactViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticators" title="fecfiler.contacts.views.ContactViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_contact_id</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_content_negotiator" title="fecfiler.contacts.views.ContactViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
