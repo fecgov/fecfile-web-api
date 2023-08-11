@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transactions', '0017_schedule_d'),
+        ('transactions', '0018_schedule_d'),
     ]
 
     operations = [
