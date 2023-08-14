@@ -78,6 +78,7 @@ fecfiler.transactions.schedule\_c1.models.ScheduleC1
       ~ScheduleC1.lender_street_1
       ~ScheduleC1.lender_street_2
       ~ScheduleC1.lender_zip
+      ~ScheduleC1.line_of_credit
       ~ScheduleC1.loan_amount
       ~ScheduleC1.loan_due_date
       ~ScheduleC1.loan_incurred_date

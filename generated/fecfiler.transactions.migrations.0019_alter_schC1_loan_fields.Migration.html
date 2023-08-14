@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>fecfiler.transactions.migrations.0004_copy_to_unified_table &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -15,8 +15,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions.html" />
-    <link rel="prev" title="fecfiler.transactions.migrations.0003_schedulea_transaction.Migration" href="fecfiler.transactions.migrations.0003_schedulea_transaction.Migration.html" />
+    <link rel="next" title="fecfiler.transactions.models" href="fecfiler.transactions.models.html" />
+    <link rel="prev" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields" href="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,32 +33,111 @@
 
           <div class="body" role="main">
             
-  <section id="module-fecfiler.transactions.migrations.0004_copy_to_unified_table">
-<span id="fecfiler-transactions-migrations-0004-copy-to-unified-table"></span><h1>fecfiler.transactions.migrations.0004_copy_to_unified_table<a class="headerlink" href="#module-fecfiler.transactions.migrations.0004_copy_to_unified_table" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Functions</p>
+  <section id="fecfiler-transactions-migrations-0019-alter-schc1-loan-fields-migration">
+<h1>fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration<a class="headerlink" href="#fecfiler-transactions-migrations-0019-alter-schc1-loan-fields-migration" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.migrations.migration.Migration</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions.html#fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions" title="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_scha_transactions</span></code></a>(apps, schema_editor)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.__init__" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(name, app_label)</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.apply" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply</span></code></a>(project_state, schema_editor[, ...])</p></td>
+<td><p>Take a project_state representing all migrations prior to this one and a schema_editor for a live database and apply the migration in a forwards order.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.mutate_state" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.mutate_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mutate_state</span></code></a>(project_state[, preserve])</p></td>
+<td><p>Take a ProjectState and return a new one with the migration's operations applied to it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.suggest_name" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.suggest_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">suggest_name</span></code></a>()</p></td>
+<td><p>Suggest a name for the operations this migration might represent.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.unapply" title="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.unapply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unapply</span></code></a>(project_state, schema_editor[, ...])</p></td>
+<td><p>Take a project_state representing all migrations prior to this one and a schema_editor for a live database and apply the migration in a reverse order.</p></td>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Classes</p>
+<p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.Migration.html#fecfiler.transactions.migrations.0004_copy_to_unified_table.Migration" title="fecfiler.transactions.migrations.0004_copy_to_unified_table.Migration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Migration</span></code></a>(name, app_label)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">atomic</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">operations</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">replaces</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_before</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a project_state representing all migrations prior to this one
+and a schema_editor for a live database and apply the migration
+in a forwards order.</p>
+<p>Return the resulting project state for efficient reuse by following
+Migrations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.mutate_state">
+<span class="sig-name descname"><span class="pre">mutate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.mutate_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a ProjectState and return a new one with the migration’s
+operations applied to it. Preserve the original object state by
+default and return a mutated state from a copy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.suggest_name">
+<span class="sig-name descname"><span class="pre">suggest_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.suggest_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Suggest a name for the operations this migration might represent. Names
+are not guaranteed to be unique, but put some effort into the fallback
+name to avoid VCS conflicts if possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.unapply">
+<span class="sig-name descname"><span class="pre">unapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.unapply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a project_state representing all migrations prior to this one
+and a schema_editor for a live database and apply the migration
+in a reverse order.</p>
+<p>The backwards migration process consists of two phases:</p>
+<ol class="arabic simple">
+<li><p>The intermediate states from right before the first until right
+after the last operation inside this migration are preserved.</p></li>
+<li><p>The operations are applied in reverse order using the states
+recorded in step 1.</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -100,11 +179,7 @@
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0001_initial.html">fecfiler.transactions.migrations.0001_initial</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0002_copy_scha.html">fecfiler.transactions.migrations.0002_copy_scha</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0003_schedulea_transaction.html">fecfiler.transactions.migrations.0003_schedulea_transaction</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.transactions.migrations.0004_copy_to_unified_table</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions.html">fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.Migration.html">fecfiler.transactions.migrations.0004_copy_to_unified_table.Migration</a></li>
-</ul>
-</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0004_copy_to_unified_table.html">fecfiler.transactions.migrations.0004_copy_to_unified_table</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0005_scheduleb_delete_schedulebtransaction_and_more.html">fecfiler.transactions.migrations.0005_scheduleb_delete_schedulebtransaction_and_more</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0006_schedulec_and_more.html">fecfiler.transactions.migrations.0006_schedulec_and_more</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0007_create_index_on_form_type.html">fecfiler.transactions.migrations.0007_create_index_on_form_type</a></li>
@@ -119,7 +194,10 @@
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0016_update_schedulec_fields.html">fecfiler.transactions.migrations.0016_update_schedulec_fields</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0017_schedule_d.html">fecfiler.transactions.migrations.0017_schedule_d</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0018_schedule_e.html">fecfiler.transactions.migrations.0018_schedule_e</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.html">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.html">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.models.html">fecfiler.transactions.models</a></li>
@@ -156,8 +234,10 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
   <li><a href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a><ul>
-      <li>Previous: <a href="fecfiler.transactions.migrations.0003_schedulea_transaction.Migration.html" title="previous chapter">fecfiler.transactions.migrations.0003_schedulea_transaction.Migration</a></li>
-      <li>Next: <a href="fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions.html" title="next chapter">fecfiler.transactions.migrations.0004_copy_to_unified_table.copy_scha_transactions</a></li>
+  <li><a href="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.html">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields</a><ul>
+      <li>Previous: <a href="fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.html" title="previous chapter">fecfiler.transactions.migrations.0019_alter_schC1_loan_fields</a></li>
+      <li>Next: <a href="fecfiler.transactions.models.html" title="next chapter">fecfiler.transactions.models</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -195,7 +275,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
-      <a href="../_sources/generated/fecfiler.transactions.migrations.0004_copy_to_unified_table.rst.txt"
+      <a href="../_sources/generated/fecfiler.transactions.migrations.0019_alter_schC1_loan_fields.Migration.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
