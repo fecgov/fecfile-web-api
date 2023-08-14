@@ -62,11 +62,9 @@ class ScheduleC1TransactionSerializer(TransactionSerializerBase):
     loan_amount = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
-    loan_interest_rate = DecimalField(
-        required=False, allow_null=True, max_digits=14, decimal_places=14
-    )
+    loan_interest_rate = CharField(required=False, allow_null=True)
     loan_incurred_date = DateField(required=False, allow_null=True)
-    loan_due_date = DateField(required=False, allow_null=True)
+    loan_due_date = CharField(required=False, allow_null=True)
     loan_restructured = BooleanField(required=False, allow_null=True, default=False)
     loan_originally_incurred_date = DateField(required=False, allow_null=True)
     credit_amount_this_draw = DecimalField(
@@ -109,6 +107,10 @@ class ScheduleC1TransactionSerializer(TransactionSerializerBase):
     authorized_suffix = CharField(required=False, allow_null=True)
     authorized_title = CharField(required=False, allow_null=True)
     authorized_date_signed = DateField(required=False, allow_null=True)
+
+    # The line_of_credit field is strictly to save state for a front-end radio
+    # button and is not part of the C1 spec
+    line_of_credit = BooleanField(required=False, allow_null=True, default=False)
 
     class Meta(TransactionSerializerBase.Meta):
         fields = TransactionSerializerBase.Meta.get_fields() + [
