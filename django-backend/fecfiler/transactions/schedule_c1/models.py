@@ -19,11 +19,9 @@ class ScheduleC1(models.Model):
     loan_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    loan_interest_rate = models.DecimalField(
-        null=True, blank=True, max_digits=14, decimal_places=14
-    )
+    loan_interest_rate = models.TextField(null=True, blank=True)
     loan_incurred_date = models.DateField(null=True, blank=True)
-    loan_due_date = models.DateField(null=True, blank=True)
+    loan_due_date = models.TextField(null=True, blank=True)
     loan_restructured = models.BooleanField(null=True, blank=True, default=False)
     loan_originally_incurred_date = models.DateField(null=True, blank=True)
     credit_amount_this_draw = models.DecimalField(
@@ -66,6 +64,10 @@ class ScheduleC1(models.Model):
     authorized_suffix = models.TextField(null=True, blank=True)
     authorized_title = models.TextField(null=True, blank=True)
     authorized_date_signed = models.DateField(null=True, blank=True)
+
+    # The line_of_credit field is strictly to save state for a front-end radio
+    # button and is not part of the C1 spec
+    line_of_credit = models.BooleanField(null=True, blank=True, default=False)
 
     def get_date(self):
         return self.loan_incurred_date
