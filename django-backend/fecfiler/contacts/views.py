@@ -47,7 +47,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
     queryset = (
         Contact.objects.annotate(
             transaction_count=Count("contact_1_transaction_set")
-            + Count("contact_2_transaction_set"),
+            + Count("contact_2_transaction_set")
+            + Count("contact_3_transaction_set"),
         )
         .alias(
             sort_name=Concat(
