@@ -53,6 +53,9 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_c__loan_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
+            ).alias(
+                parent_effective_amount=self.get_parent_amount_clause(),
+                grandparent_effective_amount=self.get_grandparent_amount_clause()
             )
         )
 
@@ -62,17 +65,47 @@ class TransactionManager(SoftDeleteManager):
             date=OuterRef("date"), created__lte=OuterRef("created")
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
-
         aggregate_clause = (
             queryset.filter(contact_clause, year_clause, date_clause, group_clause)
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
+
+        parent_contact_clause = Q(contact_1_id=OuterRef("parent_transaction__contact_1_id"))
+        parent_year_clause = Q(date__year=OuterRef("parent_transaction__date__year"))
+        parent_date_clause = Q(date__lt=OuterRef("parent_transaction__date")) | Q(
+            date=OuterRef("parent_transaction__date"), created__lte=OuterRef("parent_transaction__created")
+        )
+        parent_group_clause = Q(aggregation_group=OuterRef("parent_transaction__aggregation_group"))
+        parent_aggregate_clause = (
+            queryset.filter(parent_contact_clause, parent_year_clause, parent_date_clause, parent_group_clause)
+            .values("parent_transaction__committee_account_id")
+            .annotate(parent_aggregate=Sum("parent_effective_amount"))
+            .values("parent_aggregate")
+        )
+
+        grandparent_contact_clause = Q(contact_1_id=OuterRef("parent_transaction__parent_transaction__contact_1_id"))
+        grandparent_year_clause = Q(date__year=OuterRef("parent_transaction__parent_transaction__date__year"))
+        grandparent_date_clause = Q(date__lt=OuterRef("parent_transaction__parent_transaction__date")) | Q(
+            date=OuterRef("parent_transaction__parent_transaction__date"), created__lte=OuterRef("parent_transaction__parent_transaction__created")
+        )
+        grandparent_group_clause = Q(aggregation_group=OuterRef("parent_transaction__parent_transaction__aggregation_group"))
+        grandparent_aggregate_clause = (
+            queryset.filter(grandparent_contact_clause, grandparent_year_clause, grandparent_date_clause, grandparent_group_clause)
+            .values("parent_transaction__parent_transaction__committee_account_id")
+            .annotate(grandparent_aggregate=Sum("grandparent_effective_amount"))
+            .values("grandparent_aggregate")
+        )
+
         return (
             queryset.annotate(
-                aggregate=Subquery(aggregate_clause),
-                itemized=self.get_itemization_clause(),
+                aggregate=Subquery(aggregate_clause)
+            ).alias(
+                parent_aggregate=Subquery(parent_aggregate_clause),
+                grandparent_aggregate=Subquery(grandparent_aggregate_clause),
+            ).annotate(
+                itemized=self.get_itemization_clause()
             )
             .annotate(
                 form_type=Case(
@@ -118,15 +151,45 @@ class TransactionManager(SoftDeleteManager):
         over_two_hundred_types = (
             schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
+
         return Case(
-            When(force_itemized__isnull=False, then=F("force_itemized")),
-            When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
-            When(
-                transaction_type_identifier__in=over_two_hundred_types,
-                then=Q(aggregate__gt=Value(Decimal(200))),
-            ),
+            # No parent
+            When(parent_transaction__isnull=True, then=Case(
+                When(force_itemized__isnull=False, then=F("force_itemized")),
+                When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
+                When(
+                    transaction_type_identifier__in=over_two_hundred_types,
+                    then=Q(aggregate__gt=Value(Decimal(200))),
+                ),
+                default=Value(True),
+                output_field=BooleanField()
+            )),
+            When(parent_transaction__isnull=False, then=Case(
+                # Parent
+                When(parent_transaction__parent_transaction__isnull=True, then=Case(
+                    When(parent_transaction__force_itemized__isnull=False, then=F("parent_transaction__force_itemized")),
+                    When(parent_aggregate__lt=Value(Decimal(0)), then=Value(True)),
+                    When(
+                        parent_transaction__transaction_type_identifier__in=over_two_hundred_types,
+                        then=Q(parent_aggregate__gt=Value(Decimal(200))),
+                    ),
+                    default=Value(True),
+                    output_field=BooleanField()
+                )),
+                # Grandparent
+                When(parent_transaction__parent_transaction__isnull=False, then=Case(
+                    When(parent_transaction__parent_transaction__force_itemized__isnull=False, then=F("parent_transaction__parent_transaction__force_itemized")),
+                    When(grandparent_aggregate__lt=Value(Decimal(0)), then=Value(True)),
+                    When(
+                        parent_transaction__parent_transaction__transaction_type_identifier__in=over_two_hundred_types,
+                        then=Q(grandparent_aggregate__gt=Value(Decimal(200))),
+                    ),
+                    default=Value(True),
+                    output_field=BooleanField()
+                ))
+            )),
             default=Value(True),
-            output_field=BooleanField(),
+            output_field=BooleanField()
         )
 
     def get_amount_clause(self):
@@ -136,6 +199,26 @@ class TransactionManager(SoftDeleteManager):
                 then=F("amount") * Value(Decimal(-1)),
             ),
             default="amount",
+            output_field=DecimalField(),
+        )
+
+    def get_parent_amount_clause(self):
+        return Case(
+            When(
+                parent_transaction__transaction_type_identifier__in=schedule_b_refunds,
+                then=F("parent_transaction__amount") * Value(Decimal(-1)),
+            ),
+            default="parent_transaction__amount",
+            output_field=DecimalField(),
+        )
+
+    def get_grandparent_amount_clause(self):
+        return Case(
+            When(
+                parent_transaction__parent_transaction__transaction_type_identifier__in=schedule_b_refunds,
+                then=F("parent_transaction__parent_transaction__amount") * Value(Decimal(-1)),
+            ),
+            default="parent_transaction__parent_transaction__amount",
             output_field=DecimalField(),
         )
 
