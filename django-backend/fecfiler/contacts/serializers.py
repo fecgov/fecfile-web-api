@@ -61,6 +61,7 @@ class ContactSerializer(
                 "transaction",
                 "contact_1_transaction_set",
                 "contact_2_transaction_set",
+                "contact_3_transaction_set",
             ]
         ]
         fields.append("transaction_count")
@@ -85,12 +86,16 @@ class LinkedContactSerializerMixin(ModelSerializer):
     contact_1_id = UUIDField(required=False, allow_null=False)
     contact_2 = ContactSerializer(allow_null=True, required=False)
     contact_2_id = UUIDField(required=False, allow_null=True)
+    contact_3 = ContactSerializer(allow_null=True, required=False)
+    contact_3_id = UUIDField(required=False, allow_null=True)
 
     def create(self, validated_data: dict):
         with transaction.atomic():
             self.create_or_update_contact(validated_data, "contact_1")
             if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
                 self.create_or_update_contact(validated_data, "contact_2")
+            if validated_data.get("contact_3") or validated_data.get("contact_3_id"):
+                self.create_or_update_contact(validated_data, "contact_3")
             return super().create(validated_data)
 
     def update(self, instance, validated_data: dict):
@@ -98,6 +103,8 @@ class LinkedContactSerializerMixin(ModelSerializer):
             self.create_or_update_contact(validated_data, "contact_1")
             if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
                 self.create_or_update_contact(validated_data, "contact_2")
+            if validated_data.get("contact_3") or validated_data.get("contact_3_id"):
+                self.create_or_update_contact(validated_data, "contact_3")
             return super().update(instance, validated_data)
 
     def create_or_update_contact(self, validated_data: dict, contact_key):

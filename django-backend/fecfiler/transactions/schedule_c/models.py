@@ -84,6 +84,7 @@ class ScheduleC(models.Model):
             self.lender_candidate_office = contact.candidate_office
             self.lender_candidate_state = contact.candidate_state
             self.lender_candidate_district = contact.candidate_district
+        # Schedule C transactions do not require Contact 3
         self.save()
 
     class Meta:

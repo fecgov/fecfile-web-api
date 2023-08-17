@@ -199,12 +199,15 @@ class TransactionSerializerBase(
         contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
         if contact_2:
             self.propagate_contact(transaction, contact_2)
+        contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
+        if contact_3:
+            self.propagate_contact(transaction, contact_3)
 
     def propagate_contact(self, transaction, contact):
         subsequent_transactions = Transaction.objects.filter(
             ~Q(id=transaction.id),
             Q(Q(report__upload_submission__isnull=True)),
-            Q(Q(contact_1=contact) | Q(contact_2=contact)),
+            Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
             date__gte=transaction.get_date(),
         )
         for subsequent_transaction in subsequent_transactions:
@@ -230,6 +233,7 @@ class TransactionSerializerBase(
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
+                "contact_3_id",
                 "memo_text_id",
                 "form_type",
                 "itemized",
