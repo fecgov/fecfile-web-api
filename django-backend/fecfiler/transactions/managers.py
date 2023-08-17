@@ -54,8 +54,47 @@ class TransactionManager(SoftDeleteManager):
                 ),
                 effective_amount=self.get_amount_clause(),
             ).alias(
+                parent_schedule=Case(
+                    When(parent_transaction__schedule_a__isnull=False, then=Schedule.A.value),
+                    When(parent_transaction__schedule_b__isnull=False, then=Schedule.B.value),
+                    When(parent_transaction__schedule_c__isnull=False, then=Schedule.C.value),
+                    When(parent_transaction__schedule_c1__isnull=False, then=Schedule.C1.value),
+                    When(parent_transaction__schedule_c1__isnull=False, then=Schedule.C2.value),
+                    When(parent_transaction__schedule_d__isnull=False, then=Schedule.D.value),
+                    When(parent_transaction__schedule_e__isnull=False, then=Schedule.E.value)
+                ),
+                grandparent_schedule=Case(
+                    When(parent_transaction__parent_transaction__schedule_a__isnull=False, then=Schedule.A.value),
+                    When(parent_transaction__parent_transaction__schedule_b__isnull=False, then=Schedule.B.value),
+                    When(parent_transaction__parent_transaction__schedule_c__isnull=False, then=Schedule.C.value),
+                    When(parent_transaction__parent_transaction__schedule_c1__isnull=False, then=Schedule.C1.value),
+                    When(parent_transaction__parent_transaction__schedule_c1__isnull=False, then=Schedule.C2.value),
+                    When(parent_transaction__parent_transaction__schedule_d__isnull=False, then=Schedule.D.value),
+                    When(parent_transaction__parent_transaction__schedule_e__isnull=False, then=Schedule.E.value)
+                ),
+                parent_date=Coalesce(
+                    "parent_transaction__schedule_a__contribution_date",
+                    "parent_transaction__schedule_b__expenditure_date",
+                    "parent_transaction__schedule_c__loan_incurred_date",
+                ),
+                grandparent_date=Coalesce(
+                    "parent_transaction__parent_transaction__schedule_a__contribution_date",
+                    "parent_transaction__parent_transaction__schedule_b__expenditure_date",
+                    "parent_transaction__parent_transaction__schedule_c__loan_incurred_date",
+                ),
+                parent_amount=Coalesce(
+                    "parent_transaction__schedule_a__contribution_amount",
+                    "parent_transaction__schedule_b__expenditure_amount",
+                    "parent_transaction__schedule_c__loan_amount",
+                ),
+                grandparent_amount=Coalesce(
+                    "parent_transaction__parent_transaction__schedule_a__contribution_amount",
+                    "parent_transaction__parent_transaction__schedule_b__expenditure_amount",
+                    "parent_transaction__parent_transaction__schedule_c__loan_amount",
+                ),
+            ).alias(
                 parent_effective_amount=self.get_parent_amount_clause(),
-                grandparent_effective_amount=self.get_grandparent_amount_clause()
+                grandparent_effective_amount=self.get_grandparent_amount_clause(),
             )
         )
 
@@ -73,9 +112,9 @@ class TransactionManager(SoftDeleteManager):
         )
 
         parent_contact_clause = Q(contact_1_id=OuterRef("parent_transaction__contact_1_id"))
-        parent_year_clause = Q(date__year=OuterRef("parent_transaction__date__year"))
-        parent_date_clause = Q(date__lt=OuterRef("parent_transaction__date")) | Q(
-            date=OuterRef("parent_transaction__date"), created__lte=OuterRef("parent_transaction__created")
+        parent_year_clause = Q(parent_date__year=OuterRef("parent_date__year"))
+        parent_date_clause = Q(parent_date__lt=OuterRef("parent_date")) | Q(
+            parent_date=OuterRef("parent_date"), created__lte=OuterRef("parent_transaction__created")
         )
         parent_group_clause = Q(aggregation_group=OuterRef("parent_transaction__aggregation_group"))
         parent_aggregate_clause = (
@@ -86,9 +125,9 @@ class TransactionManager(SoftDeleteManager):
         )
 
         grandparent_contact_clause = Q(contact_1_id=OuterRef("parent_transaction__parent_transaction__contact_1_id"))
-        grandparent_year_clause = Q(date__year=OuterRef("parent_transaction__parent_transaction__date__year"))
-        grandparent_date_clause = Q(date__lt=OuterRef("parent_transaction__parent_transaction__date")) | Q(
-            date=OuterRef("parent_transaction__parent_transaction__date"), created__lte=OuterRef("parent_transaction__parent_transaction__created")
+        grandparent_year_clause = Q(grandparent_date__year=OuterRef("grandparent_date__year"))
+        grandparent_date_clause = Q(grandparent_date__lt=OuterRef("grandparent_date")) | Q(
+            grandparent_date=OuterRef("grandparent_date"), created__lte=OuterRef("parent_transaction__parent_transaction__created")
         )
         grandparent_group_clause = Q(aggregation_group=OuterRef("parent_transaction__parent_transaction__aggregation_group"))
         grandparent_aggregate_clause = (
@@ -206,9 +245,9 @@ class TransactionManager(SoftDeleteManager):
         return Case(
             When(
                 parent_transaction__transaction_type_identifier__in=schedule_b_refunds,
-                then=F("parent_transaction__amount") * Value(Decimal(-1)),
+                then=F("parent_amount") * Value(Decimal(-1)),
             ),
-            default="parent_transaction__amount",
+            default="parent_amount",
             output_field=DecimalField(),
         )
 
@@ -216,9 +255,9 @@ class TransactionManager(SoftDeleteManager):
         return Case(
             When(
                 parent_transaction__parent_transaction__transaction_type_identifier__in=schedule_b_refunds,
-                then=F("parent_transaction__parent_transaction__amount") * Value(Decimal(-1)),
+                then=F("grandparent_amount") * Value(Decimal(-1)),
             ),
-            default="parent_transaction__parent_transaction__amount",
+            default="grandparent_amount",
             output_field=DecimalField(),
         )
 
