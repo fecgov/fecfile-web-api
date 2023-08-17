@@ -47,7 +47,8 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0014_rename_form_field
    fecfiler.transactions.migrations.0015_update_partnership_memo_to_partnership_attribution
    fecfiler.transactions.migrations.0016_update_schedulec_fields
-   fecfiler.transactions.migrations.0017_schedule_d
-   fecfiler.transactions.migrations.0018_schedule_e
-   fecfiler.transactions.migrations.0019_alter_schC1_loan_fields
+   fecfiler.transactions.migrations.0017_add_contact_3
+   fecfiler.transactions.migrations.0018_schedule_d
+   fecfiler.transactions.migrations.0019_schedule_e
+   fecfiler.transactions.migrations.0020_alter_schC1_loan_fields
 
