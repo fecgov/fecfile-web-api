@@ -185,6 +185,41 @@ class TransactionSerializerBase(
 
         representation["form_type"] = instance.form_type
 
+        # Assign the itemization value of the highest level parent for all transactions.
+        # Currently, there is a recursive child depth limit afterwhich the object values
+        # for the parent object of a child are not longer included by the serializer.
+        # Until we have refactored our tree walking to walk through the parents
+        # instead of the children, we do a manual object query from the database to get the
+        # itemization value since the serializer is no longer providing the value.
+        if (
+            instance.parent_transaction
+            and not instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Transaction: itemization value for {instance.id} pulled from {instance.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction, "itemized"):
+                representation["itemized"] = instance.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(pk=instance.parent_transaction.id)
+                representation["itemized"] = t.itemized
+        if (
+            instance.parent_transaction
+            and instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Transaction: itemization value for {instance.id} pulled from {instance.parent_transaction.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
+                representation[
+                    "itemized"
+                ] = instance.parent_transaction.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(
+                    pk=instance.parent_transaction.parent_transaction.id
+                )
+                representation["itemized"] = t.itemized
+
         return representation
 
     def to_internal_value(self, data):
@@ -247,7 +282,7 @@ class TransactionSerializerBase(
                 "schedule_c",
                 "schedule_c1",
                 "schedule_c2",
-                "schedule_d"
+                "schedule_d",
             ]
 
         fields = get_fields()
