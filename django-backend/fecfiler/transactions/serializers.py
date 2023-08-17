@@ -189,14 +189,16 @@ class TransactionSerializerBase(
         # Currently, there is a recursive child depth limit afterwhich the object values
         # for the parent object of a child are not longer included by the serializer.
         # Until we have refactored our tree walking to walk through the parents
-        # instead of the children, we do a manual object query from the database to get the
-        # itemization value since the serializer is no longer providing the value.
+        # instead of the children, we do a manual object query from the database
+        # to get the itemization value since the serializer is no longer
+        # providing the value.
         if (
             instance.parent_transaction
             and not instance.parent_transaction.parent_transaction
         ):
             logger.info(
-                f"Transaction: itemization value for {instance.id} pulled from {instance.parent_transaction.id}"
+                f"Transaction: itemization value for {instance.id} pulled"
+                " from {instance.parent_transaction.id}"
             )
             if hasattr(instance.parent_transaction, "itemized"):
                 representation["itemized"] = instance.parent_transaction.itemized
@@ -208,7 +210,8 @@ class TransactionSerializerBase(
             and instance.parent_transaction.parent_transaction
         ):
             logger.info(
-                f"Transaction: itemization value for {instance.id} pulled from {instance.parent_transaction.parent_transaction.id}"
+                f"Transaction: itemization value for {instance.id} pulled"
+                " from {instance.parent_transaction.parent_transaction.id}"
             )
             if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
                 representation[
