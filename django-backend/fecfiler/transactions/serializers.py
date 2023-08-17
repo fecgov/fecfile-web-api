@@ -197,7 +197,7 @@ class TransactionSerializerBase(
             and not instance.parent_transaction.parent_transaction
         ):
             logger.info(
-                f"Transaction: itemization value for {instance.id} pulled"
+                f"Itemization value for {instance.id} pulled"
                 f" from {instance.parent_transaction.id}"
             )
             if hasattr(instance.parent_transaction, "itemized"):
@@ -210,7 +210,7 @@ class TransactionSerializerBase(
             and instance.parent_transaction.parent_transaction
         ):
             logger.info(
-                f"Transaction: itemization value for {instance.id} pulled"
+                f"Itemization value for {instance.id} pulled"
                 f" from {instance.parent_transaction.parent_transaction.id}"
             )
             if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
