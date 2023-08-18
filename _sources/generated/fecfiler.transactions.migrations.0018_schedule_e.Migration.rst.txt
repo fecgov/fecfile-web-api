@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.transactions.migrations.0020\_alter\_schC1\_loan\_fields.Migration
-===========================================================================
+fecfiler.transactions.migrations.0018\_schedule\_e.Migration
+============================================================
 
-.. currentmodule:: fecfiler.transactions.migrations.0020_alter_schC1_loan_fields
+.. currentmodule:: fecfiler.transactions.migrations.0018_schedule_e
 
 .. autoclass:: Migration
    :members:                                    

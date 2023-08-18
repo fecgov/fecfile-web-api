@@ -64,7 +64,6 @@ fecfiler.contacts.models.Contact
       ~Contact.committee_id
       ~Contact.contact_1_transaction_set
       ~Contact.contact_2_transaction_set
-      ~Contact.contact_3_transaction_set
       ~Contact.country
       ~Contact.created
       ~Contact.deleted
