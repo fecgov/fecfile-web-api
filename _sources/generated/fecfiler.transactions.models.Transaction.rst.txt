@@ -63,6 +63,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.contact_1_id
       ~Transaction.contact_2
       ~Transaction.contact_2_id
+      ~Transaction.contact_3
+      ~Transaction.contact_3_id
       ~Transaction.created
       ~Transaction.deleted
       ~Transaction.entity_type

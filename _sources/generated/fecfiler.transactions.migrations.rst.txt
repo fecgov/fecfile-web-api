@@ -50,4 +50,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0017_schedule_d
    fecfiler.transactions.migrations.0018_schedule_e
    fecfiler.transactions.migrations.0019_alter_schC1_loan_fields
+   fecfiler.transactions.migrations.0020_add_contact_3
 
