@@ -59,7 +59,6 @@
         "path": "schedule_c.loan_incurred_date"
     },
     "loan_due_date": {
-        "serializer": "DATE",
         "path": "schedule_c.loan_due_date"
     },
     "loan_interest_rate": {
