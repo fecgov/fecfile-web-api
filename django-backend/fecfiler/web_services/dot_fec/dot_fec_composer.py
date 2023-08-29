@@ -40,7 +40,8 @@ def compose_transactions(report_id):
             transaction.filer_committee_id_number = (
                 FILE_AS_TEST_COMMITTEE or transaction.committee_account.committee_id
             )
-            # TODO: improve itemization inheritance.  We should not have to determine it here
+            # TODO: improve itemization inheritance.
+            # We should not have to determine it here
             root_id = (
                 transaction.parent_transaction.parent_transaction.id
                 if transaction.parent_transaction
