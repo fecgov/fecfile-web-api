@@ -1,0 +1,128 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "transaction_id": {},
+    "receipt_line_number": {
+        "path": "schedule_e.receipt_line_number"
+    },
+    "entity_type": {},
+    "payee_organization_name": {
+        "path": "schedule_e.payee_organization_name"
+    },
+    "payee_last_name": {
+        "path": "schedule_e.payee_last_name"
+    },
+    "payee_first_name": {
+        "path": "schedule_e.payee_first_name"
+    },
+    "payee_middle_name": {
+        "path": "schedule_e.payee_middle_name"
+    },
+    "payee_prefix": {
+        "path": "schedule_e.payee_prefix"
+    },
+    "payee_suffix": {
+        "path": "schedule_e.payee_suffix"
+    },
+
+    "payee_street_1": {
+        "path": "schedule_e.payee_street_1"
+    },
+    "payee_street_2": {
+        "path": "schedule_e.payee_street_2"
+    },
+    "payee_city": {
+        "path": "schedule_e.payee_city"
+    },
+    "payee_state": {
+        "path": "schedule_e.payee_state"
+    },
+    "payee_zip": {
+        "path": "schedule_e.payee_zip"
+    },
+    "election_code": {
+        "path": "schedule_e.election_code"
+    },
+    "election_other_description": {
+        "path": "schedule_e.election_other_description"
+    },
+    "dissemination_date": {
+        "serializer": "DATE",
+        "path": "schedule_e.dissemination_date"
+    },
+    "expenditure_amount": {
+        "path": "schedule_e.expenditure_amount"
+    },
+    "disbursement_date": {
+        "serializer": "DATE",
+        "path": "schedule_e.disbursement_date"
+    },
+    "calendar_ytd": {
+        "path": "schedule_e.calendar_ytd"
+    },
+    "expenditure_purpose_descrip": {
+        "path": "schedule_e.expenditure_purpose_descrip"
+    },
+    "category_code": {
+        "path": "schedule_e.category_code"
+    },
+    "payee_cmtte_fec_id_number": {
+        "path": "schedule_e.payee_cmtte_fec_id_number"
+    },
+    "support_oppose_code": {
+        "path": "schedule_e.support_oppose_code"
+    },
+    "so_candidate_id_number": {
+        "path": "schedule_e.so_candidate_id_number"
+    },
+    "so_candidate_last_name": {
+        "path": "schedule_e.so_candidate_last_name"
+    },
+    "so_candidate_first_name": {
+        "path": "schedule_e.so_candidate_first_name"
+    },
+    "so_candinate_middle_name": {
+        "path": "schedule_e.so_candidate_middle_name"
+    },
+    "so_candidate_prefix": {
+        "path": "schedule_e.so_candidate_prefix"
+    },
+    "so_candidate_suffix": {
+        "path": "schedule_e.so_candidate_suffix"
+    },
+    "so_candidate_office": {
+        "path": "schedule_e.so_candidate_office"
+    },
+    "so_candidate_district": {
+        "path": "schedule_e.so_candidate_district"
+    },
+    "so_candidate_state": {
+        "path": "schedule_e.so_candidate_state"
+    },
+    "completing_last_name": {
+        "path": "schedule_e.completing_last_name"
+    },
+    "completing_first_name": {
+        "path": "schedule_e.completing_first_name"
+    },
+    "completing_middle_name": {
+        "path": "schedule_e.completing_middle_name"
+    },
+    "completing_prefix": {
+        "path": "schedule_e.completing_prefix"
+    },
+    "completing_suffix": {
+        "path": "schedule_e.completing_suffix"
+    },
+    "date_signed": {
+        "serializer": "DATE",
+        "path": "schedule_e.date_signed"
+    },
+    "memo_code": {
+        "path": "schedule_e.memo_code"
+    },
+    "memo_text/description": {
+        "path": "schedule_e.memo_text_description"
+    }
+
+}

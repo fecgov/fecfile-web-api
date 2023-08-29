@@ -22,6 +22,8 @@ from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
+from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.transactions.schedule_e.models import ScheduleE
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +82,24 @@ class ScheduleC2Serializer(ModelSerializer):
         model = ScheduleC2
 
 
+class ScheduleDSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleD._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+
+
+class ScheduleESerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ScheduleE._meta.get_fields()
+            if f.name not in ["deleted", "transaction"]
+        ]
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -105,6 +125,8 @@ class TransactionSerializerBase(
     schedule_c = ScheduleCSerializer(required=False)
     schedule_c1 = ScheduleC1Serializer(required=False)
     schedule_c2 = ScheduleC2Serializer(required=False)
+    schedule_d = ScheduleDSerializer(required=False)
+    schedule_e = ScheduleESerializer(required=False)
 
     def get_schema_name(self, data):
         schema_name = data.get("schema_name", None)
@@ -119,6 +141,8 @@ class TransactionSerializerBase(
         schedule_c = representation.pop("schedule_c") or []
         schedule_c1 = representation.pop("schedule_c1") or []
         schedule_c2 = representation.pop("schedule_c2") or []
+        schedule_d = representation.pop("schedule_d") or []
+        schedule_e = representation.pop("schedule_e") or []
         if (
             not hasattr(representation, "children")
             and depth < 2
@@ -150,6 +174,14 @@ class TransactionSerializerBase(
             for property in schedule_c2:
                 if not representation.get(property):
                     representation[property] = schedule_c2[property]
+        if schedule_d:
+            for property in schedule_d:
+                if not representation.get(property):
+                    representation[property] = schedule_d[property]
+        if schedule_e:
+            for property in schedule_e:
+                if not representation.get(property):
+                    representation[property] = schedule_e[property]
 
         representation["form_type"] = instance.form_type
 
@@ -211,6 +243,7 @@ class TransactionSerializerBase(
                 "schedule_c",
                 "schedule_c1",
                 "schedule_c2",
+                "schedule_d"
             ]
 
         fields = get_fields()
