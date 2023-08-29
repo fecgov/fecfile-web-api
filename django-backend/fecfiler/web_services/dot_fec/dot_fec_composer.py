@@ -32,7 +32,7 @@ def compose_f3x_summary(report_id, upload_submission_record_id):
 
 
 def compose_transactions(report_id):
-    transactions = Transaction.objects.filter(report_id=report_id, itemized=True)
+    transactions = Transaction.objects.filter(report_id=report_id)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
@@ -40,7 +40,18 @@ def compose_transactions(report_id):
             transaction.filer_committee_id_number = (
                 FILE_AS_TEST_COMMITTEE or transaction.committee_account.committee_id
             )
-        return transactions
+            # TODO: improve itemization inheritance.
+            # We should not have to determine it here
+            root_id = (
+                transaction.parent_transaction.parent_transaction.id
+                if transaction.parent_transaction
+                and transaction.parent_transaction.parent_transaction
+                else transaction.parent_transaction.id
+                if transaction.parent_transaction
+                else transaction.id
+            )
+            transaction.itemized = transactions.filter(id=root_id).first().itemized
+        return [t for t in transactions if t.itemized]
     else:
         logger.info(f"no transactions found for report: {report_id}")
         return []
@@ -105,7 +116,7 @@ def get_schema_name(schedule):
         Schedule.C.value.value: "SchC",
         Schedule.C1.value.value: "SchC1",
         Schedule.C2.value.value: "SchC2",
-        Schedule.D.value.value: "SchD"
+        Schedule.D.value.value: "SchD",
     }.get(schedule)
 
 

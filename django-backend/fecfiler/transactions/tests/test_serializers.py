@@ -25,8 +25,7 @@ class TransactionSerializerBaseTestCase(TestCase):
 
     def test_no_transaction_type_identifier(self):
         serializer = TransactionSerializerBase(
-            data=self.missing_type_transaction,
-            context={"request": self.mock_request},
+            data=self.missing_type_transaction, context={"request": self.mock_request},
         )
         with self.assertRaises(ValidationError):
             serializer.get_schema_name({}),
@@ -125,3 +124,19 @@ class TransactionSerializerBaseTestCase(TestCase):
             id="33333333-0000-0000-0000-9509df48e1aa"
         )
         self.assertEqual("new city", third_transaction.schedule_a.contributor_city)
+
+    def test_itemization_inheritance(self):
+
+        # Get tier 1 and test children and grandchildren
+        tier1 = Transaction.objects.get(id="aaaaabbb-3274-47d8-9388-7294a3fd4321")
+        tier2 = Transaction.objects.get(id="cccccbbb-3274-47d8-9388-7294a3fd4321")
+        tier3 = Transaction.objects.get(id="77777bbb-3274-47d8-9388-7294a3fd4321")
+        self.assertEquals(tier1.itemized, True)
+        self.assertEquals(tier2.itemized, None)
+        self.assertEquals(tier3.itemized, None)
+
+        representation = TransactionSerializerBase().to_representation(tier2)
+        self.assertEquals(representation["itemized"], True)
+
+        representation = TransactionSerializerBase().to_representation(tier3)
+        self.assertEquals(representation["itemized"], True)
