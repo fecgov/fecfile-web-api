@@ -48,6 +48,7 @@ def compose_transactions(report_id):
                 else transaction.parent_transaction.id
                 if transaction.parent_transaction
                 else transaction.id
+            )
             transaction.itemized = transactions.filter(id=root_id).first().itemized
         return [t for t in transactions if t.itemized]
     else:
