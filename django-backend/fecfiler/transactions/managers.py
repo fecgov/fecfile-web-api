@@ -71,10 +71,39 @@ class TransactionManager(SoftDeleteManager):
         )
 
         # loan_payment_to_date HERE
-
-        return (
+        loan_payment_to_date = (
+            queryset.filter(
+                parent_transaction__id=OuterRef("id"),
+                transaction_type_identifier__in=[
+                    "LOAN_REPAYMENT_RECEIVED",
+                    "LOAN_REPAYMENT_MADE"
+                    # "LOAN_RECEIVED_FROM_INDIVIDUAL",
+                    # "LOAN_RECEIVED_FROM_BANK",
+                    # "LOAN_BY_COMMITTEE",
+                ],
+            )
+            .annotate(
+                payment_amount=Case(
+                    When(
+                        transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
+                        then=Value(-1) * F("schedule_a__contribution_amount"),
+                    ),
+                    When(
+                        transaction_type_identifier="LOAN_REPAYMENT_MADE",
+                        then=F("schedule_b__expenditure_amount"),
+                    ),
+                    default=Value(0),
+                    output_field=DecimalField(),
+                )
+            )
+            .values("committee_account_id")
+            .annotate(total_payment=Sum("payment_amount"))
+            .values("total_payment")
+        )
+        query = (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
+                total_payment=Subquery(loan_payment_to_date),
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
@@ -116,6 +145,8 @@ class TransactionManager(SoftDeleteManager):
             )
             .order_by("order_key")
         )
+        print(f"AHOY {query.query}")
+        return query
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
