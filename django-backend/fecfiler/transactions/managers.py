@@ -40,7 +40,7 @@ class TransactionManager(SoftDeleteManager):
                     When(schedule_c1__isnull=False, then=Schedule.C1.value),
                     When(schedule_c1__isnull=False, then=Schedule.C2.value),
                     When(schedule_d__isnull=False, then=Schedule.D.value),
-                    When(schedule_e__isnull=False, then=Schedule.E.value)
+                    When(schedule_e__isnull=False, then=Schedule.E.value),
                 ),
                 date=Coalesce(
                     "schedule_a__contribution_date",
@@ -69,6 +69,9 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
+
+        # loan_payment_to_date HERE
+
         return (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
