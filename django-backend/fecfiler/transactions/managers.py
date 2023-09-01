@@ -73,9 +73,7 @@ class TransactionManager(SoftDeleteManager):
         # loan_payment_to_date HERE
         loan_payment_to_date = (
             queryset.filter(
-                parent_transaction_id=OuterRef(
-                    "id"
-                ),  #  this filter doesn't work for some reason
+                parent_transaction_id=OuterRef("id"),
                 transaction_type_identifier__in=[
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
