@@ -74,11 +74,9 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.lender_suffix
       ~ScheduleC.lender_zip
       ~ScheduleC.loan_amount
-      ~ScheduleC.loan_balance
       ~ScheduleC.loan_due_date
       ~ScheduleC.loan_incurred_date
       ~ScheduleC.loan_interest_rate
-      ~ScheduleC.loan_payment_to_date
       ~ScheduleC.memo_text_description
       ~ScheduleC.objects
       ~ScheduleC.personal_funds

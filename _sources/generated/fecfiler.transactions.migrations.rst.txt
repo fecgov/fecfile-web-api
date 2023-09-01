@@ -51,4 +51,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0018_schedule_e
    fecfiler.transactions.migrations.0019_alter_schC1_loan_fields
    fecfiler.transactions.migrations.0020_add_contact_3
+   fecfiler.transactions.migrations.0021_remove_loan_ptd_balance
 
