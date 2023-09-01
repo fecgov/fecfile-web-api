@@ -73,46 +73,34 @@ class TransactionManager(SoftDeleteManager):
         # loan_payment_to_date HERE
         loan_payment_to_date = (
             queryset.filter(
-                parent_transaction__id=OuterRef("id"),
+                parent_transaction_id=OuterRef(
+                    "id"
+                ),  #  this filter doesn't work for some reason
                 transaction_type_identifier__in=[
                     "LOAN_REPAYMENT_RECEIVED",
-                    "LOAN_REPAYMENT_MADE"
-                    # "LOAN_RECEIVED_FROM_INDIVIDUAL",
-                    # "LOAN_RECEIVED_FROM_BANK",
-                    # "LOAN_BY_COMMITTEE",
+                    "LOAN_REPAYMENT_MADE",
                 ],
             )
-            .annotate(
-                payment_amount=Case(
-                    When(
-                        transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
-                        then=Value(-1) * F("schedule_a__contribution_amount"),
-                    ),
-                    When(
-                        transaction_type_identifier="LOAN_REPAYMENT_MADE",
-                        then=F("schedule_b__expenditure_amount"),
-                    ),
-                    default=Value(0),
-                    output_field=DecimalField(),
-                )
-            )
             .values("committee_account_id")
-            .annotate(total_payment=Sum("payment_amount"))
-            .values("total_payment")
+            .annotate(payment_to_date=Sum("amount"))
+            .values("payment_to_date")
         )
         query = (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
-                total_payment=Subquery(loan_payment_to_date),
+                total_payment=Subquery(
+                    loan_payment_to_date
+                ),  # get this to serializer.  maybe change name to loan_payment_to_date and get rid of field in model
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
+                balance_remaining=F("amount") - F("total_payment"),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
                     default=F("_form_type"),
                     output_field=TextField(),
-                )
+                ),
             )
             .alias(
                 order_key=Case(
