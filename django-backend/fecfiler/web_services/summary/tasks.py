@@ -69,6 +69,9 @@ def calculate_summary(report_id):
     # line 22
     report.L22_transfers_to_affiliated_other_party_cmtes_period = a["line_22"]
     report.L22_transfers_to_affiliated_other_party_cmtes_ytd = b["line_22"]
+    # line 27
+    report.L27_loans_made_period = a["line_27"]
+    report.L27_loans_made_ytd = b["line_27"]
     # line 28a
     report.L28a_individuals_persons_period = a["line_28a"]
     report.L28a_individuals_persons_ytd = b["line_28a"]
