@@ -85,16 +85,18 @@ class TransactionManager(SoftDeleteManager):
             .annotate(payment_to_date=Sum("amount"))
             .values("payment_to_date")
         )
-        query = (
+        return (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
-                total_payment=Subquery(
-                    loan_payment_to_date
-                ),  # get this to serializer.  maybe change name to loan_payment_to_date and get rid of field in model
+                loan_payment_to_date=Case(
+                    When(schedule_c__isnull=False, then=Subquery(loan_payment_to_date)),
+                    default=Value(Decimal(0)),
+                ),
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
-                balance_remaining=F("amount") - F("total_payment"),
+                loan_balance=F("amount")
+                - Coalesce("loan_payment_to_date", Value(Decimal(0))),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
@@ -133,8 +135,6 @@ class TransactionManager(SoftDeleteManager):
             )
             .order_by("order_key")
         )
-        print(f"AHOY {query.query}")
-        return query
 
     def get_itemization_clause(self):
         over_two_hundred_types = (

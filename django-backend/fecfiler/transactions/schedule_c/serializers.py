@@ -92,8 +92,12 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
     memo_text_description = CharField(required=False, allow_null=True)
 
     class Meta(TransactionSerializerBase.Meta):
-        fields = TransactionSerializerBase.Meta.get_fields() + [
-            f.name
-            for f in ScheduleC._meta.get_fields()
-            if f.name not in ["transaction"]
-        ]
+        fields = (
+            TransactionSerializerBase.Meta.get_fields()
+            + [
+                f.name
+                for f in ScheduleC._meta.get_fields()
+                if f.name not in ["transaction"]
+            ]
+            + ["loan_balance", "loan_payment_to_date"]
+        )
