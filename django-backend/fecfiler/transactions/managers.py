@@ -98,8 +98,7 @@ class TransactionManager(SoftDeleteManager):
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
-                loan_balance=F("amount")
-                - Coalesce("loan_payment_to_date", Value(Decimal(0))),
+                loan_balance=F("amount") - F("loan_payment_to_date"),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
