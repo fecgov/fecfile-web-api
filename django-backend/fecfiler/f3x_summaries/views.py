@@ -26,15 +26,19 @@ def get_status_mapping():
             FECSubmissionState.CREATING_FILE,
             FECSubmissionState.SUBMITTING,
         ]
-    ) | Q(upload_submission__fec_status__in=[FECStatus.ACCEPTED, FECStatus.PROCESSING])
-    failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED)
-    rejected = Q(upload_submission__fec_status=FECStatus.REJECTED)
+    ) | Q(upload_submission__fec_status=FECStatus.PROCESSING)
+    success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
+    failed = Q(
+        upload_submission__fecfile_task_state=FECSubmissionState.FAILED
+    ) | Q(
+        upload_submission__fec_status=FECStatus.REJECTED
+    )
 
     return Case(
-        When(in_progress, then=Value("In-Progress")),
-        When(submitted, then=Value("Submitted")),
-        When(failed, then=Value("Failed")),
-        When(rejected, then=Value("Rejected")),
+        When(in_progress, then=Value("In progress")),
+        When(submitted, then=Value("Submission pending")),
+        When(success, then=Value("Submission success")),
+        When(failed, then=Value("Submission failure")),
     )
 
 
