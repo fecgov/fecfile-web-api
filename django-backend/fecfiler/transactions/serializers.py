@@ -89,6 +89,7 @@ class ScheduleDSerializer(ModelSerializer):
             for f in ScheduleD._meta.get_fields()
             if f.name not in ["deleted", "transaction"]
         ]
+        model = ScheduleD
 
 
 class ScheduleESerializer(ModelSerializer):
@@ -98,6 +99,7 @@ class ScheduleESerializer(ModelSerializer):
             for f in ScheduleE._meta.get_fields()
             if f.name not in ["deleted", "transaction"]
         ]
+        model = ScheduleE
 
 
 class TransactionSerializerBase(
@@ -290,6 +292,7 @@ class TransactionSerializerBase(
                 "schedule_c1",
                 "schedule_c2",
                 "schedule_d",
+                "schedule_e",
             ]
 
         fields = get_fields()
