@@ -147,6 +147,31 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     ]
     ordering = ["-created"]
 
+    # Allow requests to filter transactions output based on schedule type by
+    # passing a query parameter
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        schedule_filters = self.request.query_params.get("schedules")
+        if schedule_filters is not None:
+            sched_list = schedule_filters.split(",")
+            # All transactions are included by default, here we remove those
+            # that are not identified in the schedules query param
+            if "A" not in sched_list:
+                queryset = queryset.filter(schedule_a__isnull=True)
+            if "B" not in sched_list:
+                queryset = queryset.filter(schedule_b__isnull=True)
+            if "C" not in sched_list:
+                queryset = queryset.filter(schedule_c__isnull=True)
+            if "C1" not in sched_list:
+                queryset = queryset.filter(schedule_c1__isnull=True)
+            if "C2" not in sched_list:
+                queryset = queryset.filter(schedule_c2__isnull=True)
+            if "D" not in sched_list:
+                queryset = queryset.filter(schedule_d__isnull=True)
+            if "E" not in sched_list:
+                queryset = queryset.filter(schedule_e__isnull=True)
+        return queryset
+
     @action(detail=False, methods=["get"])
     def previous(self, request):
         """Retrieves transaction that comes before this transactions,
