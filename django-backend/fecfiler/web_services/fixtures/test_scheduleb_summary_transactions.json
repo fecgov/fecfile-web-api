@@ -216,6 +216,78 @@
         }
     },
     {
+        "comment": "SB26 transaction before report dates; should count in Column B",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-260000000001",
+            "expenditure_amount": 17,
+            "expenditure_date": "2005-01-01"
+        }
+    },
+    {
+        "comment": "SB26 transaction before report dates; should count in Column B",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-260000000001",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-260000000001",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB26",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
+        "comment": "SB26 transaction within report dates; should count in Column A",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-260000000002",
+            "expenditure_amount": 44,
+            "expenditure_date": "2005-02-01"
+        }
+    },
+    {
+        "comment": "SB26 transaction before report dates; should count in Column A",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-260000000002",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-260000000002",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "_form_type": "SB26",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
+        "comment": "SB26 transaction after report dates; should not count",
+        "model": "transactions.scheduleb",
+        "fields": {
+            "id": "a11aefe8-9b5f-4539-b7e5-260000000003",
+            "expenditure_amount": 1000,
+            "expenditure_date": "2005-05-01"
+        }
+    },
+    {
+        "comment": "SB26 transaction after report dates; should not count",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "a12aefe8-9b5f-4539-b7e5-260000000003",
+            "schedule_b_id": "a11aefe8-9b5f-4539-b7e5-260000000003",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "_form_type": "SB26",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "TRANSFER_TO_AFFILIATES"
+        }
+    },
+    {
         "comment": "SB27 transaction before report dates; should count in Column B",
         "model": "transactions.scheduleb",
         "fields": {
