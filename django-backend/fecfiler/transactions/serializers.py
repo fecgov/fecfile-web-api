@@ -89,6 +89,7 @@ class ScheduleDSerializer(ModelSerializer):
             for f in ScheduleD._meta.get_fields()
             if f.name not in ["deleted", "transaction"]
         ]
+        model = ScheduleD
 
 
 class ScheduleESerializer(ModelSerializer):
@@ -98,6 +99,7 @@ class ScheduleESerializer(ModelSerializer):
             for f in ScheduleE._meta.get_fields()
             if f.name not in ["deleted", "transaction"]
         ]
+        model = ScheduleE
 
 
 class TransactionSerializerBase(
@@ -119,6 +121,8 @@ class TransactionSerializerBase(
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -185,6 +189,44 @@ class TransactionSerializerBase(
 
         representation["form_type"] = instance.form_type
 
+        # Assign the itemization value of the highest level parent for all transactions.
+        # Currently, there is a recursive child depth limit afterwhich the object values
+        # for the parent object of a child are not longer included by the serializer.
+        # Until we have refactored our tree walking to walk through the parents
+        # instead of the children, we do a manual object query from the database
+        # to get the itemization value since the serializer is no longer
+        # providing the value.
+        if (
+            instance.parent_transaction
+            and not instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Itemization value for {instance.id} pulled"
+                f" from {instance.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction, "itemized"):
+                representation["itemized"] = instance.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(pk=instance.parent_transaction.id)
+                representation["itemized"] = t.itemized
+        if (
+            instance.parent_transaction
+            and instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Itemization value for {instance.id} pulled"
+                f" from {instance.parent_transaction.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
+                representation[
+                    "itemized"
+                ] = instance.parent_transaction.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(
+                    pk=instance.parent_transaction.parent_transaction.id
+                )
+                representation["itemized"] = t.itemized
+
         return representation
 
     def to_internal_value(self, data):
@@ -199,12 +241,15 @@ class TransactionSerializerBase(
         contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
         if contact_2:
             self.propagate_contact(transaction, contact_2)
+        contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
+        if contact_3:
+            self.propagate_contact(transaction, contact_3)
 
     def propagate_contact(self, transaction, contact):
         subsequent_transactions = Transaction.objects.filter(
             ~Q(id=transaction.id),
             Q(Q(report__upload_submission__isnull=True)),
-            Q(Q(contact_1=contact) | Q(contact_2=contact)),
+            Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
             date__gte=transaction.get_date(),
         )
         for subsequent_transaction in subsequent_transactions:
@@ -230,6 +275,7 @@ class TransactionSerializerBase(
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
+                "contact_3_id",
                 "memo_text_id",
                 "form_type",
                 "itemized",
@@ -238,12 +284,15 @@ class TransactionSerializerBase(
                 "date",
                 "amount",
                 "aggregate",
+                "loan_payment_to_date",
+                "loan_balance",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
                 "schedule_c1",
                 "schedule_c2",
-                "schedule_d"
+                "schedule_d",
+                "schedule_e",
             ]
 
         fields = get_fields()

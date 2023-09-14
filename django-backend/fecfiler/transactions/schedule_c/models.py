@@ -27,12 +27,6 @@ class ScheduleC(models.Model):
     loan_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    loan_payment_to_date = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
-    loan_balance = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
     loan_incurred_date = models.DateField(null=True, blank=True)
     loan_due_date = models.TextField(null=True, blank=True)
     loan_interest_rate = models.TextField(null=True, blank=True)
@@ -84,6 +78,7 @@ class ScheduleC(models.Model):
             self.lender_candidate_office = contact.candidate_office
             self.lender_candidate_state = contact.candidate_state
             self.lender_candidate_district = contact.candidate_district
+        # Schedule C transactions do not require Contact 3
         self.save()
 
     class Meta:

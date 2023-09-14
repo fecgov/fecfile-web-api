@@ -6,90 +6,84 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0017_schedule_d'),
+        ("transactions", "0017_schedule_d"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ScheduleE',
+            name="ScheduleE",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
                         primary_key=True,
                         serialize=False,
-                        unique=True
-                    )
+                        unique=True,
+                    ),
                 ),
-                ('payee_organization_name', models.TextField(blank=True, null=True)),
-                ('payee_last_name', models.TextField(blank=True, null=True)),
-                ('payee_first_name', models.TextField(blank=True, null=True)),
-                ('payee_middle_name', models.TextField(blank=True, null=True)),
-                ('payee_prefix', models.TextField(blank=True, null=True)),
-                ('payee_suffix', models.TextField(blank=True, null=True)),
-                ('payee_street_1', models.TextField(blank=True, null=True)),
-                ('payee_street_2', models.TextField(blank=True, null=True)),
-                ('payee_city', models.TextField(blank=True, null=True)),
-                ('payee_state', models.TextField(blank=True, null=True)),
-                ('payee_zip', models.TextField(blank=True, null=True)),
-                ('election_code', models.TextField(blank=True, null=True)),
+                ("payee_organization_name", models.TextField(blank=True, null=True)),
+                ("payee_last_name", models.TextField(blank=True, null=True)),
+                ("payee_first_name", models.TextField(blank=True, null=True)),
+                ("payee_middle_name", models.TextField(blank=True, null=True)),
+                ("payee_prefix", models.TextField(blank=True, null=True)),
+                ("payee_suffix", models.TextField(blank=True, null=True)),
+                ("payee_street_1", models.TextField(blank=True, null=True)),
+                ("payee_street_2", models.TextField(blank=True, null=True)),
+                ("payee_city", models.TextField(blank=True, null=True)),
+                ("payee_state", models.TextField(blank=True, null=True)),
+                ("payee_zip", models.TextField(blank=True, null=True)),
+                ("election_code", models.TextField(blank=True, null=True)),
+                ("election_other_description", models.TextField(blank=True, null=True)),
+                ("dissemination_date", models.DateField(blank=True, null=True)),
                 (
-                    'election_other_description',
-                    models.TextField(blank=True, null=True)
-                ),
-                ('dissemination_date', models.DateField(blank=True, null=True)),
-                (
-                    'expenditure_amount',
+                    "expenditure_amount",
                     models.DecimalField(
-                        blank=True,
-                        decimal_places=2,
-                        max_digits=11,
-                        null=True
-                    )
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
                 ),
-                ('disbursement_date', models.DateField(blank=True, null=True)),
+                ("disbursement_date", models.DateField(blank=True, null=True)),
                 (
-                    'calendar_ytd',
+                    "calendar_ytd",
                     models.DecimalField(
-                        blank=True,
-                        decimal_places=2,
-                        max_digits=11,
-                        null=True
-                    )
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
                 ),
-                ('expenditure_purpose_descrip', models.TextField(blank=True, null=True)),
-                ('category_code', models.TextField(blank=True, null=True)),
-                ('payee_cmtte_fec_id_number', models.TextField(blank=True, null=True)),
-                ('support_oppose_code', models.TextField(blank=True, null=True)),
-                ('so_candidate_id_number', models.TextField(blank=True, null=True)),
-                ('so_candidate_last_name', models.TextField(blank=True, null=True)),
-                ('so_candidate_first_name', models.TextField(blank=True, null=True)),
-                ('so_candinate_middle_name', models.TextField(blank=True, null=True)),
-                ('so_candidate_prefix', models.TextField(blank=True, null=True)),
-                ('so_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('so_candidate_office', models.TextField(blank=True, null=True)),
-                ('so_candidate_district', models.TextField(blank=True, null=True)),
-                ('so_candidate_state', models.TextField(blank=True, null=True)),
-                ('completing_last_name', models.TextField(blank=True, null=True)),
-                ('completing_first_name', models.TextField(blank=True, null=True)),
-                ('completing_middle_name', models.TextField(blank=True, null=True)),
-                ('completing_prefix', models.TextField(blank=True, null=True)),
-                ('completing_suffix', models.TextField(blank=True, null=True)),
-                ('date_signed', models.DateField(blank=True, null=True)),
-                ('memo_text_description', models.TextField(blank=True, null=True)),
+                (
+                    "expenditure_purpose_descrip",
+                    models.TextField(blank=True, null=True),
+                ),
+                ("category_code", models.TextField(blank=True, null=True)),
+                ("payee_cmtte_fec_id_number", models.TextField(blank=True, null=True)),
+                ("support_oppose_code", models.TextField(blank=True, null=True)),
+                ("so_candidate_id_number", models.TextField(blank=True, null=True)),
+                ("so_candidate_last_name", models.TextField(blank=True, null=True)),
+                ("so_candidate_first_name", models.TextField(blank=True, null=True)),
+                ("so_candinate_middle_name", models.TextField(blank=True, null=True)),
+                ("so_candidate_prefix", models.TextField(blank=True, null=True)),
+                ("so_candidate_suffix", models.TextField(blank=True, null=True)),
+                ("so_candidate_office", models.TextField(blank=True, null=True)),
+                ("so_candidate_district", models.TextField(blank=True, null=True)),
+                ("so_candidate_state", models.TextField(blank=True, null=True)),
+                ("completing_last_name", models.TextField(blank=True, null=True)),
+                ("completing_first_name", models.TextField(blank=True, null=True)),
+                ("completing_middle_name", models.TextField(blank=True, null=True)),
+                ("completing_prefix", models.TextField(blank=True, null=True)),
+                ("completing_suffix", models.TextField(blank=True, null=True)),
+                ("date_signed", models.DateField(blank=True, null=True)),
+                ("memo_text_description", models.TextField(blank=True, null=True)),
             ],
         ),
         migrations.AddField(
-            model_name='transaction',
-            name='schedule_e',
+            model_name="transaction",
+            name="schedule_e",
             field=models.ForeignKey(
                 blank=True,
                 null=True,
-                on_delete=django.db.models.deletion.CASCADE, to='transactions.schedulee'
+                on_delete=django.db.models.deletion.CASCADE,
+                to="transactions.schedulee",
             ),
         ),
     ]

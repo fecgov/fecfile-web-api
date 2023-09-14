@@ -2,6 +2,12 @@
     "form_type": {},
     "filer_committee_id_number": {},
     "transaction_id": {},
+    "back_reference_tran_id_number": {
+        "path": "parent_transaction.transaction_id"
+    },
+    "back_reference_sched_name": {
+        "path": "parent_transaction.form_type"
+    },
     "entity_type": {},
     "lender_organization_name": {
         "path": "schedule_c1.lender_organization_name"
@@ -32,7 +38,6 @@
         "path": "schedule_c1.loan_incurred_date"
     },
     "loan_due_date": {
-        "serializer": "DATE",
         "path": "schedule_c1.loan_due_date"
     },
     "loan_restructured": {
@@ -147,5 +152,4 @@
         "serializer": "DATE",
         "path": "schedule_c1.authorized_date_signed"
     }
-
 }

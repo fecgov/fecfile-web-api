@@ -92,6 +92,9 @@ class ScheduleA(models.Model):
             self.donor_candidate_office = contact.candidate_office
             self.donor_candidate_state = contact.candidate_state
             self.donor_candidate_district = contact.candidate_district
+        if contact.id == transaction.contact_3_id:
+            self.donor_committee_name = contact.name
+            self.donor_committee_fec_id = contact.committee_id
         self.save()
 
 

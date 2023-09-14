@@ -38,9 +38,9 @@ class TransactionManager(SoftDeleteManager):
                     When(schedule_b__isnull=False, then=Schedule.B.value),
                     When(schedule_c__isnull=False, then=Schedule.C.value),
                     When(schedule_c1__isnull=False, then=Schedule.C1.value),
-                    When(schedule_c1__isnull=False, then=Schedule.C2.value),
+                    When(schedule_c2__isnull=False, then=Schedule.C2.value),
                     When(schedule_d__isnull=False, then=Schedule.D.value),
-                    When(schedule_e__isnull=False, then=Schedule.E.value)
+                    When(schedule_e__isnull=False, then=Schedule.E.value),
                 ),
                 date=Coalesce(
                     "schedule_a__contribution_date",
@@ -51,6 +51,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_amount",
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
+                    "schedule_c2__guaranteed_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -69,18 +70,52 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
+
+        loan_payment_to_date_clause = (
+            queryset.filter(
+                parent_transaction_id=OuterRef("id"),
+                transaction_type_identifier__in=[
+                    "LOAN_REPAYMENT_RECEIVED",
+                    "LOAN_REPAYMENT_MADE",
+                ],
+            )
+            .values("committee_account_id")
+            .annotate(payment_to_date=Sum("amount"))
+            .values("payment_to_date")
+        )
         return (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
+                loan_payment_to_date=Case(
+                    When(
+                        schedule_c__isnull=False,
+                        then=Coalesce(
+                            Subquery(loan_payment_to_date_clause), Value(Decimal(0))
+                        ),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
+                loan_balance=F("amount") - F("loan_payment_to_date"),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
+                    When(
+                        transaction_type_identifier="C2_LOAN_GUARANTOR",
+                        parent_transaction__transaction_type_identifier=(
+                            "LOAN_BY_COMMITTEE"
+                        ),
+                        then=Value("SC2/9"),
+                    ),
+                    When(
+                        transaction_type_identifier="C2_LOAN_GUARANTOR",
+                        then=Value("SC2/10"),
+                    ),
                     default=F("_form_type"),
                     output_field=TextField(),
-                )
+                ),
             )
             .alias(
                 order_key=Case(
