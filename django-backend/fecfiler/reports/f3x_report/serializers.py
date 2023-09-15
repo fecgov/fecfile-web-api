@@ -1,4 +1,4 @@
-from .models import F3XSummary
+from .models import F3XReport
 from django.db.models import Q
 from rest_framework.serializers import EmailField, CharField, ValidationError
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
@@ -16,7 +16,7 @@ COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
 logger = logging.getLogger(__name__)
 
 
-class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
+class F3XReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     schema_name = "F3X"
     confirmation_email_1 = EmailField(
         max_length=44,
@@ -51,14 +51,14 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         """
         request = self.context["request"]
         committee_id = request.user.cmtee_id
-        number_of_collisions = F3XSummary.objects.filter(
-            ~Q(id=(self.instance or F3XSummary()).id),
+        number_of_collisions = F3XReport.objects.filter(
+            ~Q(id=(self.instance or F3XReport()).id),
             committee_account__committee_id=committee_id,
             coverage_from_date__year=self.validated_data["coverage_from_date"].year,
             report_code=self.validated_data["report_code"],
         ).count()
         if number_of_collisions == 0:
-            return super(F3XSummarySerializer, self).save(**kwargs)
+            return super(F3XReportSerializer, self).save(**kwargs)
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
@@ -69,10 +69,10 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
         return super().validate(data)
 
     class Meta:
-        model = F3XSummary
+        model = F3XReport
         fields = [
             f.name
-            for f in F3XSummary._meta.get_fields()
+            for f in F3XReport._meta.get_fields()
             if f.name
             not in [
                 "deleted",

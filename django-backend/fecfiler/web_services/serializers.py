@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from fecfiler.web_services.models import UploadSubmission, WebPrintSubmission
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.f3x_report.models import F3XReport
 
 
 class ReportIdSerializer(serializers.Serializer):
@@ -9,7 +9,7 @@ class ReportIdSerializer(serializers.Serializer):
     def validate(self, data):
         request = self.context["request"]
         committee_id = request.user.cmtee_id
-        f3x_summary_result = F3XSummary.objects.filter(
+        f3x_summary_result = F3XReport.objects.filter(
             id=data["report_id"], committee_account__committee_id=committee_id
         )
         if not f3x_summary_result.exists():

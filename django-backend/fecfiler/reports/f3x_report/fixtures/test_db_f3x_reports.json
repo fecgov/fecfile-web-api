@@ -1,6 +1,6 @@
 [
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Heather Clantz",
@@ -29,7 +29,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Kristen Roach",
@@ -58,7 +58,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Christine Smith",
@@ -87,7 +87,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Freddie Singleton",
@@ -116,7 +116,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Violet Pair",
@@ -145,7 +145,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Lola Mendez",
@@ -174,7 +174,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Douglas Whitmore",
@@ -203,7 +203,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Jacob Atkison",
@@ -232,7 +232,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Katherine Weatherwax",
@@ -261,7 +261,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Ramon Swanson",
@@ -290,7 +290,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Richard Anderson",
@@ -319,7 +319,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Jesus Grinstead",
@@ -348,7 +348,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Kali Martinez",
@@ -377,7 +377,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Linda Johnson",
@@ -406,7 +406,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Daniel Davis",
@@ -435,7 +435,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Russell Fitzgerald",
@@ -464,7 +464,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Nicole Wilson",
@@ -493,7 +493,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XN",
       "committee_name": "Angela Watson",
@@ -522,7 +522,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Joseph Lowery",
@@ -551,7 +551,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Carl Ward",
@@ -580,7 +580,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Edward Vann",
@@ -609,7 +609,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Julie Binkley",
@@ -638,7 +638,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XT",
       "committee_name": "Joel Smith",
@@ -667,7 +667,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Franklin Arce",
@@ -696,7 +696,7 @@
     }
   },
   {
-    "model": "f3x_summaries.f3xsummary",
+    "model": "f3x_reports.f3xreport",
     "fields": {
       "form_type": "F3XA",
       "committee_name": "Jerry Demery",

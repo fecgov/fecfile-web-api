@@ -1,7 +1,7 @@
 """Django App for F3X Reports
 
-Provides F3X Summary record
-:py:class:`fecfiler.f3x_summaries.models.F3XSummary`
+Provides F3X Report record
+:py:class:`fecfiler.reports.f3x_report.models.F3XReport`
 
 Also provides abstract model and viewset for
 apps that need report-related records

@@ -1,7 +1,7 @@
 from .models import MemoText
 from .serializers import MemoTextSerializer
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.f3x_summaries.views import ReportViewMixin
+from fecfiler.reports.f3x_report.views import ReportViewMixin
 
 
 class MemoTextViewSet(CommitteeOwnedViewSet, ReportViewMixin):

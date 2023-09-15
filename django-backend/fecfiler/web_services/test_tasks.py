@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.f3x_report.models import F3XReport
 from fecfiler.transactions.models import Transaction
 from .models import (
     DotFEC,
@@ -23,7 +23,7 @@ class TasksTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = F3XReport.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.transaction = Transaction.objects.filter(

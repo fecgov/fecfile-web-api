@@ -4,13 +4,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import F3XSummary
+from .models import F3XReport
 from .report_codes.views import report_code_label_mapping
 from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from .serializers import F3XSummarySerializer
+from .serializers import F3XReportSerializer
 from django.db.models import Case, Value, When, Q
 import logging
 
@@ -42,7 +42,7 @@ def get_status_mapping():
     )
 
 
-class F3XSummaryViewSet(CommitteeOwnedViewSet):
+class F3XReportViewSet(CommitteeOwnedViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -53,12 +53,12 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        F3XSummary.objects.annotate(report_code_label=report_code_label_mapping)
+        F3XReport.objects.annotate(report_code_label=report_code_label_mapping)
         .annotate(report_status=get_status_mapping())
         .all()
     )
 
-    serializer_class = F3XSummarySerializer
+    serializer_class = F3XReportSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",
@@ -90,7 +90,7 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
                 "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
             )
 
-        reports = F3XSummary.objects.filter(
+        reports = F3XReport.objects.filter(
             committee_account__committee_id=committee_id
         )
         report_count = reports.count()

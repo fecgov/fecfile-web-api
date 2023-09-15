@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.reports.f3x_report.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA

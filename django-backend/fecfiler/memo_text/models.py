@@ -1,6 +1,6 @@
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.reports.f3x_report.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid

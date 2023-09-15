@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
+class F3XReport(SoftDeleteModel, CommitteeOwnedModel):
     """Generated model from json schema"""
 
     id = models.UUIDField(
@@ -369,7 +369,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = "f3x_summaries"
+        db_table = "f3x_reports"
 
 
 class ReportMixin(models.Model):
@@ -380,7 +380,7 @@ class ReportMixin(models.Model):
     """
 
     report = models.ForeignKey(
-        "f3x_summaries.F3XSummary", on_delete=models.CASCADE, null=True, blank=True
+        "f3x_report.F3XReport", on_delete=models.CASCADE, null=True, blank=True
     )
 
     def save(self, *args, **kwargs):
@@ -390,7 +390,7 @@ class ReportMixin(models.Model):
             if report_date is not None:
                 report_year = report_date.year
 
-                reports_to_flag_for_recalculation = F3XSummary.objects.filter(
+                reports_to_flag_for_recalculation = F3XReport.objects.filter(
                     ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
                     committee_account=committee,
                     coverage_from_date__year=report_year,
@@ -402,7 +402,7 @@ class ReportMixin(models.Model):
             for report in reports_to_flag_for_recalculation:
                 report.calculation_status = None
                 report.save()
-                logger.info(f"F3X Summary: {report.id} marked for recalcuation")
+                logger.info(f"F3X Report: {report.id} marked for recalcuation")
 
         super(ReportMixin, self).save(*args, **kwargs)
 

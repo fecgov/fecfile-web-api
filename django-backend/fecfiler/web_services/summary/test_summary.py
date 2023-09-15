@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.test import TestCase
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.f3x_report.models import F3XReport
 from fecfiler.transactions.models import Transaction
 from .summary import SummaryService
 
@@ -15,7 +15,7 @@ class F3XSummaryTestCase(TestCase):
     ]
 
     def test_calculate_summary_column_a(self):
-        f3x = F3XSummary.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x = F3XReport.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
         self.assertEqual(summary["a"]["line_11ai"], Decimal("10000.23"))
@@ -67,7 +67,7 @@ class F3XSummaryTestCase(TestCase):
         )
 
     def test_calculate_summary_column_b(self):
-        f3x = F3XSummary.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x = F3XReport.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
 
@@ -115,7 +115,7 @@ class F3XSummaryTestCase(TestCase):
         )
 
     def test_report_with_no_transactions(self):
-        f3x = F3XSummary.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
+        f3x = F3XReport.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
         self.assertEqual(summary["a"]["line_15"], Decimal("0"))

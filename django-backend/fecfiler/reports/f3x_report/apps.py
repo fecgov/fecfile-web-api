@@ -1,8 +1,8 @@
 from django.apps import AppConfig
 
 
-class F3XSummariesConfig(AppConfig):
-    name = 'fecfiler.f3x_summaries'
+class F3XReportsConfig(AppConfig):
+    name = 'fecfiler.reports.f3x_report'
 
     def ready(self):
         # Implicitly connect a signal handlers decorated with @receiver.

@@ -1,6 +1,6 @@
 from enum import Enum
 from celery import shared_task
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.f3x_report.models import F3XReport
 from .summary import SummaryService
 
 import logging
@@ -22,7 +22,7 @@ class CalculationState(Enum):
 @shared_task
 def calculate_summary(report_id):
     try:
-        report = F3XSummary.objects.get(id=report_id)
+        report = F3XReport.objects.get(id=report_id)
     except Exception:
         return None
     report.calculation_status = CalculationState.CALCULATING

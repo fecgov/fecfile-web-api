@@ -65,7 +65,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
         Example:  the f3x table is related to the report code label table by the
             report code field.  DRF gives us the whole
-            :py:class:`fecfiler.f3x_summaries.models.ReportCodeLabel` object.
+            :py:class:`fecfiler.reports.f3x_report.models.ReportCodeLabel` object.
             for validating purposes, we just want the report code.  With the
             foreign_key_fields mapping defined in Meta, we replace the foreign-key-
             related object with the key only.

@@ -1,10 +1,10 @@
 from django.test import TestCase, RequestFactory
-from .views import F3XSummaryViewSet
+from .views import F3XReportViewSet
 from ..authentication.models import Account
 
 
-class F3XSummaryViewSetTest(TestCase):
-    fixtures = ["test_f3x_summaries", "test_committee_accounts", "test_accounts"]
+class F3XReportViewSetTest(TestCase):
+    fixtures = ["test_f3x_reports", "test_committee_accounts", "test_accounts"]
 
     def setUp(self):
         self.user = Account.objects.get(cmtee_id="C12345678")
@@ -12,10 +12,10 @@ class F3XSummaryViewSetTest(TestCase):
 
     def test_coverage_dates_happy_path(self):
         self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/f3x-summaries/coverage_dates")
+        request = self.factory.get("/api/v1/f3x-reports/coverage_dates")
         request.user = self.user
 
-        response = F3XSummaryViewSet.as_view({"get": "coverage_dates"})(request)
+        response = F3XReportViewSet.as_view({"get": "coverage_dates"})(request)
 
         expected_json = [
             {

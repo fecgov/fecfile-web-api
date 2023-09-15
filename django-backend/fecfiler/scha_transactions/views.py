@@ -4,7 +4,7 @@ from django.db.models.functions import Coalesce, Concat
 from datetime import datetime
 from rest_framework import filters
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.f3x_summaries.views import ReportViewMixin
+from fecfiler.reports.f3x_report.views import ReportViewMixin
 
 from .models import SchATransaction
 from .serializers import SchATransactionParentSerializer

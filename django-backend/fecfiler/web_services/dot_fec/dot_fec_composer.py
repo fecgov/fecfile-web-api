@@ -1,5 +1,5 @@
 from fecfiler.memo_text.models import MemoText
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.f3x_report.models import F3XReport
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def compose_f3x_summary(report_id, upload_submission_record_id):
-    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
+    f3x_summary_result = F3XReport.objects.filter(id=report_id)
     upload_submission_result = UploadSubmission.objects.filter(
         id=upload_submission_record_id
     )

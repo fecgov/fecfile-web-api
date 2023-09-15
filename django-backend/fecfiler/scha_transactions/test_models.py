@@ -1,6 +1,6 @@
 from django.test import TestCase
 from .models import SchATransaction
-from ..f3x_summaries.models import F3XSummary
+from ..reports.f3x_report.models import F3XReport
 from ..committee_accounts.models import CommitteeAccount
 
 
@@ -32,7 +32,7 @@ class SchATransactionTestCase(TestCase):
 
     def test_get_scha_transaction_in_f3x_summary(self):
         committee = CommitteeAccount()
-        f3x = F3XSummary(committee_account=committee)
+        f3x = F3XReport(committee_account=committee)
         trans = SchATransaction(committee_account=committee, report=f3x)
         return trans
 
@@ -45,7 +45,7 @@ class SchATransactionTestCase(TestCase):
 
     def test_generate_uid(self):
         committee = CommitteeAccount()
-        f3x = F3XSummary(committee_account=committee)
+        f3x = F3XReport(committee_account=committee)
         trans = SchATransaction(committee_account=committee, report=f3x)
         self.assertFalse(trans.transaction_id)
         unique_id = trans.generate_unique_transaction_id()
