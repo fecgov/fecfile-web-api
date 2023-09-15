@@ -55,6 +55,7 @@ testem.log
 */target
 django-backend/.cache/
 django-backend/.local/
+django-backend/fecfiler/web_services/dot_fec/output/*
 
 ### Bower ###
 */bower_components
