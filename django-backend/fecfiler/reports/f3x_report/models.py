@@ -380,7 +380,7 @@ class ReportMixin(models.Model):
     """
 
     report = models.ForeignKey(
-        "f3x_report.F3XReport", on_delete=models.CASCADE, null=True, blank=True
+        F3XReport, on_delete=models.CASCADE, null=True, blank=True
     )
 
     def save(self, *args, **kwargs):
