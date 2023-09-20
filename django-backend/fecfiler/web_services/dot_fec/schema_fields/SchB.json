@@ -2,12 +2,8 @@
     "form_type": {},
     "filer_committee_id_number": {},
     "transaction_id": {},
-    "back_reference_tran_id_number": {
-        "path": "parent_transaction.transaction_id"
-    },
-    "back_reference_sched_name": {
-        "path": "parent_transaction.form_type"
-    },
+    "back_reference_tran_id_number": {},
+    "back_reference_sched_name": {},
     "entity_type": {},
     "payee_organization_name": {
         "path": "schedule_b.payee_organization_name"
