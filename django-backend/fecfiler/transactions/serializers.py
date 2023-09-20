@@ -113,6 +113,7 @@ class TransactionSerializerBase(
 
     id = UUIDField(required=False)
     parent_transaction_id = UUIDField(required=False, allow_null=True)
+    debt_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
@@ -269,9 +270,17 @@ class TransactionSerializerBase(
             return [
                 f.name
                 for f in Transaction._meta.get_fields()
-                if f.name not in ["deleted", "transaction", "parent_transaction"]
+                if f.name
+                not in [
+                    "deleted",
+                    "transaction",
+                    "parent_transaction",
+                    "debt",
+                    "debt_repayments",
+                ]
             ] + [
                 "parent_transaction_id",
+                "debt_id",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
