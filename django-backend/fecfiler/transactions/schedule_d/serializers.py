@@ -79,8 +79,12 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
     )
 
     class Meta(TransactionSerializerBase.Meta):
-        fields = TransactionSerializerBase.Meta.get_fields() + [
-            f.name
-            for f in ScheduleD._meta.get_fields()
-            if f.name not in ["transaction"]
-        ]
+        fields = (
+            TransactionSerializerBase.Meta.get_fields()
+            + [
+                f.name
+                for f in ScheduleD._meta.get_fields()
+                if f.name not in ["transaction"]
+            ]
+            + ["payment_amount"]
+        )
