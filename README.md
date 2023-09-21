@@ -11,7 +11,6 @@ finance information. The project code is distributed across these repositories:
 - [fecfile-web-app](https://github.com/fecgov/fecfile-web-app): this is the browser-based front-end developed in Angular
 - [fecfile-web-api](https://github.com/fecgov/fecfile-web-api): RESTful endpoint supporting the front-end
 - [fecfile-validate](https://github.com/fecgov/fecfile-validate): data validation rules and engine
-- [fecfile-image-generator](https://github.com/fecgov/fecfile-image-generator): provides competed FEC forms in PDF format
 
 ---
 
