@@ -113,8 +113,12 @@ class TransactionSerializerBase(
 
     id = UUIDField(required=False)
     parent_transaction_id = UUIDField(required=False, allow_null=True)
-    back_reference_tran_id_number = CharField(required=False, allow_null=True)
-    back_reference_sched_name = CharField(required=False, allow_null=True)
+    back_reference_tran_id_number = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    back_reference_sched_name = CharField(
+        required=False, allow_null=True, read_only=True
+    )
     debt_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
