@@ -32,6 +32,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     parent_transaction = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True
     )
+    debt = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="debt_repayments",
+    )
 
     # The _form_type value in the db may or may not be correct based on whether
     # the transaction is itemized or not. For some transactions, the form_type
