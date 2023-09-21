@@ -66,6 +66,9 @@ fecfiler.transactions.models.Transaction
       ~Transaction.contact_3
       ~Transaction.contact_3_id
       ~Transaction.created
+      ~Transaction.debt
+      ~Transaction.debt_id
+      ~Transaction.debt_repayments
       ~Transaction.deleted
       ~Transaction.entity_type
       ~Transaction.force_itemized
