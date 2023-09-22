@@ -1,8 +1,12 @@
 import uuid
 from django.db import models
+from django.db import transaction as db_transaction
+from django.db.models import Q
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+from decimal import Decimal
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
@@ -367,6 +371,67 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Record if the is a create or update operation
+        created = self.created == None
+
+        with db_transaction.atomic():
+            super(F3XSummary, self).save(*args, **kwargs)
+
+            # Pull forward any loans with non-zero balances along with their
+            # loan guarantors
+            if created and self.coverage_through_date:
+                self.pull_forward_loans()
+
+    def pull_forward_loans(self):
+        previous_report = (
+            F3XSummary.objects.get_queryset()
+            .filter(
+                committee_account=self.committee_account,
+                coverage_through_date__lt=self.coverage_through_date,
+                deleted__isnull=True,
+            )
+            .order_by("coverage_through_date")
+            .last()
+        )
+        if previous_report:
+            loans_to_pull_forward = F3XSummary.objects.get(
+                id=previous_report.id
+            ).transaction_set.filter(
+                ~Q(loan_balance=Decimal(0.0)),
+                ~Q(memo_code=True),
+                schedule_c_id__isnull=False,
+                deleted__isnull=True,
+            )
+
+            for loan in loans_to_pull_forward:
+                # Save children as they are lost from the loan object
+                # when the loan is saved
+                children = copy.deepcopy(loan.children)
+
+                loan.schedule_c.pk = loan.schedule_c.id = None
+                loan.schedule_c.save()
+                loan.schedule_c_id = loan.schedule_c.id
+                loan.report_id = self.id
+                loan.report = self
+                loan.loan_id = loan.id
+                loan.loan = copy.deepcopy(loan)
+                loan.pk = loan.id = None
+                loan.save()
+                for child in children:
+                    # If child is a guarantor transaction, copy it
+                    # and link it to the new loan
+                    if child.schedule_c2_id:
+                        child.schedule_c2.pk = child.schedule_c2.id = None
+                        child.schedule_c2.save()
+                        child.schedule_c2_id = child.schedule_c2.id
+                        child.report_id = self.id
+                        child.report = self
+                        child.parent_transaction_id = loan.id
+                        child.parent_transaction = loan
+                        child.pk = child.id = None
+                        child.save()
 
     class Meta:
         db_table = "f3x_summaries"
