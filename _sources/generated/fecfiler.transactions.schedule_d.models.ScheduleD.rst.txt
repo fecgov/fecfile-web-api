@@ -65,7 +65,6 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
       ~ScheduleD.id
       ~ScheduleD.incurred_amount
       ~ScheduleD.objects
-      ~ScheduleD.payment_amount
       ~ScheduleD.pk
       ~ScheduleD.purpose_of_debt_or_obligation
       ~ScheduleD.receipt_line_number
