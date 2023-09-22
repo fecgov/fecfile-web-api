@@ -409,7 +409,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
             for loan in loans_to_pull_forward:
                 # Save children as they are lost from the loan object
                 # when the loan is saved
-                children = copy.deepcopy(loan.children)
+                loan_children = copy.deepcopy(loan.children)
 
                 loan.schedule_c.pk = loan.schedule_c.id = None
                 loan.schedule_c.save()
@@ -424,7 +424,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 )
                 loan.pk = loan.id = None
                 loan.save()
-                for child in children:
+                for child in loan_children:
                     # If child is a guarantor transaction, copy it
                     # and link it to the new loan
                     if child.schedule_c2_id:
