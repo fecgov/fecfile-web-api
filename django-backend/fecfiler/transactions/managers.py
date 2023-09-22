@@ -86,7 +86,6 @@ class TransactionManager(SoftDeleteManager):
 
         debt_payment_clause = (
             queryset.filter(debt_id=OuterRef("id"))
-            .values("")
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
             .values("payment_to_date")
@@ -107,7 +106,8 @@ class TransactionManager(SoftDeleteManager):
                     When(
                         schedule_d__isnull=False,
                         then=Coalesce(Subquery(debt_payment_clause), Value(Decimal(0))),
-                    )
+                    ),
+                    default=Value(Decimal(0)),
                 ),
                 itemized=self.get_itemization_clause(),
             )

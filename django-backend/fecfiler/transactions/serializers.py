@@ -298,6 +298,7 @@ class TransactionSerializerBase(
                 "aggregate",
                 "loan_payment_to_date",
                 "loan_balance",
+                "payment_amount",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
