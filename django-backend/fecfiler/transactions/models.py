@@ -36,14 +36,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="debt_repayments",
+        related_name="debt_associations",
     )
     loan = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="loans_pulled_forward",
+        related_name="loan_associations",
     )
 
     # The _form_type value in the db may or may not be correct based on whether

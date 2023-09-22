@@ -286,9 +286,9 @@ class TransactionSerializerBase(
                     "transaction",
                     "parent_transaction",
                     "debt",
-                    "debt_repayments",
+                    "debt_associations",
                     "loan",
-                    "loans_pulled_forward",
+                    "loan_associations",
                 ]
             ] + [
                 "parent_transaction_id",
