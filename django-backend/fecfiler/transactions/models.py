@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin

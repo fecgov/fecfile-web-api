@@ -374,14 +374,14 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
     def save(self, *args, **kwargs):
         # Record if the is a create or update operation
-        created = self.created == None
+        create_action = self.created is None
 
         with db_transaction.atomic():
             super(F3XSummary, self).save(*args, **kwargs)
 
             # Pull forward any loans with non-zero balances along with their
             # loan guarantors
-            if created and self.coverage_through_date:
+            if create_action and self.coverage_through_date:
                 self.pull_forward_loans()
 
     def pull_forward_loans(self):
