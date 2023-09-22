@@ -385,6 +385,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 self.pull_forward_loans()
 
     def pull_forward_loans(self):
+
         previous_report = (
             F3XSummary.objects.get_queryset()
             .filter(
@@ -399,7 +400,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
             loans_to_pull_forward = F3XSummary.objects.get(
                 id=previous_report.id
             ).transaction_set.filter(
-                ~Q(loan_balance=Decimal(0.0)),
+                ~Q(loan_balance=Decimal(0.0)) | Q(loan_balance=None),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
                 deleted__isnull=True,
@@ -415,8 +416,12 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 loan.schedule_c_id = loan.schedule_c.id
                 loan.report_id = self.id
                 loan.report = self
-                loan.loan_id = loan.id
-                loan.loan = copy.deepcopy(loan)
+                # The loan_id should point to the original loan transaction
+                # even if the loan is pulled forward multiple times.
+                loan.loan_id = loan.loan_id if loan.loan_id else loan.id
+                loan.loan = (
+                    copy.deepcopy(loan.loan) if loan.loan_id else copy.deepcopy(loan)
+                )
                 loan.pk = loan.id = None
                 loan.save()
                 for child in children:
