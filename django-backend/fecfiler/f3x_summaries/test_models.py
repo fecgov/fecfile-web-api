@@ -63,3 +63,17 @@ class F3XTestCase(TestCase):
         self.assertEquals(new_loan.transaction_id, "9147A12D265AADCAB2D0")
         self.assertNotEquals(new_guarantor.id, "90e268b5-ee0a-40e9-bc0b-459c097d46d7")
         self.assertEquals(new_guarantor.transaction_id, "EF3D872B9863DBEC1376")
+
+        # Activate after ticket #1195
+        # new_debt_count = new_report.transaction_set.filter(
+        #     schedule_d_id__isnull=False,
+        # ).count()
+        # self.assertEquals(new_debt_count, 1)
+
+        new_debt = new_report.transaction_set.filter(
+            transaction_type_identifier="DEBT_OWED_TO_COMMITTEE"
+        ).first()
+
+        self.assertNotEquals(new_debt.id, "474a1a10-da68-4d71-9a11-9509df4ddddd")
+        self.assertEquals(new_debt.transaction_id, "C9718E935534853B488D")
+
