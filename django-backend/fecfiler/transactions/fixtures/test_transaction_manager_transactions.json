@@ -162,6 +162,37 @@
         }
     },
     {
+        "model": "transactions.scheduled",
+        "pk": "dddddddd-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "creditor_organization_name": "1",
+            "creditor_street_1": "1",
+            "creditor_street_2": "1",
+            "creditor_city": "1",
+            "creditor_state": "AZ",
+            "creditor_zip": "1",
+            "purpose_of_debt_or_obligation": "asdf",
+            "beginning_balance": "0.00",
+            "incurred_amount": "333.00",
+            "balance_at_close": "210.00"
+        }
+    },
+    {
+        "model": "transactions.scheduleb",
+        "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+        "fields": {
+            "payee_organization_name": "1",
+            "payee_street_1": "1",
+            "payee_street_2": "1",
+            "payee_city": "1",
+            "payee_state": "AZ",
+            "payee_zip": "1",
+            "expenditure_date": "2023-09-01",
+            "expenditure_amount": "123.00",
+            "expenditure_purpose_descrip": "sdfasdf"
+        }
+    },
+    {
         "model": "transactions.transaction",
         "pk": "08b51835-9dbe-46dd-991a-884c704a8b5a",
         "fields": {
@@ -309,6 +340,42 @@
             "updated": "2023-01-01T01:00:00.000Z",
             "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_b": "bbbbbbbb-3274-47d8-9388-7294a3fd4321"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "dddddddd-3274-47d8-9388-7294a3fd4321",
+        "fields": {
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_type_identifier": "DEBT_OWED_BY_COMMITTEE",
+            "aggregation_group": "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+            "_form_type": "SD10",
+            "transaction_id": "AECCA481D7E47215897F",
+            "entity_type": "ORG",
+            "created": "2023-01-01T01:00:00.000Z",
+            "updated": "2023-01-01T01:00:00.000Z",
+            "contact_1": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
+            "schedule_d": "dddddddd-3274-47d8-9388-7294a3fd4321"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+        "fields": {
+            "deleted": null,
+            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "report": "735db943-9446-462a-9be0-c820baadb622",
+            "transaction_type_identifier": "OPERATING_EXPENDITURE",
+            "aggregation_group": "GENERAL_DISBURSEMENT",
+            "debt": "dddddddd-3274-47d8-9388-7294a3fd4321",
+            "_form_type": "SB21B",
+            "transaction_id": "9F2F8E45B759FC37727B",
+            "entity_type": "ORG",
+            "created": "2023-09-20T12:51:26.902Z",
+            "updated": "2023-09-20T22:26:42.291Z",
+            "contact_1": "f6875969-02ea-4d5f-9793-b9e4b4b228c1",
+            "schedule_b": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491"
         }
     }
 ]

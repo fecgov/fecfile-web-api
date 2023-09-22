@@ -38,3 +38,9 @@ class TransactionManagerTestCase(TestCase):
     def test_refund_aggregation(self):
         refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
         self.assertEqual(refund.aggregate, 4444)
+
+    def test_debt_repayment(self):
+        repayment = Transaction.objects.get(id="dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491")
+        debt = Transaction.objects.get(id="dddddddd-3274-47d8-9388-7294a3fd4321")
+        self.assertEqual(repayment.debt.id, debt.id)
+        self.assertEqual(debt.payment_amount, 123)
