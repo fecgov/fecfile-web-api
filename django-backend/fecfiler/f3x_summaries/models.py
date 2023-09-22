@@ -451,7 +451,8 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
             debts_to_pull_forward = F3XSummary.objects.get(
                 id=previous_report.id
             ).transaction_set.filter(
-                # ~Q(balance_at_close=Decimal(0.0)) | Q(balance_at_close=None), # Activate after ticket #1195
+                # Activate after ticket #1195
+                # ~Q(balance_at_close=Decimal(0.0)) | Q(balance_at_close=None),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
                 deleted__isnull=True,

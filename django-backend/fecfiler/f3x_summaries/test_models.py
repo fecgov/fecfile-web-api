@@ -76,4 +76,3 @@ class F3XTestCase(TestCase):
 
         self.assertNotEquals(new_debt.id, "474a1a10-da68-4d71-9a11-9509df4ddddd")
         self.assertEquals(new_debt.transaction_id, "C9718E935534853B488D")
-
