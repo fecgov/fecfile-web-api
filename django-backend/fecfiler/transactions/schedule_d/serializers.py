@@ -72,15 +72,19 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
     payment_amount = DecimalField(
-        required=False, allow_null=True, max_digits=11, decimal_places=2
+        required=False, allow_null=True, max_digits=11, decimal_places=2, read_only=True
     )
     balance_at_close = DecimalField(
-        required=False, allow_null=True, max_digits=11, decimal_places=2
+        required=False, allow_null=True, max_digits=11, decimal_places=2, read_only=True
     )
 
     class Meta(TransactionSerializerBase.Meta):
-        fields = TransactionSerializerBase.Meta.get_fields() + [
-            f.name
-            for f in ScheduleD._meta.get_fields()
-            if f.name not in ["transaction"]
-        ]
+        fields = (
+            TransactionSerializerBase.Meta.get_fields()
+            + [
+                f.name
+                for f in ScheduleD._meta.get_fields()
+                if f.name not in ["transaction"]
+            ]
+            + ["payment_amount"]
+        )

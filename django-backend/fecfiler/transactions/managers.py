@@ -83,6 +83,13 @@ class TransactionManager(SoftDeleteManager):
             .annotate(payment_to_date=Sum("amount"))
             .values("payment_to_date")
         )
+
+        debt_payment_clause = (
+            queryset.filter(debt_id=OuterRef("id"))
+            .values("committee_account_id")
+            .annotate(payment_to_date=Sum("amount"))
+            .values("payment_to_date")
+        )
         return (
             queryset.annotate(
                 aggregate=Subquery(aggregate_clause),
@@ -92,6 +99,13 @@ class TransactionManager(SoftDeleteManager):
                         then=Coalesce(
                             Subquery(loan_payment_to_date_clause), Value(Decimal(0))
                         ),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
+                payment_amount=Case(  # debt payment
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(Subquery(debt_payment_clause), Value(Decimal(0))),
                     ),
                     default=Value(Decimal(0)),
                 ),
