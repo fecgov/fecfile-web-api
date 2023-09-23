@@ -391,19 +391,15 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
             .filter(
                 committee_account=self.committee_account,
                 coverage_through_date__lt=self.coverage_through_date,
-                deleted__isnull=True,
             )
             .order_by("coverage_through_date")
             .last()
         )
         if previous_report:
-            loans_to_pull_forward = F3XSummary.objects.get(
-                id=previous_report.id
-            ).transaction_set.filter(
+            loans_to_pull_forward = previous_report.transaction_set.filter(
                 ~Q(loan_balance=Decimal(0.0)) | Q(loan_balance=None),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
-                deleted__isnull=True,
             )
 
             for loan in loans_to_pull_forward:
@@ -411,35 +407,36 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 # when the loan is saved
                 loan_children = copy.deepcopy(loan.children)
 
-                loan.schedule_c.pk = loan.schedule_c.id = None
-                loan.schedule_c.save()
-                loan.schedule_c_id = loan.schedule_c.id
+                loan.schedule_c_id = self.copy_fkey(loan.schedule_c)
+                loan.memo_text_id = self.copy_fkey(loan.memo_text)
                 loan.report_id = self.id
                 loan.report = self
                 # The loan_id should point to the original loan transaction
                 # even if the loan is pulled forward multiple times.
                 loan.loan_id = loan.loan_id if loan.loan_id else loan.id
-                loan.loan = (
-                    copy.deepcopy(loan.loan) if loan.loan_id else copy.deepcopy(loan)
-                )
-                loan.pk = loan.id = None
-                loan.save()
+                self.copy_fkey(loan)
                 for child in loan_children:
                     # If child is a guarantor transaction, copy it
                     # and link it to the new loan
                     if child.schedule_c2_id:
-                        child.schedule_c2.pk = child.schedule_c2.id = None
-                        child.schedule_c2.save()
-                        child.schedule_c2_id = child.schedule_c2.id
+                        child.schedule_c2_id = self.copy_fkey(child.schedule_c2)
+                        child.memo_text_id = self.copy_fkey(child.memo_text)
                         child.report_id = self.id
                         child.report = self
                         child.parent_transaction_id = loan.id
                         child.parent_transaction = loan
-                        child.pk = child.id = None
-                        child.save()
+                        self.copy_fkey(child)
 
     class Meta:
         db_table = "f3x_summaries"
+
+    def copy_fkey(self, fkey):
+        if fkey:
+            fkey.pk = fkey.id = None
+            fkey._state.adding = True
+            fkey.save()
+            return fkey.id
+        return None
 
 
 class ReportMixin(models.Model):
