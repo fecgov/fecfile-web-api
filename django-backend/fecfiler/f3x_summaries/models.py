@@ -391,7 +391,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
         if previous_report:
             loans_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(loan_balance=Decimal(0.0)) | Q(loan_balance=None),
+                ~Q(loan_balance=Decimal(0)) | Q(loan_balance=None),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
             )
@@ -428,19 +428,19 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
         if previous_report:
             debts_to_pull_forward = previous_report.transaction_set.filter(
                 # Activate after ticket #1195
-                # ~Q(balance_at_close=Decimal(0.0)) | Q(balance_at_close=None),
+                # ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close=None),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
             )
 
             for debt in debts_to_pull_forward:
+                debt.schedule_d.incurred_amount = Decimal(0)
                 debt.schedule_d_id = self.copy_fkey(debt.schedule_d)
                 debt.report_id = self.id
                 debt.report = self
                 # The debt_id should point to the original debt transaction
                 # even if the debt is pulled forward multiple times.
                 debt.debt_id = debt.debt_id if debt.debt_id else debt.id
-                debt.incurred_amount = Decimal(0.0)
                 self.copy_fkey(debt)
 
     def get_previous_report(self):
