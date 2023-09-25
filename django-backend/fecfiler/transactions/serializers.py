@@ -120,6 +120,7 @@ class TransactionSerializerBase(
         required=False, allow_null=True, read_only=True
     )
     debt_id = UUIDField(required=False, allow_null=True)
+    loan_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
@@ -285,11 +286,14 @@ class TransactionSerializerBase(
                     "transaction",
                     "parent_transaction",
                     "debt",
-                    "debt_repayments",
+                    "debt_associations",
+                    "loan",
+                    "loan_associations",
                 ]
             ] + [
                 "parent_transaction_id",
                 "debt_id",
+                "loan_id",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",

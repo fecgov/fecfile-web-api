@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.f3x_summaries.models import ReportMixin
@@ -37,7 +36,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="debt_repayments",
+        related_name="debt_associations",
+    )
+    loan = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="loan_associations",
     )
 
     # The _form_type value in the db may or may not be correct based on whether
@@ -57,7 +63,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         self._form_type = value
 
     transaction_id = models.TextField(
-        null=False, blank=False, unique=True, default=generate_fec_uid
+        null=False, blank=False, unique=False, default=generate_fec_uid
     )
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
@@ -150,10 +156,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
-        try:
-            super(Transaction, self).validate_unique()
-        except ValidationError:  # try using a new fec id if collision
-            self.transaction_id = generate_fec_uid()
         super(Transaction, self).save(*args, **kwargs)
 
     class Meta:
