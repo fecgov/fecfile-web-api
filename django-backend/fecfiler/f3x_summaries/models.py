@@ -401,25 +401,25 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 # when the loan is saved
                 loan_children = copy.deepcopy(loan.children)
 
-                loan.schedule_c_id = self.copy_fkey(loan.schedule_c)
-                loan.memo_text_id = self.copy_fkey(loan.memo_text)
+                loan.schedule_c_id = self.save_copy(loan.schedule_c)
+                loan.memo_text_id = self.save_copy(loan.memo_text)
                 loan.report_id = self.id
                 loan.report = self
                 # The loan_id should point to the original loan transaction
                 # even if the loan is pulled forward multiple times.
                 loan.loan_id = loan.loan_id if loan.loan_id else loan.id
-                self.copy_fkey(loan)
+                self.save_copy(loan)
                 for child in loan_children:
                     # If child is a guarantor transaction, copy it
                     # and link it to the new loan
                     if child.schedule_c2_id:
-                        child.schedule_c2_id = self.copy_fkey(child.schedule_c2)
-                        child.memo_text_id = self.copy_fkey(child.memo_text)
+                        child.schedule_c2_id = self.save_copy(child.schedule_c2)
+                        child.memo_text_id = self.save_copy(child.memo_text)
                         child.report_id = self.id
                         child.report = self
                         child.parent_transaction_id = loan.id
                         child.parent_transaction = loan
-                        self.copy_fkey(child)
+                        self.save_copy(child)
 
     def pull_forward_debts(self):
 
@@ -454,7 +454,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
             .last()
         )
 
-    def copy_fkey(self, fkey):
+    def save_copy(self, fkey):
         if fkey:
             fkey.pk = fkey.id = None
             fkey._state.adding = True
