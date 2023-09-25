@@ -23,13 +23,7 @@ class ScheduleD(models.Model):
     creditor_state = models.TextField(null=True, blank=True)
     creditor_zip = models.TextField(null=True, blank=True)
     purpose_of_debt_or_obligation = models.TextField(null=True, blank=True)
-    beginning_balance = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
     incurred_amount = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
-    balance_at_close = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
