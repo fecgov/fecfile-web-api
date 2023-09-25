@@ -44,3 +44,4 @@ class TransactionManagerTestCase(TestCase):
         debt = Transaction.objects.get(id="dddddddd-3274-47d8-9388-7294a3fd4321")
         self.assertEqual(repayment.debt.id, debt.id)
         self.assertEqual(debt.payment_amount, 123)
+        self.assertEqual(debt.balance_at_close, 210)

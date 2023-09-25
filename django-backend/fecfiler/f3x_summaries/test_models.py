@@ -28,7 +28,9 @@ class F3XTestCase(TestCase):
         self.assertEquals(f3x_summary_from_db.date_signed, datetime.date(2022, 1, 1))
         f3x_summary_from_db.delete()
         self.assertRaises(
-            F3XSummary.DoesNotExist, F3XSummary.objects.get, date_signed="2022-01-01",
+            F3XSummary.DoesNotExist,
+            F3XSummary.objects.get,
+            date_signed="2022-01-01",
         )
 
         soft_deleted_f3x_summary = F3XSummary.all_objects.get(date_signed="2022-01-01")
@@ -66,11 +68,10 @@ class F3XTestCase(TestCase):
         self.assertEquals(new_guarantor.transaction_id, "EF3D872B9863DBEC1376")
         self.assertEquals(new_guarantor.schedule_c2.guarantor_state, "CA")
 
-        # Activate after ticket #1195
-        # new_debt_count = new_report.transaction_set.filter(
-        #     schedule_d_id__isnull=False,
-        # ).count()
-        # self.assertEquals(new_debt_count, 1)
+        new_debt_count = new_report.transaction_set.filter(
+            schedule_d_id__isnull=False,
+        ).count()
+        self.assertEquals(new_debt_count, 1)
 
         new_debt = new_report.transaction_set.filter(
             transaction_type_identifier="DEBT_OWED_TO_COMMITTEE"

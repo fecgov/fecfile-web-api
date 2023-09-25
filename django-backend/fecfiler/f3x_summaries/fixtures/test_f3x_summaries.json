@@ -477,9 +477,7 @@
       "creditor_city": "ALEXANDRIA",
       "creditor_state": "VA",
       "creditor_zip": "22314",
-      "beginning_balance": "0.00",
-      "incurred_amount": "3.00",
-      "balance_at_close": "3.00"
+      "incurred_amount": "3.00"
     },
     "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
   },
@@ -520,9 +518,7 @@
       "creditor_city": "ALEXANDRIA",
       "creditor_state": "VA",
       "creditor_zip": "22314",
-      "beginning_balance": "0.00",
-      "incurred_amount": "3.00",
-      "balance_at_close": "0.00"
+      "incurred_amount": "3.00"
     },
     "pk": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718"
   },
@@ -546,6 +542,39 @@
       "parent_transaction_id": null,
       "debt_id": null,
       "loan_id": null
+    }
+  },
+  {
+    "model": "transactions.scheduleb",
+    "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+    "fields": {
+      "payee_organization_name": "1",
+      "payee_street_1": "1",
+      "payee_street_2": "1",
+      "payee_city": "1",
+      "payee_state": "AZ",
+      "payee_zip": "1",
+      "expenditure_date": "2023-09-01",
+      "expenditure_amount": "3.00",
+      "expenditure_purpose_descrip": "sdfasdf"
+    }
+  },
+  {
+    "model": "transactions.transaction",
+    "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+    "fields": {
+      "deleted": null,
+      "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+      "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "OPERATING_EXPENDITURE",
+      "aggregation_group": "GENERAL_DISBURSEMENT",
+      "debt": "474a1a10-da68-4d71-9a11-9509df4dddcc",
+      "_form_type": "SB21B",
+      "transaction_id": "9F2F8E45B759FC37727B",
+      "entity_type": "ORG",
+      "created": "2023-09-20T12:51:26.902Z",
+      "updated": "2023-09-20T22:26:42.291Z",
+      "schedule_b": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491"
     }
   }
 ]

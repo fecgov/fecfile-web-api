@@ -386,7 +386,6 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                 self.pull_forward_debts()
 
     def pull_forward_loans(self):
-
         previous_report = self.get_previous_report()
 
         if previous_report:
@@ -422,13 +421,11 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
                         self.save_copy(child)
 
     def pull_forward_debts(self):
-
         previous_report = self.get_previous_report()
 
         if previous_report:
             debts_to_pull_forward = previous_report.transaction_set.filter(
-                # Activate after ticket #1195
-                # ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close=None),
+                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close=None),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
             )

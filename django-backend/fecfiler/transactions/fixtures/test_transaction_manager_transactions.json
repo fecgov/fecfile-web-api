@@ -172,9 +172,7 @@
             "creditor_state": "AZ",
             "creditor_zip": "1",
             "purpose_of_debt_or_obligation": "asdf",
-            "beginning_balance": "0.00",
-            "incurred_amount": "333.00",
-            "balance_at_close": "210.00"
+            "incurred_amount": "333.00"
         }
     },
     {
