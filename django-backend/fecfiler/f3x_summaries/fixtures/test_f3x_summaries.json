@@ -461,5 +461,91 @@
       "debt_id": null,
       "loan_id": null
     }
+  },
+  {
+    "comment": "Debt to move forward",
+    "model": "transactions.scheduled",
+    "fields": {
+      "creditor_organization_name": "A PAC",
+      "creditor_last_name": null,
+      "creditor_first_name": null,
+      "creditor_middle_name": null,
+      "creditor_prefix": null,
+      "creditor_suffix": null,
+      "creditor_street_1": "107 S WEST ST",
+      "creditor_street_2": "SUITE 555",
+      "creditor_city": "ALEXANDRIA",
+      "creditor_state": "VA",
+      "creditor_zip": "22314",
+      "beginning_balance": "0.00",
+      "incurred_amount": "3.00",
+      "balance_at_close": "3.00"
+    },
+    "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Debt to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-9509df4ddddd",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
+      "schedule_d_id": "dddd267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SD9",
+      "transaction_id": "C9718E935534853B488D",
+      "entity_type": "COM",
+      "memo_code": null,
+      "force_itemized": null,
+      "created": "2023-09-22T05:08:34.590929-04:00",
+      "updated": "2023-09-22T07:45:11.263033-04:00",
+      "parent_transaction_id": null,
+      "debt_id": null,
+      "loan_id": null
+    }
+  },
+  {
+    "comment": "Debt NOT to move forward",
+    "model": "transactions.scheduled",
+    "fields": {
+      "creditor_organization_name": "B PAC",
+      "creditor_last_name": null,
+      "creditor_first_name": null,
+      "creditor_middle_name": null,
+      "creditor_prefix": null,
+      "creditor_suffix": null,
+      "creditor_street_1": "107 S WEST ST",
+      "creditor_street_2": "SUITE 555",
+      "creditor_city": "ALEXANDRIA",
+      "creditor_state": "VA",
+      "creditor_zip": "22314",
+      "beginning_balance": "0.00",
+      "incurred_amount": "3.00",
+      "balance_at_close": "0.00"
+    },
+    "pk": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Debt NOT to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-9509df4dddcc",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
+      "schedule_d_id": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SD9",
+      "transaction_id": "D9718E935534853B488D",
+      "entity_type": "COM",
+      "memo_code": null,
+      "force_itemized": null,
+      "created": "2023-09-22T05:08:34.590929-04:00",
+      "updated": "2023-09-22T07:45:11.263033-04:00",
+      "parent_transaction_id": null,
+      "debt_id": null,
+      "loan_id": null
+    }
   }
 ]
