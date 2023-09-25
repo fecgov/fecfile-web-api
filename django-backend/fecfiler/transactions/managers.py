@@ -52,6 +52,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
+                    "schedule_d__incurred_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -73,7 +74,7 @@ class TransactionManager(SoftDeleteManager):
 
         loan_payment_to_date_clause = (
             queryset.filter(
-                parent_transaction_id=OuterRef("id"),
+                parent_transaction__transaction_id=OuterRef("transaction_id"),
                 transaction_type_identifier__in=[
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
@@ -85,10 +86,35 @@ class TransactionManager(SoftDeleteManager):
         )
 
         debt_payment_clause = (
-            queryset.filter(debt_id=OuterRef("id"))
+            queryset.filter(debt_id=OuterRef("id"), schedule_d__isnull=True)
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
             .values("payment_to_date")
+        )
+        incurred_prior_clause = (
+            queryset.filter(
+                ~Q(debt_id=OuterRef("id")),
+                transaction_id=OuterRef("transaction_id"),
+                report__coverage_through_date__lt=OuterRef(
+                    "report__coverage_from_date"
+                ),
+            )
+            .values("committee_account_id")
+            .annotate(
+                incurred_prior=Sum("amount"),
+            )
+            .values("incurred_prior")
+        )
+        debt_payments_prior_clause = (
+            queryset.filter(
+                ~Q(debt_id=OuterRef("id")),
+                debt__transaction_id=OuterRef("transaction_id"),
+                schedule_d__isnull=True,
+                date__lt=OuterRef("report__coverage_from_date"),
+            )
+            .values("committee_account_id")
+            .annotate(debt_payments_prior=Sum("amount"))
+            .values("debt_payments_prior")
         )
         return (
             queryset.annotate(
@@ -109,10 +135,38 @@ class TransactionManager(SoftDeleteManager):
                     ),
                     default=Value(Decimal(0)),
                 ),
+                payment_prior=Case(  # debt payments
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(
+                            Subquery(debt_payments_prior_clause), Value(Decimal(0))
+                        ),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
+                incurred_prior=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(
+                            Subquery(incurred_prior_clause), Value(Decimal(0))
+                        ),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
                 itemized=self.get_itemization_clause(),
             )
             .annotate(
                 loan_balance=F("amount") - F("loan_payment_to_date"),
+                beginning_balance=F("incurred_prior") - F("payment_prior"),
+                balance_at_close=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=F("beginning_balance")
+                        + F("schedule_d__incurred_amount")
+                        - F("payment_amount"),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),

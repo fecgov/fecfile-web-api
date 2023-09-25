@@ -131,7 +131,9 @@ class TransactionSerializerBase(
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    payment_amount = DecimalField(
+    beginning_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    payment_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance_at_close = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
 
@@ -310,7 +312,9 @@ class TransactionSerializerBase(
                 "aggregate",
                 "loan_payment_to_date",
                 "loan_balance",
+                "beginning_balance",
                 "payment_amount",
+                "balance_at_close",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",

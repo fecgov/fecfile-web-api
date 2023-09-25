@@ -27,7 +27,9 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
 
     def validate(self, data):
         """Adds stub aggregate_amount to pass validation"""
+        data["beginning_balance"] = 0
         validated_data = super().validate(data)
+        del validated_data["beginning_balance"]
         return validated_data
 
     def create(self, validated_data: dict):
@@ -66,7 +68,7 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
     creditor_zip = CharField(required=False, allow_null=True)
     purpose_of_debt_or_obligation = CharField(required=False, allow_null=True)
     beginning_balance = DecimalField(
-        required=False, allow_null=True, max_digits=11, decimal_places=2
+        required=False, allow_null=True, max_digits=11, decimal_places=2, read_only=True
     )
     incurred_amount = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
@@ -86,5 +88,5 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
                 for f in ScheduleD._meta.get_fields()
                 if f.name not in ["transaction"]
             ]
-            + ["payment_amount"]
+            + ["beginning_balance", "payment_amount", "balance_at_close"]
         )
