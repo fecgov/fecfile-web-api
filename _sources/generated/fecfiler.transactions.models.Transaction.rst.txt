@@ -67,13 +67,16 @@ fecfiler.transactions.models.Transaction
       ~Transaction.contact_3_id
       ~Transaction.created
       ~Transaction.debt
+      ~Transaction.debt_associations
       ~Transaction.debt_id
-      ~Transaction.debt_repayments
       ~Transaction.deleted
       ~Transaction.entity_type
       ~Transaction.force_itemized
       ~Transaction.form_type
       ~Transaction.id
+      ~Transaction.loan
+      ~Transaction.loan_associations
+      ~Transaction.loan_id
       ~Transaction.memo_code
       ~Transaction.memo_text
       ~Transaction.memo_text_id

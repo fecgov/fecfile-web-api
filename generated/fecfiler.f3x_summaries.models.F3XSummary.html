@@ -94,20 +94,32 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_report</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.refresh_from_db" title="fecfiler.f3x_summaries.models.F3XSummary.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pull_forward_debts</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pull_forward_loans</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.refresh_from_db" title="fecfiler.f3x_summaries.models.F3XSummary.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.save" title="fecfiler.f3x_summaries.models.F3XSummary.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>([force_insert, force_update, using, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.save" title="fecfiler.f3x_summaries.models.F3XSummary.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.save_base" title="fecfiler.f3x_summaries.models.F3XSummary.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.save_base" title="fecfiler.f3x_summaries.models.F3XSummary.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
 <td><p>Handle the parts of saving which should be done only once per save, yet need to be done in raw saves, too.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_copy</span></code>(fkey)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.models.F3XSummary.serializable_value" title="fecfiler.f3x_summaries.models.F3XSummary.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
 <td><p>Return the value of the field name for this instance.</p></td>
@@ -633,7 +645,7 @@ of the field will call this method.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.f3x_summaries.models.F3XSummary.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_insert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.models.F3XSummary.save" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.models.F3XSummary.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the current instance. Override this in a subclass if you want to
 control the saving process.</p>
 <p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist

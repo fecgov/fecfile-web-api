@@ -33,11 +33,15 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.get_next_by_updated
       ~F3XSummary.get_previous_by_created
       ~F3XSummary.get_previous_by_updated
+      ~F3XSummary.get_previous_report
       ~F3XSummary.hard_delete
       ~F3XSummary.prepare_database_save
+      ~F3XSummary.pull_forward_debts
+      ~F3XSummary.pull_forward_loans
       ~F3XSummary.refresh_from_db
       ~F3XSummary.save
       ~F3XSummary.save_base
+      ~F3XSummary.save_copy
       ~F3XSummary.serializable_value
       ~F3XSummary.unique_error_message
       ~F3XSummary.validate_constraints
