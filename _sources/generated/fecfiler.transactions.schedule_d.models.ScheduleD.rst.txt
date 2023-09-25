@@ -49,8 +49,6 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
 
    .. autosummary::
    
-      ~ScheduleD.balance_at_close
-      ~ScheduleD.beginning_balance
       ~ScheduleD.creditor_city
       ~ScheduleD.creditor_first_name
       ~ScheduleD.creditor_last_name
