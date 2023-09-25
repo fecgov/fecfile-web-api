@@ -42,16 +42,10 @@
     "purpose_of_debt_or_obligation": {
         "path": "schedule_d.purpose_of_debt_or_obligation"
     },
-    "beginning_balance": {
-        "path": "schedule_d.beginning_balance"
-    },
+    "beginning_balance": {},
     "incurred_amount": {
         "path": "schedule_d.incurred_amount"
     },
-    "payment_amount": {
-        "path": "schedule_d.payment_amount"
-    },
-    "balance_at_close": {
-        "path": "schedule_d.balance_at_close"
-    }
+    "payment_amount": {},
+    "balance_at_close": {}
 }
