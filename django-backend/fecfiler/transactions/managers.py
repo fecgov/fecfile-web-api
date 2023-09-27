@@ -64,9 +64,18 @@ class TransactionManager(SoftDeleteManager):
             date=OuterRef("date"), created__lte=OuterRef("created")
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
+        force_unaggregated_clause = Q(force_unaggregated=False) | Q(
+            force_unaggregated=None
+        )
 
         aggregate_clause = (
-            queryset.filter(contact_clause, year_clause, date_clause, group_clause)
+            queryset.filter(
+                contact_clause,
+                year_clause,
+                date_clause,
+                group_clause,
+                force_unaggregated_clause,
+            )
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
@@ -100,9 +109,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("amount"),
-            )
+            .annotate(incurred_prior=Sum("amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
