@@ -390,7 +390,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
         if previous_report:
             loans_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(loan_balance=Decimal(0)) | Q(loan_balance=None),
+                ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
             )
@@ -425,7 +425,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
         if previous_report:
             debts_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close=None),
+                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
             )

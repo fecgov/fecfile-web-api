@@ -64,9 +64,7 @@ class TransactionManager(SoftDeleteManager):
             date=OuterRef("date"), created__lte=OuterRef("created")
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
-        force_unaggregated_clause = Q(force_unaggregated=False) | Q(
-            force_unaggregated=None
-        )
+        force_unaggregated_clause = ~Q(force_unaggregated=True)
 
         aggregate_clause = (
             queryset.filter(
@@ -125,7 +123,7 @@ class TransactionManager(SoftDeleteManager):
         )
         return (
             queryset.annotate(
-                aggregate=Subquery(aggregate_clause),
+                aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,
