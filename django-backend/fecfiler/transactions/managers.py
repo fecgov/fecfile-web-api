@@ -74,7 +74,7 @@ class TransactionManager(SoftDeleteManager):
 
         loan_payment_to_date_clause = (
             queryset.filter(
-                parent_transaction__transaction_id=OuterRef("transaction_id"),
+                loan__transaction_id=OuterRef("transaction_id"),
                 transaction_type_identifier__in=[
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
@@ -172,9 +172,7 @@ class TransactionManager(SoftDeleteManager):
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
                     When(
                         transaction_type_identifier="C2_LOAN_GUARANTOR",
-                        parent_transaction__transaction_type_identifier=(
-                            "LOAN_BY_COMMITTEE"
-                        ),
+                        loan__transaction_type_identifier=("LOAN_BY_COMMITTEE"),
                         then=Value("SC2/9"),
                     ),
                     When(
