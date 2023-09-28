@@ -132,8 +132,8 @@ class TransactionSerializerBaseTestCase(TestCase):
         tier2 = Transaction.objects.get(id="cccccbbb-3274-47d8-9388-7294a3fd4321")
         tier3 = Transaction.objects.get(id="77777bbb-3274-47d8-9388-7294a3fd4321")
         self.assertEquals(tier1.itemized, True)
-        self.assertEquals(tier2.itemized, None)
-        self.assertEquals(tier3.itemized, None)
+        self.assertEquals(tier2.itemized, False)
+        self.assertEquals(tier3.itemized, False)
 
         representation = TransactionSerializerBase().to_representation(tier2)
         self.assertEquals(representation["itemized"], True)
