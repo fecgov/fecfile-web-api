@@ -52,6 +52,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
+                    "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
@@ -107,7 +108,13 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
+<<<<<<< HEAD
             .annotate(incurred_prior=Sum("amount"),)
+=======
+            .annotate(
+                incurred_prior=Sum("schedule_d__incurred_amount"),
+            )
+>>>>>>> develop
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
@@ -170,7 +177,6 @@ class TransactionManager(SoftDeleteManager):
                         + F("schedule_d__incurred_amount")
                         - F("payment_amount"),
                     ),
-                    default=Value(Decimal(0)),
                 ),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
@@ -200,6 +206,11 @@ class TransactionManager(SoftDeleteManager):
                     F("debt___form_type"),
                     F("loan___form_type"),
                     Value(None),
+                ),
+            )
+            .annotate(
+                balance=Coalesce(
+                    F("balance_at_close"), F("loan_balance"), Value(Decimal(0.0))
                 ),
             )
             .alias(
