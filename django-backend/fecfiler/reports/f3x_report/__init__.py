@@ -6,6 +6,6 @@ Provides F3X Report record
 Also provides abstract model and viewset for
 apps that need report-related records
 
-:py:class:`fecfiler.committee_accounts.models.ReportMixin`
-:py:class:`fecfiler.committee_accounts.views.ReportViewMixin`
+:py:class:`fecfiler.reports.models.ReportMixin`
+:py:class:`fecfiler.reports.views.ReportViewMixin`
 """

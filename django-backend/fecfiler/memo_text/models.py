@@ -1,6 +1,6 @@
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.f3x_report.models import ReportMixin
+from fecfiler.reports.models import Report
 from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid
@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+class MemoText(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -23,6 +23,9 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     transaction_id_number = models.TextField(null=True, blank=True)
     transaction_uuid = models.TextField(null=True, blank=True)
     text4000 = models.TextField(null=True, blank=True)
+    report = models.ForeignKey(
+        Report, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     class Meta:
         db_table = "memo_text"

@@ -10,7 +10,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from .serializers import F3XReportSerializer
+from .serializers import F3XReportSerializerBase
 from django.db.models import Case, Value, When, Q
 import logging
 
@@ -58,7 +58,7 @@ class F3XReportViewSet(CommitteeOwnedViewSet):
         .all()
     )
 
-    serializer_class = F3XReportSerializer
+    serializer_class = F3XReportSerializerBase
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",

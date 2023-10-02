@@ -115,6 +115,7 @@ class ScheduleATransactionSerializerTier2(ScheduleATransactionSerializerBase):
                     del transaction_data[key]
 
             children = transaction_data.pop("children", [])
+            print("\n\n\n",super().__dict__, "\n\n\n")
             parent = super().create(transaction_data)
             for child in children:
                 child["parent_transaction_id"] = parent.id

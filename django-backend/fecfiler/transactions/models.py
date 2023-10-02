@@ -1,8 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from fecfiler.reports.models import Report
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.f3x_report.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -19,7 +19,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -29,6 +29,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     transaction_type_identifier = models.TextField(null=True, blank=True)
     aggregation_group = models.TextField(null=True, blank=True)
+    report = models.ForeignKey(
+        Report, on_delete=models.CASCADE, null=True, blank=True
+    )
     parent_transaction = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -147,6 +150,27 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             super(Transaction, self).validate_unique()
         except ValidationError:  # try using a new fec id if collision
             self.transaction_id = generate_fec_uid()
+
+        if self.report:
+            committee = self.report.committee_account
+            report_date = self.report.coverage_from_date
+            if report_date is not None:
+                report_year = report_date.year
+
+                reports_to_flag_for_recalculation = Report.objects.filter(
+                    ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
+                    committee_account=committee,
+                    coverage_from_date__year=report_year,
+                    coverage_from_date__gte=report_date,
+                )
+            else:
+                reports_to_flag_for_recalculation = [self.report]
+
+            for report in reports_to_flag_for_recalculation:
+                report.calculation_status = None
+                report.save()
+                logger.info(f"Report: {report.id} marked for recalcuation")
+
         super(Transaction, self).save(*args, **kwargs)
 
     class Meta:

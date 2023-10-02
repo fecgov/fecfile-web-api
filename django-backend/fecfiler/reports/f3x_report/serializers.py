@@ -1,4 +1,6 @@
+from fecfiler.reports.serializers import ReportSerializerBase
 from .models import F3XReport
+from django.db import transaction
 from django.db.models import Q
 from rest_framework.serializers import EmailField, CharField, ValidationError
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
@@ -16,7 +18,15 @@ COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
 logger = logging.getLogger(__name__)
 
 
-class F3XReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
+def get_model_data(data, model):
+    return {
+        field.name: data[field.name]
+        for field in model._meta.get_fields()
+        if field.name in data
+    }
+
+
+class F3XReportSerializerBase(ReportSerializerBase):
     schema_name = "F3X"
     confirmation_email_1 = EmailField(
         max_length=44,
@@ -58,9 +68,29 @@ class F3XReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializer
             report_code=self.validated_data["report_code"],
         ).count()
         if number_of_collisions == 0:
-            return super(F3XReportSerializer, self).save(**kwargs)
+            return super(F3XReportSerializerBase, self).save(**kwargs)
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
+
+    def create(self, validated_data: dict):
+        print("\n\n\n",validated_data,"\n\n")
+        with transaction.atomic():
+            f3x_data = get_model_data(validated_data, F3XReport)
+            f3x_report = F3XReport.objects.create(**f3x_data)
+            report_data = validated_data.copy()
+            for key in f3x_data.keys():
+                print(key)
+                if key != "id":
+                    del report_data[key]
+
+            if "_form_type" in report_data.keys():
+                report_data["form_type"] = report_data.pop("_form_type")
+
+            report = super().create(report_data)
+            print("\n\n\nCREATED\n\n")
+            report.f3x_report = f3x_report
+            report.save()
+            return report
 
     def validate(self, data):
         self.context["fields_to_ignore"] = self.context.get(
@@ -80,6 +110,7 @@ class F3XReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializer
                 "scheduleatransaction",
                 "schedulebtransaction",
                 "transaction",
+                "report",
                 "dotfec",
                 "memotext",
                 "uploadsubmission",
