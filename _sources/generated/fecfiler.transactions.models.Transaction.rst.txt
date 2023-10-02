@@ -72,6 +72,7 @@ fecfiler.transactions.models.Transaction
       ~Transaction.deleted
       ~Transaction.entity_type
       ~Transaction.force_itemized
+      ~Transaction.force_unaggregated
       ~Transaction.form_type
       ~Transaction.id
       ~Transaction.loan
