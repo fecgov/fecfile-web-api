@@ -129,6 +129,7 @@ class TransactionSerializerBase(
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     beginning_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -311,6 +312,7 @@ class TransactionSerializerBase(
                 "amount",
                 "aggregate",
                 "loan_payment_to_date",
+                "balance",
                 "loan_balance",
                 "beginning_balance",
                 "payment_amount",
