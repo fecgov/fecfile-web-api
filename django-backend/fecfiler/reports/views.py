@@ -22,21 +22,23 @@ class ReportViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
     ordering = ["-created"]
 
 
-class ReportViewSet(CommitteeOwnedViewSet, ReportViewMixin):
+class ReportViewSet(CommitteeOwnedViewSet):
     queryset = Report.objects.all()
+    print("\n\n\nHEYO",queryset,"\n\n")
     serializer_class = ReportSerializerBase
     pagination_class = ReportListPagination
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
         "id",
+        "_form_type"
     ]
     ordering = ["-created"]
 
     # Allow requests to filter transactions output based on schedule type by
     # passing a query parameter
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = self.queryset
         report_filters = self.request.query_params.get("reports")
         if report_filters is not None:
             report_list = report_filters.split(",")

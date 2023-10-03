@@ -2,7 +2,7 @@ from enum import Enum
 import json
 import uuid
 from django.db import models
-from fecfiler.reports.f3x_report.models import F3XReport
+from fecfiler.reports.models import Report
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class DotFEC(models.Model):
         serialize=False,
         unique=True,
     )
-    report = models.ForeignKey(F3XReport, on_delete=models.CASCADE)
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
     file_name = models.TextField()
 
     class Meta:
@@ -73,7 +73,7 @@ class UploadSubmissionManager(models.Manager):
         )
         submission.save()
 
-        F3XReport.objects.filter(id=report_id).update(upload_submission=submission)
+        Report.objects.filter(id=report_id).update(upload_submission=submission)
 
         logger.info(
             f"""Submission to Webload has been initialized for report :{report_id}
@@ -89,7 +89,7 @@ class WebPrintSubmissionManager(models.Manager):
         )
         submission.save()
 
-        F3XReport.objects.filter(id=report_id).update(webprint_submission=submission)
+        Report.objects.filter(id=report_id).update(webprint_submission=submission)
 
         logger.info(
             f"""Submission to WebPrint has been initialized for report :{report_id}

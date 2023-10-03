@@ -25,7 +25,7 @@ class F3xReportSerializer(ModelSerializer):
         fields = [
             f.name
             for f in F3XReport._meta.get_fields()
-            if f.name not in ["deleted", "report"]
+            if f.name not in ["deleted", "report", "dotfec"]
         ]
         model = F3XReport
 
@@ -60,6 +60,7 @@ class ReportSerializerBase(
 
         representation["form_type"] = instance.form_type
 
+        print("Exiting Report representation")
         return representation
     
     def create(self, validated_data):
@@ -85,7 +86,7 @@ class ReportSerializerBase(
             return [
                 f.name
                 for f in Report._meta.get_fields()
-                if f.name not in ["deleted"]
+                if f.name not in ["deleted", "transaction","memotext", "dotfec"]
             ] + [
                 "form_type",
                 "fields_to_validate",
