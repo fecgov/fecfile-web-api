@@ -273,7 +273,8 @@
             "updated": "2023-02-15T05:00:00.000Z",
             "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "43219fa2-3274-47d8-9388-7294a3fd4321",
-            "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94"
+            "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94",
+            "force_unaggregated": "True"
         }
     },
     {
