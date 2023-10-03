@@ -1,8 +1,9 @@
+from fecfiler.reports.models import Report
 from fecfiler.reports.serializers import ReportSerializerBase
 from .models import F3XReport
 from django.db import transaction
 from django.db.models import Q
-from rest_framework.serializers import EmailField, CharField, ValidationError
+from rest_framework.serializers import EmailField, CharField, ValidationError, DateField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
@@ -55,6 +56,12 @@ class F3XReportSerializerBase(ReportSerializerBase):
         read_only=True,
     )
 
+    date_of_election = DateField(required=False, allow_null=True)
+    coverage_from_date = DateField(allow_null=True, required=False)
+    coverage_through_date = DateField(allow_null=True, required=False)
+    date_signed = DateField(allow_null=True, required=False)
+    cash_on_hand_date = DateField(allow_null=True, required=False)
+
     def save(self, **kwargs):
         """Raise a ValidationError if an F3X with the same report code
         exists for the same year
@@ -72,7 +79,7 @@ class F3XReportSerializerBase(ReportSerializerBase):
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data):
         print("\n\n\n",validated_data,"\n\n")
         with transaction.atomic():
             f3x_data = get_model_data(validated_data, F3XReport)
@@ -86,8 +93,8 @@ class F3XReportSerializerBase(ReportSerializerBase):
             if "_form_type" in report_data.keys():
                 report_data["form_type"] = report_data.pop("_form_type")
 
-            report = super().create(report_data)
-            print("\n\n\nCREATED\n\n")
+            report = Report.objects.create(**report_data)
+            print("\n\n\nCREATED",report,"\n\n")
             report.f3x_report = f3x_report
             report.save()
             return report

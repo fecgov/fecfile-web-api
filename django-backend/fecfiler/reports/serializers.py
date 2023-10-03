@@ -7,7 +7,6 @@ from django.db.models import Q
 from rest_framework.serializers import (
     UUIDField,
     CharField,
-    DateField,
     ModelSerializer,
 )
 from fecfiler.contacts.models import Contact
@@ -39,9 +38,6 @@ class ReportSerializerBase(
 
     id = UUIDField(required=False)
     form_type = CharField(required=False, allow_null=True)
-    created = DateField(read_only=True)
-    updated = DateField(read_only=True)
-
     f3x_report = F3xReportSerializer(required=False)
 
     """
@@ -53,7 +49,9 @@ class ReportSerializerBase(
     def to_representation(self, instance, depth=0):
         print("\n\n\n\n\nYOOOOOO\n\n\n\n")
         representation = super().to_representation(instance)
-        f3x_report = representation.pop("f3x_report") or []
+        f3x_report = None
+        if ("f3x_report" in representation.keys()):
+            f3x_report = representation.pop("f3x_report")
 
         if f3x_report:
             for property in f3x_report:
@@ -63,6 +61,10 @@ class ReportSerializerBase(
         representation["form_type"] = instance.form_type
 
         return representation
+    
+    def create(self, validated_data):
+        print("CREATED:", validated_data, "\n\n\n")
+        return self.Meta.model.create(validated_data)
 
     def to_internal_value(self, data):
         internal_value = super().to_internal_value(data)
@@ -91,4 +93,4 @@ class ReportSerializerBase(
             ]
 
         fields = get_fields()
-        read_only_fields = []
+        read_only_fields = ["id","deleted","created","updated"]
