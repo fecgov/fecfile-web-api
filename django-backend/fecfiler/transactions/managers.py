@@ -87,6 +87,9 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
+                report__coverage_through_date__lte=OuterRef(
+                    "report__coverage_through_date"
+                ),
             )
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
@@ -108,7 +111,9 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
+            .annotate(
+                incurred_prior=Sum("schedule_d__incurred_amount"),
+            )
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (

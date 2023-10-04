@@ -12,9 +12,10 @@ def move_parent_to_loan(apps, schema_editor):
             "LOAN_REPAYMENT_MADE",
         ]
     ):
-        loan_repayment.loan = loan_repayment.parent_transaction
-        del loan_repayment.parent_transaction
-        del loan_repayment.parent_transaction_id
+        if loan_repayment.parent_transaction:
+            loan_repayment.loan = loan_repayment.parent_transaction
+            loan_repayment.parent_transaction = None
+            loan_repayment.parent_transaction_id = None
         loan_repayment.save()
 
 
