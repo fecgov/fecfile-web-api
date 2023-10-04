@@ -56,4 +56,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0023_add_loan_foreign_key
    fecfiler.transactions.migrations.0024_remove_just_in_time_sch_d_fields
    fecfiler.transactions.migrations.0025_add_force_unaggregated_field
+   fecfiler.transactions.migrations.0026_use_debt_loan_id
 

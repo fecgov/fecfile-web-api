@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0026\_use\_debt\_loan\_id.move\_parent\_to\_loan
+=================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0026_use_debt_loan_id
+
+.. autofunction:: move_parent_to_loan
