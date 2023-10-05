@@ -11,7 +11,6 @@ finance information. The project code is distributed across these repositories:
 - [fecfile-web-app](https://github.com/fecgov/fecfile-web-app): this is the browser-based front-end developed in Angular
 - [fecfile-web-api](https://github.com/fecgov/fecfile-web-api): RESTful endpoint supporting the front-end
 - [fecfile-validate](https://github.com/fecgov/fecfile-validate): data validation rules and engine
-- [fecfile-image-generator](https://github.com/fecgov/fecfile-image-generator): provides competed FEC forms in PDF format
 
 ---
 
@@ -36,9 +35,9 @@ You should set the following environment variables in the shell where you are ru
 Proper values for the development variables are shown here as an example
 
 ```
-export DATABASE_URL = "postgres://postgres:postgres@db/postgres"
-export FECFILE_TEST_DB_NAME = "postgres"
-export DJANGO_SECRET_KEY = "If_using_test_db_use_secret_key_in_cloud.gov"
+export DATABASE_URL="postgres://postgres:postgres@db/postgres"
+export FECFILE_TEST_DB_NAME="postgres"
+export DJANGO_SECRET_KEY="If_using_test_db_use_secret_key_in_cloud.gov"
 ```
 
 ### Shut down the containers
@@ -60,14 +59,14 @@ _Special Note:_ If the fecfile-validate repo was updated, the commit of the upda
 ### Create a feature branch
 
 Using git-flow extensions:
-`   git flow feature start feature_branch
-  `
+` git flow feature start feature_branch
+`
 
 Without the git-flow extensions:
-`   git checkout develop
+` git checkout develop
     git pull
     git checkout -b feature/feature_branch develop
-  `
+`
 
 - Developer creates a GitHub PR when ready to merge to `develop` branch
 - Reviewer reviews and merges feature branch into `develop` via GitHub

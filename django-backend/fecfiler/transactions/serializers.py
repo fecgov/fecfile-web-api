@@ -113,6 +113,14 @@ class TransactionSerializerBase(
 
     id = UUIDField(required=False)
     parent_transaction_id = UUIDField(required=False, allow_null=True)
+    back_reference_tran_id_number = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    back_reference_sched_name = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    debt_id = UUIDField(required=False, allow_null=True)
+    loan_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
     report = F3XSummarySerializer(read_only=True)
@@ -123,6 +131,11 @@ class TransactionSerializerBase(
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    beginning_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    payment_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance_at_close = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )  # debt payments
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -269,14 +282,27 @@ class TransactionSerializerBase(
             return [
                 f.name
                 for f in Transaction._meta.get_fields()
-                if f.name not in ["deleted", "transaction", "parent_transaction"]
+                if f.name
+                not in [
+                    "deleted",
+                    "transaction",
+                    "parent_transaction",
+                    "debt",
+                    "debt_associations",
+                    "loan",
+                    "loan_associations",
+                ]
             ] + [
                 "parent_transaction_id",
+                "debt_id",
+                "loan_id",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
                 "contact_3_id",
                 "memo_text_id",
+                "back_reference_tran_id_number",
+                "back_reference_sched_name",
                 "form_type",
                 "itemized",
                 "fields_to_validate",
@@ -286,6 +312,9 @@ class TransactionSerializerBase(
                 "aggregate",
                 "loan_payment_to_date",
                 "loan_balance",
+                "beginning_balance",
+                "payment_amount",
+                "balance_at_close",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",

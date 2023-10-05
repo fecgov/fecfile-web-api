@@ -54,6 +54,12 @@ def calculate_summary(report_id):
     # line 12
     report.L12_transfers_from_affiliated_other_party_cmtes_period = a["line_12"]
     report.L12_transfers_from_affiliated_other_party_cmtes_ytd = b["line_12"]
+    # line 13
+    report.L13_all_loans_received_period = a["line_13"]
+    report.L13_all_loans_received_ytd = b["line_13"]
+    # line 14
+    report.L14_loan_repayments_received_period = a["line_14"]
+    report.L14_loan_repayments_received_ytd = b["line_14"]
     # line 15
     report.L15_offsets_to_operating_expenditures_refunds_period = a["line_15"]
     report.L15_offsets_to_operating_expenditures_refunds_ytd = b["line_15"]
@@ -69,6 +75,12 @@ def calculate_summary(report_id):
     # line 22
     report.L22_transfers_to_affiliated_other_party_cmtes_period = a["line_22"]
     report.L22_transfers_to_affiliated_other_party_cmtes_ytd = b["line_22"]
+    # line 23
+    report.L23_contributions_to_federal_candidates_cmtes_period = a["line_23"]
+    report.L23_contributions_to_federal_candidates_cmtes_ytd = b["line_23"]
+    # line 26
+    report.L26_loan_repayments_period = a["line_26"]
+    report.L26_loan_repayments_made_ytd = b["line_26"]
     # line 27
     report.L27_loans_made_period = a["line_27"]
     report.L27_loans_made_ytd = b["line_27"]

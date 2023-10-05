@@ -391,5 +391,190 @@
       "created": "2022-02-09T00:00:00.000Z",
       "updated": "2022-02-09T00:00:00.000Z"
     }
+  },
+  {
+    "comment": "Loan to move forward",
+    "model": "transactions.schedulec",
+    "fields": {
+      "receipt_line_number": "13",
+      "loan_amount": "100"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Loan to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "LOAN_RECEIVED_FROM_INDIVIDUAL",
+      "schedule_c_id": "3799267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SC/10",
+      "transaction_id": "9147A12D265AADCAB2D0",
+      "entity_type": "IND",
+      "memo_code": null,
+      "force_itemized": null,
+      "created": "2023-09-22T05:08:34.590929-04:00",
+      "updated": "2023-09-22T07:45:11.263033-04:00",
+      "parent_transaction_id": null,
+      "debt_id": null,
+      "loan_id": null
+    }
+  },
+  {
+    "comment": "Guarantor to move forward",
+    "model": "transactions.schedulec2",
+    "fields": {
+      "guarantor_last_name": "c",
+      "guarantor_first_name": "c",
+      "guarantor_middle_name": null,
+      "guarantor_prefix": null,
+      "guarantor_suffix": null,
+      "guarantor_street_1": "c",
+      "guarantor_street_2": null,
+      "guarantor_city": "c",
+      "guarantor_state": "CA",
+      "guarantor_zip": "11111",
+      "guarantor_employer": null,
+      "guarantor_occupation": null,
+      "guaranteed_amount": "111.00"
+    },
+    "pk": "c299267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Gurarantor to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "90e268b5-ee0a-40e9-bc0b-459c097d46d7",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "parent_transaction_id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+      "transaction_type_identifier": "C2_LOAN_GUARANTOR",
+      "schedule_c2_id": "c299267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SC2/10",
+      "transaction_id": "EF3D872B9863DBEC1376",
+      "created": "2023-09-22T05:08:34.615449-04:00",
+      "updated": "2023-09-22T07:45:11.308183-04:00",
+      "debt_id": null,
+      "loan_id": null
+    }
+  },
+  {
+    "comment": "Debt to move forward",
+    "model": "transactions.scheduled",
+    "fields": {
+      "creditor_organization_name": "A PAC",
+      "creditor_last_name": null,
+      "creditor_first_name": null,
+      "creditor_middle_name": null,
+      "creditor_prefix": null,
+      "creditor_suffix": null,
+      "creditor_street_1": "107 S WEST ST",
+      "creditor_street_2": "SUITE 555",
+      "creditor_city": "ALEXANDRIA",
+      "creditor_state": "VA",
+      "creditor_zip": "22314",
+      "incurred_amount": "3.00"
+    },
+    "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Debt to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-9509df4ddddd",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
+      "schedule_d_id": "dddd267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SD9",
+      "transaction_id": "C9718E935534853B488D",
+      "entity_type": "COM",
+      "memo_code": null,
+      "force_itemized": null,
+      "created": "2023-09-22T05:08:34.590929-04:00",
+      "updated": "2023-09-22T07:45:11.263033-04:00",
+      "parent_transaction_id": null,
+      "debt_id": null,
+      "loan_id": null
+    }
+  },
+  {
+    "comment": "Debt NOT to move forward",
+    "model": "transactions.scheduled",
+    "fields": {
+      "creditor_organization_name": "B PAC",
+      "creditor_last_name": null,
+      "creditor_first_name": null,
+      "creditor_middle_name": null,
+      "creditor_prefix": null,
+      "creditor_suffix": null,
+      "creditor_street_1": "107 S WEST ST",
+      "creditor_street_2": "SUITE 555",
+      "creditor_city": "ALEXANDRIA",
+      "creditor_state": "VA",
+      "creditor_zip": "22314",
+      "incurred_amount": "3.00"
+    },
+    "pk": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718"
+  },
+  {
+    "comment": "Debt NOT to move forward",
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-9509df4dddcc",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
+      "schedule_d_id": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718",
+      "aggregation_group": null,
+      "_form_type": "SD9",
+      "transaction_id": "D9718E935534853B488D",
+      "entity_type": "COM",
+      "memo_code": null,
+      "force_itemized": null,
+      "created": "2023-09-22T05:08:34.590929-04:00",
+      "updated": "2023-09-22T07:45:11.263033-04:00",
+      "parent_transaction_id": null,
+      "debt_id": null,
+      "loan_id": null
+    }
+  },
+  {
+    "model": "transactions.scheduleb",
+    "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+    "fields": {
+      "payee_organization_name": "1",
+      "payee_street_1": "1",
+      "payee_street_2": "1",
+      "payee_city": "1",
+      "payee_state": "AZ",
+      "payee_zip": "1",
+      "expenditure_date": "2023-09-01",
+      "expenditure_amount": "3.00",
+      "expenditure_purpose_descrip": "sdfasdf"
+    }
+  },
+  {
+    "model": "transactions.transaction",
+    "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+    "fields": {
+      "deleted": null,
+      "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+      "report": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "transaction_type_identifier": "OPERATING_EXPENDITURE",
+      "aggregation_group": "GENERAL_DISBURSEMENT",
+      "debt": "474a1a10-da68-4d71-9a11-9509df4dddcc",
+      "_form_type": "SB21B",
+      "transaction_id": "9F2F8E45B759FC37727B",
+      "entity_type": "ORG",
+      "created": "2023-09-20T12:51:26.902Z",
+      "updated": "2023-09-20T22:26:42.291Z",
+      "schedule_b": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491"
+    }
   }
 ]
