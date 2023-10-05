@@ -11,35 +11,10 @@ from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XReportSerializerBase
-from django.db.models import Case, Value, When, Q
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-def get_status_mapping():
-    """returns Django Case that determines report status based on upload submission"""
-    in_progress = Q(upload_submission__fec_status=None) | Q(upload_submission=None)
-    submitted = Q(
-        upload_submission__fecfile_task_state__in=[
-            FECSubmissionState.INITIALIZING,
-            FECSubmissionState.CREATING_FILE,
-            FECSubmissionState.SUBMITTING,
-        ]
-    ) | Q(upload_submission__fec_status=FECStatus.PROCESSING)
-    success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
-    failed = Q(
-        upload_submission__fecfile_task_state=FECSubmissionState.FAILED
-    ) | Q(
-        upload_submission__fec_status=FECStatus.REJECTED
-    )
-
-    return Case(
-        When(in_progress, then=Value("In progress")),
-        When(submitted, then=Value("Submission pending")),
-        When(success, then=Value("Submission success")),
-        When(failed, then=Value("Submission failure")),
-    )
 
 
 class F3XReportViewSet(CommitteeOwnedViewSet):
@@ -53,9 +28,7 @@ class F3XReportViewSet(CommitteeOwnedViewSet):
     """
 
     queryset = (
-        F3XReport.objects.annotate(report_code_label=report_code_label_mapping)
-        .annotate(report_status=get_status_mapping())
-        .all()
+        F3XReport.objects.annotate(report_code_label=report_code_label_mapping).all()
     )
 
     serializer_class = F3XReportSerializerBase
@@ -64,8 +37,8 @@ class F3XReportViewSet(CommitteeOwnedViewSet):
         "form_type",
         "report_code_label",
         "coverage_through_date",
-        "upload_submission__fec_status",
-        "submission_status",
+        #"upload_submission__fec_status",
+        #"submission_status",
     ]
     ordering = ["form_type"]
 

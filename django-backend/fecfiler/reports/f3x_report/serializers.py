@@ -5,10 +5,6 @@ from django.db import transaction
 from django.db.models import Q
 from rest_framework.serializers import EmailField, CharField, ValidationError, DateField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.web_services.serializers import (
-    UploadSubmissionSerializer,
-    WebPrintSubmissionSerializer,
-)
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 import logging
 
@@ -42,12 +38,6 @@ class F3XReportSerializerBase(ReportSerializerBase):
         allow_blank=True,
         allow_null=True,
         required=False,
-    )
-    upload_submission = UploadSubmissionSerializer(
-        read_only=True,
-    )
-    webprint_submission = WebPrintSubmissionSerializer(
-        read_only=True,
     )
     report_status = CharField(
         read_only=True,
@@ -120,8 +110,6 @@ class F3XReportSerializerBase(ReportSerializerBase):
                 "report",
                 "dotfec",
                 "memotext",
-                "uploadsubmission",
-                "webprintsubmission",
             ]
         ] + ["report_status", "report_code_label", "fields_to_validate"]
         read_only_fields = ["id", "deleted", "created", "updated"]

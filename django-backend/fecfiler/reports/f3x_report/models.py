@@ -350,19 +350,6 @@ class F3XReport(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
-    upload_submission = models.ForeignKey(
-        "web_services.UploadSubmission",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    webprint_submission = models.ForeignKey(
-        "web_services.WebPrintSubmission",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-
     calculation_status = models.CharField(max_length=255, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)

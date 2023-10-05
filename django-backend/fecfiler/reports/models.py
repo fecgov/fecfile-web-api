@@ -33,6 +33,19 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    upload_submission = models.ForeignKey(
+        "web_services.UploadSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    webprint_submission = models.ForeignKey(
+        "web_services.WebPrintSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
     f3x_report = models.ForeignKey(
         F3XReport, on_delete=models.CASCADE, null=True, blank=True
     )

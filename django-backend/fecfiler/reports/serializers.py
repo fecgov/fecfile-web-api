@@ -2,6 +2,7 @@ import logging
 
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
+from fecfiler.web_services.serializers import UploadSubmissionSerializer, WebPrintSubmissionSerializer
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 from rest_framework.serializers import (
@@ -38,6 +39,13 @@ class ReportSerializerBase(
 
     id = UUIDField(required=False)
     form_type = CharField(required=False, allow_null=True)
+    upload_submission = UploadSubmissionSerializer(
+        read_only=True,
+    )
+    webprint_submission = WebPrintSubmissionSerializer(
+        read_only=True,
+    )
+
     f3x_report = F3xReportSerializer(required=False)
 
     """
@@ -86,7 +94,14 @@ class ReportSerializerBase(
             return [
                 f.name
                 for f in Report._meta.get_fields()
-                if f.name not in ["deleted", "transaction","memotext", "dotfec"]
+                if f.name not in [
+                    "deleted",
+                    "transaction",
+                    "memotext",
+                    "dotfec",
+                    "uploadsubmission",
+                    "webprintsubmission",
+                ]
             ] + [
                 "form_type",
                 "fields_to_validate",
