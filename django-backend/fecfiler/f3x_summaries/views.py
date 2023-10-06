@@ -28,9 +28,7 @@ def get_status_mapping():
         ]
     ) | Q(upload_submission__fec_status=FECStatus.PROCESSING)
     success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
-    failed = Q(
-        upload_submission__fecfile_task_state=FECSubmissionState.FAILED
-    ) | Q(
+    failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED) | Q(
         upload_submission__fec_status=FECStatus.REJECTED
     )
 
@@ -77,6 +75,19 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
             .values("report_code", "coverage_from_date", "coverage_through_date")
         )
         return JsonResponse(data, safe=False)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_name="amend",
+    )
+    def amend(self, request, pk):
+        report = self.get_object()
+        report.form_type = "F3XA"
+        report.report_version = int(report.report_version or "0") + 1
+        report.upload_submission = None
+        report.save()
+        return Response(f"amended {report}")
 
     @action(
         detail=False,
