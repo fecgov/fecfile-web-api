@@ -5,6 +5,9 @@ from fecfiler.transactions.schedule_a.managers import (
 from fecfiler.transactions.schedule_b.managers import (
     over_two_hundred_types as schedule_b_over_two_hundred_types,
 )
+from fecfiler.transactions.schedule_e.managers import (
+    over_two_hundred_types as schedule_e_over_two_hundred_types,
+)
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -244,7 +247,9 @@ class TransactionManager(SoftDeleteManager):
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
+            schedule_a_over_two_hundred_types
+            + schedule_b_over_two_hundred_types
+            + schedule_e_over_two_hundred_types
         )
         return Case(
             When(force_itemized__isnull=False, then=F("force_itemized")),
