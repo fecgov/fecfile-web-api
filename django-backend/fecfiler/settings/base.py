@@ -41,9 +41,9 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
-SESSION_COOKIE_AGE = int(env.get_credential(
-    "SESSION_COOKIE_AGE", str(30 * 60)  # Inactivity timeout
-))
+SESSION_COOKIE_AGE = int(
+    env.get_credential("SESSION_COOKIE_AGE", str(30 * 60))  # Inactivity timeout
+)
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
     "fecfiler.scha_transactions",
+    "fecfiler.reports",
     "fecfiler.transactions",
     "fecfiler.memo_text",
     "fecfiler.contacts",
