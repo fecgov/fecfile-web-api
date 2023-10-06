@@ -24,6 +24,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     form_type = models.TextField(null=True, blank=True)
+    report_version = models.TextField(null=True, blank=True)
     # TODO get rid of this field.  It is redundant with the related Committee_Account
     committee_name = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
