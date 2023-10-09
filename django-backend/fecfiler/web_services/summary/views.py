@@ -17,9 +17,7 @@ class SummaryViewSet(viewsets.ViewSet):
     """
 
     @action(
-        detail=False,
-        methods=["post"],
-        url_path="calculate-summary",
+        detail=False, methods=["post"], url_path="calculate-summary",
     )
     def calculate_summary(self, request):
         """ """
@@ -28,7 +26,7 @@ class SummaryViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         report = F3XSummary.objects.get(id=report_id)
-        report.calculation_status = CalculationState.CALCULATING
+        report.report_f3x.calculation_status = CalculationState.CALCULATING
         report.save()
         logger.debug(f"Starting Celery Task calculate_summary for report :{report_id}")
         task = calculate_summary.apply_async((report_id,), retry=False)

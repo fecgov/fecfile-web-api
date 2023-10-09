@@ -37,6 +37,7 @@ def get_model_data(data, model):
 class ReportF3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
+    calculation_status = CharField(required=False, allow_null=True)
     change_of_address = CharField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)

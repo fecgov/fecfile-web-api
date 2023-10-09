@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
                         unique=True,
                     ),
                 ),
+                ("calculation_status", models.TextField(blank=True, null=True)),
                 ("committee_name", models.TextField(blank=True, null=True)),
                 (
                     "change_of_address",

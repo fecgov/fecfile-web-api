@@ -25,7 +25,7 @@ def calculate_summary(report_id):
         report = F3XSummary.objects.get(id=report_id)
     except Exception:
         return None
-    report.calculation_status = CalculationState.CALCULATING
+    report.report_f3x.calculation_status = CalculationState.CALCULATING
     report.save()
 
     summary_service = SummaryService(report)
@@ -115,6 +115,6 @@ def calculate_summary(report_id):
     report.L37_offsets_to_operating_expenditures_period = a["line_37"]
     report.L37_offsets_to_operating_expenditures_ytd = b["line_37"]
 
-    report.calculation_status = CalculationState.SUCCEEDED
+    report.report_f3x.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id

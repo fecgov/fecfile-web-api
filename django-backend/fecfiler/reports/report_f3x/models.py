@@ -21,6 +21,7 @@ class ReportF3X(models.Model):
         serialize=False,
         unique=True,
     )
+    calculation_status = models.CharField(max_length=255, null=True, blank=True)
 
     # TODO get rid of this field.  It is redundant with the related Committee_Account
     committee_name = models.TextField(null=True, blank=True)

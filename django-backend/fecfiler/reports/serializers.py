@@ -1,5 +1,10 @@
 from .models import Report
-from rest_framework.serializers import ModelSerializer, CharField, UUIDField, EmailField
+from rest_framework.serializers import (
+    ModelSerializer,
+    CharField,
+    UUIDField,
+    EmailField,
+)
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
