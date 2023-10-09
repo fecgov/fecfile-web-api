@@ -1,18 +1,11 @@
 from django.http import JsonResponse
-from rest_framework import filters, status
-from rest_framework.response import Response
+from rest_framework import filters
 from rest_framework.decorators import action
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
 from .serializers import ReportF3XSerializer
-from fecfiler.transactions.models import Transaction
-from fecfiler.web_services.models import FECSubmissionState, FECStatus
-from fecfiler.memo_text.models import MemoText
-from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from django.db.models import Case, Value, When, Q, F
 import logging
 
 logger = logging.getLogger(__name__)

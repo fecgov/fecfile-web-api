@@ -159,9 +159,8 @@ class ReportMixin(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        committee = self.report.committee_account
-
         if self.report.report_f3x:
+            committee = self.report.committee_account
             report_date = self.report.report_f3x.coverage_from_date
             if report_date is not None:
                 report_year = report_date.year
