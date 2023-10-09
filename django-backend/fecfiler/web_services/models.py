@@ -2,13 +2,13 @@ from enum import Enum
 import json
 import uuid
 from django.db import models
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report, ReportMixin
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class DotFEC(models.Model):
+class DotFEC(ReportMixin):
     """Model storing .FEC file locations
 
     Look up file names by reports
@@ -21,7 +21,6 @@ class DotFEC(models.Model):
         serialize=False,
         unique=True,
     )
-    report = models.ForeignKey(F3XSummary, on_delete=models.CASCADE)
     file_name = models.TextField()
 
     class Meta:
@@ -73,7 +72,7 @@ class UploadSubmissionManager(models.Manager):
         )
         submission.save()
 
-        F3XSummary.objects.filter(id=report_id).update(upload_submission=submission)
+        Report.objects.filter(id=report_id).update(upload_submission=submission)
 
         logger.info(
             f"""Submission to Webload has been initialized for report :{report_id}
@@ -89,7 +88,7 @@ class WebPrintSubmissionManager(models.Manager):
         )
         submission.save()
 
-        F3XSummary.objects.filter(id=report_id).update(webprint_submission=submission)
+        Report.objects.filter(id=report_id).update(webprint_submission=submission)
 
         logger.info(
             f"""Submission to WebPrint has been initialized for report :{report_id}

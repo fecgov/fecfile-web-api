@@ -3,7 +3,7 @@ from django.test import TestCase
 from .dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 
 
 class DotFECSubmitterTestCase(TestCase):
@@ -13,12 +13,11 @@ class DotFECSubmitterTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            force_write_to_disk=True,
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae", force_write_to_disk=True,
         )
         self.dot_fec_record = DotFEC.objects.get(id=self.dot_fec_id)
 

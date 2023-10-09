@@ -1,6 +1,6 @@
 from django.test import TestCase
 from curses import ascii
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from .dot_fec_composer import compose_dot_fec, add_row_to_content
@@ -16,7 +16,7 @@ class DotFECSerializerTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.transaction = Transaction.objects.filter(

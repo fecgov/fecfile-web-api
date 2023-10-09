@@ -1,6 +1,6 @@
 import json
 from django.test import TestCase
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.web_services.models import (
     FECStatus,
     UploadSubmission,
@@ -16,7 +16,7 @@ class UploadSubmissionTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.upload_submission = UploadSubmission()
@@ -32,8 +32,7 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state,
-            FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.upload_submission_id, submission.id)
@@ -73,8 +72,7 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state,
-            FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.webprint_submission_id, submission.id)
