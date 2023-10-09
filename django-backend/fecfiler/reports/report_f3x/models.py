@@ -439,5 +439,5 @@ class ReportF3X(models.Model):
         return None
 
     class Meta:
-        app_label: "reports"
-        db_table = "report_f3x"
+        app_label = "reports"
+        db_table = "reports_f3x"

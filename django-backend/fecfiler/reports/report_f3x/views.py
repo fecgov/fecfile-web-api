@@ -12,7 +12,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from django.db.models import Case, Value, When, Q
+from django.db.models import Case, Value, When, Q, F
 import logging
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class ReportF3XViewSet(ReportViewSet):
 
     queryset = (
         Report.objects.select_related("report_f3x")
-        .filter(report_type=ReportType.F3X)
+        .filter(report_type=ReportType.F3X.value)
         .annotate(report_code_label=report_code_label_mapping)
     )
 

@@ -90,8 +90,8 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
-                # report__report_f3x__coverage_through_date__lte=OuterRef(
-                #     "report__report_f3x__coverage_through_date"
+                # report__report_3x__coverage_through_date__lte=OuterRef(
+                #     "report__report_3x__coverage_through_date"
                 # ),
             )
             .values("committee_account_id")

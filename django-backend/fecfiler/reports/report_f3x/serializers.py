@@ -419,9 +419,4 @@ class ReportF3XSerializer(ReportSerializer):
             + ["fields_to_validate"]
         )
 
-        # import pprint
-
-        # pprint.pprint("============================")
-        # pprint.pprint(fields)
-
         read_only_fields = ["id"]

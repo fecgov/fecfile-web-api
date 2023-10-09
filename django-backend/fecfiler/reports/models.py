@@ -53,7 +53,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         app_label = "reports"
-        db_table = "reports_NEW"
+        db_table = "reports_report"
 
 
 class ReportMixin(models.Model):
@@ -67,8 +67,8 @@ class ReportMixin(models.Model):
     def save(self, *args, **kwargs):
         committee = self.report.committee_account
 
-        if self.report__report_f3x:
-            report_date = self.report.report_f3x__coverage_from_date
+        if self.report.report_f3x:
+            report_date = self.report.report_f3x.coverage_from_date
             if report_date is not None:
                 report_year = report_date.year
 
@@ -82,9 +82,9 @@ class ReportMixin(models.Model):
                 reports_to_flag_for_recalculation = [self.report]
 
             for report in reports_to_flag_for_recalculation:
-                report.report_f3x__calculation_status = None
+                report.report_f3x.calculation_status = None
                 report.save()
-                logger.info(f"F3X Summary: {report.id} marked for recalcuation")
+                logger.info(f"F3X Report: {report.id} marked for recalcuation")
 
         super(ReportMixin, self).save(*args, **kwargs)
 

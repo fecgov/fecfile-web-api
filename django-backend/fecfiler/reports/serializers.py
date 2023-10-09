@@ -1,5 +1,5 @@
 from .models import Report
-from rest_framework.serializers import ModelSerializer, CharField, UUIDField, EmailField
+from rest_framework.serializers import ModelSerializer, CharField, UUIDField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
@@ -25,21 +25,6 @@ class ReportF3XSerializer(ModelSerializer):
 
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
-
-    # confirmation_email_1 = EmailField(
-    #     max_length=44,
-    #     min_length=None,
-    #     allow_blank=True,
-    #     allow_null=True,
-    #     required=False,
-    # )
-    # confirmation_email_2 = EmailField(
-    #     max_length=44,
-    #     min_length=None,
-    #     allow_blank=True,
-    #     allow_null=True,
-    #     required=False,
-    # )
 
     upload_submission = UploadSubmissionSerializer(read_only=True,)
     webprint_submission = WebPrintSubmissionSerializer(read_only=True,)
@@ -70,7 +55,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "transaction",
                     "committee_name",
                 ]
-            ] + ["report_status", "report_code_label", "fields_to_validate"]
+            ] + ["report_status", "report_code_label", "fields_to_validate",]
 
         fields = get_fields()
         read_only_fields = ["id", "deleted", "created", "updated"]

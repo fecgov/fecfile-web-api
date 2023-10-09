@@ -18,7 +18,7 @@ class ReportManager(SoftDeleteManager):
             .annotate(
                 report_type=Case(
                     When(report_f3x__isnull=False, then=ReportType.F3X.value)
-                )
+                ),
             )
         )
         return queryset

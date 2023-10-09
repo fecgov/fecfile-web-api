@@ -657,7 +657,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "report_f3x",},
+            options={"db_table": "reports_f3x"},
         ),
         migrations.CreateModel(
             name="Report",
@@ -724,6 +724,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "reports_NEW",},
+            options={"db_table": "reports_report"},
         ),
     ]
