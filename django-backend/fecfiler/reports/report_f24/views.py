@@ -1,51 +1,33 @@
-from django.http import JsonResponse
 from rest_framework import filters
-from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
-from .serializers import ReportF3XSerializer
+from .serializers import ReportF24Serializer
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ReportF3XViewSet(ReportViewSet):
+class ReportF24ViewSet(ReportViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
 
-    queryset = Report.objects.select_related("report_f3x").filter(
-        report_type=ReportType.F3X.value
+    queryset = Report.objects.select_related("report_f24").filter(
+        report_type=ReportType.F24.value
     )
 
-    serializer_class = ReportF3XSerializer
+    serializer_class = ReportF24Serializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",
         "report_code_label",
-        "report_f3x__coverage_through_date",
         "upload_submission__fec_status",
         "submission_status",
     ]
     ordering = ["form_type"]
-
-    @action(detail=False)
-    def coverage_dates(self, request):
-        data = list(
-            self.get_queryset()
-            .distinct(
-                "report_f3x__coverage_from_date", "report_f3x__coverage_through_date"
-            )
-            .values(
-                "report_f3x__report_code",
-                "report_f3x__coverage_from_date",
-                "report_f3x__coverage_through_date",
-            )
-        )
-        return JsonResponse(data, safe=False)
 
     def create(self, request):
         return super(ModelViewSet, self).create(request)

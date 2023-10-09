@@ -102,6 +102,8 @@ class ReportViewSet(CommitteeOwnedViewSet):
             # that are not identified in the schedules query param
             if "f3x" not in report_type_list:
                 queryset = queryset.filter(report_f3x__isnull=True)
+            if "f24" not in report_type_list:
+                queryset = queryset.filter(report_f24__isnull=True)
         return queryset
 
     @action(

@@ -12,6 +12,7 @@ from fecfiler.web_services.serializers import (
 )
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.report_f3x.models import ReportF3X
+from fecfiler.reports.report_f24.models import ReportF24
 import logging
 
 
@@ -26,6 +27,16 @@ class ReportF3XSerializer(ModelSerializer):
             if f.name not in ["deleted", "report"]
         ]
         model = ReportF3X
+
+
+class ReportF24Serializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in ReportF24._meta.get_fields()
+            if f.name not in ["deleted", "report"]
+        ]
+        model = ReportF24
 
 
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
@@ -52,15 +63,21 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     report_code_label = CharField(read_only=True,)
 
     report_f3x = ReportF3XSerializer(required=False)
+    report_f24 = ReportF24Serializer(required=False)
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         report_f3x = representation.pop("report_f3x") or []
+        report_f24 = representation.pop("report_f24") or []
 
         if report_f3x:
             for property in report_f3x:
                 if not representation.get(property):
                     representation[property] = report_f3x[property]
+        if report_f24:
+            for property in report_f24:
+                if not representation.get(property):
+                    representation[property] = report_f24[property]
         return representation
 
     def validate(self, data):
@@ -84,6 +101,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "webprintsubmission",
                     "transaction",
                     "committee_name",
+                    "memotext",
                 ]
             ] + ["report_status", "fields_to_validate", "report_code_label"]
 
