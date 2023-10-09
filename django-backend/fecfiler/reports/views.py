@@ -14,6 +14,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+report_code_label_mapping = Case(
+    When(report_f3x__report_code="Q1", then=Value("APRIL 15 (Q1)")),
+    When(report_f3x__report_code="Q2", then=Value("JULY 15 (Q2)")),
+    When(report_f3x__report_code="Q3", then=Value("OCTOBER 15 (Q3)")),
+    When(report_f3x__report_code="YE", then=Value("JANUARY 31 (YE)")),
+    When(report_f3x__report_code="TER", then=Value("TERMINATION (TER)")),
+    When(report_f3x__report_code="MY", then=Value("JULY 31 (MY)")),
+    When(report_f3x__report_code="12G", then=Value("GENERAL (12G)")),
+    When(report_f3x__report_code="12P", then=Value("PRIMARY (12P)")),
+    When(report_f3x__report_code="12R", then=Value("RUNOFF (12R)")),
+    When(report_f3x__report_code="12S", then=Value("SPECIAL (12S)")),
+    When(report_f3x__report_code="12C", then=Value("CONVENTION (12C)")),
+    When(report_f3x__report_code="30G", then=Value("GENERAL (30G)")),
+    When(report_f3x__report_code="30R", then=Value("RUNOFF (30R)")),
+    When(report_f3x__report_code="30S", then=Value("SPECIAL (30S)")),
+    When(report_f3x__report_code="M2", then=Value("FEBRUARY 20 (M2)")),
+    When(report_f3x__report_code="M3", then=Value("MARCH 30 (M3)")),
+    When(report_f3x__report_code="M4", then=Value("APRIL 20 (M4)")),
+    When(report_f3x__report_code="M5", then=Value("MAY 20 (M5)")),
+    When(report_f3x__report_code="M6", then=Value("JUNE 20 (M6)")),
+    When(report_f3x__report_code="M7", then=Value("JULY 20 (M7)")),
+    When(report_f3x__report_code="M8", then=Value("AUGUST 20 (M8)")),
+    When(report_f3x__report_code="M9", then=Value("SEPTEMBER 20 (M9)")),
+    When(report_f3x__report_code="M10", then=Value("OCTOBER 20 (M10)")),
+    When(report_f3x__report_code="M11", then=Value("NOVEMBER 20 (M11)")),
+    When(report_f3x__report_code="M12", then=Value("DECEMBER 20 (M12)")),
+)
+
 
 def get_status_mapping():
     """returns Django Case that determines report status based on upload submission"""
@@ -48,7 +76,11 @@ class ReportViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = Report.objects.annotate(report_status=get_status_mapping()).all()
+    queryset = (
+        Report.objects.annotate(report_code_label=report_code_label_mapping)
+        .annotate(report_status=get_status_mapping())
+        .all()
+    )
 
     serializer_class = ReportSerializer
     filter_backends = [filters.OrderingFilter]
