@@ -1,10 +1,9 @@
 [
   {
-    "model": "reports.report",
+    "model": "reports.reportF3X",
     "fields": {
-      "id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-      "form_type": "F3XN",
+      "id": "a6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+      "calculation_status": null,
       "committee_name": "test_string_value",
       "change_of_address": true,
       "street_1": "test_string_value",
@@ -125,17 +124,25 @@
       "L35_net_contributions_ytd": 351,
       "L36_total_federal_operating_expenditures_ytd": 361,
       "L37_offsets_to_operating_expenditures_ytd": 371,
-      "L38_net_operating_expenditures_ytd": 381,
-      "created": "2022-02-09T00:00:00.000Z",
-      "updated": "2022-02-09T00:00:00.000Z"
+      "L38_net_operating_expenditures_ytd": 381
     }
   },
   {
     "model": "reports.report",
     "fields": {
-      "id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+      "id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+      "report_f3x_id": "a6d60d2d-d926-4e89-ad4b-c47d152a66ae",
       "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
       "form_type": "F3XN",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    }
+  },
+  {
+    "model": "reports.reportF3X",
+    "fields": {
+      "id": "b07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+      "calculation_status": null,
       "committee_name": "test_string_value",
       "change_of_address": true,
       "street_1": "test_string_value",
@@ -256,17 +263,25 @@
       "L35_net_contributions_ytd": 351,
       "L36_total_federal_operating_expenditures_ytd": 361,
       "L37_offsets_to_operating_expenditures_ytd": 371,
-      "L38_net_operating_expenditures_ytd": 381,
-      "created": "2022-02-09T00:00:00.000Z",
-      "updated": "2022-02-09T00:00:00.000Z"
+      "L38_net_operating_expenditures_ytd": 381
     }
   },
   {
     "model": "reports.report",
     "fields": {
-      "id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+      "report_f3x_id": "b07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
       "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
       "form_type": "F3XN",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    }
+  },
+  {
+    "model": "reports.reportF3X",
+    "fields": {
+      "id": "a406535e-f99f-42c4-97a8-247904b7d297",
+      "calculation_status": null,
       "committee_name": "test_string_value",
       "change_of_address": true,
       "street_1": "test_string_value",
@@ -387,7 +402,16 @@
       "L35_net_contributions_ytd": 351,
       "L36_total_federal_operating_expenditures_ytd": 361,
       "L37_offsets_to_operating_expenditures_ytd": 371,
-      "L38_net_operating_expenditures_ytd": 381,
+      "L38_net_operating_expenditures_ytd": 381
+    }
+  },
+  {
+    "model": "reports.report",
+    "fields": {
+      "id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "report_f3x_id": "a406535e-f99f-42c4-97a8-247904b7d297",
+      "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+      "form_type": "F3XN",
       "created": "2022-02-09T00:00:00.000Z",
       "updated": "2022-02-09T00:00:00.000Z"
     }
