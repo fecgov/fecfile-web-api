@@ -1,5 +1,8 @@
 import uuid
-from django.db import models
+from django.db import models, transaction as db_transaction
+from django.db.models import Q
+from decimal import Decimal
+import copy
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
@@ -50,6 +53,97 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     objects = ReportManager()
+
+    def save(self, *args, **kwargs):
+        # Record if the is a create or update operation
+        create_action = self.created is None
+
+        with db_transaction.atomic():
+            super(Report, self).save(*args, **kwargs)
+
+            # Pull forward any loans with non-zero balances along with their
+            # loan guarantors
+            if (
+                create_action
+                and self.report_f3x
+                and self.report_f3x.coverage_through_date
+            ):
+                self.pull_forward_loans()
+                self.pull_forward_debts()
+
+    def pull_forward_loans(self):
+        previous_report = self.get_previous_report()
+
+        if previous_report:
+            loans_to_pull_forward = previous_report.transaction_set.filter(
+                ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
+                ~Q(memo_code=True),
+                schedule_c_id__isnull=False,
+            )
+
+            for loan in loans_to_pull_forward:
+                # Save children as they are lost from the loan object
+                # when the loan is saved
+                loan_children = copy.deepcopy(loan.children)
+
+                loan.schedule_c_id = self.save_copy(loan.schedule_c)
+                loan.memo_text_id = self.save_copy(loan.memo_text)
+                loan.report_id = self.id
+                loan.report = self
+                # The loan_id should point to the original loan transaction
+                # even if the loan is pulled forward multiple times.
+                loan.loan_id = loan.loan_id if loan.loan_id else loan.id
+                self.save_copy(loan)
+                for child in loan_children:
+                    # If child is a guarantor transaction, copy it
+                    # and link it to the new loan
+                    if child.schedule_c2_id:
+                        child.schedule_c2_id = self.save_copy(child.schedule_c2)
+                        child.memo_text_id = self.save_copy(child.memo_text)
+                        child.report_id = self.id
+                        child.report = self
+                        child.parent_transaction_id = loan.id
+                        child.parent_transaction = loan
+                        self.save_copy(child)
+
+    def pull_forward_debts(self):
+        previous_report = self.get_previous_report()
+
+        if previous_report:
+            debts_to_pull_forward = previous_report.transaction_set.filter(
+                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
+                ~Q(memo_code=True),
+                schedule_d_id__isnull=False,
+            )
+
+            for debt in debts_to_pull_forward:
+                debt.schedule_d.incurred_amount = Decimal(0)
+                debt.schedule_d_id = self.save_copy(debt.schedule_d)
+                debt.report_id = self.id
+                debt.report = self
+                # The debt_id should point to the original debt transaction
+                # even if the debt is pulled forward multiple times.
+                debt.debt_id = debt.debt_id if debt.debt_id else debt.id
+                self.save_copy(debt)
+
+    def get_previous_report(self):
+        return (
+            Report.objects.get_queryset()
+            .filter(
+                committee_account=self.committee_account,
+                report_f3x__coverage_through_date__lt=self.report_f3x.coverage_through_date,
+            )
+            .order_by("report_f3x__coverage_through_date")
+            .last()
+        )
+
+    def save_copy(self, fkey):
+        if fkey:
+            fkey.pk = fkey.id = None
+            fkey._state.adding = True
+            fkey.save()
+            return fkey.id
+        return None
 
     class Meta:
         app_label = "reports"
