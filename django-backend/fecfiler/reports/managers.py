@@ -16,7 +16,9 @@ class ReportManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
-                report=Case(When(report_f3x__isnull=False, then=ReportType.F3X.value))
+                report_type=Case(
+                    When(report_f3x__isnull=False, then=ReportType.F3X.value)
+                )
             )
         )
         return queryset
@@ -24,3 +26,4 @@ class ReportManager(SoftDeleteManager):
 
 class ReportType(Enum):
     F3X = Value("F3X")
+    F24 = Value("F24")

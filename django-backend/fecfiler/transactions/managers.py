@@ -90,9 +90,9 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
-                report__coverage_through_date__lte=OuterRef(
-                    "report__coverage_through_date"
-                ),
+                # report__report_f3x__coverage_through_date__lte=OuterRef(
+                #     "report__report_f3x__coverage_through_date"
+                # ),
             )
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
@@ -109,14 +109,12 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                report__coverage_through_date__lt=OuterRef(
-                    "report__coverage_from_date"
-                ),
+                # report__report_f3x__coverage_through_date__lt=OuterRef(
+                #     "report__report_f3x__coverage_from_date"
+                # ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("schedule_d__incurred_amount"),
-            )
+            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
@@ -124,7 +122,7 @@ class TransactionManager(SoftDeleteManager):
                 ~Q(debt_id=OuterRef("id")),
                 debt__transaction_id=OuterRef("transaction_id"),
                 schedule_d__isnull=True,
-                date__lt=OuterRef("report__coverage_from_date"),
+                # date__lt=OuterRef("report__report_f3x__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(debt_payments_prior=Sum("amount"))

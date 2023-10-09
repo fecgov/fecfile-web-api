@@ -1,12 +1,12 @@
 from .models import Report
-from rest_framework.serializers import ModelSerializer, CharField, UUIDField
+from rest_framework.serializers import ModelSerializer, CharField, UUIDField, EmailField
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
     WebPrintSubmissionSerializer,
 )
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-from fecfiler.repports.report_f3x.models import ReportF3X
+from fecfiler.reports.report_f3x.models import ReportF3X
 import logging
 
 
@@ -25,6 +25,22 @@ class ReportF3XSerializer(ModelSerializer):
 
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
+
+    # confirmation_email_1 = EmailField(
+    #     max_length=44,
+    #     min_length=None,
+    #     allow_blank=True,
+    #     allow_null=True,
+    #     required=False,
+    # )
+    # confirmation_email_2 = EmailField(
+    #     max_length=44,
+    #     min_length=None,
+    #     allow_blank=True,
+    #     allow_null=True,
+    #     required=False,
+    # )
+
     upload_submission = UploadSubmissionSerializer(read_only=True,)
     webprint_submission = WebPrintSubmissionSerializer(read_only=True,)
     report_status = CharField(read_only=True,)
@@ -40,10 +56,21 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
 
     class Meta:
         model = Report
-        fields = [
-            f.name
-            for f in Report._meta.get_fields()
-            if f.name
-            not in ["deleted", "dotfec", "uploadsubmission", "webprintsubmission",]
-        ] + ["report_status", "report_code_label", "fields_to_validate"]
+
+        def get_fields():
+            return [
+                f.name
+                for f in Report._meta.get_fields()
+                if f.name
+                not in [
+                    "deleted",
+                    "dotfec",
+                    "uploadsubmission",
+                    "webprintsubmission",
+                    "transaction",
+                    "committee_name",
+                ]
+            ] + ["report_status", "report_code_label", "fields_to_validate"]
+
+        fields = get_fields()
         read_only_fields = ["id", "deleted", "created", "updated"]

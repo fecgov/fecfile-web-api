@@ -2,11 +2,10 @@ import uuid
 from django.db import models
 from django.db import transaction as db_transaction
 from django.db.models import Q
-from fecfiler.soft_delete.models import SoftDeleteModel
-from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from decimal import Decimal
 import logging
 import copy
+from fecfiler.reports.models import Report
 
 
 logger = logging.getLogger(__name__)
@@ -29,12 +28,6 @@ class ReportF3X(models.Model):
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
-    confirmation_email_1 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None
-    )
-    confirmation_email_2 = models.EmailField(
-        max_length=44, null=True, blank=True, default=None
-    )
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     report_code = models.TextField(null=True, blank=True)
@@ -353,18 +346,23 @@ class ReportF3X(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
-    def save(self, *args, **kwargs):
-        # Record if the is a create or update operation
-        create_action = self.created is None
+    # def save(self, *args, **kwargs):
+    # Record if the is a create or update operation
+    # import pprint
 
-        with db_transaction.atomic():
-            super(ReportF3X, self).save(*args, **kwargs)
+    # pprint.pprint("###########################")
+    # pprint.pprint(dir(self))
 
-            # Pull forward any loans with non-zero balances along with their
-            # loan guarantors
-            if create_action and self.coverage_through_date:
-                self.pull_forward_loans()
-                self.pull_forward_debts()
+    # create_action = self.created is None
+
+    # with db_transaction.atomic():
+    #     super(ReportF3X, self).save(*args, **kwargs)
+
+    #     # Pull forward any loans with non-zero balances along with their
+    #     # loan guarantors
+    #     if create_action and self.coverage_through_date:
+    #         self.pull_forward_loans()
+    #         self.pull_forward_debts()
 
     def pull_forward_loans(self):
         previous_report = self.get_previous_report()
@@ -423,12 +421,12 @@ class ReportF3X(models.Model):
 
     def get_previous_report(self):
         return (
-            ReportF3X.objects.get_queryset()
+            Report.objects.get_queryset()
             .filter(
                 committee_account=self.committee_account,
-                coverage_through_date__lt=self.coverage_through_date,
+                report_f3x__coverage_through_date__lt=self.coverage_through_date,
             )
-            .order_by("coverage_through_date")
+            .order_by("report_f3x__coverage_through_date")
             .last()
         )
 
@@ -441,38 +439,5 @@ class ReportF3X(models.Model):
         return None
 
     class Meta:
+        app_label: "reports"
         db_table = "report_f3x"
-
-
-class ReportF3XMixin(models.Model):
-    """Abstract model for tracking f3x reports
-
-    Inherit this model to add an F3X Report foreign key, attributing
-    a model instance to an F3X Report
-    """
-
-    def save(self, *args, **kwargs):
-        if self.report:
-            committee = self.report.committee_account
-            report_date = self.report.coverage_from_date
-            if report_date is not None:
-                report_year = report_date.year
-
-                reports_to_flag_for_recalculation = ReportF3X.objects.filter(
-                    ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
-                    committee_account=committee,
-                    coverage_from_date__year=report_year,
-                    coverage_from_date__gte=report_date,
-                )
-            else:
-                reports_to_flag_for_recalculation = [self.report]
-
-            for report in reports_to_flag_for_recalculation:
-                report.calculation_status = None
-                report.save()
-                logger.info(f"F3X Summary: {report.id} marked for recalcuation")
-
-        super(ReportF3XMixin, self).save(*args, **kwargs)
-
-    class Meta:
-        abstract = True

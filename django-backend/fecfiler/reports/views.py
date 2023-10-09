@@ -4,7 +4,6 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import Report
-from .report_codes.views import report_code_label_mapping
 from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
@@ -49,22 +48,29 @@ class ReportViewSet(CommitteeOwnedViewSet):
     in CommitteeOwnedViewSet's implementation of get_queryset()
     """
 
-    queryset = (
-        Report.objects.annotate(report_code_label=report_code_label_mapping)
-        .annotate(report_status=get_status_mapping())
-        .all()
-    )
+    queryset = Report.objects.annotate(report_status=get_status_mapping()).all()
 
     serializer_class = ReportSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",
-        "report_code_label",
-        # "coverage_through_date",
         "upload_submission__fec_status",
         "submission_status",
     ]
     ordering = ["form_type"]
+
+    # Allow requests to filter reports output based on report type by
+    # passing a query parameter
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        report_type_filters = self.request.query_params.get("report_type")
+        if report_type_filters is not None:
+            report_type_list = report_type_filters.split(",")
+            # All transactions are included by default, here we remove those
+            # that are not identified in the schedules query param
+            if "f3x" not in report_type_list:
+                queryset = queryset.filter(report_f3x__isnull=True)
+        return queryset
 
     @action(
         detail=False, methods=["post"], url_path="hard-delete-reports",
@@ -102,6 +108,18 @@ class ReportViewSet(CommitteeOwnedViewSet):
 
         reports.hard_delete()
         return Response(f"Deleted {report_count} Reports")
+
+    def create(self, request):
+        response = {"message": "Create function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReportViewMixin(GenericViewSet):
