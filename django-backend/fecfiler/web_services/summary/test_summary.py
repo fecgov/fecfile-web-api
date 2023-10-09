@@ -8,7 +8,7 @@ from .summary import SummaryService
 class F3XReportTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_schedulea_summary_transactions",
         "test_scheduleb_summary_transactions",
         "test_contacts",

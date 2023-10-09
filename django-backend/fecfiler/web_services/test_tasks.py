@@ -17,7 +17,7 @@ from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
 class TasksTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_individual_receipt",
         "test_memo_text",
     ]

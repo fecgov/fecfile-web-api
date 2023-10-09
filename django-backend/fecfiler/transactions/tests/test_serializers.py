@@ -11,7 +11,7 @@ from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSer
 class TransactionSerializerBaseTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_transaction_serializer",
     ]
 

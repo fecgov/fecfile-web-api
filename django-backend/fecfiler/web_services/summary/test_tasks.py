@@ -8,7 +8,7 @@ class F3XSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_contacts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_schedulea_summary_transactions",
     ]
 

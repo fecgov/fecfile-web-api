@@ -278,7 +278,7 @@
         }
     },
     {
-        "model": "f3x_summaries.f3xsummary",
+        "model": "reports.report",
         "fields": {
             "id": "735db943-9446-462a-9be0-c820baadb622",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",

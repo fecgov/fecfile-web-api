@@ -12,7 +12,7 @@ from fecfiler.web_services.models import (
 class UploadSubmissionTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
     ]
 
     def setUp(self):

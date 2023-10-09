@@ -17,7 +17,7 @@ from curses import ascii
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_individual_receipt",
         "test_memo_text",
         "test_fake_schedule_c",

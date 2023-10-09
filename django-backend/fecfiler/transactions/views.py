@@ -10,7 +10,7 @@ from django.db.models import Q, Value
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.f3x_summaries.views import ReportViewMixin
+from fecfiler.reports.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from fecfiler.contacts.serializers import ContactSerializer

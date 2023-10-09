@@ -9,7 +9,7 @@ from fecfiler.reports.models import Report
 class DotFECSubmitterTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
     ]
 
     def setUp(self):
