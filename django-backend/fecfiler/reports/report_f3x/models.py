@@ -16,29 +16,16 @@ class ReportF3X(models.Model):
         serialize=False,
         unique=True,
     )
-    calculation_status = models.CharField(max_length=255, null=True, blank=True)
-
-    # TODO get rid of this field.  It is redundant with the related Committee_Account
-    committee_name = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
-    report_code = models.TextField(null=True, blank=True)
     election_code = models.TextField(null=True, blank=True)
     date_of_election = models.DateField(null=True, blank=True)
     state_of_election = models.TextField(null=True, blank=True)
-    coverage_from_date = models.DateField(null=True, blank=True)
-    coverage_through_date = models.DateField(null=True, blank=True)
     qualified_committee = models.BooleanField(default=False, null=True, blank=True)
-    treasurer_last_name = models.TextField(null=True, blank=True)
-    treasurer_first_name = models.TextField(null=True, blank=True)
-    treasurer_middle_name = models.TextField(null=True, blank=True)
-    treasurer_prefix = models.TextField(null=True, blank=True)
-    treasurer_suffix = models.TextField(null=True, blank=True)
-    date_signed = models.DateField(null=True, blank=True)
     cash_on_hand_date = models.DateField(null=True, blank=True)
     L6b_cash_on_hand_beginning_period = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
@@ -344,4 +331,3 @@ class ReportF3X(models.Model):
 
     class Meta:
         app_label = "reports"
-        db_table = "reports_f3x"

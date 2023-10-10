@@ -2,6 +2,7 @@ from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.report_f3x.models import ReportF3X
 from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.shared.utilities import get_model_data
 from django.db.models import Q
 from rest_framework.serializers import (
     CharField,
@@ -19,37 +20,19 @@ COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
 logger = logging.getLogger(__name__)
 
 
-def get_model_data(data, model):
-    return {
-        field.name: data[field.name]
-        for field in model._meta.get_fields()
-        if field.name in data
-    }
-
-
 class ReportF3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
-    calculation_status = CharField(required=False, allow_null=True)
     change_of_address = CharField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
-    report_code = CharField(required=False, allow_null=True)
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
     state_of_election = CharField(required=False, allow_null=True)
-    coverage_from_date = DateField(required=False, allow_null=True)
-    coverage_through_date = DateField(required=False, allow_null=True)
     qualified_committee = BooleanField(required=False, allow_null=True)
-    treasurer_last_name = CharField(required=False, allow_null=True)
-    treasurer_first_name = CharField(required=False, allow_null=True)
-    treasurer_middle_name = CharField(required=False, allow_null=True)
-    treasurer_prefix = CharField(required=False, allow_null=True)
-    treasurer_suffix = CharField(required=False, allow_null=True)
-    date_signed = DateField(required=False, allow_null=True)
     cash_on_hand_date = DateField(required=False, allow_null=True)
     L6b_cash_on_hand_beginning_period = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
@@ -386,10 +369,8 @@ class ReportF3XSerializer(ReportSerializer):
         number_of_collisions = Report.objects.filter(
             ~Q(id=(self.instance or Report()).id),
             committee_account__committee_id=committee_id,
-            report_f3x__coverage_from_date__year=self.validated_data[
-                "coverage_from_date"
-            ].year,
-            report_f3x__report_code=self.validated_data["report_code"],
+            coverage_from_date__year=self.validated_data["coverage_from_date"].year,
+            report_code=self.validated_data["report_code"],
         ).count()
         if number_of_collisions == 0:
             return super(ReportF3XSerializer, self).save(**kwargs)

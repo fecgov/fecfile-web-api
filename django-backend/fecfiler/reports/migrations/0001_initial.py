@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                         unique=True,
                     ),
                 ),
-                ("calculation_status", models.TextField(blank=True, max_length=255, null=True)),
+                (
+                    "calculation_status",
+                    models.TextField(blank=True, max_length=255, null=True),
+                ),
                 ("committee_name", models.TextField(blank=True, null=True)),
                 (
                     "change_of_address",
@@ -658,7 +661,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "reports_f3x"},
         ),
         migrations.CreateModel(
             name="Report",
@@ -725,6 +727,5 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "reports_report"},
         ),
     ]

@@ -42,21 +42,6 @@ class ReportF24Serializer(ModelSerializer):
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
 
-    confirmation_email_1 = EmailField(
-        max_length=44,
-        min_length=None,
-        allow_blank=True,
-        allow_null=True,
-        required=False,
-    )
-    confirmation_email_2 = EmailField(
-        max_length=44,
-        min_length=None,
-        allow_blank=True,
-        allow_null=True,
-        required=False,
-    )
-
     upload_submission = UploadSubmissionSerializer(read_only=True,)
     webprint_submission = WebPrintSubmissionSerializer(read_only=True,)
     report_status = CharField(read_only=True,)
@@ -96,12 +81,13 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 if f.name
                 not in [
                     "deleted",
-                    "dotfec",
                     "uploadsubmission",
                     "webprintsubmission",
-                    "transaction",
                     "committee_name",
                     "memotext",
+                    "transaction",
+                    "dotfec",
+                    "report",
                 ]
             ] + ["report_status", "fields_to_validate", "report_code_label"]
 

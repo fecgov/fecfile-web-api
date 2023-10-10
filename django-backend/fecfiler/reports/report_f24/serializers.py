@@ -2,6 +2,7 @@ from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.report_f24.models import ReportF24
 from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import (
     CharField,
     DateField,
@@ -12,32 +13,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_model_data(data, model):
-    return {
-        field.name: data[field.name]
-        for field in model._meta.get_fields()
-        if field.name in data
-    }
-
-
 class ReportF24Serializer(ReportSerializer):
     schema_name = "F24"
 
-    # filer_committee_id_number = CharField(required=False, allow_null=True) -- can be calculated JIT
     report_type_24_48 = CharField(required=False, allow_null=True)
     original_amendment_date = DateField(required=False, allow_null=True)
-    # committee_name = CharField(required=False, allow_null=True) -- can be calculated JIT
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
-    treasurer_last_name = CharField(required=False, allow_null=True)
-    treasurer_first_name = CharField(required=False, allow_null=True)
-    treasurer_middle_name = CharField(required=False, allow_null=True)
-    treasurer_prefix = CharField(required=False, allow_null=True)
-    treasurer_suffix = CharField(required=False, allow_null=True)
-    date_signed = DateField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)

@@ -18,7 +18,7 @@ def compose_f3x_report(report_id, upload_submission_record_id):
         id=upload_submission_record_id
     )
     if report_result.exists():
-        logger.info(f"composing f3x summary: {report_id}")
+        logger.info(f"composing f3x report: {report_id}")
         f3x_report = report_result.first()
         """Compose derived fields"""
         f3x_report.filer_committee_id_number = (

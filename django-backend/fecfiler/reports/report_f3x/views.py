@@ -26,7 +26,7 @@ class ReportF3XViewSet(ReportViewSet):
     ordering_fields = [
         "form_type",
         "report_code_label",
-        "report_f3x__coverage_through_date",
+        "coverage_through_date",
         "upload_submission__fec_status",
         "submission_status",
     ]
@@ -36,14 +36,8 @@ class ReportF3XViewSet(ReportViewSet):
     def coverage_dates(self, request):
         data = list(
             self.get_queryset()
-            .distinct(
-                "report_f3x__coverage_from_date", "report_f3x__coverage_through_date"
-            )
-            .values(
-                "report_f3x__report_code",
-                "report_f3x__coverage_from_date",
-                "report_f3x__coverage_through_date",
-            )
+            .distinct("coverage_from_date", "coverage_through_date")
+            .values("report_code", "coverage_from_date", "coverage_through_date",)
         )
         return JsonResponse(data, safe=False)
 

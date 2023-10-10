@@ -58,7 +58,7 @@ class SummaryService:
 
     def calculate_summary_column_b(self):
         committee = self.report.committee_account
-        report_date = self.report.report_f3x.coverage_through_date
+        report_date = self.report.coverage_through_date
         report_year = report_date.year
 
         ytd_transactions = Transaction.objects.filter(

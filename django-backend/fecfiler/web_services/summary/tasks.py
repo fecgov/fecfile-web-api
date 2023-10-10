@@ -22,10 +22,10 @@ class CalculationState(Enum):
 @shared_task
 def calculate_summary(report_id):
     try:
-        report = Reports.objects.get(id=report_id)
+        report = Report.objects.get(id=report_id)
     except Exception:
         return None
-    report.report_f3x.calculation_status = CalculationState.CALCULATING
+    report.calculation_status = CalculationState.CALCULATING
     report.save()
 
     summary_service = SummaryService(report)
@@ -123,6 +123,6 @@ def calculate_summary(report_id):
     report.report_f3x.L37_offsets_to_operating_expenditures_period = a["line_37"]
     report.report_f3x.L37_offsets_to_operating_expenditures_ytd = b["line_37"]
 
-    report.report_f3x.calculation_status = CalculationState.SUCCEEDED
+    report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id

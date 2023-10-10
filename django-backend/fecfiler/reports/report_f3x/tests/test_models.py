@@ -1,14 +1,14 @@
 from django.test import TestCase
-from .models import F3XSummary
+from ..models import ReportF3X
 import datetime
 from decimal import Decimal
 
 
 class F3XTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_summaries"]
+    fixtures = ["test_committee_accounts", "test_f3x_reports"]
 
     def setUp(self):
-        self.valid_f3x_summary = F3XSummary(
+        self.valid_f3x_summary = ReportF3X(
             form_type="F3XN",
             treasurer_last_name="Validlastname",
             treasurer_first_name="Validfirstname",
@@ -18,37 +18,33 @@ class F3XTestCase(TestCase):
         )
 
     def test_get_f3x_summary(self):
-        f3x_summary = F3XSummary.objects.get(L6a_year_for_above_ytd="2005")
+        f3x_summary = ReportF3X.objects.get(L6a_year_for_above_ytd="2005")
         self.assertEquals(f3x_summary.form_type, "F3XN")
 
     def test_save_and_delete(self):
         self.valid_f3x_summary.save()
-        f3x_summary_from_db = F3XSummary.objects.get(date_signed="2022-01-01")
-        self.assertIsInstance(f3x_summary_from_db, F3XSummary)
+        f3x_summary_from_db = ReportF3X.objects.get(date_signed="2022-01-01")
+        self.assertIsInstance(f3x_summary_from_db, ReportF3X)
         self.assertEquals(f3x_summary_from_db.date_signed, datetime.date(2022, 1, 1))
         f3x_summary_from_db.delete()
         self.assertRaises(
-            F3XSummary.DoesNotExist,
-            F3XSummary.objects.get,
-            date_signed="2022-01-01",
+            ReportF3X.DoesNotExist, ReportF3X.objects.get, date_signed="2022-01-01",
         )
 
-        soft_deleted_f3x_summary = F3XSummary.all_objects.get(date_signed="2022-01-01")
+        soft_deleted_f3x_summary = ReportF3X.all_objects.get(date_signed="2022-01-01")
         self.assertEquals(
             soft_deleted_f3x_summary.date_signed, datetime.date(2022, 1, 1)
         )
         self.assertIsNotNone(soft_deleted_f3x_summary.deleted)
         soft_deleted_f3x_summary.hard_delete()
         self.assertRaises(
-            F3XSummary.DoesNotExist,
-            F3XSummary.all_objects.get,
-            date_signed="2022-01-01",
+            ReportF3X.DoesNotExist, ReportF3X.all_objects.get, date_signed="2022-01-01",
         )
 
     def test_pull_report_forward(self):
         self.assertEquals(True, True)
 
-        new_report = F3XSummary(
+        new_report = ReportF3X(
             form_type="F3XN",
             committee_account_id="735db943-9446-462a-9be0-c820baadb622",
             coverage_through_date="2007-03-31",

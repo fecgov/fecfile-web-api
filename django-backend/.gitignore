@@ -13,3 +13,4 @@ local_settings.py
 .python-version
 *.python_history
 *.bash_history
+fecfiler/web_services/dot_fec/output/

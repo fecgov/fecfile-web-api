@@ -24,6 +24,16 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     form_type = models.TextField(null=True, blank=True)
+    report_code = models.TextField(null=True, blank=True)
+    coverage_from_date = models.DateField(null=True, blank=True)
+    coverage_through_date = models.DateField(null=True, blank=True)
+    treasurer_last_name = models.TextField(null=True, blank=True)
+    treasurer_first_name = models.TextField(null=True, blank=True)
+    treasurer_middle_name = models.TextField(null=True, blank=True)
+    treasurer_prefix = models.TextField(null=True, blank=True)
+    treasurer_suffix = models.TextField(null=True, blank=True)
+    date_signed = models.DateField(null=True, blank=True)
+    calculation_status = models.CharField(max_length=255, null=True, blank=True)
 
     confirmation_email_1 = models.EmailField(
         max_length=44, null=True, blank=True, default=None
@@ -66,11 +76,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
             # Pull forward any loans with non-zero balances along with their
             # loan guarantors
-            if (
-                create_action
-                and self.report_f3x
-                and self.report_f3x.coverage_through_date
-            ):
+            if create_action and self.coverage_through_date:
                 self.pull_forward_loans()
                 self.pull_forward_debts()
 
@@ -134,9 +140,9 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             Report.objects.get_queryset()
             .filter(
                 committee_account=self.committee_account,
-                report_f3x__coverage_through_date__lt=self.report_f3x.coverage_through_date,
+                coverage_through_date__lt=self.coverage_through_date,
             )
-            .order_by("report_f3x__coverage_through_date")
+            .order_by("coverage_through_date")
             .last()
         )
 
@@ -147,10 +153,6 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             fkey.save()
             return fkey.id
         return None
-
-    class Meta:
-        app_label = "reports"
-        db_table = "reports_report"
 
 
 class ReportMixin(models.Model):
@@ -164,21 +166,21 @@ class ReportMixin(models.Model):
     def save(self, *args, **kwargs):
         if self.report.report_f3x:
             committee = self.report.committee_account
-            report_date = self.report.report_f3x.coverage_from_date
+            report_date = self.report.coverage_from_date
             if report_date is not None:
                 report_year = report_date.year
 
                 reports_to_flag_for_recalculation = Report.objects.filter(
                     ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
                     committee_account=committee,
-                    report_f3x__coverage_from_date__year=report_year,
-                    report_f3x__coverage_from_date__gte=report_date,
+                    coverage_from_date__year=report_year,
+                    coverage_from_date__gte=report_date,
                 )
             else:
                 reports_to_flag_for_recalculation = [self.report]
 
             for report in reports_to_flag_for_recalculation:
-                report.report_f3x.calculation_status = None
+                report.calculation_status = None
                 report.save()
                 logger.info(f"F3X Report: {report.id} marked for recalcuation")
 
