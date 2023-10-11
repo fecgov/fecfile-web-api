@@ -22,7 +22,6 @@ from django.db.models import (
     TextField,
     DecimalField,
     UUIDField,
-    CASCADE,
 )
 from decimal import Decimal
 from enum import Enum
@@ -52,6 +51,14 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
+                    Case(
+                        When(
+                            schedule_e__isnull=False, then=Case(
+                                When(schedule_e__disbursement_date__isnull=True, then=F("schedule_e__dissemination_date")),
+                                default=F("schedule_e__disbursement_date")
+                            )
+                        )
+                    )
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -60,6 +67,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_c2__guaranteed_amount",
                     "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
+                    "schedule_e__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
                 candidate_contact_id=self.get_candidate_contact_clause(),
@@ -87,14 +95,12 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
-
         calendar_ytd_clause = (
             queryset.filter(
                 candidate_contact_clause,
                 year_clause,
                 date_clause,
                 group_clause,
-                force_unaggregated_clause,
             )
             .values("committee_account_id")
             .annotate(calendar_ytd=Sum("effective_amount"))
