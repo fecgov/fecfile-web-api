@@ -31,7 +31,6 @@ fecfiler.transactions.views
    
       TransactionListPagination
       TransactionViewSet
-      TransactionViewSetBase
    
    
 
