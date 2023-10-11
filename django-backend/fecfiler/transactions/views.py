@@ -106,38 +106,53 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class TransactionViewSetBase(CommitteeOwnedViewSet, ReportViewMixin):
-    """ """
-
-    filter_backends = [filters.OrderingFilter]
-    ordering = ["-created"]
-
-
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     queryset = Transaction.objects.all().alias(
         name=Coalesce(
             Coalesce(
-                "schedule_b__payee_organization_name",
                 "schedule_a__contributor_organization_name",
+                "schedule_b__payee_organization_name",
+                "schedule_c__lender_organization_name",
+                "schedule_d__creditor_organization_name",
+                "schedule_e__payee_organization_name",
             ),
             Concat(
                 Coalesce(
-                    "schedule_b__payee_last_name", "schedule_a__contributor_last_name"
+                    "schedule_a__contributor_last_name",
+                    "schedule_b__payee_last_name",
+                    "schedule_c__lender_last_name",
+                    "schedule_d__creditor_last_name",
+                    "schedule_e__payee_last_name",
                 ),
                 Value(", "),
                 Coalesce(
-                    "schedule_b__payee_first_name", "schedule_a__contributor_first_name"
+                    "schedule_a__contributor_first_name",
+                    "schedule_b__payee_first_name",
+                    "schedule_c__lender_first_name",
+                    "schedule_d__creditor_first_name",
+                    "schedule_e__payee_first_name",
                 ),
                 output_field=TextField(),
             ),
-        )
+        ),
+        sort_amount=Coalesce(
+            "schedule_b__expenditure_amount",
+            "schedule_c__loan_amount",
+            "schedule_d__incurred_amount",
+            "schedule_e__expenditure_amount",
+        ),
+        sort_date=Coalesce(
+            "schedule_b__expenditure_date",
+            "schedule_c__loan_incurred_date",
+            "schedule_e__disbursement_date",
+        ),
     )
     serializer_class = TransactionSerializerBase
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
-        "id",
+        "form_type",
         "transaction_type_identifier",
         "memo_code",
         "name",
@@ -145,6 +160,8 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "amount",
         "aggregate",
         "back_reference_tran_id_number",
+        "sort_amount",
+        "sort_date",
     ]
     ordering = ["-created"]
 
