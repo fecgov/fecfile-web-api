@@ -21,10 +21,13 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    UUIDField,
+    CASCADE,
 )
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
+from fecfiler.contacts.models import Contact
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -59,10 +62,12 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_d__incurred_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
+                candidate_contact_id=self.get_candidate_contact_clause(),
             )
         )
 
-        contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        contact_1_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        candidate_contact_clause = Q(candidate_contact_id__isnull=False) & Q(candidate_contact_id=OuterRef("candidate_contact_id"))
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
             date=OuterRef("date"), created__lte=OuterRef("created")
@@ -72,7 +77,7 @@ class TransactionManager(SoftDeleteManager):
 
         aggregate_clause = (
             queryset.filter(
-                contact_clause,
+                contact_1_clause,
                 year_clause,
                 date_clause,
                 group_clause,
@@ -81,6 +86,19 @@ class TransactionManager(SoftDeleteManager):
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
+        )
+
+        calendar_ytd_clause = (
+            queryset.filter(
+                candidate_contact_clause,
+                year_clause,
+                date_clause,
+                group_clause,
+                force_unaggregated_clause,
+            )
+            .values("committee_account_id")
+            .annotate(calendar_ytd=Sum("effective_amount"))
+            .values("calendar_ytd")
         )
 
         loan_payment_to_date_clause = (
@@ -133,6 +151,7 @@ class TransactionManager(SoftDeleteManager):
         return (
             queryset.annotate(
                 aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
+                calendar_ytd=Coalesce(Subquery(calendar_ytd_clause), Value(Decimal(0))),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,
@@ -270,6 +289,20 @@ class TransactionManager(SoftDeleteManager):
             ),
             default="amount",
             output_field=DecimalField(),
+        )
+
+    def get_candidate_contact_clause(self):
+        return Case(
+            When(
+                contact_2__type=Contact.ContactType.CANDIDATE,
+                then=F("contact_2_id")
+            ),
+            When(
+                contact_3__type=Contact.ContactType.CANDIDATE,
+                then=F("contact_3_id")
+            ),
+            default=None,
+            output_field=UUIDField()
         )
 
 
