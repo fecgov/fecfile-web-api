@@ -49,6 +49,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
+                    "schedule_e__disbursement_date",
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -57,6 +58,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_c2__guaranteed_amount",
                     "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
+                    "schedule_e__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -114,9 +116,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("schedule_d__incurred_amount"),
-            )
+            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (

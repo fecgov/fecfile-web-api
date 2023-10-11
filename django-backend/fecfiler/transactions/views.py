@@ -135,17 +135,6 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 output_field=TextField(),
             ),
         ),
-        sort_amount=Coalesce(
-            "schedule_b__expenditure_amount",
-            "schedule_c__loan_amount",
-            "schedule_d__incurred_amount",
-            "schedule_e__expenditure_amount",
-        ),
-        sort_date=Coalesce(
-            "schedule_b__expenditure_date",
-            "schedule_c__loan_incurred_date",
-            "schedule_e__disbursement_date",
-        ),
     )
     serializer_class = TransactionSerializerBase
     pagination_class = TransactionListPagination
@@ -160,8 +149,6 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "amount",
         "aggregate",
         "back_reference_tran_id_number",
-        "sort_amount",
-        "sort_date",
     ]
     ordering = ["-created"]
 
