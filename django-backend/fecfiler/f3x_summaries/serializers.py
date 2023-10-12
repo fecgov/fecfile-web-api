@@ -76,7 +76,6 @@ class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerialize
             if f.name
             not in [
                 "deleted",
-                "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
                 "transaction",

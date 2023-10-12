@@ -23,7 +23,6 @@ class MemoTextSerializer(
             not in [
                 "report",
                 "deleted",
-                "schatransaction",
                 "scheduleatransaction",
                 "schedulebtransaction",
                 "transaction",
