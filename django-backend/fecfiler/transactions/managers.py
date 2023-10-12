@@ -5,6 +5,9 @@ from fecfiler.transactions.schedule_a.managers import (
 from fecfiler.transactions.schedule_b.managers import (
     over_two_hundred_types as schedule_b_over_two_hundred_types,
 )
+from fecfiler.transactions.schedule_e.managers import (
+    over_two_hundred_types as schedule_e_over_two_hundred_types,
+)
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -46,6 +49,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
+                    "schedule_e__disbursement_date",
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -54,6 +58,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_c2__guaranteed_amount",
                     "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
+                    "schedule_e__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -111,9 +116,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("schedule_d__incurred_amount"),
-            )
+            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
@@ -244,7 +247,9 @@ class TransactionManager(SoftDeleteManager):
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
+            schedule_a_over_two_hundred_types
+            + schedule_b_over_two_hundred_types
+            + schedule_e_over_two_hundred_types
         )
         return Case(
             When(force_itemized__isnull=False, then=F("force_itemized")),
