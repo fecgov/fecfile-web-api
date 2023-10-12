@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("reports", "0001_initial"),
-        ("transactions", "0026_use_debt_loan_id"),
+        ("transactions", "0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx"),
     ]
 
     operations = [
