@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("memo_text", "0003_report_id"),
-        ("scha_transactions", "0019_report_id"),
         ("f3x_summaries", "0020_f3xsummary_submission_keys"),
     ]
 

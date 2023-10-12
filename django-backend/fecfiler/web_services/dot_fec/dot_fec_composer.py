@@ -95,8 +95,22 @@ class Header:
         self.hdrcomment = hdrcomment
 
 
-def compose_header():
-    return Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
+def compose_header(report_id):
+    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
+    if f3x_summary_result.exists():
+        f3x_summary = f3x_summary_result.first()
+        logger.info(f"composing header: {report_id}")
+        return Header(
+            "HDR",
+            "FEC",
+            "8.4",
+            "FECFile Online",
+            "0.0.1",
+            f3x_summary.report_id,
+            f3x_summary.report_version,
+        )
+    else:
+        raise ObjectDoesNotExist(f"header: {report_id} not found")
 
 
 def add_row_to_content(content, row):
@@ -132,7 +146,7 @@ def get_test_info_prefix(transaction):
 def compose_dot_fec(report_id, upload_submission_record_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
-        header = compose_header()
+        header = compose_header(report_id)
         header_row = serialize_instance("HDR", header)
         logger.debug("Serialized HDR:")
         logger.debug(header_row)

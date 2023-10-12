@@ -27,7 +27,7 @@ class DotFECSerializerTestCase(TestCase):
         ).first()
 
     def test_compose_dot_fec(self):
-        with self.assertRaisesMessage(Exception, "report: 100000000 not found"):
+        with self.assertRaisesMessage(Exception, "header: 100000000 not found"):
             compose_dot_fec(100000000, None)
 
         file_content = compose_dot_fec("b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None)
