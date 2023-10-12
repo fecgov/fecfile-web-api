@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0026\_auto\_20221007\_1427.update\_purpose\_description
-==============================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0026_auto_20221007_1427
-
-.. autofunction:: update_purpose_description

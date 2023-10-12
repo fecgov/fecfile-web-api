@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0011\_schatransaction\_report\_id.add\_new\_report\_id
-=============================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0011_schatransaction_report_id
-
-.. autofunction:: add_new_report_id

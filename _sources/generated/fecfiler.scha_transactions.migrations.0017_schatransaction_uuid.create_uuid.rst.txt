@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0017\_schatransaction\_uuid.create\_uuid
-===============================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0017_schatransaction_uuid
-
-.. autofunction:: create_uuid

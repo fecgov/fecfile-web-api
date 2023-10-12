@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0027\_rename\_transaction\_form\_ty\_4e50e4\_idx\_transaction\_\_form\_t\_e73a46\_idx
+======================================================================================================================
+
+.. automodule:: fecfiler.transactions.migrations.0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

@@ -78,7 +78,6 @@ fecfiler.contacts.models.Contact
       ~Contact.occupation
       ~Contact.pk
       ~Contact.prefix
-      ~Contact.schatransaction_set
       ~Contact.state
       ~Contact.street_1
       ~Contact.street_2

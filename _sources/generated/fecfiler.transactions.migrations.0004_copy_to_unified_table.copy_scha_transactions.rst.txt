@@ -1,6 +1,0 @@
-fecfiler.transactions.migrations.0004\_copy\_to\_unified\_table.copy\_scha\_transactions
-========================================================================================
-
-.. currentmodule:: fecfiler.transactions.migrations.0004_copy_to_unified_table
-
-.. autofunction:: copy_scha_transactions

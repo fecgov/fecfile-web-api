@@ -57,4 +57,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0024_remove_just_in_time_sch_d_fields
    fecfiler.transactions.migrations.0025_add_force_unaggregated_field
    fecfiler.transactions.migrations.0026_use_debt_loan_id
+   fecfiler.transactions.migrations.0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx
 

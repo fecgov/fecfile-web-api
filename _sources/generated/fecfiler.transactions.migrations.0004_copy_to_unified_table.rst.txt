@@ -12,13 +12,6 @@ fecfiler.transactions.migrations.0004\_copy\_to\_unified\_table
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      copy_scha_transactions
-   
    
 
    

@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0027\_scha\_transaction\_aggregation\_group.noop
-=======================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0027_scha_transaction_aggregation_group
-
-.. autofunction:: noop

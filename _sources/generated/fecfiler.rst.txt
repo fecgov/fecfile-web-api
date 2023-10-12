@@ -40,7 +40,6 @@ fecfiler
    fecfiler.memo_text
    fecfiler.openfec
    fecfiler.s3
-   fecfiler.scha_transactions
    fecfiler.settings
    fecfiler.shared
    fecfiler.transactions

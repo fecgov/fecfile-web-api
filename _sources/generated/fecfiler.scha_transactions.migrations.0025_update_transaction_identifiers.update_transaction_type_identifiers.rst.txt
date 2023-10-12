@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0025\_update\_transaction\_identifiers.update\_transaction\_type\_identifiers
-====================================================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0025_update_transaction_identifiers
-
-.. autofunction:: update_transaction_type_identifiers

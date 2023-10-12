@@ -23,7 +23,6 @@ fecfiler.transactions.schedule\_a.models
       :template: custom-class-template.rst               
    
       ScheduleA
-      ScheduleATransaction
    
    
 

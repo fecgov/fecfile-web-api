@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0020\_report\_fk.noop
-============================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0020_report_fk
-
-.. autofunction:: noop

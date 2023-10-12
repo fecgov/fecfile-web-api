@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.migrations.0027\_rename\_transaction\_form\_ty\_4e50e4\_idx\_transaction\_\_form\_t\_e73a46\_idx.Migration
+================================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx
+
+.. autoclass:: Migration
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Migration.__init__
+      ~Migration.apply
+      ~Migration.mutate_state
+      ~Migration.suggest_name
+      ~Migration.unapply
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Migration.atomic
+      ~Migration.dependencies
+      ~Migration.initial
+      ~Migration.operations
+      ~Migration.replaces
+      ~Migration.run_before
+   
+   

@@ -61,7 +61,6 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.rec_type
       ~MemoText.report
       ~MemoText.report_id
-      ~MemoText.schatransaction_set
       ~MemoText.text4000
       ~MemoText.transaction_id_number
       ~MemoText.transaction_set

@@ -1,6 +1,0 @@
-fecfiler.scha\_transactions.migrations.0025\_update\_transaction\_identifiers.update\_purpose\_description
-==========================================================================================================
-
-.. currentmodule:: fecfiler.scha_transactions.migrations.0025_update_transaction_identifiers
-
-.. autofunction:: update_purpose_description
