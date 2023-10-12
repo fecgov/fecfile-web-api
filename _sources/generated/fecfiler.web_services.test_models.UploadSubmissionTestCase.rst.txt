@@ -113,7 +113,6 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.tearDownClass
       ~UploadSubmissionTestCase.test_initiate_submission
       ~UploadSubmissionTestCase.test_save_error
-      ~UploadSubmissionTestCase.test_save_fec_response
       ~UploadSubmissionTestCase.test_webprint_initiate_submission
       ~UploadSubmissionTestCase.test_webprint_save_fec_response
    

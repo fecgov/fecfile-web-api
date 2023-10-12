@@ -58,4 +58,5 @@ fecfiler.f3x\_summaries.migrations
    fecfiler.f3x_summaries.migrations.0025_auto_20220915_1309
    fecfiler.f3x_summaries.migrations.0026_auto_20221130_1459
    fecfiler.f3x_summaries.migrations.0027_remove_f3xsummary_filer_committee_id_number
+   fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version
 

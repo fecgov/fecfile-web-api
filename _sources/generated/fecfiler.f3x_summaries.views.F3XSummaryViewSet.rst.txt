@@ -20,6 +20,7 @@ fecfiler.f3x\_summaries.views.F3XSummaryViewSet
    .. autosummary::
    
       ~F3XSummaryViewSet.__init__
+      ~F3XSummaryViewSet.amend
       ~F3XSummaryViewSet.as_view
       ~F3XSummaryViewSet.check_object_permissions
       ~F3XSummaryViewSet.check_permissions

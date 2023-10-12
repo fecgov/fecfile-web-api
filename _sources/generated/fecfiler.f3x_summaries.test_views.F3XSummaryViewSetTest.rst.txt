@@ -111,6 +111,7 @@ fecfiler.f3x\_summaries.test\_views.F3XSummaryViewSetTest
       ~F3XSummaryViewSetTest.subTest
       ~F3XSummaryViewSetTest.tearDown
       ~F3XSummaryViewSetTest.tearDownClass
+      ~F3XSummaryViewSetTest.test_amend
       ~F3XSummaryViewSetTest.test_coverage_dates_happy_path
    
    

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -15,8 +15,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary" href="fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary.html" />
-    <link rel="prev" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid" href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid.html" />
+    <link rel="next" title="fecfiler.f3x_summaries.models" href="fecfiler.f3x_summaries.models.html" />
+    <link rel="prev" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version" href="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,15 +33,15 @@
 
           <div class="body" role="main">
             
-  <section id="fecfiler-f3x-summaries-migrations-0020-f3xsummary-submission-keys-migration">
-<h1>fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration<a class="headerlink" href="#fecfiler-f3x-summaries-migrations-0020-f3xsummary-submission-keys-migration" title="Permalink to this headline">¶</a></h1>
+  <section id="fecfiler-f3x-summaries-migrations-0028-f3xsummary-report-id-f3xsummary-report-version-migration">
+<h1>fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration<a class="headerlink" href="#fecfiler-f3x-summaries-migrations-0028-f3xsummary-report-id-f3xsummary-report-version-migration" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.migrations.migration.Migration</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -51,19 +51,19 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.__init__" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(name, app_label)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.__init__" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(name, app_label)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.apply" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply</span></code></a>(project_state, schema_editor[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.apply" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply</span></code></a>(project_state, schema_editor[, ...])</p></td>
 <td><p>Take a project_state representing all migrations prior to this one and a schema_editor for a live database and apply the migration in a forwards order.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.mutate_state" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.mutate_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mutate_state</span></code></a>(project_state[, preserve])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.mutate_state" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.mutate_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mutate_state</span></code></a>(project_state[, preserve])</p></td>
 <td><p>Take a ProjectState and return a new one with the migration's operations applied to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.suggest_name" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.suggest_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">suggest_name</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.suggest_name" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.suggest_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">suggest_name</span></code></a>()</p></td>
 <td><p>Suggest a name for the operations this migration might represent.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.unapply" title="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.unapply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unapply</span></code></a>(project_state, schema_editor[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.unapply" title="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.unapply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unapply</span></code></a>(project_state, schema_editor[, ...])</p></td>
 <td><p>Take a project_state representing all migrations prior to this one and a schema_editor for a live database and apply the migration in a reverse order.</p></td>
 </tr>
 </tbody>
@@ -96,8 +96,8 @@
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.apply">
-<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.apply" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a project_state representing all migrations prior to this one
 and a schema_editor for a live database and apply the migration
 in a forwards order.</p>
@@ -106,24 +106,24 @@ Migrations.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.mutate_state">
-<span class="sig-name descname"><span class="pre">mutate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.mutate_state" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.mutate_state">
+<span class="sig-name descname"><span class="pre">mutate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.mutate_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a ProjectState and return a new one with the migration’s
 operations applied to it. Preserve the original object state by
 default and return a mutated state from a copy.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.suggest_name">
-<span class="sig-name descname"><span class="pre">suggest_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.suggest_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.suggest_name">
+<span class="sig-name descname"><span class="pre">suggest_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.suggest_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Suggest a name for the operations this migration might represent. Names
 are not guaranteed to be unique, but put some effort into the fallback
 name to avoid VCS conflicts if possible.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.unapply">
-<span class="sig-name descname"><span class="pre">unapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.unapply" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.unapply">
+<span class="sig-name descname"><span class="pre">unapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.unapply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a project_state representing all migrations prior to this one
 and a schema_editor for a live database and apply the migration
 in a reverse order.</p>
@@ -187,11 +187,7 @@ recorded in step 1.</p></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0017_f3xsummary_calculation_status.html">fecfiler.f3x_summaries.migrations.0017_f3xsummary_calculation_status</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0018_f3xsummary_uuid.html">fecfiler.f3x_summaries.migrations.0018_f3xsummary_uuid</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0019_f3xsummary_submission_keys.html">fecfiler.f3x_summaries.migrations.0019_f3xsummary_submission_keys</a></li>
-<li class="toctree-l5 current"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.html">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys</a><ul class="current">
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid.html">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid</a></li>
-<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration</a></li>
-</ul>
-</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.html">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary.html">fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0022_remove_id.html">fecfiler.f3x_summaries.migrations.0022_remove_id</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0023_committee_fk_to_int.html">fecfiler.f3x_summaries.migrations.0023_committee_fk_to_int</a></li>
@@ -199,7 +195,10 @@ recorded in step 1.</p></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0025_auto_20220915_1309.html">fecfiler.f3x_summaries.migrations.0025_auto_20220915_1309</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0026_auto_20221130_1459.html">fecfiler.f3x_summaries.migrations.0026_auto_20221130_1459</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0027_remove_f3xsummary_filer_committee_id_number.html">fecfiler.f3x_summaries.migrations.0027_remove_f3xsummary_filer_committee_id_number</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.html">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.html">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.f3x_summaries.models.html">fecfiler.f3x_summaries.models</a></li>
@@ -239,9 +238,9 @@ recorded in step 1.</p></li>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a><ul>
   <li><a href="fecfiler.f3x_summaries.migrations.html">fecfiler.f3x_summaries.migrations</a><ul>
-  <li><a href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.html">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys</a><ul>
-      <li>Previous: <a href="fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid.html" title="previous chapter">fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.update_uuid</a></li>
-      <li>Next: <a href="fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary.html" title="next chapter">fecfiler.f3x_summaries.migrations.0021_f3xsummary_uuid_primary</a></li>
+  <li><a href="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.html">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version</a><ul>
+      <li>Previous: <a href="fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.html" title="previous chapter">fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version</a></li>
+      <li>Next: <a href="fecfiler.f3x_summaries.models.html" title="next chapter">fecfiler.f3x_summaries.models</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -280,7 +279,7 @@ recorded in step 1.</p></li>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
-      <a href="../_sources/generated/fecfiler.f3x_summaries.migrations.0020_f3xsummary_submission_keys.Migration.rst.txt"
+      <a href="../_sources/generated/fecfiler.f3x_summaries.migrations.0028_f3xsummary_report_id_f3xsummary_report_version.Migration.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

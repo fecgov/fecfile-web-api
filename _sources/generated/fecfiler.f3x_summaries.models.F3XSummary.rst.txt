@@ -181,6 +181,8 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.pk
       ~F3XSummary.qualified_committee
       ~F3XSummary.report_code
+      ~F3XSummary.report_id
+      ~F3XSummary.report_version
       ~F3XSummary.schatransaction_set
       ~F3XSummary.state
       ~F3XSummary.state_of_election
