@@ -1,5 +1,4 @@
 from django.db import migrations
-from django.contrib.contenttypes import management
 
 
 class Migration(migrations.Migration):
