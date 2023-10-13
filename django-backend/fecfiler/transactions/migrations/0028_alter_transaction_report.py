@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('reports', '0001_initial'),
-        ('web_services', '0017_alter_dotfec_report_step_3'),
+        ('transactions', '0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='dotfec',
+            model_name='transaction',
             name='report',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.report'),
         ),

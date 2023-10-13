@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("reports", "0004_add_report_version"),
+        ("reports", "0001_initial"),
     ]
 
     operations = [
