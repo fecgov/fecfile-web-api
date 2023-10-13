@@ -156,7 +156,8 @@ class UploadSubmission(BaseSubmission):
         fec_response_json = json.loads(response_string)
         self.fec_report_id = fec_response_json.get("report_id")
         report = self.report_set.first()
-        report.report_id = self.fec_report_id
+        if not report.report_id:
+            report.report_id = self.fec_report_id
         report.save()
         super().save_fec_response(response_string)
 
