@@ -3,7 +3,6 @@
 from django.db import migrations, models
 import django.db.models.deletion
 import uuid
-from form_99.models import Form99
 
 
 class Migration(migrations.Migration):
@@ -40,7 +39,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to=Form99,
+                to="reports.form_99",
             ),
         ),
     ]
