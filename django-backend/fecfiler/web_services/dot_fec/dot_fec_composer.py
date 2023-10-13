@@ -3,7 +3,6 @@ from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
-from fecfiler.f3x_summaries.models import F3XSummary
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
