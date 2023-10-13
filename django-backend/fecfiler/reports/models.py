@@ -6,9 +6,6 @@ import copy
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
-from .report_f3x.models import ReportF3X
-from .report_f24.models import ReportF24
-from .report_f99.models import ReportF99
 import logging
 
 
@@ -66,13 +63,13 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     report_f3x = models.ForeignKey(
-        ReportF3X, on_delete=models.CASCADE, null=True, blank=True
+        "reports.reportf3x", on_delete=models.CASCADE, null=True, blank=True
     )
     report_f24 = models.ForeignKey(
-        ReportF24, on_delete=models.CASCADE, null=True, blank=True
+        "reports.reportf24", on_delete=models.CASCADE, null=True, blank=True
     )
     report_f99 = models.ForeignKey(
-        ReportF99, on_delete=models.CASCADE, null=True, blank=True
+        "reports.reportf99", on_delete=models.CASCADE, null=True, blank=True
     )
 
     objects = ReportManager()
