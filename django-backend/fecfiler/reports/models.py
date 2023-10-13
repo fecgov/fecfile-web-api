@@ -6,6 +6,9 @@ import copy
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
+from .report_f3x.models import ReportF3X
+from .report_f24.models import ReportF24
+from .report_f99.models import ReportF99
 import logging
 
 
@@ -23,9 +26,11 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         unique=True,
     )
 
-    form_type = models.TextField(null=True, blank=True)  
-    report_version = models.TextField(null=True, blank=True)  # fec 1-up version of amendment
-    report_id = models.TextField(null=True, blank=True) # fec id for report
+    form_type = models.TextField(null=True, blank=True)
+    report_version = models.TextField(
+        null=True, blank=True
+    )  # fec 1-up version of amendment
+    report_id = models.TextField(null=True, blank=True)  # fec id for report
     report_code = models.TextField(null=True, blank=True)
     coverage_from_date = models.DateField(null=True, blank=True)
     coverage_through_date = models.DateField(null=True, blank=True)
@@ -61,13 +66,13 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     report_f3x = models.ForeignKey(
-        "reports.ReportF3X", on_delete=models.CASCADE, null=True, blank=True
+        ReportF3X, on_delete=models.CASCADE, null=True, blank=True
     )
     report_f24 = models.ForeignKey(
-        "reports.ReportF24", on_delete=models.CASCADE, null=True, blank=True
+        ReportF24, on_delete=models.CASCADE, null=True, blank=True
     )
     report_f99 = models.ForeignKey(
-        "reports.ReportF99", on_delete=models.CASCADE, null=True, blank=True
+        ReportF99, on_delete=models.CASCADE, null=True, blank=True
     )
 
     objects = ReportManager()
@@ -161,8 +166,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
 
 class ReportMixin(models.Model):
-    """Abstract model for tracking reports
-    """
+    """Abstract model for tracking reports"""
 
     report = models.ForeignKey(
         "reports.Report", on_delete=models.CASCADE, null=True, blank=True
