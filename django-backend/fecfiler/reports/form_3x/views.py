@@ -5,23 +5,23 @@ from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
-from .serializers import ReportF3XSerializer
+from .serializers import Form3XSerializer
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ReportF3XViewSet(ReportViewSet):
+class Form3XViewSet(ReportViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
 
-    queryset = Report.objects.select_related("report_f3x").filter(
+    queryset = Report.objects.select_related("form_3x").filter(
         report_type=ReportType.F3X.value
     )
 
-    serializer_class = ReportF3XSerializer
+    serializer_class = Form3XSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",
@@ -37,7 +37,11 @@ class ReportF3XViewSet(ReportViewSet):
         data = list(
             self.get_queryset()
             .distinct("coverage_from_date", "coverage_through_date")
-            .values("report_code", "coverage_from_date", "coverage_through_date",)
+            .values(
+                "report_code",
+                "coverage_from_date",
+                "coverage_through_date",
+            )
         )
         return JsonResponse(data, safe=False)
 

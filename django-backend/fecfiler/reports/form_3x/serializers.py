@@ -1,6 +1,6 @@
 from django.db import transaction
 from fecfiler.reports.models import Report
-from fecfiler.reports.report_f3x.models import ReportF3X
+from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
 from django.db.models import Q
@@ -20,7 +20,7 @@ COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
 logger = logging.getLogger(__name__)
 
 
-class ReportF3XSerializer(ReportSerializer):
+class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
     change_of_address = CharField(required=False, allow_null=True)
@@ -344,10 +344,10 @@ class ReportF3XSerializer(ReportSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            report_f3x_data = get_model_data(validated_data, ReportF3X)
-            report_f3x = ReportF3X.objects.create(**report_f3x_data)
+            form_3x_data = get_model_data(validated_data, Form3X)
+            form_3x = Form3X.objects.create(**form_3x_data)
             report_data = get_model_data(validated_data, Report)
-            report_data["report_f3x_id"] = report_f3x.id
+            report_data["form_3x_id"] = form_3x.id
             report = super().create(report_data)
             return report
 
@@ -356,7 +356,7 @@ class ReportF3XSerializer(ReportSerializer):
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.schedule_a, attr, value)
-            instance.report_f3x.save()
+            instance.form_3x.save()
             updated = super().update(instance, validated_data)
             return updated
 
@@ -373,7 +373,7 @@ class ReportF3XSerializer(ReportSerializer):
             report_code=self.validated_data["report_code"],
         ).count()
         if number_of_collisions == 0:
-            return super(ReportF3XSerializer, self).save(**kwargs)
+            return super(Form3XSerializer, self).save(**kwargs)
         else:
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
@@ -388,7 +388,7 @@ class ReportF3XSerializer(ReportSerializer):
             ReportSerializer.Meta.get_fields()
             + [
                 f.name
-                for f in ReportF3X._meta.get_fields()
+                for f in Form3X._meta.get_fields()
                 if f.name not in ["committee_name", "report"]
             ]
             + ["fields_to_validate"]

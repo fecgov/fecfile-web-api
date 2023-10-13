@@ -1,6 +1,6 @@
 from django.db import transaction
 from fecfiler.reports.models import Report
-from fecfiler.reports.report_f24.models import ReportF24
+from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import (
@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ReportF24Serializer(ReportSerializer):
+class Form24Serializer(ReportSerializer):
     schema_name = "F24"
 
     report_type_24_48 = CharField(required=False, allow_null=True)
@@ -32,10 +32,10 @@ class ReportF24Serializer(ReportSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            report_f24_data = get_model_data(validated_data, ReportF24)
-            report_f24 = ReportF24.objects.create(**report_f24_data)
+            form_24_data = get_model_data(validated_data, Form24)
+            form_24 = Form24.objects.create(**form_24_data)
             report_data = get_model_data(validated_data, Report)
-            report_data["report_f24_id"] = report_f24.id
+            report_data["form_24_id"] = form_24.id
             report = super().create(report_data)
             return report
 
@@ -44,7 +44,7 @@ class ReportF24Serializer(ReportSerializer):
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.schedule_a, attr, value)
-            instance.report_f24.save()
+            instance.form_24.save()
             updated = super().update(instance, validated_data)
             return updated
 
@@ -59,7 +59,7 @@ class ReportF24Serializer(ReportSerializer):
             ReportSerializer.Meta.get_fields()
             + [
                 f.name
-                for f in ReportF24._meta.get_fields()
+                for f in Form24._meta.get_fields()
                 if f.name not in ["committee_name", "report"]
             ]
             + ["fields_to_validate"]

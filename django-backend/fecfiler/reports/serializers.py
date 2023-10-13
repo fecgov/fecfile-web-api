@@ -10,78 +10,86 @@ from fecfiler.web_services.serializers import (
     WebPrintSubmissionSerializer,
 )
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-from fecfiler.reports.report_f3x.models import ReportF3X
-from fecfiler.reports.report_f24.models import ReportF24
-from fecfiler.reports.report_f99.models import ReportF99
+from fecfiler.reports.form_3x.models import Form3X
+from fecfiler.reports.form_24.models import Form24
+from fecfiler.reports.form_99.models import Form99
 import logging
 
 
 logger = logging.getLogger(__name__)
 
 
-class ReportF3XSerializer(ModelSerializer):
+class Form3XSerializer(ModelSerializer):
     class Meta:
         fields = [
             f.name
-            for f in ReportF3X._meta.get_fields()
+            for f in Form3X._meta.get_fields()
             if f.name not in ["deleted", "report"]
         ]
-        model = ReportF3X
+        model = Form3X
 
 
-class ReportF24Serializer(ModelSerializer):
+class Form24Serializer(ModelSerializer):
     class Meta:
         fields = [
             f.name
-            for f in ReportF24._meta.get_fields()
+            for f in Form24._meta.get_fields()
             if f.name not in ["deleted", "report"]
         ]
-        model = ReportF24
+        model = Form24
 
 
-class ReportF99Serializer(ModelSerializer):
+class Form99Serializer(ModelSerializer):
     class Meta:
         fields = [
             f.name
-            for f in ReportF99._meta.get_fields()
+            for f in Form99._meta.get_fields()
             if f.name not in ["deleted", "report"]
         ]
-        model = ReportF99
+        model = Form99
 
 
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
 
-    upload_submission = UploadSubmissionSerializer(read_only=True,)
-    webprint_submission = WebPrintSubmissionSerializer(read_only=True,)
-    report_status = CharField(read_only=True,)
-    report_code_label = CharField(read_only=True,)
+    upload_submission = UploadSubmissionSerializer(
+        read_only=True,
+    )
+    webprint_submission = WebPrintSubmissionSerializer(
+        read_only=True,
+    )
+    report_status = CharField(
+        read_only=True,
+    )
+    report_code_label = CharField(
+        read_only=True,
+    )
 
-    report_f3x = ReportF3XSerializer(required=False)
-    report_f24 = ReportF24Serializer(required=False)
-    report_f99 = ReportF99Serializer(required=False)
+    form_3x = Form3XSerializer(required=False)
+    form_24 = Form24Serializer(required=False)
+    form_99 = Form99Serializer(required=False)
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
-        report_f3x = representation.pop("report_f3x") or []
-        report_f24 = representation.pop("report_f24") or []
-        report_f99 = representation.pop("report_f99") or []
+        form_3x = representation.pop("form_3x") or []
+        form_24 = representation.pop("form_24") or []
+        form_99 = representation.pop("form_99") or []
 
-        if report_f3x:
+        if form_3x:
             representation["report_type"] = "F3X"
-            for property in report_f3x:
+            for property in form_3x:
                 if not representation.get(property):
-                    representation[property] = report_f3x[property]
-        if report_f24:
+                    representation[property] = form_3x[property]
+        if form_24:
             representation["report_type"] = "F24"
-            for property in report_f24:
+            for property in form_24:
                 if not representation.get(property):
-                    representation[property] = report_f24[property]
-        if report_f99:
+                    representation[property] = form_24[property]
+        if form_99:
             representation["report_type"] = "F99"
-            for property in report_f99:
+            for property in form_99:
                 if not representation.get(property):
-                    representation[property] = report_f99[property]
+                    representation[property] = form_99[property]
         return representation
 
     def validate(self, data):

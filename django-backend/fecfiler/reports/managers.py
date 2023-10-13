@@ -17,9 +17,9 @@ class ReportManager(SoftDeleteManager):
             .get_queryset()
             .annotate(
                 report_type=Case(
-                    When(report_f3x__isnull=False, then=ReportType.F3X.value),
-                    When(report_f24__isnull=False, then=ReportType.F24.value),
-                    When(report_f99__isnull=False, then=ReportType.F99.value),
+                    When(form_3x__isnull=False, then=ReportType.F3X.value),
+                    When(form_24__isnull=False, then=ReportType.F24.value),
+                    When(form_99__isnull=False, then=ReportType.F99.value),
                 ),
             )
         )

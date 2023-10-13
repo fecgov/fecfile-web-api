@@ -1,6 +1,6 @@
 [
   {
-    "model": "reports.reportF3X",
+    "model": "reports.Form3X",
     "fields": {
       "id": "a6d60d2d-d926-4e89-ad4b-c47d152a66ae",
       "change_of_address": true,
@@ -120,7 +120,7 @@
     "model": "reports.report",
     "fields": {
       "id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-      "report_f3x_id": "a6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+      "form_3x_id": "a6d60d2d-d926-4e89-ad4b-c47d152a66ae",
       "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
       "form_type": "F3XN",
       "report_code": "Q1",
@@ -138,7 +138,7 @@
     }
   },
   {
-    "model": "reports.reportF3X",
+    "model": "reports.Form3X",
     "fields": {
       "id": "b07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
       "change_of_address": true,
@@ -258,7 +258,7 @@
     "model": "reports.report",
     "fields": {
       "id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
-      "report_f3x_id": "b07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+      "form_3x_id": "b07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
       "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
       "form_type": "F3XN",
       "report_code": "MY",
@@ -276,7 +276,7 @@
     }
   },
   {
-    "model": "reports.reportF3X",
+    "model": "reports.Form3X",
     "fields": {
       "id": "a406535e-f99f-42c4-97a8-247904b7d297",
       "change_of_address": true,
@@ -396,7 +396,7 @@
     "model": "reports.report",
     "fields": {
       "id": "1406535e-f99f-42c4-97a8-247904b7d297",
-      "report_f3x_id": "a406535e-f99f-42c4-97a8-247904b7d297",
+      "form_3x_id": "a406535e-f99f-42c4-97a8-247904b7d297",
       "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
       "form_type": "F3XN",
       "calculation_status": null,
