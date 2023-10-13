@@ -19,6 +19,7 @@ class ReportManager(SoftDeleteManager):
                 report_type=Case(
                     When(report_f3x__isnull=False, then=ReportType.F3X.value),
                     When(report_f24__isnull=False, then=ReportType.F24.value),
+                    When(report_f99__isnull=False, then=ReportType.F99.value),
                 ),
             )
         )
@@ -28,3 +29,4 @@ class ReportManager(SoftDeleteManager):
 class ReportType(Enum):
     F3X = Value("F3X")
     F24 = Value("F24")
+    F99 = Value("F99")

@@ -104,6 +104,8 @@ class ReportViewSet(CommitteeOwnedViewSet):
                 queryset = queryset.filter(report_f3x__isnull=True)
             if "f24" not in report_type_list:
                 queryset = queryset.filter(report_f24__isnull=True)
+            if "f99" not in report_type_list:
+                queryset = queryset.filter(report_f99__isnull=True)
         return queryset
 
     @action(

@@ -8,6 +8,7 @@ from .views import ReportViewSet
 router = DefaultRouter()
 router.register(r"report-f3x", ReportF3XViewSet, basename="report-f3x")
 router.register(r"report-f24", ReportF24ViewSet, basename="report-f24")
+router.register(r"report-f99", ReportF24ViewSet, basename="report-f99")
 router.register(r"", ReportViewSet, basename="reports")
 
 # The API URLs are now determined automatically by the router.
