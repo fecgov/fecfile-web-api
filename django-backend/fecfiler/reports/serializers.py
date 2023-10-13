@@ -56,10 +56,12 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
         report_f24 = representation.pop("report_f24") or []
 
         if report_f3x:
+            representation["report_type"] = "F3X"
             for property in report_f3x:
                 if not representation.get(property):
                     representation[property] = report_f3x[property]
         if report_f24:
+            representation["report_type"] = "F24"
             for property in report_f24:
                 if not representation.get(property):
                     representation[property] = report_f24[property]
