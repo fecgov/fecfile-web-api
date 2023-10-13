@@ -23,7 +23,9 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         unique=True,
     )
 
-    form_type = models.TextField(null=True, blank=True)
+    form_type = models.TextField(null=True, blank=True)  # fec 1-up version of amendment
+    report_version = models.TextField(null=True, blank=True)  # fec id for report
+    report_id = models.TextField(null=True, blank=True)
     report_code = models.TextField(null=True, blank=True)
     coverage_from_date = models.DateField(null=True, blank=True)
     coverage_through_date = models.DateField(null=True, blank=True)

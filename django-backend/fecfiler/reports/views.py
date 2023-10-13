@@ -107,6 +107,17 @@ class ReportViewSet(CommitteeOwnedViewSet):
         return queryset
 
     @action(
+        detail=True, methods=["post"], url_name="amend",
+    )
+    def amend(self, request, pk):
+        report = self.get_object()
+        report.form_type = "F3XA"
+        report.report_version = int(report.report_version or "0") + 1
+        report.upload_submission = None
+        report.save()
+        return Response(f"amended {report}")
+
+    @action(
         detail=False, methods=["post"], url_path="hard-delete-reports",
     )
     def hard_delete_reports(self, request):

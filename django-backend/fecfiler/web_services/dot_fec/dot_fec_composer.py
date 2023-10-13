@@ -97,9 +97,9 @@ class Header:
 
 
 def compose_header(report_id):
-    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
-    if f3x_summary_result.exists():
-        f3x_summary = f3x_summary_result.first()
+    report_result = Report.objects.filter(id=report_id)
+    if report_result.exists():
+        report = report_result.first()
         logger.info(f"composing header: {report_id}")
         return Header(
             "HDR",
@@ -107,8 +107,8 @@ def compose_header(report_id):
             "8.4",
             "FECFile Online",
             "0.0.1",
-            f3x_summary.report_id,
-            f3x_summary.report_version,
+            report.report_id,
+            report.report_version,
         )
     else:
         raise ObjectDoesNotExist(f"header: {report_id} not found")

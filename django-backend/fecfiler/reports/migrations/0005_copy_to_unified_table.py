@@ -12,11 +12,9 @@ def copy_f3x_summaries(apps, schema_editor):
         app_config.models_module = None
 
     try:
-        Report = apps.get_model("reports", "Report") 
+        Report = apps.get_model("reports", "Report")
         ReportF3X = apps.get_model("reports", "ReportF3X")  # noqa
-        F3XSummary = apps.get_model(  # noqa
-            "f3x_summaries", "F3XSummary"
-        )
+        F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
         reports_to_copy = F3XSummary.objects.all()
         for report in reports_to_copy:
             report.report_f3x_id = report.id
@@ -24,7 +22,7 @@ def copy_f3x_summaries(apps, schema_editor):
         ReportF3X.objects.bulk_create(reports_to_copy)
         Report.objects.bulk_create(reports_to_copy)
     except Exception as e:
-        print('Failed to copy f3x_summaries table due to: ' + str(e))
+        print("Failed to copy f3x_summaries table due to: " + str(e))
 
 
 class Migration(migrations.Migration):
@@ -32,7 +30,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("reports", "0003_move_fields_between_tables"),
+        ("reports", "0004_add_report_version"),
     ]
 
     operations = [
