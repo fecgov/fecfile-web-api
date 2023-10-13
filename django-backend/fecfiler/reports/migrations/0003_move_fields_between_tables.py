@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to="reports.reportF24",
+                to="reports.ReportF24",
             ),
         ),
         migrations.RemoveField(model_name="reportf24", name="date_signed",),
