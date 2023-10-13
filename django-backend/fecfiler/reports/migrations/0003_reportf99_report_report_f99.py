@@ -8,25 +8,39 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0002_copy_to_unified_table'),
+        ("reports", "0002_copy_to_unified_table"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReportF99',
+            name="ReportF99",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('street_1', models.TextField(blank=True, null=True)),
-                ('street_2', models.TextField(blank=True, null=True)),
-                ('city', models.TextField(blank=True, null=True)),
-                ('state', models.TextField(blank=True, null=True)),
-                ('zip', models.TextField(blank=True, null=True)),
-                ('text_code', models.TextField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("street_1", models.TextField(blank=True, null=True)),
+                ("street_2", models.TextField(blank=True, null=True)),
+                ("city", models.TextField(blank=True, null=True)),
+                ("state", models.TextField(blank=True, null=True)),
+                ("zip", models.TextField(blank=True, null=True)),
+                ("text_code", models.TextField(blank=True, null=True)),
             ],
         ),
         migrations.AddField(
-            model_name='report',
-            name='report_f99',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.reportf99'),
+            model_name="report",
+            name="report_f99",
+            field=models.ForeignKey(
+                "reports.ReportF99",
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+            ),
         ),
     ]
