@@ -7,14 +7,22 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0001_initial'),
-        ('transactions', '0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx'),
+        ("reports", "0002_copy_to_unified_table"),
+        (
+            "transactions",
+            "0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transaction',
-            name='report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.report'),
+            model_name="transaction",
+            name="report",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reports.report",
+            ),
         ),
     ]

@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0001_initial'),
-        ('web_services', '0017_alter_dotfec_report_step_3'),
+        ("reports", "0002_copy_to_unified_table"),
+        ("web_services", "0017_alter_dotfec_report_step_3"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='dotfec',
-            name='report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.report'),
+            model_name="dotfec",
+            name="report",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reports.report",
+            ),
         ),
     ]
