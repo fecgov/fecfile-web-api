@@ -37,10 +37,10 @@ class Migration(migrations.Migration):
             model_name="report",
             name="report_f99",
             field=models.ForeignKey(
-                "reports.ReportF99",
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
+                to="reports.reportf99",
             ),
         ),
     ]

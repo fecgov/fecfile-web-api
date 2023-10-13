@@ -725,19 +725,19 @@ class Migration(migrations.Migration):
                 (
                     "report_f24",
                     models.ForeignKey(
-                        "reports.ReportF24",
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
+                        to="reports.reportf24",
                     ),
                 ),
                 (
                     "report_f3x",
                     models.ForeignKey(
-                        "reports.ReportF3X",
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
+                        to="reports.reportf3x",
                     ),
                 ),
                 (
