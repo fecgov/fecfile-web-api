@@ -55,9 +55,6 @@ class ContactSerializer(
             if f.name
             not in [
                 "deleted",
-                "schatransaction",
-                "scheduleatransaction",
-                "schedulebtransaction",
                 "transaction",
                 "contact_1_transaction_set",
                 "contact_2_transaction_set",

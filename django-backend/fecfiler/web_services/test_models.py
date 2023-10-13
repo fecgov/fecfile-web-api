@@ -37,9 +37,9 @@ class UploadSubmissionTestCase(TestCase):
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.upload_submission_id, submission.id)
 
-    def test_save_fec_response(self):
-        self.assertIsNone(self.upload_submission.fec_status)
-        self.upload_submission.save_fec_response(
+        submission.refresh_from_db()
+        self.assertIsNone(submission.fec_status)
+        submission.save_fec_response(
             json.dumps(
                 {
                     "submission_id": "fake_submission_id",
@@ -49,7 +49,7 @@ class UploadSubmissionTestCase(TestCase):
                 }
             )
         )
-        from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
+        from_db = UploadSubmission.objects.get(id=submission.id)
         self.assertEqual(from_db.fec_submission_id, "fake_submission_id")
         self.assertEqual(from_db.fec_status, "ACCEPTED")
         self.assertEqual(from_db.fec_message, "Test Save Response")

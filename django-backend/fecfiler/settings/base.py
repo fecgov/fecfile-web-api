@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
-    "fecfiler.scha_transactions",
     "fecfiler.reports",
     "fecfiler.transactions",
     "fecfiler.memo_text",

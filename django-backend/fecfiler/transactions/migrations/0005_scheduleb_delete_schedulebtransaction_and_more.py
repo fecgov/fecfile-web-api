@@ -6,7 +6,6 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("transactions", "0004_copy_to_unified_table"),
     ]
@@ -103,9 +102,6 @@ class Migration(migrations.Migration):
                     models.TextField(blank=True, null=True),
                 ),
             ],
-        ),
-        migrations.DeleteModel(
-            name="ScheduleBTransaction",
         ),
         migrations.AddField(
             model_name="transaction",

@@ -123,6 +123,7 @@ def calculate_summary(report_id):
     report.report_f3x.L37_offsets_to_operating_expenditures_period = a["line_37"]
     report.report_f3x.L37_offsets_to_operating_expenditures_ytd = b["line_37"]
 
+    report.report_f3x.save()
     report.calculation_status = CalculationState.SUCCEEDED
     report.save()
     return report.id
