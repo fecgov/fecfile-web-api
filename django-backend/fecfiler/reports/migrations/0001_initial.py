@@ -723,7 +723,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="reports.ReportF3X",
+                        to="reports.reportf3x",
                     ),
                 ),
             ],
