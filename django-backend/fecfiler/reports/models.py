@@ -166,7 +166,7 @@ class ReportMixin(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if self.report.report_f3x:
+        if self.report:
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
             if report_date is not None:
@@ -184,7 +184,7 @@ class ReportMixin(models.Model):
             for report in reports_to_flag_for_recalculation:
                 report.calculation_status = None
                 report.save()
-                logger.info(f"F3X Report: {report.id} marked for recalcuation")
+                logger.info(f"Report: {report.id} marked for recalcuation")
 
         super(ReportMixin, self).save(*args, **kwargs)
 
