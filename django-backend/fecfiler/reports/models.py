@@ -66,13 +66,13 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     report_f3x = models.ForeignKey(
-        "reports.report_f3x.ReportF3X", on_delete=models.CASCADE, null=True, blank=True
+        ReportF3X, on_delete=models.CASCADE, null=True, blank=True
     )
     report_f24 = models.ForeignKey(
-        "reports.report_f24.ReportF24", on_delete=models.CASCADE, null=True, blank=True
+        ReportF24, on_delete=models.CASCADE, null=True, blank=True
     )
     report_f99 = models.ForeignKey(
-        "reports.report_f99.ReportF99", on_delete=models.CASCADE, null=True, blank=True
+        ReportF99, on_delete=models.CASCADE, null=True, blank=True
     )
 
     objects = ReportManager()
