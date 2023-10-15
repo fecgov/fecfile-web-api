@@ -1,6 +1,6 @@
 from django.test import TestCase
 from ..serializers import (
-    ReportF3XSerializer,
+    Form3XSerializer,
     COVERAGE_DATE_REPORT_CODE_COLLISION,
 )
 from fecfiler.authentication.models import Account
@@ -34,25 +34,29 @@ class F3XSerializerTestCase(TestCase):
         self.mock_request.user = user
 
     def test_serializer_validate(self):
-        valid_serializer = ReportF3XSerializer(
-            data=self.valid_f3x_report, context={"request": self.mock_request},
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
-        invalid_serializer = ReportF3XSerializer(
-            data=self.invalid_f3x_report, context={"request": self.mock_request},
+        invalid_serializer = Form3XSerializer(
+            data=self.invalid_f3x_report,
+            context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
         self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])
 
     def test_used_report_code(self):
-        valid_serializer = ReportF3XSerializer(
-            data=self.valid_f3x_report, context={"request": self.mock_request},
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
         )
         valid_serializer.is_valid()
         valid_serializer.save()
-        valid_serializer = ReportF3XSerializer(
-            data=self.valid_f3x_report, context={"request": self.mock_request},
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
         )
         valid_serializer.is_valid()
         self.assertRaises(

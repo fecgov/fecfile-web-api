@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ReportF3X(models.Model):
+class Form3X(models.Model):
     """Generated model from json schema"""
 
     id = models.UUIDField(

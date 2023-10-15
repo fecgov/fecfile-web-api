@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ReportF24(models.Model):
+class Form24(models.Model):
     """Generated model from json schema"""
 
     id = models.UUIDField(

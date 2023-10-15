@@ -3,23 +3,23 @@ from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
-from .serializers import ReportF24Serializer
+from .serializers import Form24Serializer
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class ReportF24ViewSet(ReportViewSet):
+class Form24ViewSet(ReportViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
     """
 
-    queryset = Report.objects.select_related("report_f24").filter(
+    queryset = Report.objects.select_related("form_24").filter(
         report_type=ReportType.F24.value
     )
 
-    serializer_class = ReportF24Serializer
+    serializer_class = Form24Serializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "form_type",

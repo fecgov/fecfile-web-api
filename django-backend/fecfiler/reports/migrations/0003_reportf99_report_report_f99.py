@@ -6,14 +6,13 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("reports", "0002_copy_to_unified_table"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name="ReportF99",
+            name="Form99",
             fields=[
                 (
                     "id",
@@ -35,12 +34,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="report",
-            name="report_f99",
+            name="form_99",
             field=models.ForeignKey(
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to="reports.reportf99",
+                to="reports.form99",
             ),
         ),
     ]

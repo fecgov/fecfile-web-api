@@ -6,7 +6,6 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -16,7 +15,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="ReportF24",
+            name="Form24",
             fields=[
                 (
                     "id",
@@ -38,7 +37,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name="ReportF3X",
+            name="Form3X",
             fields=[
                 (
                     "id",
@@ -723,21 +722,21 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "report_f24",
+                    "form_24",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="reports.reportf24",
+                        to="reports.form24",
                     ),
                 ),
                 (
-                    "report_f3x",
+                    "form_3x",
                     models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="reports.reportf3x",
+                        to="reports.form3x",
                     ),
                 ),
                 (
@@ -759,6 +758,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
     ]

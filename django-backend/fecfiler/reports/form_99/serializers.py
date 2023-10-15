@@ -1,6 +1,6 @@
 from django.db import transaction
 from fecfiler.reports.models import Report
-from fecfiler.reports.report_f99.models import ReportF99
+from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField
@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ReportF99Serializer(ReportSerializer):
+class Form99Serializer(ReportSerializer):
     schema_name = "F99"
 
     street_1 = CharField(required=False, allow_null=True)
@@ -28,10 +28,10 @@ class ReportF99Serializer(ReportSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            report_f99_data = get_model_data(validated_data, ReportF99)
-            report_f99 = ReportF99.objects.create(**report_f99_data)
+            form_99_data = get_model_data(validated_data, Form99)
+            form_99 = Form99.objects.create(**form_99_data)
             report_data = get_model_data(validated_data, Report)
-            report_data["report_f99_id"] = report_f99.id
+            report_data["form_99_id"] = form_99.id
             report = super().create(report_data)
             return report
 
@@ -40,7 +40,7 @@ class ReportF99Serializer(ReportSerializer):
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.schedule_a, attr, value)
-            instance.report_f99.save()
+            instance.form_99.save()
             updated = super().update(instance, validated_data)
             return updated
 
@@ -55,7 +55,7 @@ class ReportF99Serializer(ReportSerializer):
             ReportSerializer.Meta.get_fields()
             + [
                 f.name
-                for f in ReportF99._meta.get_fields()
+                for f in Form99._meta.get_fields()
                 if f.name not in ["committee_name", "report"]
             ]
             + ["fields_to_validate"]

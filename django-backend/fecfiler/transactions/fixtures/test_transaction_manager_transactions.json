@@ -278,7 +278,7 @@
         }
     },
     {
-        "model": "reports.reportF3X",
+        "model": "reports.form3X",
         "fields": {
             "id": "a35db943-9446-462a-9be0-c820baadb622",
             "change_of_address": true,
@@ -297,7 +297,7 @@
         "model": "reports.report",
         "fields": {
             "id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_f3x_id": "a35db943-9446-462a-9be0-c820baadb622",
+            "form_3x_id": "a35db943-9446-462a-9be0-c820baadb622",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "form_type": "F3XN",
             "report_code": "12C",

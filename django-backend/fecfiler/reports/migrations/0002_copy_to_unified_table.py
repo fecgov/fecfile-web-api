@@ -34,7 +34,6 @@ def copy_f3x_summaries(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

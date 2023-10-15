@@ -101,15 +101,17 @@ class ReportViewSet(CommitteeOwnedViewSet):
             # All transactions are included by default, here we remove those
             # that are not identified in the schedules query param
             if "f3x" not in report_type_list:
-                queryset = queryset.filter(report_f3x__isnull=True)
+                queryset = queryset.filter(form_3x__isnull=True)
             if "f24" not in report_type_list:
-                queryset = queryset.filter(report_f24__isnull=True)
+                queryset = queryset.filter(form_24__isnull=True)
             if "f99" not in report_type_list:
-                queryset = queryset.filter(report_f99__isnull=True)
+                queryset = queryset.filter(form_99__isnull=True)
         return queryset
 
     @action(
-        detail=True, methods=["post"], url_name="amend",
+        detail=True,
+        methods=["post"],
+        url_name="amend",
     )
     def amend(self, request, pk):
         report = self.get_object()
@@ -120,7 +122,9 @@ class ReportViewSet(CommitteeOwnedViewSet):
         return Response(f"amended {report}")
 
     @action(
-        detail=False, methods=["post"], url_path="hard-delete-reports",
+        detail=False,
+        methods=["post"],
+        url_path="hard-delete-reports",
     )
     def hard_delete_reports(self, request):
         committee_id = request.data.get("committee_id")
