@@ -1,5 +1,7 @@
 from django.db import migrations
 from django.contrib.contenttypes import management
+import copy
+import uuid
 
 
 def copy_f3x_summaries(apps, schema_editor):
@@ -12,14 +14,20 @@ def copy_f3x_summaries(apps, schema_editor):
         app_config.models_module = None
 
     try:
-        Report = apps.get_model("reports", "Report")
-        Form3X = apps.get_model("reports", "Form3X")  # noqa
         F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
+        Report = apps.get_model("reports", "Report")  # noqa
+        ReportF3X = apps.get_model("reports", "ReportF3X")  # noqa
         reports_to_copy = F3XSummary.objects.all()
-        for report in reports_to_copy:
-            report.form_3x_id = report.id
-            report.form_24_id = None
-        Form3X.objects.bulk_create(reports_to_copy)
+        f3x_to_copy = copy.deepcopy(reports_to_copy)
+        f3x_ids = []
+        for f3x_report in f3x_to_copy:
+            new_f3x_uuid = uuid.uuid4()
+            f3x_ids.append(new_f3x_uuid)
+            f3x_report.id = new_f3x_uuid
+        ReportF3X.objects.bulk_create(f3x_to_copy)
+        for index, report in enumerate(reports_to_copy):
+            report.report_f3x_id = f3x_ids[index]
+            report.report_f24_id = None
         Report.objects.bulk_create(reports_to_copy)
     except Exception as e:
         print("Failed to copy f3x_summaries table due to: " + str(e))
