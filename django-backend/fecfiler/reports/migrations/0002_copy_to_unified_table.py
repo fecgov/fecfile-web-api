@@ -16,7 +16,7 @@ def copy_f3x_summaries(apps, schema_editor):
     try:
         F3XSummary = apps.get_model("f3x_summaries", "F3XSummary")  # noqa
         Report = apps.get_model("reports", "Report")  # noqa
-        ReportF3X = apps.get_model("reports", "ReportF3X")  # noqa
+        Form3X = apps.get_model("reports", "Form3X")  # noqa
         reports_to_copy = F3XSummary.objects.all()
         f3x_to_copy = copy.deepcopy(reports_to_copy)
         f3x_ids = []
@@ -24,7 +24,7 @@ def copy_f3x_summaries(apps, schema_editor):
             new_f3x_uuid = uuid.uuid4()
             f3x_ids.append(new_f3x_uuid)
             f3x_report.id = new_f3x_uuid
-        ReportF3X.objects.bulk_create(f3x_to_copy)
+        Form3X.objects.bulk_create(f3x_to_copy)
         for index, report in enumerate(reports_to_copy):
             report.report_f3x_id = f3x_ids[index]
             report.report_f24_id = None
