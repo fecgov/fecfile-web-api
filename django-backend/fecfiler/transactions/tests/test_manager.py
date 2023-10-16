@@ -7,7 +7,7 @@ import uuid
 class TransactionManagerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_transaction_manager_transactions",
     ]
 

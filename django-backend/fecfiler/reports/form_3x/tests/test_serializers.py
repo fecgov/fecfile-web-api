@@ -1,5 +1,8 @@
 from django.test import TestCase
-from .serializers import F3XSummarySerializer, COVERAGE_DATE_REPORT_CODE_COLLISION
+from ..serializers import (
+    Form3XSerializer,
+    COVERAGE_DATE_REPORT_CODE_COLLISION,
+)
 from fecfiler.authentication.models import Account
 from rest_framework.request import Request, HttpRequest
 
@@ -8,7 +11,7 @@ class F3XSerializerTestCase(TestCase):
     fixtures = ["test_committee_accounts"]
 
     def setUp(self):
-        self.valid_f3x_summary = {
+        self.valid_f3x_report = {
             "form_type": "F3XN",
             "treasurer_last_name": "Validlastname",
             "treasurer_first_name": "Validfirstname",
@@ -19,7 +22,7 @@ class F3XSerializerTestCase(TestCase):
             "upload_submission": {"fec_status": " ACCEPTED"},
         }
 
-        self.invalid_f3x_summary = {
+        self.invalid_f3x_report = {
             "form_type": "invalidformtype",
             "treasurer_last_name": "Validlastname",
             "date_signed": "2022-01-01",
@@ -31,13 +34,13 @@ class F3XSerializerTestCase(TestCase):
         self.mock_request.user = user
 
     def test_serializer_validate(self):
-        valid_serializer = F3XSummarySerializer(
-            data=self.valid_f3x_summary,
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
             context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
-        invalid_serializer = F3XSummarySerializer(
-            data=self.invalid_f3x_summary,
+        invalid_serializer = Form3XSerializer(
+            data=self.invalid_f3x_report,
             context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
@@ -45,14 +48,14 @@ class F3XSerializerTestCase(TestCase):
         self.assertIsNotNone(invalid_serializer.errors["treasurer_first_name"])
 
     def test_used_report_code(self):
-        valid_serializer = F3XSummarySerializer(
-            data=self.valid_f3x_summary,
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
             context={"request": self.mock_request},
         )
         valid_serializer.is_valid()
         valid_serializer.save()
-        valid_serializer = F3XSummarySerializer(
-            data=self.valid_f3x_summary,
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
             context={"request": self.mock_request},
         )
         valid_serializer.is_valid()

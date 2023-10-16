@@ -7,3 +7,11 @@ def generate_fec_uid():
     # Take 20 characters from the end, skipping over the 20th char from the right,
     # which is the version number (uuid4 -> "4")
     return hex_id[-21] + hex_id[-19:]
+
+
+def get_model_data(data, model):
+    return {
+        field.name: data[field.name]
+        for field in model._meta.get_fields()
+        if field.name in data
+    }

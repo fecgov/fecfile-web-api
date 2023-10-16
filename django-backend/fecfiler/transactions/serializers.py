@@ -3,7 +3,7 @@ import logging
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
-from fecfiler.f3x_summaries.serializers import F3XSummarySerializer
+from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q
@@ -123,7 +123,7 @@ class TransactionSerializerBase(
     loan_id = UUIDField(required=False, allow_null=True)
     transaction_id = CharField(required=False, allow_null=True)
     report_id = UUIDField(required=True, allow_null=False)
-    report = F3XSummarySerializer(read_only=True)
+    report = ReportSerializer(read_only=True)
     form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
     date = DateField(read_only=True)

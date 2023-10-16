@@ -12,7 +12,7 @@ from fecfiler.transactions.schedule_b.serializers import (
 class ScheduleBTransactionSerializerBaseTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_memo_text",
         "test_transaction_serializer",
     ]
@@ -113,8 +113,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["payee_first_name"]
         invalid_serializer = ScheduleBTransactionSerializerBase(
-            data=invalid_transaction,
-            context={"request": self.mock_request},
+            data=invalid_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -124,8 +123,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         missing_type = self.valid_schedule_b_transaction.copy()
         del missing_type["payee_first_name"]
         missing_type_serializer = ScheduleBTransactionSerializerBase(
-            data=missing_type,
-            context={"request": self.mock_request},
+            data=missing_type, context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(missing_type_serializer.errors["payee_first_name"])
@@ -142,8 +140,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
         child["memo_code"] = True
         parent["children"] = [child]
         serializer = ScheduleBTransactionSerializer(
-            data=parent,
-            context={"request": self.mock_request},
+            data=parent, context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(parent))
@@ -204,8 +201,7 @@ class ScheduleBTransactionSerializerBaseTestCase(TestCase):
     def test_transaction_contact_updated(self):
         transaction = self.update_contact_schedule_b_transaction.copy()
         serializer = ScheduleBTransactionSerializer(
-            data=transaction,
-            context={"request": self.mock_request},
+            data=transaction, context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(transaction))

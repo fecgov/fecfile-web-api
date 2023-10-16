@@ -1,5 +1,5 @@
 from fecfiler.memo_text.models import MemoText
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
@@ -12,21 +12,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def compose_f3x_summary(report_id, upload_submission_record_id):
-    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
+def compose_f3x_report(report_id, upload_submission_record_id):
+    report_result = Report.objects.filter(id=report_id)
     upload_submission_result = UploadSubmission.objects.filter(
         id=upload_submission_record_id
     )
-    if f3x_summary_result.exists():
-        logger.info(f"composing f3x summary: {report_id}")
-        f3x_summary = f3x_summary_result.first()
+    if report_result.exists():
+        logger.info(f"composing f3x report: {report_id}")
+        f3x_report = report_result.first()
         """Compose derived fields"""
-        f3x_summary.filer_committee_id_number = (
-            FILE_AS_TEST_COMMITTEE or f3x_summary.committee_account.committee_id
+        f3x_report.filer_committee_id_number = (
+            FILE_AS_TEST_COMMITTEE or f3x_report.committee_account.committee_id
         )
         if upload_submission_result.exists():
-            f3x_summary.date_signed = upload_submission_result.first().created
-        return f3x_summary
+            f3x_report.date_signed = upload_submission_result.first().created
+        return f3x_report
     else:
         raise ObjectDoesNotExist(f"report: {report_id} not found")
 
@@ -59,8 +59,7 @@ def compose_transactions(report_id):
 
 def compose_report_level_memos(report_id):
     report_level_memos = MemoText.objects.filter(
-        report_id=report_id,
-        transaction_uuid=None,
+        report_id=report_id, transaction_uuid=None,
     )
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")
@@ -97,9 +96,9 @@ class Header:
 
 
 def compose_header(report_id):
-    f3x_summary_result = F3XSummary.objects.filter(id=report_id)
-    if f3x_summary_result.exists():
-        f3x_summary = f3x_summary_result.first()
+    report_result = Report.objects.filter(id=report_id)
+    if report_result.exists():
+        report = report_result.first()
         logger.info(f"composing header: {report_id}")
         return Header(
             "HDR",
@@ -107,8 +106,8 @@ def compose_header(report_id):
             "8.4",
             "FECFile Online",
             "0.0.1",
-            f3x_summary.report_id,
-            f3x_summary.report_version,
+            report.report_id,
+            report.report_version,
         )
     else:
         raise ObjectDoesNotExist(f"header: {report_id} not found")
@@ -153,11 +152,11 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
-        f3x_summary = compose_f3x_summary(report_id, upload_submission_record_id)
-        f3x_summary_row = serialize_instance("F3X", f3x_summary)
-        logger.debug("Serialized Report Summary:")
-        logger.debug(f3x_summary_row)
-        file_content = add_row_to_content(file_content, f3x_summary_row)
+        f3x_report = compose_f3x_report(report_id, upload_submission_record_id)
+        f3x_report_row = serialize_instance("F3X", f3x_report)
+        logger.debug("Serialized F3X Report:")
+        logger.debug(f3x_report_row)
+        file_content = add_row_to_content(file_content, f3x_report_row)
 
         transactions = compose_transactions(report_id)
         for transaction in transactions:
@@ -184,7 +183,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
 
         report_level_memos = compose_report_level_memos(report_id)
         for memo in report_level_memos:
-            memo.back_reference_sched_form_name = f3x_summary.form_type
+            memo.back_reference_sched_form_name = f3x_report.form_type
             serialized_memo = serialize_instance("Text", memo)
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
