@@ -176,31 +176,48 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     @action(detail=False, methods=["get"])
     def previous(self, request):
         """Retrieves transaction that comes before this transactions,
-        while bieng in the same group for aggregation"""
+        while being in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
         contact_1_id = request.query_params.get("contact_1_id", None)
+        candidate_id = request.query_params.get("candidate_id", None)
         date = request.query_params.get("date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
-        if not (contact_1_id and date):
+        election_code = request.query_params.get("election_code", None)
+
+        if not date or not (contact_1_id or candidate_id):
             return Response(
-                "Please provide contact_1_id and date in query params.",
+                "Please provide date and either contact_1_id or candidate_id in query params.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         date = datetime.fromisoformat(date)
 
-        previous_transaction = (
-            self.get_queryset()
-            .filter(
-                ~Q(id=transaction_id or None),
-                Q(contact_1_id=contact_1_id),
-                Q(date__year=date.year),
-                Q(date__lte=date),
-                Q(aggregation_group=aggregation_group),
+        if candidate_id == None:
+            previous_transactions = (
+                self.get_queryset()
+                .filter(
+                    ~Q(id=transaction_id or None),
+                    Q(contact_1_id=contact_1_id),
+                    Q(date__year=date.year),
+                    Q(date__lte=date),
+                    Q(aggregation_group=aggregation_group),
+                )
             )
-            .order_by("-date", "-created")
-            .first()
-        )
+        else:
+            previous_transactions = (
+                self.get_queryset()
+                .filter(
+                    ~Q(id=transaction_id or None),
+                    Q(contact_2_id=candidate_id) | Q(contact_3_id=candidate_id),
+                    Q(date__year=date.year),
+                    Q(date__lte=date),
+                    Q(aggregation_group=aggregation_group),
+                    Q(schedule_e__election_code=election_code)
+                )
+            )
+
+        previous_transaction = previous_transactions.order_by("-date", "-created").first()
+
 
         if previous_transaction:
             serializer = self.get_serializer(previous_transaction)
