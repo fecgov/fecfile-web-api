@@ -184,15 +184,26 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         aggregation_group = request.query_params.get("aggregation_group", None)
         election_code = request.query_params.get("election_code", None)
 
-        if not date or not (contact_1_id or candidate_id):
+        missing_params = []
+        if not date:
+            missing_params.append("date")
+        if not aggregation_group:
+            missing_params.append("aggregation_group")
+        if not contact_1_id and not candidate_id:
+            missing_params.append("and either contact_1_id or candidate_id")
+        if candidate_id and not election_code:
+            missing_params.append("election_code")
+
+        if len(missing_params) > 0:
+            response_str = "Please provide"+",".join(missing_params)+" in query params"
             return Response(
-                "Please provide date and either contact_1_id or candidate_id in query params.",
+                response_str,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         date = datetime.fromisoformat(date)
 
-        if candidate_id == None:
+        if candidate_id is None:
             previous_transactions = (
                 self.get_queryset()
                 .filter(
@@ -217,7 +228,6 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             )
 
         previous_transaction = previous_transactions.order_by("-date", "-created").first()
-
 
         if previous_transaction:
             serializer = self.get_serializer(previous_transaction)

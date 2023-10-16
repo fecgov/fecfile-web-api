@@ -54,7 +54,10 @@ class TransactionManager(SoftDeleteManager):
                     Case(
                         When(
                             schedule_e__isnull=False, then=Case(
-                                When(schedule_e__disbursement_date__isnull=True, then=F("schedule_e__dissemination_date")),
+                                When(
+                                    schedule_e__disbursement_date__isnull=True,
+                                    then=F("schedule_e__dissemination_date")
+                                ),
                                 default=F("schedule_e__disbursement_date")
                             )
                         )
@@ -75,7 +78,11 @@ class TransactionManager(SoftDeleteManager):
         )
 
         contact_1_clause = Q(contact_1_id=OuterRef("contact_1_id"))
-        candidate_contact_clause = Q(candidate_contact_id__isnull=False) & Q(candidate_contact_id=OuterRef("candidate_contact_id"))
+        candidate_contact_clause = Q(
+            candidate_contact_id__isnull=False
+        ) & Q(
+            candidate_contact_id=OuterRef("candidate_contact_id")
+        )
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
             date=OuterRef("date"), created__lte=OuterRef("created")
