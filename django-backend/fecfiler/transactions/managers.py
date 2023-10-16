@@ -51,17 +51,8 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
-                    Case(
-                        When(
-                            schedule_e__isnull=False, then=Case(
-                                When(
-                                    schedule_e__disbursement_date__isnull=True,
-                                    then=F("schedule_e__dissemination_date")
-                                ),
-                                default=F("schedule_e__disbursement_date")
-                            )
-                        )
-                    )
+                    "schedule_e__disbursement_date"
+                    "schedule_e__dissemination_date"
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
