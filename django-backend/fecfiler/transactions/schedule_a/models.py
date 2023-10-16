@@ -96,10 +96,3 @@ class ScheduleA(models.Model):
             self.donor_committee_name = contact.name
             self.donor_committee_fec_id = contact.committee_id
         self.save()
-
-
-class ScheduleATransaction(models.Model):
-    """stub class until we can figure out how to make migrations run without old models"""
-
-    class Meta:
-        app_label = "transactions"

@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
         ("contacts", "0009_committee_uuid_fk"),
         ("f3x_summaries", "0024_committee_uuid_fk"),
         ("memo_text", "0006_committee_uuid_fk"),
-        ("scha_transactions", "0022_committee_uuid_fk"),
     ]
 
     operations = [

@@ -145,9 +145,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("schedule_d__incurred_amount"),
-            )
+            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (

@@ -156,6 +156,10 @@ class UploadSubmission(BaseSubmission):
     def save_fec_response(self, response_string):
         fec_response_json = json.loads(response_string)
         self.fec_report_id = fec_response_json.get("report_id")
+        report = self.f3xsummary_set.first()
+        if not report.report_id:
+            report.report_id = self.fec_report_id
+        report.save()
         super().save_fec_response(response_string)
 
     class Meta:

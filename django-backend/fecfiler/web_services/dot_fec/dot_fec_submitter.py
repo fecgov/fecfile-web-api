@@ -22,24 +22,23 @@ class DotFECSubmitter:
             self.fec_soap_client = Client(f"{api}/webload/services/upload?wsdl")
 
     def get_submission_json(self, dot_fec_record, e_filing_password):
-        return json.dumps(
-            {
-                "committee_id": FILE_AS_TEST_COMMITTEE
-                or dot_fec_record.report.committee_account.committee_id,
-                "password": (
-                    TEST_COMMITTEE_PASSWORD
-                    if FILE_AS_TEST_COMMITTEE
-                    else e_filing_password
-                ),
-                "api_key": FEC_FILING_API_KEY,
-                "email_1": dot_fec_record.report.confirmation_email_1,
-                "email_2": dot_fec_record.report.confirmation_email_2,
-                "agency_id": FEC_AGENCY_ID,
-                "wait": False,
-            }
-        )
+        json_obj = {
+            "committee_id": FILE_AS_TEST_COMMITTEE
+            or dot_fec_record.report.committee_account.committee_id,
+            "password": (
+                TEST_COMMITTEE_PASSWORD if FILE_AS_TEST_COMMITTEE else e_filing_password
+            ),
+            "api_key": FEC_FILING_API_KEY,
+            "email_1": dot_fec_record.report.confirmation_email_1,
+            "email_2": dot_fec_record.report.confirmation_email_2,
+            "agency_id": FEC_AGENCY_ID,
+            "wait": False,
+        }
+        if dot_fec_record.report.report_id:
+            json_obj["amendment_id"] = dot_fec_record.report.report_id
+        return json.dumps(json_obj)
 
-    def submit(self, dot_fec_bytes, json_payload):
+    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = ""
         if self.fec_soap_client:
             response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
@@ -50,7 +49,7 @@ class DotFECSubmitter:
                     "submission_id": "fake_submission_id",
                     "status": FECStatus.ACCEPTED.value,
                     "message": "We didn't really send anything to FEC",
-                    "report_id": str(uuid()),
+                    "report_id": fec_report_id or str(uuid()),
                 }
             )
         logger.debug("FEC upload response: {response}")

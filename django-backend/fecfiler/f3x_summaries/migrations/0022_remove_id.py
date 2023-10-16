@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("memo_text", "0004_report_fk"),
-        ("scha_transactions", "0020_report_fk"),
         ("f3x_summaries", "0021_f3xsummary_uuid_primary"),
     ]
 
