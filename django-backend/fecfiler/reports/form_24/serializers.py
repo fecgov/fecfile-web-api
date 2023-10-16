@@ -43,7 +43,7 @@ class Form24Serializer(ReportSerializer):
         with transaction.atomic():
             for attr, value in validated_data.items():
                 if attr != "id":
-                    setattr(instance.schedule_a, attr, value)
+                    setattr(instance.form_24, attr, value)
             instance.form_24.save()
             updated = super().update(instance, validated_data)
             return updated

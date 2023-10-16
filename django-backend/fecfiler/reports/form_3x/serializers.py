@@ -355,7 +355,7 @@ class Form3XSerializer(ReportSerializer):
         with transaction.atomic():
             for attr, value in validated_data.items():
                 if attr != "id":
-                    setattr(instance.schedule_a, attr, value)
+                    setattr(instance.form_3x, attr, value)
             instance.form_3x.save()
             updated = super().update(instance, validated_data)
             return updated
