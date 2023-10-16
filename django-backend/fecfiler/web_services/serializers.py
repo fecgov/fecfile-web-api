@@ -29,7 +29,7 @@ class UploadSubmissionSerializer(serializers.ModelSerializer):
         fields = [
             f.name
             for f in UploadSubmission._meta.get_fields()
-            if f.name not in ["dot_fec", "report"]
+            if f.name not in ["dot_fec", "report", "f3xsummary"]
         ]
 
 
@@ -39,5 +39,5 @@ class WebPrintSubmissionSerializer(serializers.ModelSerializer):
         fields = [
             f.name
             for f in WebPrintSubmission._meta.get_fields()
-            if f.name not in ["dot_fec", "report"]
+            if f.name not in ["dot_fec", "report", "f3xsummary"]
         ]
