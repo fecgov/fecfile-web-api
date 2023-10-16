@@ -1,0 +1,105 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.managers.ReportManager
+=======================================
+
+.. currentmodule:: fecfiler.reports.managers
+
+.. autoclass:: ReportManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportManager.__init__
+      ~ReportManager.aaggregate
+      ~ReportManager.abulk_create
+      ~ReportManager.abulk_update
+      ~ReportManager.acontains
+      ~ReportManager.acount
+      ~ReportManager.acreate
+      ~ReportManager.aearliest
+      ~ReportManager.aexists
+      ~ReportManager.aexplain
+      ~ReportManager.afirst
+      ~ReportManager.aget
+      ~ReportManager.aget_or_create
+      ~ReportManager.aggregate
+      ~ReportManager.ain_bulk
+      ~ReportManager.aiterator
+      ~ReportManager.alast
+      ~ReportManager.alatest
+      ~ReportManager.alias
+      ~ReportManager.all
+      ~ReportManager.annotate
+      ~ReportManager.aupdate
+      ~ReportManager.aupdate_or_create
+      ~ReportManager.bulk_create
+      ~ReportManager.bulk_update
+      ~ReportManager.check
+      ~ReportManager.complex_filter
+      ~ReportManager.contains
+      ~ReportManager.contribute_to_class
+      ~ReportManager.count
+      ~ReportManager.create
+      ~ReportManager.dates
+      ~ReportManager.datetimes
+      ~ReportManager.db_manager
+      ~ReportManager.deconstruct
+      ~ReportManager.defer
+      ~ReportManager.difference
+      ~ReportManager.distinct
+      ~ReportManager.earliest
+      ~ReportManager.exclude
+      ~ReportManager.exists
+      ~ReportManager.explain
+      ~ReportManager.extra
+      ~ReportManager.filter
+      ~ReportManager.first
+      ~ReportManager.from_queryset
+      ~ReportManager.get
+      ~ReportManager.get_or_create
+      ~ReportManager.get_queryset
+      ~ReportManager.hard_delete
+      ~ReportManager.in_bulk
+      ~ReportManager.intersection
+      ~ReportManager.iterator
+      ~ReportManager.last
+      ~ReportManager.latest
+      ~ReportManager.none
+      ~ReportManager.only
+      ~ReportManager.order_by
+      ~ReportManager.prefetch_related
+      ~ReportManager.raw
+      ~ReportManager.reverse
+      ~ReportManager.select_for_update
+      ~ReportManager.select_related
+      ~ReportManager.union
+      ~ReportManager.update
+      ~ReportManager.update_or_create
+      ~ReportManager.using
+      ~ReportManager.values
+      ~ReportManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportManager.auto_created
+      ~ReportManager.creation_counter
+      ~ReportManager.db
+      ~ReportManager.use_in_migrations
+   
+   

@@ -1,0 +1,53 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.models.ReportMixin
+===================================
+
+.. currentmodule:: fecfiler.reports.models
+
+.. autoclass:: ReportMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportMixin.__init__
+      ~ReportMixin.check
+      ~ReportMixin.clean
+      ~ReportMixin.clean_fields
+      ~ReportMixin.date_error_message
+      ~ReportMixin.delete
+      ~ReportMixin.from_db
+      ~ReportMixin.full_clean
+      ~ReportMixin.get_constraints
+      ~ReportMixin.get_deferred_fields
+      ~ReportMixin.prepare_database_save
+      ~ReportMixin.refresh_from_db
+      ~ReportMixin.save
+      ~ReportMixin.save_base
+      ~ReportMixin.serializable_value
+      ~ReportMixin.unique_error_message
+      ~ReportMixin.validate_constraints
+      ~ReportMixin.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportMixin.pk
+      ~ReportMixin.report
+      ~ReportMixin.report_id
+   
+   

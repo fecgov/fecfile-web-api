@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0002\_copy\_to\_unified\_table.copy\_f3x\_summaries
+===============================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0002_copy_to_unified_table
+
+.. autofunction:: copy_f3x_summaries

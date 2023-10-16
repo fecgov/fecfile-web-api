@@ -1,0 +1,134 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
+==============================================================
+
+.. currentmodule:: fecfiler.web_services.summary.test_summary
+
+.. autoclass:: F3XReportTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3XReportTestCase.__init__
+      ~F3XReportTestCase.addClassCleanup
+      ~F3XReportTestCase.addCleanup
+      ~F3XReportTestCase.addTypeEqualityFunc
+      ~F3XReportTestCase.assertAlmostEqual
+      ~F3XReportTestCase.assertAlmostEquals
+      ~F3XReportTestCase.assertContains
+      ~F3XReportTestCase.assertCountEqual
+      ~F3XReportTestCase.assertDictContainsSubset
+      ~F3XReportTestCase.assertDictEqual
+      ~F3XReportTestCase.assertEqual
+      ~F3XReportTestCase.assertEquals
+      ~F3XReportTestCase.assertFalse
+      ~F3XReportTestCase.assertFieldOutput
+      ~F3XReportTestCase.assertFormError
+      ~F3XReportTestCase.assertFormsetError
+      ~F3XReportTestCase.assertGreater
+      ~F3XReportTestCase.assertGreaterEqual
+      ~F3XReportTestCase.assertHTMLEqual
+      ~F3XReportTestCase.assertHTMLNotEqual
+      ~F3XReportTestCase.assertIn
+      ~F3XReportTestCase.assertInHTML
+      ~F3XReportTestCase.assertIs
+      ~F3XReportTestCase.assertIsInstance
+      ~F3XReportTestCase.assertIsNone
+      ~F3XReportTestCase.assertIsNot
+      ~F3XReportTestCase.assertIsNotNone
+      ~F3XReportTestCase.assertJSONEqual
+      ~F3XReportTestCase.assertJSONNotEqual
+      ~F3XReportTestCase.assertLess
+      ~F3XReportTestCase.assertLessEqual
+      ~F3XReportTestCase.assertListEqual
+      ~F3XReportTestCase.assertLogs
+      ~F3XReportTestCase.assertMultiLineEqual
+      ~F3XReportTestCase.assertNoLogs
+      ~F3XReportTestCase.assertNotAlmostEqual
+      ~F3XReportTestCase.assertNotAlmostEquals
+      ~F3XReportTestCase.assertNotContains
+      ~F3XReportTestCase.assertNotEqual
+      ~F3XReportTestCase.assertNotEquals
+      ~F3XReportTestCase.assertNotIn
+      ~F3XReportTestCase.assertNotIsInstance
+      ~F3XReportTestCase.assertNotRegex
+      ~F3XReportTestCase.assertNotRegexpMatches
+      ~F3XReportTestCase.assertNumQueries
+      ~F3XReportTestCase.assertQuerysetEqual
+      ~F3XReportTestCase.assertRaises
+      ~F3XReportTestCase.assertRaisesMessage
+      ~F3XReportTestCase.assertRaisesRegex
+      ~F3XReportTestCase.assertRaisesRegexp
+      ~F3XReportTestCase.assertRedirects
+      ~F3XReportTestCase.assertRegex
+      ~F3XReportTestCase.assertRegexpMatches
+      ~F3XReportTestCase.assertSequenceEqual
+      ~F3XReportTestCase.assertSetEqual
+      ~F3XReportTestCase.assertTemplateNotUsed
+      ~F3XReportTestCase.assertTemplateUsed
+      ~F3XReportTestCase.assertTrue
+      ~F3XReportTestCase.assertTupleEqual
+      ~F3XReportTestCase.assertURLEqual
+      ~F3XReportTestCase.assertWarns
+      ~F3XReportTestCase.assertWarnsMessage
+      ~F3XReportTestCase.assertWarnsRegex
+      ~F3XReportTestCase.assertXMLEqual
+      ~F3XReportTestCase.assertXMLNotEqual
+      ~F3XReportTestCase.assert_
+      ~F3XReportTestCase.captureOnCommitCallbacks
+      ~F3XReportTestCase.countTestCases
+      ~F3XReportTestCase.debug
+      ~F3XReportTestCase.defaultTestResult
+      ~F3XReportTestCase.doClassCleanups
+      ~F3XReportTestCase.doCleanups
+      ~F3XReportTestCase.fail
+      ~F3XReportTestCase.failIf
+      ~F3XReportTestCase.failIfAlmostEqual
+      ~F3XReportTestCase.failIfEqual
+      ~F3XReportTestCase.failUnless
+      ~F3XReportTestCase.failUnlessAlmostEqual
+      ~F3XReportTestCase.failUnlessEqual
+      ~F3XReportTestCase.failUnlessRaises
+      ~F3XReportTestCase.id
+      ~F3XReportTestCase.modify_settings
+      ~F3XReportTestCase.run
+      ~F3XReportTestCase.setUp
+      ~F3XReportTestCase.setUpClass
+      ~F3XReportTestCase.setUpTestData
+      ~F3XReportTestCase.settings
+      ~F3XReportTestCase.shortDescription
+      ~F3XReportTestCase.skipTest
+      ~F3XReportTestCase.subTest
+      ~F3XReportTestCase.tearDown
+      ~F3XReportTestCase.tearDownClass
+      ~F3XReportTestCase.test_calculate_summary_column_a
+      ~F3XReportTestCase.test_calculate_summary_column_b
+      ~F3XReportTestCase.test_report_with_no_transactions
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3XReportTestCase.available_apps
+      ~F3XReportTestCase.databases
+      ~F3XReportTestCase.fixtures
+      ~F3XReportTestCase.longMessage
+      ~F3XReportTestCase.maxDiff
+      ~F3XReportTestCase.reset_sequences
+      ~F3XReportTestCase.serialized_rollback
+   
+   

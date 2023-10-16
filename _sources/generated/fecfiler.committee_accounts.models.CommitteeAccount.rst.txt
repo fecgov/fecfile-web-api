@@ -61,6 +61,7 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.memotext_set
       ~CommitteeAccount.objects
       ~CommitteeAccount.pk
+      ~CommitteeAccount.report_set
       ~CommitteeAccount.transaction_set
       ~CommitteeAccount.updated
    

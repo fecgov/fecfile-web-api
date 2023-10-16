@@ -66,6 +66,7 @@ fecfiler.web\_services.models.UploadSubmission
       ~UploadSubmission.id
       ~UploadSubmission.objects
       ~UploadSubmission.pk
+      ~UploadSubmission.report_set
       ~UploadSubmission.updated
    
    

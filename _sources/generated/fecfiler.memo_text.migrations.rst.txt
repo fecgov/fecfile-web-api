@@ -42,4 +42,5 @@ fecfiler.memo\_text.migrations
    fecfiler.memo_text.migrations.0009_memotext_report_level_memo
    fecfiler.memo_text.migrations.0010_remove_memotext_filer_committee_id_number
    fecfiler.memo_text.migrations.0011_remove_memotext_back_reference_sched_form_name_and_more
+   fecfiler.memo_text.migrations.0012_alter_memotext_report
 

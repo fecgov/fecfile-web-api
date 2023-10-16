@@ -1,0 +1,112 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_24.views.Form24ViewSet
+=============================================
+
+.. currentmodule:: fecfiler.reports.form_24.views
+
+.. autoclass:: Form24ViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form24ViewSet.__init__
+      ~Form24ViewSet.amend
+      ~Form24ViewSet.as_view
+      ~Form24ViewSet.check_object_permissions
+      ~Form24ViewSet.check_permissions
+      ~Form24ViewSet.check_throttles
+      ~Form24ViewSet.create
+      ~Form24ViewSet.destroy
+      ~Form24ViewSet.determine_version
+      ~Form24ViewSet.dispatch
+      ~Form24ViewSet.filter_queryset
+      ~Form24ViewSet.finalize_response
+      ~Form24ViewSet.get_authenticate_header
+      ~Form24ViewSet.get_authenticators
+      ~Form24ViewSet.get_content_negotiator
+      ~Form24ViewSet.get_exception_handler
+      ~Form24ViewSet.get_exception_handler_context
+      ~Form24ViewSet.get_extra_action_url_map
+      ~Form24ViewSet.get_extra_actions
+      ~Form24ViewSet.get_format_suffix
+      ~Form24ViewSet.get_object
+      ~Form24ViewSet.get_paginated_response
+      ~Form24ViewSet.get_parser_context
+      ~Form24ViewSet.get_parsers
+      ~Form24ViewSet.get_permissions
+      ~Form24ViewSet.get_queryset
+      ~Form24ViewSet.get_renderer_context
+      ~Form24ViewSet.get_renderers
+      ~Form24ViewSet.get_serializer
+      ~Form24ViewSet.get_serializer_class
+      ~Form24ViewSet.get_serializer_context
+      ~Form24ViewSet.get_success_headers
+      ~Form24ViewSet.get_throttles
+      ~Form24ViewSet.get_view_description
+      ~Form24ViewSet.get_view_name
+      ~Form24ViewSet.handle_exception
+      ~Form24ViewSet.hard_delete_reports
+      ~Form24ViewSet.http_method_not_allowed
+      ~Form24ViewSet.initial
+      ~Form24ViewSet.initialize_request
+      ~Form24ViewSet.list
+      ~Form24ViewSet.options
+      ~Form24ViewSet.paginate_queryset
+      ~Form24ViewSet.partial_update
+      ~Form24ViewSet.perform_authentication
+      ~Form24ViewSet.perform_content_negotiation
+      ~Form24ViewSet.perform_create
+      ~Form24ViewSet.perform_destroy
+      ~Form24ViewSet.perform_update
+      ~Form24ViewSet.permission_denied
+      ~Form24ViewSet.raise_uncaught_exception
+      ~Form24ViewSet.retrieve
+      ~Form24ViewSet.reverse_action
+      ~Form24ViewSet.setup
+      ~Form24ViewSet.throttled
+      ~Form24ViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form24ViewSet.allowed_methods
+      ~Form24ViewSet.authentication_classes
+      ~Form24ViewSet.basename
+      ~Form24ViewSet.default_response_headers
+      ~Form24ViewSet.description
+      ~Form24ViewSet.detail
+      ~Form24ViewSet.filter_backends
+      ~Form24ViewSet.http_method_names
+      ~Form24ViewSet.lookup_field
+      ~Form24ViewSet.lookup_url_kwarg
+      ~Form24ViewSet.name
+      ~Form24ViewSet.ordering
+      ~Form24ViewSet.ordering_fields
+      ~Form24ViewSet.paginator
+      ~Form24ViewSet.parser_classes
+      ~Form24ViewSet.permission_classes
+      ~Form24ViewSet.queryset
+      ~Form24ViewSet.renderer_classes
+      ~Form24ViewSet.schema
+      ~Form24ViewSet.settings
+      ~Form24ViewSet.suffix
+      ~Form24ViewSet.throttle_classes
+      ~Form24ViewSet.versioning_class
+      ~Form24ViewSet.view_is_async
+   
+   

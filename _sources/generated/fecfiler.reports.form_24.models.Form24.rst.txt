@@ -1,0 +1,61 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_24.models.Form24
+=======================================
+
+.. currentmodule:: fecfiler.reports.form_24.models
+
+.. autoclass:: Form24
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form24.__init__
+      ~Form24.check
+      ~Form24.clean
+      ~Form24.clean_fields
+      ~Form24.date_error_message
+      ~Form24.delete
+      ~Form24.from_db
+      ~Form24.full_clean
+      ~Form24.get_constraints
+      ~Form24.get_deferred_fields
+      ~Form24.prepare_database_save
+      ~Form24.refresh_from_db
+      ~Form24.save
+      ~Form24.save_base
+      ~Form24.serializable_value
+      ~Form24.unique_error_message
+      ~Form24.validate_constraints
+      ~Form24.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form24.city
+      ~Form24.id
+      ~Form24.objects
+      ~Form24.original_amendment_date
+      ~Form24.pk
+      ~Form24.report_set
+      ~Form24.report_type_24_48
+      ~Form24.state
+      ~Form24.street_1
+      ~Form24.street_2
+      ~Form24.zip
+   
+   

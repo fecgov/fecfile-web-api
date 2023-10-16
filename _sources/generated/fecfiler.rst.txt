@@ -39,6 +39,7 @@ fecfiler
    fecfiler.f3x_summaries
    fecfiler.memo_text
    fecfiler.openfec
+   fecfiler.reports
    fecfiler.s3
    fecfiler.settings
    fecfiler.shared

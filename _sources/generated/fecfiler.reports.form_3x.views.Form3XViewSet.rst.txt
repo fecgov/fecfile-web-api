@@ -1,0 +1,113 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_3x.views.Form3XViewSet
+=============================================
+
+.. currentmodule:: fecfiler.reports.form_3x.views
+
+.. autoclass:: Form3XViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form3XViewSet.__init__
+      ~Form3XViewSet.amend
+      ~Form3XViewSet.as_view
+      ~Form3XViewSet.check_object_permissions
+      ~Form3XViewSet.check_permissions
+      ~Form3XViewSet.check_throttles
+      ~Form3XViewSet.coverage_dates
+      ~Form3XViewSet.create
+      ~Form3XViewSet.destroy
+      ~Form3XViewSet.determine_version
+      ~Form3XViewSet.dispatch
+      ~Form3XViewSet.filter_queryset
+      ~Form3XViewSet.finalize_response
+      ~Form3XViewSet.get_authenticate_header
+      ~Form3XViewSet.get_authenticators
+      ~Form3XViewSet.get_content_negotiator
+      ~Form3XViewSet.get_exception_handler
+      ~Form3XViewSet.get_exception_handler_context
+      ~Form3XViewSet.get_extra_action_url_map
+      ~Form3XViewSet.get_extra_actions
+      ~Form3XViewSet.get_format_suffix
+      ~Form3XViewSet.get_object
+      ~Form3XViewSet.get_paginated_response
+      ~Form3XViewSet.get_parser_context
+      ~Form3XViewSet.get_parsers
+      ~Form3XViewSet.get_permissions
+      ~Form3XViewSet.get_queryset
+      ~Form3XViewSet.get_renderer_context
+      ~Form3XViewSet.get_renderers
+      ~Form3XViewSet.get_serializer
+      ~Form3XViewSet.get_serializer_class
+      ~Form3XViewSet.get_serializer_context
+      ~Form3XViewSet.get_success_headers
+      ~Form3XViewSet.get_throttles
+      ~Form3XViewSet.get_view_description
+      ~Form3XViewSet.get_view_name
+      ~Form3XViewSet.handle_exception
+      ~Form3XViewSet.hard_delete_reports
+      ~Form3XViewSet.http_method_not_allowed
+      ~Form3XViewSet.initial
+      ~Form3XViewSet.initialize_request
+      ~Form3XViewSet.list
+      ~Form3XViewSet.options
+      ~Form3XViewSet.paginate_queryset
+      ~Form3XViewSet.partial_update
+      ~Form3XViewSet.perform_authentication
+      ~Form3XViewSet.perform_content_negotiation
+      ~Form3XViewSet.perform_create
+      ~Form3XViewSet.perform_destroy
+      ~Form3XViewSet.perform_update
+      ~Form3XViewSet.permission_denied
+      ~Form3XViewSet.raise_uncaught_exception
+      ~Form3XViewSet.retrieve
+      ~Form3XViewSet.reverse_action
+      ~Form3XViewSet.setup
+      ~Form3XViewSet.throttled
+      ~Form3XViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form3XViewSet.allowed_methods
+      ~Form3XViewSet.authentication_classes
+      ~Form3XViewSet.basename
+      ~Form3XViewSet.default_response_headers
+      ~Form3XViewSet.description
+      ~Form3XViewSet.detail
+      ~Form3XViewSet.filter_backends
+      ~Form3XViewSet.http_method_names
+      ~Form3XViewSet.lookup_field
+      ~Form3XViewSet.lookup_url_kwarg
+      ~Form3XViewSet.name
+      ~Form3XViewSet.ordering
+      ~Form3XViewSet.ordering_fields
+      ~Form3XViewSet.paginator
+      ~Form3XViewSet.parser_classes
+      ~Form3XViewSet.permission_classes
+      ~Form3XViewSet.queryset
+      ~Form3XViewSet.renderer_classes
+      ~Form3XViewSet.schema
+      ~Form3XViewSet.settings
+      ~Form3XViewSet.suffix
+      ~Form3XViewSet.throttle_classes
+      ~Form3XViewSet.versioning_class
+      ~Form3XViewSet.view_is_async
+   
+   

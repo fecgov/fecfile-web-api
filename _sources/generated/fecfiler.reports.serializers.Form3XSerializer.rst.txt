@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.Form3XSerializer
+=============================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: Form3XSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form3XSerializer.__init__
+      ~Form3XSerializer.bind
+      ~Form3XSerializer.build_field
+      ~Form3XSerializer.build_nested_field
+      ~Form3XSerializer.build_property_field
+      ~Form3XSerializer.build_relational_field
+      ~Form3XSerializer.build_standard_field
+      ~Form3XSerializer.build_unknown_field
+      ~Form3XSerializer.build_url_field
+      ~Form3XSerializer.create
+      ~Form3XSerializer.fail
+      ~Form3XSerializer.get_attribute
+      ~Form3XSerializer.get_default
+      ~Form3XSerializer.get_default_field_names
+      ~Form3XSerializer.get_extra_kwargs
+      ~Form3XSerializer.get_field_names
+      ~Form3XSerializer.get_fields
+      ~Form3XSerializer.get_initial
+      ~Form3XSerializer.get_unique_for_date_validators
+      ~Form3XSerializer.get_unique_together_validators
+      ~Form3XSerializer.get_uniqueness_extra_kwargs
+      ~Form3XSerializer.get_validators
+      ~Form3XSerializer.get_value
+      ~Form3XSerializer.include_extra_kwargs
+      ~Form3XSerializer.is_valid
+      ~Form3XSerializer.many_init
+      ~Form3XSerializer.run_validation
+      ~Form3XSerializer.run_validators
+      ~Form3XSerializer.save
+      ~Form3XSerializer.to_internal_value
+      ~Form3XSerializer.to_representation
+      ~Form3XSerializer.update
+      ~Form3XSerializer.validate
+      ~Form3XSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form3XSerializer.context
+      ~Form3XSerializer.data
+      ~Form3XSerializer.default_error_messages
+      ~Form3XSerializer.default_validators
+      ~Form3XSerializer.errors
+      ~Form3XSerializer.fields
+      ~Form3XSerializer.initial
+      ~Form3XSerializer.root
+      ~Form3XSerializer.serializer_field_mapping
+      ~Form3XSerializer.url_field_name
+      ~Form3XSerializer.validated_data
+      ~Form3XSerializer.validators
+   
+   

@@ -68,6 +68,7 @@ fecfiler.web\_services.models.WebPrintSubmission
       ~WebPrintSubmission.id
       ~WebPrintSubmission.objects
       ~WebPrintSubmission.pk
+      ~WebPrintSubmission.report_set
       ~WebPrintSubmission.updated
    
    

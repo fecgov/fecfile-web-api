@@ -48,4 +48,5 @@ fecfiler.web\_services.migrations
    fecfiler.web_services.migrations.0015_alter_dotfec_report_step_1
    fecfiler.web_services.migrations.0016_alter_dotfec_report_step_2
    fecfiler.web_services.migrations.0017_alter_dotfec_report_step_3
+   fecfiler.web_services.migrations.0018_alter_dotfec_report
 

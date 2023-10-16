@@ -1,0 +1,82 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.ReportSerializer
+=============================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: ReportSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportSerializer.__init__
+      ~ReportSerializer.bind
+      ~ReportSerializer.build_field
+      ~ReportSerializer.build_nested_field
+      ~ReportSerializer.build_property_field
+      ~ReportSerializer.build_relational_field
+      ~ReportSerializer.build_standard_field
+      ~ReportSerializer.build_unknown_field
+      ~ReportSerializer.build_url_field
+      ~ReportSerializer.create
+      ~ReportSerializer.fail
+      ~ReportSerializer.get_attribute
+      ~ReportSerializer.get_default
+      ~ReportSerializer.get_default_field_names
+      ~ReportSerializer.get_extra_kwargs
+      ~ReportSerializer.get_field_names
+      ~ReportSerializer.get_fields
+      ~ReportSerializer.get_foreign_key_fields
+      ~ReportSerializer.get_initial
+      ~ReportSerializer.get_schema_name
+      ~ReportSerializer.get_unique_for_date_validators
+      ~ReportSerializer.get_unique_together_validators
+      ~ReportSerializer.get_uniqueness_extra_kwargs
+      ~ReportSerializer.get_validation_candidate
+      ~ReportSerializer.get_validators
+      ~ReportSerializer.get_value
+      ~ReportSerializer.ignore_fields
+      ~ReportSerializer.include_extra_kwargs
+      ~ReportSerializer.is_valid
+      ~ReportSerializer.many_init
+      ~ReportSerializer.run_validation
+      ~ReportSerializer.run_validators
+      ~ReportSerializer.save
+      ~ReportSerializer.to_internal_value
+      ~ReportSerializer.to_representation
+      ~ReportSerializer.update
+      ~ReportSerializer.validate
+      ~ReportSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportSerializer.context
+      ~ReportSerializer.data
+      ~ReportSerializer.default_error_messages
+      ~ReportSerializer.default_validators
+      ~ReportSerializer.errors
+      ~ReportSerializer.fields
+      ~ReportSerializer.initial
+      ~ReportSerializer.root
+      ~ReportSerializer.serializer_field_mapping
+      ~ReportSerializer.url_field_name
+      ~ReportSerializer.validated_data
+      ~ReportSerializer.validators
+   
+   

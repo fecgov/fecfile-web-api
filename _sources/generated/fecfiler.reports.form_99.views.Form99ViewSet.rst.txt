@@ -1,0 +1,112 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_99.views.Form99ViewSet
+=============================================
+
+.. currentmodule:: fecfiler.reports.form_99.views
+
+.. autoclass:: Form99ViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form99ViewSet.__init__
+      ~Form99ViewSet.amend
+      ~Form99ViewSet.as_view
+      ~Form99ViewSet.check_object_permissions
+      ~Form99ViewSet.check_permissions
+      ~Form99ViewSet.check_throttles
+      ~Form99ViewSet.create
+      ~Form99ViewSet.destroy
+      ~Form99ViewSet.determine_version
+      ~Form99ViewSet.dispatch
+      ~Form99ViewSet.filter_queryset
+      ~Form99ViewSet.finalize_response
+      ~Form99ViewSet.get_authenticate_header
+      ~Form99ViewSet.get_authenticators
+      ~Form99ViewSet.get_content_negotiator
+      ~Form99ViewSet.get_exception_handler
+      ~Form99ViewSet.get_exception_handler_context
+      ~Form99ViewSet.get_extra_action_url_map
+      ~Form99ViewSet.get_extra_actions
+      ~Form99ViewSet.get_format_suffix
+      ~Form99ViewSet.get_object
+      ~Form99ViewSet.get_paginated_response
+      ~Form99ViewSet.get_parser_context
+      ~Form99ViewSet.get_parsers
+      ~Form99ViewSet.get_permissions
+      ~Form99ViewSet.get_queryset
+      ~Form99ViewSet.get_renderer_context
+      ~Form99ViewSet.get_renderers
+      ~Form99ViewSet.get_serializer
+      ~Form99ViewSet.get_serializer_class
+      ~Form99ViewSet.get_serializer_context
+      ~Form99ViewSet.get_success_headers
+      ~Form99ViewSet.get_throttles
+      ~Form99ViewSet.get_view_description
+      ~Form99ViewSet.get_view_name
+      ~Form99ViewSet.handle_exception
+      ~Form99ViewSet.hard_delete_reports
+      ~Form99ViewSet.http_method_not_allowed
+      ~Form99ViewSet.initial
+      ~Form99ViewSet.initialize_request
+      ~Form99ViewSet.list
+      ~Form99ViewSet.options
+      ~Form99ViewSet.paginate_queryset
+      ~Form99ViewSet.partial_update
+      ~Form99ViewSet.perform_authentication
+      ~Form99ViewSet.perform_content_negotiation
+      ~Form99ViewSet.perform_create
+      ~Form99ViewSet.perform_destroy
+      ~Form99ViewSet.perform_update
+      ~Form99ViewSet.permission_denied
+      ~Form99ViewSet.raise_uncaught_exception
+      ~Form99ViewSet.retrieve
+      ~Form99ViewSet.reverse_action
+      ~Form99ViewSet.setup
+      ~Form99ViewSet.throttled
+      ~Form99ViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form99ViewSet.allowed_methods
+      ~Form99ViewSet.authentication_classes
+      ~Form99ViewSet.basename
+      ~Form99ViewSet.default_response_headers
+      ~Form99ViewSet.description
+      ~Form99ViewSet.detail
+      ~Form99ViewSet.filter_backends
+      ~Form99ViewSet.http_method_names
+      ~Form99ViewSet.lookup_field
+      ~Form99ViewSet.lookup_url_kwarg
+      ~Form99ViewSet.name
+      ~Form99ViewSet.ordering
+      ~Form99ViewSet.ordering_fields
+      ~Form99ViewSet.paginator
+      ~Form99ViewSet.parser_classes
+      ~Form99ViewSet.permission_classes
+      ~Form99ViewSet.queryset
+      ~Form99ViewSet.renderer_classes
+      ~Form99ViewSet.schema
+      ~Form99ViewSet.settings
+      ~Form99ViewSet.suffix
+      ~Form99ViewSet.throttle_classes
+      ~Form99ViewSet.versioning_class
+      ~Form99ViewSet.view_is_async
+   
+   

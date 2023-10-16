@@ -18,6 +18,7 @@ fecfiler.shared.utilities
       :toctree:                                          
    
       generate_fec_uid
+      get_model_data
    
    
 

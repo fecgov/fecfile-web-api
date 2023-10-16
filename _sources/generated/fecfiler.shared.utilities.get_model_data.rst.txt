@@ -1,0 +1,6 @@
+fecfiler.shared.utilities.get\_model\_data
+==========================================
+
+.. currentmodule:: fecfiler.shared.utilities
+
+.. autofunction:: get_model_data

@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.migrations.0002\_copy\_to\_unified\_table.Migration
+====================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0002_copy_to_unified_table
+
+.. autoclass:: Migration
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Migration.__init__
+      ~Migration.apply
+      ~Migration.mutate_state
+      ~Migration.suggest_name
+      ~Migration.unapply
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Migration.atomic
+      ~Migration.dependencies
+      ~Migration.initial
+      ~Migration.operations
+      ~Migration.replaces
+      ~Migration.run_before
+   
+   

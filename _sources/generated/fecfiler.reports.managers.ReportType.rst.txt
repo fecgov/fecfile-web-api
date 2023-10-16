@@ -1,0 +1,30 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.managers.ReportType
+====================================
+
+.. currentmodule:: fecfiler.reports.managers
+
+.. autoclass:: ReportType
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportType.F3X
+      ~ReportType.F24
+      ~ReportType.F99
+   
+   

@@ -1,0 +1,96 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.models.Report
+==============================
+
+.. currentmodule:: fecfiler.reports.models
+
+.. autoclass:: Report
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Report.__init__
+      ~Report.check
+      ~Report.clean
+      ~Report.clean_fields
+      ~Report.date_error_message
+      ~Report.delete
+      ~Report.from_db
+      ~Report.full_clean
+      ~Report.get_constraints
+      ~Report.get_deferred_fields
+      ~Report.get_next_by_created
+      ~Report.get_next_by_updated
+      ~Report.get_previous_by_created
+      ~Report.get_previous_by_updated
+      ~Report.get_previous_report
+      ~Report.hard_delete
+      ~Report.prepare_database_save
+      ~Report.pull_forward_debts
+      ~Report.pull_forward_loans
+      ~Report.refresh_from_db
+      ~Report.save
+      ~Report.save_base
+      ~Report.save_copy
+      ~Report.serializable_value
+      ~Report.unique_error_message
+      ~Report.validate_constraints
+      ~Report.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Report.all_objects
+      ~Report.calculation_status
+      ~Report.committee_account
+      ~Report.committee_account_id
+      ~Report.confirmation_email_1
+      ~Report.confirmation_email_2
+      ~Report.coverage_from_date
+      ~Report.coverage_through_date
+      ~Report.created
+      ~Report.date_signed
+      ~Report.deleted
+      ~Report.dotfec_set
+      ~Report.form_24
+      ~Report.form_24_id
+      ~Report.form_3x
+      ~Report.form_3x_id
+      ~Report.form_99
+      ~Report.form_99_id
+      ~Report.form_type
+      ~Report.id
+      ~Report.memotext_set
+      ~Report.objects
+      ~Report.pk
+      ~Report.report_code
+      ~Report.report_id
+      ~Report.report_version
+      ~Report.transaction_set
+      ~Report.treasurer_first_name
+      ~Report.treasurer_last_name
+      ~Report.treasurer_middle_name
+      ~Report.treasurer_prefix
+      ~Report.treasurer_suffix
+      ~Report.updated
+      ~Report.upload_submission
+      ~Report.upload_submission_id
+      ~Report.webprint_submission
+      ~Report.webprint_submission_id
+   
+   

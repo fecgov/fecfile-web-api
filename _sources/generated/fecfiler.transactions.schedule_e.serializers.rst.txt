@@ -12,13 +12,6 @@ fecfiler.transactions.schedule\_e.serializers
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      get_model_data
-   
    
 
    

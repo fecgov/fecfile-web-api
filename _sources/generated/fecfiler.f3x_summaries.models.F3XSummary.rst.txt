@@ -172,11 +172,9 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.date_of_election
       ~F3XSummary.date_signed
       ~F3XSummary.deleted
-      ~F3XSummary.dotfec_set
       ~F3XSummary.election_code
       ~F3XSummary.form_type
       ~F3XSummary.id
-      ~F3XSummary.memotext_set
       ~F3XSummary.objects
       ~F3XSummary.pk
       ~F3XSummary.qualified_committee
@@ -187,7 +185,6 @@ fecfiler.f3x\_summaries.models.F3XSummary
       ~F3XSummary.state_of_election
       ~F3XSummary.street_1
       ~F3XSummary.street_2
-      ~F3XSummary.transaction_set
       ~F3XSummary.treasurer_first_name
       ~F3XSummary.treasurer_last_name
       ~F3XSummary.treasurer_middle_name

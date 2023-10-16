@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.Form99Serializer
+=============================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: Form99Serializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form99Serializer.__init__
+      ~Form99Serializer.bind
+      ~Form99Serializer.build_field
+      ~Form99Serializer.build_nested_field
+      ~Form99Serializer.build_property_field
+      ~Form99Serializer.build_relational_field
+      ~Form99Serializer.build_standard_field
+      ~Form99Serializer.build_unknown_field
+      ~Form99Serializer.build_url_field
+      ~Form99Serializer.create
+      ~Form99Serializer.fail
+      ~Form99Serializer.get_attribute
+      ~Form99Serializer.get_default
+      ~Form99Serializer.get_default_field_names
+      ~Form99Serializer.get_extra_kwargs
+      ~Form99Serializer.get_field_names
+      ~Form99Serializer.get_fields
+      ~Form99Serializer.get_initial
+      ~Form99Serializer.get_unique_for_date_validators
+      ~Form99Serializer.get_unique_together_validators
+      ~Form99Serializer.get_uniqueness_extra_kwargs
+      ~Form99Serializer.get_validators
+      ~Form99Serializer.get_value
+      ~Form99Serializer.include_extra_kwargs
+      ~Form99Serializer.is_valid
+      ~Form99Serializer.many_init
+      ~Form99Serializer.run_validation
+      ~Form99Serializer.run_validators
+      ~Form99Serializer.save
+      ~Form99Serializer.to_internal_value
+      ~Form99Serializer.to_representation
+      ~Form99Serializer.update
+      ~Form99Serializer.validate
+      ~Form99Serializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form99Serializer.context
+      ~Form99Serializer.data
+      ~Form99Serializer.default_error_messages
+      ~Form99Serializer.default_validators
+      ~Form99Serializer.errors
+      ~Form99Serializer.fields
+      ~Form99Serializer.initial
+      ~Form99Serializer.root
+      ~Form99Serializer.serializer_field_mapping
+      ~Form99Serializer.url_field_name
+      ~Form99Serializer.validated_data
+      ~Form99Serializer.validators
+   
+   

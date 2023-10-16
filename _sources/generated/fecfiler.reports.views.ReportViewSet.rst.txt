@@ -1,0 +1,112 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.views.ReportViewSet
+====================================
+
+.. currentmodule:: fecfiler.reports.views
+
+.. autoclass:: ReportViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportViewSet.__init__
+      ~ReportViewSet.amend
+      ~ReportViewSet.as_view
+      ~ReportViewSet.check_object_permissions
+      ~ReportViewSet.check_permissions
+      ~ReportViewSet.check_throttles
+      ~ReportViewSet.create
+      ~ReportViewSet.destroy
+      ~ReportViewSet.determine_version
+      ~ReportViewSet.dispatch
+      ~ReportViewSet.filter_queryset
+      ~ReportViewSet.finalize_response
+      ~ReportViewSet.get_authenticate_header
+      ~ReportViewSet.get_authenticators
+      ~ReportViewSet.get_content_negotiator
+      ~ReportViewSet.get_exception_handler
+      ~ReportViewSet.get_exception_handler_context
+      ~ReportViewSet.get_extra_action_url_map
+      ~ReportViewSet.get_extra_actions
+      ~ReportViewSet.get_format_suffix
+      ~ReportViewSet.get_object
+      ~ReportViewSet.get_paginated_response
+      ~ReportViewSet.get_parser_context
+      ~ReportViewSet.get_parsers
+      ~ReportViewSet.get_permissions
+      ~ReportViewSet.get_queryset
+      ~ReportViewSet.get_renderer_context
+      ~ReportViewSet.get_renderers
+      ~ReportViewSet.get_serializer
+      ~ReportViewSet.get_serializer_class
+      ~ReportViewSet.get_serializer_context
+      ~ReportViewSet.get_success_headers
+      ~ReportViewSet.get_throttles
+      ~ReportViewSet.get_view_description
+      ~ReportViewSet.get_view_name
+      ~ReportViewSet.handle_exception
+      ~ReportViewSet.hard_delete_reports
+      ~ReportViewSet.http_method_not_allowed
+      ~ReportViewSet.initial
+      ~ReportViewSet.initialize_request
+      ~ReportViewSet.list
+      ~ReportViewSet.options
+      ~ReportViewSet.paginate_queryset
+      ~ReportViewSet.partial_update
+      ~ReportViewSet.perform_authentication
+      ~ReportViewSet.perform_content_negotiation
+      ~ReportViewSet.perform_create
+      ~ReportViewSet.perform_destroy
+      ~ReportViewSet.perform_update
+      ~ReportViewSet.permission_denied
+      ~ReportViewSet.raise_uncaught_exception
+      ~ReportViewSet.retrieve
+      ~ReportViewSet.reverse_action
+      ~ReportViewSet.setup
+      ~ReportViewSet.throttled
+      ~ReportViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportViewSet.allowed_methods
+      ~ReportViewSet.authentication_classes
+      ~ReportViewSet.basename
+      ~ReportViewSet.default_response_headers
+      ~ReportViewSet.description
+      ~ReportViewSet.detail
+      ~ReportViewSet.filter_backends
+      ~ReportViewSet.http_method_names
+      ~ReportViewSet.lookup_field
+      ~ReportViewSet.lookup_url_kwarg
+      ~ReportViewSet.name
+      ~ReportViewSet.ordering
+      ~ReportViewSet.ordering_fields
+      ~ReportViewSet.paginator
+      ~ReportViewSet.parser_classes
+      ~ReportViewSet.permission_classes
+      ~ReportViewSet.queryset
+      ~ReportViewSet.renderer_classes
+      ~ReportViewSet.schema
+      ~ReportViewSet.settings
+      ~ReportViewSet.suffix
+      ~ReportViewSet.throttle_classes
+      ~ReportViewSet.versioning_class
+      ~ReportViewSet.view_is_async
+   
+   

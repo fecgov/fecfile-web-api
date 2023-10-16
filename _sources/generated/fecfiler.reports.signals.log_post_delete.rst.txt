@@ -1,0 +1,6 @@
+fecfiler.reports.signals.log\_post\_delete
+==========================================
+
+.. currentmodule:: fecfiler.reports.signals
+
+.. autofunction:: log_post_delete

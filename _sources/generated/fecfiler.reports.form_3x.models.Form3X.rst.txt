@@ -1,0 +1,166 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_3x.models.Form3X
+=======================================
+
+.. currentmodule:: fecfiler.reports.form_3x.models
+
+.. autoclass:: Form3X
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form3X.__init__
+      ~Form3X.check
+      ~Form3X.clean
+      ~Form3X.clean_fields
+      ~Form3X.date_error_message
+      ~Form3X.delete
+      ~Form3X.from_db
+      ~Form3X.full_clean
+      ~Form3X.get_constraints
+      ~Form3X.get_deferred_fields
+      ~Form3X.prepare_database_save
+      ~Form3X.refresh_from_db
+      ~Form3X.save
+      ~Form3X.save_base
+      ~Form3X.serializable_value
+      ~Form3X.unique_error_message
+      ~Form3X.validate_constraints
+      ~Form3X.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form3X.L10_debts_by_period
+      ~Form3X.L11ai_itemized_period
+      ~Form3X.L11ai_itemized_ytd
+      ~Form3X.L11aii_unitemized_period
+      ~Form3X.L11aii_unitemized_ytd
+      ~Form3X.L11aiii_total_period
+      ~Form3X.L11aiii_total_ytd
+      ~Form3X.L11b_political_party_committees_period
+      ~Form3X.L11b_political_party_committees_ytd
+      ~Form3X.L11c_other_political_committees_pacs_period
+      ~Form3X.L11c_other_political_committees_pacs_ytd
+      ~Form3X.L11d_total_contributions_period
+      ~Form3X.L11d_total_contributions_ytd
+      ~Form3X.L12_transfers_from_affiliated_other_party_cmtes_period
+      ~Form3X.L12_transfers_from_affiliated_other_party_cmtes_ytd
+      ~Form3X.L13_all_loans_received_period
+      ~Form3X.L13_all_loans_received_ytd
+      ~Form3X.L14_loan_repayments_received_period
+      ~Form3X.L14_loan_repayments_received_ytd
+      ~Form3X.L15_offsets_to_operating_expenditures_refunds_period
+      ~Form3X.L15_offsets_to_operating_expenditures_refunds_ytd
+      ~Form3X.L16_refunds_of_federal_contributions_period
+      ~Form3X.L16_refunds_of_federal_contributions_ytd
+      ~Form3X.L17_other_federal_receipts_dividends_period
+      ~Form3X.L17_other_federal_receipts_dividends_ytd
+      ~Form3X.L18a_transfers_from_nonfederal_account_h3_period
+      ~Form3X.L18a_transfers_from_nonfederal_account_h3_ytd
+      ~Form3X.L18b_transfers_from_nonfederal_levin_h5_period
+      ~Form3X.L18b_transfers_from_nonfederal_levin_h5_ytd
+      ~Form3X.L18c_total_nonfederal_transfers_18a_18b_period
+      ~Form3X.L18c_total_nonfederal_transfers_18a_18b_ytd
+      ~Form3X.L19_total_receipts_period
+      ~Form3X.L19_total_receipts_ytd
+      ~Form3X.L20_total_federal_receipts_period
+      ~Form3X.L20_total_federal_receipts_ytd
+      ~Form3X.L21ai_federal_share_period
+      ~Form3X.L21ai_federal_share_ytd
+      ~Form3X.L21aii_nonfederal_share_period
+      ~Form3X.L21aii_nonfederal_share_ytd
+      ~Form3X.L21b_other_federal_operating_expenditures_period
+      ~Form3X.L21b_other_federal_operating_expenditures_ytd
+      ~Form3X.L21c_total_operating_expenditures_period
+      ~Form3X.L21c_total_operating_expenditures_ytd
+      ~Form3X.L22_transfers_to_affiliated_other_party_cmtes_period
+      ~Form3X.L22_transfers_to_affiliated_other_party_cmtes_ytd
+      ~Form3X.L23_contributions_to_federal_candidates_cmtes_period
+      ~Form3X.L23_contributions_to_federal_candidates_cmtes_ytd
+      ~Form3X.L24_independent_expenditures_period
+      ~Form3X.L24_independent_expenditures_ytd
+      ~Form3X.L25_coordinated_expend_made_by_party_cmtes_period
+      ~Form3X.L25_coordinated_expend_made_by_party_cmtes_ytd
+      ~Form3X.L26_loan_repayments_made_ytd
+      ~Form3X.L26_loan_repayments_period
+      ~Form3X.L27_loans_made_period
+      ~Form3X.L27_loans_made_ytd
+      ~Form3X.L28a_individuals_persons_period
+      ~Form3X.L28a_individuals_persons_ytd
+      ~Form3X.L28b_political_party_committees_period
+      ~Form3X.L28b_political_party_committees_ytd
+      ~Form3X.L28c_other_political_committees_period
+      ~Form3X.L28c_other_political_committees_ytd
+      ~Form3X.L28d_total_contributions_refunds_period
+      ~Form3X.L28d_total_contributions_refunds_ytd
+      ~Form3X.L29_other_disbursements_period
+      ~Form3X.L29_other_disbursements_ytd
+      ~Form3X.L30ai_shared_federal_activity_h6_fed_share_period
+      ~Form3X.L30ai_shared_federal_activity_h6_fed_share_ytd
+      ~Form3X.L30aii_shared_federal_activity_h6_nonfed_period
+      ~Form3X.L30aii_shared_federal_activity_h6_nonfed_ytd
+      ~Form3X.L30b_nonallocable_fed_election_activity_period
+      ~Form3X.L30b_nonallocable_fed_election_activity_ytd
+      ~Form3X.L30c_total_federal_election_activity_period
+      ~Form3X.L30c_total_federal_election_activity_ytd
+      ~Form3X.L31_total_disbursements_period
+      ~Form3X.L31_total_disbursements_ytd
+      ~Form3X.L32_total_federal_disbursements_period
+      ~Form3X.L32_total_federal_disbursements_ytd
+      ~Form3X.L33_total_contributions_period
+      ~Form3X.L33_total_contributions_ytd
+      ~Form3X.L34_total_contribution_refunds_period
+      ~Form3X.L34_total_contribution_refunds_ytd
+      ~Form3X.L35_net_contributions_period
+      ~Form3X.L35_net_contributions_ytd
+      ~Form3X.L36_total_federal_operating_expenditures_period
+      ~Form3X.L36_total_federal_operating_expenditures_ytd
+      ~Form3X.L37_offsets_to_operating_expenditures_period
+      ~Form3X.L37_offsets_to_operating_expenditures_ytd
+      ~Form3X.L38_net_operating_expenditures_period
+      ~Form3X.L38_net_operating_expenditures_ytd
+      ~Form3X.L6a_cash_on_hand_jan_1_ytd
+      ~Form3X.L6a_year_for_above_ytd
+      ~Form3X.L6b_cash_on_hand_beginning_period
+      ~Form3X.L6c_total_receipts_period
+      ~Form3X.L6c_total_receipts_ytd
+      ~Form3X.L6d_subtotal_period
+      ~Form3X.L6d_subtotal_ytd
+      ~Form3X.L7_total_disbursements_period
+      ~Form3X.L7_total_disbursements_ytd
+      ~Form3X.L8_cash_on_hand_at_close_period
+      ~Form3X.L8_cash_on_hand_close_ytd
+      ~Form3X.L9_debts_to_period
+      ~Form3X.cash_on_hand_date
+      ~Form3X.change_of_address
+      ~Form3X.city
+      ~Form3X.date_of_election
+      ~Form3X.election_code
+      ~Form3X.id
+      ~Form3X.objects
+      ~Form3X.pk
+      ~Form3X.qualified_committee
+      ~Form3X.report_set
+      ~Form3X.state
+      ~Form3X.state_of_election
+      ~Form3X.street_1
+      ~Form3X.street_2
+      ~Form3X.zip
+   
+   

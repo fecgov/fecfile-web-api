@@ -1,0 +1,60 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_99.models.Form99
+=======================================
+
+.. currentmodule:: fecfiler.reports.form_99.models
+
+.. autoclass:: Form99
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form99.__init__
+      ~Form99.check
+      ~Form99.clean
+      ~Form99.clean_fields
+      ~Form99.date_error_message
+      ~Form99.delete
+      ~Form99.from_db
+      ~Form99.full_clean
+      ~Form99.get_constraints
+      ~Form99.get_deferred_fields
+      ~Form99.prepare_database_save
+      ~Form99.refresh_from_db
+      ~Form99.save
+      ~Form99.save_base
+      ~Form99.serializable_value
+      ~Form99.unique_error_message
+      ~Form99.validate_constraints
+      ~Form99.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form99.city
+      ~Form99.id
+      ~Form99.objects
+      ~Form99.pk
+      ~Form99.report_set
+      ~Form99.state
+      ~Form99.street_1
+      ~Form99.street_2
+      ~Form99.text_code
+      ~Form99.zip
+   
+   

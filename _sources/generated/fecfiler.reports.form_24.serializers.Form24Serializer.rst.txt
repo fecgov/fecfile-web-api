@@ -1,0 +1,83 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_24.serializers.Form24Serializer
+======================================================
+
+.. currentmodule:: fecfiler.reports.form_24.serializers
+
+.. autoclass:: Form24Serializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form24Serializer.__init__
+      ~Form24Serializer.bind
+      ~Form24Serializer.build_field
+      ~Form24Serializer.build_nested_field
+      ~Form24Serializer.build_property_field
+      ~Form24Serializer.build_relational_field
+      ~Form24Serializer.build_standard_field
+      ~Form24Serializer.build_unknown_field
+      ~Form24Serializer.build_url_field
+      ~Form24Serializer.create
+      ~Form24Serializer.fail
+      ~Form24Serializer.get_attribute
+      ~Form24Serializer.get_default
+      ~Form24Serializer.get_default_field_names
+      ~Form24Serializer.get_extra_kwargs
+      ~Form24Serializer.get_field_names
+      ~Form24Serializer.get_fields
+      ~Form24Serializer.get_foreign_key_fields
+      ~Form24Serializer.get_initial
+      ~Form24Serializer.get_schema_name
+      ~Form24Serializer.get_unique_for_date_validators
+      ~Form24Serializer.get_unique_together_validators
+      ~Form24Serializer.get_uniqueness_extra_kwargs
+      ~Form24Serializer.get_validation_candidate
+      ~Form24Serializer.get_validators
+      ~Form24Serializer.get_value
+      ~Form24Serializer.ignore_fields
+      ~Form24Serializer.include_extra_kwargs
+      ~Form24Serializer.is_valid
+      ~Form24Serializer.many_init
+      ~Form24Serializer.run_validation
+      ~Form24Serializer.run_validators
+      ~Form24Serializer.save
+      ~Form24Serializer.to_internal_value
+      ~Form24Serializer.to_representation
+      ~Form24Serializer.update
+      ~Form24Serializer.validate
+      ~Form24Serializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form24Serializer.context
+      ~Form24Serializer.data
+      ~Form24Serializer.default_error_messages
+      ~Form24Serializer.default_validators
+      ~Form24Serializer.errors
+      ~Form24Serializer.fields
+      ~Form24Serializer.initial
+      ~Form24Serializer.root
+      ~Form24Serializer.schema_name
+      ~Form24Serializer.serializer_field_mapping
+      ~Form24Serializer.url_field_name
+      ~Form24Serializer.validated_data
+      ~Form24Serializer.validators
+   
+   
