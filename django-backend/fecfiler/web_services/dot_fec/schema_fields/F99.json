@@ -3,19 +3,19 @@
     "filer_committee_id_number": {},
     "committee_name": {},
     "street_1": {
-        "path": "report_f99.street_1"
+        "path": "form_99.street_1"
     },
     "street_2": {
-        "path": "report_f99.street_2"
+        "path": "form_99.street_2"
     },
     "city": {
-        "path": "report_f99.city"
+        "path": "form_99.city"
     },
     "state": {
-        "path": "report_f99.state"
+        "path": "form_99.state"
     },
     "zip": {
-        "path": "report_f99.zip"
+        "path": "form_99.zip"
     },
     "treasurer_last_name": {},
     "treasurer_first_name": {},
@@ -26,6 +26,6 @@
         "serializer": "DATE"
     },
     "text_code": {
-        "path": "report_f99.text_code"
+        "path": "form_99.text_code"
     }
 }
