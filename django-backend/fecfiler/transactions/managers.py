@@ -22,6 +22,7 @@ from django.db.models import (
     TextField,
     DecimalField,
     UUIDField,
+    ExpressionWrapper
 )
 from decimal import Decimal
 from enum import Enum
@@ -69,10 +70,26 @@ class TransactionManager(SoftDeleteManager):
         )
 
         contact_1_clause = Q(contact_1_id=OuterRef("contact_1_id"))
-        candidate_contact_clause = Q(
-            candidate_contact_id__isnull=False
-        ) & Q(
-            candidate_contact_id=OuterRef("candidate_contact_id")
+        election_clause = (
+            Q(
+                schedule_e__isnull=False
+            ) & Q(
+                schedule_e__election_code=OuterRef("schedule_e__election_code")
+            ) & Q(
+                schedule_e__so_candidate_office=OuterRef("schedule_e__so_candidate_office")
+            ) & Q(
+                Q(
+                    schedule_e__so_candidate_state=OuterRef("schedule_e__so_candidate_state")
+                ) | (
+                    Q(schedule_e__so_candidate_office__isnull=True) & Q(outer_candidate_state__isnull=True)
+                )
+            ) & (
+                Q(
+                    schedule_e__so_candidate_district=OuterRef("schedule_e__so_candidate_district")
+                ) | (
+                    Q(schedule_e__so_candidate_district__isnull=True) & Q(outer_candidate_district__isnull=True)
+                )
+            )
         )
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
@@ -94,8 +111,17 @@ class TransactionManager(SoftDeleteManager):
             .values("aggregate")
         )
         calendar_ytd_clause = (
-            queryset.filter(
-                candidate_contact_clause,
+            queryset.alias( # Needed to get around null-matching bug with Q
+                outer_candidate_district=ExpressionWrapper(
+                    OuterRef('schedule_e__so_candidate_district'),
+                    output_field=TextField()
+                ),
+                outer_candidate_state=ExpressionWrapper(
+                    OuterRef('schedule_e__so_candidate_state'),
+                    output_field=TextField()
+                )
+            ).filter(
+                election_clause,
                 year_clause,
                 date_clause,
                 group_clause,
