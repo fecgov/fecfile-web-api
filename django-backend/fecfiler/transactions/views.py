@@ -200,7 +200,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         if not candidate_office:
             missing_params.append("candidate_office")
         if (
-            candidate_office != Contact.CandidateOffice.PRESIDENTIAL 
+            candidate_office != Contact.CandidateOffice.PRESIDENTIAL
             and not candidate_state
         ):
             missing_params.append("candidate_state")
@@ -208,29 +208,27 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             missing_params.append("candidate_district")
 
         if len(missing_params) > 0:
-            error_msg += "Please provide " + ",".join(missing_params) + " in query params"
-            return Response(
-                error_msg,
-                status=status.HTTP_400_BAD_REQUEST,
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
             )
+            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST,)
 
         date = datetime.fromisoformat(date)
 
-        previous_transactions = (
-            self.get_queryset()
-            .filter(
-                ~Q(id=transaction_id or None),
-                Q(date__year=date.year),
-                Q(date__lte=date),
-                Q(aggregation_group=aggregation_group),
-                Q(schedule_e__election_code=election_code),
-                Q(schedule_e__so_candidate_office=candidate_office),
-                Q(schedule_e__so_candidate_state=candidate_state),
-                Q(schedule_e__so_candidate_district=candidate_district),
-            )
+        previous_transactions = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
+            Q(schedule_e__election_code=election_code),
+            Q(schedule_e__so_candidate_office=candidate_office),
+            Q(schedule_e__so_candidate_state=candidate_state),
+            Q(schedule_e__so_candidate_district=candidate_district),
         )
 
-        previous_transaction = previous_transactions.order_by("-date", "-created").first()
+        previous_transaction = previous_transactions.order_by(
+            "-date", "-created"
+        ).first()
 
         if previous_transaction:
             serializer = self.get_serializer(previous_transaction)
@@ -257,26 +255,24 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             missing_params.append("aggregation_group")
 
         if len(missing_params) > 0:
-            error_msg = "Please provide " + ",".join(missing_params) + " in query params"
-            return Response(
-                error_msg,
-                status=status.HTTP_400_BAD_REQUEST,
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
             )
+            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST,)
 
         date = datetime.fromisoformat(date)
 
-        previous_transactions = (
-            self.get_queryset()
-            .filter(
-                ~Q(id=transaction_id or None),
-                Q(contact_1_id=contact_1_id),
-                Q(date__year=date.year),
-                Q(date__lte=date),
-                Q(aggregation_group=aggregation_group),
-            )
+        previous_transactions = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(contact_1_id=contact_1_id),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
         )
 
-        previous_transaction = previous_transactions.order_by("-date", "-created").first()
+        previous_transaction = previous_transactions.order_by(
+            "-date", "-created"
+        ).first()
 
         if previous_transaction:
             serializer = self.get_serializer(previous_transaction)
