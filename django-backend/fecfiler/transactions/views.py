@@ -199,16 +199,18 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             missing_params.append("election_code")
         if not candidate_office:
             missing_params.append("candidate_office")
-        if candidate_office != Contact.CandidateOffice.PRESIDENTIAL and not candidate_state:
+        if (
+            candidate_office != Contact.CandidateOffice.PRESIDENTIAL 
+            and not candidate_state
+        ):
             missing_params.append("candidate_state")
         if candidate_office == Contact.CandidateOffice.HOUSE and not candidate_district:
             missing_params.append("candidate_district")
 
-        response_str = ""
         if len(missing_params) > 0:
-            response_str += "Please provide"+",".join(missing_params)+" in query params"
+            error_msg += "Please provide " + ",".join(missing_params) + " in query params"
             return Response(
-                response_str,
+                error_msg,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -255,9 +257,9 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             missing_params.append("aggregation_group")
 
         if len(missing_params) > 0:
-            response_str = "Please provide"+",".join(missing_params)+" in query params"
+            error_msg = "Please provide " + ",".join(missing_params) + " in query params"
             return Response(
-                response_str,
+                error_msg,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
