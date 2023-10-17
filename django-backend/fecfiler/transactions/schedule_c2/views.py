@@ -16,6 +16,7 @@ class ScheduleC2TransactionViewSet(TransactionViewSet):
     serializer_class = ScheduleC2TransactionSerializer
     ordering_fields = [
         "id",
+        "line_label",
         "transaction_type_identifier",
         "guarantor_last_name",
         "guarantor_first_name",

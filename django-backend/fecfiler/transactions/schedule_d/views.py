@@ -30,6 +30,7 @@ class ScheduleDTransactionViewSet(TransactionViewSet):
     serializer_class = ScheduleDTransactionSerializer
     ordering_fields = [
         "id",
+        "line_label",
         "transaction_type_identifier",
         "creditor_name",
     ]
