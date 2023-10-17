@@ -51,7 +51,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
-                    "schedule_e__disbursement_date"
+                    "schedule_e__disbursement_date",
                     "schedule_e__dissemination_date"
                 ),
                 amount=Coalesce(
