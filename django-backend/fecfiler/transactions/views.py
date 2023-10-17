@@ -208,7 +208,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             missing_params.append("candidate_district")
 
         if len(missing_params) > 0:
-            error_msg += "Please provide " + ",".join(missing_params) + " in query params"
+            error_msg = "Please provide " + ",".join(missing_params) + " in query params"
             return Response(
                 error_msg,
                 status=status.HTTP_400_BAD_REQUEST,
