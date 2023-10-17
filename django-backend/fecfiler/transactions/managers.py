@@ -69,25 +69,35 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-        contact_1_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
         election_clause = (
             Q(
                 schedule_e__isnull=False
             ) & Q(
-                schedule_e__election_code=OuterRef("schedule_e__election_code")
+                schedule_e__election_code=OuterRef(
+                    "schedule_e__election_code"
+                )
             ) & Q(
-                schedule_e__so_candidate_office=OuterRef("schedule_e__so_candidate_office")
+                schedule_e__so_candidate_office=OuterRef(
+                    "schedule_e__so_candidate_office"
+                )
             ) & Q(
                 Q(
-                    schedule_e__so_candidate_state=OuterRef("schedule_e__so_candidate_state")
+                    schedule_e__so_candidate_state=OuterRef(
+                        "schedule_e__so_candidate_state"
+                    )
                 ) | (
-                    Q(schedule_e__so_candidate_office__isnull=True) & Q(outer_candidate_state__isnull=True)
+                    Q(schedule_e__so_candidate_office__isnull=True) &
+                    Q(outer_candidate_state__isnull=True)
                 )
             ) & (
                 Q(
-                    schedule_e__so_candidate_district=OuterRef("schedule_e__so_candidate_district")
+                    schedule_e__so_candidate_district=OuterRef(
+                        "schedule_e__so_candidate_district"
+                    )
                 ) | (
-                    Q(schedule_e__so_candidate_district__isnull=True) & Q(outer_candidate_district__isnull=True)
+                    Q(schedule_e__so_candidate_district__isnull=True) &
+                    Q(outer_candidate_district__isnull=True)
                 )
             )
         )
@@ -100,7 +110,7 @@ class TransactionManager(SoftDeleteManager):
 
         aggregate_clause = (
             queryset.filter(
-                contact_1_clause,
+                primary_contact_clause,
                 year_clause,
                 date_clause,
                 group_clause,
@@ -111,7 +121,7 @@ class TransactionManager(SoftDeleteManager):
             .values("aggregate")
         )
         calendar_ytd_clause = (
-            queryset.alias( # Needed to get around null-matching bug with Q
+            queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
                     OuterRef('schedule_e__so_candidate_district'),
                     output_field=TextField()
