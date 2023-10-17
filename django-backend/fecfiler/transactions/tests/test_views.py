@@ -9,7 +9,7 @@ from fecfiler.transactions.views import save_transaction
 class TransactionViewsTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
     ]
 
     def setUp(self):

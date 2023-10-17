@@ -3,17 +3,10 @@ import logging
 from django.db import transaction
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField
 
 logger = logging.getLogger(__name__)
-
-
-def get_model_data(data, model):
-    return {
-        field.name: data[field.name]
-        for field in model._meta.get_fields()
-        if field.name in data
-    }
 
 
 class ScheduleC2TransactionSerializer(TransactionSerializerBase):

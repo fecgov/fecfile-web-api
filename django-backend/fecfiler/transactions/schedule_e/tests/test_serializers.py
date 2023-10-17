@@ -2,15 +2,13 @@ from django.test import TestCase
 from fecfiler.authentication.models import Account
 from rest_framework.request import HttpRequest, Request
 
-from fecfiler.transactions.schedule_e.serializers import (
-    ScheduleETransactionSerializer,
-)
+from fecfiler.transactions.schedule_e.serializers import ScheduleETransactionSerializer
 
 
 class ScheduleETransactionSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_contacts",
         "test_memo_text",
     ]
@@ -72,8 +70,7 @@ class ScheduleETransactionSerializerTestCase(TestCase):
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["payee_first_name"]
         invalid_serializer = ScheduleETransactionSerializer(
-            data=invalid_transaction,
-            context={"request": self.mock_request},
+            data=invalid_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -83,8 +80,7 @@ class ScheduleETransactionSerializerTestCase(TestCase):
         missing_type = self.valid_schedule_e_transaction.copy()
         del missing_type["payee_first_name"]
         missing_type_serializer = ScheduleETransactionSerializer(
-            data=missing_type,
-            context={"request": self.mock_request},
+            data=missing_type, context={"request": self.mock_request},
         )
         self.assertFalse(missing_type_serializer.is_valid())
         self.assertIsNotNone(missing_type_serializer.errors["payee_first_name"])

@@ -1,4 +1,4 @@
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -17,9 +17,7 @@ class SummaryViewSet(viewsets.ViewSet):
     """
 
     @action(
-        detail=False,
-        methods=["post"],
-        url_path="calculate-summary",
+        detail=False, methods=["post"], url_path="calculate-summary",
     )
     def calculate_summary(self, request):
         """ """
@@ -27,7 +25,7 @@ class SummaryViewSet(viewsets.ViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
-        report = F3XSummary.objects.get(id=report_id)
+        report = Report.objects.get(id=report_id)
         report.calculation_status = CalculationState.CALCULATING
         report.save()
         logger.debug(f"Starting Celery Task calculate_summary for report :{report_id}")

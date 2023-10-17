@@ -5,7 +5,7 @@ from rest_framework.request import Request, HttpRequest
 
 
 class MemoTextSerializerTestCase(TestCase):
-    fixtures = ["test_memo_text", "test_committee_accounts", "test_f3x_summaries"]
+    fixtures = ["test_memo_text", "test_committee_accounts", "test_f3x_reports"]
 
     def setUp(self):
         self.valid_memo_text = {
@@ -31,13 +31,11 @@ class MemoTextSerializerTestCase(TestCase):
 
     def test_serializer_validate(self):
         valid_serializer = MemoTextSerializer(
-            data=self.valid_memo_text,
-            context={"request": self.mock_request},
+            data=self.valid_memo_text, context={"request": self.mock_request},
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = MemoTextSerializer(
-            data=self.invalid_memo_text,
-            context={"request": self.mock_request},
+            data=self.invalid_memo_text, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["rec_type"])

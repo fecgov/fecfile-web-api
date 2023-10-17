@@ -1,0 +1,35 @@
+{
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "report_type_24_48": {
+        "path": "form_24.report_type_24_48"
+    },
+    "original_amendment_date": {
+        "serializer": "DATE",
+        "path": "form_24.original_amendment_date"
+    },
+    "committee_name": {},
+    "street_1": {
+        "path": "form_24.street_1"
+    },
+    "street_2": {
+        "path": "form_24.street_2"
+    },
+    "city": {
+        "path": "form_24.city"
+    },
+    "state": {
+        "path": "form_24.state"
+    },
+    "zip": {
+        "path": "form_24.zip"
+    },
+    "treasurer_last_name": {},
+    "treasurer_first_name": {},
+    "treasurer_middle_name": {},
+    "treasurer_prefix": {},
+    "treasurer_suffix": {},
+    "date_signed": {
+        "serializer": "DATE"
+    }
+}
