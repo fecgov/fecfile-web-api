@@ -32,7 +32,7 @@ class ScheduleATransactionViewSet(TransactionViewSet):
     )
     serializer_class = ScheduleATransactionSerializer
     ordering_fields = [
-        "line_label",
+        "line_label_order_key",
         "transaction_type_identifier",
         "contributor_name",
         "contribution_date",

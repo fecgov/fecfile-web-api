@@ -16,7 +16,7 @@ class ScheduleC1TransactionViewSet(TransactionViewSet):
     serializer_class = ScheduleC1TransactionSerializer
     ordering_fields = [
         "id",
-        "line_label",
+        "line_label_order_key",
         "transaction_type_identifier",
         "lender_organization_name",
     ]

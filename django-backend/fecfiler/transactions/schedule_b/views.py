@@ -32,7 +32,7 @@ class ScheduleBTransactionViewSet(TransactionViewSet):
     )
     serializer_class = ScheduleBTransactionSerializer
     ordering_fields = [
-        "line_label",
+        "line_label_order_key",
         "transaction_type_identifier",
         "payee_name",
         "expenditure_date",

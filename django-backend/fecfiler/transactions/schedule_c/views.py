@@ -30,7 +30,7 @@ class ScheduleCTransactionViewSet(TransactionViewSet):
     serializer_class = ScheduleCTransactionSerializer
     ordering_fields = [
         "id",
-        "line_label",
+        "line_label_order_key",
         "transaction_type_identifier",
         "lender_name",
         "memo_code",
