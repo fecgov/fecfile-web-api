@@ -240,7 +240,9 @@ class TransactionManager(SoftDeleteManager):
                     # Schedule E
                     When(_form_type="SE", then=Value("24")),
                 ),
-                line_label_order_key=Concat("line_label", "form_type", output_field=TextField()),
+                line_label_order_key=Concat(
+                    "line_label", "form_type", output_field=TextField()
+                ),
             )
             .annotate(
                 balance=Coalesce(
