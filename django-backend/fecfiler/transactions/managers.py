@@ -210,9 +210,7 @@ class TransactionManager(SoftDeleteManager):
                 line_label=Case(
                     # Schedule A
                     When(_form_type="SA11A", then=Value("11(a)")),
-                    When(_form_type="SA11AI", itemized=False, then=Value("11(a)(ii)")),
                     When(_form_type="SA11AI", then=Value("11(a)(i)")),
-                    When(_form_type="SA11AII", itemized=True, then=Value("11(a)(i)")),
                     When(_form_type="SA11AII", then=Value("11(a)(ii)")),
                     When(_form_type="SA11B", then=Value("11(b)")),
                     When(_form_type="SA11C", then=Value("11(c)")),
