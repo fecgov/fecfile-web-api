@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
-    change_of_address = CharField(required=False, allow_null=True)
+    change_of_address = BooleanField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
     city = CharField(required=False, allow_null=True)
