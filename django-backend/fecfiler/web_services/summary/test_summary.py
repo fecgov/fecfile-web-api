@@ -11,6 +11,8 @@ class F3XReportTestCase(TestCase):
         "test_f3x_reports",
         "test_schedulea_summary_transactions",
         "test_scheduleb_summary_transactions",
+        "test_schedulec_summary_transactions",
+        "test_scheduled_summary_transactions",
         "test_contacts",
     ]
 
@@ -18,6 +20,7 @@ class F3XReportTestCase(TestCase):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
+        self.assertEqual(summary["a"]["line_9"], Decimal("225.00"))
         self.assertEqual(summary["a"]["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary["a"]["line_11aii"], Decimal("3.77"))
         self.assertEqual(

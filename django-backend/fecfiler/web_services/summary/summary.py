@@ -42,7 +42,11 @@ class SummaryService:
             line_28c=self.get_line("SB28C"),
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
+            # Temporary aggregations
+            temp_sc9=self.get_line("SC/9"),
+            temp_sd9=self.get_line("SD/9")
         )
+        summary["line_9"]= summary["temp_sc9"] + summary["temp_sd9"]
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
@@ -54,6 +58,12 @@ class SummaryService:
         summary["line_34"] = summary["line_28d"]
         summary["line_35"] = summary["line_33"] - summary["line_34"]
         summary["line_37"] = summary["line_15"]
+
+        # Remove temporary aggregations to clean up the summary
+        for key in list(summary.keys()):
+            if key.startswith("temp_"):
+                summary.pop(key)
+
         return summary
 
     def calculate_summary_column_b(self):
