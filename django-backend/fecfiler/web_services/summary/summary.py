@@ -46,7 +46,7 @@ class SummaryService:
             temp_sc9=self.get_line("SC/9"),
             temp_sd9=self.get_line("SD/9")
         )
-        summary["line_9"]= summary["temp_sc9"] + summary["temp_sd9"]
+        summary["line_9"] = summary["temp_sc9"] + summary["temp_sd9"]
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
