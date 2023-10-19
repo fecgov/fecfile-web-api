@@ -65,7 +65,6 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_e__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
-                candidate_contact_id=self.get_candidate_contact_clause(),
             )
         )
 
@@ -327,20 +326,6 @@ class TransactionManager(SoftDeleteManager):
             ),
             default="amount",
             output_field=DecimalField(),
-        )
-
-    def get_candidate_contact_clause(self):
-        return Case(
-            When(
-                contact_2__type=Contact.ContactType.CANDIDATE,
-                then=F("contact_2_id")
-            ),
-            When(
-                contact_3__type=Contact.ContactType.CANDIDATE,
-                then=F("contact_3_id")
-            ),
-            default=None,
-            output_field=UUIDField()
         )
 
 
