@@ -21,13 +21,11 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
-    UUIDField,
     ExpressionWrapper
 )
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
-from fecfiler.contacts.models import Contact
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
