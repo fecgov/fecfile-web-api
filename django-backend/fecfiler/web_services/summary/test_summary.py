@@ -80,6 +80,7 @@ class F3XReportTestCase(TestCase):
         t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
         self.assertEqual(t.itemized, False)
 
+        self.assertEqual(summary["b"]["line_6c"], Decimal("8336.73"))
         self.assertEqual(summary["b"]["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary["b"]["line_11aii"], Decimal("103.77"))
         self.assertEqual(summary["b"]["line_11aiii"], Decimal(10104.00))
@@ -95,6 +96,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary["b"]["line_15"], Decimal("2225.79"))
         self.assertEqual(summary["b"]["line_16"], Decimal("116.00"))
         self.assertEqual(summary["b"]["line_17"], Decimal("1100.00"))
+        self.assertEqual(summary["b"]["line_19"], Decimal("8336.73"))
         self.assertEqual(summary["b"]["line_21b"], Decimal("250.00"))
         self.assertEqual(summary["b"]["line_23"], Decimal("64.00"))
         self.assertEqual(summary["b"]["line_26"], Decimal("61.00"))

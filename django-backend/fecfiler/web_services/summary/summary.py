@@ -107,10 +107,16 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
         )
+        summary["line_6c"] = (
+            summary["line_11c"] + summary["line_12"] + summary["line_13"]
+            + summary["line_14"] + summary["line_15"] + summary["line_16"]
+            + summary["line_17"] + summary.get("line_18c", Decimal("0.00"))
+        )
         summary["line_11aiii"] = summary["line_11ai"] + summary["line_11aii"]
         summary["line_11d"] = (
             summary["line_11aiii"] + summary["line_11b"] + summary["line_11c"]
         )
+        summary["line_19"] = summary["line_6c"]
         summary["line_28d"] = (
             summary["line_28a"] + summary["line_28b"] + summary["line_28c"]
         )
