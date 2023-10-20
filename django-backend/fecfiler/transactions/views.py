@@ -142,7 +142,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
-        "form_type",
+        "line_label_order_key",
         "transaction_type_identifier",
         "memo_code",
         "name",

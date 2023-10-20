@@ -138,6 +138,7 @@ class TransactionSerializerBase(
     balance_at_close = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
+    line_label = CharField(read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -319,6 +320,7 @@ class TransactionSerializerBase(
                 "beginning_balance",
                 "payment_amount",
                 "balance_at_close",
+                "line_label",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
