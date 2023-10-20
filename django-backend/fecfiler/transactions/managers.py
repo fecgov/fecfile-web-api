@@ -21,6 +21,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    ExpressionWrapper
 )
 from decimal import Decimal
 from enum import Enum
@@ -50,6 +51,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
                     "schedule_e__disbursement_date",
+                    "schedule_e__dissemination_date"
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -64,7 +66,38 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-        contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        election_clause = (
+            Q(
+                schedule_e__isnull=False
+            ) & Q(
+                schedule_e__election_code=OuterRef(
+                    "schedule_e__election_code"
+                )
+            ) & Q(
+                schedule_e__so_candidate_office=OuterRef(
+                    "schedule_e__so_candidate_office"
+                )
+            ) & Q(
+                Q(
+                    schedule_e__so_candidate_state=OuterRef(
+                        "schedule_e__so_candidate_state"
+                    )
+                ) | (
+                    Q(schedule_e__so_candidate_office__isnull=True)
+                    & Q(outer_candidate_state__isnull=True)
+                )
+            ) & (
+                Q(
+                    schedule_e__so_candidate_district=OuterRef(
+                        "schedule_e__so_candidate_district"
+                    )
+                ) | (
+                    Q(schedule_e__so_candidate_district__isnull=True)
+                    & Q(outer_candidate_district__isnull=True)
+                )
+            )
+        )
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
             date=OuterRef("date"), created__lte=OuterRef("created")
@@ -74,7 +107,7 @@ class TransactionManager(SoftDeleteManager):
 
         aggregate_clause = (
             queryset.filter(
-                contact_clause,
+                primary_contact_clause,
                 year_clause,
                 date_clause,
                 group_clause,
@@ -83,6 +116,26 @@ class TransactionManager(SoftDeleteManager):
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
+        )
+        calendar_ytd_clause = (
+            queryset.alias(  # Needed to get around null-matching bug with Q()
+                outer_candidate_district=ExpressionWrapper(
+                    OuterRef('schedule_e__so_candidate_district'),
+                    output_field=TextField()
+                ),
+                outer_candidate_state=ExpressionWrapper(
+                    OuterRef('schedule_e__so_candidate_state'),
+                    output_field=TextField()
+                )
+            ).filter(
+                election_clause,
+                year_clause,
+                date_clause,
+                group_clause,
+            )
+            .values("committee_account_id")
+            .annotate(calendar_ytd=Sum("effective_amount"))
+            .values("calendar_ytd")
         )
 
         loan_payment_to_date_clause = (
@@ -133,6 +186,7 @@ class TransactionManager(SoftDeleteManager):
         return (
             queryset.annotate(
                 aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
+                calendar_ytd=Coalesce(Subquery(calendar_ytd_clause), Value(Decimal(0))),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,
