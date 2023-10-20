@@ -35,6 +35,8 @@ def calculate_summary(report_id):
 
     # line 9
     report.form_3x.L9_debts_to_period = a["line_9"]
+    # line 10
+    report.form_3x.L10_debts_by_period = a["line_10"]
     # line 11ai
     report.form_3x.L11ai_itemized_period = a["line_11ai"]
     report.form_3x.L11ai_itemized_ytd = b["line_11ai"]

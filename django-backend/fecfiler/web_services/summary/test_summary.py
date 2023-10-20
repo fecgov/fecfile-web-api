@@ -21,6 +21,7 @@ class F3XReportTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
         self.assertEqual(summary["a"]["line_9"], Decimal("225.00"))
+        self.assertEqual(summary["a"]["line_10"], Decimal("250.00"))
         self.assertEqual(summary["a"]["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary["a"]["line_11aii"], Decimal("3.77"))
         self.assertEqual(
