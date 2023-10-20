@@ -55,3 +55,7 @@ class TransactionManagerTestCase(TestCase):
     def test_force_unaggregated(self):
         txn = Transaction.objects.get(id="12345678-1596-4ef1-a1aa-c4386b8d1234")
         self.assertEqual(txn.aggregate, 3333)
+
+    def test_line_label(self):
+        refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
+        self.assertEqual(refund.line_label, "21(b)")
