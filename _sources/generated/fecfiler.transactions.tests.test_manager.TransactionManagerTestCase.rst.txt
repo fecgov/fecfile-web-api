@@ -114,6 +114,7 @@ fecfiler.transactions.tests.test\_manager.TransactionManagerTestCase
       ~TransactionManagerTestCase.test_debt_repayment
       ~TransactionManagerTestCase.test_election_aggregation
       ~TransactionManagerTestCase.test_force_unaggregated
+      ~TransactionManagerTestCase.test_line_label
       ~TransactionManagerTestCase.test_order_of_transactions
       ~TransactionManagerTestCase.test_refund_aggregation
    
