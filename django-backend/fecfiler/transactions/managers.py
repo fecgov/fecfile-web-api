@@ -84,7 +84,7 @@ class TransactionManager(SoftDeleteManager):
                         "schedule_e__so_candidate_state"
                     )
                 ) | (
-                    Q(schedule_e__so_candidate_office__isnull=True)
+                    Q(schedule_e__so_candidate_state__isnull=True)
                     & Q(outer_candidate_state__isnull=True)
                 )
             ) & (
