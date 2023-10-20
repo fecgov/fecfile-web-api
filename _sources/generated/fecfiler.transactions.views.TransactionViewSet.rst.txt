@@ -68,7 +68,8 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.perform_destroy
       ~TransactionViewSet.perform_update
       ~TransactionViewSet.permission_denied
-      ~TransactionViewSet.previous
+      ~TransactionViewSet.previous_election
+      ~TransactionViewSet.previous_entity
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.retrieve
       ~TransactionViewSet.reverse_action

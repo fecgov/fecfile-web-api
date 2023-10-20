@@ -68,7 +68,8 @@ fecfiler.transactions.schedule\_c.views.ScheduleCTransactionViewSet
       ~ScheduleCTransactionViewSet.perform_destroy
       ~ScheduleCTransactionViewSet.perform_update
       ~ScheduleCTransactionViewSet.permission_denied
-      ~ScheduleCTransactionViewSet.previous
+      ~ScheduleCTransactionViewSet.previous_election
+      ~ScheduleCTransactionViewSet.previous_entity
       ~ScheduleCTransactionViewSet.raise_uncaught_exception
       ~ScheduleCTransactionViewSet.retrieve
       ~ScheduleCTransactionViewSet.reverse_action

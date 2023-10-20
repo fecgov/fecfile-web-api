@@ -200,28 +200,31 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.permission_denied" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
 <td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous</span></code></a>(request)</p></td>
-<td><p>Retrieves transaction that comes before this transactions, while bieng in the same group for aggregation</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_election" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_election"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_election</span></code></a>(request)</p></td>
+<td><p>Retrieves transaction that comes before this transactions, while being in the same group for aggregation</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_entity" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_entity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_entity</span></code></a>(request)</p></td>
+<td><p>Retrieves transaction that comes before this transactions, while being in the same group for aggregation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.reverse_action" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.reverse_action" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.setup" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.setup" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.throttled" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.throttled" title="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request[, pk])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_transaction</span></code>(request[, pk])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_transaction</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -605,10 +608,17 @@ will instead be performed lazily, the first time either
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous">
-<span class="sig-name descname"><span class="pre">previous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_election">
+<span class="sig-name descname"><span class="pre">previous_election</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_election" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves transaction that comes before this transactions,
-while bieng in the same group for aggregation</p>
+while being in the same group for aggregation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_entity">
+<span class="sig-name descname"><span class="pre">previous_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_c1.views.ScheduleC1TransactionViewSet.previous_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves transaction that comes before this transactions,
+while being in the same group for aggregation</p>
 </dd></dl>
 
 <dl class="py method">
