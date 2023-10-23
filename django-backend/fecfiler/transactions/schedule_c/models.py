@@ -1,7 +1,5 @@
-from fecfiler.reports.models import Report
-from django.db import models, transaction as db_transaction
+from django.db import models
 import uuid
-import copy
 
 
 class ScheduleC(models.Model):
@@ -45,41 +43,6 @@ class ScheduleC(models.Model):
     lender_candidate_state = models.TextField(null=True, blank=True)
     lender_candidate_district = models.TextField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        with db_transaction.atomic():
-            super().save(*args, **kwargs)
-            transaction = self.get_transaction()
-            if not transaction.memo_code:
-                report = transaction.report
-                future_reports = Report.objects.get_queryset().filter(
-                    committee_account=report.committee_id,
-                    upload_submission__isnull=True,
-                    coverage_through_date__gte=report.coverage_through_date,
-                )
-                transactions_to_update = ScheduleC.objects.filter(
-                    transaction__transaction_id=transaction.transaction_id,
-                    transaction__report_id__in=models.Subquery(
-                        future_reports.values('id')
-                    )
-                )
-                transactions_to_update.update(**transaction)
-                reports_ids_to_create_transaction_for = list(future_reports.exclude(
-                    id__in=models.Subquery(
-                        transactions_to_update.values('transaction__report_id')
-                    )
-                ).values_list('id', flat=True).distinct())
-
-                for report_id in reports_ids_to_create_transaction_for:
-                    schedule_c_copy = copy.deepcopy(self)
-                    schedule_c_copy.id = None
-                    schedule_c_copy.save()
-
-                    transaction_copy = copy.deepcopy(transaction)
-                    transaction_copy.id = None
-                    transaction_copy.report_id = report_id
-                    transaction_copy.schedule_c = schedule_c_copy
-                    transaction_copy.save()
 
     def get_date(self):
         return self.transaction.report.through_date

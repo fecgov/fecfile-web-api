@@ -1,10 +1,14 @@
 import logging
 
-from django.db import transaction
+from django.db import transaction, models
+from django.db.models import Q
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from fecfiler.transactions.models import Transaction
+from fecfiler.reports.models import Report
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField, DateField, BooleanField
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +38,8 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                     del transaction_data[key]
 
             schedule_c_transaction = super().create(transaction_data)
+            if not schedule_c_transaction.memo_code:
+                self.create_future_reports(schedule_c_transaction)
             return schedule_c_transaction
 
     def update(self, instance, validated_data: dict):
@@ -42,7 +48,42 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_c, attr, value)
             instance.schedule_c.save()
-            return super().update(instance, validated_data)
+            schedule_c_transaction = super().update(instance, validated_data)
+            self.update_future_reports(schedule_c_transaction)
+            return schedule_c_transaction
+
+    def get_future_in_progress_reports(self, report: Report):
+        print(str(report.__dict__))
+        return Report.objects.get_queryset().filter(
+            ~Q(id=report.id),
+            committee_account=report.committee_account_id,
+            upload_submission__isnull=True,
+            coverage_through_date__gte=report.coverage_through_date,
+        )
+
+    def create_future_reports(self, schedule_c_transaction: Transaction):
+        report = schedule_c_transaction.report
+        future_reports = self.get_future_in_progress_reports(report)
+        for report in future_reports:
+            schedule_c_copy = copy.deepcopy(schedule_c_transaction.schedule_c)
+            schedule_c_copy.id = None
+            schedule_c_copy.save()
+            schedule_c_transaction_copy = copy.deepcopy(schedule_c_transaction)
+            schedule_c_transaction_copy.id = None
+            schedule_c_transaction_copy.report = report
+            schedule_c_transaction_copy.schedule_c = schedule_c_copy
+            schedule_c_transaction_copy.save()
+
+    def update_future_reports(self, schedule_c_transaction: Transaction):
+        report = schedule_c_transaction.report
+        future_reports = self.get_future_in_progress_reports(report)
+        transactions_to_update = Transaction.objects.filter(
+            transaction_id=schedule_c_transaction.transaction_id,
+            report_id__in=models.Subquery(
+                future_reports.values('id')
+            )
+        )
+        transactions_to_update.update(**schedule_c_transaction)
 
     receipt_line_number = CharField(required=False, allow_null=True)
     lender_organization_name = CharField(required=False, allow_null=True)
