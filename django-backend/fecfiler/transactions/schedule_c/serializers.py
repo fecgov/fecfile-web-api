@@ -39,7 +39,7 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
 
             schedule_c_transaction = super().create(transaction_data)
             if not schedule_c_transaction.memo_code:
-                self.create_future_reports(schedule_c_transaction)
+                self.create_in_future_reports(schedule_c_transaction)
             return schedule_c_transaction
 
     def update(self, instance, validated_data: dict):
@@ -49,7 +49,8 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                     setattr(instance.schedule_c, attr, value)
             instance.schedule_c.save()
             schedule_c_transaction = super().update(instance, validated_data)
-            self.update_future_reports(schedule_c_transaction)
+            if not schedule_c_transaction.memo_code:
+                self.update_in_future_reports(schedule_c_transaction, validated_data)
             return schedule_c_transaction
 
     def get_future_in_progress_reports(self, report: Report):
@@ -61,29 +62,43 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
             coverage_through_date__gte=report.coverage_through_date,
         )
 
-    def create_future_reports(self, schedule_c_transaction: Transaction):
-        report = schedule_c_transaction.report
+    def create_in_future_reports(self, transaction: Transaction):
+        report = transaction.report
         future_reports = self.get_future_in_progress_reports(report)
+        schedule_c_copies_to_insert = []
+        transaction_copies_to_insert = []
         for report in future_reports:
-            schedule_c_copy = copy.deepcopy(schedule_c_transaction.schedule_c)
+            schedule_c_copy = copy.deepcopy(transaction.schedule_c)
             schedule_c_copy.id = None
-            schedule_c_copy.save()
-            schedule_c_transaction_copy = copy.deepcopy(schedule_c_transaction)
-            schedule_c_transaction_copy.id = None
-            schedule_c_transaction_copy.report = report
-            schedule_c_transaction_copy.schedule_c = schedule_c_copy
-            schedule_c_transaction_copy.save()
+            schedule_c_copies_to_insert.append(schedule_c_copy)
+            transaction_copy = copy.deepcopy(transaction)
+            transaction_copy.id = None
+            transaction_copy.report = report
+            transaction_copy.schedule_c = schedule_c_copy
+            transaction_copies_to_insert.append(transaction_copy)
+        ScheduleC.objects.bulk_create(schedule_c_copies_to_insert)
+        Transaction.objects.bulk_create(transaction_copies_to_insert)
 
-    def update_future_reports(self, schedule_c_transaction: Transaction):
-        report = schedule_c_transaction.report
+    def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
+        report = transaction.report
         future_reports = self.get_future_in_progress_reports(report)
         transactions_to_update = Transaction.objects.filter(
-            transaction_id=schedule_c_transaction.transaction_id,
+            transaction_id=transaction.transaction_id,
             report_id__in=models.Subquery(
                 future_reports.values('id')
             )
         )
-        transactions_to_update.update(**schedule_c_transaction)
+        schedule_cs_to_update = ScheduleC.objects.filter(
+            transaction__schedule_c_id__in=models.Subquery(
+                transactions_to_update.values('schedule_c_id')
+            )
+        )
+        schedule_c_data = get_model_data(validated_data, ScheduleC)
+        del schedule_c_data['id']
+        schedule_cs_to_update.update(**schedule_c_data)
+        transaction_data = get_model_data(validated_data, Transaction)
+        del transaction_data['id']
+        transactions_to_update.update(**transaction_data)
 
     receipt_line_number = CharField(required=False, allow_null=True)
     lender_organization_name = CharField(required=False, allow_null=True)
