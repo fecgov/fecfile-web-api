@@ -36,7 +36,10 @@ def reverse_ttis(apps, schema_editor):  # noqa
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("transactions", "0028_alter_transaction_report"),
+        (
+            "transactions",
+            "0029_rename_so_candinate_middle_name_schedulee_so_candidate_middle_name",
+        ),
     ]
 
     operations = [migrations.RunPython(update_ttis, reverse_code=reverse_ttis)]
