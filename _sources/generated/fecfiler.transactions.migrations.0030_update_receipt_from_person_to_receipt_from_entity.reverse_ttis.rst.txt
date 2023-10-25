@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0030\_update\_receipt\_from\_person\_to\_receipt\_from\_entity.reverse\_ttis
+=============================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0030_update_receipt_from_person_to_receipt_from_entity
+
+.. autofunction:: reverse_ttis
