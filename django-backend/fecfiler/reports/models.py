@@ -114,13 +114,16 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             # If child is a guarantor transaction, copy it
             # and link it to the new loan
             if child.schedule_c2_id:
-                child.schedule_c2_id = self.save_copy(child.schedule_c2)
-                child.memo_text_id = self.save_copy(child.memo_text)
-                child.report_id = self.id
-                child.report = self
-                child.parent_transaction_id = loan.id
-                child.parent_transaction = loan
-                self.save_copy(child)
+                self.pull_forward_loan_guarantor(child, loan)
+                
+    def pull_forward_loan_guarantor(self, loan_guarantor, loan):
+        loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
+        loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
+        loan_guarantor.report_id = self.id
+        loan_guarantor.report = self
+        loan_guarantor.parent_transaction_id = loan.id
+        loan_guarantor.parent_transaction = loan
+        self.save_copy(loan_guarantor)
 
     def pull_forward_debts(self):
         previous_report = self.get_previous_report()

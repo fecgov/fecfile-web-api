@@ -55,25 +55,14 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                 self.update_in_future_reports(schedule_c_transaction, validated_data)
             return schedule_c_transaction
 
-    def get_future_in_progress_reports(self, report: Report):
-        print(str(report.__dict__))
-        return Report.objects.get_queryset().filter(
-            ~Q(id=report.id),
-            committee_account=report.committee_account_id,
-            upload_submission__isnull=True,
-            coverage_through_date__gte=report.coverage_through_date,
-        )
-
     def create_in_future_reports(self, transaction: Transaction):
-        report: Report = transaction.report
-        future_reports = self.get_future_in_progress_reports(report)
+        future_reports = super().get_future_in_progress_reports(transaction.report)
         transaction_copy = copy.deepcopy(transaction)
         for report in future_reports:
             report.pull_forward_loan(transaction_copy)
 
     def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
-        report = transaction.report
-        future_reports = self.get_future_in_progress_reports(report)
+        future_reports = super().get_future_in_progress_reports(transaction.report)
         transactions_to_update = Transaction.objects.filter(
             transaction_id=transaction.transaction_id,
             report_id__in=models.Subquery(
