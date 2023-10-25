@@ -4,7 +4,7 @@ from .models import MemoText
 
 
 class MemoTextTestCase(TestCase):
-    fixtures = ["test_f3x_summaries", "test_memo_text", "test_committee_accounts"]
+    fixtures = ["test_f3x_reports", "test_memo_text", "test_committee_accounts"]
 
     def setUp(self):
         self.valid_memo_text = MemoText(

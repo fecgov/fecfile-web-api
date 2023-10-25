@@ -4,18 +4,11 @@ from django.db import transaction
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField, DateField
 from rest_framework.serializers import ListSerializer
 
 logger = logging.getLogger(__name__)
-
-
-def get_model_data(data, model):
-    return {
-        field.name: data[field.name]
-        for field in model._meta.get_fields()
-        if field.name in data
-    }
 
 
 class ScheduleBTransactionSerializerBase(TransactionSerializerBase):

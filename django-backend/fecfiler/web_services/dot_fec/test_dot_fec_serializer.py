@@ -7,7 +7,7 @@ from .dot_fec_serializer import (
     get_value_from_path,
 )
 from .dot_fec_composer import Header
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -17,14 +17,14 @@ from curses import ascii
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_individual_receipt",
         "test_memo_text",
         "test_fake_schedule_c",
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.transaction = Transaction.objects.filter(
@@ -52,7 +52,7 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.assertEquals(serialized_text, "Lastname")
         serialized_text_undefined = serialize_field(
-            F3XSummary(), "treasurer_last_name", f3x_field_mappings
+            Report(), "treasurer_last_name", f3x_field_mappings
         )
         self.assertEquals(serialized_text_undefined, "")
 
@@ -62,7 +62,7 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.assertEqual(serialized_numeric, "6.00")
         serialized_numeric_undefined = serialize_field(
-            F3XSummary(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
+            Report(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
         )
         self.assertEqual(serialized_numeric_undefined, "")
 
@@ -83,7 +83,7 @@ class DotFECSerializerTestCase(TestCase):
         serialzed_date = serialize_field(self.f3x, "date_signed", f3x_field_mappings)
         self.assertEqual(serialzed_date, "20040729")
         serialzed_date_undefined = serialize_field(
-            F3XSummary(), "date_signed", f3x_field_mappings
+            Report(), "date_signed", f3x_field_mappings
         )
         self.assertEqual(serialzed_date_undefined, "")
 
@@ -97,7 +97,7 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.assertEqual(serialized_boolean_x_false, "")
         serialized_boolean_x_undefined = serialize_field(
-            F3XSummary(), "qualified_committee", f3x_field_mappings
+            Report(), "qualified_committee", f3x_field_mappings
         )
         self.assertEqual(serialized_boolean_x_undefined, "")
 

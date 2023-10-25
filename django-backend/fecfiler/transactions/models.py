@@ -1,7 +1,7 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.f3x_summaries.models import ReportMixin
+from fecfiler.reports.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -68,6 +68,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
     force_itemized = models.BooleanField(null=True, blank=True)
+    force_unaggregated = models.BooleanField(null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

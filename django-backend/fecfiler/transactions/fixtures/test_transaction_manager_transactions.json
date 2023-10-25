@@ -273,29 +273,36 @@
             "updated": "2023-02-15T05:00:00.000Z",
             "contact_1": "1578e90c-5348-4afa-9db8-cbeddf9aa701",
             "schedule_a": "43219fa2-3274-47d8-9388-7294a3fd4321",
-            "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94"
+            "parent_transaction": "6fedede3-8727-495f-8106-3f971408bc94",
+            "force_unaggregated": "True"
         }
     },
     {
-        "model": "f3x_summaries.f3xsummary",
+        "model": "reports.form3X",
         "fields": {
-            "id": "735db943-9446-462a-9be0-c820baadb622",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "form_type": "F3XN",
-            "committee_name": "test_string_value",
+            "id": "a35db943-9446-462a-9be0-c820baadb622",
             "change_of_address": true,
             "street_1": "test_string_value",
             "street_2": "test_string_value",
             "city": "test_string_value",
             "state": "test_string_value",
             "zip": "test_string_value",
-            "report_code": "12C",
             "election_code": "test_string_value",
             "date_of_election": "2007-01-30",
             "state_of_election": "test_string_value",
+            "qualified_committee": false
+        }
+    },
+    {
+        "model": "reports.report",
+        "fields": {
+            "id": "735db943-9446-462a-9be0-c820baadb622",
+            "form_3x_id": "a35db943-9446-462a-9be0-c820baadb622",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "form_type": "F3XN",
+            "report_code": "12C",
             "coverage_from_date": "2007-01-30",
             "coverage_through_date": "2007-02-28",
-            "qualified_committee": false,
             "treasurer_last_name": "Lastname",
             "treasurer_first_name": "Firstname",
             "treasurer_middle_name": "test_string_value",

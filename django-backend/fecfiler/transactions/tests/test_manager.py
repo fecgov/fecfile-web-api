@@ -7,7 +7,7 @@ import uuid
 class TransactionManagerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_transaction_manager_transactions",
     ]
 
@@ -45,3 +45,7 @@ class TransactionManagerTestCase(TestCase):
         self.assertEqual(repayment.debt.id, debt.id)
         self.assertEqual(debt.payment_amount, 123)
         self.assertEqual(debt.balance_at_close, 210)
+
+    def test_force_unaggregated(self):
+        txn = Transaction.objects.get(id="12345678-1596-4ef1-a1aa-c4386b8d1234")
+        self.assertEqual(txn.aggregate, 3333)

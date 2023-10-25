@@ -5,6 +5,9 @@ from fecfiler.transactions.schedule_a.managers import (
 from fecfiler.transactions.schedule_b.managers import (
     over_two_hundred_types as schedule_b_over_two_hundred_types,
 )
+from fecfiler.transactions.schedule_e.managers import (
+    over_two_hundred_types as schedule_e_over_two_hundred_types,
+)
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -46,13 +49,16 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_a__contribution_date",
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
+                    "schedule_e__disbursement_date",
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
+                    "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
+                    "schedule_e__expenditure_amount",
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -64,9 +70,16 @@ class TransactionManager(SoftDeleteManager):
             date=OuterRef("date"), created__lte=OuterRef("created")
         )
         group_clause = Q(aggregation_group=OuterRef("aggregation_group"))
+        force_unaggregated_clause = ~Q(force_unaggregated=True)
 
         aggregate_clause = (
-            queryset.filter(contact_clause, year_clause, date_clause, group_clause)
+            queryset.filter(
+                contact_clause,
+                year_clause,
+                date_clause,
+                group_clause,
+                force_unaggregated_clause,
+            )
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
@@ -74,11 +87,14 @@ class TransactionManager(SoftDeleteManager):
 
         loan_payment_to_date_clause = (
             queryset.filter(
-                parent_transaction__transaction_id=OuterRef("transaction_id"),
+                loan__transaction_id=OuterRef("transaction_id"),
                 transaction_type_identifier__in=[
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
+                report__coverage_through_date__lte=OuterRef(
+                    "report__coverage_through_date"
+                ),
             )
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
@@ -100,9 +116,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(
-                incurred_prior=Sum("amount"),
-            )
+            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
@@ -118,7 +132,7 @@ class TransactionManager(SoftDeleteManager):
         )
         return (
             queryset.annotate(
-                aggregate=Subquery(aggregate_clause),
+                aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,
@@ -165,16 +179,13 @@ class TransactionManager(SoftDeleteManager):
                         + F("schedule_d__incurred_amount")
                         - F("payment_amount"),
                     ),
-                    default=Value(Decimal(0)),
                 ),
                 form_type=Case(
                     When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
                     When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
                     When(
                         transaction_type_identifier="C2_LOAN_GUARANTOR",
-                        parent_transaction__transaction_type_identifier=(
-                            "LOAN_BY_COMMITTEE"
-                        ),
+                        loan__transaction_type_identifier=("LOAN_BY_COMMITTEE"),
                         then=Value("SC2/9"),
                     ),
                     When(
@@ -195,6 +206,11 @@ class TransactionManager(SoftDeleteManager):
                     F("debt___form_type"),
                     F("loan___form_type"),
                     Value(None),
+                ),
+            )
+            .annotate(
+                balance=Coalesce(
+                    F("balance_at_close"), F("loan_balance"), Value(Decimal(0.0))
                 ),
             )
             .alias(
@@ -231,7 +247,9 @@ class TransactionManager(SoftDeleteManager):
 
     def get_itemization_clause(self):
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
+            schedule_a_over_two_hundred_types
+            + schedule_b_over_two_hundred_types
+            + schedule_e_over_two_hundred_types
         )
         return Case(
             When(force_itemized__isnull=False, then=F("force_itemized")),

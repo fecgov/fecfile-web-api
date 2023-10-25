@@ -1,6 +1,6 @@
 from django.test import TestCase
 from curses import ascii
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from .dot_fec_composer import compose_dot_fec, add_row_to_content
@@ -10,13 +10,13 @@ from .dot_fec_serializer import serialize_instance, CRLF_STR
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_individual_receipt",
         "test_memo_text",
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.transaction = Transaction.objects.filter(
@@ -27,7 +27,7 @@ class DotFECSerializerTestCase(TestCase):
         ).first()
 
     def test_compose_dot_fec(self):
-        with self.assertRaisesMessage(Exception, "report: 100000000 not found"):
+        with self.assertRaisesMessage(Exception, "header: 100000000 not found"):
             compose_dot_fec(100000000, None)
 
         file_content = compose_dot_fec("b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None)

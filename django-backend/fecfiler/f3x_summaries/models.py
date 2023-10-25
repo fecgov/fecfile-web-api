@@ -24,6 +24,10 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
     )
 
     form_type = models.TextField(null=True, blank=True)
+    # fec 1-up version of amendment
+    report_version = models.TextField(null=True, blank=True)
+    # fec id for report
+    report_id = models.TextField(null=True, blank=True)
     # TODO get rid of this field.  It is redundant with the related Committee_Account
     committee_name = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
@@ -390,7 +394,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
         if previous_report:
             loans_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(loan_balance=Decimal(0)) | Q(loan_balance=None),
+                ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
             )
@@ -425,7 +429,7 @@ class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):
 
         if previous_report:
             debts_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close=None),
+                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
             )

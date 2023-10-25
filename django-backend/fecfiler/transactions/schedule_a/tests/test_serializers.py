@@ -8,7 +8,7 @@ from fecfiler.transactions.models import Transaction
 class ScheduleATransactionSerializerBaseTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_transaction_serializer",
         "test_memo_text",
     ]
@@ -109,8 +109,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
         invalid_transaction["form_type"] = "invalidformtype"
         del invalid_transaction["contributor_first_name"]
         invalid_serializer = ScheduleATransactionSerializer(
-            data=invalid_transaction,
-            context={"request": self.mock_request},
+            data=invalid_transaction, context={"request": self.mock_request},
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["form_type"])
@@ -119,8 +118,7 @@ class ScheduleATransactionSerializerBaseTestCase(TestCase):
     def test_transaction_contact_updated(self):
         transaction = self.update_contact_schedule_a_transaction.copy()
         serializer = ScheduleATransactionSerializer(
-            data=transaction,
-            context={"request": self.mock_request},
+            data=transaction, context={"request": self.mock_request},
         )
         self.assertTrue(serializer.is_valid(raise_exception=True))
         serializer.create(serializer.to_internal_value(transaction))

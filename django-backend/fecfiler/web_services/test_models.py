@@ -1,6 +1,6 @@
 import json
 from django.test import TestCase
-from fecfiler.f3x_summaries.models import F3XSummary
+from fecfiler.reports.models import Report
 from fecfiler.web_services.models import (
     FECStatus,
     UploadSubmission,
@@ -12,11 +12,11 @@ from fecfiler.web_services.models import (
 class UploadSubmissionTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
-        "test_f3x_summaries",
+        "test_f3x_reports",
     ]
 
     def setUp(self):
-        self.f3x = F3XSummary.objects.filter(
+        self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
         self.upload_submission = UploadSubmission()
@@ -32,15 +32,14 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state,
-            FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.upload_submission_id, submission.id)
 
-    def test_save_fec_response(self):
-        self.assertIsNone(self.upload_submission.fec_status)
-        self.upload_submission.save_fec_response(
+        submission.refresh_from_db()
+        self.assertIsNone(submission.fec_status)
+        submission.save_fec_response(
             json.dumps(
                 {
                     "submission_id": "fake_submission_id",
@@ -50,7 +49,7 @@ class UploadSubmissionTestCase(TestCase):
                 }
             )
         )
-        from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
+        from_db = UploadSubmission.objects.get(id=submission.id)
         self.assertEqual(from_db.fec_submission_id, "fake_submission_id")
         self.assertEqual(from_db.fec_status, "ACCEPTED")
         self.assertEqual(from_db.fec_message, "Test Save Response")
@@ -73,8 +72,7 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state,
-            FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.webprint_submission_id, submission.id)

@@ -6,7 +6,7 @@ from .views import MemoTextViewSet
 
 class MemoTextViewSetTest(TestCase):
     fixtures = [
-        "test_f3x_summaries",
+        "test_f3x_reports",
         "test_memo_text",
         "test_committee_accounts",
         "test_accounts",
