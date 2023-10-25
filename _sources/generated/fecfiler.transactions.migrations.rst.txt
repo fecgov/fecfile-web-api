@@ -59,4 +59,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0026_use_debt_loan_id
    fecfiler.transactions.migrations.0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx
    fecfiler.transactions.migrations.0028_alter_transaction_report
+   fecfiler.transactions.migrations.0029_rename_so_candinate_middle_name_schedulee_so_candidate_middle_name
 

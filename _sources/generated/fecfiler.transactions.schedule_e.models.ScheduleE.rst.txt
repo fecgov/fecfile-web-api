@@ -83,11 +83,11 @@ fecfiler.transactions.schedule\_e.models.ScheduleE
       ~ScheduleE.so_candidate_first_name
       ~ScheduleE.so_candidate_id_number
       ~ScheduleE.so_candidate_last_name
+      ~ScheduleE.so_candidate_middle_name
       ~ScheduleE.so_candidate_office
       ~ScheduleE.so_candidate_prefix
       ~ScheduleE.so_candidate_state
       ~ScheduleE.so_candidate_suffix
-      ~ScheduleE.so_candinate_middle_name
       ~ScheduleE.support_oppose_code
       ~ScheduleE.transaction_set
    
