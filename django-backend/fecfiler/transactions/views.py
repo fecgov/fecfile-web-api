@@ -149,6 +149,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "date",
         "amount",
         "aggregate",
+        "balance",
         "back_reference_tran_id_number",
     ]
     ordering = ["-created"]
