@@ -1,9 +1,10 @@
 import logging
 
-from django.db import transaction
+from django.db import transaction, models
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.memo_text.models import MemoText
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField
 import copy
@@ -62,6 +63,37 @@ class ScheduleC2TransactionSerializer(TransactionSerializerBase):
                 loan_id=transaction_copy.parent_transaction.id
             )
             report.pull_forward_loan_guarantor(transaction_copy, loan)
+
+    def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
+        future_reports = super().get_future_in_progress_reports(transaction.report)
+
+        transaction_data = get_model_data(validated_data, Transaction)
+        del transaction_data['id']
+        transactions_to_update = Transaction.objects.filter(
+            transaction_id=transaction.transaction_id,
+            report_id__in=models.Subquery(
+                future_reports.values('id')
+            )
+        )
+        transactions_to_update.update(**transaction_data)
+
+        schedule_c2_data = get_model_data(validated_data, ScheduleC2)
+        del schedule_c2_data['id']
+        schedule_c2s_to_update = ScheduleC2.objects.filter(
+            transaction__schedule_c2_id__in=models.Subquery(
+                transactions_to_update.values('schedule_c2_id')
+            )
+        )
+        schedule_c2s_to_update.update(**schedule_c2_data)
+
+        memo_text_data = get_model_data(validated_data, MemoText)
+        del memo_text_data['id']
+        memo_text_to_update = MemoText.objects.filter(
+            transaction__memo_text_id__in=models.Subquery(
+                transactions_to_update.values('memo_text_id')
+            )
+        )
+        memo_text_to_update.update(**memo_text_data)
 
     guarantor_last_name = CharField(required=False, allow_null=True)
     guarantor_first_name = CharField(required=False, allow_null=True)
