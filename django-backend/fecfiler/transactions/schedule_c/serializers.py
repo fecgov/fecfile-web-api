@@ -80,6 +80,14 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
         )
         schedule_cs_to_update.update(**schedule_c_data)
 
+        self.update_memo_text_in_future_reports(
+            transaction, validated_data, transactions_to_update)
+
+    def update_memo_text_in_future_reports(
+            self,
+            transaction: Transaction,
+            validated_data: dict,
+            transactions_to_update):
         memo_text_id = validated_data.get("memo_text_id")
         if not memo_text_id:
             for memo_text in MemoText.objects.filter(

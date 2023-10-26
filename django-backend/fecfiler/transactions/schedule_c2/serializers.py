@@ -55,14 +55,13 @@ class ScheduleC2TransactionSerializer(TransactionSerializerBase):
             return schedule_c2_transaction
 
     def create_in_future_reports(self, transaction: Transaction):
-        future_reports = self.get_future_in_progress_reports(transaction.report)
-        transaction_copy = copy.deepcopy(transaction)
+        future_reports = super().get_future_in_progress_reports(transaction.report)
         for report in future_reports:
             loan = Transaction.objects.get(
                 report_id=report.id,
-                loan_id=transaction_copy.parent_transaction.id
+                loan_id=transaction.parent_transaction.id
             )
-            report.pull_forward_loan_guarantor(transaction_copy, loan)
+            report.pull_forward_loan_guarantor(copy.deepcopy(transaction), loan)
 
     def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
         future_reports = super().get_future_in_progress_reports(transaction.report)
