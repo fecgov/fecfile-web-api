@@ -60,7 +60,7 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
 
     def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
         future_reports = super().get_future_in_progress_reports(transaction.report)
-        
+
         transaction_data = get_model_data(validated_data, Transaction)
         del transaction_data['id']
         transactions_to_update = Transaction.objects.filter(
@@ -80,14 +80,27 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
         )
         schedule_cs_to_update.update(**schedule_c_data)
 
-        memo_text_data = get_model_data(validated_data, MemoText)
-        del memo_text_data['id']
-        memo_text_to_update = MemoText.objects.filter(
-            transaction__memo_text_id__in=models.Subquery(
-                transactions_to_update.values('memo_text_id')
-            )
-        )
-        memo_text_to_update.update(**memo_text_data)
+        memo_text_id = validated_data.get("memo_text_id")
+        if not memo_text_id:
+            transactions_to_update.update(**{"memo_text_id": None})
+        else:
+            MemoText.objects.filter(
+                transaction__memo_text_id__in=models.Subquery(
+                    transactions_to_update.values('memo_text_id')
+                )
+            ).update(**{"text4000": transaction.memo_text.text4000})
+
+            for transaction_to_update in transactions_to_update.filter(memo_text_id__isnull=True).all():
+                new_memo_text = MemoText.objects.create({
+                    "rec_type": "TEXT",
+                    "transaction_id_number": transaction_to_update.transaction_id,
+                    "text4000": transaction.memo_text.text4000,
+                    "report_id": transaction.report.id,
+                    "committee_account_id": transaction_to_update.committee_account.id,
+                    "transaction_uuid": transaction_to_update.id,
+                    "is_report_level_memo": False,
+                })
+                transaction_to_update.update(**{"memo_data": new_memo_text})
 
     receipt_line_number = CharField(required=False, allow_null=True)
     lender_organization_name = CharField(required=False, allow_null=True)
