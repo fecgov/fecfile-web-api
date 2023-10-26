@@ -165,9 +165,11 @@ class ScheduleC2TransactionSerializerTestCase(TestCase):
             schedule_c__lender_middle_name="test_lmn1"
         )
         self.assertEqual(created_instance.count(), 3)
-        
+
         # test c2 create
-        self.valid_schedule_c2_transaction["parent_transaction_id"] = created_instance[0].id
+        self.valid_schedule_c2_transaction[
+            "parent_transaction_id"
+        ] = created_instance[0].id
         transaction = self.valid_schedule_c2_transaction.copy()
         valid_serializer = ScheduleC2TransactionSerializer(
             data=transaction,
