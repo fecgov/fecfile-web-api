@@ -130,6 +130,7 @@ class TransactionSerializerBase(
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    calendar_ytd = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -138,6 +139,7 @@ class TransactionSerializerBase(
     balance_at_close = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
+    line_label = CharField(read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -320,12 +322,14 @@ class TransactionSerializerBase(
                 "date",
                 "amount",
                 "aggregate",
+                "calendar_ytd",
                 "loan_payment_to_date",
                 "balance",
                 "loan_balance",
                 "beginning_balance",
                 "payment_amount",
                 "balance_at_close",
+                "line_label",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",
