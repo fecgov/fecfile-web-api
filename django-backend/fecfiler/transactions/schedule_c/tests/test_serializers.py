@@ -136,4 +136,4 @@ class ScheduleCTransactionSerializerTestCase(TestCase):
         updated_instance = Transaction.objects.filter(
             schedule_c__lender_middle_name="test_lmn1_updated1"
         )
-        self.assertEqual(updated_instance.count(), 3)
+        self.assertEqual(updated_instance.count(), 4)
