@@ -47,7 +47,7 @@ class ScheduleETransactionSerializerTestCase(TestCase):
             "dissemination_date": "2022-02-09",
             "expenditure_amount": 1500,
             "disbursement_date": "2022-02-09",
-            "calendar_ytd": 3000,
+            "calendar_ytd_per_election_office": 3000,
             "so_candidate_last_name": "Testerson",
             "so_candidate_first_name": "William",
             "completing_last_name": "Testerson",
