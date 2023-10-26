@@ -96,7 +96,9 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                 )
             ).update(**{"text4000": transaction.memo_text.text4000})
 
-            for transaction_to_update in transactions_to_update.filter(memo_text_id__isnull=True):
+            for transaction_to_update in transactions_to_update.filter(
+                memo_text_id__isnull=True
+            ):
                 new_memo_text = MemoText.objects.create(**{
                     "rec_type": "TEXT",
                     "transaction_id_number": transaction_to_update.transaction_id,
@@ -106,7 +108,9 @@ class ScheduleCTransactionSerializer(TransactionSerializerBase):
                     "transaction_uuid": transaction_to_update.id,
                     "is_report_level_memo": False,
                 })
-                Transaction.objects.filter(id=transaction_to_update.id).update(**{"memo_text": new_memo_text})
+                Transaction.objects.filter(id=transaction_to_update.id).update(
+                    **{"memo_text": new_memo_text}
+                )
 
     receipt_line_number = CharField(required=False, allow_null=True)
     lender_organization_name = CharField(required=False, allow_null=True)

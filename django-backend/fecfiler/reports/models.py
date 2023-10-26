@@ -115,7 +115,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             # and link it to the new loan
             if child.schedule_c2_id:
                 self.pull_forward_loan_guarantor(child, loan)
-                
+
     def pull_forward_loan_guarantor(self, loan_guarantor, loan):
         loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
         loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
