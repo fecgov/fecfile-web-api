@@ -136,14 +136,17 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             )
 
             for debt in debts_to_pull_forward:
-                debt.schedule_d.incurred_amount = Decimal(0)
-                debt.schedule_d_id = self.save_copy(debt.schedule_d)
-                debt.report_id = self.id
-                debt.report = self
-                # The debt_id should point to the original debt transaction
-                # even if the debt is pulled forward multiple times.
-                debt.debt_id = debt.debt_id if debt.debt_id else debt.id
-                self.save_copy(debt)
+                self.pull_forward_debt(debt)
+
+    def pull_forward_debt(self, debt):
+        debt.schedule_d.incurred_amount = Decimal(0)
+        debt.schedule_d_id = self.save_copy(debt.schedule_d)
+        debt.report_id = self.id
+        debt.report = self
+        # The debt_id should point to the original debt transaction
+        # even if the debt is pulled forward multiple times.
+        debt.debt_id = debt.debt_id if debt.debt_id else debt.id
+        self.save_copy(debt)
 
     def get_previous_report(self):
         return (

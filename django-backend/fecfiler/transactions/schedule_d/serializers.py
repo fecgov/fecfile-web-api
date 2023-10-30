@@ -1,10 +1,12 @@
 import logging
 
-from django.db import transaction
+from django.db import transaction, models
 from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +38,7 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
                     del transaction_data[key]
 
             schedule_d_transaction = super().create(transaction_data)
+            self.create_in_future_reports(schedule_d_transaction)
             return schedule_d_transaction
 
     def update(self, instance, validated_data: dict):
@@ -44,7 +47,37 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_d, attr, value)
             instance.schedule_d.save()
-            return super().update(instance, validated_data)
+            schedule_d_transaction = super().update(instance, validated_data)
+            self.update_in_future_reports(schedule_d_transaction, validated_data)
+            return schedule_d_transaction
+
+    def create_in_future_reports(self, transaction: Transaction):
+        future_reports = super().get_future_in_progress_reports(transaction.report)
+        transaction_copy = copy.deepcopy(transaction)
+        for report in future_reports:
+            report.pull_forward_debt(transaction_copy)
+
+    def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
+        future_reports = super().get_future_in_progress_reports(transaction.report)
+
+        transaction_data = get_model_data(validated_data, Transaction)
+        del transaction_data['id']
+        transactions_to_update = Transaction.objects.filter(
+            transaction_id=transaction.transaction_id,
+            report_id__in=models.Subquery(
+                future_reports.values('id')
+            )
+        )
+        transactions_to_update.update(**transaction_data)
+
+        schedule_d_data = get_model_data(validated_data, ScheduleD)
+        del schedule_d_data['id']
+        schedule_ds_to_update = ScheduleD.objects.filter(
+            transaction__schedule_d_id__in=models.Subquery(
+                transactions_to_update.values('schedule_d_id')
+            )
+        )
+        schedule_ds_to_update.update(**schedule_d_data)
 
     receipt_line_number = CharField(required=False, allow_null=True)
     receipt_line_number = CharField(required=False, allow_null=True)
