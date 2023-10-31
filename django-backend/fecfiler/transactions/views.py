@@ -413,6 +413,10 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
                 queryset = queryset.filter(schedule_d__isnull=True)
             if "E" not in schedules_to_include:
                 queryset = queryset.filter(schedule_e__isnull=True)
+
+        parent_id = self.request.query_params.get("parent")
+        if parent_id:
+            queryset = queryset.filter(parent_transaction_id=parent_id)
         return queryset
 
     def create(self, request):
