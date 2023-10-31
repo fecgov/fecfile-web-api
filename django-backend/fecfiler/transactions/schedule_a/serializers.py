@@ -6,7 +6,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField, DateField
-from rest_framework.serializers import ListSerializer
+from rest_framework.serializers import ListSerializer, ModelSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -168,3 +168,61 @@ class ScheduleATransactionSerializer(ScheduleATransactionSerializerTier2):
             + ["contribution_aggregate", "children"]
         )
         depth = 3
+
+
+class ScheduleASerializer(ModelSerializer):
+    class Meta:
+        model = ScheduleA
+
+        def get_fields():
+            return [
+                f.name
+                for f in ScheduleA._meta.get_fields()
+                if f.name not in ["deleted", "transaction"] + ["contribution_aggregate"]
+            ]
+
+    contributor_organization_name = CharField(required=False, allow_null=True)
+    contributor_last_name = CharField(required=False, allow_null=True)
+    contributor_first_name = CharField(required=False, allow_null=True)
+    contributor_middle_name = CharField(required=False, allow_null=True)
+    contributor_prefix = CharField(required=False, allow_null=True)
+    contributor_suffix = CharField(required=False, allow_null=True)
+    contributor_street_1 = CharField(required=False, allow_null=True)
+    contributor_street_2 = CharField(required=False, allow_null=True)
+    contributor_city = CharField(required=False, allow_null=True)
+    contributor_state = CharField(required=False, allow_null=True)
+    contributor_zip = CharField(required=False, allow_null=True)
+
+    contribution_date = DateField(required=False, allow_null=True)
+    contribution_amount = DecimalField(
+        required=False, allow_null=True, max_digits=11, decimal_places=2
+    )
+
+    contribution_purpose_descrip = CharField(required=False, allow_null=True)
+    contributor_employer = CharField(required=False, allow_null=True)
+    contributor_occupation = CharField(required=False, allow_null=True)
+    donor_committee_fec_id = CharField(required=False, allow_null=True)
+    donor_committee_name = CharField(required=False, allow_null=True)
+    donor_candidate_fec_id = CharField(required=False, allow_null=True)
+    donor_candidate_last_name = CharField(required=False, allow_null=True)
+    donor_candidate_first_name = CharField(required=False, allow_null=True)
+    donor_candidate_middle_name = CharField(required=False, allow_null=True)
+    donor_candidate_prefix = CharField(required=False, allow_null=True)
+    donor_candidate_suffix = CharField(required=False, allow_null=True)
+    donor_candidate_office = CharField(required=False, allow_null=True)
+    donor_candidate_state = CharField(required=False, allow_null=True)
+    donor_candidate_district = CharField(required=False, allow_null=True)
+
+    election_code = CharField(required=False, allow_null=True)
+    election_other_description = CharField(required=False, allow_null=True)
+    conduit_name = CharField(required=False, allow_null=True)
+    conduit_street_1 = CharField(required=False, allow_null=True)
+    conduit_street_2 = CharField(required=False, allow_null=True)
+    conduit_city = CharField(required=False, allow_null=True)
+    conduit_state = CharField(required=False, allow_null=True)
+    conduit_zip = CharField(required=False, allow_null=True)
+
+    memo_text_description = CharField(required=False, allow_null=True)
+    reference_to_si_or_sl_system_code_that_identifies_the_account = CharField(
+        required=False, allow_null=True
+    )

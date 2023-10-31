@@ -15,10 +15,14 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import (
     TransactionSerializerBase,
     TransactionSerializer,
+    ScheduleASerializer as TSAS,
 )
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.contacts.models import Contact
-from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
+from fecfiler.transactions.schedule_a.serializers import (
+    ScheduleATransactionSerializer,
+    ScheduleASerializer,
+)
 from fecfiler.transactions.schedule_b.serializers import ScheduleBTransactionSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCTransactionSerializer
 from fecfiler.transactions.schedule_c1.serializers import (
@@ -103,6 +107,41 @@ def save_transaction(request):
             # All parent and child transaction saves were successful, return
             # parent transaction
             return Response(schedule_serializer(transaction_obj).data)
+
+
+def save_transaction3(transaction_data, request):
+    serializers = dict(
+        A=ScheduleASerializer,
+    )
+
+    if "id" in transaction_data:
+        transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
+        transaction_serializer = TransactionSerializer(
+            transaction_instance, data=transaction_data, context={"request": request}
+        )
+        # schedule_serializer = serializers.get(transaction_data.get("schedule_id"))(getattr(transaction_instance, )
+    else:
+        transaction_serializer = TransactionSerializer(
+            data=transaction_data, context={"request": request}
+        )
+        # schedule_serializer = serializers.get(transaction_data.get("schedule_id"))(
+        #     data=request.data, context={request: request}
+        # )
+
+    print(f"ahoy {transaction_serializer.context}")
+    transaction_serializer.is_valid(raise_exception=True)
+    # schedule_serializer.is_valid(raise_exception=True)
+
+    transaction_instance = transaction_serializer.save()
+
+    for child_transaction_data in transaction_data["children"]:
+        child_transaction_data["parent_transaction_id"] = transaction_instance.id
+        if child_transaction_data.pop("use_parent_contact", None):
+            child_transaction_data["contact_1_id"] = transaction_instance.contact_1_id
+
+        save_transaction3(child_transaction_data, request)
+
+    return transaction_instance
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
@@ -419,13 +458,13 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
             queryset = queryset.filter(parent_transaction_id=parent_id)
         return queryset
 
-    def create(self, request):
-        response = {"message": "Create function is not offered in this path."}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def create(self, request, *args, **kwargs):
+        saved_transaction = save_transaction3(request.data, request)
+        return Response(TransactionSerializer(saved_transaction).to_representation())
 
-    def update(self, request, pk=None):
-        response = {"message": "Update function is not offered in this path."}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def update(self, request, *args, **kwargs):
+        saved_transaction = save_transaction3(request.data, request)
+        return Response(TransactionSerializer(saved_transaction).to_representation())
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
