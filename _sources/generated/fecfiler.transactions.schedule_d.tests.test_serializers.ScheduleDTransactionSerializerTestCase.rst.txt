@@ -111,6 +111,7 @@ fecfiler.transactions.schedule\_d.tests.test\_serializers.ScheduleDTransactionSe
       ~ScheduleDTransactionSerializerTestCase.subTest
       ~ScheduleDTransactionSerializerTestCase.tearDown
       ~ScheduleDTransactionSerializerTestCase.tearDownClass
+      ~ScheduleDTransactionSerializerTestCase.test_create_and_update_with_debt_pulled_forward
       ~ScheduleDTransactionSerializerTestCase.test_no_creditor_first_name
       ~ScheduleDTransactionSerializerTestCase.test_serializer_validate
    

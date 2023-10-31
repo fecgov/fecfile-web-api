@@ -36,6 +36,7 @@ fecfiler.reports.models.Report
       ~Report.get_previous_report
       ~Report.hard_delete
       ~Report.prepare_database_save
+      ~Report.pull_forward_debt
       ~Report.pull_forward_debts
       ~Report.pull_forward_loan
       ~Report.pull_forward_loan_guarantor

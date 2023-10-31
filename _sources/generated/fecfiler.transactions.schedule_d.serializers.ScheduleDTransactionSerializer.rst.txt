@@ -29,6 +29,7 @@ fecfiler.transactions.schedule\_d.serializers.ScheduleDTransactionSerializer
       ~ScheduleDTransactionSerializer.build_unknown_field
       ~ScheduleDTransactionSerializer.build_url_field
       ~ScheduleDTransactionSerializer.create
+      ~ScheduleDTransactionSerializer.create_in_future_reports
       ~ScheduleDTransactionSerializer.create_or_update_contact
       ~ScheduleDTransactionSerializer.create_or_update_memo
       ~ScheduleDTransactionSerializer.fail
@@ -60,6 +61,7 @@ fecfiler.transactions.schedule\_d.serializers.ScheduleDTransactionSerializer
       ~ScheduleDTransactionSerializer.to_internal_value
       ~ScheduleDTransactionSerializer.to_representation
       ~ScheduleDTransactionSerializer.update
+      ~ScheduleDTransactionSerializer.update_in_future_reports
       ~ScheduleDTransactionSerializer.validate
       ~ScheduleDTransactionSerializer.validate_empty_values
    
