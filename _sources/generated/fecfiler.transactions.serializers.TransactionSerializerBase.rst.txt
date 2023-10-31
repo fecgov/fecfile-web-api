@@ -39,6 +39,7 @@ fecfiler.transactions.serializers.TransactionSerializerBase
       ~TransactionSerializerBase.get_field_names
       ~TransactionSerializerBase.get_fields
       ~TransactionSerializerBase.get_foreign_key_fields
+      ~TransactionSerializerBase.get_future_in_progress_reports
       ~TransactionSerializerBase.get_initial
       ~TransactionSerializerBase.get_schema_name
       ~TransactionSerializerBase.get_unique_for_date_validators

@@ -39,6 +39,7 @@ fecfiler.transactions.schedule\_a.serializers.ScheduleATransactionSerializerBase
       ~ScheduleATransactionSerializerBase.get_field_names
       ~ScheduleATransactionSerializerBase.get_fields
       ~ScheduleATransactionSerializerBase.get_foreign_key_fields
+      ~ScheduleATransactionSerializerBase.get_future_in_progress_reports
       ~ScheduleATransactionSerializerBase.get_initial
       ~ScheduleATransactionSerializerBase.get_schema_name
       ~ScheduleATransactionSerializerBase.get_unique_for_date_validators

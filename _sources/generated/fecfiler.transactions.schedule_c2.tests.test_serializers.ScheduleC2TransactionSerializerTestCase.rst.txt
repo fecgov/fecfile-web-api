@@ -111,6 +111,7 @@ fecfiler.transactions.schedule\_c2.tests.test\_serializers.ScheduleC2Transaction
       ~ScheduleC2TransactionSerializerTestCase.subTest
       ~ScheduleC2TransactionSerializerTestCase.tearDown
       ~ScheduleC2TransactionSerializerTestCase.tearDownClass
+      ~ScheduleC2TransactionSerializerTestCase.test_create_and_update_with_loan_guarantor_pulled_forward
       ~ScheduleC2TransactionSerializerTestCase.test_no_guarantor_last_name
       ~ScheduleC2TransactionSerializerTestCase.test_serializer_validate
    

@@ -29,6 +29,7 @@ fecfiler.transactions.schedule\_c.serializers.ScheduleCTransactionSerializer
       ~ScheduleCTransactionSerializer.build_unknown_field
       ~ScheduleCTransactionSerializer.build_url_field
       ~ScheduleCTransactionSerializer.create
+      ~ScheduleCTransactionSerializer.create_in_future_reports
       ~ScheduleCTransactionSerializer.create_or_update_contact
       ~ScheduleCTransactionSerializer.create_or_update_memo
       ~ScheduleCTransactionSerializer.fail
@@ -39,6 +40,7 @@ fecfiler.transactions.schedule\_c.serializers.ScheduleCTransactionSerializer
       ~ScheduleCTransactionSerializer.get_field_names
       ~ScheduleCTransactionSerializer.get_fields
       ~ScheduleCTransactionSerializer.get_foreign_key_fields
+      ~ScheduleCTransactionSerializer.get_future_in_progress_reports
       ~ScheduleCTransactionSerializer.get_initial
       ~ScheduleCTransactionSerializer.get_schema_name
       ~ScheduleCTransactionSerializer.get_unique_for_date_validators
@@ -59,6 +61,8 @@ fecfiler.transactions.schedule\_c.serializers.ScheduleCTransactionSerializer
       ~ScheduleCTransactionSerializer.to_internal_value
       ~ScheduleCTransactionSerializer.to_representation
       ~ScheduleCTransactionSerializer.update
+      ~ScheduleCTransactionSerializer.update_in_future_reports
+      ~ScheduleCTransactionSerializer.update_memo_text_in_future_reports
       ~ScheduleCTransactionSerializer.validate
       ~ScheduleCTransactionSerializer.validate_empty_values
    

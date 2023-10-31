@@ -81,35 +81,41 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(validated_data)</p></td>
 <td><p>We have a bit of extra checking around this in order to provide descriptive messages when something goes wrong, but this method is essentially just:</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_contact</span></code>(validated_data, ...)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_in_future_reports</span></code>(transaction)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_memo</span></code>(validated_data)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_contact</span></code>(validated_data, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_or_update_memo</span></code>(validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
 <td><p>A helper method that simply raises a validation error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
 <td><p>Given the <em>outgoing</em> object instance, return the primitive value that should be used for this field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default</span></code></a>()</p></td>
 <td><p>Return the default value to use when validating data if no input is provided for this field.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_field_names</span></code></a>(declared_fields, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_default_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_field_names</span></code></a>(declared_fields, ...)</p></td>
 <td><p>Return the default list of field names that will be used if the <cite>Meta.fields</cite> option is not specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_kwargs</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_kwargs</span></code></a>()</p></td>
 <td><p>Return a dictionary mapping field names to a dictionary of additional keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_field_names</span></code></a>(declared_fields, info)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_field_names</span></code></a>(declared_fields, info)</p></td>
 <td><p>Returns the list of all field names that should be created when instantiating this serializer class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
 <td><p>Return the dict of field names -&gt; field instances that should be used for <cite>self.fields</cite> when instantiating the serializer.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_foreign_key_fields</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_foreign_key_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_foreign_key_fields</span></code></a>()</p></td>
 <td><p>Returns a dictionary of foreign key fields</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_future_in_progress_reports</span></code>(report)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
 <td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
@@ -169,6 +175,12 @@
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_in_future_reports</span></code>(transaction, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_memo_text_in_future_reports</span></code>(...)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate" title="fecfiler.transactions.schedule_c.serializers.ScheduleCTransactionSerializer.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(data)</p></td>
