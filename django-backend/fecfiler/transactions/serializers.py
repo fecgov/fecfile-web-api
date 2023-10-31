@@ -15,6 +15,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     DecimalField,
 )
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -250,6 +251,14 @@ class TransactionSerializerBase(
         if internal_value.get("form_type"):
             internal_value["_form_type"] = internal_value["form_type"]
         return internal_value
+
+    def get_future_in_progress_reports(self, report: Report):
+        return Report.objects.get_queryset().filter(
+            ~Q(id=report.id),
+            committee_account=report.committee_account_id,
+            upload_submission__isnull=True,
+            coverage_through_date__gte=report.coverage_through_date,
+        )
 
     def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
