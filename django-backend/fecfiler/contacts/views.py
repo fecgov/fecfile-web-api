@@ -78,15 +78,18 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return HttpResponseBadRequest()
 
         max_fecfile_results, max_fec_results = self.get_max_results(request)
-
-        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        office = request.GET.get("office", "")
+        params = {"q": q, "api_key": FEC_API_KEY}
+        if office:
+            params["office"] = office
+        params = urlencode(params)
         json_results = requests.get(
             FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
         ).json()
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
-        fecfile_candidates = list(
+        query_set = (
             self.get_queryset()
             .annotate(
                 full_name_fwd=Lower(NAME_CLAUSE),
@@ -102,17 +105,20 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .values()
             .order_by("-candidate_id")
         )
+        if office:
+            query_set = query_set.filter(candidate_office=office)
+        fecfile_candidates = list(query_set)
         fec_api_candidates = json_results.get("results", [])
         fec_api_candidates = [
             fac
             for fac in fec_api_candidates
-            if not any(fac["id"] == ffc["candidate_id"] for ffc in fecfile_candidates)
+            if not any(
+                fac["candidate_id"] == ffc["candidate_id"] for ffc in fecfile_candidates
+            )
         ]
-        fec_api_candidates = fec_api_candidates[:max_fec_results]
-        fecfile_candidates = fecfile_candidates[:max_fecfile_results]
         return_value = {
-            "fec_api_candidates": fec_api_candidates,
-            "fecfile_candidates": fecfile_candidates,
+            "fec_api_candidates": fec_api_candidates[:max_fec_results],
+            "fecfile_candidates": fecfile_candidates[:max_fecfile_results],
         }
 
         return JsonResponse(return_value)
@@ -240,9 +246,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewSet,
-    mixins.ListModelMixin,
-    GenericViewSet,
+    CommitteeOwnedViewSet, mixins.ListModelMixin, GenericViewSet,
 ):
     serializer_class = ContactSerializer
 
@@ -273,8 +277,7 @@ class DeletedContactsViewSet(
         contacts = self.queryset.filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
-                "Contact Ids are invalid",
-                status=status.HTTP_400_BAD_REQUEST,
+                "Contact Ids are invalid", status=status.HTTP_400_BAD_REQUEST,
             )
         for contact in contacts:
             contact.deleted = None
