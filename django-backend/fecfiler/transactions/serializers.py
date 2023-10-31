@@ -156,13 +156,13 @@ class TransactionSerializerBase(
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
-        schedule_a = representation.pop("schedule_a") or []
-        schedule_b = representation.pop("schedule_b") or []
-        schedule_c = representation.pop("schedule_c") or []
-        schedule_c1 = representation.pop("schedule_c1") or []
-        schedule_c2 = representation.pop("schedule_c2") or []
-        schedule_d = representation.pop("schedule_d") or []
-        schedule_e = representation.pop("schedule_e") or []
+        schedule_a = representation.pop("schedule_a")
+        schedule_b = representation.pop("schedule_b")
+        schedule_c = representation.pop("schedule_c")
+        schedule_c1 = representation.pop("schedule_c1")
+        schedule_c2 = representation.pop("schedule_c2")
+        schedule_d = representation.pop("schedule_d")
+        schedule_e = representation.pop("schedule_e")
         if (
             not hasattr(representation, "children")
             and depth < 2
@@ -173,7 +173,6 @@ class TransactionSerializerBase(
             ]
 
         if schedule_a:
-            representation["contribution_aggregate"] = representation.get("aggregate")
             for property in schedule_a:
                 if not representation.get(property):
                     representation[property] = schedule_a[property]
@@ -332,3 +331,186 @@ class TransactionSerializerBase(
 
         fields = get_fields()
         read_only_fields = ["parent_transaction"]
+
+
+class TransactionSerializer(
+    LinkedContactSerializerMixin,
+    LinkedMemoTextSerializerMixin,
+    FecSchemaValidatorSerializerMixin,
+    CommitteeOwnedSerializer,
+):
+    schedule_a = ScheduleASerializer(required=False)
+    schedule_b = ScheduleBSerializer(required=False)
+    schedule_c = ScheduleCSerializer(required=False)
+    schedule_c1 = ScheduleC1Serializer(required=False)
+    schedule_c2 = ScheduleC2Serializer(required=False)
+    schedule_d = ScheduleDSerializer(required=False)
+    schedule_e = ScheduleESerializer(required=False)
+
+    back_reference_tran_id_number = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    back_reference_sched_name = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    itemized = BooleanField(read_only=True)
+    date = DateField(read_only=True)
+    amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    calendar_ytd = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    beginning_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    payment_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance_at_close = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )  # debt payments
+    line_label = CharField(read_only=True)
+
+    class Meta:
+        model = Transaction
+
+        def get_fields():
+            return [
+                f.name
+                for f in Transaction._meta.get_fields()
+                if f.name
+                not in [
+                    "deleted",
+                    "transaction",
+                    # "parent_transaction",
+                    "debt",
+                    "debt_associations",
+                    "loan",
+                    "loan_associations",
+                ]
+            ] + [
+                # "parent_transaction_id",
+                "debt_id",
+                "loan_id",
+                "report_id",
+                "contact_1_id",
+                "contact_2_id",
+                "contact_3_id",
+                "memo_text_id",
+                "back_reference_tran_id_number",
+                "back_reference_sched_name",
+                "form_type",
+                "itemized",
+                # "fields_to_validate",
+                "schema_name",
+                "date",
+                "amount",
+                "aggregate",
+                "calendar_ytd",
+                "loan_payment_to_date",
+                "balance",
+                "loan_balance",
+                "beginning_balance",
+                "payment_amount",
+                "balance_at_close",
+                "line_label",
+                # "schedule_a",
+                # "schedule_b",
+                # "schedule_c",
+                # "schedule_c1",
+                # "schedule_c2",
+                # "schedule_d",
+                # "schedule_e",
+            ]
+
+        fields = get_fields()
+        read_only_fields = ["children"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        schedule_a = representation.pop("schedule_a")
+        schedule_b = representation.pop("schedule_b")
+        schedule_c = representation.pop("schedule_c")
+        schedule_c1 = representation.pop("schedule_c1")
+        schedule_c2 = representation.pop("schedule_c2")
+        schedule_d = representation.pop("schedule_d")
+        schedule_e = representation.pop("schedule_e")
+        if instance.children.count() > 0:
+            representation["children"] = [child.id for child in instance.children]
+
+        if schedule_a:
+            representation["contribution_aggregate"] = representation.get("aggregate")
+            for property in schedule_a:
+                if not representation.get(property):
+                    representation[property] = schedule_a[property]
+        if schedule_b:
+            representation["aggregate_amount"] = representation.get("aggregate")
+            for property in schedule_b:
+                if not representation.get(property):
+                    representation[property] = schedule_b[property]
+        if schedule_c:
+            for property in schedule_c:
+                if not representation.get(property):
+                    representation[property] = schedule_c[property]
+        if schedule_c1:
+            for property in schedule_c1:
+                if not representation.get(property):
+                    representation[property] = schedule_c1[property]
+        if schedule_c2:
+            for property in schedule_c2:
+                if not representation.get(property):
+                    representation[property] = schedule_c2[property]
+        if schedule_d:
+            for property in schedule_d:
+                if not representation.get(property):
+                    representation[property] = schedule_d[property]
+        if schedule_e:
+            for property in schedule_e:
+                if not representation.get(property):
+                    representation[property] = schedule_e[property]
+
+        # because form_type is a dynamic field
+        representation["form_type"] = instance.form_type
+
+        # Assign the itemization value of the highest level parent for all transactions.
+        # Currently, there is a recursive child depth limit afterwhich the object values
+        # for the parent object of a child are not longer included by the serializer.
+        # Until we have refactored our tree walking to walk through the parents
+        # instead of the children, we do a manual object query from the database
+        # to get the itemization value since the serializer is no longer
+        # providing the value.
+        if (
+            instance.parent_transaction
+            and not instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Itemization value for {instance.id} pulled"
+                f" from {instance.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction, "itemized"):
+                representation["itemized"] = instance.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(pk=instance.parent_transaction.id)
+                representation["itemized"] = t.itemized
+        if (
+            instance.parent_transaction
+            and instance.parent_transaction.parent_transaction
+        ):
+            logger.info(
+                f"Itemization value for {instance.id} pulled"
+                f" from {instance.parent_transaction.parent_transaction.id}"
+            )
+            if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
+                representation[
+                    "itemized"
+                ] = instance.parent_transaction.parent_transaction.itemized
+            else:
+                t = Transaction.objects.get(
+                    pk=instance.parent_transaction.parent_transaction.id
+                )
+                representation["itemized"] = t.itemized
+
+        # represent parent
+        if instance.parent_transaction:
+            representation[
+                "parent_transaction"
+            ] = TransactionSerializer().to_representation(instance.parent_transaction)
+
+        return representation

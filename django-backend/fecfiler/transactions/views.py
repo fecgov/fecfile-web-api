@@ -12,7 +12,10 @@ from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.reports.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.transactions.serializers import (
+    TransactionSerializerBase,
+    TransactionSerializer,
+)
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
@@ -258,7 +261,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             error_msg = (
                 "Please provide " + ",".join(missing_params) + " in query params"
             )
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                error_msg,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         date = datetime.fromisoformat(date)
 
@@ -300,3 +306,131 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+# clause used to facilitate sorting on name as it's displayed
+DISPLAY_NAME_CLAUSE = (
+    Coalesce(
+        Coalesce(
+            "schedule_a__contributor_organization_name",
+            "schedule_b__payee_organization_name",
+            "schedule_c__lender_organization_name",
+            "schedule_d__creditor_organization_name",
+            "schedule_e__payee_organization_name",
+        ),
+        Concat(
+            Coalesce(
+                "schedule_a__contributor_last_name",
+                "schedule_b__payee_last_name",
+                "schedule_c__lender_last_name",
+                "schedule_d__creditor_last_name",
+                "schedule_e__payee_last_name",
+            ),
+            Value(", "),
+            Coalesce(
+                "schedule_a__contributor_first_name",
+                "schedule_b__payee_first_name",
+                "schedule_c__lender_first_name",
+                "schedule_d__creditor_first_name",
+                "schedule_e__payee_first_name",
+            ),
+            output_field=TextField(),
+        ),
+    ),
+)
+
+
+class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
+    serializer_class = TransactionSerializer
+    pagination_class = TransactionListPagination
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = [
+        "line_label_order_key",
+        "transaction_type_identifier",
+        "memo_code",
+        "name",
+        "date",
+        "amount",
+        "aggregate",
+        "back_reference_tran_id_number",
+    ]
+    ordering = ["-created"]
+
+    # Allow requests to filter transactions output based on schedule type by
+    # passing a query parameter
+    queryset = Transaction.objects.all()
+
+    def get_queryset(self):
+        queryset = (
+            super()
+            .get_queryset()
+            .alias(
+                name=Coalesce(
+                    Coalesce(
+                        "schedule_a__contributor_organization_name",
+                        "schedule_b__payee_organization_name",
+                        "schedule_c__lender_organization_name",
+                        "schedule_d__creditor_organization_name",
+                        "schedule_e__payee_organization_name",
+                    ),
+                    Concat(
+                        Coalesce(
+                            "schedule_a__contributor_last_name",
+                            "schedule_b__payee_last_name",
+                            "schedule_c__lender_last_name",
+                            "schedule_d__creditor_last_name",
+                            "schedule_e__payee_last_name",
+                        ),
+                        Value(", "),
+                        Coalesce(
+                            "schedule_a__contributor_first_name",
+                            "schedule_b__payee_first_name",
+                            "schedule_c__lender_first_name",
+                            "schedule_d__creditor_first_name",
+                            "schedule_e__payee_first_name",
+                        ),
+                        output_field=TextField(),
+                    ),
+                ),
+            )
+        )
+        schedule_filters = self.request.query_params.get("schedules")
+        if schedule_filters is not None:
+            schedules_to_include = schedule_filters.split(",")
+            # All transactions are included by default, here we remove those
+            # that are not identified in the schedules query param
+            if "A" not in schedules_to_include:
+                queryset = queryset.filter(schedule_a__isnull=True)
+            if "B" not in schedules_to_include:
+                queryset = queryset.filter(schedule_b__isnull=True)
+            if "C" not in schedules_to_include:
+                queryset = queryset.filter(schedule_c__isnull=True)
+            if "C1" not in schedules_to_include:
+                queryset = queryset.filter(schedule_c1__isnull=True)
+            if "C2" not in schedules_to_include:
+                queryset = queryset.filter(schedule_c2__isnull=True)
+            if "D" not in schedules_to_include:
+                queryset = queryset.filter(schedule_d__isnull=True)
+            if "E" not in schedules_to_include:
+                queryset = queryset.filter(schedule_e__isnull=True)
+        return queryset
+
+    def create(self, request):
+        response = {"message": "Create function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, pk=None):
+        response = {"message": "Update function is not offered in this path."}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return response

@@ -7,7 +7,7 @@ from .schedule_c1.views import ScheduleC1TransactionViewSet
 from .schedule_c2.views import ScheduleC2TransactionViewSet
 from .schedule_d.views import ScheduleDTransactionViewSet
 from .schedule_e.views import ScheduleETransactionViewSet
-from .views import TransactionViewSet
+from .views import TransactionViewSet, TransactionViewSet2
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -18,6 +18,7 @@ router.register(r"schedule-c1", ScheduleC1TransactionViewSet, basename="schedule
 router.register(r"schedule-c2", ScheduleC2TransactionViewSet, basename="schedule-c2")
 router.register(r"schedule-d", ScheduleDTransactionViewSet, basename="schedule-d")
 router.register(r"schedule-e", ScheduleETransactionViewSet, basename="schedule-e")
+router.register(r"transactions2", TransactionViewSet2, basename="transactions2")
 router.register(r"", TransactionViewSet, basename="transactions")
 
 # The API URLs are now determined automatically by the router.
