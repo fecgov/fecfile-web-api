@@ -38,7 +38,8 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
                     del transaction_data[key]
 
             schedule_d_transaction = super().create(transaction_data)
-            self.create_in_future_reports(schedule_d_transaction)
+            if not schedule_d_transaction.balance_at_close:
+                self.create_in_future_reports(schedule_d_transaction)
             return schedule_d_transaction
 
     def update(self, instance, validated_data: dict):
@@ -62,6 +63,7 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
 
         transaction_data = get_model_data(validated_data, Transaction)
         del transaction_data['id']
+        del transaction_data['incurred_amount']
         transactions_to_update = Transaction.objects.filter(
             transaction_id=transaction.transaction_id,
             report_id__in=models.Subquery(
