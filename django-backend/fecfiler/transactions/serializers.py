@@ -6,6 +6,9 @@ from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import empty
+from rest_framework.relations import PrimaryKeyRelatedField
+from collections import OrderedDict
 from django.db.models import Q
 from rest_framework.serializers import (
     BooleanField,
@@ -24,6 +27,8 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+import json
+from uuid import UUID
 
 
 logger = logging.getLogger(__name__)
@@ -339,6 +344,11 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
+    # parent_transaction = PrimaryKeyRelatedField(
+    #     required=False,
+    #     allow_null=True,
+    #     read_only=True,
+    # )
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
     schedule_c = ScheduleCSerializer(required=False)
@@ -353,6 +363,7 @@ class TransactionSerializer(
     back_reference_sched_name = CharField(
         required=False, allow_null=True, read_only=True
     )
+    form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -384,6 +395,7 @@ class TransactionSerializer(
                     "debt_associations",
                     "loan",
                     "loan_associations",
+                    "_form_type",
                 ]
             ] + [
                 # "parent_transaction_id",
@@ -398,7 +410,7 @@ class TransactionSerializer(
                 "back_reference_sched_name",
                 "form_type",
                 "itemized",
-                # "fields_to_validate",
+                "fields_to_validate",
                 "schema_name",
                 "date",
                 "amount",
@@ -514,3 +526,29 @@ class TransactionSerializer(
             ] = TransactionSerializer().to_representation(instance.parent_transaction)
 
         return representation
+
+    def validate(self, data):
+        initial_data = getattr(self, "initial_data")
+        print(
+            f"ahoy contact{self.fields['contact_2'].run_validation(self.fields['contact_2'].get_value(initial_data))}"
+        )
+        data_to_validate = OrderedDict(
+            [
+                (field_name, (field.run_validation(field.get_value(initial_data))))
+                for field_name, field in {
+                    **self.fields,
+                    **ScheduleASerializer(initial_data).fields,
+                }.items()
+                if (field.get_value(initial_data) is not empty and not field.read_only)
+            ]
+        )
+
+        self.context["fields_to_ignore"] = self.context.get(
+            "fields_to_ignore",
+            [
+                "filer_committee_id_number",
+                "contribution_aggregate",
+            ],
+        )
+        super().validate(data_to_validate)
+        return data

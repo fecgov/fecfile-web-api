@@ -35,6 +35,8 @@ from fecfiler.transactions.schedule_d.serializers import ScheduleDTransactionSer
 from fecfiler.transactions.schedule_e.serializers import ScheduleETransactionSerializer
 
 
+from rest_framework.exceptions import ErrorDetail, ValidationError
+
 logger = logging.getLogger(__name__)
 
 
@@ -113,6 +115,7 @@ def save_transaction3(transaction_data, request):
     serializers = dict(
         A=ScheduleASerializer,
     )
+    children = transaction_data.pop("children", [])
 
     if "id" in transaction_data:
         transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
@@ -130,12 +133,14 @@ def save_transaction3(transaction_data, request):
 
     print(f"ahoy {transaction_serializer.context}")
     transaction_serializer.is_valid(raise_exception=True)
+    print(f"passed!")
     # schedule_serializer.is_valid(raise_exception=True)
 
     transaction_instance = transaction_serializer.save()
 
-    for child_transaction_data in transaction_data["children"]:
+    for child_transaction_data in children:
         child_transaction_data["parent_transaction_id"] = transaction_instance.id
+        del child_transaction_data["parent_transaction"]
         if child_transaction_data.pop("use_parent_contact", None):
             child_transaction_data["contact_1_id"] = transaction_instance.contact_1_id
 
@@ -348,33 +353,31 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
 
 # clause used to facilitate sorting on name as it's displayed
-DISPLAY_NAME_CLAUSE = (
+DISPLAY_NAME_CLAUSE = Coalesce(
     Coalesce(
+        "schedule_a__contributor_organization_name",
+        "schedule_b__payee_organization_name",
+        "schedule_c__lender_organization_name",
+        "schedule_d__creditor_organization_name",
+        "schedule_e__payee_organization_name",
+    ),
+    Concat(
         Coalesce(
-            "schedule_a__contributor_organization_name",
-            "schedule_b__payee_organization_name",
-            "schedule_c__lender_organization_name",
-            "schedule_d__creditor_organization_name",
-            "schedule_e__payee_organization_name",
+            "schedule_a__contributor_last_name",
+            "schedule_b__payee_last_name",
+            "schedule_c__lender_last_name",
+            "schedule_d__creditor_last_name",
+            "schedule_e__payee_last_name",
         ),
-        Concat(
-            Coalesce(
-                "schedule_a__contributor_last_name",
-                "schedule_b__payee_last_name",
-                "schedule_c__lender_last_name",
-                "schedule_d__creditor_last_name",
-                "schedule_e__payee_last_name",
-            ),
-            Value(", "),
-            Coalesce(
-                "schedule_a__contributor_first_name",
-                "schedule_b__payee_first_name",
-                "schedule_c__lender_first_name",
-                "schedule_d__creditor_first_name",
-                "schedule_e__payee_first_name",
-            ),
-            output_field=TextField(),
+        Value(", "),
+        Coalesce(
+            "schedule_a__contributor_first_name",
+            "schedule_b__payee_first_name",
+            "schedule_c__lender_first_name",
+            "schedule_d__creditor_first_name",
+            "schedule_e__payee_first_name",
         ),
+        output_field=TextField(),
     ),
 )
 
@@ -404,33 +407,7 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
             super()
             .get_queryset()
             .alias(
-                name=Coalesce(
-                    Coalesce(
-                        "schedule_a__contributor_organization_name",
-                        "schedule_b__payee_organization_name",
-                        "schedule_c__lender_organization_name",
-                        "schedule_d__creditor_organization_name",
-                        "schedule_e__payee_organization_name",
-                    ),
-                    Concat(
-                        Coalesce(
-                            "schedule_a__contributor_last_name",
-                            "schedule_b__payee_last_name",
-                            "schedule_c__lender_last_name",
-                            "schedule_d__creditor_last_name",
-                            "schedule_e__payee_last_name",
-                        ),
-                        Value(", "),
-                        Coalesce(
-                            "schedule_a__contributor_first_name",
-                            "schedule_b__payee_first_name",
-                            "schedule_c__lender_first_name",
-                            "schedule_d__creditor_first_name",
-                            "schedule_e__payee_first_name",
-                        ),
-                        output_field=TextField(),
-                    ),
-                ),
+                name=DISPLAY_NAME_CLAUSE,
             )
         )
         schedule_filters = self.request.query_params.get("schedules")
@@ -460,11 +437,11 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
 
     def create(self, request, *args, **kwargs):
         saved_transaction = save_transaction3(request.data, request)
-        return Response(TransactionSerializer(saved_transaction).to_representation())
+        return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         saved_transaction = save_transaction3(request.data, request)
-        return Response(TransactionSerializer(saved_transaction).to_representation())
+        return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
