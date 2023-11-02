@@ -81,6 +81,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Retrieve parameters"""
         report_id = serializer.validated_data["report_id"]
         e_filing_password = serializer.validated_data["password"]
+        backdoor_code = serializer.validated_data.get("backdoor_code", None)
 
         """Start tracking submission"""
         upload_submission = UploadSubmission.objects.initiate_submission(report_id)
@@ -89,7 +90,11 @@ class WebServicesViewSet(viewsets.ViewSet):
         task = (
             create_dot_fec.s(report_id, upload_submission_id=upload_submission.id)
             | submit_to_fec.s(
-                upload_submission.id, e_filing_password, FEC_FILING_API, False
+                upload_submission.id,
+                e_filing_password,
+                backdoor_code,
+                FEC_FILING_API,
+                True
             )
         ).apply_async(retry=False)
 

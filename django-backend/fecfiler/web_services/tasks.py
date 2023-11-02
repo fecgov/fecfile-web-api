@@ -59,6 +59,7 @@ def submit_to_fec(
     dot_fec_id,
     submission_record_id,
     e_filing_password,
+    backdoor_code=None,
     api=None,
     force_read_from_disk=False,
 ):
@@ -84,7 +85,11 @@ def submit_to_fec(
     """Submit to FEC"""
     submitter = DotFECSubmitter(api)
     logger.info(f"Uploading {file_name} to FEC")
-    submission_json = submitter.get_submission_json(dot_fec_record, e_filing_password)
+    submission_json = submitter.get_submission_json(
+        dot_fec_record,
+        e_filing_password,
+        backdoor_code
+    )
     submission_response_string = submitter.submit(
         dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
     )
