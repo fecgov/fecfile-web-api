@@ -59,9 +59,9 @@ def submit_to_fec(
     dot_fec_id,
     submission_record_id,
     e_filing_password,
-    backdoor_code=None,
     api=None,
     force_read_from_disk=False,
+    backdoor_code=None,
 ):
     logger.info(f"FEC API: {FEC_FILING_API}")
     logger.info(f"api submitter: {api}")

@@ -92,9 +92,9 @@ class WebServicesViewSet(viewsets.ViewSet):
             | submit_to_fec.s(
                 upload_submission.id,
                 e_filing_password,
-                backdoor_code,
                 FEC_FILING_API,
-                True
+                True,
+                backdoor_code
             )
         ).apply_async(retry=False)
 
