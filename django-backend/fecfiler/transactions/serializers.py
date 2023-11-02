@@ -277,7 +277,8 @@ class TransactionSerializerBase(
             subsequent_transaction.save()
 
     def validate(self, data):
-        self.context["fields_to_ignore"] = self.context.get(
+        self._context = self.context.copy()
+        self._context["fields_to_ignore"] = self._context.get(
             "fields_to_ignore", ["filer_committee_id_number"]
         )
         return super().validate(data)
@@ -546,7 +547,7 @@ class TransactionSerializer(
             ]
         )
 
-        self.context["fields_to_ignore"] = self.context.get(
+        self._context["fields_to_ignore"] = self._context.get(
             "fields_to_ignore",
             [
                 "filer_committee_id_number",

@@ -1,5 +1,5 @@
 import logging
-
+import traceback
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
@@ -11,7 +11,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.reports.views import ReportViewMixin
-from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE
+from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE, Schedule
 from fecfiler.transactions.serializers import (
     TransactionSerializerBase,
     TransactionSerializer,
@@ -149,8 +149,10 @@ def save_transaction3(transaction_data, request):
     schedule_serializer.is_valid(raise_exception=True)
 
     schedule_instance = schedule_serializer.save()
+    # foo = {SCHEDULE_TO_TABLE[schedule]: schedule_instance}
+    print(f"schd {SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]}")
     transaction_instance = transaction_serializer.save(
-        **{SCHEDULE_TO_TABLE[schedule]: schedule_instance}
+        **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
     )
 
     for child_transaction_data in children:
