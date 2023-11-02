@@ -344,11 +344,7 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
-    # parent_transaction = PrimaryKeyRelatedField(
-    #     required=False,
-    #     allow_null=True,
-    #     read_only=True,
-    # )
+    report_id = UUIDField(required=True, allow_null=False)
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
     schedule_c = ScheduleCSerializer(required=False)
@@ -524,14 +520,21 @@ class TransactionSerializer(
             representation[
                 "parent_transaction"
             ] = TransactionSerializer().to_representation(instance.parent_transaction)
+        # represent loan
+        if instance.loan:
+            representation["loan"] = TransactionSerializer().to_representation(
+                instance.loan
+            )
+        # represent debt
+        if instance.debt:
+            representation["debt"] = TransactionSerializer().to_representation(
+                instance.debt
+            )
 
         return representation
 
     def validate(self, data):
         initial_data = getattr(self, "initial_data")
-        print(
-            f"ahoy contact{self.fields['contact_2'].run_validation(self.fields['contact_2'].get_value(initial_data))}"
-        )
         data_to_validate = OrderedDict(
             [
                 (field_name, (field.run_validation(field.get_value(initial_data))))

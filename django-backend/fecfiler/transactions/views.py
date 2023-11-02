@@ -11,18 +11,21 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.reports.views import ReportViewMixin
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE
 from fecfiler.transactions.serializers import (
     TransactionSerializerBase,
     TransactionSerializer,
-    ScheduleASerializer as TSAS,
+    ScheduleASerializer,
+    ScheduleBSerializer,
+    ScheduleCSerializer,
+    ScheduleC1Serializer,
+    ScheduleC2Serializer,
+    ScheduleDSerializer,
+    ScheduleESerializer,
 )
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.contacts.models import Contact
-from fecfiler.transactions.schedule_a.serializers import (
-    ScheduleATransactionSerializer,
-    ScheduleASerializer,
-)
+from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBTransactionSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCTransactionSerializer
 from fecfiler.transactions.schedule_c1.serializers import (
@@ -111,32 +114,44 @@ def save_transaction(request):
             return Response(schedule_serializer(transaction_obj).data)
 
 
+schduele_serializers = dict(
+    A=ScheduleASerializer,
+    B=ScheduleBSerializer,
+    C=ScheduleCSerializer,
+    C1=ScheduleC1Serializer,
+    C2=ScheduleC2Serializer,
+    D=ScheduleDSerializer,
+    E=ScheduleESerializer,
+)
+
+
 def save_transaction3(transaction_data, request):
-    serializers = dict(
-        A=ScheduleASerializer,
-    )
     children = transaction_data.pop("children", [])
+    schedule = transaction_data.get("schedule_id")
 
     if "id" in transaction_data:
         transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
         transaction_serializer = TransactionSerializer(
             transaction_instance, data=transaction_data, context={"request": request}
         )
-        # schedule_serializer = serializers.get(transaction_data.get("schedule_id"))(getattr(transaction_instance, )
+        schedule_serializer = schduele_serializers.get(schedule)(
+            transaction_instance.get_schedule(), data=transaction_data
+        )
     else:
         transaction_serializer = TransactionSerializer(
             data=transaction_data, context={"request": request}
         )
-        # schedule_serializer = serializers.get(transaction_data.get("schedule_id"))(
-        #     data=request.data, context={request: request}
-        # )
+        schedule_serializer = schduele_serializers.get(schedule)(
+            data=transaction_data, context={"request": request}
+        )
 
-    print(f"ahoy {transaction_serializer.context}")
     transaction_serializer.is_valid(raise_exception=True)
-    print(f"passed!")
-    # schedule_serializer.is_valid(raise_exception=True)
+    schedule_serializer.is_valid(raise_exception=True)
 
-    transaction_instance = transaction_serializer.save()
+    schedule_instance = schedule_serializer.save()
+    transaction_instance = transaction_serializer.save(
+        **{SCHEDULE_TO_TABLE[schedule]: schedule_instance}
+    )
 
     for child_transaction_data in children:
         child_transaction_data["parent_transaction_id"] = transaction_instance.id
@@ -436,11 +451,15 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        saved_transaction = save_transaction3(request.data, request)
+        with db_transaction.atomic():
+            saved_transaction = save_transaction3(request.data, request)
+            print(f"creater {saved_transaction.report}")
+            print(f"creater {saved_transaction.report_id}")
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
-        saved_transaction = save_transaction3(request.data, request)
+        with db_transaction.atomic():
+            saved_transaction = save_transaction3(request.data, request)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def partial_update(self, request, pk=None):

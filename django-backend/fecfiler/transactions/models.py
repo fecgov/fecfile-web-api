@@ -123,18 +123,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         return self.transaction_set.all()
 
     def get_schedule_name(self):
-        schedule_map = {
-            "schedule_a": Schedule.A,
-            "schedule_b": Schedule.B,
-            "schedule_c": Schedule.C,
-            "schedule_c1": Schedule.C1,
-            "schedule_c2": Schedule.C2,
-            "schedule_d": Schedule.D,
-            "schedule_e": Schedule.E,
-        }
-        for schedule_key in schedule_map:
+        for schedule_key in TABLE_TO_SCHEDULE:
             if getattr(self, schedule_key, None):
-                return schedule_map[schedule_key]
+                return TABLE_TO_SCHEDULE[schedule_key]
         return None
 
     def get_schedule(self):
@@ -161,3 +152,24 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
+
+
+TABLE_TO_SCHEDULE = {
+    "schedule_a": Schedule.A,
+    "schedule_b": Schedule.B,
+    "schedule_c": Schedule.C,
+    "schedule_c1": Schedule.C1,
+    "schedule_c2": Schedule.C2,
+    "schedule_d": Schedule.D,
+    "schedule_e": Schedule.E,
+}
+
+SCHEDULE_TO_TABLE = {
+    Schedule.A: "schedule_a",
+    Schedule.B: "schedule_b",
+    Schedule.C: "schedule_c",
+    Schedule.C1: "schedule_c1",
+    Schedule.C2: "schedule_c2",
+    Schedule.D: "schedule_d",
+    Schedule.E: "schedule_e",
+}
