@@ -77,6 +77,7 @@ class ScheduleDTransactionSerializerTestCase(TestCase):
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
             "contact_1": self.updated_contact,
             "schema_name": "SchD",
+            "incurred_amount": 4,
         }
 
         self.mock_request = Request(HttpRequest())

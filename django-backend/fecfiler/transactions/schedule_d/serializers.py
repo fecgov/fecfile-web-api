@@ -1,6 +1,8 @@
+from decimal import Decimal
 import logging
 
 from django.db import transaction, models
+from django.db.models import Q
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
@@ -38,7 +40,11 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
                     del transaction_data[key]
 
             schedule_d_transaction = super().create(transaction_data)
-            self.create_in_future_reports(schedule_d_transaction)
+            if Transaction.objects.filter(
+                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
+                id=schedule_d_transaction.id,
+            ).count():
+                self.create_in_future_reports(schedule_d_transaction)
             return schedule_d_transaction
 
     def update(self, instance, validated_data: dict):
@@ -72,6 +78,8 @@ class ScheduleDTransactionSerializer(TransactionSerializerBase):
 
         schedule_d_data = get_model_data(validated_data, ScheduleD)
         del schedule_d_data['id']
+        if "incurred_amount" in schedule_d_data:
+            del schedule_d_data['incurred_amount']
         schedule_ds_to_update = ScheduleD.objects.filter(
             transaction__schedule_d_id__in=models.Subquery(
                 transactions_to_update.values('schedule_d_id')
