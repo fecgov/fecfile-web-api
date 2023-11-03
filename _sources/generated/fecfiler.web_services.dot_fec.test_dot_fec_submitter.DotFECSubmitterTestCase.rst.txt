@@ -112,6 +112,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCas
       ~DotFECSubmitterTestCase.tearDown
       ~DotFECSubmitterTestCase.tearDownClass
       ~DotFECSubmitterTestCase.test_get_submission_json
+      ~DotFECSubmitterTestCase.test_get_submission_json_for_amendment
    
    
 
