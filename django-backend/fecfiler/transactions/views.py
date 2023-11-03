@@ -22,6 +22,7 @@ from fecfiler.transactions.serializers import (
     ScheduleC2Serializer,
     ScheduleDSerializer,
     ScheduleESerializer,
+    SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.contacts.models import Contact
@@ -114,42 +115,38 @@ def save_transaction(request):
             return Response(schedule_serializer(transaction_obj).data)
 
 
-schduele_serializers = dict(
-    A=ScheduleASerializer,
-    B=ScheduleBSerializer,
-    C=ScheduleCSerializer,
-    C1=ScheduleC1Serializer,
-    C2=ScheduleC2Serializer,
-    D=ScheduleDSerializer,
-    E=ScheduleESerializer,
-)
-
-
 def save_transaction3(transaction_data, request):
+    print(f"AHOYYOHA {transaction_data}")
     children = transaction_data.pop("children", [])
     schedule = transaction_data.get("schedule_id")
+    transaction_data["parent_transaction"] = transaction_data.get(
+        "parent_transaction_id", None
+    )
+    print(f"ahoyhoyahoya {transaction_data}")
 
     if "id" in transaction_data:
         transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
         transaction_serializer = TransactionSerializer(
             transaction_instance, data=transaction_data, context={"request": request}
         )
-        schedule_serializer = schduele_serializers.get(schedule)(
+        schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
             transaction_instance.get_schedule(), data=transaction_data
         )
     else:
         transaction_serializer = TransactionSerializer(
             data=transaction_data, context={"request": request}
         )
-        schedule_serializer = schduele_serializers.get(schedule)(
+        schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
             data=transaction_data, context={"request": request}
         )
 
+    print(f"ahoyhoyahoya {transaction_data}")
     transaction_serializer.is_valid(raise_exception=True)
     schedule_serializer.is_valid(raise_exception=True)
 
     schedule_instance = schedule_serializer.save()
     # foo = {SCHEDULE_TO_TABLE[schedule]: schedule_instance}
+    print(f"AHOY validated data{transaction_serializer.validated_data}")
     print(f"schd {SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]}")
     transaction_instance = transaction_serializer.save(
         **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}

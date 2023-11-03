@@ -107,6 +107,17 @@ class ScheduleESerializer(ModelSerializer):
         model = ScheduleE
 
 
+SCHEDULE_SERIALIZERS = dict(
+    A=ScheduleASerializer,
+    B=ScheduleBSerializer,
+    C=ScheduleCSerializer,
+    C1=ScheduleC1Serializer,
+    C2=ScheduleC2Serializer,
+    D=ScheduleDSerializer,
+    E=ScheduleESerializer,
+)
+
+
 class TransactionSerializerBase(
     LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
@@ -345,6 +356,11 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
+    # parent_transaction = PrimaryKeyRelatedField(
+    #     required=False,
+    #     allow_null=True,
+    #     read_only=True,
+    # )
     report_id = UUIDField(required=True, allow_null=False)
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -395,7 +411,7 @@ class TransactionSerializer(
                     "_form_type",
                 ]
             ] + [
-                # "parent_transaction_id",
+                "parent_transaction_id",
                 "debt_id",
                 "loan_id",
                 "report_id",
@@ -450,6 +466,7 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_a[property]
         if schedule_b:
+            print(f"AHOY SCHB {schedule_b}")
             representation["aggregate_amount"] = representation.get("aggregate")
             for property in schedule_b:
                 if not representation.get(property):
@@ -536,12 +553,13 @@ class TransactionSerializer(
 
     def validate(self, data):
         initial_data = getattr(self, "initial_data")
+        schedule_serializer = SCHEDULE_SERIALIZERS[initial_data.get("schedule_id")]
         data_to_validate = OrderedDict(
             [
                 (field_name, (field.run_validation(field.get_value(initial_data))))
                 for field_name, field in {
                     **self.fields,
-                    **ScheduleASerializer(initial_data).fields,
+                    **schedule_serializer(initial_data).fields,
                 }.items()
                 if (field.get_value(initial_data) is not empty and not field.read_only)
             ]
@@ -551,7 +569,10 @@ class TransactionSerializer(
             "fields_to_ignore",
             [
                 "filer_committee_id_number",
+                "back_reference_tran_id_number",
                 "contribution_aggregate",
+                "aggregate_amount",
+                "beginning_balance",
             ],
         )
         super().validate(data_to_validate)
