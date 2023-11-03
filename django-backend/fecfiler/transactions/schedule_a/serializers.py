@@ -87,6 +87,7 @@ class ScheduleATransactionSerializerBase(TransactionSerializerBase):
     reference_to_si_or_sl_system_code_that_identifies_the_account = CharField(
         required=False, allow_null=True
     )
+    reattribution_redesignation_tag = CharField(required=False, allow_null=True)
 
 
 class ScheduleATransactionSerializerTier2(ScheduleATransactionSerializerBase):
