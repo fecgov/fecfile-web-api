@@ -88,6 +88,7 @@ fecfiler.transactions.schedule\_a.models.ScheduleA
       ~ScheduleA.memo_text_description
       ~ScheduleA.objects
       ~ScheduleA.pk
+      ~ScheduleA.reattribution_redesignation_tag
       ~ScheduleA.reference_to_si_or_sl_system_code_that_identifies_the_account
       ~ScheduleA.transaction_set
    

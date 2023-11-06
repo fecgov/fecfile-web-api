@@ -87,6 +87,7 @@ fecfiler.transactions.schedule\_b.models.ScheduleB
       ~ScheduleB.payee_suffix
       ~ScheduleB.payee_zip
       ~ScheduleB.pk
+      ~ScheduleB.reattribution_redesignation_tag
       ~ScheduleB.reference_to_si_or_sl_system_code_that_identifies_the_account
       ~ScheduleB.transaction_set
    
