@@ -21,7 +21,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
-    ExpressionWrapper
+    ExpressionWrapper,
 )
 from decimal import Decimal
 from enum import Enum
@@ -51,7 +51,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
                     "schedule_e__disbursement_date",
-                    "schedule_e__dissemination_date"
+                    "schedule_e__dissemination_date",
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -68,31 +68,31 @@ class TransactionManager(SoftDeleteManager):
 
         primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
         election_clause = (
-            Q(
-                schedule_e__isnull=False
-            ) & Q(
-                schedule_e__election_code=OuterRef(
-                    "schedule_e__election_code"
-                )
-            ) & Q(
+            Q(schedule_e__isnull=False)
+            & Q(schedule_e__election_code=OuterRef("schedule_e__election_code"))
+            & Q(
                 schedule_e__so_candidate_office=OuterRef(
                     "schedule_e__so_candidate_office"
                 )
-            ) & Q(
+            )
+            & Q(
                 Q(
                     schedule_e__so_candidate_state=OuterRef(
                         "schedule_e__so_candidate_state"
                     )
-                ) | (
+                )
+                | (
                     Q(schedule_e__so_candidate_state__isnull=True)
                     & Q(outer_candidate_state__isnull=True)
                 )
-            ) & (
+            )
+            & (
                 Q(
                     schedule_e__so_candidate_district=OuterRef(
                         "schedule_e__so_candidate_district"
                     )
-                ) | (
+                )
+                | (
                     Q(schedule_e__so_candidate_district__isnull=True)
                     & Q(outer_candidate_district__isnull=True)
                 )
@@ -120,14 +120,14 @@ class TransactionManager(SoftDeleteManager):
         calendar_ytd_clause = (
             queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
-                    OuterRef('schedule_e__so_candidate_district'),
-                    output_field=TextField()
+                    OuterRef("schedule_e__so_candidate_district"),
+                    output_field=TextField(),
                 ),
                 outer_candidate_state=ExpressionWrapper(
-                    OuterRef('schedule_e__so_candidate_state'),
-                    output_field=TextField()
-                )
-            ).filter(
+                    OuterRef("schedule_e__so_candidate_state"), output_field=TextField()
+                ),
+            )
+            .filter(
                 election_clause,
                 year_clause,
                 date_clause,
@@ -169,7 +169,9 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
+            .annotate(
+                incurred_prior=Sum("schedule_d__incurred_amount"),
+            )
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (
