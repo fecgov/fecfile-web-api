@@ -43,6 +43,7 @@ class DotFECSubmitter:
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = ""
         if self.fec_soap_client:
+            logger.info(f"FEC Upload Service JSON: {json_payload}")
             response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         else:
             """return an accepted message without reaching out to api"""
