@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transactions', '0030_update_receipt_from_person_to_receipt_from_entity'),
+        ('transactions', '0031_remove_schedulee_calendar_ytd'),
     ]
 
     operations = [
