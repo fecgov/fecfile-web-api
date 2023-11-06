@@ -61,4 +61,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0028_alter_transaction_report
    fecfiler.transactions.migrations.0029_rename_so_candinate_middle_name_schedulee_so_candidate_middle_name
    fecfiler.transactions.migrations.0030_update_receipt_from_person_to_receipt_from_entity
+   fecfiler.transactions.migrations.0031_remove_schedulee_calendar_ytd
 

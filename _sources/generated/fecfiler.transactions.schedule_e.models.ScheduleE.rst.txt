@@ -49,7 +49,6 @@ fecfiler.transactions.schedule\_e.models.ScheduleE
 
    .. autosummary::
    
-      ~ScheduleE.calendar_ytd
       ~ScheduleE.category_code
       ~ScheduleE.completing_first_name
       ~ScheduleE.completing_last_name
