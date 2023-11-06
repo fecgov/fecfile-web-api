@@ -9,6 +9,7 @@ from .managers import ReportManager
 from .form_3x.models import Form3X
 from .form_24.models import Form24
 from .form_99.models import Form99
+from .form_1m.models import Form1M
 import logging
 
 
@@ -68,6 +69,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     form_3x = models.ForeignKey(Form3X, on_delete=models.CASCADE, null=True, blank=True)
     form_24 = models.ForeignKey(Form24, on_delete=models.CASCADE, null=True, blank=True)
     form_99 = models.ForeignKey(Form99, on_delete=models.CASCADE, null=True, blank=True)
+    form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
 

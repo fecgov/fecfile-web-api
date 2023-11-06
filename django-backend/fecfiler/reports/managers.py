@@ -30,3 +30,4 @@ class ReportType(Enum):
     F3X = Value("F3X")
     F24 = Value("F24")
     F99 = Value("F99")
+    F1M = Value("F1M")

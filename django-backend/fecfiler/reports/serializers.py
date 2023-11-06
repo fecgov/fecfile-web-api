@@ -13,6 +13,7 @@ from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
+from fecfiler.reports.form_1m.models import Form1M
 import logging
 
 
@@ -49,6 +50,16 @@ class Form99Serializer(ModelSerializer):
         model = Form99
 
 
+class Form1MSerializer(ModelSerializer):
+    class Meta:
+        fields = [
+            f.name
+            for f in Form1M._meta.get_fields()
+            if f.name not in ["deleted", "report"]
+        ]
+        model = Form1M
+
+
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
 
@@ -68,12 +79,14 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     form_3x = Form3XSerializer(required=False)
     form_24 = Form24Serializer(required=False)
     form_99 = Form99Serializer(required=False)
+    form_1m = Form1MSerializer(required=False)
 
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         form_3x = representation.pop("form_3x") or []
         form_24 = representation.pop("form_24") or []
         form_99 = representation.pop("form_99") or []
+        form_1m = representation.pop("form_1m") or []
 
         if form_3x:
             representation["report_type"] = "F3X"
@@ -90,6 +103,11 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             for property in form_99:
                 if not representation.get(property):
                     representation[property] = form_99[property]
+        if form_1m:
+            representation["report_type"] = "F1M"
+            for property in form_1m:
+                if not representation.get(property):
+                    representation[property] = form_1m[property]
         return representation
 
     def validate(self, data):
