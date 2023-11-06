@@ -64,7 +64,6 @@ class LinkedMemoTextSerializerMixin(ModelSerializer):
             return super().update(instance, validated_data)
 
     def create_or_update_memo(self, validated_data: dict):
-        print("HELLO!")
         memo_data = validated_data.pop("memo_text", None)
         memo_text_id = validated_data.get("memo_text_id", None)
         if memo_data:

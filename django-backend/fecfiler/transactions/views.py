@@ -1,5 +1,4 @@
 import logging
-import traceback
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
@@ -109,13 +108,11 @@ def save_transaction(request):
 
 
 def save_transaction3(transaction_data, request):
-    print(f"AHOYYOHA {transaction_data}")
     children = transaction_data.pop("children", [])
     schedule = transaction_data.get("schedule_id")
     transaction_data["parent_transaction"] = transaction_data.get(
         "parent_transaction_id", None
     )
-    print(f"ahoyhoyahoya {transaction_data}")
 
     if "id" in transaction_data:
         transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
@@ -133,14 +130,10 @@ def save_transaction3(transaction_data, request):
             data=transaction_data, context={"request": request}
         )
 
-    print(f"ahoyhoyahoya {transaction_data}")
     transaction_serializer.is_valid(raise_exception=True)
     schedule_serializer.is_valid(raise_exception=True)
 
     schedule_instance = schedule_serializer.save()
-    # foo = {SCHEDULE_TO_TABLE[schedule]: schedule_instance}
-    print(f"AHOY validated data{transaction_serializer.validated_data}")
-    print(f"schd {SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]}")
     transaction_instance = transaction_serializer.save(
         **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
     )

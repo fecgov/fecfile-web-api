@@ -356,11 +356,6 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
-    # parent_transaction = PrimaryKeyRelatedField(
-    #     required=False,
-    #     allow_null=True,
-    #     read_only=True,
-    # )
     report_id = UUIDField(required=True, allow_null=False)
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -403,7 +398,6 @@ class TransactionSerializer(
                 not in [
                     "deleted",
                     "transaction",
-                    # "parent_transaction",
                     "debt",
                     "debt_associations",
                     "loan",
@@ -436,13 +430,6 @@ class TransactionSerializer(
                 "payment_amount",
                 "balance_at_close",
                 "line_label",
-                # "schedule_a",
-                # "schedule_b",
-                # "schedule_c",
-                # "schedule_c1",
-                # "schedule_c2",
-                # "schedule_d",
-                # "schedule_e",
             ]
 
         fields = get_fields()
@@ -466,7 +453,6 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_a[property]
         if schedule_b:
-            print(f"AHOY SCHB {schedule_b}")
             representation["aggregate_amount"] = representation.get("aggregate")
             for property in schedule_b:
                 if not representation.get(property):
