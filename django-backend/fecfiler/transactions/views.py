@@ -48,7 +48,6 @@ def save_transaction(transaction_data, request):
     transaction_serializer.is_valid(raise_exception=True)
     schedule_serializer.is_valid(raise_exception=True)
 
-    foo = transaction_serializer.initial_data
     schedule_instance = schedule_serializer.save()
     transaction_instance = transaction_serializer.save(
         **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
