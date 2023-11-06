@@ -39,7 +39,7 @@ def save_transaction(request):
     just its specific schedule fields and validation rules
     """
     transaction_data = request.data
-    children_data = request.data["children"]
+    children_data = request.data.get("children", [])
     transaction_data["children"] = []
 
     serializers = dict(
@@ -259,7 +259,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             error_msg = (
                 "Please provide " + ",".join(missing_params) + " in query params"
             )
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                error_msg,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         date = datetime.fromisoformat(date)
 
