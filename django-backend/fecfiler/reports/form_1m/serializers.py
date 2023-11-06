@@ -3,7 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
-from rest_framework.serializers import CharField, DateField, BooleanField
+from rest_framework.serializers import CharField, DateField
 import logging
 
 
@@ -88,9 +88,9 @@ class Form1MSerializer(ReportSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             form_1m_data = get_model_data(validated_data, Form1M)
-            form_1m = Form1M.objects.create(**form_99_data)
+            form_1m = Form1M.objects.create(**form_1m_data)
             report_data = get_model_data(validated_data, Report)
-            report_data["form_1m_id"] = form_99.id
+            report_data["form_1m_id"] = form_1m.id
             report = super().create(report_data)
             return report
 
