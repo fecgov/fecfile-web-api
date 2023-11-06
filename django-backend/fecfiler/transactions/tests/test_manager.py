@@ -43,7 +43,9 @@ class TransactionManagerTestCase(TestCase):
 
     def test_election_aggregation(self):
         transaction = Transaction.objects.get(id="c4ba684a-607f-4f5d-bfb4-0fa1776d4e35")
-        self.assertEqual(transaction.calendar_ytd, Decimal("578.00"))
+        self.assertEqual(
+            transaction.calendar_ytd_per_election_office, Decimal("578.00")
+        )
 
     def test_debt_repayment(self):
         repayment = Transaction.objects.get(id="dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491")

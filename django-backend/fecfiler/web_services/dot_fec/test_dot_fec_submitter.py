@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4 as uuid
 from django.test import TestCase
 from .dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.models import DotFEC
@@ -30,3 +31,15 @@ class DotFECSubmitterTestCase(TestCase):
         self.assertEqual(json_obj["email_1"], self.f3x.confirmation_email_1)
         self.assertEqual(json_obj["email_2"], self.f3x.confirmation_email_2)
         self.assertFalse(json_obj["wait"])
+
+    def test_get_submission_json_for_amendment(self):
+        submitter = DotFECSubmitter(None)
+        self.dot_fec_record.report.report_id = str(uuid())
+        json_str = submitter.get_submission_json(
+            self.dot_fec_record, "test_json_password", "test_backdoor_code"
+        )
+        json_obj = json.loads(json_str)
+        self.assertEqual(
+            json_obj["amendment_id"],
+            self.dot_fec_record.report.report_id + "test_backdoor_code"
+        )

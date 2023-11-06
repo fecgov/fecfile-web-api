@@ -21,6 +21,7 @@ class ReportIdSerializer(serializers.Serializer):
 
 class SubmissionRequestSerializer(ReportIdSerializer):
     password = serializers.CharField(allow_blank=False)
+    backdoor_code = serializers.CharField(required=False, allow_null=True)
 
 
 class UploadSubmissionSerializer(serializers.ModelSerializer):
