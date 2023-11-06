@@ -1,5 +1,8 @@
 from django.db import models
+from fecfiler.shared.utilities import get_model_data
+from fecfiler.memo_text.models import MemoText
 import uuid
+import copy
 
 
 class ScheduleC(models.Model):
@@ -45,7 +48,7 @@ class ScheduleC(models.Model):
     memo_text_description = models.TextField(null=True, blank=True)
 
     def get_date(self):
-        return self.transaction.report.through_date
+        return self.get_transaction().report.coverage_through_date
 
     def get_transaction(self):
         return self.transaction_set.first()

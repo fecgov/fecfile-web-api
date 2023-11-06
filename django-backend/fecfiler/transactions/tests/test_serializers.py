@@ -4,8 +4,7 @@ from rest_framework.request import HttpRequest, Request
 from rest_framework.exceptions import ValidationError
 
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.serializers import TransactionSerializerBase
-from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
+from fecfiler.transactions.serializers import TransactionSerializer
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -24,8 +23,9 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.mock_request.user = user
 
     def test_no_transaction_type_identifier(self):
-        serializer = TransactionSerializerBase(
-            data=self.missing_type_transaction, context={"request": self.mock_request},
+        serializer = TransactionSerializer(
+            data=self.missing_type_transaction,
+            context={"request": self.mock_request},
         )
         with self.assertRaises(ValidationError):
             serializer.get_schema_name({}),
@@ -126,7 +126,6 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.assertEqual("new city", third_transaction.schedule_a.contributor_city)
 
     def test_itemization_inheritance(self):
-
         # Get tier 1 and test children and grandchildren
         tier1 = Transaction.objects.get(id="aaaaabbb-3274-47d8-9388-7294a3fd4321")
         tier2 = Transaction.objects.get(id="cccccbbb-3274-47d8-9388-7294a3fd4321")

@@ -38,7 +38,7 @@ class ScheduleE(models.Model):
     so_candidate_id_number = models.TextField(null=True, blank=True)
     so_candidate_last_name = models.TextField(null=True, blank=True)
     so_candidate_first_name = models.TextField(null=True, blank=True)
-    so_candinate_middle_name = models.TextField(null=True, blank=True)
+    so_candidate_middle_name = models.TextField(null=True, blank=True)
     so_candidate_prefix = models.TextField(null=True, blank=True)
     so_candidate_suffix = models.TextField(null=True, blank=True)
     so_candidate_office = models.TextField(null=True, blank=True)
@@ -53,7 +53,7 @@ class ScheduleE(models.Model):
     memo_text_description = models.TextField(null=True, blank=True)
 
     def get_date(self):
-        return self.transaction.report.through_date
+        return self.get_transaction().report.coverage_though_date
 
     def get_transaction(self):
         return self.transaction_set.first()

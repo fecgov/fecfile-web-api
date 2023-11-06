@@ -118,6 +118,10 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
 ):
+    """id must be explicitly configured in order to have it in validated_data
+    https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
+
+    id = UUIDField(required=False)
     report_id = UUIDField(required=True, allow_null=False)
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)

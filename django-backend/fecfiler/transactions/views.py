@@ -16,52 +16,11 @@ from fecfiler.transactions.serializers import (
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.models import Contact
+from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
+from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
+from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
 
 logger = logging.getLogger(__name__)
-
-
-def save_transaction(transaction_data, request):
-    children = transaction_data.pop("children", [])
-    schedule = transaction_data.get("schedule_id")
-    transaction_data["parent_transaction"] = transaction_data.get(
-        "parent_transaction_id", None
-    )
-    transaction_data["debt"] = transaction_data.get("debt_id", None)
-    transaction_data["loan"] = transaction_data.get("loan_id", None)
-
-    if "id" in transaction_data:
-        transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
-        transaction_serializer = TransactionSerializer(
-            transaction_instance, data=transaction_data, context={"request": request}
-        )
-        schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
-            transaction_instance.get_schedule(), data=transaction_data
-        )
-    else:
-        transaction_serializer = TransactionSerializer(
-            data=transaction_data, context={"request": request}
-        )
-        schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
-            data=transaction_data, context={"request": request}
-        )
-
-    transaction_serializer.is_valid(raise_exception=True)
-    schedule_serializer.is_valid(raise_exception=True)
-
-    schedule_instance = schedule_serializer.save()
-    transaction_instance = transaction_serializer.save(
-        **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
-    )
-
-    for child_transaction_data in children:
-        child_transaction_data["parent_transaction_id"] = transaction_instance.id
-        del child_transaction_data["parent_transaction"]
-        if child_transaction_data.pop("use_parent_contact", None):
-            child_transaction_data["contact_1_id"] = transaction_instance.contact_1_id
-
-        save_transaction(child_transaction_data, request)
-
-    return transaction_instance
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
@@ -111,6 +70,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "date",
         "amount",
         "aggregate",
+        "balance",
         "back_reference_tran_id_number",
     ]
     ordering = ["-created"]
@@ -154,14 +114,12 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
-            saved_transaction = save_transaction(request.data, request)
-            print(f"creater {saved_transaction.report}")
-            print(f"creater {saved_transaction.report_id}")
+            saved_transaction = self.save_transaction(request.data, request)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
-            saved_transaction = save_transaction(request.data, request)
+            saved_transaction = self.save_transaction(request.data, request)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def partial_update(self, request, pk=None):
@@ -291,3 +249,94 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def propagate_contacts(self, transaction):
+        contact_1 = Contact.objects.get(id=transaction.contact_1_id)
+        self.propagate_contact(transaction, contact_1)
+        contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
+        if contact_2:
+            self.propagate_contact(transaction, contact_2)
+        contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
+        if contact_3:
+            self.propagate_contact(transaction, contact_3)
+
+    def propagate_contact(self, transaction, contact):
+        subsequent_transactions = Transaction.objects.filter(
+            ~Q(id=transaction.id),
+            Q(Q(report__upload_submission__isnull=True)),
+            Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
+            date__gte=transaction.get_date(),
+        )
+        for subsequent_transaction in subsequent_transactions:
+            subsequent_transaction.get_schedule().update_with_contact(contact)
+            subsequent_transaction.save()
+
+    def save_transaction(self, transaction_data, request):
+        children = transaction_data.pop("children", [])
+        schedule = transaction_data.get("schedule_id")
+        transaction_data["parent_transaction"] = transaction_data.get(
+            "parent_transaction_id", None
+        )
+        transaction_data["debt"] = transaction_data.get("debt_id", None)
+        transaction_data["loan"] = transaction_data.get("loan_id", None)
+        if transaction_data.get("form_type"):
+            transaction_data["_form_type"] = transaction_data["form_type"]
+
+        is_existing = "id" in transaction_data
+        if is_existing:
+            transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
+            transaction_serializer = TransactionSerializer(
+                transaction_instance,
+                data=transaction_data,
+                context={"request": request},
+            )
+            schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
+                transaction_instance.get_schedule(), data=transaction_data
+            )
+        else:
+            transaction_serializer = TransactionSerializer(
+                data=transaction_data, context={"request": request}
+            )
+            schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
+                data=transaction_data, context={"request": request}
+            )
+
+        transaction_serializer.is_valid(raise_exception=True)
+        schedule_serializer.is_valid(raise_exception=True)
+
+        schedule_instance = schedule_serializer.save()
+        transaction_instance = transaction_serializer.save(
+            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
+        )
+        self.propagate_contacts(transaction_instance)
+
+        get_save_hook(transaction_instance)(
+            transaction_instance,
+            is_existing,
+        )
+
+        for child_transaction_data in children:
+            child_transaction_data["parent_transaction_id"] = transaction_instance.id
+            child_transaction_data.pop("parent_transaction", None)
+            if child_transaction_data.pop("use_parent_contact", None):
+                child_transaction_data[
+                    "contact_1_id"
+                ] = transaction_instance.contact_1_id
+
+            self.save_transaction(child_transaction_data, request)
+
+        return transaction_instance
+
+
+def noop(transaction, is_existing):
+    pass
+
+
+def get_save_hook(transaction: Transaction):
+    schedule_name = transaction.get_schedule_name()
+    hooks = {
+        Schedule.C: schedule_c_save_hook,
+        Schedule.C2: schedule_c2_save_hook,
+        Schedule.D: schedule_d_save_hook,
+    }
+    return hooks.get(schedule_name, noop)
