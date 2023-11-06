@@ -21,6 +21,7 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_submitter.DotFECSubmitter
    
       ~DotFECSubmitter.__init__
       ~DotFECSubmitter.get_submission_json
+      ~DotFECSubmitter.log_submission_json
       ~DotFECSubmitter.poll_status
       ~DotFECSubmitter.submit
    
