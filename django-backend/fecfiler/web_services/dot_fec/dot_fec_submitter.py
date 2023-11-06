@@ -1,3 +1,4 @@
+import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
@@ -38,12 +39,20 @@ class DotFECSubmitter:
             json_obj["amendment_id"] = dot_fec_record.report.report_id
             if backdoor_code:
                 json_obj["amendment_id"] += backdoor_code
+        self.log_submission_json(json_obj, dot_fec_record, backdoor_code)
         return json.dumps(json_obj)
+
+    def log_submission_json(self, json_obj, dot_fec_record, backdoor_code):
+        copy_json_obj = copy.deepcopy(json_obj)
+        copy_json_obj.pop("password", None)
+        copy_json_obj.pop("api_key", None)
+        if "amendment_id" in copy_json_obj and backdoor_code:
+            copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
+        logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = ""
         if self.fec_soap_client:
-            logger.info(f"FEC Upload Service JSON: {json_payload}")
             response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         else:
             """return an accepted message without reaching out to api"""
