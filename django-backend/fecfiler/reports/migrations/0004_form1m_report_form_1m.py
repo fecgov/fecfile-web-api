@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Form1M',
             fields=[
                 (
-                    'id', 
+                    'id',
                     models.UUIDField(
                         default=uuid.uuid4,
                         editable=False,
@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                 ('V_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('V_candidate_suffix', models.TextField(blank=True, null=True)),
                 (
-                    'V_candidate_office', 
+                    'V_candidate_office',
                     models.CharField(blank=True, max_length=1, null=True)
                 ),
                 ('V_candidate_state', models.TextField(blank=True, null=True)),
