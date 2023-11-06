@@ -15,13 +15,6 @@ from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE, Schedul
 from fecfiler.transactions.serializers import (
     TransactionSerializerBase,
     TransactionSerializer,
-    ScheduleASerializer,
-    ScheduleBSerializer,
-    ScheduleCSerializer,
-    ScheduleC1Serializer,
-    ScheduleC2Serializer,
-    ScheduleDSerializer,
-    ScheduleESerializer,
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.serializers import ContactSerializer
@@ -472,3 +465,119 @@ class TransactionViewSet2(CommitteeOwnedViewSet, ReportViewMixin):
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         return response
+
+    @action(detail=False, methods=["get"], url_path=r"previous/entity")
+    def previous_entity(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation"""
+        transaction_id = request.query_params.get("transaction_id", None)
+        contact_1_id = request.query_params.get("contact_1_id", None)
+        date = request.query_params.get("date", None)
+        aggregation_group = request.query_params.get("aggregation_group", None)
+
+        missing_params = []
+        if not contact_1_id:
+            missing_params.append("contact_1_id")
+        if not date:
+            missing_params.append("date")
+        if not aggregation_group:
+            missing_params.append("aggregation_group")
+
+        if len(missing_params) > 0:
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
+            )
+            return Response(
+                error_msg,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return self.get_previous(
+            transaction_id,
+            date,
+            aggregation_group,
+            contact_1_id,
+        )
+
+    @action(detail=False, methods=["get"], url_path=r"previous/election")
+    def previous_transaction_by_election(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation and the same election"""
+        transaction_id = request.query_params.get("transaction_id", None)
+        date = request.query_params.get("date", None)
+        aggregation_group = request.query_params.get("aggregation_group", None)
+        election_code = request.query_params.get("election_code", None)
+        candidate_office = request.query_params.get("candidate_office", None)
+        candidate_state = request.query_params.get("candidate_state", None)
+        candidate_district = request.query_params.get("candidate_district", None)
+
+        missing_params = []
+        if not date:
+            missing_params.append("date")
+        if not aggregation_group:
+            missing_params.append("aggregation_group")
+        if not election_code:
+            missing_params.append("election_code")
+        if not candidate_office:
+            missing_params.append("candidate_office")
+        if (
+            candidate_office != Contact.CandidateOffice.PRESIDENTIAL
+            and not candidate_state
+        ):
+            missing_params.append("candidate_state")
+        if candidate_office == Contact.CandidateOffice.HOUSE and not candidate_district:
+            missing_params.append("candidate_district")
+
+        if len(missing_params) > 0:
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
+            )
+            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+        return self.get_previous(
+            transaction_id,
+            date,
+            aggregation_group,
+            None,
+            election_code,
+            candidate_office,
+            candidate_state,
+            candidate_district,
+        )
+
+    def get_previous(
+        self,
+        transaction_id,
+        date,
+        aggregation_group,
+        contact_id=None,
+        election_code=None,
+        office=None,
+        state=None,
+        district=None,
+    ):
+        date = datetime.fromisoformat(date)
+        query = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
+        )
+        if contact_id:
+            query.filter(Q(contact_1_id=contact_id))
+        else:
+            query.filter(
+                Q(schedule_e__election_code=election_code),
+                Q(schedule_e__so_candidate_office=office),
+                Q(schedule_e__so_candidate_state=state),
+                Q(schedule_e__so_candidate_district=district),
+            )
+        query.order_by("-date", "-created")
+        previous_transaction = query.first()
+
+        if previous_transaction:
+            serializer = self.get_serializer(previous_transaction)
+            return Response(data=serializer.data)
+
+        response = {"message": "No previous transaction found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
