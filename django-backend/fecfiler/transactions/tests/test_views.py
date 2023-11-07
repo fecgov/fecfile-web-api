@@ -29,6 +29,6 @@ class TransactionViewsTestCase(TestCase):
         request.user = self.user
         request.data = payload
         request.query_params = {}
-        response = TransactionViewSet().save_transaction(request.data, request)
-        self.assertEqual("John", response.data["contributor_first_name"])
-        self.assertEqual("Smith", response.data["contributor_last_name"])
+        transaction = TransactionViewSet().save_transaction(request.data, request)
+        self.assertEqual("John", transaction.get("contributor_first_name"))
+        self.assertEqual("Smith", transaction.get("contributor_last_name"))
