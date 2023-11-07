@@ -1,8 +1,5 @@
 from django.db import models
-from fecfiler.shared.utilities import get_model_data
-from fecfiler.memo_text.models import MemoText
 import uuid
-import copy
 
 
 class ScheduleC(models.Model):

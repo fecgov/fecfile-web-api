@@ -1,8 +1,6 @@
 from django.db import models
-import uuid
 from decimal import Decimal
 from fecfiler.transactions.schedule_d.models import ScheduleD
-from fecfiler.shared.utilities import get_model_data
 import copy
 
 from django.db.models import Q

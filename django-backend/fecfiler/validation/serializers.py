@@ -91,7 +91,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
 
     def ignore_fields(self, errors):
         """Returns copy of errors without fields to ignore"""
-        fields_to_ignore = self.context.get(f"fields_to_ignore", None)
+        fields_to_ignore = self.context.get("fields_to_ignore", None)
         if fields_to_ignore:
             return list(filter(lambda f: f.path not in fields_to_ignore, errors))
         return errors
