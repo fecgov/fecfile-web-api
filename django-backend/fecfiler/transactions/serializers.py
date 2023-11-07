@@ -142,7 +142,9 @@ class TransactionSerializer(
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    calendar_ytd = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    calendar_ytd_per_election_office = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -186,7 +188,7 @@ class TransactionSerializer(
                 "date",
                 "amount",
                 "aggregate",
-                "calendar_ytd",
+                "calendar_ytd_per_election_office",
                 "loan_payment_to_date",
                 "balance",
                 "loan_balance",

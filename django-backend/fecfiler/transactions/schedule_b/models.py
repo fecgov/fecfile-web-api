@@ -57,6 +57,8 @@ class ScheduleB(models.Model):
         null=True, blank=True
     )
 
+    reattribution_redesignation_tag = models.TextField(null=True, blank=True)
+
     def get_date(self):
         return self.expenditure_date
 

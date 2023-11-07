@@ -117,7 +117,7 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
-        calendar_ytd_clause = (
+        calendar_ytd_per_election_office_clause = (
             queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
                     OuterRef("schedule_e__so_candidate_district"),
@@ -134,8 +134,8 @@ class TransactionManager(SoftDeleteManager):
                 group_clause,
             )
             .values("committee_account_id")
-            .annotate(calendar_ytd=Sum("effective_amount"))
-            .values("calendar_ytd")
+            .annotate(calendar_ytd_per_election_office=Sum("effective_amount"))
+            .values("calendar_ytd_per_election_office")
         )
 
         loan_payment_to_date_clause = (
@@ -188,7 +188,9 @@ class TransactionManager(SoftDeleteManager):
         return (
             queryset.annotate(
                 aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
-                calendar_ytd=Coalesce(Subquery(calendar_ytd_clause), Value(Decimal(0))),
+                calendar_ytd_per_election_office=Coalesce(
+                    Subquery(calendar_ytd_per_election_office_clause), Value(Decimal(0))
+                ),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,

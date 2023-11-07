@@ -28,9 +28,6 @@ class ScheduleE(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
     disbursement_date = models.DateField(null=True, blank=True)
-    calendar_ytd = models.DecimalField(
-        null=True, blank=True, max_digits=11, decimal_places=2
-    )
     expenditure_purpose_descrip = models.TextField(null=True, blank=True)
     category_code = models.TextField(null=True, blank=True)
     payee_cmtte_fec_id_number = models.TextField(null=True, blank=True)
