@@ -30,5 +30,5 @@ class TransactionViewsTestCase(TestCase):
         request.data = payload
         request.query_params = {}
         transaction = TransactionViewSet().save_transaction(request.data, request)
-        self.assertEqual("John", transaction.get("contributor_first_name"))
-        self.assertEqual("Smith", transaction.get("contributor_last_name"))
+        self.assertEqual("John", transaction.schedule_a.contributor_first_name)
+        self.assertEqual("Smith", transaction.schedule_a.contributor_last_name)
