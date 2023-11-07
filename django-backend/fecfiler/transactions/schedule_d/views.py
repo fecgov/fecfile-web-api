@@ -14,7 +14,7 @@ def save_hook(transaction: Transaction, is_existing):
     if not is_existing:
         if Transaction.objects.filter(
             ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
-            id=transaction.schedule_d_id,
+            id=transaction.id,
         ).count():
             create_in_future_reports(transaction)
     else:
@@ -39,10 +39,9 @@ def update_in_future_reports(transaction):
     )
     transactions_to_update.update(**transaction_data)
 
-    transaction_data = copy.deepcopy(transaction)
-    del transaction_data.id
-    hasattr(schedule_d_data, incurred_amount):
-        del schedule_d_data.incurred_amount
+    schedule_d_data = copy.deepcopy(transaction)
+    del schedule_d_data.id
+    schedule_d_data.incurred_amount = 0
     schedule_ds_to_update = ScheduleD.objects.filter(
         transaction__schedule_d_id__in=models.Subquery(
             transactions_to_update.values("schedule_d_id")
