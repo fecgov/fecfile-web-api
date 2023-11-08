@@ -33,6 +33,7 @@ def calculate_summary(report_id):
     a = summary["a"]
     b = summary["b"]
 
+    # noqa: E501 //disable max line length
     # line 6a
     report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", 0)
     report.form_3x.L6a_year_for_above_ytd = b.get("line_6a", 0)
