@@ -33,11 +33,6 @@ def calculate_summary(report_id):
     a = summary["a"]
     b = summary["b"]
 
-    for key in a.keys():
-        print("A", key, "-", a.get(key, 0))
-    for key in b.keys():
-        print("B", key, "-", b.get(key, 0))
-
     # line 6a
     report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", 0)
     report.form_3x.L6a_year_for_above_ytd = b.get("line_6a", 0)
