@@ -15,14 +15,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Form1M',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
+                (
+                    'id',
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True
+                    )
+                ),
                 ('street_1', models.TextField(blank=True, null=True)),
                 ('street_2', models.TextField(blank=True, null=True)),
                 ('city', models.TextField(blank=True, null=True)),
                 ('state', models.TextField(blank=True, null=True)),
                 ('zip', models.TextField(blank=True, null=True)),
                 ('committee_type', models.CharField(blank=True, max_length=1, null=True)),
-                ('affiliated_date_form_f1_filed', models.DateField(blank=True, null=True)),
+                (
+                    'affiliated_date_form_f1_filed',
+                    models.DateField(blank=True, null=True)
+                ),
                 ('affiliated_committee_fec_id', models.TextField(blank=True, null=True)),
                 ('affiliated_committee_name', models.TextField(blank=True, null=True)),
                 ('I_candidate_id_number', models.TextField(blank=True, null=True)),
@@ -31,7 +43,10 @@ class Migration(migrations.Migration):
                 ('I_candidate_middle_name', models.TextField(blank=True, null=True)),
                 ('I_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('I_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('I_candidate_office', models.CharField(blank=True, max_length=1, null=True)),
+                (
+                    'I_candidate_office',
+                    models.CharField(blank=True, max_length=1, null=True)
+                ),
                 ('I_candidate_state', models.TextField(blank=True, null=True)),
                 ('I_candidate_district', models.TextField(blank=True, null=True)),
                 ('I_date_of_contribution', models.DateField(blank=True, null=True)),
@@ -41,7 +56,10 @@ class Migration(migrations.Migration):
                 ('II_candidate_middle_name', models.TextField(blank=True, null=True)),
                 ('II_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('II_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('II_candidate_office', models.CharField(blank=True, max_length=1, null=True)),
+                (
+                    'II_candidate_office',
+                    models.CharField(blank=True, max_length=1, null=True)
+                ),
                 ('II_candidate_state', models.TextField(blank=True, null=True)),
                 ('II_candidate_district', models.TextField(blank=True, null=True)),
                 ('II_date_of_contribution', models.DateField(blank=True, null=True)),
@@ -51,7 +69,10 @@ class Migration(migrations.Migration):
                 ('III_candidate_middle_name', models.TextField(blank=True, null=True)),
                 ('III_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('III_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('III_candidate_office', models.CharField(blank=True, max_length=1, null=True)),
+                (
+                    'III_candidate_office',
+                    models.CharField(blank=True, max_length=1, null=True)
+                ),
                 ('III_candidate_state', models.TextField(blank=True, null=True)),
                 ('III_candidate_district', models.TextField(blank=True, null=True)),
                 ('III_date_of_contribution', models.DateField(blank=True, null=True)),
@@ -61,7 +82,10 @@ class Migration(migrations.Migration):
                 ('IV_candidate_middle_name', models.TextField(blank=True, null=True)),
                 ('IV_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('IV_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('IV_candidate_office', models.CharField(blank=True, max_length=1, null=True)),
+                (
+                    'IV_candidate_office',
+                    models.CharField(blank=True, max_length=1, null=True)
+                ),
                 ('IV_candidate_state', models.TextField(blank=True, null=True)),
                 ('IV_candidate_district', models.TextField(blank=True, null=True)),
                 ('IV_date_of_contribution', models.DateField(blank=True, null=True)),
@@ -71,7 +95,10 @@ class Migration(migrations.Migration):
                 ('V_candidate_middle_name', models.TextField(blank=True, null=True)),
                 ('V_candidate_prefix', models.TextField(blank=True, null=True)),
                 ('V_candidate_suffix', models.TextField(blank=True, null=True)),
-                ('V_candidate_office', models.CharField(blank=True, max_length=1, null=True)),
+                (
+                    'V_candidate_office',
+                    models.CharField(blank=True, max_length=1, null=True)
+                ),
                 ('V_candidate_state', models.TextField(blank=True, null=True)),
                 ('V_candidate_district', models.TextField(blank=True, null=True)),
                 ('V_date_of_contribution', models.DateField(blank=True, null=True)),
@@ -80,6 +107,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='report',
             name='form_1m',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.form1m'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE, to='reports.form1m'
+            ),
         ),
     ]

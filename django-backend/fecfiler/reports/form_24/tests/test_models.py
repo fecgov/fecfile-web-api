@@ -1,7 +1,6 @@
 from django.test import TestCase
 from ..models import Form24
 import datetime
-from decimal import Decimal
 
 
 class F24TestCase(TestCase):
@@ -9,13 +8,13 @@ class F24TestCase(TestCase):
 
     def setUp(self):
         self.valid_form_24 = Form24(
-            street_1 = "22 Test Street",
-            street_2 = "Unit B",
-            city = "Testopolis",
-            state = "AL",
-            zip = "12345",
-            report_type_24_48 = "24",
-            original_amendment_date = "2023-11-01",
+            street_1="22 Test Street",
+            street_2="Unit B",
+            city="Testopolis",
+            state="AL",
+            zip="12345",
+            report_type_24_48="24",
+            original_amendment_date="2023-11-01",
         )
 
     def test_save_and_delete(self):

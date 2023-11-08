@@ -2,7 +2,6 @@ from django.test import TestCase, RequestFactory
 
 from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
-from ..models import Form3X
 from fecfiler.authentication.models import Account
 
 from rest_framework.test import force_authenticate

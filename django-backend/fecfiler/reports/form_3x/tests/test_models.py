@@ -1,7 +1,5 @@
 from django.test import TestCase
 from ..models import Form3X
-import datetime
-from decimal import Decimal
 
 
 class F3XTestCase(TestCase):
@@ -9,17 +7,17 @@ class F3XTestCase(TestCase):
 
     def setUp(self):
         self.valid_f3x_summary = Form3X(
-            change_of_address = False,
-            street_1 = "22 Testing Ln",
-            street_2 = "Unit B",
-            city = "Testville",
-            state = "AK",
-            zip = "54321",
-            election_code = "P2020",
-            date_of_election = "2020-12-31",
-            state_of_election = "AK",
-            qualified_committee = True,
-            cash_on_hand_date = "2020-01-01",
+            change_of_address=False,
+            street_1="22 Testing Ln",
+            street_2="Unit B",
+            city="Testville",
+            state="AK",
+            zip="54321",
+            election_code="P2020",
+            date_of_election="2020-12-31",
+            state_of_election="AK",
+            qualified_committee=True,
+            cash_on_hand_date="2020-01-01",
         )
 
     def test_get_f3x_summary(self):

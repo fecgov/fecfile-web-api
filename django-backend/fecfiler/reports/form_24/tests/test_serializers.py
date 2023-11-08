@@ -46,7 +46,6 @@ class F24SerializerTestCase(TestCase):
             data=self.valid_f24_report,
             context={
                 "request": self.mock_request,
-                "fields_to_ignore": ["committee_name", "filer_committee_id_number", "committee_account"],
             },
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
@@ -54,7 +53,6 @@ class F24SerializerTestCase(TestCase):
             data=self.invalid_f24_report,
             context={
                 "request": self.mock_request,
-                "fields_to_ignore": ["committee_name", "committee_account"]
             },
         )
         self.assertFalse(invalid_serializer.is_valid())

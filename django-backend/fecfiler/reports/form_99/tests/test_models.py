@@ -1,7 +1,5 @@
 from django.test import TestCase
 from ..models import Form99
-import datetime
-from decimal import Decimal
 
 
 class F99TestCase(TestCase):
@@ -9,12 +7,12 @@ class F99TestCase(TestCase):
 
     def setUp(self):
         self.valid_form_99 = Form99(
-            street_1 = "22 Test Street",
-            street_2 = "Unit B",
-            city = "Testopolis",
-            state = "AL",
-            zip = "12345",
-            text_code = "MSM",
+            street_1="22 Test Street",
+            street_2="Unit B",
+            city="Testopolis",
+            state="AL",
+            zip="12345",
+            text_code="MSM",
         )
 
     def test_save_and_delete(self):
