@@ -1,0 +1,185 @@
+{
+    "street_1": {
+        "path": "form_1m.street_1"
+    },
+    "street_2": {
+        "path": "form_1m.street_2"
+    },
+    "city": {
+        "path": "form_1m.city"
+    },
+    "state": {
+        "path": "form_1m.state"
+    },
+    "zip": {
+        "path": "form_1m.zip"
+    },
+    "committee_type": {
+        "path": "form_1m.committee_type"
+    },
+
+    "affiliated_date_form_f1_filed": {
+        "path": "form_1m.affiliated_date_form_f1_filed"
+    },
+    "affiliated_committee_fec_id": {
+        "path": "form_1m.affiliated_committee_fec_id"
+    },
+    "affiliated_committee_name": {
+        "path": "form_1m.affiliated_committee_name"
+    },
+
+    "I_candidate_id_number": {
+        "path": "form_1m.I_candidate_id_number"
+    },
+    "I_candidate_last_name": {
+        "path": "form_1m.I_candidate_last_name"
+    },
+    "I_candidate_first_name": {
+        "path": "form_1m.I_candidate_first_name"
+    },
+    "I_candidate_middle_name": {
+        "path": "form_1m.I_candidate_middle_name"
+    },
+    "I_candidate_prefix": {
+        "path": "form_1m.I_candidate_prefix"
+    },
+    "I_candidate_suffix": {
+        "path": "form_1m.I_candidate_suffix"
+    },
+    "I_candidate_office": {
+        "path": "form_1m.I_candidate_office"
+    },
+    "I_candidate_state": {
+        "path": "form_1m.I_candidate_state"
+    },
+    "I_candidate_district": {
+        "path": "form_1m.I_candidate_district"
+    },
+    "I_date_of_contribution": {
+        "path": "form_1m.I_date_of_contribution"
+    },
+
+    "II_candidate_id_number": {
+        "path": "form_1m.II_candidate_id_number"
+    },
+    "II_candidate_last_name": {
+        "path": "form_1m.II_candidate_last_name"
+    },
+    "II_candidate_first_name": {
+        "path": "form_1m.II_candidate_first_name"
+    },
+    "II_candidate_middle_name": {
+        "path": "form_1m.II_candidate_middle_name"
+    },
+    "II_candidate_prefix": {
+        "path": "form_1m.II_candidate_prefix"
+    },
+    "II_candidate_suffix": {
+        "path": "form_1m.II_candidate_suffix"
+    },
+    "II_candidate_office": {
+        "path": "form_1m.II_candidate_office"
+    },
+    "II_candidate_state": {
+        "path": "form_1m.II_candidate_state"
+    },
+    "II_candidate_district": {
+        "path": "form_1m.II_candidate_district"
+    },
+    "II_date_of_contribution": {
+        "path": "form_1m.II_date_of_contribution"
+    },
+
+    "III_candidate_id_number": {
+        "path": "form_1m.III_candidate_id_number"
+    },
+    "III_candidate_last_name": {
+        "path": "form_1m.III_candidate_last_name"
+    },
+    "III_candidate_first_name": {
+        "path": "form_1m.III_candidate_first_name"
+    },
+    "III_candidate_middle_name": {
+        "path": "form_1m.III_candidate_middle_name"
+    },
+    "III_candidate_prefix": {
+        "path": "form_1m.III_candidate_prefix"
+    },
+    "III_candidate_suffix": {
+        "path": "form_1m.III_candidate_suffix"
+    },
+    "III_candidate_office": {
+        "path": "form_1m.III_candidate_office"
+    },
+    "III_candidate_state": {
+        "path": "form_1m.III_candidate_state"
+    },
+    "III_candidate_district": {
+        "path": "form_1m.III_candidate_district"
+    },
+    "III_date_of_contribution": {
+        "path": "form_1m.III_date_of_contribution"
+    },
+
+    "IV_candidate_id_number": {
+        "path": "form_1m.IV_candidate_id_number"
+    },
+    "IV_candidate_last_name": {
+        "path": "form_1m.IV_candidate_last_name"
+    },
+    "IV_candidate_first_name": {
+        "path": "form_1m.IV_candidate_first_name"
+    },
+    "IV_candidate_middle_name": {
+        "path": "form_1m.IV_candidate_middle_name"
+    },
+    "IV_candidate_prefix": {
+        "path": "form_1m.IV_candidate_prefix"
+    },
+    "IV_candidate_suffix": {
+        "path": "form_1m.IV_candidate_suffix"
+    },
+    "IV_candidate_office": {
+        "path": "form_1m.IV_candidate_office"
+    },
+    "IV_candidate_state": {
+        "path": "form_1m.IV_candidate_state"
+    },
+    "IV_candidate_district": {
+        "path": "form_1m.IV_candidate_district"
+    },
+    "IV_date_of_contribution": {
+        "path": "form_1m.IV_date_of_contribution"
+    },
+
+    "V_candidate_id_number": {
+        "path": "form_1m.V_candidate_id_number"
+    },
+    "V_candidate_last_name": {
+        "path": "form_1m.V_candidate_last_name"
+    },
+    "V_candidate_first_name": {
+        "path": "form_1m.V_candidate_first_name"
+    },
+    "V_candidate_middle_name": {
+        "path": "form_1m.V_candidate_middle_name"
+    },
+    "V_candidate_prefix": {
+        "path": "form_1m.V_candidate_prefix"
+    },
+    "V_candidate_suffix": {
+        "path": "form_1m.V_candidate_suffix"
+    },
+    "V_candidate_office": {
+        "path": "form_1m.V_candidate_office"
+    },
+    "V_candidate_state": {
+        "path": "form_1m.V_candidate_state"
+    },
+    "V_candidate_district": {
+        "path": "form_1m.V_candidate_district"
+    },
+    "V_date_of_contribution": {
+        "path": "form_1m.V_date_of_contribution"
+    }
+}
