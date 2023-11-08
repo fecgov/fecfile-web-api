@@ -22,10 +22,11 @@ class Form1M(models.Model):
     city = models.TextField(null=True, blank=True)
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
+    committee_name = models.TextField(null=True, blank=True)
     committee_type = models.CharField(max_length=1, null=True, blank=True)
 
     affiliated_date_form_f1_filed = models.DateField(null=True, blank=True)
-    affiliated_date_committee_fec_id = models.DateField(null=True, blank=True)
+    affiliated_committee_fec_id = models.TextField(null=True, blank=True)
     affiliated_committee_name = models.TextField(null=True, blank=True)
 
     I_candidate_id_number = models.TextField(null=True, blank=True)

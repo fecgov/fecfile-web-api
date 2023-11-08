@@ -18,10 +18,11 @@ class Form1MSerializer(ReportSerializer):
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
+    committee_name = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
-    affiliated_date_committee_fec_id = DateField(required=False, allow_null=True)
+    affiliated_committee_fec_id = CharField(required=False, allow_null=True)
     affiliated_committee_name = CharField(required=False, allow_null=True)
 
     I_candidate_id_number = CharField(required=False, allow_null=True)
@@ -115,7 +116,7 @@ class Form1MSerializer(ReportSerializer):
             + [
                 f.name
                 for f in Form1M._meta.get_fields()
-                if f.name not in ["committee_name", "report"]
+                if f.name not in ["report"]
             ]
             + ["fields_to_validate"]
         )
