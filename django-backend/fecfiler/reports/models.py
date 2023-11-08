@@ -97,29 +97,35 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             )
 
             for loan in loans_to_pull_forward:
-                # Save children as they are lost from the loan object
-                # when the loan is saved
-                loan_children = copy.deepcopy(loan.children)
+                self.pull_forward_loan(loan)
 
-                loan.schedule_c_id = self.save_copy(loan.schedule_c)
-                loan.memo_text_id = self.save_copy(loan.memo_text)
-                loan.report_id = self.id
-                loan.report = self
-                # The loan_id should point to the original loan transaction
-                # even if the loan is pulled forward multiple times.
-                loan.loan_id = loan.loan_id if loan.loan_id else loan.id
-                self.save_copy(loan)
-                for child in loan_children:
-                    # If child is a guarantor transaction, copy it
-                    # and link it to the new loan
-                    if child.schedule_c2_id:
-                        child.schedule_c2_id = self.save_copy(child.schedule_c2)
-                        child.memo_text_id = self.save_copy(child.memo_text)
-                        child.report_id = self.id
-                        child.report = self
-                        child.parent_transaction_id = loan.id
-                        child.parent_transaction = loan
-                        self.save_copy(child)
+    def pull_forward_loan(self, loan):
+        # Save children as they are lost from the loan object
+        # when the loan is saved
+        loan_children = copy.deepcopy(loan.children)
+
+        loan.schedule_c_id = self.save_copy(loan.schedule_c)
+        loan.memo_text_id = self.save_copy(loan.memo_text)
+        loan.report_id = self.id
+        loan.report = self
+        # The loan_id should point to the original loan transaction
+        # even if the loan is pulled forward multiple times.
+        loan.loan_id = loan.loan_id if loan.loan_id else loan.id
+        self.save_copy(loan)
+        for child in loan_children:
+            # If child is a guarantor transaction, copy it
+            # and link it to the new loan
+            if child.schedule_c2_id:
+                self.pull_forward_loan_guarantor(child, loan)
+
+    def pull_forward_loan_guarantor(self, loan_guarantor, loan):
+        loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
+        loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
+        loan_guarantor.report_id = self.id
+        loan_guarantor.report = self
+        loan_guarantor.parent_transaction_id = loan.id
+        loan_guarantor.parent_transaction = loan
+        self.save_copy(loan_guarantor)
 
     def pull_forward_debts(self):
         previous_report = self.get_previous_report()
@@ -132,14 +138,17 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             )
 
             for debt in debts_to_pull_forward:
-                debt.schedule_d.incurred_amount = Decimal(0)
-                debt.schedule_d_id = self.save_copy(debt.schedule_d)
-                debt.report_id = self.id
-                debt.report = self
-                # The debt_id should point to the original debt transaction
-                # even if the debt is pulled forward multiple times.
-                debt.debt_id = debt.debt_id if debt.debt_id else debt.id
-                self.save_copy(debt)
+                self.pull_forward_debt(debt)
+
+    def pull_forward_debt(self, debt):
+        debt.schedule_d.incurred_amount = Decimal(0)
+        debt.schedule_d_id = self.save_copy(debt.schedule_d)
+        debt.report_id = self.id
+        debt.report = self
+        # The debt_id should point to the original debt transaction
+        # even if the debt is pulled forward multiple times.
+        debt.debt_id = debt.debt_id if debt.debt_id else debt.id
+        self.save_copy(debt)
 
     def get_previous_report(self):
         return (

@@ -1,3 +1,4 @@
+import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
@@ -21,7 +22,7 @@ class DotFECSubmitter:
         if api:
             self.fec_soap_client = Client(f"{api}/webload/services/upload?wsdl")
 
-    def get_submission_json(self, dot_fec_record, e_filing_password):
+    def get_submission_json(self, dot_fec_record, e_filing_password, backdoor_code=None):
         json_obj = {
             "committee_id": FILE_AS_TEST_COMMITTEE
             or dot_fec_record.report.committee_account.committee_id,
@@ -36,7 +37,18 @@ class DotFECSubmitter:
         }
         if dot_fec_record.report.report_id:
             json_obj["amendment_id"] = dot_fec_record.report.report_id
+            if backdoor_code:
+                json_obj["amendment_id"] += backdoor_code
+        self.log_submission_json(json_obj, dot_fec_record, backdoor_code)
         return json.dumps(json_obj)
+
+    def log_submission_json(self, json_obj, dot_fec_record, backdoor_code):
+        copy_json_obj = copy.deepcopy(json_obj)
+        copy_json_obj.pop("password", None)
+        copy_json_obj.pop("api_key", None)
+        if "amendment_id" in copy_json_obj and backdoor_code:
+            copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
+        logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = ""

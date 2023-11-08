@@ -56,6 +56,8 @@ class ScheduleA(models.Model):
         null=True, blank=True
     )
 
+    reattribution_redesignation_tag = models.TextField(null=True, blank=True)
+
     class Meta:
         app_label = "transactions"
 
