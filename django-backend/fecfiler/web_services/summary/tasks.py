@@ -33,7 +33,6 @@ def calculate_summary(report_id):
     a = summary["a"]
     b = summary["b"]
 
-    # noqa: E501 //disable max line length
     # line 6a
     report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", 0)
     report.form_3x.L6a_year_for_above_ytd = b.get("line_6a", 0)
@@ -83,7 +82,7 @@ def calculate_summary(report_id):
     report.form_3x.L14_loan_repayments_received_period = a.get("line_14", 0)
     report.form_3x.L14_loan_repayments_received_ytd = b.get("line_14", 0)
     # line 15
-    report.form_3x.L15_offsets_to_operating_expenditures_refunds_period = a.get("line_15", 0)
+    report.form_3x.L15_offsets_to_operating_expenditures_refunds_period = a.get("line_15", 0)  # noqa: E501
     report.form_3x.L15_offsets_to_operating_expenditures_refunds_ytd = b.get("line_15", 0)
     # line 16
     report.form_3x.L16_refunds_of_federal_contributions_period = a.get("line_16", 0)
@@ -119,10 +118,10 @@ def calculate_summary(report_id):
     report.form_3x.L21c_total_operating_expenditures_ytd = b.get("line_21c", 0)
     report.form_3x.L21c_total_operating_expenditures_period = a.get("line_21c", 0)
     # line 22
-    report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_period = a.get("line_22", 0)
+    report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_period = a.get("line_22", 0)  # noqa: E501
     report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_ytd = b.get("line_22", 0)
     # line 23
-    report.form_3x.L23_contributions_to_federal_candidates_cmtes_period = a.get("line_23", 0)
+    report.form_3x.L23_contributions_to_federal_candidates_cmtes_period = a.get("line_23", 0)  # noqa: E501
     report.form_3x.L23_contributions_to_federal_candidates_cmtes_ytd = b.get("line_23", 0)
     # line 24
     report.form_3x.L24_independent_expenditures_period = a.get("line_24", 0)
@@ -152,10 +151,10 @@ def calculate_summary(report_id):
     report.form_3x.L29_other_disbursements_period = a.get("line_29", 0)
     report.form_3x.L29_other_disbursements_ytd = b.get("line_29", 0)
     # line 30ai
-    report.form_3x.L30ai_shared_federal_activity_h6_fed_share_period = a.get("line_30ai", 0)
+    report.form_3x.L30ai_shared_federal_activity_h6_fed_share_period = a.get("line_30ai", 0)  # noqa: E501
     report.form_3x.L30ai_shared_federal_activity_h6_fed_share_ytd = b.get("line_30ai", 0)
     # line 30aii
-    report.form_3x.L30aii_shared_federal_activity_h6_nonfed_period = a.get("line_30aii", 0)
+    report.form_3x.L30aii_shared_federal_activity_h6_nonfed_period = a.get("line_30aii", 0)  # noqa: E501
     report.form_3x.L30aii_shared_federal_activity_h6_nonfed_ytd = b.get("line_30aii", 0)
     # line 30b
     report.form_3x.L30b_nonallocable_fed_election_activity_period = a.get("line_30b", 0)
