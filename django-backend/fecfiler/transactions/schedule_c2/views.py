@@ -17,10 +17,13 @@ def save_hook(transaction: Transaction, is_existing):
 def create_in_future_reports(transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
     for report in future_reports:
-        loan = Transaction.objects.get(
+        loan_query = Transaction.objects.filter(
             report_id=report.id, loan_id=transaction.parent_transaction.id
         )
-        report.pull_forward_loan_guarantor(copy.deepcopy(transaction), loan)
+        if loan_query.count():
+            report.pull_forward_loan_guarantor(
+                copy.deepcopy(transaction), loan_query.first()
+            )
 
 
 def update_in_future_reports(transaction):

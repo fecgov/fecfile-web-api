@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
@@ -23,36 +24,25 @@ def create_in_future_reports(transaction: Transaction):
 
 def update_in_future_reports(transaction: Transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
-
-    transaction_data = get_model_data(transaction, Transaction)
-    del transaction_data["id"]
+    transaction_copy = copy.deepcopy(model_to_dict(transaction))
+    # model_to_dict doesn't copy id
+    del transaction_copy["report"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
         report_id__in=models.Subquery(future_reports.values("id")),
     )
-    # transaction_data["contact_1_id"] = (transaction_data.pop("contact_1") or {}).pop(
-    #     "id", transaction_data.get("contact_1_id")
-    # )
-    # transaction_data["contact_2_id"] = (transaction_data.pop("contact_2") or {}).pop(
-    #     "id", transaction_data.get("contact_2_id")
-    # )
-    # transaction_data["contact_3_id"] = (transaction_data.pop("contact_3") or {}).pop(
-    #     "id", transaction_data.get("contact_3_id")
-    # )
-    # print(f"AHOYYOHA:{transaction_data}")
-    transactions_to_update.update(**transaction_data)
+    transactions_to_update.update(**transaction_copy)
 
-    schedule_c_data = get_model_data(transaction, ScheduleC)
-    del schedule_c_data["id"]
+    schedule_c_copy = copy.deepcopy(model_to_dict(transaction.schedule_c))
     schedule_cs_to_update = ScheduleC.objects.filter(
         transaction__schedule_c_id__in=models.Subquery(
             transactions_to_update.values("schedule_c_id")
         )
     )
-    schedule_cs_to_update.update(**schedule_c_data)
+    schedule_cs_to_update.update(**schedule_c_copy)
 
     update_memo_text_in_future_reports(
-        transaction, transaction_data, transactions_to_update
+        transaction, transaction_copy, transactions_to_update
     )
 
 

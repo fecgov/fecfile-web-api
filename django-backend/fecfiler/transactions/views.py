@@ -135,82 +135,43 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         return response
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
-    def previous_entity(self, request):
+    def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
-        contact_1_id = request.query_params.get("contact_1_id", None)
-        date = request.query_params.get("date", None)
-        aggregation_group = request.query_params.get("aggregation_group", None)
+        try:
+            contact_1_id = request.query_params["contact_1_id"]
+            date = request.query_params["date"]
+            aggregation_group = request.query_params["aggregation_group"]
+        except:
+            message = "contact_1_id, date, and aggregate_group are required params"
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        missing_params = []
-        if not contact_1_id:
-            missing_params.append("contact_1_id")
-        if not date:
-            missing_params.append("date")
-        if not aggregation_group:
-            missing_params.append("aggregation_group")
-
-        if len(missing_params) > 0:
-            error_msg = (
-                "Please provide " + ",".join(missing_params) + " in query params"
-            )
-            return Response(
-                error_msg,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        return self.get_previous(
-            transaction_id,
-            date,
-            aggregation_group,
-            contact_1_id,
-        )
+        return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
-        transaction_id = request.query_params.get("transaction_id", None)
-        date = request.query_params.get("date", None)
-        aggregation_group = request.query_params.get("aggregation_group", None)
-        election_code = request.query_params.get("election_code", None)
-        candidate_office = request.query_params.get("candidate_office", None)
-        candidate_state = request.query_params.get("candidate_state", None)
-        candidate_district = request.query_params.get("candidate_district", None)
-
-        missing_params = []
-        if not date:
-            missing_params.append("date")
-        if not aggregation_group:
-            missing_params.append("aggregation_group")
-        if not election_code:
-            missing_params.append("election_code")
-        if not candidate_office:
-            missing_params.append("candidate_office")
-        if (
-            candidate_office != Contact.CandidateOffice.PRESIDENTIAL
-            and not candidate_state
-        ):
-            missing_params.append("candidate_state")
-        if candidate_office == Contact.CandidateOffice.HOUSE and not candidate_district:
-            missing_params.append("candidate_district")
-
-        if len(missing_params) > 0:
-            error_msg = (
-                "Please provide " + ",".join(missing_params) + " in query params"
-            )
-            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+        id = request.query_params.get("transaction_id", None)
+        try:
+            date = request.query_params["date"]
+            aggregation_group = request.query_params["aggregation_group"]
+            election_code = request.query_params["election_code"]
+            office = request.query_params["candidate_office"]
+            state = request.query_params.get("candidate_state", None)
+            if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
+                raise Exception()
+            district = request.query_params.get("candidate_district", None)
+            if office == Contact.CandidateOffice.HOUSE and not district:
+                raise Exception()
+        except:
+            message = """date, aggregate_group, election_code, and candidate_office are required params.
+            candidate_state is required for HOUSE and SENATE.  candidate_district is required for HOUSE"""
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            transaction_id,
-            date,
-            aggregation_group,
-            None,
-            election_code,
-            candidate_office,
-            candidate_state,
-            candidate_district,
+            id, date, aggregation_group, None, election_code, office, state, district
         )
 
     def get_previous(
@@ -232,15 +193,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             Q(aggregation_group=aggregation_group),
         )
         if contact_id:
-            query.filter(Q(contact_1_id=contact_id))
+            query = query.filter(Q(contact_1_id=contact_id))
         else:
-            query.filter(
+            query = query.filter(
                 Q(schedule_e__election_code=election_code),
                 Q(schedule_e__so_candidate_office=office),
                 Q(schedule_e__so_candidate_state=state),
                 Q(schedule_e__so_candidate_district=district),
             )
-        query.order_by("-date", "-created")
+        query = query.order_by("-date", "-created")
         previous_transaction = query.first()
 
         if previous_transaction:
@@ -318,14 +279,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         for child_transaction_data in children:
             child_transaction_data["parent_transaction_id"] = transaction_instance.id
             child_transaction_data.pop("parent_transaction", None)
-            if child_transaction_data.pop("use_parent_contact", None):
+            if child_transaction_data.get("use_parent_contact", None):
                 child_transaction_data[
                     "contact_1_id"
                 ] = transaction_instance.contact_1_id
+                del child_transaction_data["contact_1"]
 
             self.save_transaction(child_transaction_data, request)
 
-        return transaction_instance
+        return self.queryset.get(id=transaction_instance.id)
 
 
 def noop(transaction, is_existing):
