@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+from fecfiler.reports.form_24.models import Form24
 from ..serializers import (
     Form24Serializer,
 )
@@ -11,18 +13,18 @@ class F24SerializerTestCase(TestCase):
 
     def setUp(self):
         self.valid_f24_report = {
-            "form_type": "F24",
+            "form_type": "F24N",
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
-            "committee_name": "Testing Committee",
             "date_signed": "2023-11-1",
             "street_1": "22 Test Street",
             "street_2": "Unit B",
             "city": "Testopolis",
             "state": "AL",
             "zip": "12345",
-            "report_type_24_48": "24",
+            "report_type_24_48": "48",
             "original_amendment_date": "2023-11-01",
+            "fields_to_validate": [f.name for f in Form24._meta.get_fields()],
         }
 
         self.invalid_f24_report = {
@@ -30,6 +32,7 @@ class F24SerializerTestCase(TestCase):
             "street_2": "Unit B",
             "city": "Testopolis",
             "state": "AL",
+            "report_type_24_48": "90c",
             "committee_type": "WAY TOO MANY CHARS",
         }
 
@@ -41,13 +44,19 @@ class F24SerializerTestCase(TestCase):
     def test_serializer_validate(self):
         valid_serializer = Form24Serializer(
             data=self.valid_f24_report,
-            context={"request": self.mock_request},
+            context={
+                "request": self.mock_request,
+                "fields_to_ignore": ["committee_name", "filer_committee_id_number", "committee_account"],
+            },
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
         invalid_serializer = Form24Serializer(
             data=self.invalid_f24_report,
-            context={"request": self.mock_request},
+            context={
+                "request": self.mock_request,
+                "fields_to_ignore": ["committee_name", "committee_account"]
+            },
         )
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["zip"])
-        self.assertIsNotNone(invalid_serializer.errors["committee_type"])
+        self.assertIsNotNone(invalid_serializer.errors["report_type_24_48"])

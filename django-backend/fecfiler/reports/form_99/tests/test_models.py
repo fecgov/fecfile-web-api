@@ -1,38 +1,35 @@
 from django.test import TestCase
-from ..models import Form1M
+from ..models import Form99
 import datetime
 from decimal import Decimal
 
 
-class F1MTestCase(TestCase):
+class F99TestCase(TestCase):
     fixtures = ["test_committee_accounts"]
 
     def setUp(self):
-        self.valid_form_1m = Form1M(
+        self.valid_form_99 = Form99(
             street_1 = "22 Test Street",
             street_2 = "Unit B",
             city = "Testopolis",
             state = "AL",
             zip = "12345",
-            committee_type = "X",
-            affiliated_date_form_f1_filed = "2023-11-7",
-            affiliated_committee_fec_id = "C00277616",
-            affiliated_committee_name = "United Testing Committee"
+            text_code = "MSM",
         )
 
     def test_save_and_delete(self):
-        self.valid_form_1m.save()
-        form_1m_from_db = Form1M.objects.get(
-            affiliated_committee_name="United Testing Committee"
+        self.valid_form_99.save()
+        form_99_from_db = Form99.objects.get(
+            text_code="MSM"
         )
-        self.assertIsInstance(form_1m_from_db, Form1M)
+        self.assertIsInstance(form_99_from_db, Form99)
         self.assertEquals(
-            form_1m_from_db.affiliated_date_form_f1_filed,
-            datetime.date(2023, 11, 7)
+            form_99_from_db.text_code,
+            "MSM"
         )
-        form_1m_from_db.delete()
+        form_99_from_db.delete()
         self.assertRaises(
-            Form1M.DoesNotExist,
-            Form1M.objects.get,
-            affiliated_committee_name="United Testing Committee",
+            Form99.DoesNotExist,
+            Form99.objects.get,
+            text_code="MSM"
         )

@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+from fecfiler.reports.form_1m.models import Form1M
 from ..serializers import (
     Form1MSerializer,
 )
@@ -23,7 +25,8 @@ class F1MSerializerTestCase(TestCase):
             "committee_type": "X",
             "affiliated_date_form_f1_filed": "2023-11-7",
             "affiliated_committee_fec_id": "C00277616",
-            "affiliated_committee_name": "United Testing Committee"
+            "affiliated_committee_name": "United Testing Committee",
+            "fields_to_validate": [f.name for f in Form1M._meta.get_fields()],
         }
 
         self.invalid_f1m_report = {
@@ -44,7 +47,6 @@ class F1MSerializerTestCase(TestCase):
             data=self.valid_f1m_report,
             context={
                 "request": self.mock_request,
-                "fields_to_ignore": ["committee_name", "filer_committee_id_number", "committee_account"]
             },
         )
         self.assertTrue(valid_serializer.is_valid(raise_exception=True))
@@ -52,7 +54,6 @@ class F1MSerializerTestCase(TestCase):
             data=self.invalid_f1m_report,
             context={
                 "request": self.mock_request,
-                "fields_to_ignore": ["committee_name", "committee_account"]
             },
         )
         self.assertFalse(invalid_serializer.is_valid())

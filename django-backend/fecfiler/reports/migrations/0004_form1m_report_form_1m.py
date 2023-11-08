@@ -21,7 +21,6 @@ class Migration(migrations.Migration):
                 ('city', models.TextField(blank=True, null=True)),
                 ('state', models.TextField(blank=True, null=True)),
                 ('zip', models.TextField(blank=True, null=True)),
-                ('committee_name', models.TextField(blank=True, null=True)),
                 ('committee_type', models.CharField(blank=True, max_length=1, null=True)),
                 ('affiliated_date_form_f1_filed', models.DateField(blank=True, null=True)),
                 ('affiliated_committee_fec_id', models.TextField(blank=True, null=True)),

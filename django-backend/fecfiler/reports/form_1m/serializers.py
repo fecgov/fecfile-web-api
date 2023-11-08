@@ -18,7 +18,6 @@ class Form1MSerializer(ReportSerializer):
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
-    committee_name = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
