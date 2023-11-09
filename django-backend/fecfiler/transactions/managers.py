@@ -127,7 +127,12 @@ class TransactionManager(SoftDeleteManager):
                     OuterRef("schedule_e__so_candidate_state"), output_field=TextField()
                 ),
             )
-            .filter(election_clause, year_clause, date_clause, group_clause,)
+            .filter(
+                election_clause,
+                year_clause,
+                date_clause,
+                group_clause,
+            )
             .values("committee_account_id")
             .annotate(calendar_ytd_per_election_office=Sum("effective_amount"))
             .values("calendar_ytd_per_election_office")
@@ -164,7 +169,9 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .values("committee_account_id")
-            .annotate(incurred_prior=Sum("schedule_d__incurred_amount"),)
+            .annotate(
+                incurred_prior=Sum("schedule_d__incurred_amount"),
+            )
             .values("incurred_prior")
         )
         debt_payments_prior_clause = (

@@ -1,45 +1,52 @@
-import logging
+from django.db import models
+from django.forms.models import model_to_dict
+from decimal import Decimal
+from fecfiler.transactions.schedule_d.models import ScheduleD
+import copy
 
-from django.db.models.functions import Coalesce, Concat
-from .serializers import ScheduleDTransactionSerializer
-from fecfiler.transactions.views import TransactionViewSet
+from django.db.models import Q
+
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.managers import Schedule
-from django.db.models import TextField, Value
-from rest_framework.viewsets import ModelViewSet
-
-logger = logging.getLogger(__name__)
 
 
-class ScheduleDTransactionViewSet(TransactionViewSet):
-    queryset = (
-        Transaction.objects.select_related("schedule_d")
-        .filter(schedule=Schedule.D.value)
-        .alias(
-            creditor_name=Coalesce(
-                "schedule_d__creditor_organization_name",
-                Concat(
-                    "schedule_d__creditor_last_name",
-                    Value(", "),
-                    "schedule_d__creditor_first_name",
-                    output_field=TextField(),
-                ),
-            ),
+def save_hook(transaction: Transaction, is_existing):
+    if not is_existing:
+        if Transaction.objects.filter(
+            ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
+            id=transaction.id,
+        ).count():
+            create_in_future_reports(transaction)
+    else:
+        update_in_future_reports(transaction)
+
+
+def create_in_future_reports(transaction):
+    future_reports = transaction.report.get_future_in_progress_reports()
+    transaction_copy = copy.deepcopy(transaction)
+    for report in future_reports:
+        report.pull_forward_debt(transaction_copy)
+
+
+def update_in_future_reports(transaction):
+    future_reports = transaction.report.get_future_in_progress_reports()
+
+    transaction_copy = copy.deepcopy(model_to_dict(transaction))
+    # model_to_dict doesn't copy id
+    del transaction_copy["report"]
+    del transaction_copy["loan"]
+    transactions_to_update = Transaction.objects.filter(
+        transaction_id=transaction.transaction_id,
+        report_id__in=models.Subquery(future_reports.values("id")),
+    )
+    transactions_to_update.update(**transaction_copy)
+
+    schedule_d_copy = copy.deepcopy(model_to_dict(transaction.schedule_d))
+    # don't update the incurred amount because the debt already exists on
+    # this report
+    del schedule_d_copy["incurred_amount"]
+    schedule_ds_to_update = ScheduleD.objects.filter(
+        transaction__schedule_d_id__in=models.Subquery(
+            transactions_to_update.values("schedule_d_id")
         )
     )
-    serializer_class = ScheduleDTransactionSerializer
-    ordering_fields = [
-        "id",
-        "line_label_order_key",
-        "transaction_type_identifier",
-        "creditor_name",
-    ]
-
-    def create(self, request):
-        return super(ModelViewSet, self).create(request)
-
-    def update(self, request, pk=None):
-        return super(ModelViewSet, self).update(request, pk)
-
-    def partial_update(self, request, pk=None):
-        return super(ModelViewSet, self).partial_update(request, pk)
+    schedule_ds_to_update.update(**schedule_d_copy)
