@@ -143,7 +143,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             contact_1_id = request.query_params["contact_1_id"]
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
-        except:
+        except Exception:
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -165,9 +165,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             district = request.query_params.get("candidate_district", None)
             if office == Contact.CandidateOffice.HOUSE and not district:
                 raise Exception()
-        except:
+        except Exception:
             message = """date, aggregate_group, election_code, and candidate_office are required params.
-            candidate_state is required for HOUSE and SENATE.  candidate_district is required for HOUSE"""
+            candidate_state is required for HOUSE and SENATE.
+            candidate_district is required for HOUSE"""
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(

@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from decimal import Decimal
 from fecfiler.transactions.schedule_d.models import ScheduleD
 import copy
@@ -29,20 +30,23 @@ def create_in_future_reports(transaction):
 def update_in_future_reports(transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
 
-    transaction_data = copy.deepcopy(transaction)
-    del transaction_data.id
+    transaction_copy = copy.deepcopy(model_to_dict(transaction))
+    # model_to_dict doesn't copy id
+    del transaction_copy["report"]
+    del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
         report_id__in=models.Subquery(future_reports.values("id")),
     )
-    transactions_to_update.update(**transaction_data)
+    transactions_to_update.update(**transaction_copy)
 
-    schedule_d_data = copy.deepcopy(transaction)
-    del schedule_d_data.id
-    schedule_d_data.incurred_amount = 0
+    schedule_d_copy = copy.deepcopy(model_to_dict(transaction.schedule_d))
+    # don't update the incurred amount because the debt already exists on
+    # this report
+    del schedule_d_copy["incurred_amount"]
     schedule_ds_to_update = ScheduleD.objects.filter(
         transaction__schedule_d_id__in=models.Subquery(
             transactions_to_update.values("schedule_d_id")
         )
     )
-    schedule_ds_to_update.update(**schedule_d_data)
+    schedule_ds_to_update.update(**schedule_d_copy)
