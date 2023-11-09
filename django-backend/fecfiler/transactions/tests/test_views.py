@@ -87,6 +87,18 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.data["date"], "2023-09-02")
 
+        response = view_set.previous_transaction_by_entity(
+            self.request(
+                {},
+                {
+                    "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
+                    "date": "2024-09-20",
+                    "aggregation_group": "GENERAL_DISBURSEMENT",
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
@@ -128,5 +140,4 @@ class TransactionViewsTestCase(TestCase):
                 },
             )
         )
-        print(f"ahoy{response.data}")
         self.assertEqual(response.data["date"], "2023-10-31")
