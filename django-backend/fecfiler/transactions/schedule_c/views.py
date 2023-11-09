@@ -3,7 +3,6 @@ from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
-from fecfiler.shared.utilities import get_model_data
 import copy
 
 
@@ -27,6 +26,7 @@ def update_in_future_reports(transaction: Transaction):
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
     del transaction_copy["report"]
+    del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
         report_id__in=models.Subquery(future_reports.values("id")),
