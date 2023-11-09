@@ -101,6 +101,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.failUnlessRaises
       ~TransactionViewsTestCase.id
       ~TransactionViewsTestCase.modify_settings
+      ~TransactionViewsTestCase.request
       ~TransactionViewsTestCase.run
       ~TransactionViewsTestCase.setUp
       ~TransactionViewsTestCase.setUpClass
@@ -111,7 +112,11 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.subTest
       ~TransactionViewsTestCase.tearDown
       ~TransactionViewsTestCase.tearDownClass
-      ~TransactionViewsTestCase.test_save_new_transaction_pair
+      ~TransactionViewsTestCase.test_get_previous_election
+      ~TransactionViewsTestCase.test_get_previous_entity
+      ~TransactionViewsTestCase.test_get_queryset
+      ~TransactionViewsTestCase.test_save_transaction_pair
+      ~TransactionViewsTestCase.test_update
    
    
 

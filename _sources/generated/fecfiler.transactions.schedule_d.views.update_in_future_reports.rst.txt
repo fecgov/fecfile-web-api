@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_d.views.update\_in\_future\_reports
+===================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_d.views
+
+.. autofunction:: update_in_future_reports

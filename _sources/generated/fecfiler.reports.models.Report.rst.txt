@@ -29,6 +29,7 @@ fecfiler.reports.models.Report
       ~Report.full_clean
       ~Report.get_constraints
       ~Report.get_deferred_fields
+      ~Report.get_future_in_progress_reports
       ~Report.get_next_by_created
       ~Report.get_next_by_updated
       ~Report.get_previous_by_created

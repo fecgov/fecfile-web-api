@@ -30,6 +30,7 @@ fecfiler.transactions.schedule\_c2.models.ScheduleC2
       ~ScheduleC2.get_constraints
       ~ScheduleC2.get_date
       ~ScheduleC2.get_deferred_fields
+      ~ScheduleC2.get_transaction
       ~ScheduleC2.prepare_database_save
       ~ScheduleC2.refresh_from_db
       ~ScheduleC2.save

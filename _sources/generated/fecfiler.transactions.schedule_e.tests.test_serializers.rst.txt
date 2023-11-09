@@ -16,14 +16,6 @@ fecfiler.transactions.schedule\_e.tests.test\_serializers
 
    
    
-   .. rubric:: Classes
-
-   .. autosummary::
-      :toctree:                                          
-      :template: custom-class-template.rst               
-   
-      ScheduleETransactionSerializerTestCase
-   
    
 
    

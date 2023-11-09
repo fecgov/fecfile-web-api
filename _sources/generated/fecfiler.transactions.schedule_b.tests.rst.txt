@@ -24,12 +24,3 @@ fecfiler.transactions.schedule\_b.tests
 
 
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: custom-module-template.rst                 
-   :recursive:
-
-   fecfiler.transactions.schedule_b.tests.test_serializers
-

@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c2.tests.test\_views.ScheduleC2ViewsTestCase
+============================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c2.tests.test_views
+
+.. autoclass:: ScheduleC2ViewsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC2ViewsTestCase.__init__
+      ~ScheduleC2ViewsTestCase.addClassCleanup
+      ~ScheduleC2ViewsTestCase.addCleanup
+      ~ScheduleC2ViewsTestCase.addTypeEqualityFunc
+      ~ScheduleC2ViewsTestCase.assertAlmostEqual
+      ~ScheduleC2ViewsTestCase.assertAlmostEquals
+      ~ScheduleC2ViewsTestCase.assertContains
+      ~ScheduleC2ViewsTestCase.assertCountEqual
+      ~ScheduleC2ViewsTestCase.assertDictContainsSubset
+      ~ScheduleC2ViewsTestCase.assertDictEqual
+      ~ScheduleC2ViewsTestCase.assertEqual
+      ~ScheduleC2ViewsTestCase.assertEquals
+      ~ScheduleC2ViewsTestCase.assertFalse
+      ~ScheduleC2ViewsTestCase.assertFieldOutput
+      ~ScheduleC2ViewsTestCase.assertFormError
+      ~ScheduleC2ViewsTestCase.assertFormsetError
+      ~ScheduleC2ViewsTestCase.assertGreater
+      ~ScheduleC2ViewsTestCase.assertGreaterEqual
+      ~ScheduleC2ViewsTestCase.assertHTMLEqual
+      ~ScheduleC2ViewsTestCase.assertHTMLNotEqual
+      ~ScheduleC2ViewsTestCase.assertIn
+      ~ScheduleC2ViewsTestCase.assertInHTML
+      ~ScheduleC2ViewsTestCase.assertIs
+      ~ScheduleC2ViewsTestCase.assertIsInstance
+      ~ScheduleC2ViewsTestCase.assertIsNone
+      ~ScheduleC2ViewsTestCase.assertIsNot
+      ~ScheduleC2ViewsTestCase.assertIsNotNone
+      ~ScheduleC2ViewsTestCase.assertJSONEqual
+      ~ScheduleC2ViewsTestCase.assertJSONNotEqual
+      ~ScheduleC2ViewsTestCase.assertLess
+      ~ScheduleC2ViewsTestCase.assertLessEqual
+      ~ScheduleC2ViewsTestCase.assertListEqual
+      ~ScheduleC2ViewsTestCase.assertLogs
+      ~ScheduleC2ViewsTestCase.assertMultiLineEqual
+      ~ScheduleC2ViewsTestCase.assertNoLogs
+      ~ScheduleC2ViewsTestCase.assertNotAlmostEqual
+      ~ScheduleC2ViewsTestCase.assertNotAlmostEquals
+      ~ScheduleC2ViewsTestCase.assertNotContains
+      ~ScheduleC2ViewsTestCase.assertNotEqual
+      ~ScheduleC2ViewsTestCase.assertNotEquals
+      ~ScheduleC2ViewsTestCase.assertNotIn
+      ~ScheduleC2ViewsTestCase.assertNotIsInstance
+      ~ScheduleC2ViewsTestCase.assertNotRegex
+      ~ScheduleC2ViewsTestCase.assertNotRegexpMatches
+      ~ScheduleC2ViewsTestCase.assertNumQueries
+      ~ScheduleC2ViewsTestCase.assertQuerysetEqual
+      ~ScheduleC2ViewsTestCase.assertRaises
+      ~ScheduleC2ViewsTestCase.assertRaisesMessage
+      ~ScheduleC2ViewsTestCase.assertRaisesRegex
+      ~ScheduleC2ViewsTestCase.assertRaisesRegexp
+      ~ScheduleC2ViewsTestCase.assertRedirects
+      ~ScheduleC2ViewsTestCase.assertRegex
+      ~ScheduleC2ViewsTestCase.assertRegexpMatches
+      ~ScheduleC2ViewsTestCase.assertSequenceEqual
+      ~ScheduleC2ViewsTestCase.assertSetEqual
+      ~ScheduleC2ViewsTestCase.assertTemplateNotUsed
+      ~ScheduleC2ViewsTestCase.assertTemplateUsed
+      ~ScheduleC2ViewsTestCase.assertTrue
+      ~ScheduleC2ViewsTestCase.assertTupleEqual
+      ~ScheduleC2ViewsTestCase.assertURLEqual
+      ~ScheduleC2ViewsTestCase.assertWarns
+      ~ScheduleC2ViewsTestCase.assertWarnsMessage
+      ~ScheduleC2ViewsTestCase.assertWarnsRegex
+      ~ScheduleC2ViewsTestCase.assertXMLEqual
+      ~ScheduleC2ViewsTestCase.assertXMLNotEqual
+      ~ScheduleC2ViewsTestCase.assert_
+      ~ScheduleC2ViewsTestCase.captureOnCommitCallbacks
+      ~ScheduleC2ViewsTestCase.countTestCases
+      ~ScheduleC2ViewsTestCase.debug
+      ~ScheduleC2ViewsTestCase.defaultTestResult
+      ~ScheduleC2ViewsTestCase.doClassCleanups
+      ~ScheduleC2ViewsTestCase.doCleanups
+      ~ScheduleC2ViewsTestCase.fail
+      ~ScheduleC2ViewsTestCase.failIf
+      ~ScheduleC2ViewsTestCase.failIfAlmostEqual
+      ~ScheduleC2ViewsTestCase.failIfEqual
+      ~ScheduleC2ViewsTestCase.failUnless
+      ~ScheduleC2ViewsTestCase.failUnlessAlmostEqual
+      ~ScheduleC2ViewsTestCase.failUnlessEqual
+      ~ScheduleC2ViewsTestCase.failUnlessRaises
+      ~ScheduleC2ViewsTestCase.id
+      ~ScheduleC2ViewsTestCase.modify_settings
+      ~ScheduleC2ViewsTestCase.run
+      ~ScheduleC2ViewsTestCase.setUp
+      ~ScheduleC2ViewsTestCase.setUpClass
+      ~ScheduleC2ViewsTestCase.setUpTestData
+      ~ScheduleC2ViewsTestCase.settings
+      ~ScheduleC2ViewsTestCase.shortDescription
+      ~ScheduleC2ViewsTestCase.skipTest
+      ~ScheduleC2ViewsTestCase.subTest
+      ~ScheduleC2ViewsTestCase.tearDown
+      ~ScheduleC2ViewsTestCase.tearDownClass
+      ~ScheduleC2ViewsTestCase.test_create_guarantor_in_future_report
+      ~ScheduleC2ViewsTestCase.test_update_guarantor_in_future_report
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC2ViewsTestCase.available_apps
+      ~ScheduleC2ViewsTestCase.databases
+      ~ScheduleC2ViewsTestCase.fixtures
+      ~ScheduleC2ViewsTestCase.longMessage
+      ~ScheduleC2ViewsTestCase.maxDiff
+      ~ScheduleC2ViewsTestCase.reset_sequences
+      ~ScheduleC2ViewsTestCase.serialized_rollback
+   
+   

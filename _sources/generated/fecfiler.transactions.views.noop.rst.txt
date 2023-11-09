@@ -1,0 +1,6 @@
+fecfiler.transactions.views.noop
+================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: noop

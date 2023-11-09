@@ -15,8 +15,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet" href="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet.html" />
-    <link rel="prev" title="fecfiler.transactions.schedule_c.tests.test_serializers.ScheduleCTransactionSerializerTestCase" href="fecfiler.transactions.schedule_c.tests.test_serializers.ScheduleCTransactionSerializerTestCase.html" />
+    <link rel="next" title="fecfiler.transactions.schedule_c.views.create_in_future_reports" href="fecfiler.transactions.schedule_c.views.create_in_future_reports.html" />
+    <link rel="prev" title="fecfiler.transactions.schedule_c.tests.test_views.ScheduleCViewsTestCase" href="fecfiler.transactions.schedule_c.tests.test_views.ScheduleCViewsTestCase.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -35,14 +35,23 @@
             
   <section id="module-fecfiler.transactions.schedule_c.views">
 <span id="fecfiler-transactions-schedule-c-views"></span><h1>fecfiler.transactions.schedule_c.views<a class="headerlink" href="#module-fecfiler.transactions.schedule_c.views" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Classes</p>
+<p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet.html#fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet" title="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScheduleCTransactionViewSet</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.schedule_c.views.create_in_future_reports.html#fecfiler.transactions.schedule_c.views.create_in_future_reports" title="fecfiler.transactions.schedule_c.views.create_in_future_reports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_in_future_reports</span></code></a>(transaction)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.transactions.schedule_c.views.save_hook.html#fecfiler.transactions.schedule_c.views.save_hook" title="fecfiler.transactions.schedule_c.views.save_hook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_hook</span></code></a>(transaction, is_existing)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.schedule_c.views.update_in_future_reports.html#fecfiler.transactions.schedule_c.views.update_in_future_reports" title="fecfiler.transactions.schedule_c.views.update_in_future_reports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_in_future_reports</span></code></a>(transaction)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports.html#fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports" title="fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_memo_text_in_future_reports</span></code></a>(...)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -90,10 +99,12 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.schedule_b.html">fecfiler.transactions.schedule_b</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.schedule_c.html">fecfiler.transactions.schedule_c</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.models.html">fecfiler.transactions.schedule_c.models</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.serializers.html">fecfiler.transactions.schedule_c.serializers</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.schedule_c.tests.html">fecfiler.transactions.schedule_c.tests</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.transactions.schedule_c.views</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet.html">fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.create_in_future_reports.html">fecfiler.transactions.schedule_c.views.create_in_future_reports</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.save_hook.html">fecfiler.transactions.schedule_c.views.save_hook</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.update_in_future_reports.html">fecfiler.transactions.schedule_c.views.update_in_future_reports</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports.html">fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports</a></li>
 </ul>
 </li>
 </ul>
@@ -128,8 +139,8 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
   <li><a href="fecfiler.transactions.schedule_c.html">fecfiler.transactions.schedule_c</a><ul>
-      <li>Previous: <a href="fecfiler.transactions.schedule_c.tests.test_serializers.ScheduleCTransactionSerializerTestCase.html" title="previous chapter">fecfiler.transactions.schedule_c.tests.test_serializers.ScheduleCTransactionSerializerTestCase</a></li>
-      <li>Next: <a href="fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet.html" title="next chapter">fecfiler.transactions.schedule_c.views.ScheduleCTransactionViewSet</a></li>
+      <li>Previous: <a href="fecfiler.transactions.schedule_c.tests.test_views.ScheduleCViewsTestCase.html" title="previous chapter">fecfiler.transactions.schedule_c.tests.test_views.ScheduleCViewsTestCase</a></li>
+      <li>Next: <a href="fecfiler.transactions.schedule_c.views.create_in_future_reports.html" title="next chapter">fecfiler.transactions.schedule_c.views.create_in_future_reports</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

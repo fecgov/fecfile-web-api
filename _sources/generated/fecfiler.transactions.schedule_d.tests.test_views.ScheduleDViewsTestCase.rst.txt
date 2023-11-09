@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_d.tests.test\_views.ScheduleDViewsTestCase
+==========================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_d.tests.test_views
+
+.. autoclass:: ScheduleDViewsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleDViewsTestCase.__init__
+      ~ScheduleDViewsTestCase.addClassCleanup
+      ~ScheduleDViewsTestCase.addCleanup
+      ~ScheduleDViewsTestCase.addTypeEqualityFunc
+      ~ScheduleDViewsTestCase.assertAlmostEqual
+      ~ScheduleDViewsTestCase.assertAlmostEquals
+      ~ScheduleDViewsTestCase.assertContains
+      ~ScheduleDViewsTestCase.assertCountEqual
+      ~ScheduleDViewsTestCase.assertDictContainsSubset
+      ~ScheduleDViewsTestCase.assertDictEqual
+      ~ScheduleDViewsTestCase.assertEqual
+      ~ScheduleDViewsTestCase.assertEquals
+      ~ScheduleDViewsTestCase.assertFalse
+      ~ScheduleDViewsTestCase.assertFieldOutput
+      ~ScheduleDViewsTestCase.assertFormError
+      ~ScheduleDViewsTestCase.assertFormsetError
+      ~ScheduleDViewsTestCase.assertGreater
+      ~ScheduleDViewsTestCase.assertGreaterEqual
+      ~ScheduleDViewsTestCase.assertHTMLEqual
+      ~ScheduleDViewsTestCase.assertHTMLNotEqual
+      ~ScheduleDViewsTestCase.assertIn
+      ~ScheduleDViewsTestCase.assertInHTML
+      ~ScheduleDViewsTestCase.assertIs
+      ~ScheduleDViewsTestCase.assertIsInstance
+      ~ScheduleDViewsTestCase.assertIsNone
+      ~ScheduleDViewsTestCase.assertIsNot
+      ~ScheduleDViewsTestCase.assertIsNotNone
+      ~ScheduleDViewsTestCase.assertJSONEqual
+      ~ScheduleDViewsTestCase.assertJSONNotEqual
+      ~ScheduleDViewsTestCase.assertLess
+      ~ScheduleDViewsTestCase.assertLessEqual
+      ~ScheduleDViewsTestCase.assertListEqual
+      ~ScheduleDViewsTestCase.assertLogs
+      ~ScheduleDViewsTestCase.assertMultiLineEqual
+      ~ScheduleDViewsTestCase.assertNoLogs
+      ~ScheduleDViewsTestCase.assertNotAlmostEqual
+      ~ScheduleDViewsTestCase.assertNotAlmostEquals
+      ~ScheduleDViewsTestCase.assertNotContains
+      ~ScheduleDViewsTestCase.assertNotEqual
+      ~ScheduleDViewsTestCase.assertNotEquals
+      ~ScheduleDViewsTestCase.assertNotIn
+      ~ScheduleDViewsTestCase.assertNotIsInstance
+      ~ScheduleDViewsTestCase.assertNotRegex
+      ~ScheduleDViewsTestCase.assertNotRegexpMatches
+      ~ScheduleDViewsTestCase.assertNumQueries
+      ~ScheduleDViewsTestCase.assertQuerysetEqual
+      ~ScheduleDViewsTestCase.assertRaises
+      ~ScheduleDViewsTestCase.assertRaisesMessage
+      ~ScheduleDViewsTestCase.assertRaisesRegex
+      ~ScheduleDViewsTestCase.assertRaisesRegexp
+      ~ScheduleDViewsTestCase.assertRedirects
+      ~ScheduleDViewsTestCase.assertRegex
+      ~ScheduleDViewsTestCase.assertRegexpMatches
+      ~ScheduleDViewsTestCase.assertSequenceEqual
+      ~ScheduleDViewsTestCase.assertSetEqual
+      ~ScheduleDViewsTestCase.assertTemplateNotUsed
+      ~ScheduleDViewsTestCase.assertTemplateUsed
+      ~ScheduleDViewsTestCase.assertTrue
+      ~ScheduleDViewsTestCase.assertTupleEqual
+      ~ScheduleDViewsTestCase.assertURLEqual
+      ~ScheduleDViewsTestCase.assertWarns
+      ~ScheduleDViewsTestCase.assertWarnsMessage
+      ~ScheduleDViewsTestCase.assertWarnsRegex
+      ~ScheduleDViewsTestCase.assertXMLEqual
+      ~ScheduleDViewsTestCase.assertXMLNotEqual
+      ~ScheduleDViewsTestCase.assert_
+      ~ScheduleDViewsTestCase.captureOnCommitCallbacks
+      ~ScheduleDViewsTestCase.countTestCases
+      ~ScheduleDViewsTestCase.debug
+      ~ScheduleDViewsTestCase.defaultTestResult
+      ~ScheduleDViewsTestCase.doClassCleanups
+      ~ScheduleDViewsTestCase.doCleanups
+      ~ScheduleDViewsTestCase.fail
+      ~ScheduleDViewsTestCase.failIf
+      ~ScheduleDViewsTestCase.failIfAlmostEqual
+      ~ScheduleDViewsTestCase.failIfEqual
+      ~ScheduleDViewsTestCase.failUnless
+      ~ScheduleDViewsTestCase.failUnlessAlmostEqual
+      ~ScheduleDViewsTestCase.failUnlessEqual
+      ~ScheduleDViewsTestCase.failUnlessRaises
+      ~ScheduleDViewsTestCase.id
+      ~ScheduleDViewsTestCase.modify_settings
+      ~ScheduleDViewsTestCase.run
+      ~ScheduleDViewsTestCase.setUp
+      ~ScheduleDViewsTestCase.setUpClass
+      ~ScheduleDViewsTestCase.setUpTestData
+      ~ScheduleDViewsTestCase.settings
+      ~ScheduleDViewsTestCase.shortDescription
+      ~ScheduleDViewsTestCase.skipTest
+      ~ScheduleDViewsTestCase.subTest
+      ~ScheduleDViewsTestCase.tearDown
+      ~ScheduleDViewsTestCase.tearDownClass
+      ~ScheduleDViewsTestCase.test_create_guarantor_in_future_report
+      ~ScheduleDViewsTestCase.test_update_guarantor_in_future_report
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleDViewsTestCase.available_apps
+      ~ScheduleDViewsTestCase.databases
+      ~ScheduleDViewsTestCase.fixtures
+      ~ScheduleDViewsTestCase.longMessage
+      ~ScheduleDViewsTestCase.maxDiff
+      ~ScheduleDViewsTestCase.reset_sequences
+      ~ScheduleDViewsTestCase.serialized_rollback
+   
+   

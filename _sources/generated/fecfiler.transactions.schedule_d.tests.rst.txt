@@ -31,5 +31,5 @@ fecfiler.transactions.schedule\_d.tests
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.transactions.schedule_d.tests.test_serializers
+   fecfiler.transactions.schedule_d.tests.test_views
 

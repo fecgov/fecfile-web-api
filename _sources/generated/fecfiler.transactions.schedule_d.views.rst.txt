@@ -12,17 +12,18 @@ fecfiler.transactions.schedule\_d.views
 
    
    
-   
-
-   
-   
-   .. rubric:: Classes
+   .. rubric:: Functions
 
    .. autosummary::
       :toctree:                                          
-      :template: custom-class-template.rst               
    
-      ScheduleDTransactionViewSet
+      create_in_future_reports
+      save_hook
+      update_in_future_reports
+   
+   
+
+   
    
    
 

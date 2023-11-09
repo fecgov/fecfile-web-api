@@ -32,5 +32,5 @@ fecfiler.transactions.schedule\_c2.tests
    :recursive:
 
    fecfiler.transactions.schedule_c2.tests.test_models
-   fecfiler.transactions.schedule_c2.tests.test_serializers
+   fecfiler.transactions.schedule_c2.tests.test_views
 

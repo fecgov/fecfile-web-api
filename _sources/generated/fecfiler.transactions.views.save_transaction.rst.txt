@@ -1,6 +1,0 @@
-fecfiler.transactions.views.save\_transaction
-=============================================
-
-.. currentmodule:: fecfiler.transactions.views
-
-.. autofunction:: save_transaction

@@ -25,7 +25,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.check_permissions
       ~TransactionViewSet.check_throttles
       ~TransactionViewSet.create
-      ~TransactionViewSet.create_transaction
       ~TransactionViewSet.destroy
       ~TransactionViewSet.determine_version
       ~TransactionViewSet.dispatch
@@ -44,6 +43,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.get_parser_context
       ~TransactionViewSet.get_parsers
       ~TransactionViewSet.get_permissions
+      ~TransactionViewSet.get_previous
       ~TransactionViewSet.get_queryset
       ~TransactionViewSet.get_renderer_context
       ~TransactionViewSet.get_renderers
@@ -68,15 +68,17 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.perform_destroy
       ~TransactionViewSet.perform_update
       ~TransactionViewSet.permission_denied
-      ~TransactionViewSet.previous_election
-      ~TransactionViewSet.previous_entity
+      ~TransactionViewSet.previous_transaction_by_election
+      ~TransactionViewSet.previous_transaction_by_entity
+      ~TransactionViewSet.propagate_contact
+      ~TransactionViewSet.propagate_contacts
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.retrieve
       ~TransactionViewSet.reverse_action
+      ~TransactionViewSet.save_transaction
       ~TransactionViewSet.setup
       ~TransactionViewSet.throttled
       ~TransactionViewSet.update
-      ~TransactionViewSet.update_transaction
    
    
 

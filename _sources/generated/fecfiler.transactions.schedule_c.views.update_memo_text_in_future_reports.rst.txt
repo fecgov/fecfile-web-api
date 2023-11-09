@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_c.views.update\_memo\_text\_in\_future\_reports
+===============================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c.views
+
+.. autofunction:: update_memo_text_in_future_reports

@@ -1,0 +1,6 @@
+fecfiler.transactions.views.get\_save\_hook
+===========================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: get_save_hook
