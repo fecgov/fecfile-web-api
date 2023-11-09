@@ -156,8 +156,8 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertMultiLineEqual" title="fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertMultiLineEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertMultiLineEqual</span></code></a>(first, second[, msg])</p></td>
 <td><p>Assert that two multi-line strings are equal.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs" title="fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNoLogs</span></code></a>(logger[, level])</p></td>
-<td><p>Assert no messages are logged on the logger, with at least the given level.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs" title="fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNoLogs</span></code></a>([logger, level])</p></td>
+<td><p>Fail unless no log messages of level <em>level</em> or higher are emitted on <em>logger_name</em> or its children.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNotAlmostEqual" title="fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNotAlmostEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEqual</span></code></a>(first, second[, ...])</p></td>
 <td><p>Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero, or by comparing that the difference between the two objects is less than the given delta.</p></td>
@@ -645,9 +645,10 @@ objects.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs">
-<span class="sig-name descname"><span class="pre">assertNoLogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assert no messages are logged on the logger, with at least the
-given level.</p>
+<span class="sig-name descname"><span class="pre">assertNoLogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.schedule_d.tests.test_views.ScheduleDViewsTestCase.assertNoLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless no log messages of level <em>level</em> or higher are emitted
+on <em>logger_name</em> or its children.</p>
+<p>This method must be used as a context manager.</p>
 </dd></dl>
 
 <dl class="py method">
