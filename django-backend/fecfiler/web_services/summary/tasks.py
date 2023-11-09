@@ -73,8 +73,8 @@ def calculate_summary(report_id):
     report.form_3x.L11d_total_contributions_period = a.get("line_11d", 0)
     report.form_3x.L11d_total_contributions_ytd = b.get("line_11d", 0)
     # line 12
-    report.form_3x.L12_transfers_from_affiliated_other_party_cmtes_period = a.get("line_12", 0)
-    report.form_3x.L12_transfers_from_affiliated_other_party_cmtes_ytd = b.get("line_12", 0)
+    report.form_3x.L12_transfers_from_affiliated_other_party_cmtes_period = a.get("line_12", 0)  # noqa: E501
+    report.form_3x.L12_transfers_from_affiliated_other_party_cmtes_ytd = b.get("line_12", 0)  # noqa: E501
     # line 13
     report.form_3x.L13_all_loans_received_period = a.get("line_13", 0)
     report.form_3x.L13_all_loans_received_ytd = b.get("line_13", 0)
