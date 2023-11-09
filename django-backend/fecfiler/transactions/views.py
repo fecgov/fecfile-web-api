@@ -225,9 +225,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def propagate_contact(self, transaction, contact):
         subsequent_transactions = Transaction.objects.filter(
             ~Q(id=transaction.id),
-            Q(Q(report__upload_submission__isnull=True)),
             Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
-            date__gte=transaction.get_date(),
         )
         for subsequent_transaction in subsequent_transactions:
             subsequent_transaction.get_schedule().update_with_contact(contact)
