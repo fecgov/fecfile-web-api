@@ -98,6 +98,18 @@ class SummaryService:
             summary.get("line_30aii", 0) +
             summary.get("line_30b", 0)
         )
+        summary["line_31"] = (
+            summary.get("line_21c", 0) +
+            summary.get("line_22", 0) +
+            summary.get("line_23", 0) +
+            summary.get("line_24", 0) +
+            summary.get("line_25", 0) +
+            summary.get("line_26", 0) +
+            summary.get("line_27", 0) +
+            summary.get("line_28d", 0) +
+            summary.get("line_29", 0) +
+            summary.get("line_30c", 0)
+        )
         summary["line_33"] = (
             summary.get("line_11d", 0)
         )
@@ -118,6 +130,9 @@ class SummaryService:
         summary["line_38"] = (
             summary.get("line_36", 0) -
             summary.get("line_37", 0)
+        )
+        summary["line_7"] = (
+            summary.get("line_31")
         )
 
         # Remove temporary aggregations to clean up the summary
@@ -201,6 +216,18 @@ class SummaryService:
             summary.get("line_30aii", 0) +
             summary.get("line_30b", 0)
         )
+        summary["line_31"] = (
+            summary.get("line_21c", 0) +
+            summary.get("line_22", 0) +
+            summary.get("line_23", 0) +
+            summary.get("line_24", 0) +
+            summary.get("line_25", 0) +
+            summary.get("line_26", 0) +
+            summary.get("line_27", 0) +
+            summary.get("line_28d", 0) +
+            summary.get("line_29", 0) +
+            summary.get("line_30c", 0)
+        )
         summary["line_33"] = (
             summary.get("line_11d", 0)
         )
@@ -221,6 +248,9 @@ class SummaryService:
         summary["line_38"] = (
             summary.get("line_36", 0) -
             summary.get("line_37", 0)
+        )
+        summary["line_7"] = (
+            summary.get("line_31", 0)
         )
 
         return summary
