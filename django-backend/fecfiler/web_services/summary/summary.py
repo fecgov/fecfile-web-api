@@ -143,6 +143,10 @@ class SummaryService:
         summary["line_7"] = (
             summary.get("line_31")
         )
+        summary["line_8"] = (
+            summary.get("line_6d", 0) -
+            summary.get("line_7")
+        )
 
         # Remove temporary aggregations to clean up the summary
         for key in list(summary.keys()):
@@ -269,6 +273,10 @@ class SummaryService:
         )
         summary["line_7"] = (
             summary.get("line_31", 0)
+        )
+        summary["line_8"] = (
+            summary.get("line_6d", 0) -
+            summary.get("line_7")
         )
 
         return summary
