@@ -167,6 +167,16 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             return fkey.id
         return None
 
+    def get_future_in_progress_reports(
+        self,
+    ):
+        return Report.objects.get_queryset().filter(
+            ~Q(id=self.id),
+            committee_account=self.committee_account_id,
+            upload_submission__isnull=True,
+            coverage_through_date__gte=self.coverage_through_date,
+        )
+
 
 class ReportMixin(models.Model):
     """Abstract model for tracking reports"""
