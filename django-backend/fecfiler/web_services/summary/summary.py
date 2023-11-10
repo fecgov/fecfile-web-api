@@ -114,6 +114,11 @@ class SummaryService:
             summary.get("line_29", 0) +
             summary.get("line_30c", 0)
         )
+        summary["line_32"] = (
+            summary.get("line_31", 0) -
+            summary.get("line_21aii", 0) -
+            summary.get("line_30aii", 0)
+        )
         summary["line_33"] = (
             summary.get("line_11d", 0)
         )
@@ -235,6 +240,11 @@ class SummaryService:
             summary.get("line_28d", 0) +
             summary.get("line_29", 0) +
             summary.get("line_30c", 0)
+        )
+        summary["line_32"] = (
+            summary.get("line_31", 0) -
+            summary.get("line_21aii", 0) -
+            summary.get("line_30aii", 0)
         )
         summary["line_33"] = (
             summary.get("line_11d", 0)
