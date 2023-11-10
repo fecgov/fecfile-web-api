@@ -50,74 +50,74 @@ class SummaryService:
             temp_sd10=self.get_line("SD/10")
         )
         summary["line_6c"] = (
-            summary.get("line_11c", 0) +
-            summary.get("line_12", 0) +
-            summary.get("line_13", 0) +
-            summary.get("line_14", 0) +
-            summary.get("line_15", 0) +
-            summary.get("line_16", 0) +
-            summary.get("line_17", 0) +
-            summary.get("line_18c", 0)
+            summary.get("line_11c", 0)
+            + summary.get("line_12", 0)
+            + summary.get("line_13", 0)
+            + summary.get("line_14", 0)
+            + summary.get("line_15", 0)
+            + summary.get("line_16", 0)
+            + summary.get("line_17", 0)
+            + summary.get("line_18c", 0)
         )
         summary["line_6d"] = (
-            summary.get("line_6b", 0) +
-            summary.get("line_6c", 0)
+            summary.get("line_6b", 0)
+            + summary.get("line_6c", 0)
         )
         summary["line_9"] = (
-            summary.get("temp_sc9", 0) +
-            summary.get("temp_sd9", 0)
+            summary.get("temp_sc9", 0)
+            + summary.get("temp_sd9", 0)
         )
         summary["line_10"] = (
-            summary.get("temp_sc10", 0) +
-            summary.get("temp_sd10", 0)
+            summary.get("temp_sc10", 0)
+            + summary.get("temp_sd10", 0)
         )
         summary["line_11aiii"] = (
-            summary.get("line_11ai", 0) +
-            summary.get("line_11aii", 0)
+            summary.get("line_11ai", 0)
+            + summary.get("line_11aii", 0)
         )
         summary["line_11d"] = (
-            summary.get("line_11aiii", 0) +
-            summary.get("line_11b", 0) +
-            summary.get("line_11c", 0)
+            summary.get("line_11aiii", 0)
+            + summary.get("line_11b", 0)
+            + summary.get("line_11c", 0)
         )
         summary["line_19"] = (
             summary.get("line_6c", 0)
         )
         summary["line_20"] = (
-            summary.get("line_19", 0) -
-            summary.get("line_18c", 0)
+            summary.get("line_19", 0)
+            - summary.get("line_18c", 0)
         )
         summary["line_21c"] = (
-            summary.get("line_21ai", 0) +
-            summary.get("line_21aii", 0) +
-            summary.get("line_21b", 0)
+            summary.get("line_21ai", 0)
+            + summary.get("line_21aii", 0)
+            + summary.get("line_21b", 0)
         )
         summary["line_28d"] = (
-            summary.get("line_28a", 0) +
-            summary.get("line_28b", 0) +
-            summary.get("line_28c", 0)
+            summary.get("line_28a", 0)
+            + summary.get("line_28b", 0)
+            + summary.get("line_28c", 0)
         )
         summary["line_30c"] = (
-            summary.get("line_30ai", 0) +
-            summary.get("line_30aii", 0) +
-            summary.get("line_30b", 0)
+            summary.get("line_30ai", 0)
+            + summary.get("line_30aii", 0)
+            + summary.get("line_30b", 0)
         )
         summary["line_31"] = (
-            summary.get("line_21c", 0) +
-            summary.get("line_22", 0) +
-            summary.get("line_23", 0) +
-            summary.get("line_24", 0) +
-            summary.get("line_25", 0) +
-            summary.get("line_26", 0) +
-            summary.get("line_27", 0) +
-            summary.get("line_28d", 0) +
-            summary.get("line_29", 0) +
-            summary.get("line_30c", 0)
+            summary.get("line_21c", 0)
+            + summary.get("line_22", 0)
+            + summary.get("line_23", 0)
+            + summary.get("line_24", 0)
+            + summary.get("line_25", 0)
+            + summary.get("line_26", 0)
+            + summary.get("line_27", 0)
+            + summary.get("line_28d", 0)
+            + summary.get("line_29", 0)
+            + summary.get("line_30c", 0)
         )
         summary["line_32"] = (
-            summary.get("line_31", 0) -
-            summary.get("line_21aii", 0) -
-            summary.get("line_30aii", 0)
+            summary.get("line_31", 0)
+            - summary.get("line_21aii", 0)
+            - summary.get("line_30aii", 0)
         )
         summary["line_33"] = (
             summary.get("line_11d", 0)
@@ -126,26 +126,26 @@ class SummaryService:
             summary.get("line_28d", 0)
         )
         summary["line_35"] = (
-            summary.get("line_33", 0) -
-            summary.get("line_34", 0)
+            summary.get("line_33", 0)
+            - summary.get("line_34", 0)
         )
         summary["line_36"] = (
-            summary.get("line_21ai", 0) +
-            summary.get("line_21b", 0)
+            summary.get("line_21ai", 0)
+            - summary.get("line_21b", 0)
         )
         summary["line_37"] = (
             summary.get("line_15", 0)
         )
         summary["line_38"] = (
-            summary.get("line_36", 0) -
-            summary.get("line_37", 0)
+            summary.get("line_36", 0)
+            - summary.get("line_37", 0)
         )
         summary["line_7"] = (
             summary.get("line_31")
         )
         summary["line_8"] = (
-            summary.get("line_6d", 0) -
-            summary.get("line_7")
+            summary.get("line_6d", 0)
+            - summary.get("line_7")
         )
 
         # Remove temporary aggregations to clean up the summary
@@ -189,66 +189,66 @@ class SummaryService:
             line_30b=self.get_line("SB30B"),
         )
         summary["line_6c"] = (
-            summary.get("line_11c", 0) +
-            summary.get("line_12", 0) +
-            summary.get("line_13", 0) +
-            summary.get("line_14", 0) +
-            summary.get("line_15", 0) +
-            summary.get("line_16", 0) +
-            summary.get("line_17", 0) +
-            summary.get("line_18c", 0)
+            summary.get("line_11c", 0)
+            + summary.get("line_12", 0)
+            + summary.get("line_13", 0)
+            + summary.get("line_14", 0)
+            + summary.get("line_15", 0)
+            + summary.get("line_16", 0)
+            + summary.get("line_17", 0)
+            + summary.get("line_18c", 0)
         )
         summary["line_6d"] = (
-            summary.get("line_6a", 0) +
-            summary.get("line_6c", 0)
+            summary.get("line_6a", 0)
+            + summary.get("line_6c", 0)
         )
         summary["line_11aiii"] = (
-            summary.get("line_11ai", 0) +
-            summary.get("line_11aii", 0)
+            summary.get("line_11ai", 0)
+            + summary.get("line_11aii", 0)
         )
         summary["line_11d"] = (
-            summary.get("line_11aiii", 0) +
-            summary.get("line_11b", 0) +
-            summary.get("line_11c", 0)
+            summary.get("line_11aiii", 0)
+            + summary.get("line_11b", 0)
+            + summary.get("line_11c", 0)
         )
         summary["line_19"] = (
             summary.get("line_6c", 0)
         )
         summary["line_20"] = (
-            summary.get("line_19", 0) -
-            summary.get("line_18c", 0)
+            summary.get("line_19", 0)
+            - summary.get("line_18c", 0)
         )
         summary["line_21c"] = (
-            summary.get("line_21ai", 0) +
-            summary.get("line_21aii", 0) +
-            summary.get("line_21b", 0)
+            summary.get("line_21ai", 0)
+            + summary.get("line_21aii", 0)
+            + summary.get("line_21b", 0)
         )
         summary["line_28d"] = (
-            summary.get("line_28a", 0) +
-            summary.get("line_28b", 0) +
-            summary.get("line_28c", 0)
+            summary.get("line_28a", 0)
+            + summary.get("line_28b", 0)
+            + summary.get("line_28c", 0)
         )
         summary["line_30c"] = (
-            summary.get("line_30ai", 0) +
-            summary.get("line_30aii", 0) +
-            summary.get("line_30b", 0)
+            summary.get("line_30ai", 0)
+            + summary.get("line_30aii", 0)
+            + summary.get("line_30b", 0)
         )
         summary["line_31"] = (
-            summary.get("line_21c", 0) +
-            summary.get("line_22", 0) +
-            summary.get("line_23", 0) +
-            summary.get("line_24", 0) +
-            summary.get("line_25", 0) +
-            summary.get("line_26", 0) +
-            summary.get("line_27", 0) +
-            summary.get("line_28d", 0) +
-            summary.get("line_29", 0) +
-            summary.get("line_30c", 0)
+            summary.get("line_21c", 0)
+            + summary.get("line_22", 0)
+            + summary.get("line_23", 0)
+            + summary.get("line_24", 0)
+            + summary.get("line_25", 0)
+            + summary.get("line_26", 0)
+            + summary.get("line_27", 0)
+            + summary.get("line_28d", 0)
+            + summary.get("line_29", 0)
+            + summary.get("line_30c", 0)
         )
         summary["line_32"] = (
-            summary.get("line_31", 0) -
-            summary.get("line_21aii", 0) -
-            summary.get("line_30aii", 0)
+            summary.get("line_31", 0)
+            - summary.get("line_21aii", 0)
+            - summary.get("line_30aii", 0)
         )
         summary["line_33"] = (
             summary.get("line_11d", 0)
@@ -257,26 +257,26 @@ class SummaryService:
             summary.get("line_28d", 0)
         )
         summary["line_35"] = (
-            summary.get("line_33", 0) -
-            summary.get("line_34", 0)
+            summary.get("line_33", 0)
+            - summary.get("line_34", 0)
         )
         summary["line_36"] = (
-            summary.get("line_21ai", 0) +
-            summary.get("line_21b", 0)
+            summary.get("line_21ai", 0)
+            + summary.get("line_21b", 0)
         )
         summary["line_37"] = (
             summary.get("line_15", 0)
         )
         summary["line_38"] = (
-            summary.get("line_36", 0) -
-            summary.get("line_37", 0)
+            summary.get("line_36", 0)
+            - summary.get("line_37", 0)
         )
         summary["line_7"] = (
             summary.get("line_31", 0)
         )
         summary["line_8"] = (
-            summary.get("line_6d", 0) -
-            summary.get("line_7")
+            summary.get("line_6d", 0)
+            - summary.get("line_7")
         )
 
         return summary
