@@ -8,8 +8,8 @@ def remove_receipt_line_number(apps, schema_editor):  # noqa
     for transaction in Transaction.objects.filter(
         transaction_type_identifier="LOAN_BY_COMMITTEE"
     ):
-        del transaction.schedule_c.receipt_line_number
-        transaction.save()
+        transaction.schedule_c.receipt_line_number = None
+        transaction.schedule_c.save()
 
 
 def add_receipt_line_number(apps, schema_editor):  # noqa
@@ -18,7 +18,7 @@ def add_receipt_line_number(apps, schema_editor):  # noqa
         transaction_type_identifier="LOAN_BY_COMMITTEE"
     ):
         transaction.schedule_c.receipt_line_number = "27"
-        transaction.save()
+        transaction.schedule_c.save()
 
 
 class Migration(migrations.Migration):
