@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0033\_remove\_receipt\_line\_number\_from\_loans\_by\_committee.add\_receipt\_line\_number
+===========================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0033_remove_receipt_line_number_from_loans_by_committee
+
+.. autofunction:: add_receipt_line_number

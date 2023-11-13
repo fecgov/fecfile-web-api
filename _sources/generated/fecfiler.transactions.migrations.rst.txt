@@ -63,4 +63,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0030_update_receipt_from_person_to_receipt_from_entity
    fecfiler.transactions.migrations.0031_remove_schedulee_calendar_ytd
    fecfiler.transactions.migrations.0032_schedulea_reattribution_redesignation_tag_and_more
+   fecfiler.transactions.migrations.0033_remove_receipt_line_number_from_loans_by_committee
 
