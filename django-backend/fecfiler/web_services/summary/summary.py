@@ -45,9 +45,9 @@ class SummaryService:
             line_30b=self.get_line("SB30B"),
             # Temporary aggregations
             temp_sc9=self.get_line("SC/9"),
-            temp_sd9=self.get_line("SD/9"),
+            temp_sd9=self.get_line("SD9"),
             temp_sc10=self.get_line("SC/10"),
-            temp_sd10=self.get_line("SD/10")
+            temp_sd10=self.get_line("SD10")
         )
         summary["line_6c"] = (
             summary.get("line_11c", 0)
