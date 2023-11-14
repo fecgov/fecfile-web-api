@@ -214,22 +214,13 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
     def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
-        self.propagate_contact(transaction, contact_1)
+        propagate_contact(transaction, contact_1)
         contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
         if contact_2:
-            self.propagate_contact(transaction, contact_2)
+            propagate_contact(transaction, contact_2)
         contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
         if contact_3:
-            self.propagate_contact(transaction, contact_3)
-
-    def propagate_contact(self, transaction, contact):
-        subsequent_transactions = Transaction.objects.filter(
-            ~Q(id=transaction.id),
-            Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
-        )
-        for subsequent_transaction in subsequent_transactions:
-            subsequent_transaction.get_schedule().update_with_contact(contact)
-            subsequent_transaction.save()
+            propagate_contact(transaction, contact_3)
 
     def save_transaction(self, transaction_data, request):
         children = transaction_data.pop("children", [])
@@ -301,3 +292,13 @@ def get_save_hook(transaction: Transaction):
         Schedule.D: schedule_d_save_hook,
     }
     return hooks.get(schedule_name, noop)
+
+
+def propagate_contact(transaction, contact):
+    subsequent_transactions = Transaction.objects.filter(
+        ~Q(id=getattr(transaction, "id", None)),
+        Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
+    )
+    for subsequent_transaction in subsequent_transactions:
+        subsequent_transaction.get_schedule().update_with_contact(contact)
+        subsequent_transaction.save()
