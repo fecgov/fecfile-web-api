@@ -1,0 +1,37 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.form\_3x.tests
+===============================
+
+.. automodule:: fecfiler.reports.form_3x.tests
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.reports.form_3x.tests.test_models
+   fecfiler.reports.form_3x.tests.test_serializers
+   fecfiler.reports.form_3x.tests.test_views
+

@@ -1,0 +1,112 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_1m.views.Form1MViewSet
+=============================================
+
+.. currentmodule:: fecfiler.reports.form_1m.views
+
+.. autoclass:: Form1MViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form1MViewSet.__init__
+      ~Form1MViewSet.amend
+      ~Form1MViewSet.as_view
+      ~Form1MViewSet.check_object_permissions
+      ~Form1MViewSet.check_permissions
+      ~Form1MViewSet.check_throttles
+      ~Form1MViewSet.create
+      ~Form1MViewSet.destroy
+      ~Form1MViewSet.determine_version
+      ~Form1MViewSet.dispatch
+      ~Form1MViewSet.filter_queryset
+      ~Form1MViewSet.finalize_response
+      ~Form1MViewSet.get_authenticate_header
+      ~Form1MViewSet.get_authenticators
+      ~Form1MViewSet.get_content_negotiator
+      ~Form1MViewSet.get_exception_handler
+      ~Form1MViewSet.get_exception_handler_context
+      ~Form1MViewSet.get_extra_action_url_map
+      ~Form1MViewSet.get_extra_actions
+      ~Form1MViewSet.get_format_suffix
+      ~Form1MViewSet.get_object
+      ~Form1MViewSet.get_paginated_response
+      ~Form1MViewSet.get_parser_context
+      ~Form1MViewSet.get_parsers
+      ~Form1MViewSet.get_permissions
+      ~Form1MViewSet.get_queryset
+      ~Form1MViewSet.get_renderer_context
+      ~Form1MViewSet.get_renderers
+      ~Form1MViewSet.get_serializer
+      ~Form1MViewSet.get_serializer_class
+      ~Form1MViewSet.get_serializer_context
+      ~Form1MViewSet.get_success_headers
+      ~Form1MViewSet.get_throttles
+      ~Form1MViewSet.get_view_description
+      ~Form1MViewSet.get_view_name
+      ~Form1MViewSet.handle_exception
+      ~Form1MViewSet.hard_delete_reports
+      ~Form1MViewSet.http_method_not_allowed
+      ~Form1MViewSet.initial
+      ~Form1MViewSet.initialize_request
+      ~Form1MViewSet.list
+      ~Form1MViewSet.options
+      ~Form1MViewSet.paginate_queryset
+      ~Form1MViewSet.partial_update
+      ~Form1MViewSet.perform_authentication
+      ~Form1MViewSet.perform_content_negotiation
+      ~Form1MViewSet.perform_create
+      ~Form1MViewSet.perform_destroy
+      ~Form1MViewSet.perform_update
+      ~Form1MViewSet.permission_denied
+      ~Form1MViewSet.raise_uncaught_exception
+      ~Form1MViewSet.retrieve
+      ~Form1MViewSet.reverse_action
+      ~Form1MViewSet.setup
+      ~Form1MViewSet.throttled
+      ~Form1MViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form1MViewSet.allowed_methods
+      ~Form1MViewSet.authentication_classes
+      ~Form1MViewSet.basename
+      ~Form1MViewSet.default_response_headers
+      ~Form1MViewSet.description
+      ~Form1MViewSet.detail
+      ~Form1MViewSet.filter_backends
+      ~Form1MViewSet.http_method_names
+      ~Form1MViewSet.lookup_field
+      ~Form1MViewSet.lookup_url_kwarg
+      ~Form1MViewSet.name
+      ~Form1MViewSet.ordering
+      ~Form1MViewSet.ordering_fields
+      ~Form1MViewSet.paginator
+      ~Form1MViewSet.parser_classes
+      ~Form1MViewSet.permission_classes
+      ~Form1MViewSet.queryset
+      ~Form1MViewSet.renderer_classes
+      ~Form1MViewSet.schema
+      ~Form1MViewSet.settings
+      ~Form1MViewSet.suffix
+      ~Form1MViewSet.throttle_classes
+      ~Form1MViewSet.versioning_class
+      ~Form1MViewSet.view_is_async
+   
+   

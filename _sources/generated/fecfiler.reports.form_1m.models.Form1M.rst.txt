@@ -1,0 +1,113 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_1m.models.Form1M
+=======================================
+
+.. currentmodule:: fecfiler.reports.form_1m.models
+
+.. autoclass:: Form1M
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form1M.__init__
+      ~Form1M.check
+      ~Form1M.clean
+      ~Form1M.clean_fields
+      ~Form1M.date_error_message
+      ~Form1M.delete
+      ~Form1M.from_db
+      ~Form1M.full_clean
+      ~Form1M.get_constraints
+      ~Form1M.get_deferred_fields
+      ~Form1M.prepare_database_save
+      ~Form1M.refresh_from_db
+      ~Form1M.save
+      ~Form1M.save_base
+      ~Form1M.serializable_value
+      ~Form1M.unique_error_message
+      ~Form1M.validate_constraints
+      ~Form1M.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form1M.III_candidate_district
+      ~Form1M.III_candidate_first_name
+      ~Form1M.III_candidate_id_number
+      ~Form1M.III_candidate_last_name
+      ~Form1M.III_candidate_middle_name
+      ~Form1M.III_candidate_office
+      ~Form1M.III_candidate_prefix
+      ~Form1M.III_candidate_state
+      ~Form1M.III_candidate_suffix
+      ~Form1M.III_date_of_contribution
+      ~Form1M.II_candidate_district
+      ~Form1M.II_candidate_first_name
+      ~Form1M.II_candidate_id_number
+      ~Form1M.II_candidate_last_name
+      ~Form1M.II_candidate_middle_name
+      ~Form1M.II_candidate_office
+      ~Form1M.II_candidate_prefix
+      ~Form1M.II_candidate_state
+      ~Form1M.II_candidate_suffix
+      ~Form1M.II_date_of_contribution
+      ~Form1M.IV_candidate_district
+      ~Form1M.IV_candidate_first_name
+      ~Form1M.IV_candidate_id_number
+      ~Form1M.IV_candidate_last_name
+      ~Form1M.IV_candidate_middle_name
+      ~Form1M.IV_candidate_office
+      ~Form1M.IV_candidate_prefix
+      ~Form1M.IV_candidate_state
+      ~Form1M.IV_candidate_suffix
+      ~Form1M.IV_date_of_contribution
+      ~Form1M.I_candidate_district
+      ~Form1M.I_candidate_first_name
+      ~Form1M.I_candidate_id_number
+      ~Form1M.I_candidate_last_name
+      ~Form1M.I_candidate_middle_name
+      ~Form1M.I_candidate_office
+      ~Form1M.I_candidate_prefix
+      ~Form1M.I_candidate_state
+      ~Form1M.I_candidate_suffix
+      ~Form1M.I_date_of_contribution
+      ~Form1M.V_candidate_district
+      ~Form1M.V_candidate_first_name
+      ~Form1M.V_candidate_id_number
+      ~Form1M.V_candidate_last_name
+      ~Form1M.V_candidate_middle_name
+      ~Form1M.V_candidate_office
+      ~Form1M.V_candidate_prefix
+      ~Form1M.V_candidate_state
+      ~Form1M.V_candidate_suffix
+      ~Form1M.V_date_of_contribution
+      ~Form1M.affiliated_committee_fec_id
+      ~Form1M.affiliated_committee_name
+      ~Form1M.affiliated_date_form_f1_filed
+      ~Form1M.city
+      ~Form1M.committee_type
+      ~Form1M.id
+      ~Form1M.objects
+      ~Form1M.pk
+      ~Form1M.report_set
+      ~Form1M.state
+      ~Form1M.street_1
+      ~Form1M.street_2
+      ~Form1M.zip
+   
+   

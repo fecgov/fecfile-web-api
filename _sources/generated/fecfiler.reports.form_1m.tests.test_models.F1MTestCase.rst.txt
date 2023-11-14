@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
+========================================================
+
+.. currentmodule:: fecfiler.reports.form_1m.tests.test_models
+
+.. autoclass:: F1MTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F1MTestCase.__init__
+      ~F1MTestCase.addClassCleanup
+      ~F1MTestCase.addCleanup
+      ~F1MTestCase.addTypeEqualityFunc
+      ~F1MTestCase.assertAlmostEqual
+      ~F1MTestCase.assertAlmostEquals
+      ~F1MTestCase.assertContains
+      ~F1MTestCase.assertCountEqual
+      ~F1MTestCase.assertDictContainsSubset
+      ~F1MTestCase.assertDictEqual
+      ~F1MTestCase.assertEqual
+      ~F1MTestCase.assertEquals
+      ~F1MTestCase.assertFalse
+      ~F1MTestCase.assertFieldOutput
+      ~F1MTestCase.assertFormError
+      ~F1MTestCase.assertFormsetError
+      ~F1MTestCase.assertGreater
+      ~F1MTestCase.assertGreaterEqual
+      ~F1MTestCase.assertHTMLEqual
+      ~F1MTestCase.assertHTMLNotEqual
+      ~F1MTestCase.assertIn
+      ~F1MTestCase.assertInHTML
+      ~F1MTestCase.assertIs
+      ~F1MTestCase.assertIsInstance
+      ~F1MTestCase.assertIsNone
+      ~F1MTestCase.assertIsNot
+      ~F1MTestCase.assertIsNotNone
+      ~F1MTestCase.assertJSONEqual
+      ~F1MTestCase.assertJSONNotEqual
+      ~F1MTestCase.assertLess
+      ~F1MTestCase.assertLessEqual
+      ~F1MTestCase.assertListEqual
+      ~F1MTestCase.assertLogs
+      ~F1MTestCase.assertMultiLineEqual
+      ~F1MTestCase.assertNoLogs
+      ~F1MTestCase.assertNotAlmostEqual
+      ~F1MTestCase.assertNotAlmostEquals
+      ~F1MTestCase.assertNotContains
+      ~F1MTestCase.assertNotEqual
+      ~F1MTestCase.assertNotEquals
+      ~F1MTestCase.assertNotIn
+      ~F1MTestCase.assertNotIsInstance
+      ~F1MTestCase.assertNotRegex
+      ~F1MTestCase.assertNotRegexpMatches
+      ~F1MTestCase.assertNumQueries
+      ~F1MTestCase.assertQuerysetEqual
+      ~F1MTestCase.assertRaises
+      ~F1MTestCase.assertRaisesMessage
+      ~F1MTestCase.assertRaisesRegex
+      ~F1MTestCase.assertRaisesRegexp
+      ~F1MTestCase.assertRedirects
+      ~F1MTestCase.assertRegex
+      ~F1MTestCase.assertRegexpMatches
+      ~F1MTestCase.assertSequenceEqual
+      ~F1MTestCase.assertSetEqual
+      ~F1MTestCase.assertTemplateNotUsed
+      ~F1MTestCase.assertTemplateUsed
+      ~F1MTestCase.assertTrue
+      ~F1MTestCase.assertTupleEqual
+      ~F1MTestCase.assertURLEqual
+      ~F1MTestCase.assertWarns
+      ~F1MTestCase.assertWarnsMessage
+      ~F1MTestCase.assertWarnsRegex
+      ~F1MTestCase.assertXMLEqual
+      ~F1MTestCase.assertXMLNotEqual
+      ~F1MTestCase.assert_
+      ~F1MTestCase.captureOnCommitCallbacks
+      ~F1MTestCase.countTestCases
+      ~F1MTestCase.debug
+      ~F1MTestCase.defaultTestResult
+      ~F1MTestCase.doClassCleanups
+      ~F1MTestCase.doCleanups
+      ~F1MTestCase.fail
+      ~F1MTestCase.failIf
+      ~F1MTestCase.failIfAlmostEqual
+      ~F1MTestCase.failIfEqual
+      ~F1MTestCase.failUnless
+      ~F1MTestCase.failUnlessAlmostEqual
+      ~F1MTestCase.failUnlessEqual
+      ~F1MTestCase.failUnlessRaises
+      ~F1MTestCase.id
+      ~F1MTestCase.modify_settings
+      ~F1MTestCase.run
+      ~F1MTestCase.setUp
+      ~F1MTestCase.setUpClass
+      ~F1MTestCase.setUpTestData
+      ~F1MTestCase.settings
+      ~F1MTestCase.shortDescription
+      ~F1MTestCase.skipTest
+      ~F1MTestCase.subTest
+      ~F1MTestCase.tearDown
+      ~F1MTestCase.tearDownClass
+      ~F1MTestCase.test_save_and_delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F1MTestCase.available_apps
+      ~F1MTestCase.databases
+      ~F1MTestCase.fixtures
+      ~F1MTestCase.longMessage
+      ~F1MTestCase.maxDiff
+      ~F1MTestCase.reset_sequences
+      ~F1MTestCase.serialized_rollback
+   
+   

@@ -1,0 +1,133 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
+=============================================================
+
+.. currentmodule:: fecfiler.reports.form_3x.tests.test_views
+
+.. autoclass:: Form3XViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form3XViewSetTest.__init__
+      ~Form3XViewSetTest.addClassCleanup
+      ~Form3XViewSetTest.addCleanup
+      ~Form3XViewSetTest.addTypeEqualityFunc
+      ~Form3XViewSetTest.assertAlmostEqual
+      ~Form3XViewSetTest.assertAlmostEquals
+      ~Form3XViewSetTest.assertContains
+      ~Form3XViewSetTest.assertCountEqual
+      ~Form3XViewSetTest.assertDictContainsSubset
+      ~Form3XViewSetTest.assertDictEqual
+      ~Form3XViewSetTest.assertEqual
+      ~Form3XViewSetTest.assertEquals
+      ~Form3XViewSetTest.assertFalse
+      ~Form3XViewSetTest.assertFieldOutput
+      ~Form3XViewSetTest.assertFormError
+      ~Form3XViewSetTest.assertFormsetError
+      ~Form3XViewSetTest.assertGreater
+      ~Form3XViewSetTest.assertGreaterEqual
+      ~Form3XViewSetTest.assertHTMLEqual
+      ~Form3XViewSetTest.assertHTMLNotEqual
+      ~Form3XViewSetTest.assertIn
+      ~Form3XViewSetTest.assertInHTML
+      ~Form3XViewSetTest.assertIs
+      ~Form3XViewSetTest.assertIsInstance
+      ~Form3XViewSetTest.assertIsNone
+      ~Form3XViewSetTest.assertIsNot
+      ~Form3XViewSetTest.assertIsNotNone
+      ~Form3XViewSetTest.assertJSONEqual
+      ~Form3XViewSetTest.assertJSONNotEqual
+      ~Form3XViewSetTest.assertLess
+      ~Form3XViewSetTest.assertLessEqual
+      ~Form3XViewSetTest.assertListEqual
+      ~Form3XViewSetTest.assertLogs
+      ~Form3XViewSetTest.assertMultiLineEqual
+      ~Form3XViewSetTest.assertNoLogs
+      ~Form3XViewSetTest.assertNotAlmostEqual
+      ~Form3XViewSetTest.assertNotAlmostEquals
+      ~Form3XViewSetTest.assertNotContains
+      ~Form3XViewSetTest.assertNotEqual
+      ~Form3XViewSetTest.assertNotEquals
+      ~Form3XViewSetTest.assertNotIn
+      ~Form3XViewSetTest.assertNotIsInstance
+      ~Form3XViewSetTest.assertNotRegex
+      ~Form3XViewSetTest.assertNotRegexpMatches
+      ~Form3XViewSetTest.assertNumQueries
+      ~Form3XViewSetTest.assertQuerysetEqual
+      ~Form3XViewSetTest.assertRaises
+      ~Form3XViewSetTest.assertRaisesMessage
+      ~Form3XViewSetTest.assertRaisesRegex
+      ~Form3XViewSetTest.assertRaisesRegexp
+      ~Form3XViewSetTest.assertRedirects
+      ~Form3XViewSetTest.assertRegex
+      ~Form3XViewSetTest.assertRegexpMatches
+      ~Form3XViewSetTest.assertSequenceEqual
+      ~Form3XViewSetTest.assertSetEqual
+      ~Form3XViewSetTest.assertTemplateNotUsed
+      ~Form3XViewSetTest.assertTemplateUsed
+      ~Form3XViewSetTest.assertTrue
+      ~Form3XViewSetTest.assertTupleEqual
+      ~Form3XViewSetTest.assertURLEqual
+      ~Form3XViewSetTest.assertWarns
+      ~Form3XViewSetTest.assertWarnsMessage
+      ~Form3XViewSetTest.assertWarnsRegex
+      ~Form3XViewSetTest.assertXMLEqual
+      ~Form3XViewSetTest.assertXMLNotEqual
+      ~Form3XViewSetTest.assert_
+      ~Form3XViewSetTest.captureOnCommitCallbacks
+      ~Form3XViewSetTest.countTestCases
+      ~Form3XViewSetTest.debug
+      ~Form3XViewSetTest.defaultTestResult
+      ~Form3XViewSetTest.doClassCleanups
+      ~Form3XViewSetTest.doCleanups
+      ~Form3XViewSetTest.fail
+      ~Form3XViewSetTest.failIf
+      ~Form3XViewSetTest.failIfAlmostEqual
+      ~Form3XViewSetTest.failIfEqual
+      ~Form3XViewSetTest.failUnless
+      ~Form3XViewSetTest.failUnlessAlmostEqual
+      ~Form3XViewSetTest.failUnlessEqual
+      ~Form3XViewSetTest.failUnlessRaises
+      ~Form3XViewSetTest.id
+      ~Form3XViewSetTest.modify_settings
+      ~Form3XViewSetTest.run
+      ~Form3XViewSetTest.setUp
+      ~Form3XViewSetTest.setUpClass
+      ~Form3XViewSetTest.setUpTestData
+      ~Form3XViewSetTest.settings
+      ~Form3XViewSetTest.shortDescription
+      ~Form3XViewSetTest.skipTest
+      ~Form3XViewSetTest.subTest
+      ~Form3XViewSetTest.tearDown
+      ~Form3XViewSetTest.tearDownClass
+      ~Form3XViewSetTest.test_amend
+      ~Form3XViewSetTest.test_coverage_dates_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form3XViewSetTest.available_apps
+      ~Form3XViewSetTest.databases
+      ~Form3XViewSetTest.fixtures
+      ~Form3XViewSetTest.longMessage
+      ~Form3XViewSetTest.maxDiff
+      ~Form3XViewSetTest.reset_sequences
+      ~Form3XViewSetTest.serialized_rollback
+   
+   

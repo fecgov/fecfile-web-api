@@ -32,6 +32,7 @@ fecfiler.reports
    :recursive:
 
    fecfiler.reports.apps
+   fecfiler.reports.form_1m
    fecfiler.reports.form_24
    fecfiler.reports.form_3x
    fecfiler.reports.form_99

@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
+=======================================================================
+
+.. currentmodule:: fecfiler.reports.form_99.tests.test_serializers
+
+.. autoclass:: F99SerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F99SerializerTestCase.__init__
+      ~F99SerializerTestCase.addClassCleanup
+      ~F99SerializerTestCase.addCleanup
+      ~F99SerializerTestCase.addTypeEqualityFunc
+      ~F99SerializerTestCase.assertAlmostEqual
+      ~F99SerializerTestCase.assertAlmostEquals
+      ~F99SerializerTestCase.assertContains
+      ~F99SerializerTestCase.assertCountEqual
+      ~F99SerializerTestCase.assertDictContainsSubset
+      ~F99SerializerTestCase.assertDictEqual
+      ~F99SerializerTestCase.assertEqual
+      ~F99SerializerTestCase.assertEquals
+      ~F99SerializerTestCase.assertFalse
+      ~F99SerializerTestCase.assertFieldOutput
+      ~F99SerializerTestCase.assertFormError
+      ~F99SerializerTestCase.assertFormsetError
+      ~F99SerializerTestCase.assertGreater
+      ~F99SerializerTestCase.assertGreaterEqual
+      ~F99SerializerTestCase.assertHTMLEqual
+      ~F99SerializerTestCase.assertHTMLNotEqual
+      ~F99SerializerTestCase.assertIn
+      ~F99SerializerTestCase.assertInHTML
+      ~F99SerializerTestCase.assertIs
+      ~F99SerializerTestCase.assertIsInstance
+      ~F99SerializerTestCase.assertIsNone
+      ~F99SerializerTestCase.assertIsNot
+      ~F99SerializerTestCase.assertIsNotNone
+      ~F99SerializerTestCase.assertJSONEqual
+      ~F99SerializerTestCase.assertJSONNotEqual
+      ~F99SerializerTestCase.assertLess
+      ~F99SerializerTestCase.assertLessEqual
+      ~F99SerializerTestCase.assertListEqual
+      ~F99SerializerTestCase.assertLogs
+      ~F99SerializerTestCase.assertMultiLineEqual
+      ~F99SerializerTestCase.assertNoLogs
+      ~F99SerializerTestCase.assertNotAlmostEqual
+      ~F99SerializerTestCase.assertNotAlmostEquals
+      ~F99SerializerTestCase.assertNotContains
+      ~F99SerializerTestCase.assertNotEqual
+      ~F99SerializerTestCase.assertNotEquals
+      ~F99SerializerTestCase.assertNotIn
+      ~F99SerializerTestCase.assertNotIsInstance
+      ~F99SerializerTestCase.assertNotRegex
+      ~F99SerializerTestCase.assertNotRegexpMatches
+      ~F99SerializerTestCase.assertNumQueries
+      ~F99SerializerTestCase.assertQuerysetEqual
+      ~F99SerializerTestCase.assertRaises
+      ~F99SerializerTestCase.assertRaisesMessage
+      ~F99SerializerTestCase.assertRaisesRegex
+      ~F99SerializerTestCase.assertRaisesRegexp
+      ~F99SerializerTestCase.assertRedirects
+      ~F99SerializerTestCase.assertRegex
+      ~F99SerializerTestCase.assertRegexpMatches
+      ~F99SerializerTestCase.assertSequenceEqual
+      ~F99SerializerTestCase.assertSetEqual
+      ~F99SerializerTestCase.assertTemplateNotUsed
+      ~F99SerializerTestCase.assertTemplateUsed
+      ~F99SerializerTestCase.assertTrue
+      ~F99SerializerTestCase.assertTupleEqual
+      ~F99SerializerTestCase.assertURLEqual
+      ~F99SerializerTestCase.assertWarns
+      ~F99SerializerTestCase.assertWarnsMessage
+      ~F99SerializerTestCase.assertWarnsRegex
+      ~F99SerializerTestCase.assertXMLEqual
+      ~F99SerializerTestCase.assertXMLNotEqual
+      ~F99SerializerTestCase.assert_
+      ~F99SerializerTestCase.captureOnCommitCallbacks
+      ~F99SerializerTestCase.countTestCases
+      ~F99SerializerTestCase.debug
+      ~F99SerializerTestCase.defaultTestResult
+      ~F99SerializerTestCase.doClassCleanups
+      ~F99SerializerTestCase.doCleanups
+      ~F99SerializerTestCase.fail
+      ~F99SerializerTestCase.failIf
+      ~F99SerializerTestCase.failIfAlmostEqual
+      ~F99SerializerTestCase.failIfEqual
+      ~F99SerializerTestCase.failUnless
+      ~F99SerializerTestCase.failUnlessAlmostEqual
+      ~F99SerializerTestCase.failUnlessEqual
+      ~F99SerializerTestCase.failUnlessRaises
+      ~F99SerializerTestCase.id
+      ~F99SerializerTestCase.modify_settings
+      ~F99SerializerTestCase.run
+      ~F99SerializerTestCase.setUp
+      ~F99SerializerTestCase.setUpClass
+      ~F99SerializerTestCase.setUpTestData
+      ~F99SerializerTestCase.settings
+      ~F99SerializerTestCase.shortDescription
+      ~F99SerializerTestCase.skipTest
+      ~F99SerializerTestCase.subTest
+      ~F99SerializerTestCase.tearDown
+      ~F99SerializerTestCase.tearDownClass
+      ~F99SerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F99SerializerTestCase.available_apps
+      ~F99SerializerTestCase.databases
+      ~F99SerializerTestCase.fixtures
+      ~F99SerializerTestCase.longMessage
+      ~F99SerializerTestCase.maxDiff
+      ~F99SerializerTestCase.reset_sequences
+      ~F99SerializerTestCase.serialized_rollback
+   
+   

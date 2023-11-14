@@ -26,5 +26,6 @@ fecfiler.reports.managers.ReportType
       ~ReportType.F3X
       ~ReportType.F24
       ~ReportType.F99
+      ~ReportType.F1M
    
    

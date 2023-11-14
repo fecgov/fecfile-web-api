@@ -1,0 +1,83 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_1m.serializers.Form1MSerializer
+======================================================
+
+.. currentmodule:: fecfiler.reports.form_1m.serializers
+
+.. autoclass:: Form1MSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Form1MSerializer.__init__
+      ~Form1MSerializer.bind
+      ~Form1MSerializer.build_field
+      ~Form1MSerializer.build_nested_field
+      ~Form1MSerializer.build_property_field
+      ~Form1MSerializer.build_relational_field
+      ~Form1MSerializer.build_standard_field
+      ~Form1MSerializer.build_unknown_field
+      ~Form1MSerializer.build_url_field
+      ~Form1MSerializer.create
+      ~Form1MSerializer.fail
+      ~Form1MSerializer.get_attribute
+      ~Form1MSerializer.get_default
+      ~Form1MSerializer.get_default_field_names
+      ~Form1MSerializer.get_extra_kwargs
+      ~Form1MSerializer.get_field_names
+      ~Form1MSerializer.get_fields
+      ~Form1MSerializer.get_foreign_key_fields
+      ~Form1MSerializer.get_initial
+      ~Form1MSerializer.get_schema_name
+      ~Form1MSerializer.get_unique_for_date_validators
+      ~Form1MSerializer.get_unique_together_validators
+      ~Form1MSerializer.get_uniqueness_extra_kwargs
+      ~Form1MSerializer.get_validation_candidate
+      ~Form1MSerializer.get_validators
+      ~Form1MSerializer.get_value
+      ~Form1MSerializer.ignore_fields
+      ~Form1MSerializer.include_extra_kwargs
+      ~Form1MSerializer.is_valid
+      ~Form1MSerializer.many_init
+      ~Form1MSerializer.run_validation
+      ~Form1MSerializer.run_validators
+      ~Form1MSerializer.save
+      ~Form1MSerializer.to_internal_value
+      ~Form1MSerializer.to_representation
+      ~Form1MSerializer.update
+      ~Form1MSerializer.validate
+      ~Form1MSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Form1MSerializer.context
+      ~Form1MSerializer.data
+      ~Form1MSerializer.default_error_messages
+      ~Form1MSerializer.default_validators
+      ~Form1MSerializer.errors
+      ~Form1MSerializer.fields
+      ~Form1MSerializer.initial
+      ~Form1MSerializer.root
+      ~Form1MSerializer.schema_name
+      ~Form1MSerializer.serializer_field_mapping
+      ~Form1MSerializer.url_field_name
+      ~Form1MSerializer.validated_data
+      ~Form1MSerializer.validators
+   
+   

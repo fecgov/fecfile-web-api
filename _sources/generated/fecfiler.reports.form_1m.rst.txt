@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.form\_1m
+=========================
+
+.. automodule:: fecfiler.reports.form_1m
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.reports.form_1m.models
+   fecfiler.reports.form_1m.serializers
+   fecfiler.reports.form_1m.tests
+   fecfiler.reports.form_1m.views
+

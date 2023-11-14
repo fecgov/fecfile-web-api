@@ -34,4 +34,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0001_initial
    fecfiler.reports.migrations.0002_copy_to_unified_table
    fecfiler.reports.migrations.0003_reportf99_report_report_f99
+   fecfiler.reports.migrations.0004_form1m_report_form_1m
 

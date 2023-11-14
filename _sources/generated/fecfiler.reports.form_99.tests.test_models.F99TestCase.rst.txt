@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_99.tests.test\_models.F99TestCase
+========================================================
+
+.. currentmodule:: fecfiler.reports.form_99.tests.test_models
+
+.. autoclass:: F99TestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F99TestCase.__init__
+      ~F99TestCase.addClassCleanup
+      ~F99TestCase.addCleanup
+      ~F99TestCase.addTypeEqualityFunc
+      ~F99TestCase.assertAlmostEqual
+      ~F99TestCase.assertAlmostEquals
+      ~F99TestCase.assertContains
+      ~F99TestCase.assertCountEqual
+      ~F99TestCase.assertDictContainsSubset
+      ~F99TestCase.assertDictEqual
+      ~F99TestCase.assertEqual
+      ~F99TestCase.assertEquals
+      ~F99TestCase.assertFalse
+      ~F99TestCase.assertFieldOutput
+      ~F99TestCase.assertFormError
+      ~F99TestCase.assertFormsetError
+      ~F99TestCase.assertGreater
+      ~F99TestCase.assertGreaterEqual
+      ~F99TestCase.assertHTMLEqual
+      ~F99TestCase.assertHTMLNotEqual
+      ~F99TestCase.assertIn
+      ~F99TestCase.assertInHTML
+      ~F99TestCase.assertIs
+      ~F99TestCase.assertIsInstance
+      ~F99TestCase.assertIsNone
+      ~F99TestCase.assertIsNot
+      ~F99TestCase.assertIsNotNone
+      ~F99TestCase.assertJSONEqual
+      ~F99TestCase.assertJSONNotEqual
+      ~F99TestCase.assertLess
+      ~F99TestCase.assertLessEqual
+      ~F99TestCase.assertListEqual
+      ~F99TestCase.assertLogs
+      ~F99TestCase.assertMultiLineEqual
+      ~F99TestCase.assertNoLogs
+      ~F99TestCase.assertNotAlmostEqual
+      ~F99TestCase.assertNotAlmostEquals
+      ~F99TestCase.assertNotContains
+      ~F99TestCase.assertNotEqual
+      ~F99TestCase.assertNotEquals
+      ~F99TestCase.assertNotIn
+      ~F99TestCase.assertNotIsInstance
+      ~F99TestCase.assertNotRegex
+      ~F99TestCase.assertNotRegexpMatches
+      ~F99TestCase.assertNumQueries
+      ~F99TestCase.assertQuerysetEqual
+      ~F99TestCase.assertRaises
+      ~F99TestCase.assertRaisesMessage
+      ~F99TestCase.assertRaisesRegex
+      ~F99TestCase.assertRaisesRegexp
+      ~F99TestCase.assertRedirects
+      ~F99TestCase.assertRegex
+      ~F99TestCase.assertRegexpMatches
+      ~F99TestCase.assertSequenceEqual
+      ~F99TestCase.assertSetEqual
+      ~F99TestCase.assertTemplateNotUsed
+      ~F99TestCase.assertTemplateUsed
+      ~F99TestCase.assertTrue
+      ~F99TestCase.assertTupleEqual
+      ~F99TestCase.assertURLEqual
+      ~F99TestCase.assertWarns
+      ~F99TestCase.assertWarnsMessage
+      ~F99TestCase.assertWarnsRegex
+      ~F99TestCase.assertXMLEqual
+      ~F99TestCase.assertXMLNotEqual
+      ~F99TestCase.assert_
+      ~F99TestCase.captureOnCommitCallbacks
+      ~F99TestCase.countTestCases
+      ~F99TestCase.debug
+      ~F99TestCase.defaultTestResult
+      ~F99TestCase.doClassCleanups
+      ~F99TestCase.doCleanups
+      ~F99TestCase.fail
+      ~F99TestCase.failIf
+      ~F99TestCase.failIfAlmostEqual
+      ~F99TestCase.failIfEqual
+      ~F99TestCase.failUnless
+      ~F99TestCase.failUnlessAlmostEqual
+      ~F99TestCase.failUnlessEqual
+      ~F99TestCase.failUnlessRaises
+      ~F99TestCase.id
+      ~F99TestCase.modify_settings
+      ~F99TestCase.run
+      ~F99TestCase.setUp
+      ~F99TestCase.setUpClass
+      ~F99TestCase.setUpTestData
+      ~F99TestCase.settings
+      ~F99TestCase.shortDescription
+      ~F99TestCase.skipTest
+      ~F99TestCase.subTest
+      ~F99TestCase.tearDown
+      ~F99TestCase.tearDownClass
+      ~F99TestCase.test_save_and_delete
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F99TestCase.available_apps
+      ~F99TestCase.databases
+      ~F99TestCase.fixtures
+      ~F99TestCase.longMessage
+      ~F99TestCase.maxDiff
+      ~F99TestCase.reset_sequences
+      ~F99TestCase.serialized_rollback
+   
+   

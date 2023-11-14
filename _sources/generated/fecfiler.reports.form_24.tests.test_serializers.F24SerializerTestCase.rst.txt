@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
+=======================================================================
+
+.. currentmodule:: fecfiler.reports.form_24.tests.test_serializers
+
+.. autoclass:: F24SerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F24SerializerTestCase.__init__
+      ~F24SerializerTestCase.addClassCleanup
+      ~F24SerializerTestCase.addCleanup
+      ~F24SerializerTestCase.addTypeEqualityFunc
+      ~F24SerializerTestCase.assertAlmostEqual
+      ~F24SerializerTestCase.assertAlmostEquals
+      ~F24SerializerTestCase.assertContains
+      ~F24SerializerTestCase.assertCountEqual
+      ~F24SerializerTestCase.assertDictContainsSubset
+      ~F24SerializerTestCase.assertDictEqual
+      ~F24SerializerTestCase.assertEqual
+      ~F24SerializerTestCase.assertEquals
+      ~F24SerializerTestCase.assertFalse
+      ~F24SerializerTestCase.assertFieldOutput
+      ~F24SerializerTestCase.assertFormError
+      ~F24SerializerTestCase.assertFormsetError
+      ~F24SerializerTestCase.assertGreater
+      ~F24SerializerTestCase.assertGreaterEqual
+      ~F24SerializerTestCase.assertHTMLEqual
+      ~F24SerializerTestCase.assertHTMLNotEqual
+      ~F24SerializerTestCase.assertIn
+      ~F24SerializerTestCase.assertInHTML
+      ~F24SerializerTestCase.assertIs
+      ~F24SerializerTestCase.assertIsInstance
+      ~F24SerializerTestCase.assertIsNone
+      ~F24SerializerTestCase.assertIsNot
+      ~F24SerializerTestCase.assertIsNotNone
+      ~F24SerializerTestCase.assertJSONEqual
+      ~F24SerializerTestCase.assertJSONNotEqual
+      ~F24SerializerTestCase.assertLess
+      ~F24SerializerTestCase.assertLessEqual
+      ~F24SerializerTestCase.assertListEqual
+      ~F24SerializerTestCase.assertLogs
+      ~F24SerializerTestCase.assertMultiLineEqual
+      ~F24SerializerTestCase.assertNoLogs
+      ~F24SerializerTestCase.assertNotAlmostEqual
+      ~F24SerializerTestCase.assertNotAlmostEquals
+      ~F24SerializerTestCase.assertNotContains
+      ~F24SerializerTestCase.assertNotEqual
+      ~F24SerializerTestCase.assertNotEquals
+      ~F24SerializerTestCase.assertNotIn
+      ~F24SerializerTestCase.assertNotIsInstance
+      ~F24SerializerTestCase.assertNotRegex
+      ~F24SerializerTestCase.assertNotRegexpMatches
+      ~F24SerializerTestCase.assertNumQueries
+      ~F24SerializerTestCase.assertQuerysetEqual
+      ~F24SerializerTestCase.assertRaises
+      ~F24SerializerTestCase.assertRaisesMessage
+      ~F24SerializerTestCase.assertRaisesRegex
+      ~F24SerializerTestCase.assertRaisesRegexp
+      ~F24SerializerTestCase.assertRedirects
+      ~F24SerializerTestCase.assertRegex
+      ~F24SerializerTestCase.assertRegexpMatches
+      ~F24SerializerTestCase.assertSequenceEqual
+      ~F24SerializerTestCase.assertSetEqual
+      ~F24SerializerTestCase.assertTemplateNotUsed
+      ~F24SerializerTestCase.assertTemplateUsed
+      ~F24SerializerTestCase.assertTrue
+      ~F24SerializerTestCase.assertTupleEqual
+      ~F24SerializerTestCase.assertURLEqual
+      ~F24SerializerTestCase.assertWarns
+      ~F24SerializerTestCase.assertWarnsMessage
+      ~F24SerializerTestCase.assertWarnsRegex
+      ~F24SerializerTestCase.assertXMLEqual
+      ~F24SerializerTestCase.assertXMLNotEqual
+      ~F24SerializerTestCase.assert_
+      ~F24SerializerTestCase.captureOnCommitCallbacks
+      ~F24SerializerTestCase.countTestCases
+      ~F24SerializerTestCase.debug
+      ~F24SerializerTestCase.defaultTestResult
+      ~F24SerializerTestCase.doClassCleanups
+      ~F24SerializerTestCase.doCleanups
+      ~F24SerializerTestCase.fail
+      ~F24SerializerTestCase.failIf
+      ~F24SerializerTestCase.failIfAlmostEqual
+      ~F24SerializerTestCase.failIfEqual
+      ~F24SerializerTestCase.failUnless
+      ~F24SerializerTestCase.failUnlessAlmostEqual
+      ~F24SerializerTestCase.failUnlessEqual
+      ~F24SerializerTestCase.failUnlessRaises
+      ~F24SerializerTestCase.id
+      ~F24SerializerTestCase.modify_settings
+      ~F24SerializerTestCase.run
+      ~F24SerializerTestCase.setUp
+      ~F24SerializerTestCase.setUpClass
+      ~F24SerializerTestCase.setUpTestData
+      ~F24SerializerTestCase.settings
+      ~F24SerializerTestCase.shortDescription
+      ~F24SerializerTestCase.skipTest
+      ~F24SerializerTestCase.subTest
+      ~F24SerializerTestCase.tearDown
+      ~F24SerializerTestCase.tearDownClass
+      ~F24SerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F24SerializerTestCase.available_apps
+      ~F24SerializerTestCase.databases
+      ~F24SerializerTestCase.fixtures
+      ~F24SerializerTestCase.longMessage
+      ~F24SerializerTestCase.maxDiff
+      ~F24SerializerTestCase.reset_sequences
+      ~F24SerializerTestCase.serialized_rollback
+   
+   

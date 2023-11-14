@@ -33,5 +33,6 @@ fecfiler.reports.form\_3x
 
    fecfiler.reports.form_3x.models
    fecfiler.reports.form_3x.serializers
+   fecfiler.reports.form_3x.tests
    fecfiler.reports.form_3x.views
 

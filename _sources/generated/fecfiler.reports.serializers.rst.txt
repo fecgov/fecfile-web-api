@@ -22,6 +22,7 @@ fecfiler.reports.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      Form1MSerializer
       Form24Serializer
       Form3XSerializer
       Form99Serializer

@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.migrations.0004\_form1m\_report\_form\_1m
+==========================================================
+
+.. automodule:: fecfiler.reports.migrations.0004_form1m_report_form_1m
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

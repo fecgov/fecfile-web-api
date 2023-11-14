@@ -71,6 +71,8 @@ fecfiler.reports.models.Report
       ~Report.date_signed
       ~Report.deleted
       ~Report.dotfec_set
+      ~Report.form_1m
+      ~Report.form_1m_id
       ~Report.form_24
       ~Report.form_24_id
       ~Report.form_3x

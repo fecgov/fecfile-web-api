@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
+=======================================================================
+
+.. currentmodule:: fecfiler.reports.form_1m.tests.test_serializers
+
+.. autoclass:: F1MSerializerTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F1MSerializerTestCase.__init__
+      ~F1MSerializerTestCase.addClassCleanup
+      ~F1MSerializerTestCase.addCleanup
+      ~F1MSerializerTestCase.addTypeEqualityFunc
+      ~F1MSerializerTestCase.assertAlmostEqual
+      ~F1MSerializerTestCase.assertAlmostEquals
+      ~F1MSerializerTestCase.assertContains
+      ~F1MSerializerTestCase.assertCountEqual
+      ~F1MSerializerTestCase.assertDictContainsSubset
+      ~F1MSerializerTestCase.assertDictEqual
+      ~F1MSerializerTestCase.assertEqual
+      ~F1MSerializerTestCase.assertEquals
+      ~F1MSerializerTestCase.assertFalse
+      ~F1MSerializerTestCase.assertFieldOutput
+      ~F1MSerializerTestCase.assertFormError
+      ~F1MSerializerTestCase.assertFormsetError
+      ~F1MSerializerTestCase.assertGreater
+      ~F1MSerializerTestCase.assertGreaterEqual
+      ~F1MSerializerTestCase.assertHTMLEqual
+      ~F1MSerializerTestCase.assertHTMLNotEqual
+      ~F1MSerializerTestCase.assertIn
+      ~F1MSerializerTestCase.assertInHTML
+      ~F1MSerializerTestCase.assertIs
+      ~F1MSerializerTestCase.assertIsInstance
+      ~F1MSerializerTestCase.assertIsNone
+      ~F1MSerializerTestCase.assertIsNot
+      ~F1MSerializerTestCase.assertIsNotNone
+      ~F1MSerializerTestCase.assertJSONEqual
+      ~F1MSerializerTestCase.assertJSONNotEqual
+      ~F1MSerializerTestCase.assertLess
+      ~F1MSerializerTestCase.assertLessEqual
+      ~F1MSerializerTestCase.assertListEqual
+      ~F1MSerializerTestCase.assertLogs
+      ~F1MSerializerTestCase.assertMultiLineEqual
+      ~F1MSerializerTestCase.assertNoLogs
+      ~F1MSerializerTestCase.assertNotAlmostEqual
+      ~F1MSerializerTestCase.assertNotAlmostEquals
+      ~F1MSerializerTestCase.assertNotContains
+      ~F1MSerializerTestCase.assertNotEqual
+      ~F1MSerializerTestCase.assertNotEquals
+      ~F1MSerializerTestCase.assertNotIn
+      ~F1MSerializerTestCase.assertNotIsInstance
+      ~F1MSerializerTestCase.assertNotRegex
+      ~F1MSerializerTestCase.assertNotRegexpMatches
+      ~F1MSerializerTestCase.assertNumQueries
+      ~F1MSerializerTestCase.assertQuerysetEqual
+      ~F1MSerializerTestCase.assertRaises
+      ~F1MSerializerTestCase.assertRaisesMessage
+      ~F1MSerializerTestCase.assertRaisesRegex
+      ~F1MSerializerTestCase.assertRaisesRegexp
+      ~F1MSerializerTestCase.assertRedirects
+      ~F1MSerializerTestCase.assertRegex
+      ~F1MSerializerTestCase.assertRegexpMatches
+      ~F1MSerializerTestCase.assertSequenceEqual
+      ~F1MSerializerTestCase.assertSetEqual
+      ~F1MSerializerTestCase.assertTemplateNotUsed
+      ~F1MSerializerTestCase.assertTemplateUsed
+      ~F1MSerializerTestCase.assertTrue
+      ~F1MSerializerTestCase.assertTupleEqual
+      ~F1MSerializerTestCase.assertURLEqual
+      ~F1MSerializerTestCase.assertWarns
+      ~F1MSerializerTestCase.assertWarnsMessage
+      ~F1MSerializerTestCase.assertWarnsRegex
+      ~F1MSerializerTestCase.assertXMLEqual
+      ~F1MSerializerTestCase.assertXMLNotEqual
+      ~F1MSerializerTestCase.assert_
+      ~F1MSerializerTestCase.captureOnCommitCallbacks
+      ~F1MSerializerTestCase.countTestCases
+      ~F1MSerializerTestCase.debug
+      ~F1MSerializerTestCase.defaultTestResult
+      ~F1MSerializerTestCase.doClassCleanups
+      ~F1MSerializerTestCase.doCleanups
+      ~F1MSerializerTestCase.fail
+      ~F1MSerializerTestCase.failIf
+      ~F1MSerializerTestCase.failIfAlmostEqual
+      ~F1MSerializerTestCase.failIfEqual
+      ~F1MSerializerTestCase.failUnless
+      ~F1MSerializerTestCase.failUnlessAlmostEqual
+      ~F1MSerializerTestCase.failUnlessEqual
+      ~F1MSerializerTestCase.failUnlessRaises
+      ~F1MSerializerTestCase.id
+      ~F1MSerializerTestCase.modify_settings
+      ~F1MSerializerTestCase.run
+      ~F1MSerializerTestCase.setUp
+      ~F1MSerializerTestCase.setUpClass
+      ~F1MSerializerTestCase.setUpTestData
+      ~F1MSerializerTestCase.settings
+      ~F1MSerializerTestCase.shortDescription
+      ~F1MSerializerTestCase.skipTest
+      ~F1MSerializerTestCase.subTest
+      ~F1MSerializerTestCase.tearDown
+      ~F1MSerializerTestCase.tearDownClass
+      ~F1MSerializerTestCase.test_serializer_validate
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F1MSerializerTestCase.available_apps
+      ~F1MSerializerTestCase.databases
+      ~F1MSerializerTestCase.fixtures
+      ~F1MSerializerTestCase.longMessage
+      ~F1MSerializerTestCase.maxDiff
+      ~F1MSerializerTestCase.reset_sequences
+      ~F1MSerializerTestCase.serialized_rollback
+   
+   

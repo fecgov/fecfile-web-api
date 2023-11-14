@@ -33,5 +33,6 @@ fecfiler.reports.form\_24
 
    fecfiler.reports.form_24.models
    fecfiler.reports.form_24.serializers
+   fecfiler.reports.form_24.tests
    fecfiler.reports.form_24.views
 
