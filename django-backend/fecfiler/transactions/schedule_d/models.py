@@ -28,7 +28,7 @@ class ScheduleD(models.Model):
     )
 
     def get_date(self):
-        return self.transaction.report.through_date
+        return self.get_transaction().report.coverage_through_date
 
     def get_transaction(self):
         return self.transaction_set.first()

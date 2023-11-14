@@ -72,3 +72,6 @@ front-end/.vscode/launch.json
 
 # cloud foundry
 .cfmeta
+
+# Virtual environment
+.venv/
