@@ -99,16 +99,6 @@ def get_id(form_type, record_number, schedule=""):
     return f"{schedule_str}-{random_hex(4)}-{random_hex(4)}-{random_hex(4)}-{record_str}"
 
 def get_records(form_type, args):
-    template_schedule_transaction = """    {
-            "comment": "{}",
-            "model": "transactions.{}",
-            "fields": {
-                "id": "{}",
-                "{}_amount": {},
-{}
-            }
-        }"""
-
     records = []
     test_cases = [
         "within_dates",
@@ -134,7 +124,7 @@ def get_records(form_type, args):
         schedule_id = get_id(form_type, record_number, schedule)
         transaction_id = get_id(form_type, record_number, schedule)
 
-        schedule_model = f"schedule_{schedule.lower()}"
+        schedule_model = f"schedule{schedule.lower()}"
 
         amount_field = "amount"
         if schedule == "A":
@@ -185,24 +175,22 @@ def get_records(form_type, args):
         "fields": {{
             "id": "{schedule_id}",
             "{amount_field}": {amount}{date_entry}
-        }}
-    }}"""
+        }}\n    }}"""
 
         transaction_record = f"""    {{
         "comment": "{comment}",
         "model": "transactions.transaction",
         "fields": {{
             "id": "{transaction_id}",
-            "schedule_a_id": "{schedule_id}",
-            "committee_account_id": {args.committee_account_id},
+            "schedule_{schedule.lower()}_id": "{schedule_id}",
+            "committee_account_id": "{args.committee_account_id}",
             "report_id": "{args.report_id}",
             "_form_type": "{form_type}",
-            "memo_code": {memo_code},
+            "memo_code": {str(memo_code).lower()},
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
             "transaction_type_identifier": "Transaction Type Identifier"
-        }}
-    }}"""
+        }}\n    }}"""
 
         records.append(schedule_record)
         records.append(transaction_record)
