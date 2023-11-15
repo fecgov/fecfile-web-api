@@ -151,11 +151,14 @@ class F3XReportTestCase(TestCase):
         )
         self.assertEqual(sum_b["line_11ai"], Decimal("10000.23"))
         self.assertEqual(sum_b["line_11aii"], Decimal("103.77"))
-        self.assertEqual(sum_b["line_11aiii"], Decimal(10104.00))
+        self.assertEqual(sum_b["line_11aiii"], Decimal("10104.00"))
         self.assertEqual(sum_b["line_11b"], Decimal("544.44"))
         self.assertEqual(sum_b["line_11c"], Decimal("655.55"))
         self.assertEqual(
-            sum_b["line_11d"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
+            sum_b["line_11d"],
+            Decimal("10104.00")  # line_11aiii
+            + Decimal("544.44")  # line_11b
+            + Decimal("655.55")  # line_11c
         )
 
         self.assertEqual(sum_b["line_12"], Decimal("1312.12"))
@@ -177,7 +180,10 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(sum_b["line_28b"], Decimal("2201.50"))
         self.assertEqual(sum_b["line_28c"], Decimal("3301.50"))
         self.assertEqual(
-            sum_b["line_28d"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
+            sum_b["line_28d"],
+            Decimal("1101.50")  # line_28a
+            + Decimal("2201.50")  # line_28b
+            + Decimal("3301.50")  # line_28c
         )
         self.assertEqual(sum_b["line_29"], Decimal("1201.50"))
         self.assertEqual(sum_b["line_30b"], Decimal("1102.25"))
@@ -189,17 +195,12 @@ class F3XReportTestCase(TestCase):
             - Decimal("0")  # line_21aii
             - Decimal("0")  # line_30aii
         )
-        self.assertEqual(
-            sum_b["line_33"], round(Decimal(10104.00 + 544.44 + 655.55), 2)
-        )
-        self.assertEqual(
-            sum_b["line_34"], round(Decimal(1101.50 + 2201.50 + 3301.50), 2)
-        )
+        self.assertEqual(sum_b["line_33"], sum_b["line_11d"])
+        self.assertEqual(sum_b["line_34"], sum_b["line_28d"])
         self.assertEqual(
             sum_b["line_35"],
-            round(
-                Decimal((10104.00 + 544.44 + 655.55) - (1101.50 + 2201.50 + 3301.50)), 2
-            ),
+            sum_b["line_33"]
+            - sum_b["line_34"],
         )
         self.assertEqual(sum_b["line_36"], Decimal("250.00"))
         self.assertEqual(sum_b["line_37"], Decimal("2225.79"))
