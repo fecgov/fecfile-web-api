@@ -28,9 +28,14 @@ def get_arguments():
         help='default value: 735db943-9446-462a-9be0-c820baadb622'
     )
     parser.add_argument(
-        '--report_id',
+        '--report_a_id',
         default="b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-        help='default value: b6d60d2d-d926-4e89-ad4b-c47d152a66ae'
+        help='primary report (default: b6d60d2d-d926-4e89-ad4b-c47d152a66ae)'
+    )
+    parser.add_argument(
+        '--report_b_id',
+        default="1406535e-f99f-42c4-97a8-247904b7d297",
+        help='secondary report (default: 1406535e-f99f-42c4-97a8-247904b7d297)'
     )
     parser.add_argument(
         '--report_start_date',
@@ -111,11 +116,31 @@ def get_date(args, test_case):
     if "within_dates" in test_case:
         return "-".join(report_start)
     if "year" in test_case:
-        report_months = range(int(report_start[1]), int(report_end[1]) + 1)
+        months = set([str(m).rjust(2, "0") for m in range(1, 13)])
+        report_start_month = report_start[1]
+        report_months = range(int(report_start_month), 13)
+        formatted_report_months = set([str(m).rjust(2, "0") for m in report_months])
+        months_before_report = list(months - formatted_report_months)
+        if len(months_before_report) > 0:
+            random_month = choice(months_before_report)
+        else:
+            random_month = report_start_month
+
+        report_start_day = int(report_start[2])
+        if (report_start_day > 1):
+            random_day = str(randrange(1, report_start_day)).rjust(2, "0")
+        else:
+            random_day = "01"
+
+        if report_start_month == "01" and report_start_day == "01":
+            raise ValueError(
+                f'Cannot set any date in same year before provided start date ({
+                    args.report_start_date
+                })'
+            )
+
         year = report_start[0]
-        months = [str(m).rjust(2, "0") for m in range(1, 13)]
-        random_month = choice(list(set(months) - set(report_months)))
-        return f"{year}-{random_month}-01"
+        return f"{year}-{random_month}-{random_day}"
 
     report_years = set([report_start[0], report_end[0]])
     random_year = choice(list(set(range(2000 - 50, 2000 + 50)) - report_years))
@@ -127,6 +152,12 @@ def get_date_entry(date_field, date):
     if (len(date_field) > 0):
         return f''',\n{" "*12}"{date_field}": "{date}"'''
     return ""
+
+def get_report_id(args, test_case):
+    if "within_dates" in test_case:
+        return args.report_a_id
+    else:
+        return args.report_b_id
 
 
 def random_hex(length=1):
@@ -184,6 +215,8 @@ def get_records(form_type, args):
         date = get_date(args, test_case)
         date_entry = get_date_entry(date_field, date)
 
+        report_id = get_report_id(args, test_case)
+
         memo_code = str(
             test_case == "within_dates_but_memo"
         ).lower()  # JSON uses lowercase true/false
@@ -203,7 +236,7 @@ def get_records(form_type, args):
             "id": "{transaction_id}",
             "schedule_{schedule.lower()}_id": "{schedule_id}",
             "committee_account_id": "{args.committee_account_id}",
-            "report_id": "{args.report_id}",
+            "report_id": "{report_id}",
             "_form_type": "{form_type}",
             "memo_code": {memo_code},
             "created": "2022-02-09T00:00:00.000Z",
