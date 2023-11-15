@@ -69,6 +69,7 @@ class TransactionManager(SoftDeleteManager):
         primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
         election_clause = (
             Q(schedule_e__isnull=False)
+            & Q(parent_transaction__isnull=True)
             & Q(schedule_e__election_code=OuterRef("schedule_e__election_code"))
             & Q(
                 schedule_e__so_candidate_office=OuterRef(
