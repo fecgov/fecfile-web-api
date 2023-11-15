@@ -1,6 +1,7 @@
 from django.test import TestCase, RequestFactory
+
+from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
-from ..models import Form3X
 from fecfiler.authentication.models import Account
 
 from rest_framework.test import force_authenticate
@@ -51,7 +52,7 @@ class Form3XViewSetTest(TestCase):
         response = view(request, pk="1406535e-f99f-42c4-97a8-247904b7d297")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            Form3X.objects.filter(id="1406535e-f99f-42c4-97a8-247904b7d297")
+            Report.objects.filter(id="1406535e-f99f-42c4-97a8-247904b7d297")
             .first()
             .form_type,
             "F3XA",
