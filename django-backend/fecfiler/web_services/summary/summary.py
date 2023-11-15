@@ -22,8 +22,8 @@ class SummaryService:
     def calculate_summary_column_a(self):
         report_transactions = Transaction.objects.filter(report=self.report)
         summary = report_transactions.aggregate(
-            line_11ai=self.get_line("SA11AI", True),
-            line_11aii=self.get_line("SA11AI", False),
+            line_11ai=self.get_line("SA11AI", itemized=True),
+            line_11aii=self.get_line("SA11AI", itemized=False),
             line_11b=self.get_line("SA11B"),
             line_11c=self.get_line("SA11C"),
             line_12=self.get_line("SA12"),
@@ -44,10 +44,10 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
             # Temporary aggregations
-            temp_sc9=self.get_line("SC/9"),
-            temp_sd9=self.get_line("SD9"),
-            temp_sc10=self.get_line("SC/10"),
-            temp_sd10=self.get_line("SD10")
+            temp_sc9=self.get_line("SC/9", field="loan_balance"),
+            temp_sd9=self.get_line("SD9", field="balance_at_close"),
+            temp_sc10=self.get_line("SC/10", field="loan_balance"),
+            temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
         summary["line_6c"] = (
             summary.get("line_11c", 0)
@@ -166,8 +166,8 @@ class SummaryService:
 
         # build summary
         summary = ytd_transactions.aggregate(
-            line_11ai=self.get_line("SA11AI", True),
-            line_11aii=self.get_line("SA11AI", False),
+            line_11ai=self.get_line("SA11AI", itemized=True),
+            line_11aii=self.get_line("SA11AI", itemized=False),
             line_11b=self.get_line("SA11B"),
             line_11c=self.get_line("SA11C"),
             line_12=self.get_line("SA12"),
@@ -281,10 +281,10 @@ class SummaryService:
 
         return summary
 
-    def get_line(self, form_type, itemized=None):
+    def get_line(self, form_type, field="amount", itemized=None):
         query = (
             Q(~Q(memo_code=True), itemized=itemized, _form_type=form_type)
             if itemized is not None
             else Q(~Q(memo_code=True), _form_type=form_type)
         )
-        return Coalesce(Sum("amount", filter=query), Decimal(0.0))
+        return Coalesce(Sum(field, filter=query), Decimal(0.0))
