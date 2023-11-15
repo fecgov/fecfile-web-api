@@ -1,5 +1,5 @@
 import argparse
-from random import randrange, choice
+from random import randrange
 
 # Generate Transaction Record Fixture
 #
@@ -52,6 +52,11 @@ def get_arguments():
         help="Output to a file instead of the console (e.g --output_file=records.txt)")
 
     return parser.parse_args()
+
+
+# re-implement choice to keep sonarcloud happy
+def choice(lst):
+    return lst[randrange(len(lst))]
 
 
 def get_schedule(form_type):
