@@ -115,6 +115,7 @@ def get_date(args, test_case):
 
     if "within_dates" in test_case:
         return "-".join(report_start)
+
     if "year" in test_case:
         months = set([str(m).rjust(2, "0") for m in range(1, 13)])
         report_start_month = report_start[1]
@@ -126,9 +127,9 @@ def get_date(args, test_case):
         else:
             random_month = report_start_month
 
-        report_start_day = int(report_start[2])
-        if (report_start_day > 1):
-            random_day = str(randrange(1, report_start_day)).rjust(2, "0")
+        report_start_day = report_start[2]
+        if (int(report_start_day) > 1):
+            random_day = str(randrange(1, int(report_start_day))).rjust(2, "0")
         else:
             random_day = "01"
 
