@@ -49,16 +49,6 @@ class SummaryService:
             temp_sc10=self.get_line("SC/10", field="loan_balance"),
             temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
-        summary["line_6c"] = (
-            summary.get("line_11c", 0)
-            + summary.get("line_12", 0)
-            + summary.get("line_13", 0)
-            + summary.get("line_14", 0)
-            + summary.get("line_15", 0)
-            + summary.get("line_16", 0)
-            + summary.get("line_17", 0)
-            + summary.get("line_18c", 0)
-        )
         summary["line_6d"] = (
             summary.get("line_6b", 0)
             + summary.get("line_6c", 0)
@@ -79,9 +69,6 @@ class SummaryService:
             summary.get("line_11aiii", 0)
             + summary.get("line_11b", 0)
             + summary.get("line_11c", 0)
-        )
-        summary["line_19"] = (
-            summary.get("line_6c", 0)
         )
         summary["line_20"] = (
             summary.get("line_19", 0)
@@ -140,12 +127,25 @@ class SummaryService:
             summary.get("line_36", 0)
             - summary.get("line_37", 0)
         )
+        summary["line_6c"] = (
+            summary.get("line_11d", 0)
+            + summary.get("line_12", 0)
+            + summary.get("line_13", 0)
+            + summary.get("line_14", 0)
+            + summary.get("line_15", 0)
+            + summary.get("line_16", 0)
+            + summary.get("line_17", 0)
+            + summary.get("line_18c", 0)
+        )
         summary["line_7"] = (
             summary.get("line_31")
         )
         summary["line_8"] = (
             summary.get("line_6d", 0)
             - summary.get("line_7")
+        )
+        summary["line_19"] = (
+            summary.get("line_6c", 0)
         )
 
         # Remove temporary aggregations to clean up the summary
@@ -188,16 +188,6 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
         )
-        summary["line_6c"] = (
-            summary.get("line_11c", 0)
-            + summary.get("line_12", 0)
-            + summary.get("line_13", 0)
-            + summary.get("line_14", 0)
-            + summary.get("line_15", 0)
-            + summary.get("line_16", 0)
-            + summary.get("line_17", 0)
-            + summary.get("line_18c", 0)
-        )
         summary["line_6d"] = (
             summary.get("line_6a", 0)
             + summary.get("line_6c", 0)
@@ -210,9 +200,6 @@ class SummaryService:
             summary.get("line_11aiii", 0)
             + summary.get("line_11b", 0)
             + summary.get("line_11c", 0)
-        )
-        summary["line_19"] = (
-            summary.get("line_6c", 0)
         )
         summary["line_20"] = (
             summary.get("line_19", 0)
@@ -271,12 +258,25 @@ class SummaryService:
             summary.get("line_36", 0)
             - summary.get("line_37", 0)
         )
+        summary["line_6c"] = (
+            summary.get("line_11d", 0)
+            + summary.get("line_12", 0)
+            + summary.get("line_13", 0)
+            + summary.get("line_14", 0)
+            + summary.get("line_15", 0)
+            + summary.get("line_16", 0)
+            + summary.get("line_17", 0)
+            + summary.get("line_18c", 0)
+        )
         summary["line_7"] = (
             summary.get("line_31", 0)
         )
         summary["line_8"] = (
             summary.get("line_6d", 0)
             - summary.get("line_7")
+        )
+        summary["line_19"] = (
+            summary.get("line_6c", 0)
         )
 
         return summary
