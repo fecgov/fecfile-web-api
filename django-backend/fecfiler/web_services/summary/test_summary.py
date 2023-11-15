@@ -13,6 +13,7 @@ class F3XReportTestCase(TestCase):
         "test_scheduleb_summary_transactions",
         "test_schedulec_summary_transactions",
         "test_scheduled_summary_transactions",
+        "test_schedulee_summary_transactions",
         "test_contacts",
     ]
 
