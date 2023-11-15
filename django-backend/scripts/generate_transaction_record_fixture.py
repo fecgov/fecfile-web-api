@@ -153,6 +153,7 @@ def get_date_entry(date_field, date):
         return f''',\n{" "*12}"{date_field}": "{date}"'''
     return ""
 
+
 def get_report_id(args, test_case):
     if "within_dates" in test_case:
         return args.report_a_id
