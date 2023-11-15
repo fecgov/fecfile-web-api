@@ -49,10 +49,54 @@ def get_arguments():
 
 def get_schedule(form_type):
     schedule =  str(form_type[1]).capitalize()  # the second char in the form_type
-    if schedule == "C":
-        if form_type[2] in ["1", "2"]:
-            schedule = form_type[1:2]
+    if schedule == "C" and form_type[2] in ["1", "2"]:
+        schedule = form_type[1:2]
     return schedule
+
+def get_comment(form_type, test_case):
+    if test_case == "within_dates":
+        return f"{form_type} within report dates, should count in Col. A"
+    if test_case == "within_year":
+        return f"{form_type} within year, should count in Col. B"
+    if test_case == "outside_dates":
+        return f"{form_type} outside of dates, should not count"
+    if test_case == "within_dates_but_memo":
+        return f"{form_type} is a memo item, should not count"
+    return ""
+
+def get_amount_field(schedule):
+    if schedule == "A":
+        return "contribution_amount"
+    if schedule == "B":
+        return "expenditure_amount"
+    if schedule == "C":
+        return "loan_amount"
+    if schedule == "C1":
+        return "loan_amount"
+    if schedule == "C2":
+        return "guaranteed_amount"
+    if schedule == "D":
+        return "incurred_amount"
+    if schedule == "E":
+        return "expenditure_amount"
+    return ""
+
+def get_date_field(schedule):
+    if schedule == "A":
+        return "contribution_date"
+    if schedule == "B":
+        return "expenditure_date"
+    if schedule == "C":
+        return "loan_incurred_date"
+    if schedule == "C1":
+        return "loan_incurred_date"
+    if schedule == "C2":
+        return ""
+    if schedule == "D":
+        return ""
+    if schedule == "E":
+        return "disbursement_date"
+    return ""
 
 def get_date(args, test_case):
     report_start = args.report_start_date.split("-")
@@ -71,6 +115,11 @@ def get_date(args, test_case):
     random_year = choice(list(set(range(2000-50, 2000+50)) - report_years))
     random_month = choice([str(m).rjust(2, "0") for m in range(1,13)])
     return f"{random_year}-{random_month}-01"
+
+def get_date_entry(date_field, date):
+    if (len(date_field) > 0):
+        return f''',\n{" "*12}"{date_field}": "{date}"'''
+    return ""
 
 def random_hex(length=1):
     hex_chars = "0123456789abcdef"
@@ -94,7 +143,7 @@ def get_id(form_type, record_number, schedule=""):
     schedule_str+="0"+str(line_number)
     schedule_str = schedule_str.ljust(8, "0")
 
-    record_str = str(record_number).rjust(12, "0")
+    record_str = str(record_number+1).rjust(12, "0")
 
     return f"{schedule_str}-{random_hex(4)}-{random_hex(4)}-{random_hex(4)}-{record_str}"
 
@@ -109,65 +158,25 @@ def get_records(form_type, args):
     ]
     for record_number in range(len(test_cases)):
         test_case = test_cases[record_number]
-        comment = "Comment"
-        if test_case == "within_dates":
-            comment = f"{form_type} within report dates, should count in Col. A"
-        if test_case == "within_year":
-            comment = f"{form_type} within year, should count in Col. B"
-        if test_case == "outside_dates":
-            comment = f"{form_type} outside of dates, should not count"
-        if test_case == "within_dates_but_memo":
-            comment = f"{form_type} is a memo item, should not count"
+
+        comment = get_comment(form_type, test_case)
 
         schedule = get_schedule(form_type)
+        schedule_model = f"schedule{schedule.lower()}"
 
         schedule_id = get_id(form_type, record_number, schedule)
         transaction_id = get_id(form_type, record_number, schedule)
 
-        schedule_model = f"schedule{schedule.lower()}"
-
-        amount_field = "amount"
-        if schedule == "A":
-            amount_field = "contribution_amount"
-        if schedule == "B":
-            amount_field = "expenditure_amount"
-        if schedule == "C":
-            amount_field = "loan_amount"
-        if schedule == "C1":
-            amount_field = "loan_amount"
-        if schedule == "C2":
-            amount_field = "guaranteed_amount"
-        if schedule == "D":
-            amount_field = "incurred_amount"
-        if schedule == "E":
-            amount_field = "expenditure_amount"
-
+        amount_field = get_amount_field(schedule)
         amount = randrange(20, 150)
 
-        date_field = ""
-        if schedule == "A":
-            date_field = "contribution_date"
-        if schedule == "B":
-            date_field = "expenditure_date"
-        if schedule == "C":
-            date_field = "loan_incurred_date"
-        if schedule == "C1":
-            date_field = "loan_incurred_date"
-        if schedule == "C2":
-            date_field = ""
-        if schedule == "D":
-            date_field = ""
-        if schedule == "E":
-            date_field = "disbursement_date"
-
+        date_field = get_date_field(schedule)
         date = get_date(args, test_case)
+        date_entry = get_date_entry(date_field, date)
 
-        print(schedule, date_field)
-        date_entry = ""
-        if (len(date_field) > 0):
-            date_entry = f''',\n{" "*12}"{date_field}": "{date}"'''
-
-        memo_code = (test_case=="within_dates_but_memo")
+        memo_code = str(
+            test_case=="within_dates_but_memo"
+        ).lower()  # JSON uses lowercase true/false
 
         schedule_record = f"""    {{
         "comment": "{comment}",
@@ -186,7 +195,7 @@ def get_records(form_type, args):
             "committee_account_id": "{args.committee_account_id}",
             "report_id": "{args.report_id}",
             "_form_type": "{form_type}",
-            "memo_code": {str(memo_code).lower()},
+            "memo_code": {memo_code},
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
             "transaction_type_identifier": "Transaction Type Identifier"
@@ -196,7 +205,6 @@ def get_records(form_type, args):
         records.append(transaction_record)
 
     return records
-
 
 
 if (__name__ == "__main__"):
@@ -215,130 +223,3 @@ if (__name__ == "__main__"):
         file = open(args.output_file, 'w')
         file.write(output)
         file.close()
-
-
-
-
-
-"""
-    {
-        "comment": "SA17 transaction before report dates; should count in Column B",
-        "model": "transactions.schedulea",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-170000000008",
-            "contribution_amount": 100,
-            "contribution_date": "2005-01-01"
-        }
-    },
-    {
-        "comment": "SA17 transaction before report dates; should count in Column B",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-170000000008",
-            "schedule_a_id": "a11aefe8-9b5f-4539-b7e5-170000000008",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SA17",
-            "memo_code": false,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count",
-        "model": "transactions.schedulea",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-170000000002",
-            "contribution_amount": 200.50,
-            "contribution_date": "2005-02-01"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count with SA17",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-170000000002",
-            "schedule_a_id": "a11aefe8-9b5f-4539-b7e5-170000000002",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SA17",
-            "memo_code": false,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count",
-        "model": "transactions.schedulea",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-170000000003",
-            "contribution_amount": -1,
-            "contribution_date": "2005-02-01"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count with SA17",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-170000000003",
-            "schedule_a_id": "a11aefe8-9b5f-4539-b7e5-170000000003",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SA17",
-            "memo_code": false,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
-        }
-    },
-    {
-        "comment": "SA17 transaction to not count",
-        "model": "transactions.schedulea",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-170000000004",
-            "contribution_amount": 500,
-            "contribution_date": "2005-02-01"
-        }
-    },
-    {
-        "comment": "SA17 transaction to not count with SA17",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-170000000004",
-            "schedule_a_id": "a11aefe8-9b5f-4539-b7e5-170000000004",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SA17",
-            "memo_code": true,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count",
-        "model": "transactions.schedulea",
-        "fields": {
-            "id": "a11aefe8-9b5f-4539-b7e5-170000000001",
-            "contribution_amount": 800.50,
-            "contribution_date": "2005-02-01"
-        }
-    },
-    {
-        "comment": "SA17 transaction to count with SA17",
-        "model": "transactions.transaction",
-        "fields": {
-            "id": "a12aefe8-9b5f-4539-b7e5-170000000001",
-            "schedule_a_id": "a11aefe8-9b5f-4539-b7e5-170000000001",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SA17",
-            "memo_code": false,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
-        }
-    }
-"""
