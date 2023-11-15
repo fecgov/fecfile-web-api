@@ -1,5 +1,5 @@
 import argparse
-from random import randrange
+from secrets import choice
 
 # Generate Transaction Record Fixture
 #
@@ -52,11 +52,6 @@ def get_arguments():
         help="Output to a file instead of the console (e.g --output_file=records.txt)")
 
     return parser.parse_args()
-
-
-# re-implement choice to keep sonarcloud happy
-def choice(lst):
-    return lst[randrange(len(lst))]
 
 
 def get_schedule(form_type):
@@ -134,7 +129,7 @@ def get_date(args, test_case):
 
         report_start_day = report_start[2]
         if (int(report_start_day) > 1):
-            random_day = str(randrange(1, int(report_start_day))).rjust(2, "0")
+            random_day = str(choice(range(1, int(report_start_day)))).rjust(2, "0")
         else:
             random_day = "01"
 
@@ -215,7 +210,7 @@ def get_records(form_type, args):
         transaction_id = get_id(form_type, record_number, schedule)
 
         amount_field = get_amount_field(schedule)
-        amount = randrange(20, 150)
+        amount = choice(range(20, 150))
 
         date_field = get_date_field(schedule)
         date = get_date(args, test_case)
