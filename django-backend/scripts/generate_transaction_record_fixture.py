@@ -7,12 +7,13 @@ from random import randrange, choice
 #    for the form_type values specified by the user, and with
 #    randomly generated values for transaction_amount.
 
+
 def get_arguments():
     parser = argparse.ArgumentParser(
         prog='Generate  Transaction Record Fixture',
-        description='Creates a json file containing valid transaction records\n' +
-                    'for the form_type values specified by the user, and with\n' +
-                    'randomly generated values for transaction_amount.'
+        description='Creates a json file containing valid transaction records\n'
+                    + 'for the form_type values specified by the user and with\n'
+                    + 'randomly generated values for transaction_amount.'
     )
 
     parser.add_argument(
@@ -47,11 +48,13 @@ def get_arguments():
 
     return parser.parse_args()
 
+
 def get_schedule(form_type):
-    schedule =  str(form_type[1]).capitalize()  # the second char in the form_type
+    schedule = str(form_type[1]).capitalize()  # the second char in the form_type
     if schedule == "C" and form_type[2] in ["1", "2"]:
         schedule = form_type[1:2]
     return schedule
+
 
 def get_comment(form_type, test_case):
     if test_case == "within_dates":
@@ -63,6 +66,7 @@ def get_comment(form_type, test_case):
     if test_case == "within_dates_but_memo":
         return f"{form_type} is a memo item, should not count"
     return ""
+
 
 def get_amount_field(schedule):
     if schedule == "A":
@@ -81,6 +85,7 @@ def get_amount_field(schedule):
         return "expenditure_amount"
     return ""
 
+
 def get_date_field(schedule):
     if schedule == "A":
         return "contribution_date"
@@ -98,6 +103,7 @@ def get_date_field(schedule):
         return "disbursement_date"
     return ""
 
+
 def get_date(args, test_case):
     report_start = args.report_start_date.split("-")
     report_end = args.report_end_date.split("-")
@@ -105,21 +111,23 @@ def get_date(args, test_case):
     if "within_dates" in test_case:
         return "-".join(report_start)
     if "year" in test_case:
-        report_months = range(int(report_start[1]), int(report_end[1])+1)
+        report_months = range(int(report_start[1]), int(report_end[1]) + 1)
         year = report_start[0]
-        months = [str(m).rjust(2, "0") for m in range(1,13)]
+        months = [str(m).rjust(2, "0") for m in range(1, 13)]
         random_month = choice(list(set(months) - set(report_months)))
         return f"{year}-{random_month}-01"
 
     report_years = set([report_start[0], report_end[0]])
-    random_year = choice(list(set(range(2000-50, 2000+50)) - report_years))
-    random_month = choice([str(m).rjust(2, "0") for m in range(1,13)])
+    random_year = choice(list(set(range(2000 - 50, 2000 + 50)) - report_years))
+    random_month = choice([str(m).rjust(2, "0") for m in range(1, 13)])
     return f"{random_year}-{random_month}-01"
+
 
 def get_date_entry(date_field, date):
     if (len(date_field) > 0):
         return f''',\n{" "*12}"{date_field}": "{date}"'''
     return ""
+
 
 def random_hex(length=1):
     hex_chars = "0123456789abcdef"
@@ -129,6 +137,7 @@ def random_hex(length=1):
         out_string += choice(hex_chars)
 
     return out_string
+
 
 def get_id(form_type, record_number, schedule=""):
     hex_chars = "0123456789abcdef"
@@ -140,12 +149,13 @@ def get_id(form_type, record_number, schedule=""):
         schedule_str += hex(ord(schedule.lower()))[2:]
 
     line_number = form_type.split(schedule)[1].strip('/')
-    schedule_str+="0"+str(line_number)
+    schedule_str += "0" + str(line_number)
     schedule_str = schedule_str.ljust(8, "0")
 
-    record_str = str(record_number+1).rjust(12, "0")
+    record_str = str(record_number + 1).rjust(12, "0")
 
     return f"{schedule_str}-{random_hex(4)}-{random_hex(4)}-{random_hex(4)}-{record_str}"
+
 
 def get_records(form_type, args):
     records = []
@@ -175,7 +185,7 @@ def get_records(form_type, args):
         date_entry = get_date_entry(date_field, date)
 
         memo_code = str(
-            test_case=="within_dates_but_memo"
+            test_case == "within_dates_but_memo"
         ).lower()  # JSON uses lowercase true/false
 
         schedule_record = f"""    {{
