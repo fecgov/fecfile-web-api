@@ -1,6 +1,6 @@
 [
     {
-        "comment": "SD/9 within dates that should count",
+        "comment": "SD9 within dates that should count",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d09000000001",
@@ -8,14 +8,14 @@
         }
     },
     {
-        "comment": "SD/9 within dates that should count",
+        "comment": "SD9 within dates that should count",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d09000000001",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d09000000001",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SD/9",
+            "_form_type": "SD9",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -23,7 +23,7 @@
         }
     },
     {
-        "comment": "SD/9 before dates but same year, and that should count in Column B",
+        "comment": "SD9 before dates but same year, and that should count in Column B",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d09000000002",
@@ -31,14 +31,14 @@
         }
     },
     {
-        "comment": "SD/9 before dates but same year, and that should count in Column B",
+        "comment": "SD9 before dates but same year, and that should count in Column B",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d09000000002",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d09000000002",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SD/9",
+            "_form_type": "SD9",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -46,7 +46,7 @@
         }
     },
     {
-        "comment": "SD/9 different year, and that should not count",
+        "comment": "SD9 different year, and that should not count",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d09000000003",
@@ -54,14 +54,14 @@
         }
     },
     {
-        "comment": "SD/9 different year, and that should not count",
+        "comment": "SD9 different year, and that should not count",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d09000000003",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d09000000003",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SD/9",
+            "_form_type": "SD9",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -69,7 +69,7 @@
         }
     },
     {
-        "comment": "SD/10 within dates that should count",
+        "comment": "SD10 within dates that should count",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d10000000001",
@@ -77,14 +77,14 @@
         }
     },
     {
-        "comment": "SD/10 within dates that should count",
+        "comment": "SD10 within dates that should count",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d10000000001",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d10000000001",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-            "_form_type": "SD/10",
+            "_form_type": "SD10",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -92,7 +92,7 @@
         }
     },
     {
-        "comment": "SD/10 before dates but same year, and that should count in Column B",
+        "comment": "SD10 before dates but same year, and that should count in Column B",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d10000000002",
@@ -100,14 +100,14 @@
         }
     },
     {
-        "comment": "SD/10 before dates but same year, and that should count in Column B",
+        "comment": "SD10 before dates but same year, and that should count in Column B",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d10000000002",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d10000000002",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SD/10",
+            "_form_type": "SD10",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
@@ -115,7 +115,7 @@
         }
     },
     {
-        "comment": "SD/10 different year, and that should not count",
+        "comment": "SD10 different year, and that should not count",
         "model": "transactions.scheduled",
         "fields": {
             "id": "d11aefe8-9b5f-4539-b7e5-d10000000003",
@@ -123,14 +123,14 @@
         }
     },
     {
-        "comment": "SD/10 different year, and that should not count",
+        "comment": "SD10 different year, and that should not count",
         "model": "transactions.transaction",
         "fields": {
             "id": "d12aefe8-9b5f-4539-b7e5-d10000000003",
             "schedule_d_id": "d11aefe8-9b5f-4539-b7e5-d10000000003",
             "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "_form_type": "SD/10",
+            "_form_type": "SD10",
             "memo_code": false,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
