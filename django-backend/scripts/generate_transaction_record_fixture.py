@@ -135,9 +135,8 @@ def get_date(args, test_case):
 
         if report_start_month == "01" and report_start_day == "01":
             raise ValueError(
-                f'Cannot set any date in same year before provided start date ({
-                    args.report_start_date
-                })'
+                'Cannot set any date in same year before provided start date'
+                + f' ({args.report_start_date})'
             )
 
         year = report_start[0]
