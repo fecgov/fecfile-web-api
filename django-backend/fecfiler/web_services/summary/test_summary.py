@@ -87,8 +87,8 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             sum_a["line_28d"],
             Decimal(101.50)  # line_28a
-             + Decimal(201.50)  # line_28b
-             + Decimal(301.50)  # line_28c
+            + Decimal(201.50)  # line_28b
+            + Decimal(301.50)  # line_28c
         )
         self.assertEqual(sum_a["line_29"], Decimal("201.50"))
         self.assertEqual(sum_a["line_30b"], Decimal("102.25"))
@@ -96,7 +96,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(sum_a["line_31"], sum_a["line_7"])
         self.assertEqual(
             sum_a["line_32"],
-            sum_a["line_31"]  # line_31 = line_7
+            sum_a["line_31"]  # line_31
             - Decimal("0")  # line_21aii
             - Decimal("0")  # line_30aii
         )
@@ -191,7 +191,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(sum_b["line_31"], sum_b["line_7"])
         self.assertEqual(
             sum_b["line_32"],
-            sum_b["line_31"]  # line_31 = line_7
+            sum_b["line_31"]  # line_31
             - Decimal("0")  # line_21aii
             - Decimal("0")  # line_30aii
         )
