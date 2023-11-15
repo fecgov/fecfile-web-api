@@ -10,7 +10,7 @@ from secrets import choice
 
 def get_arguments():
     parser = argparse.ArgumentParser(
-        prog='Generate  Transaction Record Fixture',
+        prog='Generate Transaction Record Fixture',
         description='Creates a json file containing valid transaction records\n'
                     + 'for the form_type values specified by the user and with\n'
                     + 'randomly generated values for transaction_amount.'
