@@ -122,12 +122,12 @@ jobs:
           command: mkdir -p /tmp/cache/scanner
       - restore_cache:
           keys:
-            - v1-sonarcloud-scanner-4.6.2.2472
+            - v1-sonarcloud-scanner-5.0.1
       - run:
           name: SonarCloud
           command: |
             set -e
-            VERSION=4.6.2.2472
+            VERSION=5.0.1
             if [ -z "$SONAR_TOKEN" ]; then
                  echo "You must set SONAR_TOKEN environemnt variable"
                  exit 1
@@ -147,7 +147,7 @@ jobs:
           environment:
             SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
       - save_cache:
-          key: v1-sonarcloud-scanner-4.6.2.2472
+          key: v1-sonarcloud-scanner-5.0.1
           paths: /tmp/cache/scanner
 
       - run:
