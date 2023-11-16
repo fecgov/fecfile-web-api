@@ -142,11 +142,11 @@ class SummaryService:
             + summary["line_6c"]
         )
         summary["line_7"] = (
-            summary.get("line_31")
+            summary["line_31"]
         )
         summary["line_8"] = (
             summary["line_6d"]
-            - summary.get("line_7")
+            - summary["line_7"]
         )
         summary["line_19"] = (
             summary["line_6c"]
