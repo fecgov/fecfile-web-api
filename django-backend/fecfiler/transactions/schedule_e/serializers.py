@@ -62,7 +62,7 @@ class ScheduleETransactionSerializer(TransactionSerializerBase):
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
     disbursement_date = DateField(required=False, allow_null=True)
-    calendar_ytd = DecimalField(
+    calendar_ytd_per_election_office = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
     expenditure_purpose_descrip = CharField(required=False, allow_null=True)
@@ -72,7 +72,7 @@ class ScheduleETransactionSerializer(TransactionSerializerBase):
     so_candidate_id_number = CharField(required=False, allow_null=True)
     so_candidate_last_name = CharField(required=False, allow_null=True)
     so_candidate_first_name = CharField(required=False, allow_null=True)
-    so_candinate_middle_name = CharField(required=False, allow_null=True)
+    so_candidate_middle_name = CharField(required=False, allow_null=True)
     so_candidate_prefix = CharField(required=False, allow_null=True)
     so_candidate_suffix = CharField(required=False, allow_null=True)
     so_candidate_office = CharField(required=False, allow_null=True)

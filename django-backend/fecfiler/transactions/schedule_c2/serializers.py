@@ -1,10 +1,13 @@
 import logging
 
-from django.db import transaction
+from django.db import transaction, models
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.serializers import TransactionSerializerBase
+from fecfiler.memo_text.models import MemoText
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.fields import DecimalField, CharField
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +39,8 @@ class ScheduleC2TransactionSerializer(TransactionSerializerBase):
                     del transaction_data[key]
 
             schedule_c2_transaction = super().create(transaction_data)
+            if not schedule_c2_transaction.parent_transaction.memo_code:
+                self.create_in_future_reports(schedule_c2_transaction)
             return schedule_c2_transaction
 
     def update(self, instance, validated_data: dict):
@@ -44,7 +49,50 @@ class ScheduleC2TransactionSerializer(TransactionSerializerBase):
                 if attr != "id":
                     setattr(instance.schedule_c2, attr, value)
             instance.schedule_c2.save()
-            return super().update(instance, validated_data)
+            schedule_c2_transaction = super().update(instance, validated_data)
+            if not schedule_c2_transaction.parent_transaction.memo_code:
+                self.update_in_future_reports(schedule_c2_transaction, validated_data)
+            return schedule_c2_transaction
+
+    def create_in_future_reports(self, transaction: Transaction):
+        future_reports = super().get_future_in_progress_reports(transaction.report)
+        for report in future_reports:
+            loan = Transaction.objects.get(
+                report_id=report.id,
+                loan_id=transaction.parent_transaction.id
+            )
+            report.pull_forward_loan_guarantor(copy.deepcopy(transaction), loan)
+
+    def update_in_future_reports(self, transaction: Transaction, validated_data: dict):
+        future_reports = super().get_future_in_progress_reports(transaction.report)
+
+        transaction_data = get_model_data(validated_data, Transaction)
+        del transaction_data['id']
+        transactions_to_update = Transaction.objects.filter(
+            transaction_id=transaction.transaction_id,
+            report_id__in=models.Subquery(
+                future_reports.values('id')
+            )
+        )
+        transactions_to_update.update(**transaction_data)
+
+        schedule_c2_data = get_model_data(validated_data, ScheduleC2)
+        del schedule_c2_data['id']
+        schedule_c2s_to_update = ScheduleC2.objects.filter(
+            transaction__schedule_c2_id__in=models.Subquery(
+                transactions_to_update.values('schedule_c2_id')
+            )
+        )
+        schedule_c2s_to_update.update(**schedule_c2_data)
+
+        memo_text_data = get_model_data(validated_data, MemoText)
+        del memo_text_data['id']
+        memo_text_to_update = MemoText.objects.filter(
+            transaction__memo_text_id__in=models.Subquery(
+                transactions_to_update.values('memo_text_id')
+            )
+        )
+        memo_text_to_update.update(**memo_text_data)
 
     guarantor_last_name = CharField(required=False, allow_null=True)
     guarantor_first_name = CharField(required=False, allow_null=True)

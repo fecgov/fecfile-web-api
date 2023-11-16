@@ -15,6 +15,7 @@ from rest_framework.serializers import (
     ModelSerializer,
     DecimalField,
 )
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -129,6 +130,9 @@ class TransactionSerializerBase(
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    calendar_ytd_per_election_office = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -137,6 +141,7 @@ class TransactionSerializerBase(
     balance_at_close = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
+    line_label = CharField(read_only=True)
 
     schedule_a = ScheduleASerializer(required=False)
     schedule_b = ScheduleBSerializer(required=False)
@@ -249,6 +254,14 @@ class TransactionSerializerBase(
             internal_value["_form_type"] = internal_value["form_type"]
         return internal_value
 
+    def get_future_in_progress_reports(self, report: Report):
+        return Report.objects.get_queryset().filter(
+            ~Q(id=report.id),
+            committee_account=report.committee_account_id,
+            upload_submission__isnull=True,
+            coverage_through_date__gte=report.coverage_through_date,
+        )
+
     def propagate_contacts(self, transaction):
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
         self.propagate_contact(transaction, contact_1)
@@ -311,12 +324,14 @@ class TransactionSerializerBase(
                 "date",
                 "amount",
                 "aggregate",
+                "calendar_ytd_per_election_office",
                 "loan_payment_to_date",
                 "balance",
                 "loan_balance",
                 "beginning_balance",
                 "payment_amount",
                 "balance_at_close",
+                "line_label",
                 "schedule_a",
                 "schedule_b",
                 "schedule_c",

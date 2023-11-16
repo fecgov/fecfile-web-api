@@ -21,6 +21,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    ExpressionWrapper,
 )
 from decimal import Decimal
 from enum import Enum
@@ -50,6 +51,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_date",
                     "schedule_c__loan_incurred_date",
                     "schedule_e__disbursement_date",
+                    "schedule_e__dissemination_date",
                 ),
                 amount=Coalesce(
                     "schedule_a__contribution_amount",
@@ -64,7 +66,38 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-        contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+        election_clause = (
+            Q(schedule_e__isnull=False)
+            & Q(schedule_e__election_code=OuterRef("schedule_e__election_code"))
+            & Q(
+                schedule_e__so_candidate_office=OuterRef(
+                    "schedule_e__so_candidate_office"
+                )
+            )
+            & Q(
+                Q(
+                    schedule_e__so_candidate_state=OuterRef(
+                        "schedule_e__so_candidate_state"
+                    )
+                )
+                | (
+                    Q(schedule_e__so_candidate_state__isnull=True)
+                    & Q(outer_candidate_state__isnull=True)
+                )
+            )
+            & (
+                Q(
+                    schedule_e__so_candidate_district=OuterRef(
+                        "schedule_e__so_candidate_district"
+                    )
+                )
+                | (
+                    Q(schedule_e__so_candidate_district__isnull=True)
+                    & Q(outer_candidate_district__isnull=True)
+                )
+            )
+        )
         year_clause = Q(date__year=OuterRef("date__year"))
         date_clause = Q(date__lt=OuterRef("date")) | Q(
             date=OuterRef("date"), created__lte=OuterRef("created")
@@ -74,7 +107,7 @@ class TransactionManager(SoftDeleteManager):
 
         aggregate_clause = (
             queryset.filter(
-                contact_clause,
+                primary_contact_clause,
                 year_clause,
                 date_clause,
                 group_clause,
@@ -83,6 +116,21 @@ class TransactionManager(SoftDeleteManager):
             .values("committee_account_id")
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
+        )
+        calendar_ytd_per_election_office_clause = (
+            queryset.alias(  # Needed to get around null-matching bug with Q()
+                outer_candidate_district=ExpressionWrapper(
+                    OuterRef("schedule_e__so_candidate_district"),
+                    output_field=TextField(),
+                ),
+                outer_candidate_state=ExpressionWrapper(
+                    OuterRef("schedule_e__so_candidate_state"), output_field=TextField()
+                ),
+            )
+            .filter(election_clause, year_clause, date_clause, group_clause,)
+            .values("committee_account_id")
+            .annotate(calendar_ytd_per_election_office=Sum("effective_amount"))
+            .values("calendar_ytd_per_election_office")
         )
 
         loan_payment_to_date_clause = (
@@ -133,6 +181,9 @@ class TransactionManager(SoftDeleteManager):
         return (
             queryset.annotate(
                 aggregate=Coalesce(Subquery(aggregate_clause), Value(Decimal(0))),
+                calendar_ytd_per_election_office=Coalesce(
+                    Subquery(calendar_ytd_per_election_office_clause), Value(Decimal(0))
+                ),
                 loan_payment_to_date=Case(
                     When(
                         schedule_c__isnull=False,
@@ -206,6 +257,42 @@ class TransactionManager(SoftDeleteManager):
                     F("debt___form_type"),
                     F("loan___form_type"),
                     Value(None),
+                ),
+                line_label=Case(
+                    # Schedule A
+                    When(_form_type="SA11A", then=Value("11(a)")),
+                    When(_form_type="SA11AI", then=Value("11(a)(i)")),
+                    When(_form_type="SA11AII", then=Value("11(a)(i)")),
+                    When(_form_type="SA11B", then=Value("11(b)")),
+                    When(_form_type="SA11C", then=Value("11(c)")),
+                    When(_form_type="SA12", then=Value("12")),
+                    When(_form_type="SA13", then=Value("13")),
+                    When(_form_type="SA14", then=Value("14")),
+                    When(_form_type="SA15", then=Value("15")),
+                    When(_form_type="SA16", then=Value("16")),
+                    When(_form_type="SA17", then=Value("17")),
+                    # Schedule B
+                    When(_form_type="SB21B", then=Value("21(b)")),
+                    When(_form_type="SB22", then=Value("22")),
+                    When(_form_type="SB23", then=Value("23")),
+                    When(_form_type="SB26", then=Value("26")),
+                    When(_form_type="SB27", then=Value("27")),
+                    When(_form_type="SB28A", then=Value("28(a)")),
+                    When(_form_type="SB28B", then=Value("28(b)")),
+                    When(_form_type="SB28C", then=Value("28(c)")),
+                    When(_form_type="SB29", then=Value("29")),
+                    When(_form_type="SB30B", then=Value("30(b)")),
+                    # Schedule C
+                    When(_form_type="SC/10", then=Value("10")),
+                    When(_form_type="SC/9", then=Value("9")),
+                    # Schedule D
+                    When(_form_type="SD9", then=Value("9")),
+                    When(_form_type="SD10", then=Value("10")),
+                    # Schedule E
+                    When(_form_type="SE", then=Value("24")),
+                ),
+                line_label_order_key=Concat(
+                    "line_label", "form_type", output_field=TextField()
                 ),
             )
             .annotate(

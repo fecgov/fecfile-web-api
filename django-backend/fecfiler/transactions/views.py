@@ -14,6 +14,7 @@ from fecfiler.reports.views import ReportViewMixin
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.serializers import TransactionSerializerBase
 from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.contacts.models import Contact
 from fecfiler.transactions.schedule_a.serializers import ScheduleATransactionSerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBTransactionSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCTransactionSerializer
@@ -38,7 +39,7 @@ def save_transaction(request):
     just its specific schedule fields and validation rules
     """
     transaction_data = request.data
-    children_data = request.data["children"]
+    children_data = request.data.get("children", [])
     transaction_data["children"] = []
 
     serializers = dict(
@@ -141,13 +142,14 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     filter_backends = [filters.OrderingFilter]
 
     ordering_fields = [
-        "form_type",
+        "line_label_order_key",
         "transaction_type_identifier",
         "memo_code",
         "name",
         "date",
         "amount",
         "aggregate",
+        "balance",
         "back_reference_tran_id_number",
     ]
     ordering = ["-created"]
@@ -177,34 +179,104 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 queryset = queryset.filter(schedule_e__isnull=True)
         return queryset
 
-    @action(detail=False, methods=["get"])
-    def previous(self, request):
+    @action(detail=False, methods=["get"], url_path=r"previous/election")
+    def previous_election(self, request):
         """Retrieves transaction that comes before this transactions,
-        while bieng in the same group for aggregation"""
+        while being in the same group for aggregation"""
+        transaction_id = request.query_params.get("transaction_id", None)
+        date = request.query_params.get("date", None)
+        aggregation_group = request.query_params.get("aggregation_group", None)
+        election_code = request.query_params.get("election_code", None)
+        candidate_office = request.query_params.get("candidate_office", None)
+        candidate_state = request.query_params.get("candidate_state", None)
+        candidate_district = request.query_params.get("candidate_district", None)
+
+        missing_params = []
+        if not date:
+            missing_params.append("date")
+        if not aggregation_group:
+            missing_params.append("aggregation_group")
+        if not election_code:
+            missing_params.append("election_code")
+        if not candidate_office:
+            missing_params.append("candidate_office")
+        if (
+            candidate_office != Contact.CandidateOffice.PRESIDENTIAL
+            and not candidate_state
+        ):
+            missing_params.append("candidate_state")
+        if candidate_office == Contact.CandidateOffice.HOUSE and not candidate_district:
+            missing_params.append("candidate_district")
+
+        if len(missing_params) > 0:
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
+            )
+            return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+        date = datetime.fromisoformat(date)
+
+        previous_transactions = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
+            Q(schedule_e__election_code=election_code),
+            Q(schedule_e__so_candidate_office=candidate_office),
+            Q(schedule_e__so_candidate_state=candidate_state),
+            Q(schedule_e__so_candidate_district=candidate_district),
+        )
+
+        previous_transaction = previous_transactions.order_by(
+            "-date", "-created"
+        ).first()
+
+        if previous_transaction:
+            serializer = self.get_serializer(previous_transaction)
+            return Response(data=serializer.data)
+
+        response = {"message": "No previous transaction found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=["get"], url_path=r"previous/entity")
+    def previous_entity(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation"""
         transaction_id = request.query_params.get("transaction_id", None)
         contact_1_id = request.query_params.get("contact_1_id", None)
         date = request.query_params.get("date", None)
         aggregation_group = request.query_params.get("aggregation_group", None)
-        if not (contact_1_id and date):
+
+        missing_params = []
+        if not contact_1_id:
+            missing_params.append("contact_1_id")
+        if not date:
+            missing_params.append("date")
+        if not aggregation_group:
+            missing_params.append("aggregation_group")
+
+        if len(missing_params) > 0:
+            error_msg = (
+                "Please provide " + ",".join(missing_params) + " in query params"
+            )
             return Response(
-                "Please provide contact_1_id and date in query params.",
+                error_msg,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         date = datetime.fromisoformat(date)
 
-        previous_transaction = (
-            self.get_queryset()
-            .filter(
-                ~Q(id=transaction_id or None),
-                Q(contact_1_id=contact_1_id),
-                Q(date__year=date.year),
-                Q(date__lte=date),
-                Q(aggregation_group=aggregation_group),
-            )
-            .order_by("-date", "-created")
-            .first()
+        previous_transactions = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(contact_1_id=contact_1_id),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
         )
+
+        previous_transaction = previous_transactions.order_by(
+            "-date", "-created"
+        ).first()
 
         if previous_transaction:
             serializer = self.get_serializer(previous_transaction)

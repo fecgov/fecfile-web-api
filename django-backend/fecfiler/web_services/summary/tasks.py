@@ -33,6 +33,13 @@ def calculate_summary(report_id):
     a = summary["a"]
     b = summary["b"]
 
+    # line 6
+    report.form_3x.L6c_total_receipts_period = a["line_6c"]
+    report.form_3x.L6c_total_receipts_ytd = a["line_6c"]
+    # line 9
+    report.form_3x.L9_debts_to_period = a["line_9"]
+    # line 10
+    report.form_3x.L10_debts_by_period = a["line_10"]
     # line 11ai
     report.form_3x.L11ai_itemized_period = a["line_11ai"]
     report.form_3x.L11ai_itemized_ytd = b["line_11ai"]
@@ -69,6 +76,9 @@ def calculate_summary(report_id):
     # line 17
     report.form_3x.L17_other_federal_receipts_dividends_period = a["line_17"]
     report.form_3x.L17_other_federal_receipts_dividends_ytd = b["line_17"]
+    # line 19
+    report.form_3x.L19_total_receipts_period = a["line_19"]
+    report.form_3x.L19_total_receipts_ytd = b["line_19"]
     # line 21b
     report.form_3x.L21b_other_federal_operating_expenditures_period = a["line_21b"]
     report.form_3x.L21b_other_federal_operating_expenditures_ytd = b["line_21b"]

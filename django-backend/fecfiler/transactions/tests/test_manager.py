@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from fecfiler.transactions.models import Transaction, Schedule
 import uuid
+from decimal import Decimal
 
 
 class TransactionManagerTestCase(TestCase):
@@ -9,6 +10,7 @@ class TransactionManagerTestCase(TestCase):
         "test_committee_accounts",
         "test_f3x_reports",
         "test_transaction_manager_transactions",
+        "test_election_aggregation_data",
     ]
 
     def test_order_of_transactions(self):
@@ -39,6 +41,12 @@ class TransactionManagerTestCase(TestCase):
         refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
         self.assertEqual(refund.aggregate, 4444)
 
+    def test_election_aggregation(self):
+        transaction = Transaction.objects.get(id="c4ba684a-607f-4f5d-bfb4-0fa1776d4e35")
+        self.assertEqual(
+            transaction.calendar_ytd_per_election_office, Decimal("578.00")
+        )
+
     def test_debt_repayment(self):
         repayment = Transaction.objects.get(id="dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491")
         debt = Transaction.objects.get(id="dddddddd-3274-47d8-9388-7294a3fd4321")
@@ -49,3 +57,7 @@ class TransactionManagerTestCase(TestCase):
     def test_force_unaggregated(self):
         txn = Transaction.objects.get(id="12345678-1596-4ef1-a1aa-c4386b8d1234")
         self.assertEqual(txn.aggregate, 3333)
+
+    def test_line_label(self):
+        refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
+        self.assertEqual(refund.line_label, "21(b)")
