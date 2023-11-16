@@ -50,7 +50,13 @@ def compose_transactions(report_id):
                 if transaction.parent_transaction
                 else transaction.id
             )
-            transaction.itemized = transactions.filter(id=root_id).first().itemized
+            root = transactions.filter(id=root_id).first()
+            transaction.itemized = root.itemized
+            # Assign child IE's thier parent's calendar ytd per election
+            if transaction.schedule_e:
+                transaction.calendar_ytd_per_election_office = (
+                    root.calendar_ytd_per_election_office
+                )
         return [t for t in transactions if t.itemized]
     else:
         logger.info(f"no transactions found for report: {report_id}")
@@ -59,7 +65,8 @@ def compose_transactions(report_id):
 
 def compose_report_level_memos(report_id):
     report_level_memos = MemoText.objects.filter(
-        report_id=report_id, transaction_uuid=None,
+        report_id=report_id,
+        transaction_uuid=None,
     )
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")

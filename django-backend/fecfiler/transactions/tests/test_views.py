@@ -59,9 +59,9 @@ class TransactionViewsTestCase(TestCase):
     def test_get_queryset(self):
         view_set = TransactionViewSet()
         view_set.request = self.request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 11)
+        self.assertEqual(view_set.get_queryset().count(), 12)
         view_set.request = self.request({}, {"schedules": "A,B,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 9)
+        self.assertEqual(view_set.get_queryset().count(), 10)
         view_set.request = self.request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
@@ -141,3 +141,19 @@ class TransactionViewsTestCase(TestCase):
             )
         )
         self.assertEqual(response.data["date"], "2023-10-31")
+
+    def test_inherited_election_aggregate(self):
+        request = self.factory.get(
+            "/api/v1/transactions/aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35/"
+        )
+        request.user = self.user
+        request.query_params = {}
+        request.data = {}
+
+        view = TransactionViewSet
+        view.request = request
+        response = view.as_view({"get": "retrieve"})(
+            request, pk="aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35"
+        )
+        transaction = response.data
+        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), 58.00)

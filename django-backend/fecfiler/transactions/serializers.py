@@ -248,42 +248,22 @@ class TransactionSerializer(
         representation["form_type"] = instance.form_type
 
         # Assign the itemization value of the highest level parent for all transactions.
-        # Currently, there is a recursive child depth limit afterwhich the object values
-        # for the parent object of a child are not longer included by the serializer.
-        # Until we have refactored our tree walking to walk through the parents
-        # instead of the children, we do a manual object query from the database
-        # to get the itemization value since the serializer is no longer
-        # providing the value.
-        if (
-            instance.parent_transaction
-            and not instance.parent_transaction.parent_transaction
-        ):
-            logger.info(
-                f"Itemization value for {instance.id} pulled"
-                f" from {instance.parent_transaction.id}"
-            )
-            if hasattr(instance.parent_transaction, "itemized"):
-                representation["itemized"] = instance.parent_transaction.itemized
+        # The itemization value of the parent (or any ancestor) is not yet calcuated
+        # when retrieving this instance from the db.
+        if instance.parent_transaction:
+            if instance.parent_transaction.parent_transaction:
+                itemized = Transaction.objects.get(
+                    id=instance.parent_transaction.parent_transaction.id
+                ).itemized
             else:
-                t = Transaction.objects.get(pk=instance.parent_transaction.id)
-                representation["itemized"] = t.itemized
-        if (
-            instance.parent_transaction
-            and instance.parent_transaction.parent_transaction
-        ):
-            logger.info(
-                f"Itemization value for {instance.id} pulled"
-                f" from {instance.parent_transaction.parent_transaction.id}"
-            )
-            if hasattr(instance.parent_transaction.parent_transaction, "itemized"):
-                representation[
-                    "itemized"
-                ] = instance.parent_transaction.parent_transaction.itemized
-            else:
-                t = Transaction.objects.get(
-                    pk=instance.parent_transaction.parent_transaction.id
-                )
-                representation["itemized"] = t.itemized
+                parent = Transaction.objects.get(id=instance.parent_transaction.id)
+                # Assign child IE's thier parent's calendar ytd per election
+                if instance.schedule_e:
+                    representation[
+                        "calendar_ytd_per_election_office"
+                    ] = parent.calendar_ytd_per_election_office
+                itemized = parent.itemized
+            representation["itemized"] = itemized
 
         # represent parent
         if instance.parent_transaction:
