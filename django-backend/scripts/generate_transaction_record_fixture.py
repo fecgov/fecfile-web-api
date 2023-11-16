@@ -36,7 +36,7 @@ def get_arguments():
         '--report_b_id',
         default="1406535e-f99f-42c4-97a8-247904b7d297",
         help='secondary report used for transactions outside of report dates'
-            +' (default: 1406535e-f99f-42c4-97a8-247904b7d297)'
+             + ' (default: 1406535e-f99f-42c4-97a8-247904b7d297)'
     )
     parser.add_argument(
         '--report_start_date',
