@@ -49,103 +49,111 @@ class SummaryService:
             temp_sc10=self.get_line("SC/10", field="loan_balance"),
             temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
+        summary["line_6a"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_6b"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_9"] = (
-            summary.get("temp_sc9", 0)
-            + summary.get("temp_sd9", 0)
+            summary["temp_sc9"]
+            + summary["temp_sd9"]
         )
         summary["line_10"] = (
-            summary.get("temp_sc10", 0)
-            + summary.get("temp_sd10", 0)
+            summary["temp_sc10"]
+            + summary["temp_sd10"]
         )
         summary["line_11aiii"] = (
-            summary.get("line_11ai", 0)
-            + summary.get("line_11aii", 0)
+            summary["line_11ai"]
+            + summary["line_11aii"]
         )
         summary["line_11d"] = (
-            summary.get("line_11aiii", 0)
-            + summary.get("line_11b", 0)
-            + summary.get("line_11c", 0)
+            summary["line_11aiii"]
+            + summary["line_11b"]
+            + summary["line_11c"]
         )
+        summary["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_21c"] = (
-            summary.get("line_21ai", 0)
-            + summary.get("line_21aii", 0)
-            + summary.get("line_21b", 0)
+            summary["line_21ai"]
+            + summary["line_21aii"]
+            + summary["line_21b"]
         )
+        summary["line_25"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_28d"] = (
-            summary.get("line_28a", 0)
-            + summary.get("line_28b", 0)
-            + summary.get("line_28c", 0)
+            summary["line_28a"]
+            + summary["line_28b"]
+            + summary["line_28c"]
         )
+        summary["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_30c"] = (
-            summary.get("line_30ai", 0)
-            + summary.get("line_30aii", 0)
-            + summary.get("line_30b", 0)
+            summary["line_30ai"]
+            + summary["line_30aii"]
+            + summary["line_30b"]
         )
         summary["line_31"] = (
-            summary.get("line_21c", 0)
-            + summary.get("line_22", 0)
-            + summary.get("line_23", 0)
-            + summary.get("line_24", 0)
-            + summary.get("line_25", 0)
-            + summary.get("line_26", 0)
-            + summary.get("line_27", 0)
-            + summary.get("line_28d", 0)
-            + summary.get("line_29", 0)
-            + summary.get("line_30c", 0)
+            summary["line_21c"]
+            + summary["line_22"]
+            + summary["line_23"]
+            + summary["line_24"]
+            + summary["line_25"]
+            + summary["line_26"]
+            + summary["line_27"]
+            + summary["line_28d"]
+            + summary["line_29"]
+            + summary["line_30c"]
         )
         summary["line_32"] = (
-            summary.get("line_31", 0)
-            - summary.get("line_21aii", 0)
-            - summary.get("line_30aii", 0)
+            summary["line_31"]
+            - summary["line_21aii"]
+            - summary["line_30aii"]
         )
         summary["line_33"] = (
-            summary.get("line_11d", 0)
+            summary["line_11d"]
         )
         summary["line_34"] = (
-            summary.get("line_28d", 0)
+            summary["line_28d"]
         )
         summary["line_35"] = (
-            summary.get("line_33", 0)
-            - summary.get("line_34", 0)
+            summary["line_33"]
+            - summary["line_34"]
         )
         summary["line_36"] = (
-            summary.get("line_21ai", 0)
-            + summary.get("line_21b", 0)
+            summary["line_21ai"]
+            + summary["line_21b"]
         )
         summary["line_37"] = (
-            summary.get("line_15", 0)
+            summary["line_15"]
         )
         summary["line_38"] = (
-            summary.get("line_36", 0)
-            - summary.get("line_37", 0)
+            summary["line_36"]
+            - summary["line_37"]
         )
         summary["line_6c"] = (
-            summary.get("line_11d", 0)
-            + summary.get("line_12", 0)
-            + summary.get("line_13", 0)
-            + summary.get("line_14", 0)
-            + summary.get("line_15", 0)
-            + summary.get("line_16", 0)
-            + summary.get("line_17", 0)
-            + summary.get("line_18c", 0)
+            summary["line_11d"]
+            + summary["line_12"]
+            + summary["line_13"]
+            + summary["line_14"]
+            + summary["line_15"]
+            + summary["line_16"]
+            + summary["line_17"]
+            + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary.get("line_6b", 0)
-            + summary.get("line_6c", 0)
+            summary["line_6b"]
+            + summary["line_6c"]
         )
         summary["line_7"] = (
             summary.get("line_31")
         )
         summary["line_8"] = (
-            summary.get("line_6d", 0)
+            summary["line_6d"]
             - summary.get("line_7")
         )
         summary["line_19"] = (
-            summary.get("line_6c", 0)
+            summary["line_6c"]
         )
         summary["line_20"] = (
-            summary.get("line_19", 0)
-            - summary.get("line_18c", 0)
+            summary["line_19"]
+            - summary["line_18c"]
         )
 
         # Remove temporary aggregations to clean up the summary
@@ -188,95 +196,103 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
         )
+        summary["line_6a"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_6b"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_11aiii"] = (
-            summary.get("line_11ai", 0)
-            + summary.get("line_11aii", 0)
+            summary["line_11ai"]
+            + summary["line_11aii"]
         )
         summary["line_11d"] = (
-            summary.get("line_11aiii", 0)
-            + summary.get("line_11b", 0)
-            + summary.get("line_11c", 0)
+            summary["line_11aiii"]
+            + summary["line_11b"]
+            + summary["line_11c"]
         )
+        summary["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_21c"] = (
-            summary.get("line_21ai", 0)
-            + summary.get("line_21aii", 0)
-            + summary.get("line_21b", 0)
+            summary["line_21ai"]
+            + summary["line_21aii"]
+            + summary["line_21b"]
         )
+        summary["line_25"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_28d"] = (
-            summary.get("line_28a", 0)
-            + summary.get("line_28b", 0)
-            + summary.get("line_28c", 0)
+            summary["line_28a"]
+            + summary["line_28b"]
+            + summary["line_28c"]
         )
+        summary["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
+        summary["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
         summary["line_30c"] = (
-            summary.get("line_30ai", 0)
-            + summary.get("line_30aii", 0)
-            + summary.get("line_30b", 0)
+            summary["line_30ai"]
+            + summary["line_30aii"]
+            + summary["line_30b"]
         )
         summary["line_31"] = (
-            summary.get("line_21c", 0)
-            + summary.get("line_22", 0)
-            + summary.get("line_23", 0)
-            + summary.get("line_24", 0)
-            + summary.get("line_25", 0)
-            + summary.get("line_26", 0)
-            + summary.get("line_27", 0)
-            + summary.get("line_28d", 0)
-            + summary.get("line_29", 0)
-            + summary.get("line_30c", 0)
+            summary["line_21c"]
+            + summary["line_22"]
+            + summary["line_23"]
+            + summary["line_24"]
+            + summary["line_25"]
+            + summary["line_26"]
+            + summary["line_27"]
+            + summary["line_28d"]
+            + summary["line_29"]
+            + summary["line_30c"]
         )
         summary["line_32"] = (
-            summary.get("line_31", 0)
-            - summary.get("line_21aii", 0)
-            - summary.get("line_30aii", 0)
+            summary["line_31"]
+            - summary["line_21aii"]
+            - summary["line_30aii"]
         )
         summary["line_33"] = (
-            summary.get("line_11d", 0)
+            summary["line_11d"]
         )
         summary["line_34"] = (
-            summary.get("line_28d", 0)
+            summary["line_28d"]
         )
         summary["line_35"] = (
-            summary.get("line_33", 0)
-            - summary.get("line_34", 0)
+            summary["line_33"]
+            - summary["line_34"]
         )
         summary["line_36"] = (
-            summary.get("line_21ai", 0)
-            + summary.get("line_21b", 0)
+            summary["line_21ai"]
+            + summary["line_21b"]
         )
         summary["line_37"] = (
-            summary.get("line_15", 0)
+            summary["line_15"]
         )
         summary["line_38"] = (
-            summary.get("line_36", 0)
-            - summary.get("line_37", 0)
+            summary["line_36"]
+            - summary["line_37"]
         )
         summary["line_6c"] = (
-            summary.get("line_11d", 0)
-            + summary.get("line_12", 0)
-            + summary.get("line_13", 0)
-            + summary.get("line_14", 0)
-            + summary.get("line_15", 0)
-            + summary.get("line_16", 0)
-            + summary.get("line_17", 0)
-            + summary.get("line_18c", 0)
+            summary["line_11d"]
+            + summary["line_12"]
+            + summary["line_13"]
+            + summary["line_14"]
+            + summary["line_15"]
+            + summary["line_16"]
+            + summary["line_17"]
+            + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary.get("line_6a", 0)
-            + summary.get("line_6c", 0)
+            summary["line_6a"]
+            + summary["line_6c"]
         )
         summary["line_7"] = (
-            summary.get("line_31", 0)
+            summary["line_31"]
         )
         summary["line_8"] = (
-            summary.get("line_6d", 0)
-            - summary.get("line_7")
+            summary["line_6d"]
+            - summary["line_7"]
         )
         summary["line_19"] = (
-            summary.get("line_6c", 0)
+            summary["line_6c"]
         )
         summary["line_20"] = (
-            summary.get("line_19", 0)
-            - summary.get("line_18c", 0)
+            summary["line_19"]
+            - summary["line_18c"]
         )
 
         return summary

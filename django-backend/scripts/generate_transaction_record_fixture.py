@@ -35,7 +35,8 @@ def get_arguments():
     parser.add_argument(
         '--report_b_id',
         default="1406535e-f99f-42c4-97a8-247904b7d297",
-        help='secondary report (default: 1406535e-f99f-42c4-97a8-247904b7d297)'
+        help='secondary report used for transactions outside of report dates'
+            +' (default: 1406535e-f99f-42c4-97a8-247904b7d297)'
     )
     parser.add_argument(
         '--report_start_date',
@@ -46,6 +47,11 @@ def get_arguments():
         '--report_end_date',
         default="2005-02-28",
         help='default value: 2005-02-28'
+    )
+    parser.add_argument(
+        '--transaction_type_identifier',
+        default="Transaction Type Identifier",
+        help='default value: Transaction Type Identifier'
     )
     parser.add_argument(
         '--output_file',
@@ -242,7 +248,7 @@ def get_records(form_type, args):
             "memo_code": {memo_code},
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "transaction_type_identifier": "Transaction Type Identifier"
+            "transaction_type_identifier": {args.transaction_type_identifier}
         }}\n    }}"""
 
         records.append(schedule_record)
