@@ -34,6 +34,7 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.assertFalse
       ~OpenfecViewSetTest.assertFieldOutput
       ~OpenfecViewSetTest.assertFormError
+      ~OpenfecViewSetTest.assertFormSetError
       ~OpenfecViewSetTest.assertFormsetError
       ~OpenfecViewSetTest.assertGreater
       ~OpenfecViewSetTest.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.assertNotRegex
       ~OpenfecViewSetTest.assertNotRegexpMatches
       ~OpenfecViewSetTest.assertNumQueries
+      ~OpenfecViewSetTest.assertQuerySetEqual
       ~OpenfecViewSetTest.assertQuerysetEqual
       ~OpenfecViewSetTest.assertRaises
       ~OpenfecViewSetTest.assertRaisesMessage

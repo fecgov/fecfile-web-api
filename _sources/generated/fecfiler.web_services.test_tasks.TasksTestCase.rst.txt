@@ -34,6 +34,7 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertFalse
       ~TasksTestCase.assertFieldOutput
       ~TasksTestCase.assertFormError
+      ~TasksTestCase.assertFormSetError
       ~TasksTestCase.assertFormsetError
       ~TasksTestCase.assertGreater
       ~TasksTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertNotRegex
       ~TasksTestCase.assertNotRegexpMatches
       ~TasksTestCase.assertNumQueries
+      ~TasksTestCase.assertQuerySetEqual
       ~TasksTestCase.assertQuerysetEqual
       ~TasksTestCase.assertRaises
       ~TasksTestCase.assertRaisesMessage

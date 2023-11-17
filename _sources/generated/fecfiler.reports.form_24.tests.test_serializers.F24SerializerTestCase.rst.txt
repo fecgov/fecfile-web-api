@@ -34,6 +34,7 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertFalse
       ~F24SerializerTestCase.assertFieldOutput
       ~F24SerializerTestCase.assertFormError
+      ~F24SerializerTestCase.assertFormSetError
       ~F24SerializerTestCase.assertFormsetError
       ~F24SerializerTestCase.assertGreater
       ~F24SerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertNotRegex
       ~F24SerializerTestCase.assertNotRegexpMatches
       ~F24SerializerTestCase.assertNumQueries
+      ~F24SerializerTestCase.assertQuerySetEqual
       ~F24SerializerTestCase.assertQuerysetEqual
       ~F24SerializerTestCase.assertRaises
       ~F24SerializerTestCase.assertRaisesMessage

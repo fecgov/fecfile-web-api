@@ -20,6 +20,9 @@ fecfiler.memo\_text.models.MemoText
    .. autosummary::
    
       ~MemoText.__init__
+      ~MemoText.adelete
+      ~MemoText.arefresh_from_db
+      ~MemoText.asave
       ~MemoText.check
       ~MemoText.check_for_uid_conflicts
       ~MemoText.clean

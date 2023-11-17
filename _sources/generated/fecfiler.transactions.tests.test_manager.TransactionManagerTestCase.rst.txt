@@ -34,6 +34,7 @@ fecfiler.transactions.tests.test\_manager.TransactionManagerTestCase
       ~TransactionManagerTestCase.assertFalse
       ~TransactionManagerTestCase.assertFieldOutput
       ~TransactionManagerTestCase.assertFormError
+      ~TransactionManagerTestCase.assertFormSetError
       ~TransactionManagerTestCase.assertFormsetError
       ~TransactionManagerTestCase.assertGreater
       ~TransactionManagerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.transactions.tests.test\_manager.TransactionManagerTestCase
       ~TransactionManagerTestCase.assertNotRegex
       ~TransactionManagerTestCase.assertNotRegexpMatches
       ~TransactionManagerTestCase.assertNumQueries
+      ~TransactionManagerTestCase.assertQuerySetEqual
       ~TransactionManagerTestCase.assertQuerysetEqual
       ~TransactionManagerTestCase.assertRaises
       ~TransactionManagerTestCase.assertRaisesMessage

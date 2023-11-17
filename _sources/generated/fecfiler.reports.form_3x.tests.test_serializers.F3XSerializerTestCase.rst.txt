@@ -34,6 +34,7 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertFalse
       ~F3XSerializerTestCase.assertFieldOutput
       ~F3XSerializerTestCase.assertFormError
+      ~F3XSerializerTestCase.assertFormSetError
       ~F3XSerializerTestCase.assertFormsetError
       ~F3XSerializerTestCase.assertGreater
       ~F3XSerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertNotRegex
       ~F3XSerializerTestCase.assertNotRegexpMatches
       ~F3XSerializerTestCase.assertNumQueries
+      ~F3XSerializerTestCase.assertQuerySetEqual
       ~F3XSerializerTestCase.assertQuerysetEqual
       ~F3XSerializerTestCase.assertRaises
       ~F3XSerializerTestCase.assertRaisesMessage

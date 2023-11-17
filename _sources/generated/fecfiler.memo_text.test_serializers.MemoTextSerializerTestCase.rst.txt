@@ -34,6 +34,7 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertFalse
       ~MemoTextSerializerTestCase.assertFieldOutput
       ~MemoTextSerializerTestCase.assertFormError
+      ~MemoTextSerializerTestCase.assertFormSetError
       ~MemoTextSerializerTestCase.assertFormsetError
       ~MemoTextSerializerTestCase.assertGreater
       ~MemoTextSerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertNotRegex
       ~MemoTextSerializerTestCase.assertNotRegexpMatches
       ~MemoTextSerializerTestCase.assertNumQueries
+      ~MemoTextSerializerTestCase.assertQuerySetEqual
       ~MemoTextSerializerTestCase.assertQuerysetEqual
       ~MemoTextSerializerTestCase.assertRaises
       ~MemoTextSerializerTestCase.assertRaisesMessage

@@ -20,6 +20,9 @@ fecfiler.f3x\_summaries.models.F3XSummary
    .. autosummary::
    
       ~F3XSummary.__init__
+      ~F3XSummary.adelete
+      ~F3XSummary.arefresh_from_db
+      ~F3XSummary.asave
       ~F3XSummary.check
       ~F3XSummary.clean
       ~F3XSummary.clean_fields

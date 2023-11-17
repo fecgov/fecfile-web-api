@@ -34,6 +34,7 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertFalse
       ~SharedUtilitiesTestCase.assertFieldOutput
       ~SharedUtilitiesTestCase.assertFormError
+      ~SharedUtilitiesTestCase.assertFormSetError
       ~SharedUtilitiesTestCase.assertFormsetError
       ~SharedUtilitiesTestCase.assertGreater
       ~SharedUtilitiesTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertNotRegex
       ~SharedUtilitiesTestCase.assertNotRegexpMatches
       ~SharedUtilitiesTestCase.assertNumQueries
+      ~SharedUtilitiesTestCase.assertQuerySetEqual
       ~SharedUtilitiesTestCase.assertQuerysetEqual
       ~SharedUtilitiesTestCase.assertRaises
       ~SharedUtilitiesTestCase.assertRaisesMessage

@@ -34,6 +34,7 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.assertFalse
       ~AuthenticationTest.assertFieldOutput
       ~AuthenticationTest.assertFormError
+      ~AuthenticationTest.assertFormSetError
       ~AuthenticationTest.assertFormsetError
       ~AuthenticationTest.assertGreater
       ~AuthenticationTest.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.assertNotRegex
       ~AuthenticationTest.assertNotRegexpMatches
       ~AuthenticationTest.assertNumQueries
+      ~AuthenticationTest.assertQuerySetEqual
       ~AuthenticationTest.assertQuerysetEqual
       ~AuthenticationTest.assertRaises
       ~AuthenticationTest.assertRaisesMessage

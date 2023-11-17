@@ -34,6 +34,7 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertFalse
       ~F3XReportTestCase.assertFieldOutput
       ~F3XReportTestCase.assertFormError
+      ~F3XReportTestCase.assertFormSetError
       ~F3XReportTestCase.assertFormsetError
       ~F3XReportTestCase.assertGreater
       ~F3XReportTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertNotRegex
       ~F3XReportTestCase.assertNotRegexpMatches
       ~F3XReportTestCase.assertNumQueries
+      ~F3XReportTestCase.assertQuerySetEqual
       ~F3XReportTestCase.assertQuerysetEqual
       ~F3XReportTestCase.assertRaises
       ~F3XReportTestCase.assertRaisesMessage

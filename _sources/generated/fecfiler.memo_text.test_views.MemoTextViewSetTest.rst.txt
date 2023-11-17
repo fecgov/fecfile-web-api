@@ -34,6 +34,7 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertFalse
       ~MemoTextViewSetTest.assertFieldOutput
       ~MemoTextViewSetTest.assertFormError
+      ~MemoTextViewSetTest.assertFormSetError
       ~MemoTextViewSetTest.assertFormsetError
       ~MemoTextViewSetTest.assertGreater
       ~MemoTextViewSetTest.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertNotRegex
       ~MemoTextViewSetTest.assertNotRegexpMatches
       ~MemoTextViewSetTest.assertNumQueries
+      ~MemoTextViewSetTest.assertQuerySetEqual
       ~MemoTextViewSetTest.assertQuerysetEqual
       ~MemoTextViewSetTest.assertRaises
       ~MemoTextViewSetTest.assertRaisesMessage

@@ -20,6 +20,9 @@ fecfiler.transactions.schedule\_c1.models.ScheduleC1
    .. autosummary::
    
       ~ScheduleC1.__init__
+      ~ScheduleC1.adelete
+      ~ScheduleC1.arefresh_from_db
+      ~ScheduleC1.asave
       ~ScheduleC1.check
       ~ScheduleC1.clean
       ~ScheduleC1.clean_fields

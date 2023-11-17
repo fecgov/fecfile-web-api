@@ -34,6 +34,7 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.assertFalse
       ~Form3XViewSetTest.assertFieldOutput
       ~Form3XViewSetTest.assertFormError
+      ~Form3XViewSetTest.assertFormSetError
       ~Form3XViewSetTest.assertFormsetError
       ~Form3XViewSetTest.assertGreater
       ~Form3XViewSetTest.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.assertNotRegex
       ~Form3XViewSetTest.assertNotRegexpMatches
       ~Form3XViewSetTest.assertNumQueries
+      ~Form3XViewSetTest.assertQuerySetEqual
       ~Form3XViewSetTest.assertQuerysetEqual
       ~Form3XViewSetTest.assertRaises
       ~Form3XViewSetTest.assertRaisesMessage

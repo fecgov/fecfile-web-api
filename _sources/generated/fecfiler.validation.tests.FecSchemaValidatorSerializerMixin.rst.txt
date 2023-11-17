@@ -34,6 +34,7 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertFalse
       ~FecSchemaValidatorSerializerMixin.assertFieldOutput
       ~FecSchemaValidatorSerializerMixin.assertFormError
+      ~FecSchemaValidatorSerializerMixin.assertFormSetError
       ~FecSchemaValidatorSerializerMixin.assertFormsetError
       ~FecSchemaValidatorSerializerMixin.assertGreater
       ~FecSchemaValidatorSerializerMixin.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertNotRegex
       ~FecSchemaValidatorSerializerMixin.assertNotRegexpMatches
       ~FecSchemaValidatorSerializerMixin.assertNumQueries
+      ~FecSchemaValidatorSerializerMixin.assertQuerySetEqual
       ~FecSchemaValidatorSerializerMixin.assertQuerysetEqual
       ~FecSchemaValidatorSerializerMixin.assertRaises
       ~FecSchemaValidatorSerializerMixin.assertRaisesMessage

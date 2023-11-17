@@ -34,6 +34,7 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertFalse
       ~CommitteeAccountTestCase.assertFieldOutput
       ~CommitteeAccountTestCase.assertFormError
+      ~CommitteeAccountTestCase.assertFormSetError
       ~CommitteeAccountTestCase.assertFormsetError
       ~CommitteeAccountTestCase.assertGreater
       ~CommitteeAccountTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertNotRegex
       ~CommitteeAccountTestCase.assertNotRegexpMatches
       ~CommitteeAccountTestCase.assertNumQueries
+      ~CommitteeAccountTestCase.assertQuerySetEqual
       ~CommitteeAccountTestCase.assertQuerysetEqual
       ~CommitteeAccountTestCase.assertRaises
       ~CommitteeAccountTestCase.assertRaisesMessage

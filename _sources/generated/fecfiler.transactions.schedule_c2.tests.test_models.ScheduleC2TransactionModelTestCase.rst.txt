@@ -34,6 +34,7 @@ fecfiler.transactions.schedule\_c2.tests.test\_models.ScheduleC2TransactionModel
       ~ScheduleC2TransactionModelTestCase.assertFalse
       ~ScheduleC2TransactionModelTestCase.assertFieldOutput
       ~ScheduleC2TransactionModelTestCase.assertFormError
+      ~ScheduleC2TransactionModelTestCase.assertFormSetError
       ~ScheduleC2TransactionModelTestCase.assertFormsetError
       ~ScheduleC2TransactionModelTestCase.assertGreater
       ~ScheduleC2TransactionModelTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.transactions.schedule\_c2.tests.test\_models.ScheduleC2TransactionModel
       ~ScheduleC2TransactionModelTestCase.assertNotRegex
       ~ScheduleC2TransactionModelTestCase.assertNotRegexpMatches
       ~ScheduleC2TransactionModelTestCase.assertNumQueries
+      ~ScheduleC2TransactionModelTestCase.assertQuerySetEqual
       ~ScheduleC2TransactionModelTestCase.assertQuerysetEqual
       ~ScheduleC2TransactionModelTestCase.assertRaises
       ~ScheduleC2TransactionModelTestCase.assertRaisesMessage

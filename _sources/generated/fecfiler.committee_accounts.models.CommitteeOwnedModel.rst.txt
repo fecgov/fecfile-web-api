@@ -20,6 +20,9 @@ fecfiler.committee\_accounts.models.CommitteeOwnedModel
    .. autosummary::
    
       ~CommitteeOwnedModel.__init__
+      ~CommitteeOwnedModel.adelete
+      ~CommitteeOwnedModel.arefresh_from_db
+      ~CommitteeOwnedModel.asave
       ~CommitteeOwnedModel.check
       ~CommitteeOwnedModel.clean
       ~CommitteeOwnedModel.clean_fields

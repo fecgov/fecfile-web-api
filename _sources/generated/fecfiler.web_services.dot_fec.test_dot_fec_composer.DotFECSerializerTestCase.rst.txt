@@ -34,6 +34,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_composer.DotFECSerializerTestCas
       ~DotFECSerializerTestCase.assertFalse
       ~DotFECSerializerTestCase.assertFieldOutput
       ~DotFECSerializerTestCase.assertFormError
+      ~DotFECSerializerTestCase.assertFormSetError
       ~DotFECSerializerTestCase.assertFormsetError
       ~DotFECSerializerTestCase.assertGreater
       ~DotFECSerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_composer.DotFECSerializerTestCas
       ~DotFECSerializerTestCase.assertNotRegex
       ~DotFECSerializerTestCase.assertNotRegexpMatches
       ~DotFECSerializerTestCase.assertNumQueries
+      ~DotFECSerializerTestCase.assertQuerySetEqual
       ~DotFECSerializerTestCase.assertQuerysetEqual
       ~DotFECSerializerTestCase.assertRaises
       ~DotFECSerializerTestCase.assertRaisesMessage

@@ -34,6 +34,7 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.assertFalse
       ~F24TestCase.assertFieldOutput
       ~F24TestCase.assertFormError
+      ~F24TestCase.assertFormSetError
       ~F24TestCase.assertFormsetError
       ~F24TestCase.assertGreater
       ~F24TestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.assertNotRegex
       ~F24TestCase.assertNotRegexpMatches
       ~F24TestCase.assertNumQueries
+      ~F24TestCase.assertQuerySetEqual
       ~F24TestCase.assertQuerysetEqual
       ~F24TestCase.assertRaises
       ~F24TestCase.assertRaisesMessage

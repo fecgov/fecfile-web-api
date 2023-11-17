@@ -20,6 +20,9 @@ fecfiler.web\_services.models.WebPrintSubmission
    .. autosummary::
    
       ~WebPrintSubmission.__init__
+      ~WebPrintSubmission.adelete
+      ~WebPrintSubmission.arefresh_from_db
+      ~WebPrintSubmission.asave
       ~WebPrintSubmission.check
       ~WebPrintSubmission.clean
       ~WebPrintSubmission.clean_fields

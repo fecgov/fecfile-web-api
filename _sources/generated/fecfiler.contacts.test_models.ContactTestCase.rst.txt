@@ -34,6 +34,7 @@ fecfiler.contacts.test\_models.ContactTestCase
       ~ContactTestCase.assertFalse
       ~ContactTestCase.assertFieldOutput
       ~ContactTestCase.assertFormError
+      ~ContactTestCase.assertFormSetError
       ~ContactTestCase.assertFormsetError
       ~ContactTestCase.assertGreater
       ~ContactTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.contacts.test\_models.ContactTestCase
       ~ContactTestCase.assertNotRegex
       ~ContactTestCase.assertNotRegexpMatches
       ~ContactTestCase.assertNumQueries
+      ~ContactTestCase.assertQuerySetEqual
       ~ContactTestCase.assertQuerysetEqual
       ~ContactTestCase.assertRaises
       ~ContactTestCase.assertRaisesMessage

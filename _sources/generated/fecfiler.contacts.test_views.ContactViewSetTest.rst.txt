@@ -34,6 +34,7 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertFalse
       ~ContactViewSetTest.assertFieldOutput
       ~ContactViewSetTest.assertFormError
+      ~ContactViewSetTest.assertFormSetError
       ~ContactViewSetTest.assertFormsetError
       ~ContactViewSetTest.assertGreater
       ~ContactViewSetTest.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertNotRegex
       ~ContactViewSetTest.assertNotRegexpMatches
       ~ContactViewSetTest.assertNumQueries
+      ~ContactViewSetTest.assertQuerySetEqual
       ~ContactViewSetTest.assertQuerysetEqual
       ~ContactViewSetTest.assertRaises
       ~ContactViewSetTest.assertRaisesMessage

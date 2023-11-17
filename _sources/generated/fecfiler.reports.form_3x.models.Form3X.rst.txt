@@ -20,6 +20,9 @@ fecfiler.reports.form\_3x.models.Form3X
    .. autosummary::
    
       ~Form3X.__init__
+      ~Form3X.adelete
+      ~Form3X.arefresh_from_db
+      ~Form3X.asave
       ~Form3X.check
       ~Form3X.clean
       ~Form3X.clean_fields

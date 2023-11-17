@@ -34,6 +34,7 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertFalse
       ~MemoTextTestCase.assertFieldOutput
       ~MemoTextTestCase.assertFormError
+      ~MemoTextTestCase.assertFormSetError
       ~MemoTextTestCase.assertFormsetError
       ~MemoTextTestCase.assertGreater
       ~MemoTextTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertNotRegex
       ~MemoTextTestCase.assertNotRegexpMatches
       ~MemoTextTestCase.assertNumQueries
+      ~MemoTextTestCase.assertQuerySetEqual
       ~MemoTextTestCase.assertQuerysetEqual
       ~MemoTextTestCase.assertRaises
       ~MemoTextTestCase.assertRaisesMessage

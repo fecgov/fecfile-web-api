@@ -20,6 +20,9 @@ fecfiler.reports.form\_24.models.Form24
    .. autosummary::
    
       ~Form24.__init__
+      ~Form24.adelete
+      ~Form24.arefresh_from_db
+      ~Form24.asave
       ~Form24.check
       ~Form24.clean
       ~Form24.clean_fields

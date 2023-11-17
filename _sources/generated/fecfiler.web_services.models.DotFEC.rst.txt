@@ -20,6 +20,9 @@ fecfiler.web\_services.models.DotFEC
    .. autosummary::
    
       ~DotFEC.__init__
+      ~DotFEC.adelete
+      ~DotFEC.arefresh_from_db
+      ~DotFEC.asave
       ~DotFEC.check
       ~DotFEC.clean
       ~DotFEC.clean_fields

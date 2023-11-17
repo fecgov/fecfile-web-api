@@ -34,6 +34,7 @@ fecfiler.contacts.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.assertFalse
       ~ContactSerializerTestCase.assertFieldOutput
       ~ContactSerializerTestCase.assertFormError
+      ~ContactSerializerTestCase.assertFormSetError
       ~ContactSerializerTestCase.assertFormsetError
       ~ContactSerializerTestCase.assertGreater
       ~ContactSerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.contacts.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.assertNotRegex
       ~ContactSerializerTestCase.assertNotRegexpMatches
       ~ContactSerializerTestCase.assertNumQueries
+      ~ContactSerializerTestCase.assertQuerySetEqual
       ~ContactSerializerTestCase.assertQuerysetEqual
       ~ContactSerializerTestCase.assertRaises
       ~ContactSerializerTestCase.assertRaisesMessage

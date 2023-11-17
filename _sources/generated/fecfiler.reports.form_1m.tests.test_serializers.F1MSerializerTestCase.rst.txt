@@ -34,6 +34,7 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertFalse
       ~F1MSerializerTestCase.assertFieldOutput
       ~F1MSerializerTestCase.assertFormError
+      ~F1MSerializerTestCase.assertFormSetError
       ~F1MSerializerTestCase.assertFormsetError
       ~F1MSerializerTestCase.assertGreater
       ~F1MSerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertNotRegex
       ~F1MSerializerTestCase.assertNotRegexpMatches
       ~F1MSerializerTestCase.assertNumQueries
+      ~F1MSerializerTestCase.assertQuerySetEqual
       ~F1MSerializerTestCase.assertQuerysetEqual
       ~F1MSerializerTestCase.assertRaises
       ~F1MSerializerTestCase.assertRaisesMessage

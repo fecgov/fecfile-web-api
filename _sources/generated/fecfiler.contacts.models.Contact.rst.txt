@@ -20,6 +20,9 @@ fecfiler.contacts.models.Contact
    .. autosummary::
    
       ~Contact.__init__
+      ~Contact.adelete
+      ~Contact.arefresh_from_db
+      ~Contact.asave
       ~Contact.check
       ~Contact.clean
       ~Contact.clean_fields

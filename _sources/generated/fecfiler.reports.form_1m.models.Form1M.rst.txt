@@ -20,6 +20,9 @@ fecfiler.reports.form\_1m.models.Form1M
    .. autosummary::
    
       ~Form1M.__init__
+      ~Form1M.adelete
+      ~Form1M.arefresh_from_db
+      ~Form1M.asave
       ~Form1M.check
       ~Form1M.clean
       ~Form1M.clean_fields

@@ -20,6 +20,9 @@ fecfiler.transactions.models.Transaction
    .. autosummary::
    
       ~Transaction.__init__
+      ~Transaction.adelete
+      ~Transaction.arefresh_from_db
+      ~Transaction.asave
       ~Transaction.check
       ~Transaction.clean
       ~Transaction.clean_fields

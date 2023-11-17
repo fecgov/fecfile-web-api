@@ -20,6 +20,9 @@ fecfiler.reports.form\_99.models.Form99
    .. autosummary::
    
       ~Form99.__init__
+      ~Form99.adelete
+      ~Form99.arefresh_from_db
+      ~Form99.asave
       ~Form99.check
       ~Form99.clean
       ~Form99.clean_fields

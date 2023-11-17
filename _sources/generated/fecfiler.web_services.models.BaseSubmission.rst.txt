@@ -20,6 +20,9 @@ fecfiler.web\_services.models.BaseSubmission
    .. autosummary::
    
       ~BaseSubmission.__init__
+      ~BaseSubmission.adelete
+      ~BaseSubmission.arefresh_from_db
+      ~BaseSubmission.asave
       ~BaseSubmission.check
       ~BaseSubmission.clean
       ~BaseSubmission.clean_fields

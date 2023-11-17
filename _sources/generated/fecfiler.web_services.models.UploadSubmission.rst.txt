@@ -20,6 +20,9 @@ fecfiler.web\_services.models.UploadSubmission
    .. autosummary::
    
       ~UploadSubmission.__init__
+      ~UploadSubmission.adelete
+      ~UploadSubmission.arefresh_from_db
+      ~UploadSubmission.asave
       ~UploadSubmission.check
       ~UploadSubmission.clean
       ~UploadSubmission.clean_fields

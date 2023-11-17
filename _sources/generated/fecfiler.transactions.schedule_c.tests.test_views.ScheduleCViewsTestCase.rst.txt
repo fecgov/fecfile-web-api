@@ -34,6 +34,7 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.assertFalse
       ~ScheduleCViewsTestCase.assertFieldOutput
       ~ScheduleCViewsTestCase.assertFormError
+      ~ScheduleCViewsTestCase.assertFormSetError
       ~ScheduleCViewsTestCase.assertFormsetError
       ~ScheduleCViewsTestCase.assertGreater
       ~ScheduleCViewsTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.assertNotRegex
       ~ScheduleCViewsTestCase.assertNotRegexpMatches
       ~ScheduleCViewsTestCase.assertNumQueries
+      ~ScheduleCViewsTestCase.assertQuerySetEqual
       ~ScheduleCViewsTestCase.assertQuerysetEqual
       ~ScheduleCViewsTestCase.assertRaises
       ~ScheduleCViewsTestCase.assertRaisesMessage

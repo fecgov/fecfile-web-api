@@ -20,6 +20,9 @@ fecfiler.reports.models.Report
    .. autosummary::
    
       ~Report.__init__
+      ~Report.adelete
+      ~Report.arefresh_from_db
+      ~Report.asave
       ~Report.check
       ~Report.clean
       ~Report.clean_fields

@@ -34,6 +34,7 @@ fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
       ~F99SerializerTestCase.assertFalse
       ~F99SerializerTestCase.assertFieldOutput
       ~F99SerializerTestCase.assertFormError
+      ~F99SerializerTestCase.assertFormSetError
       ~F99SerializerTestCase.assertFormsetError
       ~F99SerializerTestCase.assertGreater
       ~F99SerializerTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
       ~F99SerializerTestCase.assertNotRegex
       ~F99SerializerTestCase.assertNotRegexpMatches
       ~F99SerializerTestCase.assertNumQueries
+      ~F99SerializerTestCase.assertQuerySetEqual
       ~F99SerializerTestCase.assertQuerysetEqual
       ~F99SerializerTestCase.assertRaises
       ~F99SerializerTestCase.assertRaisesMessage

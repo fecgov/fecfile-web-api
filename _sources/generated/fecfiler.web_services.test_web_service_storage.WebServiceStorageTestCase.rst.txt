@@ -34,6 +34,7 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.assertFalse
       ~WebServiceStorageTestCase.assertFieldOutput
       ~WebServiceStorageTestCase.assertFormError
+      ~WebServiceStorageTestCase.assertFormSetError
       ~WebServiceStorageTestCase.assertFormsetError
       ~WebServiceStorageTestCase.assertGreater
       ~WebServiceStorageTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.assertNotRegex
       ~WebServiceStorageTestCase.assertNotRegexpMatches
       ~WebServiceStorageTestCase.assertNumQueries
+      ~WebServiceStorageTestCase.assertQuerySetEqual
       ~WebServiceStorageTestCase.assertQuerysetEqual
       ~WebServiceStorageTestCase.assertRaises
       ~WebServiceStorageTestCase.assertRaisesMessage

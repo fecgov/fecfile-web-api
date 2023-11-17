@@ -20,6 +20,9 @@ fecfiler.reports.models.ReportMixin
    .. autosummary::
    
       ~ReportMixin.__init__
+      ~ReportMixin.adelete
+      ~ReportMixin.arefresh_from_db
+      ~ReportMixin.asave
       ~ReportMixin.check
       ~ReportMixin.clean
       ~ReportMixin.clean_fields

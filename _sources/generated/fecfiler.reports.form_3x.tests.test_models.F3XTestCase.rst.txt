@@ -34,6 +34,7 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.assertFalse
       ~F3XTestCase.assertFieldOutput
       ~F3XTestCase.assertFormError
+      ~F3XTestCase.assertFormSetError
       ~F3XTestCase.assertFormsetError
       ~F3XTestCase.assertGreater
       ~F3XTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.assertNotRegex
       ~F3XTestCase.assertNotRegexpMatches
       ~F3XTestCase.assertNumQueries
+      ~F3XTestCase.assertQuerySetEqual
       ~F3XTestCase.assertQuerysetEqual
       ~F3XTestCase.assertRaises
       ~F3XTestCase.assertRaisesMessage

@@ -34,6 +34,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertFalse
       ~TransactionViewsTestCase.assertFieldOutput
       ~TransactionViewsTestCase.assertFormError
+      ~TransactionViewsTestCase.assertFormSetError
       ~TransactionViewsTestCase.assertFormsetError
       ~TransactionViewsTestCase.assertGreater
       ~TransactionViewsTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertNotRegex
       ~TransactionViewsTestCase.assertNotRegexpMatches
       ~TransactionViewsTestCase.assertNumQueries
+      ~TransactionViewsTestCase.assertQuerySetEqual
       ~TransactionViewsTestCase.assertQuerysetEqual
       ~TransactionViewsTestCase.assertRaises
       ~TransactionViewsTestCase.assertRaisesMessage

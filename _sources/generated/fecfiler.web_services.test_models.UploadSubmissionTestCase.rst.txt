@@ -34,6 +34,7 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertFalse
       ~UploadSubmissionTestCase.assertFieldOutput
       ~UploadSubmissionTestCase.assertFormError
+      ~UploadSubmissionTestCase.assertFormSetError
       ~UploadSubmissionTestCase.assertFormsetError
       ~UploadSubmissionTestCase.assertGreater
       ~UploadSubmissionTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertNotRegex
       ~UploadSubmissionTestCase.assertNotRegexpMatches
       ~UploadSubmissionTestCase.assertNumQueries
+      ~UploadSubmissionTestCase.assertQuerySetEqual
       ~UploadSubmissionTestCase.assertQuerysetEqual
       ~UploadSubmissionTestCase.assertRaises
       ~UploadSubmissionTestCase.assertRaisesMessage

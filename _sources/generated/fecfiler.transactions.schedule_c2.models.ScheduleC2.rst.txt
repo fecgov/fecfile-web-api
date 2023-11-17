@@ -20,6 +20,9 @@ fecfiler.transactions.schedule\_c2.models.ScheduleC2
    .. autosummary::
    
       ~ScheduleC2.__init__
+      ~ScheduleC2.adelete
+      ~ScheduleC2.arefresh_from_db
+      ~ScheduleC2.asave
       ~ScheduleC2.check
       ~ScheduleC2.clean
       ~ScheduleC2.clean_fields

@@ -34,6 +34,7 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertFalse
       ~TransactionSerializerBaseTestCase.assertFieldOutput
       ~TransactionSerializerBaseTestCase.assertFormError
+      ~TransactionSerializerBaseTestCase.assertFormSetError
       ~TransactionSerializerBaseTestCase.assertFormsetError
       ~TransactionSerializerBaseTestCase.assertGreater
       ~TransactionSerializerBaseTestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertNotRegex
       ~TransactionSerializerBaseTestCase.assertNotRegexpMatches
       ~TransactionSerializerBaseTestCase.assertNumQueries
+      ~TransactionSerializerBaseTestCase.assertQuerySetEqual
       ~TransactionSerializerBaseTestCase.assertQuerysetEqual
       ~TransactionSerializerBaseTestCase.assertRaises
       ~TransactionSerializerBaseTestCase.assertRaisesMessage

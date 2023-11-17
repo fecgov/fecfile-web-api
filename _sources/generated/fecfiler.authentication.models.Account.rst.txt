@@ -20,6 +20,9 @@ fecfiler.authentication.models.Account
    .. autosummary::
    
       ~Account.__init__
+      ~Account.adelete
+      ~Account.arefresh_from_db
+      ~Account.asave
       ~Account.check
       ~Account.check_password
       ~Account.clean
@@ -44,6 +47,7 @@ fecfiler.authentication.models.Account
       ~Account.get_previous_by_date_joined
       ~Account.get_previous_by_last_login
       ~Account.get_previous_by_updated_at
+      ~Account.get_session_auth_fallback_hash
       ~Account.get_session_auth_hash
       ~Account.get_short_name
       ~Account.get_user_permissions

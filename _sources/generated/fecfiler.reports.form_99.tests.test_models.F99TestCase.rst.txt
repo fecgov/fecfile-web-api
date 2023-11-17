@@ -34,6 +34,7 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.assertFalse
       ~F99TestCase.assertFieldOutput
       ~F99TestCase.assertFormError
+      ~F99TestCase.assertFormSetError
       ~F99TestCase.assertFormsetError
       ~F99TestCase.assertGreater
       ~F99TestCase.assertGreaterEqual
@@ -64,6 +65,7 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.assertNotRegex
       ~F99TestCase.assertNotRegexpMatches
       ~F99TestCase.assertNumQueries
+      ~F99TestCase.assertQuerySetEqual
       ~F99TestCase.assertQuerysetEqual
       ~F99TestCase.assertRaises
       ~F99TestCase.assertRaisesMessage
