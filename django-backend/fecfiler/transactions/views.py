@@ -295,10 +295,10 @@ def get_save_hook(transaction: Transaction):
 
 
 def propagate_contact(transaction, contact):
-    subsequent_transactions = Transaction.objects.filter(
+    other_transactions = Transaction.objects.filter(
         ~Q(id=getattr(transaction, "id", None)),
         Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
     )
-    for subsequent_transaction in subsequent_transactions:
-        subsequent_transaction.get_schedule().update_with_contact(contact)
-        subsequent_transaction.save()
+    for other_transaction in other_transactions:
+        other_transaction.get_schedule().update_with_contact(contact)
+        other_transaction.save()
