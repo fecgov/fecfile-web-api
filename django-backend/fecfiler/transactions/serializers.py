@@ -171,7 +171,7 @@ class TransactionSerializer(
                     "transaction",
                     "debt_associations",
                     "loan_associations",
-                    "reatt_redes_associations", # reattribution/redesignation
+                    "reatt_redes_associations",  # reattribution/redesignation
                     "_form_type",
                 ]
             ] + [
