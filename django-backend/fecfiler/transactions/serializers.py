@@ -4,6 +4,7 @@ from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
+from fecfiler.reports.serializers import ReportSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty
 from collections import OrderedDict
@@ -131,6 +132,8 @@ class TransactionSerializer(
     schedule_d = ScheduleDSerializer(required=False)
     schedule_e = ScheduleESerializer(required=False)
 
+    report = ReportSerializer(read_only=True)
+
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
@@ -168,12 +171,14 @@ class TransactionSerializer(
                     "transaction",
                     "debt_associations",
                     "loan_associations",
+                    "reatt_redes_associations", # reattribution/redesignation
                     "_form_type",
                 ]
             ] + [
                 "parent_transaction_id",
                 "debt_id",
                 "loan_id",
+                "reatt_redes_id",
                 "report_id",
                 "contact_1_id",
                 "contact_2_id",
@@ -279,6 +284,11 @@ class TransactionSerializer(
         if instance.debt:
             representation["debt"] = TransactionSerializer().to_representation(
                 instance.debt
+            )
+        # represent original reattribution/redesignation transaction
+        if instance.reatt_redes:
+            representation["reatt_redes"] = TransactionSerializer().to_representation(
+                instance.reatt_redes
             )
 
         return representation

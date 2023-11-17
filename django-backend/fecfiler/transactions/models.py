@@ -45,6 +45,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         blank=True,
         related_name="loan_associations",
     )
+    reatt_redes = models.ForeignKey(  # reattribution/redesignation
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="reatt_redes_associations",
+    )
 
     # The _form_type value in the db may or may not be correct based on whether
     # the transaction is itemized or not. For some transactions, the form_type
