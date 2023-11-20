@@ -70,7 +70,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.permission_denied
       ~TransactionViewSet.previous_transaction_by_election
       ~TransactionViewSet.previous_transaction_by_entity
-      ~TransactionViewSet.propagate_contact
       ~TransactionViewSet.propagate_contacts
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.retrieve

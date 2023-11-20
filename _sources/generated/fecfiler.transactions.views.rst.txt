@@ -19,6 +19,7 @@ fecfiler.transactions.views
    
       get_save_hook
       noop
+      propagate_contact
    
    
 

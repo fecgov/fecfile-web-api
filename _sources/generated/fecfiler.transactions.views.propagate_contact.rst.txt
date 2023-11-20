@@ -1,0 +1,6 @@
+fecfiler.transactions.views.propagate\_contact
+==============================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: propagate_contact
