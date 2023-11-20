@@ -42,6 +42,12 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     treasurer_suffix = models.TextField(null=True, blank=True)
     date_signed = models.DateField(null=True, blank=True)
     calculation_status = models.CharField(max_length=255, null=True, blank=True)
+    calculation_token = models.UUIDField(
+        null=True,
+        blank=True,
+        editable=True,
+        unique=True
+    )
 
     confirmation_email_1 = models.EmailField(
         max_length=44, null=True, blank=True, default=None
@@ -195,7 +201,6 @@ class ReportMixin(models.Model):
                 report_year = report_date.year
 
                 reports_to_flag_for_recalculation = Report.objects.filter(
-                    ~models.Q(upload_submission__fec_status=models.Value("ACCEPTED")),
                     committee_account=committee,
                     coverage_from_date__year=report_year,
                     coverage_from_date__gte=report_date,
