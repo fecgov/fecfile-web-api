@@ -83,7 +83,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         queryset = (
             super()
             .get_queryset()
-            .alias(
+            .annotate(
                 name=DISPLAY_NAME_CLAUSE,
             )
         )
