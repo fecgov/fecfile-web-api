@@ -179,6 +179,19 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             coverage_through_date__gte=self.coverage_through_date,
         )
 
+    def get_report_name(self):
+        for form_key in TABLE_TO_FORM:
+            if getattr(self, form_key, None):
+                return TABLE_TO_FORM.get(form_key)
+
+
+TABLE_TO_FORM = {
+    "form_3x": "F3X",
+    "form_24": "F24",
+    "form_99": "F99",
+    "form_1m": "F1M",
+}
+
 
 class ReportMixin(models.Model):
     """Abstract model for tracking reports"""

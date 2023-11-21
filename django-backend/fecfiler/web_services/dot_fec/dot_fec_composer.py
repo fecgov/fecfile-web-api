@@ -159,11 +159,11 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
-        f3x_report = compose_f3x_report(report_id, upload_submission_record_id)
-        f3x_report_row = serialize_instance("F3X", f3x_report)
-        logger.debug("Serialized F3X Report:")
-        logger.debug(f3x_report_row)
-        file_content = add_row_to_content(file_content, f3x_report_row)
+        report = compose_f3x_report(report_id, upload_submission_record_id)
+        report_row = serialize_instance(report.get_from_name(), report)
+        logger.debug("Serialized Report:")
+        logger.debug(report_row)
+        file_content = add_row_to_content(file_content, report_row)
 
         transactions = compose_transactions(report_id)
         for transaction in transactions:
