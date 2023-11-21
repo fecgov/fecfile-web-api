@@ -224,6 +224,12 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
         if schedule_c:
+            loan_agreement = instance.children.filter(
+                transaction_type_identifier="C1_LOAN_AGREEMENT"
+            ).first()
+            representation["loan_agreement"] = (
+                loan_agreement.id if loan_agreement else None
+            )
             for property in schedule_c:
                 if not representation.get(property):
                     representation[property] = schedule_c[property]
