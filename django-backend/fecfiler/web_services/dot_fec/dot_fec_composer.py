@@ -129,6 +129,19 @@ def add_row_to_content(content, row):
     return (content or "") + str(row) + CRLF_STR
 
 
+def add_free_text(content, text):
+    """Returns new string with free text wrapped with begin/end markers"""
+    return (
+        (content or "")
+        + "[BEGINTEXT]"
+        + CRLF_STR
+        + text
+        + CRLF_STR
+        + "[ENDTEXT]"
+        + CRLF_STR
+    )
+
+
 def get_schema_name(schedule):
     return {
         Schedule.A.value.value: "SchA",
@@ -195,6 +208,10 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
             file_content = add_row_to_content(file_content, serialized_memo)
+
+        """Free text"""
+        if report.get_form_name() is "F99":
+            file_content = add_free_text(file_content, report.form_99.text)
 
         return file_content
     except Exception as error:
