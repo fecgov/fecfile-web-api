@@ -267,15 +267,21 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
 
         for child_transaction_data in children:
-            child_transaction_data["parent_transaction_id"] = transaction_instance.id
-            child_transaction_data.pop("parent_transaction", None)
-            if child_transaction_data.get("use_parent_contact", None):
+            if type(child_transaction_data) is str:
+                child_transaction = self.get_queryset().get(id=child_transaction_data)
+                child_transaction.parent_transaction_id = transaction_instance.id
+            else:
                 child_transaction_data[
-                    "contact_1_id"
-                ] = transaction_instance.contact_1_id
-                del child_transaction_data["contact_1"]
+                    "parent_transaction_id"
+                ] = transaction_instance.id
+                child_transaction_data.pop("parent_transaction", None)
+                if child_transaction_data.get("use_parent_contact", None):
+                    child_transaction_data[
+                        "contact_1_id"
+                    ] = transaction_instance.contact_1_id
+                    del child_transaction_data["contact_1"]
 
-            self.save_transaction(child_transaction_data, request)
+                self.save_transaction(child_transaction_data, request)
 
         return self.queryset.get(id=transaction_instance.id)
 
