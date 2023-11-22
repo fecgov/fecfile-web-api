@@ -11,6 +11,7 @@ class DotFECSerializerTestCase(TestCase):
     fixtures = [
         "test_committee_accounts",
         "test_f3x_reports",
+        "test_f99",
         "test_individual_receipt",
         "test_memo_text",
     ]
@@ -47,3 +48,10 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_dot_fec_str[0].split(chr(ascii.FS))[-1], "381.00")
         self.assertEqual(split_dot_fec_str[1].split(chr(ascii.FS))[0], "SA11AI")
         self.assertEqual(split_dot_fec_str[2].split(chr(ascii.FS))[-1], "dahtest2")
+
+    def test_f99(self):
+        content = compose_dot_fec("11111111-1111-1111-1111-111111111111", None)
+        content = content.split("\n")
+        split_report_row = content[1].split(CRLF_STR)
+        print(f"AHOY{content[1]}")
+        self.assertEqual(split_report_row[15], "ABC")

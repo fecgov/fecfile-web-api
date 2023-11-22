@@ -179,7 +179,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             coverage_through_date__gte=self.coverage_through_date,
         )
 
-    def get_report_name(self):
+    def get_form_name(self):
         for form_key in TABLE_TO_FORM:
             if getattr(self, form_key, None):
                 return TABLE_TO_FORM.get(form_key)

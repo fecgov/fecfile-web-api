@@ -12,21 +12,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def compose_f3x_report(report_id, upload_submission_record_id):
+def compose_report(report_id, upload_submission_record_id):
     report_result = Report.objects.filter(id=report_id)
     upload_submission_result = UploadSubmission.objects.filter(
         id=upload_submission_record_id
     )
     if report_result.exists():
-        logger.info(f"composing f3x report: {report_id}")
-        f3x_report = report_result.first()
+        logger.info(f"composing report: {report_id}")
+        report = report_result.first()
         """Compose derived fields"""
-        f3x_report.filer_committee_id_number = (
-            FILE_AS_TEST_COMMITTEE or f3x_report.committee_account.committee_id
+        report.filer_committee_id_number = (
+            FILE_AS_TEST_COMMITTEE or report.committee_account.committee_id
         )
         if upload_submission_result.exists():
-            f3x_report.date_signed = upload_submission_result.first().created
-        return f3x_report
+            report.date_signed = upload_submission_result.first().created
+        return report
     else:
         raise ObjectDoesNotExist(f"report: {report_id} not found")
 
@@ -159,8 +159,8 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
-        report = compose_f3x_report(report_id, upload_submission_record_id)
-        report_row = serialize_instance(report.get_from_name(), report)
+        report = compose_report(report_id, upload_submission_record_id)
+        report_row = serialize_instance(report.get_form_name(), report)
         logger.debug("Serialized Report:")
         logger.debug(report_row)
         file_content = add_row_to_content(file_content, report_row)
@@ -190,7 +190,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
 
         report_level_memos = compose_report_level_memos(report_id)
         for memo in report_level_memos:
-            memo.back_reference_sched_form_name = f3x_report.form_type
+            memo.back_reference_sched_form_name = report.form_type
             serialized_memo = serialize_instance("Text", memo)
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
