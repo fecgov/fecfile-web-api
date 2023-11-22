@@ -45,24 +45,17 @@ report_code_label_mapping = Case(
 
 def get_status_mapping():
     """returns Django Case that determines report status based on upload submission"""
-    in_progress = Q(upload_submission__fec_status=None) | Q(upload_submission=None)
-    submitted = Q(
-        upload_submission__fecfile_task_state__in=[
-            FECSubmissionState.INITIALIZING,
-            FECSubmissionState.CREATING_FILE,
-            FECSubmissionState.SUBMITTING,
-        ]
-    ) | Q(upload_submission__fec_status=FECStatus.PROCESSING)
+    upload_exists = Q(upload_submission__isnull=False)
     success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
     failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED) | Q(
         upload_submission__fec_status=FECStatus.REJECTED
     )
 
     return Case(
-        When(in_progress, then=Value("In progress")),
-        When(submitted, then=Value("Submission pending")),
         When(success, then=Value("Submission success")),
         When(failed, then=Value("Submission failure")),
+        When(upload_exists, then=Value("Submission pending")),
+        default=Value("In progress"),
     )
 
 
