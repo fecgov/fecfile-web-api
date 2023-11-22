@@ -4,7 +4,7 @@ from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from .dot_fec_composer import compose_dot_fec, add_row_to_content
-from .dot_fec_serializer import serialize_instance, CRLF_STR
+from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
 
 
 class DotFECSerializerTestCase(TestCase):
@@ -45,13 +45,14 @@ class DotFECSerializerTestCase(TestCase):
         dot_fec_str = add_row_to_content(dot_fec_str, report_level_memo_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
         split_dot_fec_str = dot_fec_str.split(CRLF_STR)
-        self.assertEqual(split_dot_fec_str[0].split(chr(ascii.FS))[-1], "381.00")
-        self.assertEqual(split_dot_fec_str[1].split(chr(ascii.FS))[0], "SA11AI")
-        self.assertEqual(split_dot_fec_str[2].split(chr(ascii.FS))[-1], "dahtest2")
+        self.assertEqual(split_dot_fec_str[0].split(FS_STR)[-1], "381.00")
+        self.assertEqual(split_dot_fec_str[1].split(FS_STR)[0], "SA11AI")
+        self.assertEqual(split_dot_fec_str[2].split(FS_STR)[-1], "dahtest2")
 
     def test_f99(self):
         content = compose_dot_fec("11111111-1111-1111-1111-111111111111", None)
         content = content.split("\n")
-        split_report_row = content[1].split(CRLF_STR)
-        print(f"AHOY{content[1]}")
+        split_report_row = content[1].split(FS_STR)
+        print(f"AHOY{content[1].split(FS_STR)}")
+        print(f"AHOY{repr(FS_STR)}")
         self.assertEqual(split_report_row[15], "ABC")
