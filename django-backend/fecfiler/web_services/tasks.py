@@ -33,15 +33,20 @@ def create_dot_fec(
     if webprint_submission_id:
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
-    file_content = compose_dot_fec(report_id, upload_submission_id)
-    file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
-    if not file_content or not file_name:
-        if submission:
-            submission.save_error("Creating .FEC failed")
+    try:
+        file_content = compose_dot_fec(report_id, upload_submission_id)
+        file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
+
+        if not file_content or not file_name:
+            raise Exception("No file created")
+        store_file(file_content, file_name, force_write_to_disk)
+        dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
+        dot_fec_record.save()
+
+    except Exception as e:
+        submission.save_error("Creating .FEC failed")
         return None
-    store_file(file_content, file_name, force_write_to_disk)
-    dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
-    dot_fec_record.save()
+
     if upload_submission_id:
         UploadSubmission.objects.filter(id=upload_submission_id).update(
             dot_fec=dot_fec_record
@@ -86,9 +91,7 @@ def submit_to_fec(
     submitter = DotFECSubmitter(api)
     logger.info(f"Uploading {file_name} to FEC")
     submission_json = submitter.get_submission_json(
-        dot_fec_record,
-        e_filing_password,
-        backdoor_code
+        dot_fec_record, e_filing_password, backdoor_code
     )
     submission_response_string = submitter.submit(
         dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
