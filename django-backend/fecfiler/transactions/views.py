@@ -289,6 +289,12 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         return self.queryset.get(id=transaction_instance.id)
 
+    @action(detail=False, methods=["put"], url_path=r"multisave")
+    def save_transactions(self, request):
+        with db_transaction.atomic():
+            saved_data = [self.save_transaction(data, request) for data in request.data]
+        return Response([TransactionSerializer().to_representation(data) for data in saved_data])
+
 
 def noop(transaction, is_existing):
     pass
