@@ -1,5 +1,4 @@
 from django.test import TestCase
-from curses import ascii
 from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
@@ -54,8 +53,9 @@ class DotFECSerializerTestCase(TestCase):
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[15], "ABC\r")
-        free_text = content[content.find("[BEGINTEXT]") :]
+        free_text = content[content.find("[BEGINTEXT]"):]
         self.assertEqual(
             free_text,
-            "[BEGINTEXT]\r\n\nBEHOLD! A large text string\nwith new lines\r\n[ENDTEXT]\r\n",
+            "[BEGINTEXT]\r\n\nBEHOLD! A large text string"
+            + "\nwith new lines\r\n[ENDTEXT]\r\n",
         )

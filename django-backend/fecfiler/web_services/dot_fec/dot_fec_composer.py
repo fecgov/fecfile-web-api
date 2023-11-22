@@ -210,7 +210,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             file_content = add_row_to_content(file_content, serialized_memo)
 
         """Free text"""
-        if report.get_form_name() is "F99":
+        if report.get_form_name() == "F99":
             file_content = add_free_text(file_content, report.form_99.text)
 
         return file_content
