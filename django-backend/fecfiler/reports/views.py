@@ -9,7 +9,7 @@ from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
-from django.db.models import Case, Value, When, Q
+from django.db.models import Case, Value, When, Q, F
 import logging
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def get_status_mapping():
     return Case(
         When(success, then=Value("Submission success")),
         When(failed, then=Value("Submission failure")),
-        When(upload_exists, then=Value("Submission pending")),
+        When(upload_exists, then=F("upload_submission__fecfile_task_state")),
         default=Value("In progress"),
     )
 
