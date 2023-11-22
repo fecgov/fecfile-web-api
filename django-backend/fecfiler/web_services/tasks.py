@@ -88,26 +88,30 @@ def submit_to_fec(
         return
 
     """Submit to FEC"""
-    submitter = DotFECSubmitter(api)
-    logger.info(f"Uploading {file_name} to FEC")
-    submission_json = submitter.get_submission_json(
-        dot_fec_record, e_filing_password, backdoor_code
-    )
-    submission_response_string = submitter.submit(
-        dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
-    )
-    submission.save_fec_response(submission_response_string)
-
-    """Poll FEC for status of submission"""
-    # TODO: add timeout?
-    while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-        logger.info(f"Polling status for {submission.fec_submission_id}.")
-        logger.info(
-            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+    try:
+        submitter = DotFECSubmitter(api)
+        logger.info(f"Uploading {file_name} to FEC")
+        submission_json = submitter.get_submission_json(
+            dot_fec_record, e_filing_password, backdoor_code
         )
-        time.sleep(2)
-        status_response_string = submitter.poll_status(submission.fec_submission_id)
-        submission.save_fec_response(status_response_string)
+        submission_response_string = submitter.submit(
+            dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
+        )
+        submission.save_fec_response(submission_response_string)
+
+        """Poll FEC for status of submission"""
+        # TODO: add timeout?
+        while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+            logger.info(f"Polling status for {submission.fec_submission_id}.")
+            logger.info(
+                f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+            )
+            time.sleep(2)
+            status_response_string = submitter.poll_status(submission.fec_submission_id)
+            submission.save_fec_response(status_response_string)
+    except Exception:
+        submission.save_error("Failed submitting to FEC")
+        return
 
     new_state = (
         FECSubmissionState.SUCCEEDED
