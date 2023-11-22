@@ -52,7 +52,7 @@ def get_status_mapping():
     )
 
     return Case(
-        When(success, then=Value("Submission success")),
+        When(success, then=F("upload_submission__fecfile_error")),
         When(failed, then=Value("Submission failure")),
         When(upload_exists, then=F("upload_submission__fecfile_task_state")),
         default=Value("In progress"),
