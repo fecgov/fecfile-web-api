@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_f3x_report = Report.objects.filter(
+        self.previous_report = Report.objects.filter(
             ~Q(id=report.id),
             form_3x__isnull=False,
             coverage_from_date__year=report.coverage_from_date.year,
             coverage_through_date__lt=report.coverage_from_date
-        ).order_by("-coverage_through_date").first().form_3x
+        ).order_by("-coverage_through_date").first()
 
     def calculate_summary(self):
         summary = {
@@ -56,7 +56,11 @@ class SummaryService:
             temp_sc10=self.get_line("SC/10", field="loan_balance"),
             temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
-        summary["line_6b"] = self.previous_f3x_report.L8_cash_on_hand_close_period
+
+        summary["line_6b"] = 0
+        if self.previous_report and self.previous_report.form_3x:
+            summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_close_period
+
         summary["line_9"] = (
             summary["temp_sc9"]
             + summary["temp_sd9"]
@@ -202,7 +206,11 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
         )
-        summary["line_6a"] = self.previous_f3x_report.L8_cash_on_hand_at_close_ytd
+
+        summary["line_6a"] = 0
+        if self.previous_report and self.previous_report.form_3x:
+            summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_ytd
+
         summary["line_11aiii"] = (
             summary["line_11ai"]
             + summary["line_11aii"]

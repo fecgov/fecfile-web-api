@@ -22,19 +22,15 @@ class CalculationState(Enum):
 
 def get_reports_to_calculate(primary_report):
     report_year = primary_report.coverage_from_date.year
-    reports_in_year = Report.objects.filter(
+    reports_to_recalculate = Report.objects.filter(
         coverage_from_date__year=report_year,
-        coverage_through_date__lte=primary_report.coverage_through_date
-    ).order_by("-coverage_through_date")
+        coverage_through_date__lte=primary_report.coverage_through_date,
+        calculation_status__isnull=True
+    ).order_by("coverage_through_date")
 
-    reports_to_recalculate = []
-    for report in reports_in_year:
-        if report.calculation_status == None:
-            reports_to_recalculate.insert(0, report)
-        else:
-            break
-
-    return reports_to_recalculate
+    if len(reports_to_recalculate) > 0:
+        return reports_to_recalculate
+    return primary_report
 
 
 @shared_task
@@ -215,10 +211,13 @@ def calculate_summary(report_id):
 
         # Set the calculation status to SUCCEEDED *only*
         # if the recalculation still belongs to this task
+        #
+        # In the future, we can look into filtering on
+        # calculation_status as well to prevent saving
+        # reports that have been invalidated
         updated = bool(
             Report.objects.filter(
                 id=report.id,
-                calculation_status=CalculationState.CALCULATING,
                 calculation_token=calculation_token
             ).update(
                 calculation_status=CalculationState.SUCCEEDED,
