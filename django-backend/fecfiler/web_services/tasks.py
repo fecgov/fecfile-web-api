@@ -71,6 +71,8 @@ def submit_to_fec(
     logger.info(f"FEC API: {FEC_FILING_API}")
     logger.info(f"api submitter: {api}")
     submission = UploadSubmission.objects.get(id=submission_record_id)
+    submission.save_error(f"api submitter: {api is not None}")
+    return
     submission.save_state(FECSubmissionState.SUBMITTING)
 
     """Get Password"""
