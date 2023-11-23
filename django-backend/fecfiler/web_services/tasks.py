@@ -70,6 +70,10 @@ def submit_to_fec(
 ):
     logger.info(f"FEC API: {FEC_FILING_API}")
     logger.info(f"api submitter: {api}")
+
+    if submission.fecfile_task_state == FECSubmissionState.FAILED:
+        return
+
     submission = UploadSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
@@ -79,9 +83,9 @@ def submit_to_fec(
         return
 
     """Get .FEC file bytes"""
-    dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
-    file_name = dot_fec_record.file_name
     try:
+        dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+        file_name = dot_fec_record.file_name
         dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
     except Exception:
         submission.save_error("Could not retrieve .FEC bytes")
@@ -98,9 +102,6 @@ def submit_to_fec(
             dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
         )
         submission.save_fec_response(submission_response_string)
-
-        submission.save_error("HIT")
-        return
 
         """Poll FEC for status of submission"""
         # TODO: add timeout?
