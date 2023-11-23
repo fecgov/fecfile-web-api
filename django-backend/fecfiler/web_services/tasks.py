@@ -44,7 +44,7 @@ def create_dot_fec(
         dot_fec_record.save()
 
     except Exception as e:
-        submission.save_error("Creating .FEC failed {e}")
+        submission.save_error(f"Creating .FEC failed {e}")
         return None
 
     if upload_submission_id:
