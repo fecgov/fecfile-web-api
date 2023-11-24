@@ -115,6 +115,7 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_composer.DotFECSerializerTestCas
       ~DotFECSerializerTestCase.tearDownClass
       ~DotFECSerializerTestCase.test_add_row_to_content
       ~DotFECSerializerTestCase.test_compose_dot_fec
+      ~DotFECSerializerTestCase.test_f99
    
    
 

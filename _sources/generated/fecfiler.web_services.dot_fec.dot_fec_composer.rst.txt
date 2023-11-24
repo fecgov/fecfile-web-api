@@ -17,10 +17,11 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_composer
    .. autosummary::
       :toctree:                                          
    
+      add_free_text
       add_row_to_content
       compose_dot_fec
-      compose_f3x_report
       compose_header
+      compose_report
       compose_report_level_memos
       compose_transactions
       get_schema_name

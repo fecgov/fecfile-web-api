@@ -57,6 +57,7 @@ fecfiler.reports.form\_99.models.Form99
       ~Form99.state
       ~Form99.street_1
       ~Form99.street_2
+      ~Form99.text
       ~Form99.text_code
       ~Form99.zip
    
