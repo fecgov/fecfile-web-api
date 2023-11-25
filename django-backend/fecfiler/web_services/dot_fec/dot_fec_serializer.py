@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
+FS_STR = chr(ascii.FS)
 
 
 def get_value_from_path(object, path):
@@ -93,7 +94,7 @@ def serialize_instance(schema_name, instance):
         else ""
         for column_index in range(0, row_length)
     ]
-    return chr(ascii.FS).join(row)
+    return FS_STR.join(row)
 
 
 def get_field_mappings(schema_name):

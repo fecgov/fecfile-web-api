@@ -1,12 +1,13 @@
 import logging
 import re
 from urllib.parse import urlencode
-
+from django.db import transaction
 import requests
 from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
@@ -219,6 +220,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
         )
         return Response(match.id if match else "")
 
+    def update(self, request, *args, **kwargs):
+        with transaction.atomic():
+            propagate_contact(None, self.get_object())
+            return super().update(request, *args, **kwargs)
+
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
@@ -246,7 +252,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewSet, mixins.ListModelMixin, GenericViewSet,
+    CommitteeOwnedViewSet,
+    mixins.ListModelMixin,
+    GenericViewSet,
 ):
     serializer_class = ContactSerializer
 
@@ -277,7 +285,8 @@ class DeletedContactsViewSet(
         contacts = self.queryset.filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
-                "Contact Ids are invalid", status=status.HTTP_400_BAD_REQUEST,
+                "Contact Ids are invalid",
+                status=status.HTTP_400_BAD_REQUEST,
             )
         for contact in contacts:
             contact.deleted = None
