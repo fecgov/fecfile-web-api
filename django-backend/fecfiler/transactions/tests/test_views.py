@@ -157,3 +157,24 @@ class TransactionViewsTestCase(TestCase):
         )
         transaction = response.data
         self.assertEqual(transaction.get("calendar_ytd_per_election_office"), 58.00)
+
+    def test_multisave_transactions(self):
+
+        request = self.request([self.payloads["IN_KIND"] for i in range(3)])
+        response = TransactionViewSet().save_transactions(request)
+
+        txn1 = deepcopy(self.payloads["IN_KIND"])
+        txn1["id"] = str(response.data[0]["id"])
+        txn1["contributor_last_name"] = "one"
+        txn2 = deepcopy(self.payloads["IN_KIND"])
+        txn2["id"] = str(response.data[1]["id"])
+        txn2["contributor_last_name"] = "two"
+        txn3 = deepcopy(self.payloads["IN_KIND"])
+        txn3["id"] = str(response.data[2]["id"])
+        txn3["contributor_last_name"] = "three"
+
+        request = self.request([txn1, txn2, txn3])
+        response = TransactionViewSet().save_transactions(request)
+        self.assertEqual(len(response.data), 3)
+        # self.assertEqual("one", updated_transaction.schedule_a.contributor_last_name)
+
