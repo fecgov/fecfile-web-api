@@ -288,6 +288,21 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
 
+    @action(detail=False, methods=["get"], url_path=r"reattributions-redesignations")
+    def transaction_reattributions_redesignations(self, request):
+        transaction_id = request.query_params.get("transaction_id", None)
+        from pprint import pprint
+        query = self.get_queryset().filter(
+            Q(reatt_redes_id=transaction_id),
+        )
+        transactions = query.all()
+
+        if len(transactions) > 0:
+            return Response(data=[self.get_serializer(t).data for t in transactions])
+
+        response = {"message": "Did not find 2 reattributions or 2 redesignations."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+
 
 def noop(transaction, is_existing):
     pass
