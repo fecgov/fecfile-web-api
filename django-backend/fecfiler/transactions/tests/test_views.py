@@ -177,4 +177,3 @@ class TransactionViewsTestCase(TestCase):
         response = TransactionViewSet().save_transactions(request)
         self.assertEqual(len(response.data), 3)
         # self.assertEqual("one", updated_transaction.schedule_a.contributor_last_name)
-
