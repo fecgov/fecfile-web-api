@@ -160,7 +160,7 @@ class TransactionViewsTestCase(TestCase):
 
     def test_multisave_transactions(self):
 
-        request = self.request([self.payloads["IN_KIND"] for i in range(3)])
+        request = self.request([self.payloads["IN_KIND"] for _ in range(3)])
         response = TransactionViewSet().save_transactions(request)
 
         txn1 = deepcopy(self.payloads["IN_KIND"])
