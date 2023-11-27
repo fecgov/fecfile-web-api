@@ -9,7 +9,7 @@ from .models import (
     UploadSubmission,
     WebPrintSubmission,
 )
-from curses import ascii
+from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from pathlib import Path
 from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
 
@@ -45,9 +45,9 @@ class TasksTestCase(TestCase):
         try:
             with open(result_dot_fec, encoding="utf-8") as f:
                 lines = f.readlines()
-                self.assertEqual(lines[0][:4], "HDR" + chr(ascii.FS))
-                self.assertEqual(lines[1][:5], "F3XN" + chr(ascii.FS))
-                self.assertEqual(lines[2][:7], "SA11AI" + chr(ascii.FS))
+                self.assertEqual(lines[0][:4], "HDR" + FS_STR)
+                self.assertEqual(lines[1][:5], "F3XN" + FS_STR)
+                self.assertEqual(lines[2][:7], "SA11AI" + FS_STR)
         finally:
             if result_dot_fec.exists():
                 result_dot_fec.unlink()
@@ -66,7 +66,11 @@ class TasksTestCase(TestCase):
             force_write_to_disk=True,
         )
         upload_id = submit_to_fec(
-            dot_fec_id, upload_submission.id, "test_password", None, True,
+            dot_fec_id,
+            upload_submission.id,
+            "test_password",
+            None,
+            True,
         )
         upload_submission.refresh_from_db()
         self.assertEqual(upload_id, upload_submission.id)

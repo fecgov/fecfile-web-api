@@ -11,7 +11,7 @@ from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
-from curses import ascii
+from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 
 
 class DotFECSerializerTestCase(TestCase):
@@ -118,7 +118,7 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_serialize_f3x_summary_instance(self):
         summary_row = serialize_instance("F3X", self.f3x)
-        split_row = summary_row.split(chr(ascii.FS))
+        split_row = summary_row.split(FS_STR)
         self.assertEqual(split_row[0], "F3XN")
         self.assertEqual(split_row[21], "20040729")
         self.assertEqual(split_row[3], "X")
@@ -126,12 +126,12 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_serialize_schedule_a_transaction_instance(self):
         transaction_row = serialize_instance("SchA", self.transaction)
-        split_row = transaction_row.split(chr(ascii.FS))
+        split_row = transaction_row.split(FS_STR)
         self.assertEqual(split_row[0], "SA11AI")
 
     def test_serialize_report_level_memo_instance(self):
         report_level_memo_row = serialize_instance("Text", self.report_level_memo_text)
-        split_row = report_level_memo_row.split(chr(ascii.FS))
+        split_row = report_level_memo_row.split(FS_STR)
         self.assertEqual(split_row[0], "TEXT")
         self.assertEqual(split_row[1], "C00601211")
         self.assertEqual(split_row[2], "REPORT_MEMO_TEXT_1")
@@ -140,7 +140,7 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_serialize_header_instance(self):
         report_level_memo_row = serialize_instance("HDR", self.header)
-        split_row = report_level_memo_row.split(chr(ascii.FS))
+        split_row = report_level_memo_row.split(FS_STR)
         self.assertEqual(split_row[0], "HDR")
         self.assertEqual(split_row[1], "FEC")
         self.assertEqual(split_row[2], "8.4")
