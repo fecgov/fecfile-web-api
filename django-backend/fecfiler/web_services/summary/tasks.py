@@ -1,6 +1,7 @@
 from enum import Enum
 from celery import shared_task
 from fecfiler.reports.models import Report
+from django.db.models import Q
 from .summary import SummaryService
 import uuid
 
@@ -23,9 +24,9 @@ class CalculationState(Enum):
 def get_reports_to_calculate(primary_report):
     report_year = primary_report.coverage_from_date.year
     reports_to_recalculate = Report.objects.filter(
+        ~Q(calculation_status=CalculationState.SUCCEEDED),
         coverage_from_date__year=report_year,
-        coverage_through_date__lte=primary_report.coverage_through_date,
-        calculation_status__isnull=True
+        coverage_through_date__lte=primary_report.coverage_through_date
     ).order_by("coverage_through_date")
 
     if len(reports_to_recalculate) > 0:
@@ -42,12 +43,17 @@ def calculate_summary(report_id):
 
     reports_to_recalculate = get_reports_to_calculate(primary_report)
     calculation_token = uuid.uuid4()
+    print("Before update", len(reports_to_recalculate))
     reports_to_recalculate.update(
         calculation_token=calculation_token,
         calculation_status=CalculationState.CALCULATING
     )
 
+    print("After update", len(reports_to_recalculate))
+
+    print("\n\n\n","Recalculating", len(reports_to_recalculate), "Reports")
     for report in reports_to_recalculate:
+        print("Recalculating", report.id)
         summary_service = SummaryService(report)
         summary = summary_service.calculate_summary()
         a = summary["a"]
@@ -206,6 +212,8 @@ def calculate_summary(report_id):
         # line 38
         report.form_3x.L38_net_operating_expenditures_period = a.get("line_38", 0)
         report.form_3x.L38_net_operating_expenditures_ytd = b.get("line_38", 0)
+
+        print("\n\n\n",a["line_15"], b["line_15"],"\n\n\n")
 
         report.form_3x.save()
 

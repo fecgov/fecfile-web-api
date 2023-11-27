@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='report',
             name='calculation_token',
-            field=models.UUIDField(blank=True, null=True, unique=True),
+            field=models.UUIDField(blank=True, null=True, default=None),
         ),
     ]

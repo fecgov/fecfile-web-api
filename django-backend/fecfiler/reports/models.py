@@ -45,8 +45,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     calculation_token = models.UUIDField(
         null=True,
         blank=True,
-        editable=True,
-        unique=True
+        default=None
     )
 
     confirmation_email_1 = models.EmailField(
