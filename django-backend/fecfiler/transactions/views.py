@@ -270,6 +270,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             if type(child_transaction_data) is str:
                 child_transaction = self.get_queryset().get(id=child_transaction_data)
                 child_transaction.parent_transaction_id = transaction_instance.id
+                child_transaction.save()
             else:
                 child_transaction_data[
                     "parent_transaction_id"
