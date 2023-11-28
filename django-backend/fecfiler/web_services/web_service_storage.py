@@ -20,7 +20,12 @@ def store_file(file_content, file_name, force_write_to_disk=False):
     else:
         logger.info(f"writing file to disk: {file_name}")
         path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / file_name
-        with open(path, "w", encoding="utf-8") as file:
+        try:
+            file = open(path, "w", encoding="utf-8")
+        except Exception as e:
+            logger.error(f"FAILED file could not be opened to write: {file_name}")
+            raise e
+        with file:
             file.write(file_content)
             logger.info(f"SUCCESS file was written to disk: {file_name}")
 
