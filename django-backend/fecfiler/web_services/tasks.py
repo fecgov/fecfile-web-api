@@ -74,8 +74,12 @@ def submit_to_fec(
     if submission.fecfile_task_state == FECSubmissionState.FAILED:
         return
 
-    submission = UploadSubmission.objects.get(id=submission_record_id)
-    submission.save_state(FECSubmissionState.SUBMITTING)
+    try:
+        submission = UploadSubmission.objects.get(id=submission_record_id)
+        submission.save_state(FECSubmissionState.SUBMITTING)
+    except Exception as e:
+        submission = DotFEC.objects.get(id=dot_fec_id).uploadsubmission_set.first()
+        submission.save_error(f"ERROR GETTING SUBMISSION {submission_record_id}")
 
     """Get Password"""
     if not e_filing_password:
