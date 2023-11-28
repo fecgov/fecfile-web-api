@@ -56,7 +56,6 @@ def create_dot_fec(
             dot_fec=dot_fec_record
         )
 
-    submission.save_error(f"saved dot fec")
     return dot_fec_record.id
 
 
