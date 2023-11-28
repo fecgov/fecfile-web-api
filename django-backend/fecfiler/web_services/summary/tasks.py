@@ -104,7 +104,7 @@ def calculate_summary(report_id):
         report.form_3x.L14_loan_repayments_received_ytd = b.get("line_14", 0)
         # line 15
         report.form_3x.L15_offsets_to_operating_expenditures_refunds_period = a.get("line_15", 0)  # noqa: E501
-        report.form_3x.L15_offsets_to_operating_expenditures_refunds_ytd = b.get("line_15", 0)
+        report.form_3x.L15_offsets_to_operating_expenditures_refunds_ytd = b.get("line_15", 0)  # noqa: E501
         # line 16
         report.form_3x.L16_refunds_of_federal_contributions_period = a.get("line_16", 0)
         report.form_3x.L16_refunds_of_federal_contributions_ytd = b.get("line_16", 0)
@@ -112,13 +112,13 @@ def calculate_summary(report_id):
         report.form_3x.L17_other_federal_receipts_dividends_period = a.get("line_17", 0)
         report.form_3x.L17_other_federal_receipts_dividends_ytd = b.get("line_17", 0)
         # line 18a
-        report.form_3x.L18a_transfers_from_nonfederal_account_h3_period = a.get("line_18a", 0)
-        report.form_3x.L18a_transfers_from_nonfederal_account_h3_ytd = b.get("line_18a", 0)
+        report.form_3x.L18a_transfers_from_nonfederal_account_h3_period = a.get("line_18a", 0)  # noqa: E501
+        report.form_3x.L18a_transfers_from_nonfederal_account_h3_ytd = b.get("line_18a", 0)  # noqa: E501
         # line 18b
-        report.form_3x.L18b_transfers_from_nonfederal_levin_h5_period = a.get("line_18b", 0)
+        report.form_3x.L18b_transfers_from_nonfederal_levin_h5_period = a.get("line_18b", 0)  # noqa: E501
         report.form_3x.L18b_transfers_from_nonfederal_levin_h5_ytd = b.get("line_18b", 0)
         # line 18c
-        report.form_3x.L18c_total_nonfederal_transfers_18a_18b_period = a.get("line_18c", 0)
+        report.form_3x.L18c_total_nonfederal_transfers_18a_18b_period = a.get("line_18c", 0)  # noqa: E501
         report.form_3x.L18c_total_nonfederal_transfers_18a_18b_ytd = b.get("line_18c", 0)
         # line 19
         report.form_3x.L19_total_receipts_period = a.get("line_19", 0)
@@ -133,23 +133,23 @@ def calculate_summary(report_id):
         report.form_3x.L21aii_nonfederal_share_period = a.get("line_21aii", 0)
         report.form_3x.L21aii_nonfederal_share_ytd = b.get("line_21aii", 0)
         # line 21b
-        report.form_3x.L21b_other_federal_operating_expenditures_period = a.get("line_21b", 0)
-        report.form_3x.L21b_other_federal_operating_expenditures_ytd = b.get("line_21b", 0)
+        report.form_3x.L21b_other_federal_operating_expenditures_period = a.get("line_21b", 0)  # noqa: E501
+        report.form_3x.L21b_other_federal_operating_expenditures_ytd = b.get("line_21b", 0)  # noqa: E501
         # line 21c
         report.form_3x.L21c_total_operating_expenditures_ytd = b.get("line_21c", 0)
         report.form_3x.L21c_total_operating_expenditures_period = a.get("line_21c", 0)
         # line 22
         report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_period = a.get("line_22", 0)  # noqa: E501
-        report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_ytd = b.get("line_22", 0)
+        report.form_3x.L22_transfers_to_affiliated_other_party_cmtes_ytd = b.get("line_22", 0)  # noqa: E501
         # line 23
         report.form_3x.L23_contributions_to_federal_candidates_cmtes_period = a.get("line_23", 0)  # noqa: E501
-        report.form_3x.L23_contributions_to_federal_candidates_cmtes_ytd = b.get("line_23", 0)
+        report.form_3x.L23_contributions_to_federal_candidates_cmtes_ytd = b.get("line_23", 0)  # noqa: E501
         # line 24
         report.form_3x.L24_independent_expenditures_period = a.get("line_24", 0)
         report.form_3x.L24_independent_expenditures_ytd = b.get("line_24", 0)
         # line 25
-        report.form_3x.L25_coordinated_expend_made_by_party_cmtes_period = a.get("line_25", 0)
-        report.form_3x.L25_coordinated_expend_made_by_party_cmtes_ytd = b.get("line_25", 0)
+        report.form_3x.L25_coordinated_expend_made_by_party_cmtes_period = a.get("line_25", 0)  # noqa: E501
+        report.form_3x.L25_coordinated_expend_made_by_party_cmtes_ytd = b.get("line_25", 0)  # noqa: E501
         # line 26
         report.form_3x.L26_loan_repayments_period = a.get("line_26", 0)
         report.form_3x.L26_loan_repayments_made_ytd = b.get("line_26", 0)
@@ -173,12 +173,12 @@ def calculate_summary(report_id):
         report.form_3x.L29_other_disbursements_ytd = b.get("line_29", 0)
         # line 30ai
         report.form_3x.L30ai_shared_federal_activity_h6_fed_share_period = a.get("line_30ai", 0)  # noqa: E501
-        report.form_3x.L30ai_shared_federal_activity_h6_fed_share_ytd = b.get("line_30ai", 0)
+        report.form_3x.L30ai_shared_federal_activity_h6_fed_share_ytd = b.get("line_30ai", 0)  # noqa: E501
         # line 30aii
         report.form_3x.L30aii_shared_federal_activity_h6_nonfed_period = a.get("line_30aii", 0)  # noqa: E501
-        report.form_3x.L30aii_shared_federal_activity_h6_nonfed_ytd = b.get("line_30aii", 0)
+        report.form_3x.L30aii_shared_federal_activity_h6_nonfed_ytd = b.get("line_30aii", 0)  # noqa: E501
         # line 30b
-        report.form_3x.L30b_nonallocable_fed_election_activity_period = a.get("line_30b", 0)
+        report.form_3x.L30b_nonallocable_fed_election_activity_period = a.get("line_30b", 0)  # noqa: E501
         report.form_3x.L30b_nonallocable_fed_election_activity_ytd = b.get("line_30b", 0)
         # line 30c
         report.form_3x.L30c_total_federal_election_activity_period = a.get("line_30c", 0)
@@ -199,7 +199,7 @@ def calculate_summary(report_id):
         report.form_3x.L35_net_contributions_period = a.get("line_35", 0)
         report.form_3x.L35_net_contributions_ytd = b.get("line_35", 0)
         # line 36
-        report.form_3x.L36_total_federal_operating_expenditures_period = a.get("line_36", 0)
+        report.form_3x.L36_total_federal_operating_expenditures_period = a.get("line_36", 0)  # noqa: E501
         report.form_3x.L36_total_federal_operating_expenditures_ytd = b.get("line_36", 0)
         # line 37
         report.form_3x.L37_offsets_to_operating_expenditures_period = a.get("line_37", 0)
