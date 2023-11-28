@@ -38,4 +38,29 @@ class F3XSerializerTestCase(TestCase):
         self.assertEqual(
             report.form_3x.L37_offsets_to_operating_expenditures_period, Decimal("0")
         )
+        self.assertEqual(
+            report.form_3x.L6b_cash_on_hand_beginning_period, Decimal("0")
+        )
         self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
+
+    def test_report_b(self):
+        report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-000000000002")
+        previous_report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+
+        previous_report.calculation_status = None
+        previous_report.save()
+
+        report.calculation_status = None
+        report.save()
+
+        calculate_summary("b6d60d2d-d926-4e89-ad4b-000000000002")
+        calculated_report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-000000000002")
+
+        self.assertEqual(
+            calculated_report.form_3x.L6b_cash_on_hand_beginning_period,
+            Decimal("18085.17")
+        )
+        self.assertEqual(
+            calculated_report.form_3x.L6a_cash_on_hand_jan_1_ytd,
+            Decimal("18985.17")
+        )

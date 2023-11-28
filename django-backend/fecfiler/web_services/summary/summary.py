@@ -59,7 +59,7 @@ class SummaryService:
 
         summary["line_6b"] = 0
         if self.previous_report and self.previous_report.form_3x:
-            summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_close_period
+            summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period
 
         summary["line_9"] = (
             summary["temp_sc9"]
@@ -209,7 +209,7 @@ class SummaryService:
 
         summary["line_6a"] = 0
         if self.previous_report and self.previous_report.form_3x:
-            summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_ytd
+            summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_close_ytd
 
         summary["line_11aiii"] = (
             summary["line_11ai"]
