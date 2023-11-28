@@ -40,6 +40,7 @@ def create_dot_fec(
         if not file_content or not file_name:
             raise Exception("No file created")
         store_file(file_content, file_name, force_write_to_disk)
+        submission.save_error(f"STORED FILE")
         dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
         dot_fec_record.save()
 
