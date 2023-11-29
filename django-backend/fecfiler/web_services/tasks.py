@@ -43,8 +43,8 @@ def create_dot_fec(
         dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
         dot_fec_record.save()
 
-    except Exception as e:
-        submission.save_error(f"Creating .FEC failed {e}")
+    except Exception:
+        submission.save_error("Creating .FEC failed")
         return None
 
     if upload_submission_id:
@@ -72,10 +72,10 @@ def submit_to_fec(
     logger.info(f"api submitter: {api}")
 
     submission = UploadSubmission.objects.get(id=submission_record_id)
-    submission.save_state(FECSubmissionState.SUBMITTING)
-
     if submission.fecfile_task_state == FECSubmissionState.FAILED:
         return
+    submission.save_state(FECSubmissionState.SUBMITTING)
+
 
     """Get Password"""
     if not e_filing_password:
