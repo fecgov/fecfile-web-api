@@ -1,4 +1,3 @@
-from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
