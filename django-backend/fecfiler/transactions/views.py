@@ -288,6 +288,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
 
+
 def noop(transaction, is_existing):
     pass
 

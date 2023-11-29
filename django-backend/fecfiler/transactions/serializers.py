@@ -222,7 +222,8 @@ class TransactionSerializer(
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
 
-            # For REATTRIBUTED transactions, calculate the amount that has been reattributed for the transaction
+            # For REATTRIBUTED transactions, calculate the amount that has
+            # been reattributed for the transaction
             total = instance.reatt_redes_associations.filter(
                 schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
             ).aggregate(Sum("amount"))['amount__sum'] or 0.0
@@ -234,7 +235,8 @@ class TransactionSerializer(
         if schedule_b:
             representation["aggregate_amount"] = representation.get("aggregate")
 
-            # For REDESIGNATED transactions, calculate the amount that has been redesignated for the transaction
+            # For REDESIGNATED transactions, calculate the amount that has
+            # been redesignated for the transaction
             total = instance.reatt_redes_associations.filter(
                 schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
             ).aggregate(Sum("amount"))['amount__sum'] or 0.0
