@@ -1,7 +1,6 @@
 import logging
 
 from django.db.models import Sum
-from decimal import Decimal
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
@@ -226,7 +225,7 @@ class TransactionSerializer(
             # For REATTRIBUTED transactions, calculate the amount that has been reattributed for the transaction
             total = instance.reatt_redes_associations.filter(
                 schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-                ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
@@ -238,7 +237,7 @@ class TransactionSerializer(
             # For REDESIGNATED transactions, calculate the amount that has been redesignated for the transaction
             total = instance.reatt_redes_associations.filter(
                 schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-                ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:
