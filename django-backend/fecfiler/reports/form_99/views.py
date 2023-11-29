@@ -20,14 +20,6 @@ class Form99ViewSet(ReportViewSet):
     )
 
     serializer_class = Form99Serializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "form_type",
-        "report_code_label",
-        "upload_submission__fec_status",
-        "submission_status",
-    ]
-    ordering = ["form_type"]
 
     def create(self, request):
         return super(ModelViewSet, self).create(request)
