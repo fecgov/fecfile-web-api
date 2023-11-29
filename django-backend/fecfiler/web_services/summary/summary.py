@@ -27,7 +27,7 @@ class SummaryService:
         return summary
 
     def calculate_summary_column_a(self):
-        report_transactions = Transaction.objects.filter(report=self.report)
+        report_transactions = Transaction.objects.filter(report_id=self.report.id)
         summary = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI", itemized=True),
             line_11aii=self.get_line("SA11AI", itemized=False),
@@ -57,7 +57,6 @@ class SummaryService:
             temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
 
-        summary["line_6b"] = 0
         if self.previous_report and self.previous_report.form_3x:
             summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
 
@@ -148,7 +147,7 @@ class SummaryService:
             + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary["line_6b"]
+            summary.get("line_6b", 0)
             + summary["line_6c"]
         )
         summary["line_7"] = (
@@ -182,6 +181,8 @@ class SummaryService:
             committee_account=committee, date__year=report_year, date__lte=report_date,
         )
 
+        logger.info("This many transactions! "+str(len(ytd_transactions)))
+
         # build summary
         summary = ytd_transactions.aggregate(
             line_11ai=self.get_line("SA11AI", itemized=True),
@@ -207,7 +208,6 @@ class SummaryService:
             line_30b=self.get_line("SB30B"),
         )
 
-        summary["line_6a"] = 0
         if self.previous_report and self.previous_report.form_3x:
             summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_close_ytd
 
@@ -290,7 +290,7 @@ class SummaryService:
             + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary["line_6a"]
+            summary.get("line_6a", 0)
             + summary["line_6c"]
         )
         summary["line_7"] = (
@@ -307,6 +307,8 @@ class SummaryService:
             summary["line_19"]
             - summary["line_18c"]
         )
+
+        logger.info(summary.values())
 
         return summary
 

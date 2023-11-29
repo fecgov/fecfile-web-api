@@ -47,18 +47,22 @@ def calculate_summary(report_id):
         calculation_token=calculation_token,
         calculation_status=CalculationState.CALCULATING
     )
+    claimed_reports = list(reports_to_recalculate)
 
-    for report in reports_to_recalculate:
+    for report in claimed_reports:
         summary_service = SummaryService(report)
         summary = summary_service.calculate_summary()
         a = summary["a"]
         b = summary["b"]
 
         # line 6a
-        report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", 0)
-        report.form_3x.L6a_year_for_above_ytd = b.get("line_6a", 0)
+        if "line_6a" in b:
+            report.form_3x.L6a_cash_on_hand_jan_1_ytd = b["line_6a"]
         # line 6b
-        report.form_3x.L6b_cash_on_hand_beginning_period = a.get("line_6b", 0)
+        if "line_6b" in a:
+            report.form_3x.L6b_cash_on_hand_beginning_period = a["line_6b"]
+        else:
+            report.form_3x.L6b_cash_on_hand_beginning_period = report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
         # line 6c
         report.form_3x.L6c_total_receipts_period = a.get("line_6c", 0)
         report.form_3x.L6c_total_receipts_ytd = b.get("line_6c", 0)
