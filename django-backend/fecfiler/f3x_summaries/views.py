@@ -63,7 +63,6 @@ class F3XSummaryViewSet(CommitteeOwnedViewSet):
         "report_code_label",
         "coverage_through_date",
         "upload_submission__fec_status",
-        "submission_status",
     ]
     ordering = ["form_type"]
 
