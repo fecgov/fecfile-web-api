@@ -22,8 +22,8 @@ class SummaryService:
     def calculate_summary_column_a(self):
         report_transactions = Transaction.objects.filter(report=self.report)
         summary = report_transactions.aggregate(
-            line_11ai=self.get_line("SA11AI", itemized=True),
-            line_11aii=self.get_line("SA11AI", itemized=False),
+            line_11ai=self.get_line("SA11AI"),
+            line_11aii=self.get_line("SA11AII"),
             line_11b=self.get_line("SA11B"),
             line_11c=self.get_line("SA11C"),
             line_12=self.get_line("SA12"),
@@ -174,8 +174,8 @@ class SummaryService:
 
         # build summary
         summary = ytd_transactions.aggregate(
-            line_11ai=self.get_line("SA11AI", itemized=True),
-            line_11aii=self.get_line("SA11AI", itemized=False),
+            line_11ai=self.get_line("SA11AI"),
+            line_11aii=self.get_line("SA11AII"),
             line_11b=self.get_line("SA11B"),
             line_11c=self.get_line("SA11C"),
             line_12=self.get_line("SA12"),
@@ -297,10 +297,6 @@ class SummaryService:
 
         return summary
 
-    def get_line(self, form_type, field="amount", itemized=None):
-        query = (
-            Q(~Q(memo_code=True), itemized=itemized, _form_type=form_type)
-            if itemized is not None
-            else Q(~Q(memo_code=True), _form_type=form_type)
-        )
+    def get_line(self, form_type, field="amount"):
+        query = Q(~Q(memo_code=True), form_type=form_type)
         return Coalesce(Sum(field, filter=query), Decimal(0.0))
