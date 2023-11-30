@@ -76,7 +76,6 @@ def submit_to_fec(
         return
     submission.save_state(FECSubmissionState.SUBMITTING)
 
-
     """Get Password"""
     if not e_filing_password:
         submission.save_error("No E-Filing Password provided")
