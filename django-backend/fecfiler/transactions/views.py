@@ -234,6 +234,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
+        transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
@@ -289,6 +290,14 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 self.save_transaction(child_transaction_data, request)
 
         return self.queryset.get(id=transaction_instance.id)
+
+    @action(detail=False, methods=["put"], url_path=r"multisave")
+    def save_transactions(self, request):
+        with db_transaction.atomic():
+            saved_data = [self.save_transaction(data, request) for data in request.data]
+        return Response(
+            [TransactionSerializer().to_representation(data) for data in saved_data]
+        )
 
 
 def noop(transaction, is_existing):
