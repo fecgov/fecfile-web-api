@@ -85,9 +85,11 @@ class ReportViewSet(CommitteeOwnedViewSet):
     serializer_class = ReportSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
+        "report_code_label",
+        "coverage_through_date",
         "form_type",
-        "upload_submission__fec_status",
-        "submission_status",
+        "upload_submission__created",
+        "report_status",
     ]
     ordering = ["form_type"]
 

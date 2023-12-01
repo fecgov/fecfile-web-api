@@ -1,4 +1,3 @@
-from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
@@ -20,14 +19,6 @@ class Form24ViewSet(ReportViewSet):
     )
 
     serializer_class = Form24Serializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "form_type",
-        "report_code_label",
-        "upload_submission__fec_status",
-        "submission_status",
-    ]
-    ordering = ["form_type"]
 
     def create(self, request):
         return super(ModelViewSet, self).create(request)
