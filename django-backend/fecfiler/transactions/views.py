@@ -34,6 +34,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
         "schedule_a__contributor_organization_name",
         "schedule_b__payee_organization_name",
         "schedule_c__lender_organization_name",
+        "schedule_c1__lender_organization_name",
         "schedule_d__creditor_organization_name",
         "schedule_e__payee_organization_name",
     ),
@@ -42,6 +43,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
             "schedule_a__contributor_last_name",
             "schedule_b__payee_last_name",
             "schedule_c__lender_last_name",
+            "schedule_c2__guarantor_last_name",
             "schedule_d__creditor_last_name",
             "schedule_e__payee_last_name",
         ),
@@ -50,6 +52,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
             "schedule_a__contributor_first_name",
             "schedule_b__payee_first_name",
             "schedule_c__lender_first_name",
+            "schedule_c2__guarantor_first_name",
             "schedule_d__creditor_first_name",
             "schedule_e__payee_first_name",
         ),
@@ -84,7 +87,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         queryset = (
             super()
             .get_queryset()
-            .alias(
+            .annotate(
                 name=DISPLAY_NAME_CLAUSE,
             )
         )
@@ -268,15 +271,22 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
 
         for child_transaction_data in children:
-            child_transaction_data["parent_transaction_id"] = transaction_instance.id
-            child_transaction_data.pop("parent_transaction", None)
-            if child_transaction_data.get("use_parent_contact", None):
+            if type(child_transaction_data) is str:
+                child_transaction = self.get_queryset().get(id=child_transaction_data)
+                child_transaction.parent_transaction_id = transaction_instance.id
+                child_transaction.save()
+            else:
                 child_transaction_data[
-                    "contact_1_id"
-                ] = transaction_instance.contact_1_id
-                del child_transaction_data["contact_1"]
+                    "parent_transaction_id"
+                ] = transaction_instance.id
+                child_transaction_data.pop("parent_transaction", None)
+                if child_transaction_data.get("use_parent_contact", None):
+                    child_transaction_data[
+                        "contact_1_id"
+                    ] = transaction_instance.contact_1_id
+                    del child_transaction_data["contact_1"]
 
-            self.save_transaction(child_transaction_data, request)
+                self.save_transaction(child_transaction_data, request)
 
         return self.queryset.get(id=transaction_instance.id)
 

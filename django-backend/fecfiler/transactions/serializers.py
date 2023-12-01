@@ -139,6 +139,7 @@ class TransactionSerializer(
     )
     form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
+    name = CharField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -185,6 +186,7 @@ class TransactionSerializer(
                 "itemized",
                 "fields_to_validate",
                 "schema_name",
+                "name",
                 "date",
                 "amount",
                 "aggregate",
@@ -224,6 +226,12 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
         if schedule_c:
+            loan_agreement = instance.children.filter(
+                transaction_type_identifier="C1_LOAN_AGREEMENT"
+            ).first()
+            representation["loan_agreement_id"] = (
+                loan_agreement.id if loan_agreement else None
+            )
             for property in schedule_c:
                 if not representation.get(property):
                     representation[property] = schedule_c[property]
