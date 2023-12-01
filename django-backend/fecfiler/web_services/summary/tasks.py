@@ -56,13 +56,9 @@ def calculate_summary(report_id):
         b = summary["b"]
 
         # line 6a
-        if "line_6a" in b:
-            report.form_3x.L6a_cash_on_hand_jan_1_ytd = b["line_6a"]
+        report.form_3x.L6a_cash_on_hand_jan_1_ytd = b["line_6a"]
         # line 6b
-        if "line_6b" in a:
-            report.form_3x.L6b_cash_on_hand_beginning_period = a["line_6b"]
-        else:
-            report.form_3x.L6b_cash_on_hand_beginning_period = report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+        report.form_3x.L6b_cash_on_hand_beginning_period = a["line_6b"]
         # line 6c
         report.form_3x.L6c_total_receipts_period = a.get("line_6c", 0)
         report.form_3x.L6c_total_receipts_ytd = b.get("line_6c", 0)

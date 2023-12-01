@@ -59,6 +59,8 @@ class SummaryService:
 
         if self.previous_report and self.previous_report.form_3x:
             summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
+        else:
+            summary["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
 
         summary["line_9"] = (
             summary["temp_sc9"]
@@ -208,6 +210,8 @@ class SummaryService:
 
         if self.previous_report and self.previous_report.form_3x:
             summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_close_ytd
+        else:
+            summary["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
         summary["line_11aiii"] = (
             summary["line_11ai"]
