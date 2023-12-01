@@ -149,7 +149,7 @@ class SummaryService:
             + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary.get("line_6b", 0)
+            summary["line_6b"]
             + summary["line_6c"]
         )
         summary["line_7"] = (
@@ -292,7 +292,7 @@ class SummaryService:
             + summary["line_18c"]
         )
         summary["line_6d"] = (
-            summary.get("line_6a", 0)
+            summary["line_6a"]
             + summary["line_6c"]
         )
         summary["line_7"] = (
