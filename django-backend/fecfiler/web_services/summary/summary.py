@@ -181,8 +181,6 @@ class SummaryService:
             committee_account=committee, date__year=report_year, date__lte=report_date,
         )
 
-        logger.info("This many transactions! "+str(len(ytd_transactions)))
-
         # build summary
         summary = ytd_transactions.aggregate(
             line_11ai=self.get_line("SA11AI", itemized=True),
@@ -307,8 +305,6 @@ class SummaryService:
             summary["line_19"]
             - summary["line_18c"]
         )
-
-        logger.info(summary.values())
 
         return summary
 
