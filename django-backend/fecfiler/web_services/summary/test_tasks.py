@@ -40,7 +40,7 @@ class F3XSerializerTestCase(TestCase):
         )
         self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
 
-    def test_report_b(self):
+    def test_report_group_recalculation(self):
         report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-000000000002")
         previous_report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
 
