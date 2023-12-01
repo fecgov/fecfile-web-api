@@ -88,6 +88,9 @@ fecfiler.transactions.models.Transaction
       ~Transaction.parent_transaction
       ~Transaction.parent_transaction_id
       ~Transaction.pk
+      ~Transaction.reatt_redes
+      ~Transaction.reatt_redes_associations
+      ~Transaction.reatt_redes_id
       ~Transaction.report
       ~Transaction.report_id
       ~Transaction.schedule_a

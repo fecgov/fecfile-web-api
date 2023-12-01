@@ -75,6 +75,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.retrieve
       ~TransactionViewSet.reverse_action
       ~TransactionViewSet.save_transaction
+      ~TransactionViewSet.save_transactions
       ~TransactionViewSet.setup
       ~TransactionViewSet.throttled
       ~TransactionViewSet.update
