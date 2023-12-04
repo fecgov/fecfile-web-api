@@ -120,6 +120,7 @@ class F3XReportTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
 
+        summary_a = summary["a"]
         summary_b = summary["b"]
 
         t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
@@ -129,7 +130,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             summary_b["line_6d"],
             Decimal("0")  # line_6a
-            + Decimal("19046.17")  # line_6c
+            + Decimal("18146.17")  # line_6c
         )
         self.assertEqual(
             summary_b["line_7"],
@@ -147,7 +148,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             summary_b["line_8"],
             summary_b["line_6d"]
-            - summary_b["line_7"]
+            - summary_a["line_7"]
         )
         self.assertEqual(summary_b["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_b["line_11aii"], Decimal("103.77"))

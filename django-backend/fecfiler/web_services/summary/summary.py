@@ -19,9 +19,12 @@ class SummaryService:
         ).order_by("-coverage_through_date").first()
 
     def calculate_summary(self):
+        summary_a = self.calculate_summary_column_a()
+        summary_b = self.calculate_summary_column_b(summary_a)
+
         summary = {
-            "a": self.calculate_summary_column_a(),
-            "b": self.calculate_summary_column_b(),
+            "a": summary_a,
+            "b": summary_b,
         }
 
         return summary
@@ -174,7 +177,7 @@ class SummaryService:
 
         return summary
 
-    def calculate_summary_column_b(self):
+    def calculate_summary_column_b(self, summary_a):
         committee = self.report.committee_account
         report_date = self.report.coverage_through_date
         report_year = report_date.year
@@ -293,14 +296,14 @@ class SummaryService:
         )
         summary["line_6d"] = (
             summary["line_6a"]
-            + summary["line_6c"]
+            + summary_a["line_6c"]
         )
         summary["line_7"] = (
             summary["line_31"]
         )
         summary["line_8"] = (
             summary["line_6d"]
-            - summary["line_7"]
+            - summary_a["line_7"]
         )
         summary["line_19"] = (
             summary["line_6c"]
