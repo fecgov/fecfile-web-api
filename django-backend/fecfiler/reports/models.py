@@ -42,7 +42,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     treasurer_suffix = models.TextField(null=True, blank=True)
     date_signed = models.DateField(null=True, blank=True)
     calculation_status = models.CharField(max_length=255, null=True, blank=True)
-    calculation_token = models.UUIDField(
+    calculation_token = models.UUIDField(  # Prevents race conditions in summary calc.
         null=True,
         blank=True,
         default=None
