@@ -1,7 +1,7 @@
 from decimal import Decimal
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
-from django.db.models import Q, Sum, Case, When
+from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 import logging
 
@@ -220,7 +220,7 @@ class SummaryService:
             form_3x__isnull=False
         ).order_by("coverage_from_date")
 
-        if len(reports_from_prior_years) > 0:
+        if reports_from_prior_years.count() > 0:
             summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
         else:
             l6a_sources_in_year = Report.objects.filter(
@@ -229,7 +229,7 @@ class SummaryService:
                 form_3x__L6a_cash_on_hand_jan_1_ytd__gt=0
             ).order_by("coverage_from_date")
 
-            if len(l6a_sources_in_year) > 0:
+            if l6a_sources_in_year.count() > 0:
                 summary["line_6a"] = l6a_sources_in_year.first().form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
             else:
                 summary["line_6a"] = Decimal("0.00")
