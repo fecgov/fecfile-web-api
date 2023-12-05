@@ -65,7 +65,7 @@ class SummaryService:
         else:
             summary["line_6b"] = summary_b["line_6a"]
 
-        if summary["line_6b"] == None:
+        if summary["line_6b"] is None:
             summary["line_6b"] = Decimal("0.00")
 
         summary["line_9"] = (

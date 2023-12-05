@@ -120,7 +120,6 @@ class F3XReportTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary = summary_service.calculate_summary()
 
-        summary_a = summary["a"]
         summary_b = summary["b"]
 
         t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
