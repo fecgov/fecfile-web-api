@@ -220,7 +220,7 @@ class SummaryService:
             form_3x__isnull=False
         ).order_by("coverage_from_date")
 
-        if len(reports_from_prior_years):
+        if len(reports_from_prior_years) > 0:
             summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
         else:
             l6a_sources_in_year = Report.objects.filter(
