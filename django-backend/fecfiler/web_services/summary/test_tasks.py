@@ -60,7 +60,7 @@ class F3XSerializerTestCase(TestCase):
         )
         self.assertEqual(
             calculated_report.form_3x.L6a_cash_on_hand_jan_1_ytd,
-            Decimal("18146.17")
+            Decimal("61.00")
         )
         self.assertEqual(
             calculated_prev_report.form_3x.L15_offsets_to_operating_expenditures_refunds_period,  # noqa: E501

@@ -1,7 +1,7 @@
 from decimal import Decimal
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Case, When
 from django.db.models.functions import Coalesce
 import logging
 
@@ -19,8 +19,8 @@ class SummaryService:
         ).order_by("-coverage_through_date").first()
 
     def calculate_summary(self):
-        summary_a = self.calculate_summary_column_a()
-        summary_b = self.calculate_summary_column_b(summary_a)
+        summary_b = self.calculate_summary_column_b()
+        summary_a = self.calculate_summary_column_a(summary_b)
 
         summary = {
             "a": summary_a,
@@ -29,7 +29,7 @@ class SummaryService:
 
         return summary
 
-    def calculate_summary_column_a(self):
+    def calculate_summary_column_a(self, summary_b):
         report_transactions = Transaction.objects.filter(report_id=self.report.id)
         summary = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
@@ -63,7 +63,10 @@ class SummaryService:
         if self.previous_report and self.previous_report.form_3x:
             summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
         else:
-            summary["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+            summary["line_6b"] = summary_b["line_6a"]
+
+        if summary["line_6b"] == None:
+            summary["line_6b"] = Decimal("0.00")
 
         summary["line_9"] = (
             summary["temp_sc9"]
@@ -177,7 +180,7 @@ class SummaryService:
 
         return summary
 
-    def calculate_summary_column_b(self, summary_a):
+    def calculate_summary_column_b(self):
         committee = self.report.committee_account
         report_date = self.report.coverage_through_date
         report_year = report_date.year
@@ -211,10 +214,24 @@ class SummaryService:
             line_30b=self.get_line("SB30B"),
         )
 
-        if self.previous_report and self.previous_report.form_3x:
-            summary["line_6a"] = self.previous_report.form_3x.L8_cash_on_hand_close_ytd
+        reports_from_prior_years = Report.objects.filter(
+            committee_account=self.report.committee_account,
+            coverage_through_date__year__lt=self.report.coverage_from_date.year,
+            form_3x__isnull=False
+        ).order_by("coverage_from_date")
+
+        if len(reports_from_prior_years):
+            summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
         else:
-            summary["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            earliest_l6a_source_in_year = Report.objects.filter(
+                coverage_through_date__year=self.report.coverage_from_date.year,
+                form_3x__L6a_cash_on_hand_jan_1_ytd__gt=0
+            ).order_by("coverage_from_date").first()
+
+            if earliest_l6a_source_in_year:
+                summary["line_6a"] = earliest_l6a_source_in_year.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+            else:
+                summary["line_6a"] = 0
 
         summary["line_11aiii"] = (
             summary["line_11ai"]
@@ -296,14 +313,14 @@ class SummaryService:
         )
         summary["line_6d"] = (
             summary["line_6a"]
-            + summary_a["line_6c"]
+            + summary["line_6c"]
         )
         summary["line_7"] = (
             summary["line_31"]
         )
         summary["line_8"] = (
             summary["line_6d"]
-            - summary_a["line_7"]
+            - summary["line_7"]
         )
         summary["line_19"] = (
             summary["line_6c"]

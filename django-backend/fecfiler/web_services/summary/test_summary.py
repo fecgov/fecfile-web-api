@@ -129,8 +129,8 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(
             summary_b["line_6d"],
-            Decimal("0")  # line_6a
-            + Decimal("18146.17")  # line_6c
+            Decimal("61")  # line_6a
+            + Decimal("18985.17")  # line_6c
         )
         self.assertEqual(
             summary_b["line_7"],
@@ -148,7 +148,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             summary_b["line_8"],
             summary_b["line_6d"]
-            - summary_a["line_7"]
+            - summary_b["line_7"]
         )
         self.assertEqual(summary_b["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_b["line_11aii"], Decimal("103.77"))
