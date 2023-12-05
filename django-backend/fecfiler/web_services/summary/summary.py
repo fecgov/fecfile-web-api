@@ -223,15 +223,16 @@ class SummaryService:
         if len(reports_from_prior_years):
             summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
         else:
-            earliest_l6a_source_in_year = Report.objects.filter(
+            l6a_sources_in_year = Report.objects.filter(
+                committee_account=self.report.committee_account,
                 coverage_through_date__year=self.report.coverage_from_date.year,
                 form_3x__L6a_cash_on_hand_jan_1_ytd__gt=0
-            ).order_by("coverage_from_date").first()
+            ).order_by("coverage_from_date")
 
-            if earliest_l6a_source_in_year:
-                summary["line_6a"] = earliest_l6a_source_in_year.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+            if len(l6a_sources_in_year) > 0:
+                summary["line_6a"] = l6a_sources_in_year.first().form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
             else:
-                summary["line_6a"] = 0
+                summary["line_6a"] = Decimal("0.00")
 
         summary["line_11aiii"] = (
             summary["line_11ai"]
