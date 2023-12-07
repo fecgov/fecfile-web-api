@@ -11,25 +11,43 @@ logger = logging.getLogger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_report = Report.objects.filter(
-            ~Q(id=report.id),
-            form_3x__isnull=False,
-            coverage_from_date__year=report.coverage_from_date.year,
-            coverage_through_date__lt=report.coverage_from_date
-        ).order_by("-coverage_through_date").first()
+        self.previous_report = (
+            Report.objects.filter(
+                ~Q(id=report.id),
+                committee_account=report.committee_account,
+                form_3x__isnull=False,
+                coverage_through_date__lt=report.coverage_from_date,
+            )
+            .order_by("-coverage_through_date")
+            .first()
+        )
 
     def calculate_summary(self):
+        summary_a = self.calculate_summary_column_a()
         summary_b = self.calculate_summary_column_b()
-        summary_a = self.calculate_summary_column_a(summary_b)
 
-        summary = {
-            "a": summary_a,
-            "b": summary_b,
-        }
 
-        return summary
 
-    def calculate_summary_column_a(self, summary_b):
+        reports_from_prior_years = Report.objects.filter(
+            committee_account=self.report.committee_account,
+            coverage_through_date__year__lt=self.report.coverage_from_date.year,
+            form_3x__isnull=False
+        ).order_by("coverage_from_date")
+
+        if reports_from_prior_years.count() > 0:
+            summary_b["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
+        elif self.previous_report:
+                summary_b["line_6a"] = self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+
+        if self.previous_report:
+            summary_a["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
+        else:
+            summary_a["line_6b"] = summary_b["line_6a"]
+
+
+        return summary_a, summary_b
+
+    def calculate_summary_column_a(self):
         report_transactions = Transaction.objects.filter(report_id=self.report.id)
         summary = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
@@ -59,14 +77,6 @@ class SummaryService:
             temp_sc10=self.get_line("SC/10", field="loan_balance"),
             temp_sd10=self.get_line("SD10", field="balance_at_close")
         )
-
-        if self.previous_report and self.previous_report.form_3x:
-            summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
-        else:
-            summary["line_6b"] = summary_b["line_6a"]
-
-        if summary["line_6b"] is None:
-            summary["line_6b"] = Decimal("0.00")
 
         summary["line_9"] = (
             summary["temp_sc9"]
@@ -213,26 +223,6 @@ class SummaryService:
             line_29=self.get_line("SB29"),
             line_30b=self.get_line("SB30B"),
         )
-
-        reports_from_prior_years = Report.objects.filter(
-            committee_account=self.report.committee_account,
-            coverage_through_date__year__lt=self.report.coverage_from_date.year,
-            form_3x__isnull=False
-        ).order_by("coverage_from_date")
-
-        if reports_from_prior_years.count() > 0:
-            summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
-        else:
-            l6a_sources_in_year = Report.objects.filter(
-                committee_account=self.report.committee_account,
-                coverage_through_date__year=self.report.coverage_from_date.year,
-                form_3x__L6a_cash_on_hand_jan_1_ytd__gt=0
-            ).order_by("coverage_from_date")
-
-            if l6a_sources_in_year.count() > 0:
-                summary["line_6a"] = l6a_sources_in_year.first().form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
-            else:
-                summary["line_6a"] = Decimal("0.00")
 
         summary["line_11aiii"] = (
             summary["line_11ai"]

@@ -51,9 +51,7 @@ def calculate_summary(report_id):
 
     for report in claimed_reports:
         summary_service = SummaryService(report)
-        summary = summary_service.calculate_summary()
-        a = summary["a"]
-        b = summary["b"]
+        a, b = summary_service.calculate_summary()
 
         # line 6a
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = b["line_6a"]
