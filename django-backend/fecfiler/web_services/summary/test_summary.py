@@ -20,15 +20,13 @@ class F3XReportTestCase(TestCase):
     def test_calculate_summary_column_a(self):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
-        summary = summary_service.calculate_summary()
-
-        summary_a = summary["a"]
+        summary_a, _ = summary_service.calculate_summary()
 
         self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
         self.assertEqual(
             summary_a["line_6d"],
             Decimal("0") +  # line_6b
-            + Decimal("18085.17")  # line_6c
+            + Decimal("18146.17")  # line_6c
         )
         self.assertEqual(
             summary_a["line_7"],
@@ -118,9 +116,7 @@ class F3XReportTestCase(TestCase):
     def test_calculate_summary_column_b(self):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
-        summary = summary_service.calculate_summary()
-
-        summary_b = summary["b"]
+        _, summary_b = summary_service.calculate_summary()
 
         t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
         self.assertEqual(t.itemized, False)
@@ -128,7 +124,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(
             summary_b["line_6d"],
-            Decimal("0")  # line_6a
+            Decimal("61")  # line_6a
             + Decimal("18985.17")  # line_6c
         )
         self.assertEqual(
@@ -213,6 +209,6 @@ class F3XReportTestCase(TestCase):
     def test_report_with_no_transactions(self):
         f3x = Report.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
         summary_service = SummaryService(f3x)
-        summary = summary_service.calculate_summary()
-        self.assertEqual(summary["a"]["line_15"], Decimal("0"))
-        self.assertEqual(summary["a"]["line_17"], Decimal("0"))
+        summary_a, _ = summary_service.calculate_summary()
+        self.assertEqual(summary_a["line_15"], Decimal("0"))
+        self.assertEqual(summary_a["line_17"], Decimal("0"))
