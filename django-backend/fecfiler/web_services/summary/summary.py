@@ -224,17 +224,17 @@ class SummaryService:
         ).order_by("coverage_from_date")
 
         if reports_from_prior_years.count() > 0:
-            column_b["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd # noqa: E501
+            column_b["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
         elif self.previous_report:
             column_b["line_6a"] = self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
         else:
-            #  user defined cash on hand
+            # user defined cash on hand
             column_b["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
         if self.previous_report:
-            column_a["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period # noqa: E501
+            column_a["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
         else:
-            #  user defined cash on hand
+            # user defined cash on hand
             column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
         if column_a["line_6b"] and column_b["line_6a"]:
