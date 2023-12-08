@@ -11,27 +11,28 @@ logger = logging.getLogger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_report = Report.objects.filter(
-            ~Q(id=report.id),
-            form_3x__isnull=False,
-            coverage_from_date__year=report.coverage_from_date.year,
-            coverage_through_date__lt=report.coverage_from_date
-        ).order_by("-coverage_through_date").first()
+        self.previous_report = (
+            Report.objects.filter(
+                ~Q(id=report.id),
+                committee_account=report.committee_account,
+                form_3x__isnull=False,
+                coverage_through_date__lt=report.coverage_from_date,
+            )
+            .order_by("-coverage_through_date")
+            .first()
+        )
 
     def calculate_summary(self):
-        summary_b = self.calculate_summary_column_b()
-        summary_a = self.calculate_summary_column_a(summary_b)
+        column_a = self.calculate_summary_column_a()
+        column_b = self.calculate_summary_column_b()
 
-        summary = {
-            "a": summary_a,
-            "b": summary_b,
-        }
+        column_a, column_b = self.calculate_cash_on_hand_fields(column_a, column_b)
 
-        return summary
+        return column_a, column_b
 
-    def calculate_summary_column_a(self, summary_b):
+    def calculate_summary_column_a(self):
         report_transactions = Transaction.objects.filter(report_id=self.report.id)
-        summary = report_transactions.aggregate(
+        column_a = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
             line_11aii=self.get_line("SA11AII"),
             line_11b=self.get_line("SA11B"),
@@ -57,128 +58,71 @@ class SummaryService:
             temp_sc9=self.get_line("SC/9", field="loan_balance"),
             temp_sd9=self.get_line("SD9", field="balance_at_close"),
             temp_sc10=self.get_line("SC/10", field="loan_balance"),
-            temp_sd10=self.get_line("SD10", field="balance_at_close")
+            temp_sd10=self.get_line("SD10", field="balance_at_close"),
         )
 
-        if self.previous_report and self.previous_report.form_3x:
-            summary["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
-        else:
-            summary["line_6b"] = summary_b["line_6a"]
-
-        if summary["line_6b"] is None:
-            summary["line_6b"] = Decimal("0.00")
-
-        summary["line_9"] = (
-            summary["temp_sc9"]
-            + summary["temp_sd9"]
+        column_a["line_9"] = column_a["temp_sc9"] + column_a["temp_sd9"]
+        column_a["line_10"] = column_a["temp_sc10"] + column_a["temp_sd10"]
+        column_a["line_11aiii"] = column_a["line_11ai"] + column_a["line_11aii"]
+        column_a["line_11d"] = (
+            column_a["line_11aiii"] + column_a["line_11b"] + column_a["line_11c"]
         )
-        summary["line_10"] = (
-            summary["temp_sc10"]
-            + summary["temp_sd10"]
+        column_a["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_21c"] = (
+            column_a["line_21ai"] + column_a["line_21aii"] + column_a["line_21b"]
         )
-        summary["line_11aiii"] = (
-            summary["line_11ai"]
-            + summary["line_11aii"]
+        column_a["line_25"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_28d"] = (
+            column_a["line_28a"] + column_a["line_28b"] + column_a["line_28c"]
         )
-        summary["line_11d"] = (
-            summary["line_11aiii"]
-            + summary["line_11b"]
-            + summary["line_11c"]
+        column_a["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
+        column_a["line_30c"] = (
+            column_a["line_30ai"] + column_a["line_30aii"] + column_a["line_30b"]
         )
-        summary["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21c"] = (
-            summary["line_21ai"]
-            + summary["line_21aii"]
-            + summary["line_21b"]
+        column_a["line_31"] = (
+            column_a["line_21c"]
+            + column_a["line_22"]
+            + column_a["line_23"]
+            + column_a["line_24"]
+            + column_a["line_25"]
+            + column_a["line_26"]
+            + column_a["line_27"]
+            + column_a["line_28d"]
+            + column_a["line_29"]
+            + column_a["line_30c"]
         )
-        summary["line_25"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_28d"] = (
-            summary["line_28a"]
-            + summary["line_28b"]
-            + summary["line_28c"]
+        column_a["line_32"] = (
+            column_a["line_31"] - column_a["line_21aii"] - column_a["line_30aii"]
         )
-        summary["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_30c"] = (
-            summary["line_30ai"]
-            + summary["line_30aii"]
-            + summary["line_30b"]
+        column_a["line_33"] = column_a["line_11d"]
+        column_a["line_34"] = column_a["line_28d"]
+        column_a["line_35"] = column_a["line_33"] - column_a["line_34"]
+        column_a["line_36"] = column_a["line_21ai"] + column_a["line_21b"]
+        column_a["line_37"] = column_a["line_15"]
+        column_a["line_38"] = column_a["line_36"] - column_a["line_37"]
+        column_a["line_6c"] = (
+            column_a["line_11d"]
+            + column_a["line_12"]
+            + column_a["line_13"]
+            + column_a["line_14"]
+            + column_a["line_15"]
+            + column_a["line_16"]
+            + column_a["line_17"]
+            + column_a["line_18c"]
         )
-        summary["line_31"] = (
-            summary["line_21c"]
-            + summary["line_22"]
-            + summary["line_23"]
-            + summary["line_24"]
-            + summary["line_25"]
-            + summary["line_26"]
-            + summary["line_27"]
-            + summary["line_28d"]
-            + summary["line_29"]
-            + summary["line_30c"]
-        )
-        summary["line_32"] = (
-            summary["line_31"]
-            - summary["line_21aii"]
-            - summary["line_30aii"]
-        )
-        summary["line_33"] = (
-            summary["line_11d"]
-        )
-        summary["line_34"] = (
-            summary["line_28d"]
-        )
-        summary["line_35"] = (
-            summary["line_33"]
-            - summary["line_34"]
-        )
-        summary["line_36"] = (
-            summary["line_21ai"]
-            + summary["line_21b"]
-        )
-        summary["line_37"] = (
-            summary["line_15"]
-        )
-        summary["line_38"] = (
-            summary["line_36"]
-            - summary["line_37"]
-        )
-        summary["line_6c"] = (
-            summary["line_11d"]
-            + summary["line_12"]
-            + summary["line_13"]
-            + summary["line_14"]
-            + summary["line_15"]
-            + summary["line_16"]
-            + summary["line_17"]
-            + summary["line_18c"]
-        )
-        summary["line_6d"] = (
-            summary["line_6b"]
-            + summary["line_6c"]
-        )
-        summary["line_7"] = (
-            summary["line_31"]
-        )
-        summary["line_8"] = (
-            summary["line_6d"]
-            - summary["line_7"]
-        )
-        summary["line_19"] = (
-            summary["line_6c"]
-        )
-        summary["line_20"] = (
-            summary["line_19"]
-            - summary["line_18c"]
-        )
+        column_a["line_7"] = column_a["line_31"]
+        column_a["line_19"] = column_a["line_6c"]
+        column_a["line_20"] = column_a["line_19"] - column_a["line_18c"]
 
         # Remove temporary aggregations to clean up the summary
-        for key in list(summary.keys()):
+        for key in list(column_a.keys()):
             if key.startswith("temp_"):
-                summary.pop(key)
+                column_a.pop(key)
 
-        return summary
+        return column_a
 
     def calculate_summary_column_b(self):
         committee = self.report.committee_account
@@ -186,11 +130,13 @@ class SummaryService:
         report_year = report_date.year
 
         ytd_transactions = Transaction.objects.filter(
-            committee_account=committee, date__year=report_year, date__lte=report_date,
+            committee_account=committee,
+            date__year=report_year,
+            date__lte=report_date,
         )
 
         # build summary
-        summary = ytd_transactions.aggregate(
+        column_b = ytd_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
             line_11aii=self.get_line("SA11AII"),
             line_11b=self.get_line("SA11B"),
@@ -214,124 +160,89 @@ class SummaryService:
             line_30b=self.get_line("SB30B"),
         )
 
+        column_b["line_11aiii"] = column_b["line_11ai"] + column_b["line_11aii"]
+        column_b["line_11d"] = (
+            column_b["line_11aiii"] + column_b["line_11b"] + column_b["line_11c"]
+        )
+        column_b["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_21c"] = (
+            column_b["line_21ai"] + column_b["line_21aii"] + column_b["line_21b"]
+        )
+        column_b["line_25"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_28d"] = (
+            column_b["line_28a"] + column_b["line_28b"] + column_b["line_28c"]
+        )
+        column_b["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
+        column_b["line_30c"] = (
+            column_b["line_30ai"] + column_b["line_30aii"] + column_b["line_30b"]
+        )
+        column_b["line_31"] = (
+            column_b["line_21c"]
+            + column_b["line_22"]
+            + column_b["line_23"]
+            + column_b["line_24"]
+            + column_b["line_25"]
+            + column_b["line_26"]
+            + column_b["line_27"]
+            + column_b["line_28d"]
+            + column_b["line_29"]
+            + column_b["line_30c"]
+        )
+        column_b["line_32"] = (
+            column_b["line_31"] - column_b["line_21aii"] - column_b["line_30aii"]
+        )
+        column_b["line_33"] = column_b["line_11d"]
+        column_b["line_34"] = column_b["line_28d"]
+        column_b["line_35"] = column_b["line_33"] - column_b["line_34"]
+        column_b["line_36"] = column_b["line_21ai"] + column_b["line_21b"]
+        column_b["line_37"] = column_b["line_15"]
+        column_b["line_38"] = column_b["line_36"] - column_b["line_37"]
+        column_b["line_6c"] = (
+            column_b["line_11d"]
+            + column_b["line_12"]
+            + column_b["line_13"]
+            + column_b["line_14"]
+            + column_b["line_15"]
+            + column_b["line_16"]
+            + column_b["line_17"]
+            + column_b["line_18c"]
+        )
+        column_b["line_7"] = column_b["line_31"]
+        column_b["line_19"] = column_b["line_6c"]
+        column_b["line_20"] = column_b["line_19"] - column_b["line_18c"]
+
+        return column_b
+
+    def calculate_cash_on_hand_fields(self, column_a, column_b):
         reports_from_prior_years = Report.objects.filter(
             committee_account=self.report.committee_account,
             coverage_through_date__year__lt=self.report.coverage_from_date.year,
-            form_3x__isnull=False
+            form_3x__isnull=False,
         ).order_by("coverage_from_date")
 
         if reports_from_prior_years.count() > 0:
-            summary["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
+            column_b["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
+        elif self.previous_report:
+            column_b["line_6a"] = self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
         else:
-            l6a_sources_in_year = Report.objects.filter(
-                committee_account=self.report.committee_account,
-                coverage_through_date__year=self.report.coverage_from_date.year,
-                form_3x__L6a_cash_on_hand_jan_1_ytd__gt=0
-            ).order_by("coverage_from_date")
+            # user defined cash on hand
+            column_b["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
-            if l6a_sources_in_year.count() > 0:
-                summary["line_6a"] = l6a_sources_in_year.first().form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
-            else:
-                summary["line_6a"] = Decimal("0.00")
+        if self.previous_report:
+            column_a["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
+        else:
+            # user defined cash on hand
+            column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
-        summary["line_11aiii"] = (
-            summary["line_11ai"]
-            + summary["line_11aii"]
-        )
-        summary["line_11d"] = (
-            summary["line_11aiii"]
-            + summary["line_11b"]
-            + summary["line_11c"]
-        )
-        summary["line_18c"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21ai"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21aii"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_21c"] = (
-            summary["line_21ai"]
-            + summary["line_21aii"]
-            + summary["line_21b"]
-        )
-        summary["line_25"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_28d"] = (
-            summary["line_28a"]
-            + summary["line_28b"]
-            + summary["line_28c"]
-        )
-        summary["line_30ai"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_30aii"] = Decimal(0)  # Stubbed out until a future ticket
-        summary["line_30c"] = (
-            summary["line_30ai"]
-            + summary["line_30aii"]
-            + summary["line_30b"]
-        )
-        summary["line_31"] = (
-            summary["line_21c"]
-            + summary["line_22"]
-            + summary["line_23"]
-            + summary["line_24"]
-            + summary["line_25"]
-            + summary["line_26"]
-            + summary["line_27"]
-            + summary["line_28d"]
-            + summary["line_29"]
-            + summary["line_30c"]
-        )
-        summary["line_32"] = (
-            summary["line_31"]
-            - summary["line_21aii"]
-            - summary["line_30aii"]
-        )
-        summary["line_33"] = (
-            summary["line_11d"]
-        )
-        summary["line_34"] = (
-            summary["line_28d"]
-        )
-        summary["line_35"] = (
-            summary["line_33"]
-            - summary["line_34"]
-        )
-        summary["line_36"] = (
-            summary["line_21ai"]
-            + summary["line_21b"]
-        )
-        summary["line_37"] = (
-            summary["line_15"]
-        )
-        summary["line_38"] = (
-            summary["line_36"]
-            - summary["line_37"]
-        )
-        summary["line_6c"] = (
-            summary["line_11d"]
-            + summary["line_12"]
-            + summary["line_13"]
-            + summary["line_14"]
-            + summary["line_15"]
-            + summary["line_16"]
-            + summary["line_17"]
-            + summary["line_18c"]
-        )
-        summary["line_6d"] = (
-            summary["line_6a"]
-            + summary["line_6c"]
-        )
-        summary["line_7"] = (
-            summary["line_31"]
-        )
-        summary["line_8"] = (
-            summary["line_6d"]
-            - summary["line_7"]
-        )
-        summary["line_19"] = (
-            summary["line_6c"]
-        )
-        summary["line_20"] = (
-            summary["line_19"]
-            - summary["line_18c"]
-        )
-
-        return summary
+        if column_a["line_6b"] and column_b["line_6a"]:
+            column_a["line_6d"] = column_a["line_6b"] + column_a["line_6c"]
+            column_a["line_8"] = column_a["line_6d"] - column_a["line_7"]
+            column_b["line_6d"] = column_b["line_6a"] + column_b["line_6c"]
+            column_b["line_8"] = column_b["line_6d"] - column_b["line_7"]
+        return column_a, column_b
 
     def get_line(self, form_type, field="amount"):
         query = Q(~Q(memo_code=True), form_type=form_type)
