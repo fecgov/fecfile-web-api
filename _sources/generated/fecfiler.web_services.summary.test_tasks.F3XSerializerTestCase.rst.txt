@@ -113,6 +113,7 @@ fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
       ~F3XSerializerTestCase.subTest
       ~F3XSerializerTestCase.tearDown
       ~F3XSerializerTestCase.tearDownClass
+      ~F3XSerializerTestCase.test_report_group_recalculation
       ~F3XSerializerTestCase.test_report_with_no_transactions
       ~F3XSerializerTestCase.test_summary_task
    

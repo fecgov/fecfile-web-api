@@ -1,0 +1,6 @@
+fecfiler.web\_services.summary.tasks.get\_reports\_to\_calculate
+================================================================
+
+.. currentmodule:: fecfiler.web_services.summary.tasks
+
+.. autofunction:: get_reports_to_calculate

@@ -36,4 +36,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0003_reportf99_report_report_f99
    fecfiler.reports.migrations.0004_form1m_report_form_1m
    fecfiler.reports.migrations.0005_form99_text
+   fecfiler.reports.migrations.0006_report_calculation_token
 

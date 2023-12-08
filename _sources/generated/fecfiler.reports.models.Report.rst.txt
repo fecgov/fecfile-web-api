@@ -65,6 +65,7 @@ fecfiler.reports.models.Report
    
       ~Report.all_objects
       ~Report.calculation_status
+      ~Report.calculation_token
       ~Report.committee_account
       ~Report.committee_account_id
       ~Report.confirmation_email_1

@@ -20,6 +20,7 @@ fecfiler.web\_services.summary.summary.SummaryService
    .. autosummary::
    
       ~SummaryService.__init__
+      ~SummaryService.calculate_cash_on_hand_fields
       ~SummaryService.calculate_summary
       ~SummaryService.calculate_summary_column_a
       ~SummaryService.calculate_summary_column_b
