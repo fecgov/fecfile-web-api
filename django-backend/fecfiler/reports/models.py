@@ -9,6 +9,7 @@ from .managers import ReportManager
 from .form_3x.models import Form3X
 from .form_24.models import Form24
 from .form_99.models import Form99
+from .form_1m.models import Form1M
 import logging
 
 
@@ -68,6 +69,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     form_3x = models.ForeignKey(Form3X, on_delete=models.CASCADE, null=True, blank=True)
     form_24 = models.ForeignKey(Form24, on_delete=models.CASCADE, null=True, blank=True)
     form_99 = models.ForeignKey(Form99, on_delete=models.CASCADE, null=True, blank=True)
+    form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
 
@@ -166,6 +168,29 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             fkey.save()
             return fkey.id
         return None
+
+    def get_future_in_progress_reports(
+        self,
+    ):
+        return Report.objects.get_queryset().filter(
+            ~Q(id=self.id),
+            committee_account=self.committee_account_id,
+            upload_submission__isnull=True,
+            coverage_through_date__gte=self.coverage_through_date,
+        )
+
+    def get_form_name(self):
+        for form_key in TABLE_TO_FORM:
+            if getattr(self, form_key, None):
+                return TABLE_TO_FORM.get(form_key)
+
+
+TABLE_TO_FORM = {
+    "form_3x": "F3X",
+    "form_24": "F24",
+    "form_99": "F99",
+    "form_1m": "F1M",
+}
 
 
 class ReportMixin(models.Model):

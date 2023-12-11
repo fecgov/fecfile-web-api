@@ -115,5 +115,5 @@ class LinkedContactSerializerMixin(ModelSerializer):
                 )
             contact: Contact = Contact.objects.create(**contact_data)
             validated_data[contact_key + "_id"] = contact.id
-        else:
+        elif contact_data:
             Contact.objects.filter(id=contact_id).update(**contact_data)

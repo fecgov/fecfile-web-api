@@ -26,8 +26,11 @@ class ScheduleC2(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
+    def get_transaction(self):
+        return self.transaction_set.first()
+
     def get_date(self):
-        return self.transaction.report.through_date
+        return self.get_transaction().report.coverage_through_date
 
     def update_with_contact(self, contact):
         self.guarantor_last_name = contact.last_name

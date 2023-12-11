@@ -1,0 +1,36 @@
+[
+    {
+        "model": "reports.Form99",
+        "fields": {
+            "id": "11111111-1111-1111-1111-111111111111",
+            "street_1": "test_string_value",
+            "street_2": "test_string_value",
+            "city": "test_string_value",
+            "state": "test_string_value",
+            "zip": "test_string_value",
+            "text_code": "ABC",
+            "text": "\nBEHOLD! A large text string\nwith new lines"
+        }
+    },
+    {
+        "model": "reports.report",
+        "fields": {
+            "id": "11111111-1111-1111-1111-111111111111",
+            "form_99_id": "11111111-1111-1111-1111-111111111111",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "form_type": "F99",
+            "report_code": "Q1",
+            "calculation_status": null,
+            "coverage_from_date": "2005-01-30",
+            "coverage_through_date": "2005-02-28",
+            "treasurer_last_name": "Lastname",
+            "treasurer_first_name": "Firstname",
+            "treasurer_middle_name": "test_string_value",
+            "treasurer_prefix": "test_string_value",
+            "treasurer_suffix": "test_string_value",
+            "date_signed": "2004-07-29",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]

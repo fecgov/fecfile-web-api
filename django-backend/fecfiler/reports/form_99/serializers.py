@@ -19,6 +19,7 @@ class Form99Serializer(ReportSerializer):
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
     text_code = CharField(required=False, allow_null=True)
+    text = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
@@ -45,7 +46,8 @@ class Form99Serializer(ReportSerializer):
             return updated
 
     def validate(self, data):
-        self.context["fields_to_ignore"] = self.context.get(
+        self._context = self.context.copy()
+        self._context["fields_to_ignore"] = self._context.get(
             "fields_to_ignore", ["filer_committee_id_number"]
         )
         return super().validate(data)

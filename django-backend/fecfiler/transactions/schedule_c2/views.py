@@ -1,32 +1,46 @@
-import logging
-
-from .serializers import ScheduleC2TransactionSerializer
-from fecfiler.transactions.views import TransactionViewSet
+from django.db import models
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.managers import Schedule
-from rest_framework.viewsets import ModelViewSet
+from django.forms.models import model_to_dict
+from fecfiler.transactions.schedule_c2.models import ScheduleC2
+import copy
 
-logger = logging.getLogger(__name__)
+
+def save_hook(transaction: Transaction, is_existing):
+    if not transaction.parent_transaction.memo_code:
+        if not is_existing:
+            create_in_future_reports(transaction)
+        else:
+            update_in_future_reports(transaction)
 
 
-class ScheduleC2TransactionViewSet(TransactionViewSet):
-    queryset = Transaction.objects.select_related("schedule_c2").filter(
-        schedule=Schedule.C2.value
+def create_in_future_reports(transaction):
+    future_reports = transaction.report.get_future_in_progress_reports()
+    for report in future_reports:
+        loan_query = Transaction.objects.filter(
+            report_id=report.id, loan_id=transaction.parent_transaction.id
+        )
+        if loan_query.count():
+            report.pull_forward_loan_guarantor(
+                copy.deepcopy(transaction), loan_query.first()
+            )
+
+
+def update_in_future_reports(transaction):
+    future_reports = transaction.report.get_future_in_progress_reports()
+
+    transaction_copy = copy.deepcopy(model_to_dict(transaction))
+    # model_to_dict doesn't copy id
+    del transaction_copy["report"]
+    transactions_to_update = Transaction.objects.filter(
+        transaction_id=transaction.transaction_id,
+        report_id__in=models.Subquery(future_reports.values("id")),
     )
-    serializer_class = ScheduleC2TransactionSerializer
-    ordering_fields = [
-        "id",
-        "line_label_order_key",
-        "transaction_type_identifier",
-        "guarantor_last_name",
-        "guarantor_first_name",
-    ]
+    transactions_to_update.update(**transaction_copy)
 
-    def create(self, request):
-        return super(ModelViewSet, self).create(request)
-
-    def update(self, request, pk=None):
-        return super(ModelViewSet, self).update(request, pk)
-
-    def partial_update(self, request, pk=None):
-        return super(ModelViewSet, self).partial_update(request, pk)
+    schedule_c2_copy = copy.deepcopy(model_to_dict(transaction.schedule_c2))
+    schedule_c2s_to_update = ScheduleC2.objects.filter(
+        transaction__schedule_c2_id__in=models.Subquery(
+            transactions_to_update.values("schedule_c2_id")
+        )
+    )
+    schedule_c2s_to_update.update(**schedule_c2_copy)

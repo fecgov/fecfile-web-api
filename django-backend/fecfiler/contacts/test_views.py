@@ -274,3 +274,29 @@ class ContactViewSetTest(TestCase):
         response = DeletedContactsViewSet.as_view({"post": "restore"})(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
+
+    def test_update(self):
+        contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+        )
+        request = self.factory.put(
+            f"/api/v1/contacts/{str(contact.id)}/",
+            {
+                "first_name": "Other",
+                "last_name": "other",
+                "street_1": "1",
+                "city": "here",
+                "zip": "1",
+                "state": "MD",
+                "country": "USA",
+                "type": "IND",
+            },
+            "application/json",
+        )
+        force_authenticate(request, self.user)
+        response = ContactViewSet.as_view({"put": "update"})(request, pk=contact.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["first_name"], "Other")
