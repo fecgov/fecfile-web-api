@@ -55,6 +55,8 @@ def calculate_summary(report_id):
 
         # line 6a
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", None)
+        report.form_3x.L6a_year_for_above_ytd = b.get("line_6a_year", None)
+
         # line 6b
         report.form_3x.L6b_cash_on_hand_beginning_period = a.get("line_6b", None)
         # line 6c
