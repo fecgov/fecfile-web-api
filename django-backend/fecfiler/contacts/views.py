@@ -11,6 +11,7 @@ from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
+    FEC_API_CANDIDATE_ENDPOINT,
     FEC_API_KEY,
 )
 from rest_framework.decorators import action
@@ -30,6 +31,14 @@ NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharFie
 NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )
+
+
+def validate_candidate(candidate_id):
+    return len(candidate_id) == 9
+
+
+def sanitize(candidate_id):
+    return candidate_id
 
 
 class ContactViewSet(CommitteeOwnedViewSet):
@@ -71,6 +80,17 @@ class ContactViewSet(CommitteeOwnedViewSet):
         "id",
     ]
     ordering = ["-created"]
+
+    @action(detail=False)
+    def candidate(self, request):
+        candidate_id = request.query_params.get("candidate_id")
+        if candidate_id is None:
+            return HttpResponseBadRequest()
+        if validate_candidate(candidate_id) is False:
+            return HttpResponseBadRequest()
+        url = FEC_API_CANDIDATE_ENDPOINT + sanitize(candidate_id) + "/"
+        return JsonResponse(requests.get(url, params=urlencode(
+            {"api_key": FEC_API_KEY})).json())
 
     @action(detail=False)
     def candidate_lookup(self, request):
