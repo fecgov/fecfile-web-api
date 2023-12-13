@@ -8,12 +8,14 @@ but are called different names"""
 
 class ReportManager(SoftDeleteManager):
     def get_queryset(self):
-        foo = super().get_queryset().filter(form_3x__isnull=False)
-        print(f"AHOY{foo}")
         older_f3x = (
             super()
             .get_queryset()
-            .filter(form_3x__isnull=False, created__lt=OuterRef("created"))
+            .filter(
+                form_3x__isnull=False,
+                committee_account_id=OuterRef("committee_account_id"),
+                created__lt=OuterRef("created"),
+            )
         )
         queryset = (
             super()
