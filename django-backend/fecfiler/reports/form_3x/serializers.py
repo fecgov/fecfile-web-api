@@ -345,8 +345,9 @@ class Form3XSerializer(ReportSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             form_3x_data = get_model_data(validated_data, Form3X)
-            form_3x = Form3X.objects.create(**form_3x_data)
             report_data = get_model_data(validated_data, Report)
+            form_3x_data["L6a_year_for_above_ytd"] = report_data["coverage_from_date"].year  # noqa: E501
+            form_3x = Form3X.objects.create(**form_3x_data)
             report_data["form_3x_id"] = form_3x.id
             report = super().create(report_data)
             return report
