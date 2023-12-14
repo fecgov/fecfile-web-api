@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0007\_update\_l6a\_coh\_year.update\_coh\_year
+==========================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0007_update_l6a_coh_year
+
+.. autofunction:: update_coh_year
