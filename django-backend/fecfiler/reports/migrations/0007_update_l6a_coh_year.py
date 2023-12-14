@@ -4,7 +4,8 @@ from django.db import migrations
 def update_coh_year(apps, schema_editor):
     Report = apps.get_model("reports", "Report")  # noqa
     reports_to_update = Report.objects.filter(
-        form_3x__isnull=False
+        form_3x__isnull=False,
+        coverage_from_date__isnull=False
     )
     for report in reports_to_update:
         year = report.coverage_from_date.year
