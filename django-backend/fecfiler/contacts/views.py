@@ -33,11 +33,9 @@ NAME_REVERSED_CLAUSE = Concat(
 )
 
 
-def validate_candidate(candidate_id):
-    return len(candidate_id) == 9
-
-
-def sanitize(candidate_id):
+def validate_and_sanitize_candidate(candidate_id):
+    if candidate_id is None:
+        raise AssertionError("No Candidate ID provided")
     return candidate_id
 
 
@@ -84,13 +82,13 @@ class ContactViewSet(CommitteeOwnedViewSet):
     @action(detail=False)
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
-        if candidate_id is None:
+        try:
+            url = (FEC_API_CANDIDATE_ENDPOINT
+                   + validate_and_sanitize_candidate(candidate_id) + "/")
+            return JsonResponse(requests.get(url, params=urlencode(
+                {"api_key": FEC_API_KEY})).json())
+        except AssertionError:
             return HttpResponseBadRequest()
-        if validate_candidate(candidate_id) is False:
-            return HttpResponseBadRequest()
-        url = FEC_API_CANDIDATE_ENDPOINT + sanitize(candidate_id) + "/"
-        return JsonResponse(requests.get(url, params=urlencode(
-            {"api_key": FEC_API_KEY})).json())
 
     @action(detail=False)
     def candidate_lookup(self, request):
@@ -246,7 +244,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(
-        self, request, param_name: str, default_param_value: int, max_param_value: int
+            self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
         if request:
             param_val = request.GET.get(param_name, "")
