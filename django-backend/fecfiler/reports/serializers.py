@@ -111,7 +111,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 if not representation.get(property):
                     representation[property] = form_1m[property]
 
-        if not representation["is_first"]:
+        if not representation.get("is_first"):
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
