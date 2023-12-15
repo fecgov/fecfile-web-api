@@ -1,0 +1,6 @@
+fecfiler.contacts.views.validate\_and\_sanitize\_candidate
+==========================================================
+
+.. currentmodule:: fecfiler.contacts.views
+
+.. autofunction:: validate_and_sanitize_candidate

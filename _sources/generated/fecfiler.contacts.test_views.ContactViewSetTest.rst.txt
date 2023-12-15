@@ -113,6 +113,7 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.subTest
       ~ContactViewSetTest.tearDown
       ~ContactViewSetTest.tearDownClass
+      ~ContactViewSetTest.test_candidate
       ~ContactViewSetTest.test_candidate_lookup_happy_path
       ~ContactViewSetTest.test_candidate_lookup_no_auth
       ~ContactViewSetTest.test_candidate_lookup_no_q

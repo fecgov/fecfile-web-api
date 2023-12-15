@@ -12,6 +12,13 @@ fecfiler.contacts.views
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      validate_and_sanitize_candidate
+   
    
 
    

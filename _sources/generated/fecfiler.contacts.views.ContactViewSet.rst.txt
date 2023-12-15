@@ -21,6 +21,7 @@ fecfiler.contacts.views.ContactViewSet
    
       ~ContactViewSet.__init__
       ~ContactViewSet.as_view
+      ~ContactViewSet.candidate
       ~ContactViewSet.candidate_lookup
       ~ContactViewSet.check_object_permissions
       ~ContactViewSet.check_permissions
