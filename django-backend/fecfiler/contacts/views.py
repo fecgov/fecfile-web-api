@@ -11,6 +11,7 @@ from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
+    FEC_API_CANDIDATE_ENDPOINT,
     FEC_API_KEY,
 )
 from rest_framework.decorators import action
@@ -30,6 +31,12 @@ NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharFie
 NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )
+
+
+def validate_and_sanitize_candidate(candidate_id):
+    if candidate_id is None:
+        raise AssertionError("No Candidate ID provided")
+    return candidate_id
 
 
 class ContactViewSet(CommitteeOwnedViewSet):
@@ -71,6 +78,17 @@ class ContactViewSet(CommitteeOwnedViewSet):
         "id",
     ]
     ordering = ["-created"]
+
+    @action(detail=False)
+    def candidate(self, request):
+        candidate_id = request.query_params.get("candidate_id")
+        try:
+            url = (FEC_API_CANDIDATE_ENDPOINT
+                   + validate_and_sanitize_candidate(candidate_id) + "/")
+            return JsonResponse(requests.get(url, params=urlencode(
+                {"api_key": FEC_API_KEY})).json())
+        except AssertionError:
+            return HttpResponseBadRequest()
 
     @action(detail=False)
     def candidate_lookup(self, request):
@@ -226,7 +244,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(
-        self, request, param_name: str, default_param_value: int, max_param_value: int
+            self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
         if request:
             param_val = request.GET.get(param_name, "")
