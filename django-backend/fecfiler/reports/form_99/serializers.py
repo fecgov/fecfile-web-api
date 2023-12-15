@@ -19,7 +19,7 @@ class Form99Serializer(ReportSerializer):
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
     text_code = CharField(required=False, allow_null=True)
-    text = CharField(required=False, allow_null=True)
+    text_message = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
