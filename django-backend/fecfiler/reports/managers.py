@@ -1,5 +1,5 @@
 from fecfiler.soft_delete.managers import SoftDeleteManager
-from django.db.models import Case, When, Value, OuterRef, Exists, Q
+from django.db.models import Case, When, Value, OuterRef, Exists
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
