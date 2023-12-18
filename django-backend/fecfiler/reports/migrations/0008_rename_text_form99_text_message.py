@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0006_report_calculation_token'),
+        ('reports', '0007_update_l6a_coh_year'),
     ]
 
     operations = [
