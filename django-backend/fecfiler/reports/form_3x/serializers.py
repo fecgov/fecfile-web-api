@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
+    is_first = BooleanField(read_only=True, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
@@ -345,8 +346,9 @@ class Form3XSerializer(ReportSerializer):
     def create(self, validated_data: dict):
         with transaction.atomic():
             form_3x_data = get_model_data(validated_data, Form3X)
-            form_3x = Form3X.objects.create(**form_3x_data)
             report_data = get_model_data(validated_data, Report)
+            form_3x_data["L6a_year_for_above_ytd"] = report_data["coverage_from_date"].year  # noqa: E501
+            form_3x = Form3X.objects.create(**form_3x_data)
             report_data["form_3x_id"] = form_3x.id
             report = super().create(report_data)
             return report
@@ -392,7 +394,7 @@ class Form3XSerializer(ReportSerializer):
                 for f in Form3X._meta.get_fields()
                 if f.name not in ["committee_name", "report"]
             ]
-            + ["fields_to_validate"]
+            + ["fields_to_validate", "is_first"]
         )
 
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "deleted", "created", "updated", "is_first"]

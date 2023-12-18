@@ -1,9 +1,5 @@
 from fecfiler.soft_delete.managers import SoftDeleteManager
-from django.db.models import (
-    Case,
-    When,
-    Value,
-)
+from django.db.models import Case, When, Value, OuterRef, Exists
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
@@ -12,6 +8,15 @@ but are called different names"""
 
 class ReportManager(SoftDeleteManager):
     def get_queryset(self):
+        older_f3x = (
+            super()
+            .get_queryset()
+            .filter(
+                form_3x__isnull=False,
+                committee_account_id=OuterRef("committee_account_id"),
+                created__lt=OuterRef("created"),
+            )
+        )
         queryset = (
             super()
             .get_queryset()
@@ -21,6 +26,7 @@ class ReportManager(SoftDeleteManager):
                     When(form_24__isnull=False, then=ReportType.F24.value),
                     When(form_99__isnull=False, then=ReportType.F99.value),
                 ),
+                is_first=~Exists(older_f3x),
             )
         )
         return queryset
