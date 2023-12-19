@@ -8,9 +8,6 @@
             "city": "test_string_value",
             "state": "test_string_value",
             "zip": "test_string_value",
-            "treasurer_first_name": "test_string_value",
-            "treasurer_last_name": "test_string_value",
-            "date_signed": "2005-01-30",
             "text_code": "ABC",
             "message_text": "\nBEHOLD! A large text string\nwith new lines"
         }
