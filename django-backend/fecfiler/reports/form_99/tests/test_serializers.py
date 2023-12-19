@@ -23,6 +23,7 @@ class F99SerializerTestCase(TestCase):
             "state": "AL",
             "zip": "12345",
             "text_code": "MSM",
+            "message_text": "A message to FEC",
             "fields_to_validate": [f.name for f in Form99._meta.get_fields()],
         }
 
