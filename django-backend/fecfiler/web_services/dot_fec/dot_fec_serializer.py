@@ -121,7 +121,8 @@ def extract_row_config(schema_name):
     schema = validate.get_schema(schema_name)
     schema_properties = schema.get("properties", {}).items()
     column_sequences = {
-        v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties if v.get("fec_spec", {}).get("COL_SEQ", None)
+        v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in \
+            schema_properties if v.get("fec_spec", {}).get("COL_SEQ", None)
     }
     row_length = max(column_sequences.keys())
     return column_sequences, row_length
