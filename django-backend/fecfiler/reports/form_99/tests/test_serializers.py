@@ -14,6 +14,7 @@ class F99SerializerTestCase(TestCase):
     def setUp(self):
         self.valid_f99_report = {
             "form_type": "F99N",
+            "committee_name": "my committee",
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",

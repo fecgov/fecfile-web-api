@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class Form99Serializer(ReportSerializer):
     schema_name = "F99"
 
+    committee_name = CharField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
     city = CharField(required=False, allow_null=True)
@@ -58,7 +59,7 @@ class Form99Serializer(ReportSerializer):
             + [
                 f.name
                 for f in Form99._meta.get_fields()
-                if f.name not in ["committee_name", "report"]
+                if f.name not in ["report"]
             ]
             + ["fields_to_validate"]
         )
