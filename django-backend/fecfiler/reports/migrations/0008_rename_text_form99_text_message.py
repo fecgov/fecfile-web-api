@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='form99',
             old_name='text',
-            new_name='text_message',
+            new_name='message_text',
         ),
     ]

@@ -23,7 +23,7 @@ class Form99(models.Model):
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     text_code = models.TextField(null=True, blank=True)
-    text_message = models.TextField(null=True, blank=True)
+    message_text = models.TextField(null=True, blank=True)
 
     class Meta:
         app_label = "reports"
