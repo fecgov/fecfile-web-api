@@ -211,7 +211,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
 
         """Free text"""
         if report.get_form_name() == "F99":
-            file_content = add_free_text(file_content, report.form_99.text)
+            file_content = add_free_text(file_content, report.form_99.message_text)
 
         return file_content
     except Exception as error:
