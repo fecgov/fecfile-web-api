@@ -50,14 +50,15 @@ fecfiler.reports.form\_99.models.Form99
    .. autosummary::
    
       ~Form99.city
+      ~Form99.committee_name
       ~Form99.id
+      ~Form99.message_text
       ~Form99.objects
       ~Form99.pk
       ~Form99.report_set
       ~Form99.state
       ~Form99.street_1
       ~Form99.street_2
-      ~Form99.text
       ~Form99.text_code
       ~Form99.zip
    

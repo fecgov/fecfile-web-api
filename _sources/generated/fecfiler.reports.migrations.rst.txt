@@ -38,4 +38,6 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0005_form99_text
    fecfiler.reports.migrations.0006_report_calculation_token
    fecfiler.reports.migrations.0007_update_l6a_coh_year
+   fecfiler.reports.migrations.0008_rename_text_form99_text_message
+   fecfiler.reports.migrations.0009_form99_committee_name
 
