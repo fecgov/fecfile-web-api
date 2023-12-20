@@ -135,7 +135,7 @@ def add_free_text(content, text):
         (content or "")
         + "[BEGINTEXT]"
         + CRLF_STR
-        + text
+        + (text or "")
         + CRLF_STR
         + "[ENDTEXT]"
         + CRLF_STR
