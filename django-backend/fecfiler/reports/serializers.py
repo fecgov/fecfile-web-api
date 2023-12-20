@@ -115,8 +115,9 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
-        request = self.context["request"]
-        representation["filer_committee_id_number"] = request.user.cmtee_id
+        if self.context:
+            request = self.context["request"]
+            representation["filer_committee_id_number"] = request.user.cmtee_id
 
         return representation
 
