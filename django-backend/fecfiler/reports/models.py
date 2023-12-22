@@ -208,8 +208,6 @@ class ReportMixin(models.Model):
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
             if report_date is not None:
-                report_year = report_date.year
-
                 reports_to_flag_for_recalculation = Report.objects.filter(
                     committee_account=committee,
                     coverage_from_date__gte=report_date,
