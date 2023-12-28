@@ -1,7 +1,7 @@
 ---
 applications:
   - name: fecfile-web-services
-    instances: 1
+    instances: 2
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
