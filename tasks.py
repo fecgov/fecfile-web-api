@@ -86,7 +86,7 @@ def _login_to_cf(ctx, space):
 
 def _do_deploy(ctx, space):
 
-    manifest_filename = f"manifest-{space}.yml"
+    manifest_filename = f"manifests/manifest-{space}.yml"
     existing_deploy = ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
     print("\n")
 
@@ -98,7 +98,7 @@ def _do_deploy(ctx, space):
 
 
 def _deploy_web_services(ctx):
-    manifest_filename = "manifest-web-services.yml"
+    manifest_filename = "manifests/manifest-web-services.yml"
     existing_deploy = ctx.run(f"cf app {WEB_SERVICES_NAME}", echo=True, warn=True)
     print("\n")
 
