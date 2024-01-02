@@ -12,6 +12,11 @@ APP_NAME = "fecfile-web-api"
 WEB_SERVICES_NAME = "fecfile-web-services"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
+MANIFEST_LABEL = {
+    APP_NAME: "api",
+    WEB_SERVICES_NAME: "web-services",
+}
+
 
 def _resolve_rule(repo, branch):
     """Get space associated with first matching rule."""
@@ -84,27 +89,15 @@ def _login_to_cf(ctx, space):
         exit(1)
 
 
-def _do_deploy(ctx, space):
+def _do_deploy(ctx, space, app):
 
-    manifest_filename = f"manifest-{space}.yml"
-    existing_deploy = ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
+    manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
+    existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
 
     cmd = "push --strategy rolling" if existing_deploy.ok else "push"
     new_deploy = ctx.run(
-        f"cf {cmd} {APP_NAME} -f {manifest_filename}", echo=True, warn=True,
-    )
-    return new_deploy
-
-
-def _deploy_web_services(ctx):
-    manifest_filename = "manifest-web-services.yml"
-    existing_deploy = ctx.run(f"cf app {WEB_SERVICES_NAME}", echo=True, warn=True)
-    print("\n")
-
-    cmd = "push --strategy rolling" if existing_deploy.ok else "push"
-    new_deploy = ctx.run(
-        f"cf {cmd} {WEB_SERVICES_NAME} -f {manifest_filename}", echo=True, warn=True,
+        f"cf {cmd} {app} -f {manifest_filename}", echo=True, warn=True,
     )
     return new_deploy
 
@@ -134,10 +127,10 @@ def _print_help_text():
     print(help_text)
 
 
-def _rollback(ctx):
+def _rollback(ctx, app):
     print("Build failed!")
     # Check if there are active deployments
-    app_guid = ctx.run(f"cf app {APP_NAME} --guid", hide=True, warn=True)
+    app_guid = ctx.run(f"cf app {app} --guid", hide=True, warn=True)
     app_guid_formatted = app_guid.stdout.strip()
     status = ctx.run(
         f'cf curl "/v3/deployments?app_guids={app_guid_formatted}&status_values=ACTIVE"',
@@ -151,9 +144,9 @@ def _rollback(ctx):
     if active_deployments > 0:
         print("Attempting to roll back any deployment in progress...")
         # Show the in-between state
-        ctx.run(f"cf app {APP_NAME}", echo=True, warn=True)
+        ctx.run(f"cf app {app}", echo=True, warn=True)
         cancel_deploy = ctx.run(
-            f"cf cancel-deployment {APP_NAME}", echo=True, warn=True
+            f"cf cancel-deployment {app}", echo=True, warn=True
         )
         if cancel_deploy.ok:
             print("Successfully cancelled deploy. Check logs.")
@@ -197,22 +190,12 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    new_deploy = _do_deploy(ctx, space)
+    for app in [APP_NAME, WEB_SERVICES_NAME]:
+        new_deploy = _do_deploy(ctx, space, app)
 
-    if not new_deploy.ok:
-        _rollback(ctx)
-        return sys.exit(1)
-
-    new_webservices_deploy = _deploy_web_services(ctx)
-
-    if not new_webservices_deploy.ok:
-        _rollback(ctx)
-        return sys.exit(1)
-
-    ctx.run("cf apps", echo=True, warn=True)
-    print(
-        f"A new version of your application '{APP_NAME}' has been successfully pushed!"
-    )
+        if not new_deploy.ok:
+            _rollback(ctx, app)
+            return sys.exit(1)
 
     # Needed for CircleCI
     return sys.exit(0)
