@@ -14,6 +14,7 @@ class F99SerializerTestCase(TestCase):
     def setUp(self):
         self.valid_f99_report = {
             "form_type": "F99N",
+            "committee_name": "my committee",
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",
@@ -23,6 +24,7 @@ class F99SerializerTestCase(TestCase):
             "state": "AL",
             "zip": "12345",
             "text_code": "MSM",
+            "message_text": "A message to FEC",
             "fields_to_validate": [f.name for f in Form99._meta.get_fields()],
         }
 

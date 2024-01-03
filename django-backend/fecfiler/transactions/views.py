@@ -34,6 +34,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
         "schedule_a__contributor_organization_name",
         "schedule_b__payee_organization_name",
         "schedule_c__lender_organization_name",
+        "schedule_c1__lender_organization_name",
         "schedule_d__creditor_organization_name",
         "schedule_e__payee_organization_name",
     ),
@@ -42,6 +43,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
             "schedule_a__contributor_last_name",
             "schedule_b__payee_last_name",
             "schedule_c__lender_last_name",
+            "schedule_c2__guarantor_last_name",
             "schedule_d__creditor_last_name",
             "schedule_e__payee_last_name",
         ),
@@ -50,6 +52,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
             "schedule_a__contributor_first_name",
             "schedule_b__payee_first_name",
             "schedule_c__lender_first_name",
+            "schedule_c2__guarantor_first_name",
             "schedule_d__creditor_first_name",
             "schedule_e__payee_first_name",
         ),
@@ -64,6 +67,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "line_label_order_key",
+        "created",
         "transaction_type_identifier",
         "memo_code",
         "name",
@@ -83,7 +87,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         queryset = (
             super()
             .get_queryset()
-            .alias(
+            .annotate(
                 name=DISPLAY_NAME_CLAUSE,
             )
         )
@@ -230,6 +234,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
+        transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
@@ -267,17 +272,32 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
 
         for child_transaction_data in children:
-            child_transaction_data["parent_transaction_id"] = transaction_instance.id
-            child_transaction_data.pop("parent_transaction", None)
-            if child_transaction_data.get("use_parent_contact", None):
+            if type(child_transaction_data) is str:
+                child_transaction = self.get_queryset().get(id=child_transaction_data)
+                child_transaction.parent_transaction_id = transaction_instance.id
+                child_transaction.save()
+            else:
                 child_transaction_data[
-                    "contact_1_id"
-                ] = transaction_instance.contact_1_id
-                del child_transaction_data["contact_1"]
+                    "parent_transaction_id"
+                ] = transaction_instance.id
+                child_transaction_data.pop("parent_transaction", None)
+                if child_transaction_data.get("use_parent_contact", None):
+                    child_transaction_data[
+                        "contact_1_id"
+                    ] = transaction_instance.contact_1_id
+                    del child_transaction_data["contact_1"]
 
-            self.save_transaction(child_transaction_data, request)
+                self.save_transaction(child_transaction_data, request)
 
         return self.queryset.get(id=transaction_instance.id)
+
+    @action(detail=False, methods=["put"], url_path=r"multisave")
+    def save_transactions(self, request):
+        with db_transaction.atomic():
+            saved_data = [self.save_transaction(data, request) for data in request.data]
+        return Response(
+            [TransactionSerializer().to_representation(data) for data in saved_data]
+        )
 
 
 def noop(transaction, is_existing):

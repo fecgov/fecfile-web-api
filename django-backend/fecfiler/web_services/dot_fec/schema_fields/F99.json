@@ -1,7 +1,9 @@
 {
     "form_type": {},
     "filer_committee_id_number": {},
-    "committee_name": {},
+    "committee_name": {
+        "path": "form_99.committee_name"
+    },
     "street_1": {
         "path": "form_99.street_1"
     },

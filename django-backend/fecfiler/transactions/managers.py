@@ -255,12 +255,14 @@ class TransactionManager(SoftDeleteManager):
                     output_field=TextField(),
                 ),
                 back_reference_tran_id_number=Coalesce(
+                    F("reatt_redes__transaction_id"),
                     F("parent_transaction__transaction_id"),
                     F("debt__transaction_id"),
                     F("loan__transaction_id"),
                     Value(None),
                 ),
                 back_reference_sched_name=Coalesce(
+                    F("reatt_redes___form_type"),
                     F("parent_transaction___form_type"),
                     F("debt___form_type"),
                     F("loan___form_type"),
@@ -269,8 +271,10 @@ class TransactionManager(SoftDeleteManager):
                 line_label=Case(
                     # Schedule A
                     When(_form_type="SA11A", then=Value("11(a)")),
-                    When(_form_type="SA11AI", then=Value("11(a)(i)")),
-                    When(_form_type="SA11AII", then=Value("11(a)(i)")),
+                    When(_form_type="SA11AI", itemized=True, then=Value("11(a)(i)")),
+                    When(_form_type="SA11AI", itemized=False, then=Value("11(a)(ii)")),
+                    When(_form_type="SA11AII", itemized=False, then=Value("11(a)(ii)")),
+                    When(_form_type="SA11AII", itemized=True, then=Value("11(a)(i)")),
                     When(_form_type="SA11B", then=Value("11(b)")),
                     When(_form_type="SA11C", then=Value("11(c)")),
                     When(_form_type="SA12", then=Value("12")),
@@ -299,8 +303,40 @@ class TransactionManager(SoftDeleteManager):
                     # Schedule E
                     When(_form_type="SE", then=Value("24")),
                 ),
-                line_label_order_key=Concat(
-                    "line_label", "form_type", output_field=TextField()
+                line_label_order_key=Case(
+                    # Schedule A
+                    When(_form_type="SA11A", then=Value(3)),
+                    When(_form_type="SA11AI", itemized=True, then=Value(4)),
+                    When(_form_type="SA11AI", itemized=False, then=Value(5)),
+                    When(_form_type="SA11AII", itemized=False, then=Value(5)),
+                    When(_form_type="SA11AII", itemized=True, then=Value(4)),
+                    When(_form_type="SA11B", then=Value(6)),
+                    When(_form_type="SA11C", then=Value(7)),
+                    When(_form_type="SA12", then=Value(8)),
+                    When(_form_type="SA13", then=Value(9)),
+                    When(_form_type="SA14", then=Value(10)),
+                    When(_form_type="SA15", then=Value(11)),
+                    When(_form_type="SA16", then=Value(12)),
+                    When(_form_type="SA17", then=Value(13)),
+                    # Schedule B
+                    When(_form_type="SB21B", then=Value(14)),
+                    When(_form_type="SB22", then=Value(15)),
+                    When(_form_type="SB23", then=Value(16)),
+                    When(_form_type="SB26", then=Value(18)),
+                    When(_form_type="SB27", then=Value(19)),
+                    When(_form_type="SB28A", then=Value(20)),
+                    When(_form_type="SB28B", then=Value(21)),
+                    When(_form_type="SB28C", then=Value(22)),
+                    When(_form_type="SB29", then=Value(23)),
+                    When(_form_type="SB30B", then=Value(24)),
+                    # Schedule C
+                    When(_form_type="SC/10", then=Value(2)),
+                    When(_form_type="SC/9", then=Value(1)),
+                    # Schedule D
+                    When(_form_type="SD9", then=Value(1)),
+                    When(_form_type="SD10", then=Value(2)),
+                    # Schedule E
+                    When(_form_type="SE", then=Value(17)),
                 ),
             )
             .annotate(

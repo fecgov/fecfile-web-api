@@ -28,6 +28,11 @@ class Form3XViewSetTest(TestCase):
                 "report_code": "Q1",
             },
             {
+                "coverage_from_date": "2005-03-01",
+                "coverage_through_date": "2005-03-31",
+                "report_code": "M4",
+            },
+            {
                 "coverage_from_date": "2006-01-30",
                 "coverage_through_date": "2006-02-28",
                 "report_code": "MY",

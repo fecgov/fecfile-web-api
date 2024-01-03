@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
@@ -22,15 +21,6 @@ class Form3XViewSet(ReportViewSet):
     )
 
     serializer_class = Form3XSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "form_type",
-        "report_code_label",
-        "coverage_through_date",
-        "upload_submission__fec_status",
-        "submission_status",
-    ]
-    ordering = ["form_type"]
 
     @action(detail=False)
     def coverage_dates(self, request):

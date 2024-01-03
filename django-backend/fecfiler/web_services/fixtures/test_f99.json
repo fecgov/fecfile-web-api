@@ -9,7 +9,7 @@
             "state": "test_string_value",
             "zip": "test_string_value",
             "text_code": "ABC",
-            "text": "\nBEHOLD! A large text string\nwith new lines"
+            "message_text": "\nBEHOLD! A large text string\nwith new lines"
         }
     },
     {

@@ -52,7 +52,7 @@ class DotFECSerializerTestCase(TestCase):
         content = compose_dot_fec("11111111-1111-1111-1111-111111111111", None)
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[15], "ABC\r")
+        self.assertEqual(split_report_row[14], "ABC\r")
         free_text = content[content.find("[BEGINTEXT]"):]
         self.assertEqual(
             free_text,
