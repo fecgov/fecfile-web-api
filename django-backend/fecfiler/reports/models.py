@@ -43,9 +43,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     date_signed = models.DateField(null=True, blank=True)
     calculation_status = models.CharField(max_length=255, null=True, blank=True)
     calculation_token = models.UUIDField(  # Prevents race conditions in summary calc.
-        null=True,
-        blank=True,
-        default=None
+        null=True, blank=True, default=None
     )
 
     confirmation_email_1 = models.EmailField(
@@ -210,11 +208,8 @@ class ReportMixin(models.Model):
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
             if report_date is not None:
-                report_year = report_date.year
-
                 reports_to_flag_for_recalculation = Report.objects.filter(
                     committee_account=committee,
-                    coverage_from_date__year=report_year,
                     coverage_from_date__gte=report_date,
                 )
             else:
