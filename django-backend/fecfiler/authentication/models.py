@@ -40,8 +40,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, unique=True)
     cmtee_id = models.CharField(max_length=9)
     contact = models.CharField(max_length=10)
-    first_name = models.CharField(max_length=40, blank=True)
-    last_name = models.CharField(max_length=40, blank=True)
+    first_name = models.CharField(max_length=40, null=True, blank=True)
+    last_name = models.CharField(max_length=40, null=True, blank=True)
     role = models.CharField(max_length=40, blank=True)
     tagline = models.CharField(max_length=140, blank=True)
     delete_ind = models.CharField(max_length=1, blank=False, default="N")
@@ -64,11 +64,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
     login_code_counter = models.CharField(max_length=1, blank=False, default=0)
-    register_token = models.CharField(max_length=32, blank=True)
-    personal_key = models.CharField(max_length=64, blank=True)
-    status = models.CharField(max_length=15, blank=True)
+    register_token = models.CharField(max_length=32, null=True, blank=True)
+    personal_key = models.CharField(max_length=64, null=True, blank=True)
+    status = models.CharField(max_length=15, null=True, blank=True)
     code_generated_counter = models.CharField(max_length=2, blank=False, default=0)
-    secret_key = models.CharField(max_length=100, blank=True)
+    secret_key = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         unique_together = (("username", "email"),)
