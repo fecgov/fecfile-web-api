@@ -13,8 +13,7 @@ class Command(BaseCommand):
         'connections_utilization_pctg',
     )
 
-    def get_pg_stat_activity(self):
-        SQL = """
+    SQL = """
         SELECT
         A.total_connections AS {},
         A.non_idle_connections AS {},
@@ -29,10 +28,12 @@ class Command(BaseCommand):
          FROM pg_stat_activity) A,
         (SELECT setting AS max_connections FROM pg_settings
          WHERE name='max_connections') B;
-        """.format(*self.COLUMN_LABELS)
+        """.format(*COLUMN_LABELS)
+
+    def get_pg_stat_activity(self):
 
         with connection.cursor() as cursor:
-            cursor.execute(SQL)
+            cursor.execute(self.SQL)
             results = cursor.fetchall()
 
         return results
