@@ -6,61 +6,109 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('reports', '0001_initial'),
+        ("reports", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DotFEC',
+            name="DotFEC",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('file_name', models.TextField()),
-                ('report', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.report')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("file_name", models.TextField()),
+                (
+                    "report",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="reports.report",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'dot_fecs',
+                "db_table": "dot_fecs",
             },
         ),
         migrations.CreateModel(
-            name='WebPrintSubmission',
+            name="WebPrintSubmission",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('fecfile_task_state', models.CharField(max_length=255)),
-                ('fecfile_error', models.TextField(null=True)),
-                ('fec_submission_id', models.CharField(max_length=255, null=True)),
-                ('fec_status', models.CharField(max_length=255, null=True)),
-                ('fec_message', models.TextField(null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('fec_image_url', models.CharField(max_length=255, null=True)),
-                ('fec_batch_id', models.CharField(max_length=255, null=True)),
-                ('fec_email', models.CharField(max_length=255, null=True)),
-                ('dot_fec', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.dotfec')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("fecfile_task_state", models.CharField(max_length=255)),
+                ("fecfile_error", models.TextField(null=True)),
+                ("fec_submission_id", models.CharField(max_length=255, null=True)),
+                ("fec_status", models.CharField(max_length=255, null=True)),
+                ("fec_message", models.TextField(null=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("fec_image_url", models.CharField(max_length=255, null=True)),
+                ("fec_batch_id", models.CharField(max_length=255, null=True)),
+                ("fec_email", models.CharField(max_length=255, null=True)),
+                (
+                    "dot_fec",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="web_services.dotfec",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'webprint_submissions',
+                "db_table": "webprint_submissions",
             },
         ),
         migrations.CreateModel(
-            name='UploadSubmission',
+            name="UploadSubmission",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('fecfile_task_state', models.CharField(max_length=255)),
-                ('fecfile_error', models.TextField(null=True)),
-                ('fec_submission_id', models.CharField(max_length=255, null=True)),
-                ('fec_status', models.CharField(max_length=255, null=True)),
-                ('fec_message', models.TextField(null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('fec_report_id', models.CharField(max_length=255, null=True)),
-                ('dot_fec', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.dotfec')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("fecfile_task_state", models.CharField(max_length=255)),
+                ("fecfile_error", models.TextField(null=True)),
+                ("fec_submission_id", models.CharField(max_length=255, null=True)),
+                ("fec_status", models.CharField(max_length=255, null=True)),
+                ("fec_message", models.TextField(null=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("fec_report_id", models.CharField(max_length=255, null=True)),
+                (
+                    "dot_fec",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="web_services.dotfec",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'upload_submissions',
+                "db_table": "upload_submissions",
             },
         ),
     ]

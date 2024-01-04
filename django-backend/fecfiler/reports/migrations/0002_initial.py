@@ -5,23 +5,32 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('reports', '0001_initial'),
-        ('web_services', '0001_initial'),
+        ("reports", "0001_initial"),
+        ("web_services", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='report',
-            name='upload_submission',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.uploadsubmission'),
+            model_name="report",
+            name="upload_submission",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.uploadsubmission",
+            ),
         ),
         migrations.AddField(
-            model_name='report',
-            name='webprint_submission',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='web_services.webprintsubmission'),
+            model_name="report",
+            name="webprint_submission",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="web_services.webprintsubmission",
+            ),
         ),
     ]
