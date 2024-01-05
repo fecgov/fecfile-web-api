@@ -8,6 +8,17 @@ from ..authentication.models import Account
 from .models import Contact
 from .views import ContactViewSet, DeletedContactsViewSet
 
+mock_results = {
+    "results": [
+        {"name": "LNAME, FNAME I", "id": "P60012143", "office_sought": "P"},
+        {
+            "name": "LNAME, FNAME",
+            "id": "P60012465",
+            "office_sought": "P",
+        },
+    ]
+}
+
 
 def mocked_requests_get_candidates(*args, **kwargs):
     class MockResponse:
@@ -18,19 +29,7 @@ def mocked_requests_get_candidates(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    return MockResponse(
-        {
-            "results": [
-                {"name": "BIDEN, JOE R", "id": "P60012143", "office_sought": "P"},
-                {
-                    "name": "BIDEN, JR., JOSEPH R.",
-                    "id": "P60012465",
-                    "office_sought": "P",
-                },
-            ]
-        },
-        200,
-    )
+    return MockResponse(mock_results, 200)
 
 
 def mocked_requests_get_committees(*args, **kwargs):
@@ -60,6 +59,19 @@ class ContactViewSetTest(TestCase):
         self.user = Account.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
 
+    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    def test_candidate(self, mock_get):
+        request = self.factory.get(
+            "/api/v1/contacts/candidate?"
+            "candidate_id=P60012143"
+        )
+        request.user = self.user
+        response = ContactViewSet.as_view({"get": "candidate"})(request)
+
+        expected_json = mock_results
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
+
     def test_candidate_lookup_no_auth(self):
         request = self.factory.get("/api/v1/contacts/candidate_lookup")
 
@@ -88,9 +100,9 @@ class ContactViewSetTest(TestCase):
 
         expected_json = {
             "fec_api_candidates": [
-                {"name": "BIDEN, JOE R", "id": "P60012143", "office_sought": "P"},
+                {"name": "LNAME, FNAME I", "id": "P60012143", "office_sought": "P"},
                 {
-                    "name": "BIDEN, JR., JOSEPH R.",
+                    "name": "LNAME, FNAME",
                     "id": "P60012465",
                     "office_sought": "P",
                 },

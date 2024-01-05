@@ -255,12 +255,14 @@ class TransactionManager(SoftDeleteManager):
                     output_field=TextField(),
                 ),
                 back_reference_tran_id_number=Coalesce(
+                    F("reatt_redes__transaction_id"),
                     F("parent_transaction__transaction_id"),
                     F("debt__transaction_id"),
                     F("loan__transaction_id"),
                     Value(None),
                 ),
                 back_reference_sched_name=Coalesce(
+                    F("reatt_redes___form_type"),
                     F("parent_transaction___form_type"),
                     F("debt___form_type"),
                     F("loan___form_type"),

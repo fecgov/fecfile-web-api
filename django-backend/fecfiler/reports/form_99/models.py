@@ -17,14 +17,14 @@ class Form99(models.Model):
         unique=True,
     )
 
+    committee_name = models.TextField(null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)
     state = models.TextField(null=True, blank=True)
     zip = models.TextField(null=True, blank=True)
     text_code = models.TextField(null=True, blank=True)
-
-    text = models.TextField(null=True, blank=True)
+    message_text = models.TextField(null=True, blank=True)
 
     class Meta:
         app_label = "reports"
