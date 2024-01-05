@@ -211,6 +211,7 @@ class TransactionSerializer(
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        print(f"RENDERING {instance.id}")
         schedule_a = representation.pop("schedule_a")
         schedule_b = representation.pop("schedule_b")
         schedule_c = representation.pop("schedule_c")
@@ -218,17 +219,20 @@ class TransactionSerializer(
         schedule_c2 = representation.pop("schedule_c2")
         schedule_d = representation.pop("schedule_d")
         schedule_e = representation.pop("schedule_e")
-        if instance.children.count() > 0:
-            representation["children"] = [child.id for child in instance.children]
+        if instance.children_set.count() > 0:
+            representation["children"] = [child.id for child in instance.children_set]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            total = instance.reatt_redes_associations.filter(
-                schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
+                ).aggregate(Sum("amount"))["amount__sum"]
+                or 0.0
+            )
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
@@ -239,16 +243,19 @@ class TransactionSerializer(
 
             # For REDESIGNATED transactions, calculate the amount that has
             # been redesignated for the transaction
-            total = instance.reatt_redes_associations.filter(
-                schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
+                ).aggregate(Sum("amount"))["amount__sum"]
+                or 0.0
+            )
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
         if schedule_c:
-            loan_agreement = instance.children.filter(
+            loan_agreement = instance.children_set.filter(
                 transaction_type_identifier="C1_LOAN_AGREEMENT"
             ).first()
             representation["loan_agreement_id"] = (

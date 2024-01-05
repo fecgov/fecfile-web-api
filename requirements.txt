@@ -6,8 +6,10 @@ coreschema==0.0.4
 decorator==5.1.1
 dj-database-url==1.0.0
 dj-static==0.0.6
+Faker==22.0.0
 Django==4.2.7
 django-cors-headers==3.13.0
+django-silk==5.0.4
 django-storages==1.13.1
 djangorestframework==3.14.0
 drf-spectacular==0.24.2

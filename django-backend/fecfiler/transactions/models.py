@@ -29,7 +29,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     transaction_type_identifier = models.TextField(null=True, blank=True)
     aggregation_group = models.TextField(null=True, blank=True)
     parent_transaction = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="childrens",
     )
     debt = models.ForeignKey(
         "self",
@@ -126,8 +130,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     objects = TransactionManager()
 
     @property
-    def children(self):
-        return self.transaction_set.all()
+    def children_set(self):
+        return self.childrens.all()
 
     def get_schedule_name(self):
         for schedule_key in TABLE_TO_SCHEDULE:

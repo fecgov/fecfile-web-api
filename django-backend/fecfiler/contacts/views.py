@@ -83,10 +83,14 @@ class ContactViewSet(CommitteeOwnedViewSet):
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
         try:
-            url = (FEC_API_CANDIDATE_ENDPOINT
-                   + validate_and_sanitize_candidate(candidate_id) + "/")
-            return JsonResponse(requests.get(url, params=urlencode(
-                {"api_key": FEC_API_KEY})).json())
+            url = (
+                FEC_API_CANDIDATE_ENDPOINT
+                + validate_and_sanitize_candidate(candidate_id)
+                + "/"
+            )
+            return JsonResponse(
+                requests.get(url, params=urlencode({"api_key": FEC_API_KEY})).json()
+            )
         except AssertionError:
             return HttpResponseBadRequest()
 
@@ -240,11 +244,11 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
-            propagate_contact(None, self.get_object())
+            propagate_contact(self.get_committee().id, None, self.get_object())
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(
-            self, request, param_name: str, default_param_value: int, max_param_value: int
+        self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
         if request:
             param_val = request.GET.get(param_name, "")

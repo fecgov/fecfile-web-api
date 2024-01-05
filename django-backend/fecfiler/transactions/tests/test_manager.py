@@ -61,3 +61,6 @@ class TransactionManagerTestCase(TestCase):
     def test_line_label(self):
         refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
         self.assertEqual(refund.line_label, "21(b)")
+
+    # def test_fast(self):
+    #     Transaction.objects.get_owned_data()

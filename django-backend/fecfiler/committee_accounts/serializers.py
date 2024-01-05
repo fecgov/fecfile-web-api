@@ -19,8 +19,10 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         """Extract committee_id from request to assign the corresponding
         CommitteeAccount as the owner of the object
         """
+        data["committee_account"] = self.get_committee().id
+        return super().to_internal_value(data)
+
+    def get_committee(self):
         request = self.context["request"]
         committee_id = request.user.cmtee_id
-        committee = CommitteeAccount.objects.get(committee_id=committee_id)
-        data["committee_account"] = committee.id
-        return super().to_internal_value(data)
+        return CommitteeAccount.objects.get(committee_id=committee_id)

@@ -1,4 +1,5 @@
 import logging
+from silk.profiling.profiler import silk_profile
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
@@ -79,48 +80,35 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     ]
     ordering = ["-created"]
 
-    # Allow requests to filter transactions output based on schedule type by
-    # passing a query parameter
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects
 
     def get_queryset(self):
-        queryset = (
-            super()
-            .get_queryset()
-            .annotate(
-                name=DISPLAY_NAME_CLAUSE,
-            )
+        queryset = Transaction.objects.annotate(
+            name=DISPLAY_NAME_CLAUSE,
         )
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
             schedules_to_include = schedule_filters.split(",")
             # All transactions are included by default, here we remove those
             # that are not identified in the schedules query param
-            if "A" not in schedules_to_include:
-                queryset = queryset.filter(schedule_a__isnull=True)
-            if "B" not in schedules_to_include:
-                queryset = queryset.filter(schedule_b__isnull=True)
-            if "C" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c__isnull=True)
-            if "C1" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c1__isnull=True)
-            if "C2" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c2__isnull=True)
-            if "D" not in schedules_to_include:
-                queryset = queryset.filter(schedule_d__isnull=True)
-            if "E" not in schedules_to_include:
-                queryset = queryset.filter(schedule_e__isnull=True)
+            queryset = queryset.filter(
+                schedule__in=[
+                    Schedule[schedule].value for schedule in schedules_to_include
+                ]
+            )
 
         parent_id = self.request.query_params.get("parent")
         if parent_id:
             queryset = queryset.filter(parent_transaction_id=parent_id)
         return queryset
 
+    @silk_profile(name="CREATE TRANSACTION")
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
+    @silk_profile(name="UPDATE TRANSACTION")
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
@@ -130,6 +118,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    @silk_profile(name="LIST TRANSACTIONS")
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         return response
@@ -217,14 +206,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def propagate_contacts(self, transaction):
+        committee_id = self.get_committee().id
         contact_1 = Contact.objects.get(id=transaction.contact_1_id)
-        propagate_contact(transaction, contact_1)
+        propagate_contact(committee_id, transaction, contact_1)
         contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
         if contact_2:
-            propagate_contact(transaction, contact_2)
+            propagate_contact(committee_id, transaction, contact_2)
         contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
         if contact_3:
-            propagate_contact(transaction, contact_3)
+            propagate_contact(committee_id, transaction, contact_3)
 
     def save_transaction(self, transaction_data, request):
         children = transaction_data.pop("children", [])
@@ -314,7 +304,7 @@ def get_save_hook(transaction: Transaction):
     return hooks.get(schedule_name, noop)
 
 
-def propagate_contact(transaction, contact):
+def propagate_contact(committee_id, transaction, contact):
     other_transactions = Transaction.objects.filter(
         ~Q(id=getattr(transaction, "id", None)),
         Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),

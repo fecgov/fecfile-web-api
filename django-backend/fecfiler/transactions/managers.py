@@ -8,7 +8,7 @@ from fecfiler.transactions.schedule_b.managers import (
 from fecfiler.transactions.schedule_e.managers import (
     over_two_hundred_types as schedule_e_over_two_hundred_types,
 )
-from django.db.models.functions import Coalesce, Concat
+from django.db.models.functions import Coalesce, Concat, Lag
 from django.db.models import (
     OuterRef,
     Subquery,
@@ -22,7 +22,11 @@ from django.db.models import (
     TextField,
     DecimalField,
     ExpressionWrapper,
+    RowRange,
+    Window,
 )
+from django.db.models.expressions import RawSQL
+from django.contrib.postgres.expressions import ArraySubquery
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
@@ -32,7 +36,173 @@ but are called different names"""
 
 
 class TransactionManager(SoftDeleteManager):
+    entity_aggregate_window = {
+        "partition_by": [
+            F("contact_1_id"),
+            F("date__year"),
+            F("aggregation_group"),
+        ],
+        "order_by": ["date", "created"],
+        "frame": RowRange(None, 0),
+    }
+    election_aggregate_window = {
+        "partition_by": [
+            F("schedule_e__election_code"),
+            F("schedule_e__so_candidate_office"),
+            F("schedule_e__so_candidate_state"),
+            F("schedule_e__so_candidate_district"),
+            F("date__year"),
+            F("aggregation_group"),
+        ],
+        "order_by": ["date", "created"],
+        "frame": RowRange(None, 0),
+    }
+    loan_payment_window = {
+        "partition_by": [F("loan_key")],
+        "order_by": ["loan_key"],
+        "frame": RowRange(None, 0),
+    }
+    debt_payment_window = {
+        "partition_by": [F("debt_key")],
+        "order_by": ["debt_key"],
+        "frame": RowRange(None, 0),
+    }
+
     def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                schedule=Case(
+                    When(schedule_a__isnull=False, then=Schedule.A.value),
+                    When(schedule_b__isnull=False, then=Schedule.B.value),
+                    When(schedule_c__isnull=False, then=Schedule.C.value),
+                    When(schedule_c1__isnull=False, then=Schedule.C1.value),
+                    When(schedule_c2__isnull=False, then=Schedule.C2.value),
+                    When(schedule_d__isnull=False, then=Schedule.D.value),
+                    When(schedule_e__isnull=False, then=Schedule.E.value),
+                ),
+                date=Coalesce(
+                    "schedule_a__contribution_date",
+                    "schedule_b__expenditure_date",
+                    "schedule_c__loan_incurred_date",
+                    "schedule_e__disbursement_date",
+                    "schedule_e__dissemination_date",
+                ),
+                amount=Coalesce(
+                    "schedule_a__contribution_amount",
+                    "schedule_b__expenditure_amount",
+                    "schedule_c__loan_amount",
+                    "schedule_c2__guaranteed_amount",
+                    "debt__schedule_d__incurred_amount",
+                    "schedule_d__incurred_amount",
+                    "schedule_e__expenditure_amount",
+                ),
+                effective_amount=self.get_amount_clause(),
+                aggregate=Window(
+                    expression=Sum("effective_amount"), **self.entity_aggregate_window
+                )
+                - Case(  # https://code.djangoproject.com/ticket/29850
+                    When(force_unaggregated=True, then=F("effective_amount")),
+                    default=Value(0.0),
+                    output_field=DecimalField(),
+                ),
+                calendar_ytd_per_election_office=Window(
+                    expression=Sum("effective_amount"), **self.election_aggregate_window
+                )
+                - Case(  # https://code.djangoproject.com/ticket/29850
+                    When(force_unaggregated=True, then=F("effective_amount")),
+                    default=Value(0.0),
+                    output_field=DecimalField(),
+                ),
+                loan_key=Case(
+                    When(
+                        Q(loan_id__isnull=False)
+                        & Q(
+                            schedule__in=[
+                                Schedule.A.value,
+                                Schedule.B.value,
+                                Schedule.E.value,
+                            ]
+                        )
+                        & Q(
+                            transaction_type_identifier__in=[
+                                "LOAN_REPAYMENT_RECEIVED",
+                                "LOAN_REPAYMENT_MADE",
+                            ]
+                        ),
+                        then=Concat(F("loan__transaction_id"), F("date")),
+                    ),
+                    When(
+                        schedule_c__isnull=False,
+                        then=Concat(
+                            F("transaction_id"), F("report__coverage_from_date")
+                        ),
+                    ),
+                    default=None,
+                    output_field=TextField(),
+                ),
+                loan_payment_to_date=Window(
+                    expression=Sum("effective_amount"), **self.loan_payment_window
+                )
+                - Case(
+                    When(
+                        schedule_c__isnull=False,
+                        then=F("effective_amount"),
+                    ),
+                    default=Value(0.0),
+                    output_field=DecimalField(),
+                ),
+                loan_balance=F("amount") - F("loan_payment_to_date"),
+                debt_key=Case(
+                    When(
+                        Q(debt_id__isnull=False)
+                        & Q(
+                            schedule__in=[
+                                Schedule.A.value,
+                                Schedule.B.value,
+                                Schedule.E.value,
+                            ]
+                        ),
+                        then=Concat(F("debt__transaction_id"), F("date")),
+                    ),
+                    When(
+                        schedule_d__isnull=False,
+                        then=Concat(
+                            F("transaction_id"), F("report__coverage_from_date")
+                        ),
+                    ),
+                    default=None,
+                    output_field=TextField(),
+                ),
+                debt_payment_=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=Window(
+                            expression=Sum("effective_amount"),
+                            **self.debt_payment_window
+                        )
+                        - F("effective_amount"),
+                    ),
+                    default=Value(0.0),
+                    output_field=DecimalField(),
+                ),
+                balance=Coalesce(
+                    F("loan_balance"),
+                    Value(
+                        Decimal(0.0)
+                    ),  # F("balance_at_close"), F("loan_balance"), Value(Decimal(0.0))
+                ),
+                line_label_order_key=F("_form_type"),
+                itemized=self.get_itemization_clause(),
+                children=ArraySubquery(
+                    super()
+                    .get_queryset()
+                    .filter(parent_transaction_id=OuterRef("id"))
+                    .values("id")
+                ),
+            )
+        )
         queryset = (
             super()
             .get_queryset()
@@ -65,8 +235,8 @@ class TransactionManager(SoftDeleteManager):
                 effective_amount=self.get_amount_clause(),
             )
         )
-
         primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
+
         election_clause = (
             Q(schedule_e__isnull=False)
             & Q(parent_transaction__isnull=True)
@@ -118,6 +288,7 @@ class TransactionManager(SoftDeleteManager):
             .annotate(aggregate=Sum("effective_amount"))
             .values("aggregate")
         )
+
         calendar_ytd_per_election_office_clause = (
             queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
@@ -401,6 +572,46 @@ class TransactionManager(SoftDeleteManager):
             ),
             default="amount",
             output_field=DecimalField(),
+        )
+
+    def committee_transactions(self, committee_id):
+        return super().get_queryset().filter(committee_account_id=committee_id)
+
+    def fast(self, committee_id):
+        return self.committee_transactions(committee_id).annotate(
+            schedule=Case(
+                When(schedule_a__isnull=False, then=Schedule.A.value),
+                When(schedule_b__isnull=False, then=Schedule.B.value),
+                When(schedule_c__isnull=False, then=Schedule.C.value),
+                When(schedule_c1__isnull=False, then=Schedule.C1.value),
+                When(schedule_c2__isnull=False, then=Schedule.C2.value),
+                When(schedule_d__isnull=False, then=Schedule.D.value),
+                When(schedule_e__isnull=False, then=Schedule.E.value),
+            ),
+            date=Coalesce(
+                "schedule_a__contribution_date",
+                "schedule_b__expenditure_date",
+                "schedule_c__loan_incurred_date",
+                "schedule_e__disbursement_date",
+                "schedule_e__dissemination_date",
+            ),
+            amount=Coalesce(
+                "schedule_a__contribution_amount",
+                "schedule_b__expenditure_amount",
+                "schedule_c__loan_amount",
+                "schedule_c2__guaranteed_amount",
+                "debt__schedule_d__incurred_amount",
+                "schedule_d__incurred_amount",
+                "schedule_e__expenditure_amount",
+            ),
+            effective_amount=self.get_amount_clause(),
+            # aggregate_window_key=Concat("contact_id","date__year","force_unaggregated")
+            aggregate=Window(
+                expression=Lag("effective_amount", 1, Value(0.0)),
+                **self.aggregate_window
+            )
+            + F("effective_amount"),
+            line_label_order_key=F("_form_type"),
         )
 
 
