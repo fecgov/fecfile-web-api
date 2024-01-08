@@ -3,7 +3,9 @@ from celery import shared_task
 from fecfiler.reports.models import Report
 from django.db.models import Q
 from .summary import SummaryService
+from django.db import connection
 import uuid
+import json
 
 import logging
 
@@ -285,3 +287,39 @@ def calculate_summary(report_id):
             break
 
     return primary_report.id
+
+
+@shared_task
+def get_database_connections():
+
+    COLUMN_LABELS = (
+        'total_connections',
+        'non_idle_connections',
+        'max_connections',
+        'connections_utilization_pctg',
+    )
+
+    SQL = """
+        SELECT
+        A.total_connections AS {},
+        A.non_idle_connections AS {},
+        B.max_connections AS {},
+        ROUND(
+            (100 * A.total_connections::numeric / B.max_connections::numeric), 0
+            )::INTEGER
+            AS {}
+        FROM
+        (SELECT count(1) AS total_connections,
+         SUM(CASE WHEN state!='idle' THEN 1 ELSE 0 END) AS non_idle_connections
+         FROM pg_stat_activity) A,
+        (SELECT setting AS max_connections FROM pg_settings
+         WHERE name='max_connections') B;
+        """.format(*COLUMN_LABELS)
+
+    with connection.cursor() as cursor:
+        cursor.execute(SQL)
+        results = cursor.fetchall()
+
+    results_dict = [dict(zip(COLUMN_LABELS, row)) for row in results]
+    json_data = json.dumps(results_dict)
+    logger.info(json_data)

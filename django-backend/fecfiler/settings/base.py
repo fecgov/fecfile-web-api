@@ -233,6 +233,17 @@ CELERY_WORKER_STORAGE = env.get_credential(
     "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
 )
 
+CELERY_BEAT_SCHEDULE = {
+    'print-db-stats': {
+        'task': 'fecfiler.web_services.summary.tasks.get_database_connections',
+        'schedule': 60.0,
+        'args': (),
+        'options': {
+            'expires': 15.0,
+        },
+    },
+}
+
 """FEC Webload settings
 """
 FEC_FILING_API = env.get_credential("FEC_FILING_API")

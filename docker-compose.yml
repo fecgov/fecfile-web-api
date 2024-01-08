@@ -60,6 +60,41 @@ services:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
 
+  api-scheduler:
+    build:
+      context: './'
+      dockerfile: '${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}'
+    image: fecfile-celery-beat
+    container_name: fecfile-celery-beat
+    volumes:
+      - ./django-backend:/opt/nxg_fec
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL:
+      FECFILE_TEST_DB_NAME:
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.local
+      DJANGO_SECRET_KEY:
+      FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      AWS_STORAGE_BUCKET_NAME:
+      AWS_REGION:
+      CELERY_WORKER_STORAGE:
+      FEC_FILING_API:
+      FEC_FILING_API_KEY:
+      FEC_AGENCY_ID:
+      FILE_AS_TEST_COMMITTEE:
+      TEST_COMMITTEE_PASSWORD:
+      WEBPRINT_EMAIL:
+      OUTPUT_TEST_INFO_IN_DOT_FEC:
+
 
   api:
     build:
