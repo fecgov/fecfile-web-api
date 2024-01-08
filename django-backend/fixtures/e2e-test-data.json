@@ -60,5 +60,13 @@
         "groups": [],
         "user_permissions": []
     }
+},
+{
+    "model": "committee_accounts.CommitteeAccount",
+    "fields": {
+        "committee_id": "C00601211",
+        "created": "2022-02-09T00:00:00.000Z",
+        "updated": "2022-02-09T00:00:00.000Z"
+    }
 }
 ]
