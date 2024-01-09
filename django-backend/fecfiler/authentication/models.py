@@ -47,7 +47,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     delete_ind = models.CharField(max_length=1, blank=False, default="N")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    last_login = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(auto_now=True, null=True)
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,
