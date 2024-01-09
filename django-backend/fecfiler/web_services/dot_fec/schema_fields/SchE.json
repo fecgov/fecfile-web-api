@@ -2,6 +2,8 @@
     "form_type": {},
     "filer_committee_id_number": {},
     "transaction_id": {},
+    "back_reference_tran_id_number": {},
+    "back_reference_sched_name": {},
     "receipt_line_number": {
         "path": "schedule_e.receipt_line_number"
     },
@@ -81,7 +83,7 @@
     "so_candidate_first_name": {
         "path": "schedule_e.so_candidate_first_name"
     },
-    "so_candinate_middle_name": {
+    "so_candidate_middle_name": {
         "path": "schedule_e.so_candidate_middle_name"
     },
     "so_candidate_prefix": {
@@ -121,7 +123,7 @@
     "memo_code": {
         "path": "schedule_e.memo_code"
     },
-    "memo_text/description": {
+    "memo_text_description": {
         "path": "schedule_e.memo_text_description"
     }
 
