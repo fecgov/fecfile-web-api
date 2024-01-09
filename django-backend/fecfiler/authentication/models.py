@@ -36,7 +36,8 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
+    password = models.CharField(_("password"), max_length=128, null=True)
+    email = models.EmailField()
     username = models.CharField(max_length=100, unique=True)
     cmtee_id = models.CharField(max_length=9)
     contact = models.CharField(max_length=10)
