@@ -249,7 +249,7 @@ workflows:
             - dependency-check
           filters:
             branches:
-              only: /develop|release\/sprint-\d+|main/
+              only: /592-prod|592-stage|592-dev/
       - docs-build:
           requires:
             - test
