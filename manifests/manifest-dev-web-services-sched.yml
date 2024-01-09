@@ -1,14 +1,14 @@
 ---
 applications:
-  - name: fecfile-web-services
-    instances: 2
+  - name: fecfile-web-services-sched
+    instances: 1
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
     memory: 500M
     no-route: true
     health-check-type: process
-    command: bin/run-celery-worker.sh
+    command: bin/run-celery-beat.sh
     services:
       - fecfile-api-rds
       - fecfile-api-s3

@@ -10,11 +10,13 @@ env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
 WEB_SERVICES_NAME = "fecfile-web-services"
+WEB_SERVICES_SCHED_NAME = "fecfile-web-services-sched"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 MANIFEST_LABEL = {
     APP_NAME: "api",
     WEB_SERVICES_NAME: "web-services",
+    WEB_SERVICES_SCHED_NAME: "web-services-sched",
 }
 
 
@@ -50,7 +52,8 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    # ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "feature/642-add-celery-worker-and-db-stats"),
 )
 
 
@@ -190,7 +193,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    for app in [APP_NAME, WEB_SERVICES_NAME]:
+    for app in [APP_NAME, WEB_SERVICES_NAME, WEB_SERVICES_SCHED_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
 
         if not new_deploy.ok:

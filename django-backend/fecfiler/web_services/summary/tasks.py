@@ -292,14 +292,14 @@ def calculate_summary(report_id):
 @shared_task
 def get_database_connections():
 
-    COLUMN_LABELS = (
+    column_labels = (
         'total_connections',
         'non_idle_connections',
         'max_connections',
         'connections_utilization_pctg',
     )
 
-    SQL = """
+    sql = """
         SELECT
         A.total_connections AS {},
         A.non_idle_connections AS {},
@@ -314,12 +314,12 @@ def get_database_connections():
          FROM pg_stat_activity) A,
         (SELECT setting AS max_connections FROM pg_settings
          WHERE name='max_connections') B;
-        """.format(*COLUMN_LABELS)
+        """.format(*column_labels)
 
     with connection.cursor() as cursor:
-        cursor.execute(SQL)
+        cursor.execute(sql)
         results = cursor.fetchall()
 
-    results_dict = [dict(zip(COLUMN_LABELS, row)) for row in results]
+    results_dict = [dict(zip(column_labels, row)) for row in results]
     json_data = json.dumps(results_dict)
     logger.info(json_data)
