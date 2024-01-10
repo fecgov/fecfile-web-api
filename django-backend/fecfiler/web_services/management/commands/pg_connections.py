@@ -15,12 +15,11 @@ class Command(BaseCommand):
 
     SQL = """
         SELECT
-        A.total_connections AS {},
-        A.non_idle_connections AS {},
-        B.max_connections AS {},
+        A.total_connections::text AS {},
+        A.non_idle_connections::text AS {},
+        B.max_connections::text AS {},
         ROUND(
-            (100 * A.total_connections::numeric / B.max_connections::numeric), 0
-            )::INTEGER
+            100 * (A.total_connections::numeric / B.max_connections::numeric), 2)::text
             AS {}
         FROM
         (SELECT count(1) AS total_connections,
@@ -40,8 +39,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        pg_stat_activity_data = self.get_pg_stat_activity()
-        keys = self.COLUMN_LABELS
-        results = [dict(zip(keys, row)) for row in pg_stat_activity_data]
-        json_data = json.dumps(results)
+        results = self.get_pg_stat_activity()
+        results_dict = {"results": dict(zip(self.COLUMN_LABELS, row)) for row in results}
+        json_data = json.dumps(results_dict)
         print(json_data)

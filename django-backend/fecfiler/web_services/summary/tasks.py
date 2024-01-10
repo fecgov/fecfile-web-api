@@ -301,12 +301,11 @@ def get_database_connections():
 
     sql = """
         SELECT
-        A.total_connections AS {},
-        A.non_idle_connections AS {},
-        B.max_connections AS {},
+        A.total_connections::text AS {},
+        A.non_idle_connections::text AS {},
+        B.max_connections::text AS {},
         ROUND(
-            (100 * A.total_connections::numeric / B.max_connections::numeric), 0
-            )::INTEGER
+            100 * (A.total_connections::numeric / B.max_connections::numeric), 2)::text
             AS {}
         FROM
         (SELECT count(1) AS total_connections,
@@ -320,6 +319,6 @@ def get_database_connections():
         cursor.execute(sql)
         results = cursor.fetchall()
 
-    results_dict = [dict(zip(column_labels, row)) for row in results]
+    results_dict = {"results": dict(zip(column_labels, row)) for row in results}
     json_data = json.dumps(results_dict)
     logger.info(json_data)
