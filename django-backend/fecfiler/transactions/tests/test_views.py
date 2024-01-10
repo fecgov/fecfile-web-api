@@ -46,14 +46,14 @@ class TransactionViewsTestCase(TestCase):
         updated_payload = deepcopy(self.payloads["IN_KIND"])
         updated_payload["id"] = str(transaction.id)
         updated_payload["contribution_amount"] = 999
-        updated_payload["children"][0]["id"] = str(transaction.children_set[0].id)
+        updated_payload["children"][0]["id"] = str(transaction.transaction_set[0].id)
         updated_payload["children"][0]["expenditure_amount"] = 999
         request = self.request(updated_payload)
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_transaction = Transaction.objects.get(id=transaction.id)
         self.assertEqual(updated_transaction.schedule_a.contribution_amount, 999)
         self.assertEqual(
-            updated_transaction.children_set[0].schedule_b.expenditure_amount, 999
+            updated_transaction.transaction_set[0].schedule_b.expenditure_amount, 999
         )
 
     def test_get_queryset(self):

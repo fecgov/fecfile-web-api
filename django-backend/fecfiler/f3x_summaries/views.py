@@ -2,8 +2,8 @@ from django.http import JsonResponse
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.viewsets import GenericViewSet
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import F3XSummary
 from .report_codes.views import report_code_label_mapping
 from fecfiler.transactions.models import Transaction
@@ -40,14 +40,14 @@ def get_status_mapping():
     )
 
 
-class F3XSummaryViewSet(CommitteeOwnedViewSet):
+class F3XSummaryViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
 
-    Note that this ViewSet inherits from CommitteeOwnedViewSet
+    Note that this ViewSet inherits from CommitteeOwnedViewMixin
     The queryset will be further limited by the user's committee
-    in CommitteeOwnedViewSet's implementation of get_queryset()
+    in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
     queryset = (

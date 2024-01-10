@@ -6,7 +6,10 @@ import requests
 from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from rest_framework import viewsets
+from fecfiler.committee_accounts.views import (
+    CommitteeOwnedViewMixin,
+)
 from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
@@ -39,7 +42,7 @@ def validate_and_sanitize_candidate(candidate_id):
     return candidate_id
 
 
-class ContactViewSet(CommitteeOwnedViewSet):
+class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -47,9 +50,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     serializer_class = ContactSerializer
 
-    """Note that this ViewSet inherits from CommitteeOwnedViewSet
+    """Note that this ViewSet inherits from CommitteeOwnedViewMixin
     The queryset will be further limmited by the user's committee
-    in CommitteeOwnedViewSet's implementation of get_queryset()
+    in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
     queryset = (
@@ -274,7 +277,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewSet,
+    CommitteeOwnedViewMixin,
     mixins.ListModelMixin,
     GenericViewSet,
 ):

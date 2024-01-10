@@ -219,8 +219,10 @@ class TransactionSerializer(
         schedule_c2 = representation.pop("schedule_c2")
         schedule_d = representation.pop("schedule_d")
         schedule_e = representation.pop("schedule_e")
-        if instance.children_set.count() > 0:
-            representation["children"] = [child.id for child in instance.children_set]
+        if instance.transaction_set.count() > 0:
+            representation["children"] = [
+                child.id for child in instance.transaction_set.all()
+            ]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
@@ -255,7 +257,7 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
         if schedule_c:
-            loan_agreement = instance.children_set.filter(
+            loan_agreement = instance.transaction_set.filter(
                 transaction_type_identifier="C1_LOAN_AGREEMENT"
             ).first()
             representation["loan_agreement_id"] = (
