@@ -133,6 +133,7 @@ class TransactionManager(SoftDeleteManager):
                 year_clause,
                 date_clause,
                 group_clause,
+                force_unaggregated_clause,
             )
             .values("committee_account_id")
             .annotate(calendar_ytd_per_election_office=Sum("effective_amount"))
