@@ -88,32 +88,25 @@ class LinkedContactSerializerMixin(ModelSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data, "contact_1")
-            if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
-                self.create_or_update_contact(validated_data, "contact_2")
-            if validated_data.get("contact_3") or validated_data.get("contact_3_id"):
-                self.create_or_update_contact(validated_data, "contact_3")
+            self.write_contacts(validated_data)
             return super().create(validated_data)
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
-            self.create_or_update_contact(validated_data, "contact_1")
-            if validated_data.get("contact_2") or validated_data.get("contact_2_id"):
-                self.create_or_update_contact(validated_data, "contact_2")
-            if validated_data.get("contact_3") or validated_data.get("contact_3_id"):
-                self.create_or_update_contact(validated_data, "contact_3")
+            self.write_contacts(validated_data)
             return super().update(instance, validated_data)
 
-    def create_or_update_contact(self, validated_data: dict, contact_key):
-        contact_data = validated_data.pop(contact_key, None)
-        contact_id = validated_data.get(contact_key + "_id", None)
+    def write_contacts(validated_data: dict):
+        for contact_key in ["contact_1", "contact_2", "contact_3"]:
+            create_or_update_contact(validated_data, contact_key)
 
-        if not contact_id:
-            if not contact_data:
-                raise ValidationError(
-                    {"contact_id": ["No contact or contact id provided"]}
-                )
-            contact: Contact = Contact.objects.create(**contact_data)
-            validated_data[contact_key + "_id"] = contact.id
-        elif contact_data:
-            Contact.objects.filter(id=contact_id).update(**contact_data)
+
+def create_or_update_contact(validated_data: dict, contact_key):
+    contact_data = validated_data.pop(contact_key, None)
+    contact_id = validated_data.get(contact_key + "_id", None)
+
+    if not contact_id and contact_data:
+        contact: Contact = Contact.objects.create(**contact_data)
+        validated_data[contact_key + "_id"] = contact.id
+    elif contact_data:
+        Contact.objects.filter(id=contact_id).update(**contact_data)
