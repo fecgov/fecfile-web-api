@@ -208,15 +208,31 @@ REST_FRAMEWORK = {
 }
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(created)f %(asctime)s %(levelname)s %(name)s %(message)s',
+        },
     },
-    "handlers": {
-        "default": {"class": "logging.StreamHandler", "formatter": "standard"},
+    'handlers': {
+        'default': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'json'
+        },
     },
-    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True}},
+    'loggers': {
+        'django': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        },
+        '': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        },
+    },
 }
 
 """Celery configurations
