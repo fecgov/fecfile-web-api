@@ -9,6 +9,8 @@ from celery import Celery
 from celery.signals import setup_logging
 from django_structlog.celery.steps import DjangoStructLogInitStep
 
+logger = structlog.get_logger(__name__)
+
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fecfiler.settings")
 
@@ -32,55 +34,11 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     Celery and environment-specific logging
     See https://django-structlog.readthedocs.io/en/latest/celery.html
     """
-    if env.space is not None:  # Running in prod
-        loggers = settings.PROD_LOGGERS
-        logger_processors = settings.get_prod_logger_processors
-    else:
-        loggers = settings.LOCAL_LOGGERS
-        logger_processors = settings.get_local_logger_processors
-
-    logging.config.dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "formatters": {
-                "json_formatter": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.processors.JSONRenderer(),
-                },
-                "plain_console": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.dev.ConsoleRenderer(),
-                },
-                "key_value": {
-                    "()": structlog.stdlib.ProcessorFormatter,
-                    "processor": structlog.processors.KeyValueRenderer(
-                        key_order=['timestamp', 'level', 'event', 'logger']
-                    ),
-                },
-            },
-            "handlers": {
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "plain_console",
-                },
-                "json_file": {
-                    "class": "logging.handlers.WatchedFileHandler",
-                    "filename": "logs/json.log",
-                    "formatter": "json_formatter",
-                },
-                "flat_line_file": {
-                    "class": "logging.handlers.WatchedFileHandler",
-                    "filename": "logs/flat_line.log",
-                    "formatter": "key_value",
-                },
-            },
-            "loggers": loggers
-        }
-    )
+    # env.space will be None if we're local, and dev/stage/prod in cloud.gov
+    logging.config.dictConfig(settings.get_env_logging_config(env.space))
 
     structlog.configure(  # noqa
-        processors=logger_processors(),
+        processors=settings.get_env_logging_processors(),
         logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
         cache_logger_on_first_use=True,
     )
@@ -101,4 +59,4 @@ class CeleryStorageType(Enum):
 
 @app.task(bind=True)
 def debug_task(self):
-    print(f"Request: {self.request!r}")
+    logger.debug(f"Request: {self.request!r}")
