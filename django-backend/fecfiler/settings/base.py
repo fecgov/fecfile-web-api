@@ -209,112 +209,107 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
-LOCAL_LOGGERS = {
-    "django_structlog": {
-        "handlers": ["console"],
-        "level": "DEBUG",
-    },
-    "fecfiler": {
-        "handlers": ["console"],
-        "level": "DEBUG",
-    },
-}
 
-# We will need to set these explicitly for Celery too
-PROD_LOGGERS = {
-    "django_structlog": {
-        "handlers": ["cloud"],
-        "level": "INFO",
-    },
-    "fecfiler": {
-        "handlers": ["cloud"],
-        "level": "INFO",
-    },
-}
+def get_env_logging_config(prod=False):
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "json_formatter": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.JSONRenderer(),
+            },
+            "plain_console": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(),
+            },
+            "key_value": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.KeyValueRenderer(
+                    key_order=['timestamp', 'level', 'event', 'logger']
+                ),
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+            },
+            "cloud": {
+                "class": "logging.StreamHandler",
+                "formatter": "json_formatter",
+            },
+        }
+    }
+
+    if prod:
+        logging_config["loggers"] = {
+            "django_structlog": {
+                "handlers": ["cloud"],
+                "level": "INFO",
+            },
+            "fecfiler": {
+                "handlers": ["cloud"],
+                "level": "INFO",
+            },
+        }
+    else:
+        logging_config["loggers"] = {
+            "django_structlog": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+            "fecfiler": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+        }
+
+    return logging_config
 
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "json_formatter": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
-        },
-        "plain_console": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(),
-        },
-        "key_value": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.KeyValueRenderer(
-                key_order=['timestamp', 'level', 'event', 'logger']
-            ),
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "plain_console",
-        },
-        "cloud": {
-            "class": "logging.StreamHandler",
-            "formatter": "json_formatter",
-        },
-    },
-    "loggers": LOCAL_LOGGERS
-}
+def get_env_logging_processors(prod=False):
+    """
+    get logger setup, base logging config, and structlog processors
+    depending on environment
+    env.space will None on local.
+
+    We will need to set these explicitly for Celery too
+    """
+
+    if prod:
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+            # JSON in production
+            structlog.processors.JSONRenderer(),
+        ]
+    else:
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ]
+
+
+LOGGING = get_env_logging_config()
 
 DJANGO_STRUCTLOG_CELERY_ENABLED = True
-
-# Helper functions so these don't get evaluated until we need them
-# need to set them explicitly for Celery too
-
-
-def get_local_logger_processors():
-    """
-    Formatted console logs
-    from https://github.com/jrobichaud/django-structlog?tab=readme-ov-file#installation
-    see also
-    https://www.structlog.org/en/stable/api.html#structlog.stdlib.ProcessorFormatter
-    """
-    return [
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.filter_by_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ]
-
-
-def get_prod_logger_processors():
-    """
-    JSON output configuration
-    From https://www.structlog.org/en/stable/api.html#structlog.processors.JSONRenderer
-
-    structlog.processors.dict_tracebacks is recommended, but we do custom exception
-    handling ("EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler" above)
-    """
-    return [
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.filter_by_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        # JSON in production
-        structlog.processors.JSONRenderer(),
-    ]
-
 
 """Celery configurations
 """
