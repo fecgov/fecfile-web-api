@@ -209,7 +209,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    # TODO: Take a look at this
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
@@ -267,7 +266,6 @@ LOGGING = {
         },
     },
     "loggers": LOCAL_LOGGERS
-    # Use "loggers":PROD_LOGGERS to test json logs
 }
 
 DJANGO_STRUCTLOG_CELERY_ENABLED = True
@@ -301,6 +299,9 @@ def get_prod_logger_processors():
     """
     JSON output configuration
     From https://www.structlog.org/en/stable/api.html#structlog.processors.JSONRenderer
+
+    structlog.processors.dict_tracebacks is recommended, but we do custom exception
+    handling ("EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler" above)
     """
     return [
         structlog.contextvars.merge_contextvars,
@@ -314,7 +315,6 @@ def get_prod_logger_processors():
         structlog.processors.UnicodeDecoder(),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         # JSON in production
-        structlog.processors.dict_tracebacks,  # exception handling
         structlog.processors.JSONRenderer(),
     ]
 
