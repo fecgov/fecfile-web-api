@@ -5,8 +5,6 @@ from django.db.models import Q
 from .summary import SummaryService
 from django.db import connection
 import uuid
-import json
-
 import structlog
 
 logger = structlog.get_logger(__name__)

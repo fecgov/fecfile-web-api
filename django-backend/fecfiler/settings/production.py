@@ -10,7 +10,7 @@ TEMPLATE_DEBUG = False
 LOGGING['loggers'].update(PROD_LOGGERS)
 
 structlog.configure(  # noqa
-    processors=PROD_LOGGER_PROCESSORS,
+    processors=get_prod_logger_processors(),  # noqa
     logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
     cache_logger_on_first_use=True,
 )

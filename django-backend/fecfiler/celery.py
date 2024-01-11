@@ -28,12 +28,16 @@ env = cfenv.AppEnv()
 
 @setup_logging.connect
 def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
+    """
+    Celery and environment-specific logging
+    See https://django-structlog.readthedocs.io/en/latest/celery.html
+    """
     if env.space is not None:  # Running in prod
         loggers = settings.PROD_LOGGERS
         logger_processors = settings.get_prod_logger_processors
     else:
         loggers = settings.LOCAL_LOGGERS
-        logger_processors = settings.LOCAL_LOGGER_PROCESSORS
+        logger_processors = settings.get_local_logger_processors
 
     logging.config.dictConfig(
         {

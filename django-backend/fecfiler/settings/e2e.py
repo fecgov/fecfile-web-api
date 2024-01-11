@@ -3,6 +3,7 @@ import os
 
 # These settings are for local development only.
 
+#  TODO: Leave as-is?
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
