@@ -10,8 +10,7 @@ def generate_fec_uid():
 
 
 def get_model_data(data, model):
-    return {
-        field.name: data[field.name]
-        for field in model._meta.get_fields()
-        if field.name in data
-    }
+    field_names = sum(
+        [[field.name, field.name + "_id"] for field in model._meta.get_fields()], []
+    )
+    return {field: data[field] for field in field_names if field in data}
