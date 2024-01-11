@@ -7,9 +7,9 @@ from django.db import connection
 import uuid
 import json
 
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class CalculationState(Enum):
@@ -320,5 +320,4 @@ def get_database_connections():
         results = cursor.fetchall()
 
     results_dict = {"results": dict(zip(column_labels, row)) for row in results}
-    json_data = json.dumps(results_dict)
-    logger.info(json_data)
+    logger.info(results_dict)

@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import requests
+import structlog
 
 from .env import env
 from corsheaders.defaults import default_headers
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
+    "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
@@ -80,6 +82,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
 ]
 
 TEMPLATES = [
@@ -207,33 +210,108 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'json': {
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-            'format': '%(created)f %(asctime)s %(levelname)s %(name)s %(message)s',
-        },
+LOCAL_LOGGERS = {
+    "django_structlog": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
-    'handlers': {
-        'default': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'json'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['default'],
-            'level': 'INFO',
-        },
-        '': {
-            'handlers': ['default'],
-            'level': 'INFO',
-        },
+    "fecfiler": {
+        "handlers": ["console"],
+        "level": "DEBUG",
     },
 }
+
+PROD_LOGGERS = {
+    "django_structlog": {
+        "handlers": ["cloud"],
+        "level": "INFO",
+    },
+    "fecfiler": {
+        "handlers": ["cloud"],
+        "level": "INFO",
+    },
+}
+
+
+def get_local_logger_processors():
+    return [
+        structlog.contextvars.merge_contextvars,  # noqa
+        structlog.stdlib.filter_by_level,  # noqa
+        structlog.processors.TimeStamper(fmt="iso"),  # noqa
+        structlog.stdlib.add_logger_name,  # noqa
+        structlog.stdlib.add_log_level,  # noqa
+        structlog.stdlib.PositionalArgumentsFormatter(),  # noqa
+        structlog.processors.StackInfoRenderer(),  # noqa
+        structlog.processors.format_exc_info,  # noqa
+        structlog.processors.UnicodeDecoder(),  # noqa
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,  # noqa
+    ]
+
+
+def get_prod_logger_processors():
+    return [
+        structlog.contextvars.merge_contextvars,  # noqa
+        structlog.stdlib.filter_by_level,  # noqa
+        structlog.processors.TimeStamper(fmt="iso"),  # noqa
+        structlog.stdlib.add_logger_name,  # noqa
+        structlog.stdlib.add_log_level,  # noqa
+        structlog.stdlib.PositionalArgumentsFormatter(),  # noqa
+        structlog.processors.StackInfoRenderer(),  # noqa
+        structlog.processors.format_exc_info,  # noqa
+        structlog.processors.UnicodeDecoder(),  # noqa
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,  # noqa
+        # JSON in production
+        structlog.processors.JSONRenderer(),  # noqa
+    ]
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
+        },
+        "key_value": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=['timestamp', 'level', 'event', 'logger']
+            ),
+        },
+    },
+    "handlers": {
+        # Important notes regarding handlers.
+        #
+        # 1. Make sure you use handlers adapted for your project.
+        # These handlers configurations are only examples for this library.
+        # See python's logging.handlers:
+        # https://docs.python.org/3/library/logging.handlers.html
+        #
+        # 2. You might also want to use different logging configurations
+        # depending of the environment.
+        # Different files (local.py, tests.py, production.py, ci.py, etc.)
+        # or only conditions.
+        # See https://docs.djangoproject.com/en/dev/topics/settings/#designating-the-settings
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "plain_console",
+        },
+        "cloud": {
+            "class": "logging.StreamHandler",
+            "formatter": "json_formatter",
+        },
+    },
+    "loggers": LOCAL_LOGGERS
+    # Uncomment to test json logs locally
+    # "loggers": PROD_LOGGERS
+}
+
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 """Celery configurations
 """
