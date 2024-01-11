@@ -21,9 +21,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from urllib.parse import urlencode
 from django.http import JsonResponse
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 """
 Option for :py:const:`fecfiler.settings.base.ALTERNATIVE_LOGIN`.

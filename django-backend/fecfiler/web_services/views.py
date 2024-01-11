@@ -12,10 +12,9 @@ from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
+import structlog
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class WebServicesViewSet(viewsets.ViewSet):

@@ -4,10 +4,9 @@ from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Form99Serializer(ReportSerializer):

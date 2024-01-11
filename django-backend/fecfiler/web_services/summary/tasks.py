@@ -4,10 +4,9 @@ from fecfiler.reports.models import Report
 from django.db.models import Q
 from .summary import SummaryService
 import uuid
+import structlog
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class CalculationState(Enum):

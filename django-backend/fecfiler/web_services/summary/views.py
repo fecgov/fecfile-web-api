@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 from .tasks import calculate_summary, CalculationState
 from ..serializers import ReportIdSerializer
 
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SummaryViewSet(viewsets.ViewSet):

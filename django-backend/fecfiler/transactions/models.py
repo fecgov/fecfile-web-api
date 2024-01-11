@@ -12,10 +12,9 @@ from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 import uuid
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):

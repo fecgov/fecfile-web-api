@@ -4,9 +4,9 @@ from zeep import Client
 from fecfiler.web_services.models import FECStatus
 from fecfiler.settings import FEC_FILING_API_KEY
 
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class WebPrintSubmitter:

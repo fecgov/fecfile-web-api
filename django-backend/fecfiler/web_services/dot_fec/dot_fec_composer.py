@@ -6,10 +6,9 @@ from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
+import structlog
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def compose_report(report_id, upload_submission_record_id):
