@@ -102,20 +102,20 @@ class Form1MSerializer(ReportSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
+            self.write_contacts(validated_data)
             form_1m_data = get_model_data(validated_data, Form1M)
             form_1m = Form1M.objects.create(**form_1m_data)
             report_data = get_model_data(validated_data, Report)
             report_data["form_1m_id"] = form_1m.id
-            self.write_contacts(validated_data)
             return super().create(report_data)
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            self.write_contacts(validated_data)
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_1m, attr, value)
             instance.form_1m.save()
-            self.write_contacts(validated_data)
             return super().update(instance, validated_data)
 
     def write_contacts(self, validated_data: dict):
