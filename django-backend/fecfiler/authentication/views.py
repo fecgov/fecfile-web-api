@@ -28,9 +28,9 @@ from .serializers import AccountSerializer
 from urllib.parse import urlencode
 from datetime import datetime
 from django.http import JsonResponse
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AccountViewSet(GenericViewSet, ListModelMixin):

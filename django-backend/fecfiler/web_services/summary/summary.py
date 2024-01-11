@@ -3,9 +3,9 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SummaryService:

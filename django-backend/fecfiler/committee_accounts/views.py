@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):

@@ -12,8 +12,11 @@ standard and are specific to the FEC data.
 """
 import json
 import argparse
-import logging
 import os
+
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def determine_model_name(model_id=None, filename=None):
@@ -28,7 +31,7 @@ def determine_model_name(model_id=None, filename=None):
         try:
             model_name = model_id.split("/")[-1].replace(".json", "")
         except Exception as e:
-            logging.exception("Unhandled exception {}".format(e))
+            logger.exception("Unhandled exception {}".format(e))
 
     if not model_name and filename:
         filename = filename.strip(os.sep)

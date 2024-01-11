@@ -1,4 +1,3 @@
-import logging
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
@@ -19,8 +18,9 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
