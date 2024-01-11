@@ -7,10 +7,10 @@ from .base import *  # NOSONAR # noqa F401, F403
 DEBUG = False
 TEMPLATE_DEBUG = False
 
-LOGGING['loggers'].update(PROD_LOGGERS) # noqa
+LOGGING = get_env_logging_config(prod=True) # noqa
 
 structlog.configure(  # noqa
-    processors=get_prod_logger_processors(),  # noqa
+    processors=get_env_logging_processors(prod=True),  # noqa
     logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
     cache_logger_on_first_use=True,
 )
