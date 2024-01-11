@@ -10,6 +10,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+contact_id_fields = [
+    'contact_affiliated_id',
+    'contact_candidate_I_id',
+    'contact_candidate_II_id',
+    'contact_candidate_III_id',
+    'contact_candidate_IV_id',
+    'contact_candidate_V_id'
+]
 
 class Form1MSerializer(ReportSerializer):
     schema_name = "F1M"
@@ -104,6 +112,9 @@ class Form1MSerializer(ReportSerializer):
         with transaction.atomic():
             self.write_contacts(validated_data)
             form_1m_data = get_model_data(validated_data, Form1M)
+            for field in contact_id_fields:
+                if field in validated_data:
+                    form_1m_data[field] = validated_data[field]
             form_1m = Form1M.objects.create(**form_1m_data)
             report_data = get_model_data(validated_data, Report)
             report_data["form_1m_id"] = form_1m.id
