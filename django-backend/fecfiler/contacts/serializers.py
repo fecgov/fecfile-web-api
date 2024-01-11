@@ -59,6 +59,12 @@ class ContactSerializer(
                 "contact_1_transaction_set",
                 "contact_2_transaction_set",
                 "contact_3_transaction_set",
+                "contact_affiliated_transaction_set",
+                "contact_candidate_I_transaction_set",
+                "contact_candidate_II_transaction_set",
+                "contact_candidate_III_transaction_set",
+                "contact_candidate_IV_transaction_set",
+                "contact_candidate_V_transaction_set",
             ]
         ]
         fields.append("transaction_count")
@@ -96,7 +102,7 @@ class LinkedContactSerializerMixin(ModelSerializer):
             self.write_contacts(validated_data)
             return super().update(instance, validated_data)
 
-    def write_contacts(validated_data: dict):
+    def write_contacts(self, validated_data: dict):
         for contact_key in ["contact_1", "contact_2", "contact_3"]:
             create_or_update_contact(validated_data, contact_key)
 
