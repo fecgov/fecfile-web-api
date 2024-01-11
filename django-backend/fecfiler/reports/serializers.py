@@ -10,6 +10,7 @@ from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
     WebPrintSubmissionSerializer,
 )
+from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
@@ -52,6 +53,13 @@ class Form99Serializer(ModelSerializer):
 
 
 class Form1MSerializer(ModelSerializer):
+    contact_affiliated = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_I = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_II = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_III = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_V = ContactSerializer(allow_null=True, required=False)
+
     class Meta:
         fields = [
             f.name
