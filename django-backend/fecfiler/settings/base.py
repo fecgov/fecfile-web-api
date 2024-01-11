@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import requests
+import structlog
 
 from .env import env
 from corsheaders.defaults import default_headers
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
+    "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.f3x_summaries",
@@ -80,6 +82,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
 ]
 
 TEMPLATES = [
@@ -204,20 +207,115 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    # TODO: Take a look at this
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
+
+LOCAL_LOGGERS = {
+    "django_structlog": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+    },
+    "fecfiler": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+    },
+}
+
+# We will need to set these explicitly for Celery too
+PROD_LOGGERS = {
+    "django_structlog": {
+        "handlers": ["cloud"],
+        "level": "INFO",
+    },
+    "fecfiler": {
+        "handlers": ["cloud"],
+        "level": "INFO",
+    },
+}
+
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
+        },
+        "key_value": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=['timestamp', 'level', 'event', 'logger']
+            ),
+        },
     },
     "handlers": {
-        "default": {"class": "logging.StreamHandler", "formatter": "standard"},
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "plain_console",
+        },
+        "cloud": {
+            "class": "logging.StreamHandler",
+            "formatter": "json_formatter",
+        },
     },
-    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True}},
+    "loggers": LOCAL_LOGGERS
+    # Use "loggers":PROD_LOGGERS to test json logs
 }
+
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
+
+# Helper functions so these don't get evaluated until we need them
+# need to set them explicitly for Celery too
+
+
+def get_local_logger_processors():
+    """
+    Formatted console logs
+    from https://github.com/jrobichaud/django-structlog?tab=readme-ov-file#installation
+    see also
+    https://www.structlog.org/en/stable/api.html#structlog.stdlib.ProcessorFormatter
+    """
+    return [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ]
+
+
+def get_prod_logger_processors():
+    """
+    JSON output configuration
+    From https://www.structlog.org/en/stable/api.html#structlog.processors.JSONRenderer
+    """
+    return [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        # JSON in production
+        structlog.processors.dict_tracebacks,  # exception handling
+        structlog.processors.JSONRenderer(),
+    ]
+
 
 """Celery configurations
 """

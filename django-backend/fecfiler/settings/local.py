@@ -2,22 +2,16 @@ from .base import *  # NOSONAR # noqa F401, F403
 
 # These settings are for local development only.
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
-    },
-    "handlers": {
-        "default": {
-            "class": "logging.StreamHandler",
-            "formatter": "standard",
-        },
-    },
-    "loggers": {
-        "": {"handlers": ["default"], "level": "DEBUG", "propagate": True},
-    },
-}
+LOGGER_PROCESSORS = get_local_logger_processors()  # noqa
+
+# To test json locally,
+# Set LOGGER_PROCESSORS to get_prod_logger_processors() above
+
+structlog.configure(  # noqa
+    processors=LOGGER_PROCESSORS,
+    logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
+    cache_logger_on_first_use=True,
+)
 
 # E2E Testing Login API
 E2E_TESTING_LOGIN = True
