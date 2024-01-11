@@ -5,9 +5,10 @@ from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import CharField, ListField
 from functools import reduce
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
+
 MISSING_SCHEMA_NAME_ERROR = ValidationError(
     {"schema_name": ["No schema_name provided"]}
 )

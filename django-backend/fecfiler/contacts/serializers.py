@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from django.db import transaction
 from django.db.models import Q
@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 from .models import Contact
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class ContactSerializer(

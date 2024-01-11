@@ -12,9 +12,9 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import F3XSummarySerializer
 from django.db.models import Case, Value, When, Q
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def get_status_mapping():

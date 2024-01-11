@@ -5,11 +5,10 @@ from django.db.models import Q
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from decimal import Decimal
-import logging
 import copy
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class F3XSummary(SoftDeleteModel, CommitteeOwnedModel):

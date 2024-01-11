@@ -1,8 +1,8 @@
 from fecfiler.committee_accounts.models import CommitteeAccount
 from rest_framework import serializers, relations
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeOwnedSerializer(serializers.ModelSerializer):

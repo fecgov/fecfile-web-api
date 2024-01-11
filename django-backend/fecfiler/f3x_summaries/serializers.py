@@ -7,13 +7,13 @@ from fecfiler.web_services.serializers import (
     WebPrintSubmissionSerializer,
 )
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-import logging
+import structlog
+
 
 COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
     {"report_code": ["Collision with existing report_code and year"]}
 )
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class F3XSummarySerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
