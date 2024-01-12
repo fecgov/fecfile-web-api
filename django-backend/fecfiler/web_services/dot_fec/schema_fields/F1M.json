@@ -1,4 +1,7 @@
 {
+    "form_type": {},
+    "filer_committee_id_number": {},
+    "committee_name": {},
     "street_1": {
         "path": "form_1m.street_1"
     },
@@ -17,7 +20,6 @@
     "committee_type": {
         "path": "form_1m.committee_type"
     },
-
     "affiliated_date_form_f1_filed": {
         "path": "form_1m.affiliated_date_form_f1_filed"
     },
@@ -27,9 +29,8 @@
     "affiliated_committee_name": {
         "path": "form_1m.affiliated_committee_name"
     },
-
-    "I_candidate_id_number": {
-        "path": "form_1m.I_candidate_id_number"
+    "I_candidate_id": {
+        "path": "form_1m.I_candidate_id"
     },
     "I_candidate_last_name": {
         "path": "form_1m.I_candidate_last_name"
@@ -58,9 +59,8 @@
     "I_date_of_contribution": {
         "path": "form_1m.I_date_of_contribution"
     },
-
-    "II_candidate_id_number": {
-        "path": "form_1m.II_candidate_id_number"
+    "II_candidate_id": {
+        "path": "form_1m.II_candidate_id"
     },
     "II_candidate_last_name": {
         "path": "form_1m.II_candidate_last_name"
@@ -89,9 +89,8 @@
     "II_date_of_contribution": {
         "path": "form_1m.II_date_of_contribution"
     },
-
-    "III_candidate_id_number": {
-        "path": "form_1m.III_candidate_id_number"
+    "III_candidate_id": {
+        "path": "form_1m.III_candidate_id"
     },
     "III_candidate_last_name": {
         "path": "form_1m.III_candidate_last_name"
@@ -120,9 +119,8 @@
     "III_date_of_contribution": {
         "path": "form_1m.III_date_of_contribution"
     },
-
-    "IV_candidate_id_number": {
-        "path": "form_1m.IV_candidate_id_number"
+    "IV_candidate_id": {
+        "path": "form_1m.IV_candidate_id"
     },
     "IV_candidate_last_name": {
         "path": "form_1m.IV_candidate_last_name"
@@ -151,9 +149,8 @@
     "IV_date_of_contribution": {
         "path": "form_1m.IV_date_of_contribution"
     },
-
-    "V_candidate_id_number": {
-        "path": "form_1m.V_candidate_id_number"
+    "V_candidate_id": {
+        "path": "form_1m.V_candidate_id"
     },
     "V_candidate_last_name": {
         "path": "form_1m.V_candidate_last_name"
@@ -181,5 +178,14 @@
     },
     "V_date_of_contribution": {
         "path": "form_1m.V_date_of_contribution"
-    }
+    },
+    "date_of_original_registration": {},
+    "date_of_51st_contributor": {},
+    "date_committee_met_requirements": {},
+    "treasurer_last_name": {},
+    "treasurer_first_name": {},
+    "treasurer_middle_name": {},
+    "treasurer_prefix": {},
+    "treasurer_suffix": {},
+    "date_signed": {}
 }
