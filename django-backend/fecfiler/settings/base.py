@@ -209,7 +209,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
 
@@ -224,7 +223,10 @@ def get_env_logging_config(prod=False):
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(),
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=True,
+                    exception_formatter=structlog.dev.rich_traceback
+                ),
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
@@ -281,6 +283,7 @@ def get_env_logging_processors(prod=False):
     """
 
     if prod:
+        # JSON in production
         return [
             structlog.contextvars.merge_contextvars,
             structlog.stdlib.filter_by_level,
@@ -289,10 +292,8 @@ def get_env_logging_processors(prod=False):
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-            # JSON in production
             structlog.processors.JSONRenderer(),
         ]
     else:
@@ -304,7 +305,6 @@ def get_env_logging_processors(prod=False):
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ]

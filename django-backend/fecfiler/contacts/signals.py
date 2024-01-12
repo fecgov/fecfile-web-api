@@ -21,9 +21,12 @@ def log_post_save(sender, instance, created, **kwargs):
         action = "created"
     elif instance.deleted:
         action = "deleted"
-    logger.info("Contact: %s was %s", str(instance), action)
+    logger.info(
+        f"Contact {action}",
+        contact_id=instance.id
+    )
 
 
 @receiver(post_delete, sender=Contact)
 def log_post_delete(sender, instance, **kwargs):
-    logger.info("Contact: %s was deleted", str(instance))
+    logger.info("Contact deleted", contact_id=instance.id)
