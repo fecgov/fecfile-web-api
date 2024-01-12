@@ -53,6 +53,12 @@ class Form99Serializer(ModelSerializer):
 
 
 class Form1MSerializer(ModelSerializer):
+    contact_affiliated_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_I_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_II_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_III_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_IV_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_V_id = UUIDField(allow_null=True, required=False)
     contact_affiliated = ContactSerializer(allow_null=True, required=False)
     contact_candidate_I = ContactSerializer(allow_null=True, required=False)
     contact_candidate_II = ContactSerializer(allow_null=True, required=False)
@@ -65,6 +71,13 @@ class Form1MSerializer(ModelSerializer):
             f.name
             for f in Form1M._meta.get_fields()
             if f.name not in ["deleted", "report"]
+        ] + [
+            "contact_affiliated_id",
+            "contact_candidate_I_id",
+            "contact_candidate_II_id",
+            "contact_candidate_III_id",
+            "contact_candidate_IV_id",
+            "contact_candidate_V_id",
         ]
         model = Form1M
 
