@@ -29,8 +29,8 @@
     "affiliated_committee_name": {
         "path": "form_1m.affiliated_committee_name"
     },
-    "I_candidate_id": {
-        "path": "form_1m.I_candidate_id"
+    "I_candidate_id_number": {
+        "path": "form_1m.I_candidate_id_number"
     },
     "I_candidate_last_name": {
         "path": "form_1m.I_candidate_last_name"
@@ -59,8 +59,8 @@
     "I_date_of_contribution": {
         "path": "form_1m.I_date_of_contribution"
     },
-    "II_candidate_id": {
-        "path": "form_1m.II_candidate_id"
+    "II_candidate_id_number": {
+        "path": "form_1m.II_candidate_id_number"
     },
     "II_candidate_last_name": {
         "path": "form_1m.II_candidate_last_name"
@@ -89,8 +89,8 @@
     "II_date_of_contribution": {
         "path": "form_1m.II_date_of_contribution"
     },
-    "III_candidate_id": {
-        "path": "form_1m.III_candidate_id"
+    "III_candidate_id_number": {
+        "path": "form_1m.III_candidate_id_number"
     },
     "III_candidate_last_name": {
         "path": "form_1m.III_candidate_last_name"
@@ -119,8 +119,8 @@
     "III_date_of_contribution": {
         "path": "form_1m.III_date_of_contribution"
     },
-    "IV_candidate_id": {
-        "path": "form_1m.IV_candidate_id"
+    "IV_candidate_id_number": {
+        "path": "form_1m.IV_candidate_id_number"
     },
     "IV_candidate_last_name": {
         "path": "form_1m.IV_candidate_last_name"
@@ -149,8 +149,8 @@
     "IV_date_of_contribution": {
         "path": "form_1m.IV_date_of_contribution"
     },
-    "V_candidate_id": {
-        "path": "form_1m.V_candidate_id"
+    "V_candidate_id_number": {
+        "path": "form_1m.V_candidate_id_number"
     },
     "V_candidate_last_name": {
         "path": "form_1m.V_candidate_last_name"

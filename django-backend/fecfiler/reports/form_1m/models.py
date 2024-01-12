@@ -66,7 +66,7 @@ class Form1M(models.Model):
     affiliated_committee_fec_id = models.TextField(null=True, blank=True)
     affiliated_committee_name = models.TextField(null=True, blank=True)
 
-    I_candidate_id = models.TextField(null=True, blank=True)
+    I_candidate_id_number = models.TextField(null=True, blank=True)
     I_candidate_last_name = models.TextField(null=True, blank=True)
     I_candidate_first_name = models.TextField(null=True, blank=True)
     I_candidate_middle_name = models.TextField(null=True, blank=True)
@@ -77,7 +77,7 @@ class Form1M(models.Model):
     I_candidate_district = models.TextField(null=True, blank=True)
     I_date_of_contribution = models.DateField(null=True, blank=True)
 
-    II_candidate_id = models.TextField(null=True, blank=True)
+    II_candidate_id_number = models.TextField(null=True, blank=True)
     II_candidate_last_name = models.TextField(null=True, blank=True)
     II_candidate_first_name = models.TextField(null=True, blank=True)
     II_candidate_middle_name = models.TextField(null=True, blank=True)
@@ -88,7 +88,7 @@ class Form1M(models.Model):
     II_candidate_district = models.TextField(null=True, blank=True)
     II_date_of_contribution = models.DateField(null=True, blank=True)
 
-    III_candidate_id = models.TextField(null=True, blank=True)
+    III_candidate_id_number = models.TextField(null=True, blank=True)
     III_candidate_last_name = models.TextField(null=True, blank=True)
     III_candidate_first_name = models.TextField(null=True, blank=True)
     III_candidate_middle_name = models.TextField(null=True, blank=True)
@@ -99,7 +99,7 @@ class Form1M(models.Model):
     III_candidate_district = models.TextField(null=True, blank=True)
     III_date_of_contribution = models.DateField(null=True, blank=True)
 
-    IV_candidate_id = models.TextField(null=True, blank=True)
+    IV_candidate_id_number = models.TextField(null=True, blank=True)
     IV_candidate_last_name = models.TextField(null=True, blank=True)
     IV_candidate_first_name = models.TextField(null=True, blank=True)
     IV_candidate_middle_name = models.TextField(null=True, blank=True)
@@ -110,7 +110,7 @@ class Form1M(models.Model):
     IV_candidate_district = models.TextField(null=True, blank=True)
     IV_date_of_contribution = models.DateField(null=True, blank=True)
 
-    V_candidate_id = models.TextField(null=True, blank=True)
+    V_candidate_id_number = models.TextField(null=True, blank=True)
     V_candidate_last_name = models.TextField(null=True, blank=True)
     V_candidate_first_name = models.TextField(null=True, blank=True)
     V_candidate_middle_name = models.TextField(null=True, blank=True)

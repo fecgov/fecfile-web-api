@@ -39,7 +39,7 @@ class Form1MSerializer(ReportSerializer):
     affiliated_committee_fec_id = CharField(required=False, allow_null=True)
     affiliated_committee_name = CharField(required=False, allow_null=True)
 
-    I_candidate_id = CharField(required=False, allow_null=True)
+    I_candidate_id_number = CharField(required=False, allow_null=True)
     I_candidate_last_name = CharField(required=False, allow_null=True)
     I_candidate_first_name = CharField(required=False, allow_null=True)
     I_candidate_middle_name = CharField(required=False, allow_null=True)
@@ -50,7 +50,7 @@ class Form1MSerializer(ReportSerializer):
     I_candidate_district = CharField(required=False, allow_null=True)
     I_date_of_contribution = DateField(required=False, allow_null=True)
 
-    II_candidate_id = CharField(required=False, allow_null=True)
+    II_candidate_id_number = CharField(required=False, allow_null=True)
     II_candidate_last_name = CharField(required=False, allow_null=True)
     II_candidate_first_name = CharField(required=False, allow_null=True)
     II_candidate_middle_name = CharField(required=False, allow_null=True)
@@ -61,7 +61,7 @@ class Form1MSerializer(ReportSerializer):
     II_candidate_district = CharField(required=False, allow_null=True)
     II_date_of_contribution = DateField(required=False, allow_null=True)
 
-    III_candidate_id = CharField(required=False, allow_null=True)
+    III_candidate_id_number = CharField(required=False, allow_null=True)
     III_candidate_last_name = CharField(required=False, allow_null=True)
     III_candidate_first_name = CharField(required=False, allow_null=True)
     III_candidate_middle_name = CharField(required=False, allow_null=True)
@@ -72,7 +72,7 @@ class Form1MSerializer(ReportSerializer):
     III_candidate_district = CharField(required=False, allow_null=True)
     III_date_of_contribution = DateField(required=False, allow_null=True)
 
-    IV_candidate_id = CharField(required=False, allow_null=True)
+    IV_candidate_id_number = CharField(required=False, allow_null=True)
     IV_candidate_last_name = CharField(required=False, allow_null=True)
     IV_candidate_first_name = CharField(required=False, allow_null=True)
     IV_candidate_middle_name = CharField(required=False, allow_null=True)
@@ -83,7 +83,7 @@ class Form1MSerializer(ReportSerializer):
     IV_candidate_district = CharField(required=False, allow_null=True)
     IV_date_of_contribution = DateField(required=False, allow_null=True)
 
-    V_candidate_id = CharField(required=False, allow_null=True)
+    V_candidate_id_number = CharField(required=False, allow_null=True)
     V_candidate_last_name = CharField(required=False, allow_null=True)
     V_candidate_first_name = CharField(required=False, allow_null=True)
     V_candidate_middle_name = CharField(required=False, allow_null=True)
