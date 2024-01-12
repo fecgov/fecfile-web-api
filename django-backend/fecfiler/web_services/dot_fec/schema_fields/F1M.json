@@ -32,7 +32,7 @@
     },
 
     "I_candidate_id": {
-        "path": "form_1m.I_candidate_id"
+        "path": "form_1m.I_candidate_id_number"
     },
     "I_candidate_last_name": {
         "path": "form_1m.I_candidate_last_name"
@@ -63,7 +63,7 @@
     },
 
     "II_candidate_id": {
-        "path": "form_1m.II_candidate_id"
+        "path": "form_1m.II_candidate_id_number"
     },
     "II_candidate_last_name": {
         "path": "form_1m.II_candidate_last_name"
@@ -94,7 +94,7 @@
     },
 
     "III_candidate_id": {
-        "path": "form_1m.III_candidate_id"
+        "path": "form_1m.III_candidate_id_number"
     },
     "III_candidate_last_name": {
         "path": "form_1m.III_candidate_last_name"
@@ -125,7 +125,7 @@
     },
 
     "IV_candidate_id": {
-        "path": "form_1m.IV_candidate_id"
+        "path": "form_1m.IV_candidate_id_number"
     },
     "IV_candidate_last_name": {
         "path": "form_1m.IV_candidate_last_name"
@@ -155,7 +155,7 @@
         "path": "form_1m.IV_date_of_contribution"
     },
     "V_candidate_id": {
-        "path": "form_1m.V_candidate_id"
+        "path": "form_1m.V_candidate_id_number"
     },
     "V_candidate_last_name": {
         "path": "form_1m.V_candidate_last_name"
