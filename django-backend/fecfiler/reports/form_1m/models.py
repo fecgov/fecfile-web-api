@@ -31,31 +31,31 @@ class Form1M(models.Model):
         related_name="contact_affiliated_transaction_set",
         null=True,
     )
-    contact_candidate_I = models.ForeignKey(
+    contact_candidate_I = models.ForeignKey(  # noqa: N815
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_candidate_I_transaction_set",
         null=True,
     )
-    contact_candidate_II = models.ForeignKey(
+    contact_candidate_II = models.ForeignKey(  # noqa: N815
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_candidate_II_transaction_set",
         null=True,
     )
-    contact_candidate_III = models.ForeignKey(
+    contact_candidate_III = models.ForeignKey(  # noqa: N815
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_candidate_III_transaction_set",
         null=True,
     )
-    contact_candidate_IV = models.ForeignKey(
+    contact_candidate_IV = models.ForeignKey(  # noqa: N815
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_candidate_IV_transaction_set",
         null=True,
     )
-    contact_candidate_V = models.ForeignKey(
+    contact_candidate_V = models.ForeignKey(  # noqa: N815
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_candidate_V_transaction_set",
