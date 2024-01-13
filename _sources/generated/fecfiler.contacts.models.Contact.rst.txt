@@ -68,6 +68,12 @@ fecfiler.contacts.models.Contact
       ~Contact.contact_1_transaction_set
       ~Contact.contact_2_transaction_set
       ~Contact.contact_3_transaction_set
+      ~Contact.contact_affiliated_transaction_set
+      ~Contact.contact_candidate_III_transaction_set
+      ~Contact.contact_candidate_II_transaction_set
+      ~Contact.contact_candidate_IV_transaction_set
+      ~Contact.contact_candidate_I_transaction_set
+      ~Contact.contact_candidate_V_transaction_set
       ~Contact.country
       ~Contact.created
       ~Contact.deleted

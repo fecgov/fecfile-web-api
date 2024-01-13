@@ -57,6 +57,7 @@ fecfiler.reports.form\_1m.serializers.Form1MSerializer
       ~Form1MSerializer.update
       ~Form1MSerializer.validate
       ~Form1MSerializer.validate_empty_values
+      ~Form1MSerializer.write_contacts
    
    
 

@@ -29,7 +29,6 @@ fecfiler.contacts.serializers.LinkedContactSerializerMixin
       ~LinkedContactSerializerMixin.build_unknown_field
       ~LinkedContactSerializerMixin.build_url_field
       ~LinkedContactSerializerMixin.create
-      ~LinkedContactSerializerMixin.create_or_update_contact
       ~LinkedContactSerializerMixin.fail
       ~LinkedContactSerializerMixin.get_attribute
       ~LinkedContactSerializerMixin.get_default
@@ -54,6 +53,7 @@ fecfiler.contacts.serializers.LinkedContactSerializerMixin
       ~LinkedContactSerializerMixin.update
       ~LinkedContactSerializerMixin.validate
       ~LinkedContactSerializerMixin.validate_empty_values
+      ~LinkedContactSerializerMixin.write_contacts
    
    
 

@@ -103,7 +103,20 @@ fecfiler.reports.form\_1m.models.Form1M
       ~Form1M.affiliated_committee_name
       ~Form1M.affiliated_date_form_f1_filed
       ~Form1M.city
+      ~Form1M.committee_name
       ~Form1M.committee_type
+      ~Form1M.contact_affiliated
+      ~Form1M.contact_affiliated_id
+      ~Form1M.contact_candidate_I
+      ~Form1M.contact_candidate_II
+      ~Form1M.contact_candidate_III
+      ~Form1M.contact_candidate_III_id
+      ~Form1M.contact_candidate_II_id
+      ~Form1M.contact_candidate_IV
+      ~Form1M.contact_candidate_IV_id
+      ~Form1M.contact_candidate_I_id
+      ~Form1M.contact_candidate_V
+      ~Form1M.contact_candidate_V_id
       ~Form1M.id
       ~Form1M.objects
       ~Form1M.pk

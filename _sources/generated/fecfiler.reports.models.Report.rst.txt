@@ -21,6 +21,7 @@ fecfiler.reports.models.Report
    
       ~Report.__init__
       ~Report.adelete
+      ~Report.amend
       ~Report.arefresh_from_db
       ~Report.asave
       ~Report.check

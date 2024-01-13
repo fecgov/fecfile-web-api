@@ -40,4 +40,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0007_update_l6a_coh_year
    fecfiler.reports.migrations.0008_rename_text_form99_text_message
    fecfiler.reports.migrations.0009_form99_committee_name
+   fecfiler.reports.migrations.0010_form1m_committee_name_form1m_contact_affiliated_and_more
 

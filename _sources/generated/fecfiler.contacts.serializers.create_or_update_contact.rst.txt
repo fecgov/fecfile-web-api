@@ -1,0 +1,6 @@
+fecfiler.contacts.serializers.create\_or\_update\_contact
+=========================================================
+
+.. currentmodule:: fecfiler.contacts.serializers
+
+.. autofunction:: create_or_update_contact
