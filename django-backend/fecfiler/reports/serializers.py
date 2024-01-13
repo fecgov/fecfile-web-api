@@ -10,6 +10,7 @@ from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
     WebPrintSubmissionSerializer,
 )
+from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
@@ -52,11 +53,31 @@ class Form99Serializer(ModelSerializer):
 
 
 class Form1MSerializer(ModelSerializer):
+    contact_affiliated_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_I_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_II_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_III_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_IV_id = UUIDField(allow_null=True, required=False)
+    contact_candidate_V_id = UUIDField(allow_null=True, required=False)
+    contact_affiliated = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_I = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_II = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_III = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)
+    contact_candidate_V = ContactSerializer(allow_null=True, required=False)
+
     class Meta:
         fields = [
             f.name
             for f in Form1M._meta.get_fields()
             if f.name not in ["deleted", "report"]
+        ] + [
+            "contact_affiliated_id",
+            "contact_candidate_I_id",
+            "contact_candidate_II_id",
+            "contact_candidate_III_id",
+            "contact_candidate_IV_id",
+            "contact_candidate_V_id",
         ]
         model = Form1M
 
