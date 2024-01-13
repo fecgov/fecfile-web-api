@@ -187,6 +187,12 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             if getattr(self, form_key, None):
                 return TABLE_TO_FORM.get(form_key)
 
+    def amend(self):
+        self.form_type = self.get_form_name() + "A"
+        self.report_version = int(self.report_version or "0") + 1
+        self.upload_submission = None
+        self.save()
+
 
 TABLE_TO_FORM = {
     "form_3x": "F3X",

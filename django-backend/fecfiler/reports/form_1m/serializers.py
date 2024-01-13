@@ -24,16 +24,16 @@ class Form1MSerializer(ReportSerializer):
 
     contact_affiliated = ContactSerializer(allow_null=True, required=False)
     contact_affiliated_id = UUIDField(required=False, allow_null=False)
-    contact_candidate_I = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_I_id = UUIDField(required=False, allow_null=True)
-    contact_candidate_II = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_II_id = UUIDField(required=False, allow_null=True)
-    contact_candidate_III = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_III_id = UUIDField(required=False, allow_null=True)
-    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_IV_id = UUIDField(required=False, allow_null=True)
-    contact_candidate_V = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_V_id = UUIDField(required=False, allow_null=True)
+    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_I_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_II_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_III = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_III_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_IV_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_V_id = UUIDField(required=False, allow_null=True)  # noqa: N815
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
     affiliated_committee_fec_id = CharField(required=False, allow_null=True)

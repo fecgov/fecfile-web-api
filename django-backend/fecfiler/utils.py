@@ -1,7 +1,7 @@
 from fecfiler.authentication.views import delete_user_logged_in_cookies
 from rest_framework.views import exception_handler
-from django.http import HttpResponseServerError
-from fecfiler.settings import DEBUG
+# from django.http import HttpResponseServerError
+# from fecfiler.settings import DEBUG
 
 
 def custom_exception_handler(exc, context):
