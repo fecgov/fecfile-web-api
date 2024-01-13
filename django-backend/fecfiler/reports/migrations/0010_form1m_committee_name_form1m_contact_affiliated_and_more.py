@@ -20,31 +20,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='form1m',
             name='contact_affiliated',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_affiliated_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_affiliated_transaction_set', to='contacts.contact'), # noqa: E501
         ),
         migrations.AddField(
             model_name='form1m',
             name='contact_candidate_I',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_I_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_I_transaction_set', to='contacts.contact'), # noqa: E501
         ),
         migrations.AddField(
             model_name='form1m',
             name='contact_candidate_II',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_II_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_II_transaction_set', to='contacts.contact'), # noqa: E501
         ),
         migrations.AddField(
             model_name='form1m',
             name='contact_candidate_III',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_III_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_III_transaction_set', to='contacts.contact'), # noqa: E501
         ),
         migrations.AddField(
             model_name='form1m',
             name='contact_candidate_IV',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_IV_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_IV_transaction_set', to='contacts.contact'), # noqa: E501
         ),
         migrations.AddField(
             model_name='form1m',
             name='contact_candidate_V',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_V_transaction_set', to='contacts.contact'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='contact_candidate_V_transaction_set', to='contacts.contact'), # noqa: E501
         ),
     ]
