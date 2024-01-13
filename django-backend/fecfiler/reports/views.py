@@ -106,7 +106,7 @@ class ReportViewSet(CommitteeOwnedViewSet):
                 queryset = queryset.filter(form_1m__isnull=True)
         return queryset
 
-    @action( detail=True, methods=["post"], url_name="amend", )
+    @action(detail=True, methods=["post"], url_name="amend")
     def amend(self, request, pk):
         report = self.get_object()
         report.amend()
