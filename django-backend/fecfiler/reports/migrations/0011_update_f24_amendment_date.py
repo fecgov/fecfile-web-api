@@ -21,5 +21,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_f24_original_amendment_date, migrations.RunPython.noop),
+        migrations.RunPython(
+            update_f24_original_amendment_date,
+            migrations.RunPython.noop
+        ),
     ]
