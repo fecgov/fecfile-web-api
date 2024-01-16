@@ -121,5 +121,9 @@ class Form1M(models.Model):
     V_candidate_district = models.TextField(null=True, blank=True)
     V_date_of_contribution = models.DateField(null=True, blank=True)
 
+    date_of_original_registration = models.DateField(null=True, blank=True)
+    date_of_51st_contributor = models.DateField(null=True, blank=True)
+    date_committee_met_requirements = models.DateField(null=True, blank=True)
+
     class Meta:
         app_label = "reports"
