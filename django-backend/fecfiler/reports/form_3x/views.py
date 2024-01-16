@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
@@ -44,16 +43,3 @@ class Form3XViewSet(ReportViewSet):
 
     def partial_update(self, request, pk=None):
         return super(ModelViewSet, self).partial_update(request, pk)
-
-    @action(
-        detail=True,
-        methods=["post"],
-        url_name="amend",
-    )
-    def amend(self, request, pk):
-        report = self.get_object()
-        report.form_type = "F3XA"
-        report.report_version = int(report.report_version or "0") + 1
-        report.upload_submission = None
-        report.save()
-        return Response(f"amended {report}")
