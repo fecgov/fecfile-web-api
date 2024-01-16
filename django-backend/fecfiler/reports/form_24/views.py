@@ -40,6 +40,11 @@ class Form24ViewSet(ReportViewSet):
         report = self.get_object()
         report.form_type = "F24A"
         report.report_version = int(report.report_version or "0") + 1
+
+        if report.upload_submission is not None:
+            report.form_24.original_amendment_date = report.upload_submission.created
+            report.form_24.save()
+
         report.upload_submission = None
         report.save()
         return Response(f"amended {report}")
