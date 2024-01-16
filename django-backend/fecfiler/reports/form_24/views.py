@@ -1,6 +1,4 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
@@ -30,21 +28,3 @@ class Form24ViewSet(ReportViewSet):
 
     def partial_update(self, request, pk=None):
         return super(ModelViewSet, self).partial_update(request, pk)
-
-    @action(
-        detail=True,
-        methods=["post"],
-        url_name="amend",
-    )
-    def amend(self, request, pk):
-        report = self.get_object()
-        report.form_type = "F24A"
-        report.report_version = int(report.report_version or "0") + 1
-
-        if report.upload_submission is not None:
-            report.form_24.original_amendment_date = report.upload_submission.created
-            report.form_24.save()
-
-        report.upload_submission = None
-        report.save()
-        return Response(f"amended {report}")

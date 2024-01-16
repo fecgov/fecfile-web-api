@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("reports", "0009_form99_committee_name"),
+        ("reports", "0010_form1m_committee_name_form1m_contact_affiliated_and_more"),
     ]
 
     operations = [
