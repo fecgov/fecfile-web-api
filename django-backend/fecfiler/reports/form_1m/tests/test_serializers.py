@@ -14,6 +14,7 @@ class F1MSerializerTestCase(TestCase):
     def setUp(self):
         self.valid_f1m_report = {
             "form_type": "F1MN",
+            "committee_name": "committee name",
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",

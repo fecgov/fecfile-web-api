@@ -2,8 +2,9 @@ from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
 from fecfiler.shared.utilities import get_model_data
-from rest_framework.serializers import CharField, DateField
+from rest_framework.serializers import CharField, DateField, UUIDField
 import logging
 
 
@@ -13,12 +14,26 @@ logger = logging.getLogger(__name__)
 class Form1MSerializer(ReportSerializer):
     schema_name = "F1M"
 
+    committee_name = CharField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
     street_2 = CharField(required=False, allow_null=True)
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
+
+    contact_affiliated = ContactSerializer(allow_null=True, required=False)
+    contact_affiliated_id = UUIDField(required=False, allow_null=False)
+    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_I_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_II_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_III = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_III_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_IV_id = UUIDField(required=False, allow_null=True)  # noqa: N815
+    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_V_id = UUIDField(required=False, allow_null=True)  # noqa: N815
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
     affiliated_committee_fec_id = CharField(required=False, allow_null=True)
@@ -87,21 +102,32 @@ class Form1MSerializer(ReportSerializer):
 
     def create(self, validated_data: dict):
         with transaction.atomic():
+            self.write_contacts(validated_data)
             form_1m_data = get_model_data(validated_data, Form1M)
             form_1m = Form1M.objects.create(**form_1m_data)
             report_data = get_model_data(validated_data, Report)
             report_data["form_1m_id"] = form_1m.id
-            report = super().create(report_data)
-            return report
+            return super().create(report_data)
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            self.write_contacts(validated_data)
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_1m, attr, value)
             instance.form_1m.save()
-            updated = super().update(instance, validated_data)
-            return updated
+            return super().update(instance, validated_data)
+
+    def write_contacts(self, validated_data: dict):
+        for contact_key in [
+            "contact_affiliated",
+            "contact_candidate_I",
+            "contact_candidate_II",
+            "contact_candidate_III",
+            "contact_candidate_IV",
+            "contact_candidate_V",
+        ]:
+            create_or_update_contact(validated_data, contact_key)
 
     def validate(self, data):
         self.context["fields_to_ignore"] = self.context.get(
@@ -112,12 +138,16 @@ class Form1MSerializer(ReportSerializer):
     class Meta(ReportSerializer.Meta):
         fields = (
             ReportSerializer.Meta.get_fields()
+            + [f.name for f in Form1M._meta.get_fields() if f.name not in ["report"]]
             + [
-                f.name
-                for f in Form1M._meta.get_fields()
-                if f.name not in ["report"]
+                "fields_to_validate",
+                "contact_affiliated_id",
+                "contact_candidate_I_id",
+                "contact_candidate_II_id",
+                "contact_candidate_III_id",
+                "contact_candidate_IV_id",
+                "contact_candidate_V_id",
             ]
-            + ["fields_to_validate"]
         )
 
         read_only_fields = ["id"]
