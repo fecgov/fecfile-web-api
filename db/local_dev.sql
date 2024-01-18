@@ -1,0 +1,3 @@
+COPY public.authentication_account (id, password, last_login, is_superuser, email, username, tagline, created_at, updated_at, is_staff, is_active, date_joined, first_name, last_name, role, delete_ind, cmtee_id, contact, secret_key, code_generated_counter, status, personal_key, register_token, login_code_counter) FROM stdin;
+175	pbkdf2_sha256$150000$x0245whwObY6$j3O4N6GCXOyVUdhd72ioy5ZGT8hbwrtB6pqWnSxHyFc=	2021-12-23 07:51:59.997283+00	f	test@fec.gov	C00601211test@fec.gov		2020-09-28 15:13:37.269717+00	2021-10-13 08:39:07.555506+00	f	t	2020-09-28 15:13:37.269717+00	first_name_175	last_name_175	C_ADMIN	N	C00601211	2022519761	pbkdf2_sha256$150000$jcZaVwLbiTm0$MOd8ZzHWSqGGlGBBDA0BfN9VXe3uhZ5iiMee9JpXwSM=	1	Registered	\N	\N	2
+\.
