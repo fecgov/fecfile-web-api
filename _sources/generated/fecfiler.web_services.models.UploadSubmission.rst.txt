@@ -59,7 +59,6 @@ fecfiler.web\_services.models.UploadSubmission
       ~UploadSubmission.created
       ~UploadSubmission.dot_fec
       ~UploadSubmission.dot_fec_id
-      ~UploadSubmission.f3xsummary_set
       ~UploadSubmission.fec_message
       ~UploadSubmission.fec_report_id
       ~UploadSubmission.fec_status

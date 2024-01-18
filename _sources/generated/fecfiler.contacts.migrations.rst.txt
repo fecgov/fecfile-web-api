@@ -32,14 +32,4 @@ fecfiler.contacts.migrations
    :recursive:
 
    fecfiler.contacts.migrations.0001_initial
-   fecfiler.contacts.migrations.0002_auto_20220310_1202
-   fecfiler.contacts.migrations.0003_auto_20220317_1320
-   fecfiler.contacts.migrations.0004_auto_20220317_1636
-   fecfiler.contacts.migrations.0005_contact_committee_account
-   fecfiler.contacts.migrations.0006_alter_contact_committee_account
-   fecfiler.contacts.migrations.0007_contact_uuid
-   fecfiler.contacts.migrations.0008_committee_fk_to_int
-   fecfiler.contacts.migrations.0009_committee_uuid_fk
-   fecfiler.contacts.migrations.0010_auto_20220915_1309
-   fecfiler.contacts.migrations.0011_alter_contact_id
 

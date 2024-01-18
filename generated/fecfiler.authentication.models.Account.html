@@ -38,7 +38,7 @@
 <h1>fecfiler.authentication.models.Account<a class="headerlink" href="#fecfiler-authentication-models-account" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.authentication.models.Account">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.authentication.models.</span></span><span class="sig-name descname"><span class="pre">Account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_superuser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmtee_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_login</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_staff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_joined</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">login_code_counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">register_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personal_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_generated_counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.Account" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.authentication.models.</span></span><span class="sig-name descname"><span class="pre">Account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_superuser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmtee_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tagline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_at</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_login</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_staff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_joined</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">login_code_counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">register_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personal_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code_generated_counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.Account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.base_user.AbstractBaseUser</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.models.PermissionsMixin</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.authentication.models.Account.__init__">
@@ -118,19 +118,13 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_date_joined</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_last_login</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_updated_at</span></code>(*[, field, is_next])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created_at</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_created_at</span></code>(*[, field, is_next])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_date_joined</span></code>(*[, field, is_next])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_last_login</span></code>(*[, field, is_next])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_date_joined</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous_by_updated_at</span></code>(*[, field, is_next])</p></td>
@@ -529,6 +523,7 @@ failed.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.authentication.migrations.html">fecfiler.authentication.migrations</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.authentication.models.html">fecfiler.authentication.models</a><ul class="current">
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.authentication.models.Account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.authentication.models.AccountManager.html">fecfiler.authentication.models.AccountManager</a></li>
@@ -544,7 +539,6 @@ failed.</p>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.f3x_summaries.html">fecfiler.f3x_summaries</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>

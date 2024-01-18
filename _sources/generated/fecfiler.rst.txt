@@ -36,7 +36,6 @@ fecfiler
    fecfiler.committee_accounts
    fecfiler.contacts
    fecfiler.dcf_importer
-   fecfiler.f3x_summaries
    fecfiler.memo_text
    fecfiler.openfec
    fecfiler.reports

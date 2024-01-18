@@ -32,37 +32,4 @@ fecfiler.transactions.migrations
    :recursive:
 
    fecfiler.transactions.migrations.0001_initial
-   fecfiler.transactions.migrations.0002_copy_scha
-   fecfiler.transactions.migrations.0003_schedulea_transaction
-   fecfiler.transactions.migrations.0004_copy_to_unified_table
-   fecfiler.transactions.migrations.0005_scheduleb_delete_schedulebtransaction_and_more
-   fecfiler.transactions.migrations.0006_schedulec_and_more
-   fecfiler.transactions.migrations.0007_create_index_on_form_type
-   fecfiler.transactions.migrations.0008_rename_benificiary_candidate_district_scheduleb_beneficiary_candidate_district_and_more
-   fecfiler.transactions.migrations.0009_add_force_itemized
-   fecfiler.transactions.migrations.0010_remove_filer_id_and_back_reference
-   fecfiler.transactions.migrations.0011_schedulec1_and_more
-   fecfiler.transactions.migrations.0012_schedulec2_and_more
-   fecfiler.transactions.migrations.0013_remove_contact_add_contact_1_contact_2
-   fecfiler.transactions.migrations.0014_rename_form_field
-   fecfiler.transactions.migrations.0015_update_partnership_memo_to_partnership_attribution
-   fecfiler.transactions.migrations.0016_update_schedulec_fields
-   fecfiler.transactions.migrations.0017_schedule_d
-   fecfiler.transactions.migrations.0018_schedule_e
-   fecfiler.transactions.migrations.0019_alter_schC1_loan_fields
-   fecfiler.transactions.migrations.0020_add_contact_3
-   fecfiler.transactions.migrations.0021_remove_loan_ptd_balance
-   fecfiler.transactions.migrations.0022_add_debt_foreign_key
-   fecfiler.transactions.migrations.0023_add_loan_foreign_key
-   fecfiler.transactions.migrations.0024_remove_just_in_time_sch_d_fields
-   fecfiler.transactions.migrations.0025_add_force_unaggregated_field
-   fecfiler.transactions.migrations.0026_use_debt_loan_id
-   fecfiler.transactions.migrations.0027_rename_transaction_form_ty_4e50e4_idx_transaction__form_t_e73a46_idx
-   fecfiler.transactions.migrations.0028_alter_transaction_report
-   fecfiler.transactions.migrations.0029_rename_so_candinate_middle_name_schedulee_so_candidate_middle_name
-   fecfiler.transactions.migrations.0030_update_receipt_from_person_to_receipt_from_entity
-   fecfiler.transactions.migrations.0031_remove_schedulee_calendar_ytd
-   fecfiler.transactions.migrations.0032_schedulea_reattribution_redesignation_tag_and_more
-   fecfiler.transactions.migrations.0033_remove_receipt_line_number_from_loans_by_committee
-   fecfiler.transactions.migrations.0034_add_reattr_redes_foreign_key
 

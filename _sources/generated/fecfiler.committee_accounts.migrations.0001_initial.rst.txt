@@ -12,13 +12,6 @@ fecfiler.committee\_accounts.migrations.0001\_initial
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      forwards_func
-   
    
 
    

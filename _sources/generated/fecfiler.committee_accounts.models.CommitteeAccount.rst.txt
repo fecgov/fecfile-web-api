@@ -59,7 +59,6 @@ fecfiler.committee\_accounts.models.CommitteeAccount
       ~CommitteeAccount.contact_set
       ~CommitteeAccount.created
       ~CommitteeAccount.deleted
-      ~CommitteeAccount.f3xsummary_set
       ~CommitteeAccount.id
       ~CommitteeAccount.memotext_set
       ~CommitteeAccount.objects

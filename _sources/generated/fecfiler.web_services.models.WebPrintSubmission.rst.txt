@@ -59,7 +59,6 @@ fecfiler.web\_services.models.WebPrintSubmission
       ~WebPrintSubmission.created
       ~WebPrintSubmission.dot_fec
       ~WebPrintSubmission.dot_fec_id
-      ~WebPrintSubmission.f3xsummary_set
       ~WebPrintSubmission.fec_batch_id
       ~WebPrintSubmission.fec_email
       ~WebPrintSubmission.fec_image_url

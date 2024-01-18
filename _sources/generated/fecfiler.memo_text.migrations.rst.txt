@@ -32,15 +32,5 @@ fecfiler.memo\_text.migrations
    :recursive:
 
    fecfiler.memo_text.migrations.0001_initial
-   fecfiler.memo_text.migrations.0002_memotext_uuid
-   fecfiler.memo_text.migrations.0003_report_id
-   fecfiler.memo_text.migrations.0004_report_fk
-   fecfiler.memo_text.migrations.0005_committee_fk_to_int
-   fecfiler.memo_text.migrations.0006_committee_uuid_fk
-   fecfiler.memo_text.migrations.0007_auto_20220915_1309
-   fecfiler.memo_text.migrations.0008_memotext_transaction_uuid
-   fecfiler.memo_text.migrations.0009_memotext_report_level_memo
-   fecfiler.memo_text.migrations.0010_remove_memotext_filer_committee_id_number
-   fecfiler.memo_text.migrations.0011_remove_memotext_back_reference_sched_form_name_and_more
-   fecfiler.memo_text.migrations.0012_alter_memotext_report
+   fecfiler.memo_text.migrations.0002_initial
 
