@@ -87,8 +87,8 @@ class TransactionViewSet(
             )
 
         parent_id = self.request.query_params.get("parent")
-        if parent_id:
-            queryset = queryset.filter(parent_transaction_id=parent_id)
+        # if parent_id:
+        #     queryset = queryset.filter(parent_transaction_id=parent_id)
 
         return queryset
 
@@ -96,7 +96,8 @@ class TransactionViewSet(
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+            transaction_view = self.get_queryset().get(id=saved_transaction.id)
+        return Response(TransactionSerializer().to_representation(transaction_view))
 
     @silk_profile(name="UPDATE TRANSACTION")
     def update(self, request, *args, **kwargs):

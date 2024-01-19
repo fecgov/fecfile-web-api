@@ -474,7 +474,7 @@ class TransactionManager(SoftDeleteManager):
         ),
     )
 
-    def committee_db_view(self, committee):
+    def transaction_view(self):
         return (
             super()
             .get_queryset()
@@ -609,8 +609,9 @@ class TransactionManager(SoftDeleteManager):
                 #     .values("id")
                 # ),
                 name=self.DISPLAY_NAME_CLAUSE,
+                transaction_ptr_id=F("id"),
             )
-            .filter(committee_account_id=committee.id)
+            # .filter(committee_account_id=committee.id)
         )
 
 

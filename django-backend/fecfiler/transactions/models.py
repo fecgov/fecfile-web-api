@@ -162,11 +162,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
 
 def get_read_model(committee):
-    committee_id = committee.committee_id
-    if not re.fullmatch("C[0-9]{8}", committee_id):
-        raise Exception("invalid committee_id when defining Transaction view model")
+    committee_id = committee.id
 
-    committee_transaction_view = f"transaction_view__{committee_id}"
+    committee_transaction_view = (
+        f"transaction_view__{str(committee_id).replace('-','_')}"
+    )
 
     class T(Transaction):
         schedule = models.TextField()
@@ -182,16 +182,21 @@ def get_read_model(committee):
         debt_key = models.TextField()
         debt_payment = models.DecimalField()
 
+        objects = TransactionManager()
+
         class Meta:
             db_table = committee_transaction_view
 
     with connection.cursor() as cursor:
-        view_results = cursor.execute(
+        cursor.execute(
             "select * from pg_views where viewname = %s;", [committee_transaction_view]
         )
-        if not view_results:
+        if not cursor.fetchone():
             # create veiw
-            definition = str(Transaction.objects.committee_db_view(committee).query)
+            definition = (
+                str(Transaction.objects.transaction_view().query)
+                + f' AND "transactions_transaction"."committee_account_id" = \'{committee.id}\''
+            )
             cursor.execute(f"CREATE VIEW {committee_transaction_view} as {definition}")
 
     return T

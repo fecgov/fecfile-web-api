@@ -229,13 +229,13 @@ class TransactionSerializer(
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            total = (
-                instance.reatt_redes_associations.filter(
-                    schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-                ).aggregate(Sum("amount"))["amount__sum"]
-                or 0.0
-            )
-            representation["reatt_redes_total"] = str(total)
+            # total = (
+            #     instance.reatt_redes_associations.filter(
+            #         schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
+            #     ).aggregate(Sum("amount"))["amount__sum"]
+            #     or 0.0
+            # )
+            # representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
                 if not representation.get(property):
@@ -243,15 +243,15 @@ class TransactionSerializer(
         if schedule_b:
             representation["aggregate_amount"] = representation.get("aggregate")
 
-            # For REDESIGNATED transactions, calculate the amount that has
-            # been redesignated for the transaction
-            total = (
-                instance.reatt_redes_associations.filter(
-                    schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-                ).aggregate(Sum("amount"))["amount__sum"]
-                or 0.0
-            )
-            representation["reatt_redes_total"] = str(total)
+            # # For REDESIGNATED transactions, calculate the amount that has
+            # # been redesignated for the transaction
+            # total = (
+            #     instance.reatt_redes_associations.filter(
+            #         schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
+            #     ).aggregate(Sum("amount"))["amount__sum"]
+            #     or 0.0
+            # )
+            # representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:
                 if not representation.get(property):
