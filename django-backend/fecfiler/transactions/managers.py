@@ -581,7 +581,7 @@ class TransactionManager(SoftDeleteManager):
                     default=None,
                     output_field=TextField(),
                 ),
-                debt_payment_=Case(
+                debt_payment=Case(
                     When(
                         schedule_d__isnull=False,
                         then=Window(

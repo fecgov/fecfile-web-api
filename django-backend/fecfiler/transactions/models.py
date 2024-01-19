@@ -169,6 +169,7 @@ def get_read_model(committee):
     )
 
     class T(Transaction):
+        report_id = models.UUIDField()
         schedule = models.TextField()
         line_label_order_key = models.TextField()
         itemized = models.BooleanField()
@@ -182,7 +183,7 @@ def get_read_model(committee):
         debt_key = models.TextField()
         debt_payment = models.DecimalField()
 
-        objects = TransactionManager()
+        objects = models.Manager()
 
         class Meta:
             db_table = committee_transaction_view
@@ -193,10 +194,12 @@ def get_read_model(committee):
         )
         if not cursor.fetchone():
             # create veiw
-            definition = (
-                str(Transaction.objects.transaction_view().query)
-                + f' AND "transactions_transaction"."committee_account_id" = \'{committee.id}\''
+            sql, params = (
+                Transaction.objects.transaction_view()
+                .filter(committee_account_id=committee_id)
+                .query.sql_with_params()
             )
+            definition = cursor.mogrify(sql, params).decode("utf-8")
             cursor.execute(f"CREATE VIEW {committee_transaction_view} as {definition}")
 
     return T

@@ -2,6 +2,8 @@ import logging
 from silk.profiling.profiler import silk_profile
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
+
+from django.core.paginator import Paginator as DjangoPaginator
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -75,7 +77,9 @@ class TransactionViewSet(
         # Otherwise, use the view for reading
         committee = self.get_committee()
         model = get_read_model(committee)
-        queryset = filter_by_report(model.objects, self)
+        print("AHOY")
+        print(model.objects.all())
+        queryset = filter_by_report(model.objects.all(), self)
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
@@ -90,6 +94,7 @@ class TransactionViewSet(
         # if parent_id:
         #     queryset = queryset.filter(parent_transaction_id=parent_id)
 
+        print(queryset.query)
         return queryset
 
     @silk_profile(name="CREATE TRANSACTION")
@@ -195,6 +200,15 @@ class TransactionViewSet(
 
     @silk_profile(name="LIST TRANSACTIONS")
     def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
         response = super().list(request, *args, **kwargs)
         return response
 
