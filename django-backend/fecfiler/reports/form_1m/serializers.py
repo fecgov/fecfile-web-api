@@ -23,7 +23,7 @@ class Form1MSerializer(ReportSerializer):
     committee_type = CharField(required=False, allow_null=True)
 
     contact_affiliated = ContactSerializer(allow_null=True, required=False)
-    contact_affiliated_id = UUIDField(required=False, allow_null=False)
+    contact_affiliated_id = UUIDField(required=False, allow_null=True)
     contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
     contact_candidate_I_id = UUIDField(required=False, allow_null=True)  # noqa: N815
     contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
@@ -93,6 +93,10 @@ class Form1MSerializer(ReportSerializer):
     V_candidate_state = CharField(required=False, allow_null=True)
     V_candidate_district = CharField(required=False, allow_null=True)
     V_date_of_contribution = DateField(required=False, allow_null=True)
+
+    date_of_original_registration = DateField(required=False, allow_null=True)
+    date_of_51st_contributor = DateField(required=False, allow_null=True)
+    date_committee_met_requirements = DateField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
