@@ -10,6 +10,7 @@ from fecfiler.transactions.models import Transaction
 
 
 def save_hook(transaction: Transaction, is_existing):
+    return
     if not is_existing:
         if Transaction.objects.filter(
             ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),

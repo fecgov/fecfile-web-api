@@ -3,7 +3,11 @@ from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.reports.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
-from fecfiler.transactions.managers import TransactionManager, Schedule
+from fecfiler.transactions.managers import (
+    TransactionManager,
+    TransactionViewManager,
+    Schedule,
+)
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
@@ -180,10 +184,11 @@ def get_read_model(committee):
         calendar_ytd_per_election_office = models.DecimalField()
         loan_key = models.TextField()
         loan_payment_to_date = models.DecimalField()
-        debt_key = models.TextField()
-        debt_payment = models.DecimalField()
+        incurred_prior = models.DecimalField()
+        payment_prior = models.DecimalField()
+        payment_amount = models.DecimalField()
 
-        objects = models.Manager()
+        objects = TransactionViewManager()
 
         class Meta:
             db_table = committee_transaction_view

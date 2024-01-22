@@ -24,6 +24,7 @@ from django.db.models import (
     ExpressionWrapper,
     RowRange,
     Window,
+    Manager,
 )
 from django.db.models.expressions import RawSQL
 from django.contrib.postgres.expressions import ArraySubquery
@@ -58,12 +59,12 @@ class TransactionManager(SoftDeleteManager):
         "frame": RowRange(None, 0),
     }
     loan_payment_window = {
-        "partition_by": [F("loan_key")],
+        "partition_by": [F("debt_id")],
         "order_by": ["loan_key"],
         "frame": RowRange(None, 0),
     }
     debt_payment_window = {
-        "partition_by": [F("debt_key")],
+        "partition_by": [F("debt_id")],
         "order_by": ["debt_key"],
         "frame": RowRange(None, 0),
     }
@@ -100,7 +101,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_d__incurred_amount",
                     "schedule_e__expenditure_amount",
                 ),
-                effective_amount=self.get_amount_clause(),
+                effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE(),
             )
         )
         primary_contact_clause = Q(contact_1_id=OuterRef("contact_1_id"))
@@ -265,7 +266,7 @@ class TransactionManager(SoftDeleteManager):
                     ),
                     default=Value(Decimal(0)),
                 ),
-                itemized=self.get_itemization_clause(),
+                itemized=self.ITEMIZATION_CLAUSE(),
             )
             .annotate(
                 loan_balance=F("amount") - F("loan_payment_to_date"),
@@ -415,7 +416,7 @@ class TransactionManager(SoftDeleteManager):
             .order_by("order_key")
         )
 
-    def get_itemization_clause(self):
+    def ITEMIZATION_CLAUSE(self):
         over_two_hundred_types = (
             schedule_a_over_two_hundred_types
             + schedule_b_over_two_hundred_types
@@ -432,13 +433,59 @@ class TransactionManager(SoftDeleteManager):
             output_field=BooleanField(),
         )
 
-    def get_amount_clause(self):
+    EFFECTIVE_AMOUNT_CLAUSE = Case(
+        When(
+            transaction_type_identifier__in=schedule_b_refunds,
+            then=F("amount") * Value(Decimal(-1)),
+        ),
+        default="amount",
+        output_field=DecimalField(),
+    )
+
+    def SCHEDULE_CLAUSE(self):
         return Case(
-            When(
-                transaction_type_identifier__in=schedule_b_refunds,
-                then=F("amount") * Value(Decimal(-1)),
-            ),
-            default="amount",
+            When(schedule_a__isnull=False, then=Schedule.A.value),
+            When(schedule_b__isnull=False, then=Schedule.B.value),
+            When(schedule_c__isnull=False, then=Schedule.C.value),
+            When(schedule_c1__isnull=False, then=Schedule.C1.value),
+            When(schedule_c2__isnull=False, then=Schedule.C2.value),
+            When(schedule_d__isnull=False, then=Schedule.D.value),
+            When(schedule_e__isnull=False, then=Schedule.E.value),
+        )
+
+    DATE_CLAUSE = Coalesce(
+        "schedule_a__contribution_date",
+        "schedule_b__expenditure_date",
+        "schedule_c__loan_incurred_date",
+        "schedule_e__disbursement_date",
+        "schedule_e__dissemination_date",
+    )
+
+    AMOUNT_CLAUSE = Coalesce(
+        "schedule_a__contribution_amount",
+        "schedule_b__expenditure_amount",
+        "schedule_c__loan_amount",
+        "schedule_c2__guaranteed_amount",
+        "debt__schedule_d__incurred_amount",
+        "schedule_d__incurred_amount",
+        "schedule_e__expenditure_amount",
+    )
+
+    def ENTITY_AGGREGGATE_CLAUSE(self):
+        return Window(
+            expression=Sum("effective_amount"), **self.entity_aggregate_window
+        ) - Case(
+            When(force_unaggregated=True, then=F("effective_amount")),
+            default=Value(0.0),
+            output_field=DecimalField(),
+        )
+
+    def ELECTION_AGGREGATE_CLAUSE(self):
+        return Window(
+            expression=Sum("effective_amount"), **self.election_aggregate_window
+        ) - Case(
+            When(force_unaggregated=True, then=F("effective_amount")),
+            default=Value(0.0),
             output_field=DecimalField(),
         )
 
@@ -474,53 +521,94 @@ class TransactionManager(SoftDeleteManager):
         ),
     )
 
+    def INCURRED_PRIOR_CLAUSE(self):
+        return Case(
+            When(
+                schedule_d__isnull=False,
+                then=Coalesce(
+                    Subquery(
+                        (
+                            super()
+                            .get_queryset()
+                            .filter(
+                                ~Q(debt_id=OuterRef("id")),
+                                transaction_id=OuterRef("transaction_id"),
+                                report__coverage_through_date__lt=OuterRef(
+                                    "report__coverage_from_date"
+                                ),
+                            )
+                            .values("committee_account_id")
+                            .annotate(
+                                incurred_prior=Sum("schedule_d__incurred_amount"),
+                            )
+                            .values("incurred_prior")
+                        )
+                    ),
+                    Value(Decimal(0)),
+                ),
+            ),
+            default=None,
+        )
+
+    def PAYMENT_PRIOR_CLAUSE(self):
+        return Case(
+            When(
+                schedule_d__isnull=False,
+                then=Coalesce(
+                    Subquery(
+                        super()
+                        .get_queryset()
+                        .annotate(date=self.DATE_CLAUSE, amount=self.AMOUNT_CLAUSE)
+                        .filter(
+                            ~Q(debt_id=OuterRef("id")),
+                            debt__transaction_id=OuterRef("transaction_id"),
+                            schedule_d__isnull=True,
+                            date__lt=OuterRef("report__coverage_from_date"),
+                        )
+                        .values("committee_account_id")
+                        .annotate(debt_payments_prior=Sum("amount"))
+                        .values("debt_payments_prior")
+                    ),
+                    Value(Decimal(0)),
+                ),
+            ),
+            default=None,
+        )
+
+    def PAYMENT_AMOUNT_CLAUSE(self):
+        return Case(
+            When(
+                schedule_d__isnull=False,
+                then=Coalesce(
+                    Subquery(
+                        super()
+                        .get_queryset()
+                        .filter(debt_id=OuterRef("id"), schedule_d__isnull=True)
+                        .annotate(amount=self.AMOUNT_CLAUSE)
+                        .values("committee_account_id")
+                        .annotate(payment_to_date=Sum("amount"))
+                        .values("payment_to_date")
+                    ),
+                    Value(Decimal(0)),
+                ),
+            ),
+            default=None,
+        )
+
     def transaction_view(self):
         return (
             super()
             .get_queryset()
             .annotate(
-                schedule=Case(
-                    When(schedule_a__isnull=False, then=Schedule.A.value),
-                    When(schedule_b__isnull=False, then=Schedule.B.value),
-                    When(schedule_c__isnull=False, then=Schedule.C.value),
-                    When(schedule_c1__isnull=False, then=Schedule.C1.value),
-                    When(schedule_c2__isnull=False, then=Schedule.C2.value),
-                    When(schedule_d__isnull=False, then=Schedule.D.value),
-                    When(schedule_e__isnull=False, then=Schedule.E.value),
-                ),
-                date=Coalesce(
-                    "schedule_a__contribution_date",
-                    "schedule_b__expenditure_date",
-                    "schedule_c__loan_incurred_date",
-                    "schedule_e__disbursement_date",
-                    "schedule_e__dissemination_date",
-                ),
-                amount=Coalesce(
-                    "schedule_a__contribution_amount",
-                    "schedule_b__expenditure_amount",
-                    "schedule_c__loan_amount",
-                    "schedule_c2__guaranteed_amount",
-                    "debt__schedule_d__incurred_amount",
-                    "schedule_d__incurred_amount",
-                    "schedule_e__expenditure_amount",
-                ),
-                effective_amount=self.get_amount_clause(),
-                aggregate=Window(
-                    expression=Sum("effective_amount"), **self.entity_aggregate_window
-                )
-                - Case(
-                    When(force_unaggregated=True, then=F("effective_amount")),
-                    default=Value(0.0),
-                    output_field=DecimalField(),
-                ),
-                calendar_ytd_per_election_office=Window(
-                    expression=Sum("effective_amount"), **self.election_aggregate_window
-                )
-                - Case(
-                    When(force_unaggregated=True, then=F("effective_amount")),
-                    default=Value(0.0),
-                    output_field=DecimalField(),
-                ),
+                schedule=self.SCHEDULE_CLAUSE(),
+                date=self.DATE_CLAUSE,
+                amount=self.AMOUNT_CLAUSE,
+                effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
+                aggregate=self.ENTITY_AGGREGGATE_CLAUSE(),
+                calendar_ytd_per_election_office=self.ELECTION_AGGREGATE_CLAUSE(),
+                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
+                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
+                payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=Case(
                     When(
                         Q(loan_id__isnull=False)
@@ -560,39 +648,39 @@ class TransactionManager(SoftDeleteManager):
                     output_field=DecimalField(),
                 ),
                 # do after view: loan_balance=F("amount") - F("loan_payment_to_date"),
-                debt_key=Case(
-                    When(
-                        Q(debt_id__isnull=False)
-                        & Q(
-                            schedule__in=[
-                                Schedule.A.value,
-                                Schedule.B.value,
-                                Schedule.E.value,
-                            ]
-                        ),
-                        then=Concat(F("debt__transaction_id"), F("date")),
-                    ),
-                    When(
-                        schedule_d__isnull=False,
-                        then=Concat(
-                            F("transaction_id"), F("report__coverage_from_date")
-                        ),
-                    ),
-                    default=None,
-                    output_field=TextField(),
-                ),
-                debt_payment=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=Window(
-                            expression=Sum("effective_amount"),
-                            **self.debt_payment_window
-                        )
-                        - F("effective_amount"),
-                    ),
-                    default=Value(0.0),
-                    output_field=DecimalField(),
-                ),
+                # debt_key=Case(
+                #     When(
+                #         Q(debt_id__isnull=False)
+                #         & Q(
+                #             schedule__in=[
+                #                 Schedule.A.value,
+                #                 Schedule.B.value,
+                #                 Schedule.E.value,
+                #             ]
+                #         ),
+                #         then=Concat(F("debt__transaction_id"), F("date")),
+                #     ),
+                #     When(
+                #         schedule_d__isnull=False,
+                #         then=Concat(
+                #             F("transaction_id"), F("report__coverage_from_date")
+                #         ),
+                #     ),
+                #     default=None,
+                #     output_field=TextField(),
+                # ),
+                # debt_payment=Case(
+                #     When(
+                #         schedule_d__isnull=False,
+                #         then=Window(
+                #             expression=Sum("effective_amount"),
+                #             **self.debt_payment_window
+                #         )
+                #         - F("effective_amount"),
+                #     ),
+                #     default=Value(0.0),
+                #     output_field=DecimalField(),
+                # ),
                 # do after view
                 # balance=Coalesce(
                 #     F("loan_balance"),
@@ -601,7 +689,7 @@ class TransactionManager(SoftDeleteManager):
                 #     ),  # F("balance_at_close"), F("loan_balance"), Value(Decimal(0.0))
                 # ),
                 line_label_order_key=F("_form_type"),
-                itemized=self.get_itemization_clause(),
+                itemized=self.ITEMIZATION_CLAUSE(),
                 # children=ArraySubquery(
                 #     super()
                 #     .get_queryset()
@@ -615,11 +703,36 @@ class TransactionManager(SoftDeleteManager):
         )
 
 
+class TransactionViewManager(Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                beginning_balance=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=F("incurred_prior") - F("payment_prior"),
+                    ),
+                ),
+                balance_at_close=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=F("beginning_balance")
+                        + F("schedule_d__incurred_amount")
+                        - F("payment_amount"),
+                    ),
+                ),
+                balance=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+            )
+        )
+
+
 class Schedule(Enum):
-    A = Value("'A'")
-    B = Value("'B'")
-    C = Value("'C'")
-    C2 = Value("'C1'")
-    C1 = Value("'C2'")
-    D = Value("'D'")
-    E = Value("'E'")
+    A = Value("A")
+    B = Value("B")
+    C = Value("C")
+    C2 = Value("C1")
+    C1 = Value("C2")
+    D = Value("D")
+    E = Value("E")
