@@ -240,8 +240,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
+            response = super().update(request, *args, **kwargs)
             propagate_contact(None, self.get_object())
-            return super().update(request, *args, **kwargs)
+            return response
 
     def get_int_param_value(
             self, request, param_name: str, default_param_value: int, max_param_value: int
