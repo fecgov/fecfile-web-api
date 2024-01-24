@@ -58,7 +58,6 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
-                    "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
                     "schedule_e__expenditure_amount",
                 ),
