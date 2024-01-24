@@ -58,12 +58,17 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
+                    "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
                     "schedule_e__expenditure_amount",
                 ),
                 transaction_table_amount=Case(
-                    When(schedule_d__isnull=False, debt__isnull=False, then=F("debt__schedule_d__incurred_amount")),
-                    default=F("amount")
+                    When(
+                        schedule_d__isnull=False,
+                        debt__isnull=False,
+                        then=F("debt__schedule_d__incurred_amount"),
+                    ),
+                    default=F("amount"),
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -169,9 +174,7 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                report__coverage_through_date__lt=OuterRef(
-                    "report__coverage_from_date"
-                ),
+                report__coverage_through_date__lt=OuterRef("report__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(
