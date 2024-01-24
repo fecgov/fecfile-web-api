@@ -61,7 +61,7 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_d__incurred_amount",
                     "schedule_e__expenditure_amount",
                 ),
-                transaction_table_amount=Case(
+                loans_debts_transaction_table_amount=Case(
                     When(
                         schedule_d__isnull=False,
                         debt__isnull=False,
