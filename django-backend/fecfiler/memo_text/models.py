@@ -23,6 +23,8 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     transaction_id_number = models.TextField(null=True, blank=True)
     transaction_uuid = models.TextField(null=True, blank=True)
     text4000 = models.TextField(null=True, blank=True)
+    text_prefix = models.TextField(null=True, blank=True)
+
 
     class Meta:
         db_table = "memo_text"
