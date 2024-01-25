@@ -2,7 +2,8 @@ from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.serializers import ReportSerializer
-from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
+from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.contacts.models import Contact
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField, DateField, UUIDField
 import logging
@@ -10,6 +11,64 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+CONTACT_FIELDS = [
+    'affiliated_committee_fec_id',
+    'affiliated_committee_name',
+    'I_candidate_id_number',
+    'I_candidate_last_name',
+    'I_candidate_first_name',
+    'I_candidate_middle_name',
+    'I_candidate_prefix',
+    'I_candidate_suffix',
+    'I_candidate_office',
+    'I_candidate_district',
+    'I_candidate_state',
+    'II_candidate_id_number',
+    'II_candidate_last_name',
+    'II_candidate_first_name',
+    'II_candidate_middle_name',
+    'II_candidate_prefix',
+    'II_candidate_suffix',
+    'II_candidate_office',
+    'II_candidate_district',
+    'II_candidate_state',
+    'III_candidate_id_number',
+    'III_candidate_last_name',
+    'III_candidate_first_name',
+    'III_candidate_middle_name',
+    'III_candidate_prefix',
+    'III_candidate_suffix',
+    'III_candidate_office',
+    'III_candidate_district',
+    'III_candidate_state',
+    'IV_candidate_id_number',
+    'IV_candidate_last_name',
+    'IV_candidate_first_name',
+    'IV_candidate_middle_name',
+    'IV_candidate_prefix',
+    'IV_candidate_suffix',
+    'IV_candidate_office',
+    'IV_candidate_district',
+    'IV_candidate_state',
+    'V_candidate_id_number',
+    'V_candidate_last_name',
+    'V_candidate_first_name',
+    'V_candidate_middle_name',
+    'V_candidate_prefix',
+    'V_candidate_suffix',
+    'V_candidate_office',
+    'V_candidate_district',
+    'V_candidate_state',
+]
+
+CONTACT_KEYS = [
+    'contact_affiliated',
+    'contact_candidate_I',
+    'contact_candidate_II',
+    'contact_candidate_III',
+    'contact_candidate_IV',
+    'contact_candidate_V',
+]
 
 class Form1MSerializer(ReportSerializer):
     schema_name = "F1M"
@@ -22,17 +81,17 @@ class Form1MSerializer(ReportSerializer):
     zip = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
 
-    contact_affiliated = ContactSerializer(allow_null=True, required=False)
+    contact_affiliated = ContactSerializer(read_only=True)
     contact_affiliated_id = UUIDField(required=False, allow_null=True)
-    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_I = ContactSerializer(read_only=True)  # noqa: N815
     contact_candidate_I_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_II = ContactSerializer(read_only=True)  # noqa: N815,E501
     contact_candidate_II_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_III = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_III = ContactSerializer(read_only=True)  # noqa: N815,E501
     contact_candidate_III_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_IV = ContactSerializer(read_only=True)  # noqa: N815,E501
     contact_candidate_IV_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_V = ContactSerializer(read_only=True)  # noqa: N815
     contact_candidate_V_id = UUIDField(required=False, allow_null=True)  # noqa: N815
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
@@ -104,9 +163,65 @@ class Form1MSerializer(ReportSerializer):
         internal.update(report)
         return internal
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.contact_affiliated:
+            representation['affiliated_committee_fec_id'] = instance.contact_affiliated.committee_id
+            representation['affiliated_committee_name'] = instance.contact_affiliated.name
+        if instance.contact_candidate_I:
+            representation['I_candidate_id_number'] = instance.contact_candidate_I.candidate_id
+            representation['I_candidate_last_name'] = instance.contact_candidate_I.last_name
+            representation['I_candidate_first_name'] = instance.contact_candidate_I.first_name
+            representation['I_candidate_middle_name'] = instance.contact_candidate_I.middle_name
+            representation['I_candidate_prefix'] = instance.contact_candidate_I.prefix
+            representation['I_candidate_suffix'] = instance.contact_candidate_I.suffix
+            representation['I_candidate_office'] = instance.contact_candidate_I.candidate_office
+            representation['I_candidate_district'] = instance.contact_candidate_I.candidate_district
+            representation['I_candidate_state'] = instance.contact_candidate_I.candidate_state
+        if instance.contact_candidate_II:
+            representation['II_candidate_id_number'] = instance.contact_candidate_II.candidate_id
+            representation['II_candidate_last_name'] = instance.contact_candidate_II.last_name
+            representation['II_candidate_first_name'] = instance.contact_candidate_II.first_name
+            representation['II_candidate_middle_name'] = instance.contact_candidate_II.middle_name
+            representation['II_candidate_prefix'] = instance.contact_candidate_II.prefix
+            representation['II_candidate_suffix'] = instance.contact_candidate_II.suffix
+            representation['II_candidate_office'] = instance.contact_candidate_II.candidate_office
+            representation['II_candidate_district'] = instance.contact_candidate_II.candidate_district
+            representation['II_candidate_state'] = instance.contact_candidate_II.candidate_state
+        if instance.contact_candidate_III:
+            representation['III_candidate_id_number'] = instance.contact_candidate_III.candidate_id
+            representation['III_candidate_last_name'] = instance.contact_candidate_III.last_name
+            representation['III_candidate_first_name'] = instance.contact_candidate_III.first_name
+            representation['III_candidate_middle_name'] = instance.contact_candidate_III.middle_name
+            representation['III_candidate_prefix'] = instance.contact_candidate_III.prefix
+            representation['III_candidate_suffix'] = instance.contact_candidate_III.suffix
+            representation['III_candidate_office'] = instance.contact_candidate_III.candidate_office
+            representation['III_candidate_district'] = instance.contact_candidate_III.candidate_district
+            representation['III_candidate_state'] = instance.contact_candidate_III.candidate_state
+        if instance.contact_candidate_IV:
+            representation['IV_candidate_id_number'] = instance.contact_candidate_IV.candidate_id
+            representation['IV_candidate_last_name'] = instance.contact_candidate_IV.last_name
+            representation['IV_candidate_first_name'] = instance.contact_candidate_IV.first_name
+            representation['IV_candidate_middle_name'] = instance.contact_candidate_IV.middle_name
+            representation['IV_candidate_prefix'] = instance.contact_candidate_IV.prefix
+            representation['IV_candidate_suffix'] = instance.contact_candidate_IV.suffix
+            representation['IV_candidate_office'] = instance.contact_candidate_IV.candidate_office
+            representation['IV_candidate_district'] = instance.contact_candidate_IV.candidate_district
+            representation['IV_candidate_state'] = instance.contact_candidate_IV.candidate_state
+        if instance.contact_candidate_V:
+            representation['V_candidate_id_number'] = instance.contact_candidate_V.candidate_id
+            representation['V_candidate_last_name'] = instance.contact_candidate_V.last_name
+            representation['V_candidate_first_name'] = instance.contact_candidate_V.first_name
+            representation['V_candidate_middle_name'] = instance.contact_candidate_V.middle_name
+            representation['V_candidate_prefix'] = instance.contact_candidate_V.prefix
+            representation['V_candidate_suffix'] = instance.contact_candidate_V.suffix
+            representation['V_candidate_office'] = instance.contact_candidate_V.candidate_office
+            representation['V_candidate_district'] = instance.contact_candidate_V.candidate_district
+            representation['V_candidate_state'] = instance.contact_candidate_V.candidate_state
+        return representation
+
     def create(self, validated_data: dict):
         with transaction.atomic():
-            self.write_contacts(validated_data)
             form_1m_data = get_model_data(validated_data, Form1M)
             form_1m = Form1M.objects.create(**form_1m_data)
             report_data = get_model_data(validated_data, Report)
@@ -115,23 +230,11 @@ class Form1MSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
-            self.write_contacts(validated_data)
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_1m, attr, value)
             instance.form_1m.save()
             return super().update(instance, validated_data)
-
-    def write_contacts(self, validated_data: dict):
-        for contact_key in [
-            "contact_affiliated",
-            "contact_candidate_I",
-            "contact_candidate_II",
-            "contact_candidate_III",
-            "contact_candidate_IV",
-            "contact_candidate_V",
-        ]:
-            create_or_update_contact(validated_data, contact_key)
 
     def validate(self, data):
         self.context["fields_to_ignore"] = self.context.get(
@@ -143,6 +246,7 @@ class Form1MSerializer(ReportSerializer):
         fields = (
             ReportSerializer.Meta.get_fields()
             + [f.name for f in Form1M._meta.get_fields() if f.name not in ["report"]]
+            + CONTACT_FIELDS
             + [
                 "fields_to_validate",
                 "contact_affiliated_id",

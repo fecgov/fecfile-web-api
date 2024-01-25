@@ -2,10 +2,10 @@ import logging
 
 from django.db.models import Sum
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from fecfiler.contacts.serializers import LinkedContactSerializerMixin
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty
 from collections import OrderedDict
@@ -18,90 +18,19 @@ from rest_framework.serializers import (
     DecimalField,
 )
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.schedule_a.models import ScheduleA
-from fecfiler.transactions.schedule_b.models import ScheduleB
-from fecfiler.transactions.schedule_c.models import ScheduleC
-from fecfiler.transactions.schedule_c1.models import ScheduleC1
-from fecfiler.transactions.schedule_c2.models import ScheduleC2
-from fecfiler.transactions.schedule_d.models import ScheduleD
-from fecfiler.transactions.schedule_e.models import ScheduleE
+from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer, schedule_a_contact_fields
+from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer, schedule_b_contact_fields
+from fecfiler.transactions.schedule_c.serializers import ScheduleCSerializer, schedule_c_contact_fields
+from fecfiler.transactions.schedule_c1.serializers import ScheduleC1Serializer, schedule_c1_contact_fields
+from fecfiler.transactions.schedule_c2.serializers import ScheduleC2Serializer, schedule_c2_contact_fields
+from fecfiler.transactions.schedule_d.serializers import ScheduleDSerializer, schedule_d_contact_fields
+from fecfiler.transactions.schedule_e.serializers import ScheduleESerializer, schedule_e_contact_fields
 
 
 logger = logging.getLogger(__name__)
 MISSING_SCHEMA_NAME_ERROR = ValidationError(
     {"schema_name": ["No schema_name provided"]}
 )
-
-
-class ScheduleASerializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleA._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleA
-
-
-class ScheduleBSerializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleB._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleB
-
-
-class ScheduleCSerializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleC._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleC
-
-
-class ScheduleC1Serializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleC1._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleC1
-
-
-class ScheduleC2Serializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleC2._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleC2
-
-
-class ScheduleDSerializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleD._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleD
-
-
-class ScheduleESerializer(ModelSerializer):
-    class Meta:
-        fields = [
-            f.name
-            for f in ScheduleE._meta.get_fields()
-            if f.name not in ["deleted", "transaction"]
-        ]
-        model = ScheduleE
-
 
 SCHEDULE_SERIALIZERS = dict(
     A=ScheduleASerializer,
@@ -115,7 +44,6 @@ SCHEDULE_SERIALIZERS = dict(
 
 
 class TransactionSerializer(
-    LinkedContactSerializerMixin,
     LinkedMemoTextSerializerMixin,
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
@@ -125,13 +53,21 @@ class TransactionSerializer(
 
     id = UUIDField(required=False)
     report_id = UUIDField(required=True, allow_null=False)
-    schedule_a = ScheduleASerializer(required=False)
-    schedule_b = ScheduleBSerializer(required=False)
-    schedule_c = ScheduleCSerializer(required=False)
-    schedule_c1 = ScheduleC1Serializer(required=False)
-    schedule_c2 = ScheduleC2Serializer(required=False)
-    schedule_d = ScheduleDSerializer(required=False)
-    schedule_e = ScheduleESerializer(required=False)
+
+    schedule_a = ScheduleASerializer(read_only=True)
+    schedule_b = ScheduleBSerializer(read_only=True)
+    schedule_c = ScheduleCSerializer(read_only=True)
+    schedule_c1 = ScheduleC1Serializer(read_only=True)
+    schedule_c2 = ScheduleC2Serializer(read_only=True)
+    schedule_d = ScheduleDSerializer(read_only=True)
+    schedule_e = ScheduleESerializer(read_only=True)
+
+    contact_1_id = UUIDField(required=False, allow_null=True)
+    contact_1 = ContactSerializer(read_only=True)
+    contact_2_id = UUIDField(required=False, allow_null=True)
+    contact_2 = ContactSerializer(read_only=True)
+    contact_3_id = UUIDField(required=False, allow_null=True)
+    contact_3 = ContactSerializer(read_only=True)
 
     report = ReportSerializer(read_only=True)
 
@@ -223,6 +159,7 @@ class TransactionSerializer(
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
+            representation = schedule_a_contact_fields(instance, representation)
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
@@ -236,6 +173,7 @@ class TransactionSerializer(
                     representation[property] = schedule_a[property]
         if schedule_b:
             representation["aggregate_amount"] = representation.get("aggregate")
+            representation = schedule_b_contact_fields(instance, representation)
 
             # For REDESIGNATED transactions, calculate the amount that has
             # been redesignated for the transaction
@@ -254,22 +192,27 @@ class TransactionSerializer(
             representation["loan_agreement_id"] = (
                 loan_agreement.id if loan_agreement else None
             )
+            representation = schedule_c_contact_fields(instance, representation)
             for property in schedule_c:
                 if not representation.get(property):
                     representation[property] = schedule_c[property]
         if schedule_c1:
+            representation = schedule_c1_contact_fields(instance, representation)
             for property in schedule_c1:
                 if not representation.get(property):
                     representation[property] = schedule_c1[property]
         if schedule_c2:
+            representation = schedule_c2_contact_fields(instance, representation)
             for property in schedule_c2:
                 if not representation.get(property):
                     representation[property] = schedule_c2[property]
         if schedule_d:
+            representation = schedule_d_contact_fields(instance, representation)
             for property in schedule_d:
                 if not representation.get(property):
                     representation[property] = schedule_d[property]
         if schedule_e:
+            representation = schedule_e_contact_fields(instance, representation)
             for property in schedule_e:
                 if not representation.get(property):
                     representation[property] = schedule_e[property]

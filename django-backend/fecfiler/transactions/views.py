@@ -16,6 +16,7 @@ from fecfiler.transactions.serializers import (
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.views import get_contact_instances_from_payload
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
@@ -30,36 +31,14 @@ class TransactionListPagination(pagination.PageNumberPagination):
 
 # clause used to facilitate sorting on name as it's displayed
 DISPLAY_NAME_CLAUSE = Coalesce(
-    Coalesce(
-        "schedule_a__contributor_organization_name",
-        "schedule_b__payee_organization_name",
-        "schedule_c__lender_organization_name",
-        "schedule_c1__lender_organization_name",
-        "schedule_d__creditor_organization_name",
-        "schedule_e__payee_organization_name",
-    ),
+    "contact_1__name",
     Concat(
-        Coalesce(
-            "schedule_a__contributor_last_name",
-            "schedule_b__payee_last_name",
-            "schedule_c__lender_last_name",
-            "schedule_c2__guarantor_last_name",
-            "schedule_d__creditor_last_name",
-            "schedule_e__payee_last_name",
-        ),
+        "contact_1__last_name",
         Value(", "),
-        Coalesce(
-            "schedule_a__contributor_first_name",
-            "schedule_b__payee_first_name",
-            "schedule_c__lender_first_name",
-            "schedule_c2__guarantor_first_name",
-            "schedule_d__creditor_first_name",
-            "schedule_e__payee_first_name",
-        ),
+        "contact_1__first_name",
         output_field=TextField(),
-    ),
+    )
 )
-
 
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     serializer_class = TransactionSerializer
@@ -202,9 +181,9 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         else:
             query = query.filter(
                 Q(schedule_e__election_code=election_code),
-                Q(schedule_e__so_candidate_office=office),
-                Q(schedule_e__so_candidate_state=state),
-                Q(schedule_e__so_candidate_district=district),
+                Q(contact_2__candidate_office=office),
+                Q(contact_2__candidate_state=state),
+                Q(contact_2__candidate_district=district),
             )
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
@@ -215,16 +194,6 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
-
-    def propagate_contacts(self, transaction):
-        contact_1 = Contact.objects.get(id=transaction.contact_1_id)
-        propagate_contact(transaction, contact_1)
-        contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
-        if contact_2:
-            propagate_contact(transaction, contact_2)
-        contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
-        if contact_3:
-            propagate_contact(transaction, contact_3)
 
     def save_transaction(self, transaction_data, request):
         children = transaction_data.pop("children", [])
@@ -257,14 +226,19 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 data=transaction_data, context={"request": request}
             )
 
+        contact_instances = get_contact_instances_from_payload(
+            transaction_data,
+            ['contact_1', 'contact_2', 'contact_3'],
+            request
+        )
         transaction_serializer.is_valid(raise_exception=True)
         schedule_serializer.is_valid(raise_exception=True)
 
         schedule_instance = schedule_serializer.save()
         transaction_instance = transaction_serializer.save(
-            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
+            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance},
+            **contact_instances
         )
-        self.propagate_contacts(transaction_instance)
 
         get_save_hook(transaction_instance)(
             transaction_instance,
@@ -312,13 +286,3 @@ def get_save_hook(transaction: Transaction):
         Schedule.D: schedule_d_save_hook,
     }
     return hooks.get(schedule_name, noop)
-
-
-def propagate_contact(transaction, contact):
-    other_transactions = Transaction.objects.filter(
-        ~Q(id=getattr(transaction, "id", None)),
-        Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
-    )
-    for other_transaction in other_transactions:
-        other_transaction.get_schedule().update_with_contact(contact)
-        other_transaction.save()

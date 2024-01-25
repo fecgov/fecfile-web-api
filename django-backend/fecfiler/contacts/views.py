@@ -7,7 +7,6 @@ from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
@@ -37,6 +36,27 @@ def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
     return candidate_id
+
+def get_contact_instances_from_payload(payload, contactKeys, request):
+    contact_instances = {}
+    for contact_key in contactKeys:
+        contact_data = payload.get(contact_key, None)
+        if contact_data:
+            if 'id' in contact_data:
+                contact_instance = Contact.objects.get(pk=contact_data['id'])
+                contact_serializer = ContactSerializer(
+                    contact_instance,
+                    data=contact_data,
+                    context={"request": request}
+                )
+            else:
+                contact_serializer = ContactSerializer(
+                    data=contact_data,
+                    context={"request": request}
+                )
+            contact_serializer.is_valid(raise_exception=True)
+            contact_instances[contact_key] = contact_serializer.save()
+    return contact_instances
 
 
 class ContactViewSet(CommitteeOwnedViewSet):
@@ -241,7 +261,6 @@ class ContactViewSet(CommitteeOwnedViewSet):
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             response = super().update(request, *args, **kwargs)
-            propagate_contact(None, self.get_object())
             return response
 
     def get_int_param_value(

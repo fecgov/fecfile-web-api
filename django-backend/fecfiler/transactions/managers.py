@@ -72,29 +72,29 @@ class TransactionManager(SoftDeleteManager):
             & Q(parent_transaction__isnull=True)
             & Q(schedule_e__election_code=OuterRef("schedule_e__election_code"))
             & Q(
-                schedule_e__so_candidate_office=OuterRef(
-                    "schedule_e__so_candidate_office"
+                contact_2__candidate_office=OuterRef(
+                    "contact_2__candidate_office"
                 )
             )
             & Q(
                 Q(
-                    schedule_e__so_candidate_state=OuterRef(
-                        "schedule_e__so_candidate_state"
+                    contact_2__candidate_state=OuterRef(
+                        "contact_2__candidate_state"
                     )
                 )
                 | (
-                    Q(schedule_e__so_candidate_state__isnull=True)
+                    Q(contact_2__candidate_state__isnull=True)
                     & Q(outer_candidate_state__isnull=True)
                 )
             )
             & (
                 Q(
-                    schedule_e__so_candidate_district=OuterRef(
-                        "schedule_e__so_candidate_district"
+                    contact_2__candidate_district=OuterRef(
+                        "contact_2__candidate_district"
                     )
                 )
                 | (
-                    Q(schedule_e__so_candidate_district__isnull=True)
+                    Q(contact_2__candidate_district__isnull=True)
                     & Q(outer_candidate_district__isnull=True)
                 )
             )
@@ -121,15 +121,15 @@ class TransactionManager(SoftDeleteManager):
         calendar_ytd_per_election_office_clause = (
             queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
-                    OuterRef("schedule_e__so_candidate_district"),
+                    OuterRef("contact_2__candidate_district"),
                     output_field=TextField(),
                 ),
                 outer_candidate_state=ExpressionWrapper(
-                    OuterRef("schedule_e__so_candidate_state"), output_field=TextField()
+                    OuterRef("contact_2__candidate_state"), output_field=TextField()
                 ),
             )
             .filter(
-                election_clause,
+                # election_clause,
                 year_clause,
                 date_clause,
                 group_clause,

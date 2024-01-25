@@ -10,12 +10,6 @@ class ScheduleC1(models.Model):
         serialize=False,
         unique=True,
     )
-    lender_organization_name = models.TextField(null=True, blank=True)
-    lender_street_1 = models.TextField(null=True, blank=True)
-    lender_street_2 = models.TextField(null=True, blank=True)
-    lender_city = models.TextField(null=True, blank=True)
-    lender_state = models.TextField(null=True, blank=True)
-    lender_zip = models.TextField(null=True, blank=True)
     loan_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
@@ -71,15 +65,6 @@ class ScheduleC1(models.Model):
 
     def get_date(self):
         return self.loan_incurred_date
-
-    def update_with_contact(self, contact):
-        self.lender_organization_name = contact.name
-        self.lender_street_1 = contact.street_1
-        self.lender_street_2 = contact.street_2
-        self.lender_city = contact.city
-        self.lender_state = contact.state
-        self.lender_zip = contact.zip
-        self.save()
 
     class Meta:
         app_label = "transactions"

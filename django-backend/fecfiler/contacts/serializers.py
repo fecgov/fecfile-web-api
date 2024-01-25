@@ -82,37 +82,3 @@ class ContactSerializer(
         if "transaction_count" in data:
             del data["transaction_count"]
         return super().to_internal_value(data)
-
-
-class LinkedContactSerializerMixin(ModelSerializer):
-    contact_1 = ContactSerializer(allow_null=True, required=False)
-    contact_1_id = UUIDField(required=False, allow_null=False)
-    contact_2 = ContactSerializer(allow_null=True, required=False)
-    contact_2_id = UUIDField(required=False, allow_null=True)
-    contact_3 = ContactSerializer(allow_null=True, required=False)
-    contact_3_id = UUIDField(required=False, allow_null=True)
-
-    def create(self, validated_data: dict):
-        with transaction.atomic():
-            self.write_contacts(validated_data)
-            return super().create(validated_data)
-
-    def update(self, instance, validated_data: dict):
-        with transaction.atomic():
-            self.write_contacts(validated_data)
-            return super().update(instance, validated_data)
-
-    def write_contacts(self, validated_data: dict):
-        for contact_key in ["contact_1", "contact_2", "contact_3"]:
-            create_or_update_contact(validated_data, contact_key)
-
-
-def create_or_update_contact(validated_data: dict, contact_key):
-    contact_data = validated_data.pop(contact_key, None)
-    contact_id = validated_data.get(contact_key + "_id", None)
-
-    if not contact_id and contact_data:
-        contact: Contact = Contact.objects.create(**contact_data)
-        validated_data[contact_key + "_id"] = contact.id
-    elif contact_data:
-        Contact.objects.filter(id=contact_id).update(**contact_data)
