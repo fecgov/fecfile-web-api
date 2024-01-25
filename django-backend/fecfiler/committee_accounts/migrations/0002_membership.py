@@ -5,6 +5,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.contrib.auth.validators
 import django.utils.timezone
+from fecfiler.committee_accounts.models import Membership as MembershipModel
 
 
 def create_memberships(apps, schema_editor):
@@ -14,11 +15,13 @@ def create_memberships(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     users = User.objects.using(db_alias).all()
     for user in users:
-        committee = CommitteeAccount.get(committee_id=user.cmtee_id)
+        committee = CommitteeAccount.objects.using(db_alias).get(
+            committee_id=user.cmtee_id
+        )
         membership = Membership(
             user=user,
             committee_account=committee,
-            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            role=MembershipModel.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         )
         membership.save()
 
