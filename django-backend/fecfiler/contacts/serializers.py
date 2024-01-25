@@ -82,3 +82,13 @@ class ContactSerializer(
         if "transaction_count" in data:
             del data["transaction_count"]
         return super().to_internal_value(data)
+
+def create_or_update_contact(validated_data: dict, contact_key):
+    contact_data = validated_data.pop(contact_key, None)
+    contact_id = validated_data.get(contact_key + "_id", None)
+
+    if not contact_id and contact_data:
+        contact: Contact = Contact.objects.create(**contact_data)
+        validated_data[contact_key + "_id"] = contact.id
+    elif contact_data:
+        Contact.objects.filter(id=contact_id).update(**contact_data)

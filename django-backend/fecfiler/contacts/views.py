@@ -37,7 +37,7 @@ def validate_and_sanitize_candidate(candidate_id):
         raise AssertionError("No Candidate ID provided")
     return candidate_id
 
-def get_contact_instances_from_payload(payload, contactKeys, request):
+def save_payload_contacts(payload, contactKeys, request={}):
     contact_instances = {}
     for contact_key in contactKeys:
         contact_data = payload.get(contact_key, None)
