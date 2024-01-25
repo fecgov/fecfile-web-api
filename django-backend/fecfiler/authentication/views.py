@@ -18,55 +18,13 @@ from fecfiler.settings import (
 )
 
 from rest_framework.response import Response
-from rest_framework import filters, status
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin
-from django.db.models import Value, CharField
-from django.db.models.functions import Concat
-from .models import Account
-from .serializers import AccountSerializer
+from rest_framework import status
 from urllib.parse import urlencode
 from datetime import datetime
 from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-class AccountViewSet(GenericViewSet, ListModelMixin):
-    """
-        The Account ViewSet allows the user to retrieve the users in the same committee
-
-        The CommitteeOwnedViewset could not be inherited due to the different structure
-        of a user object versus other objects.
-            (IE - having a "cmtee_id" field instead of "committee_id")
-    """
-
-    serializer_class = AccountSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "last_name",
-        "first_name",
-        "id",
-        "email",
-        "role",
-        "is_active",
-        "name",
-    ]
-    ordering = ["name"]
-
-    def get_queryset(self):
-        queryset = (
-            Account.objects.annotate(
-                name=Concat(
-                    "last_name", Value(", "), "first_name", output_field=CharField()
-                )
-            )
-            .filter(cmtee_id=self.request.user.cmtee_id)
-            .all()
-        )
-
-        return queryset
 
 
 def login_dot_gov_logout(request):
@@ -90,14 +48,7 @@ def generate_username(uuid):
     return uuid
 
 
-def update_last_login_time(account):
-    account.last_login = datetime.now()
-    account.save()
-
-
 def handle_valid_login(account):
-    update_last_login_time(account)
-
     logger.debug("Successful login: {}".format(account))
     return JsonResponse(
         {"is_allowed": True, "committee_id": account.cmtee_id, "email": account.email},

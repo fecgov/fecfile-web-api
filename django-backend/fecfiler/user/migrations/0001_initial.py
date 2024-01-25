@@ -2,6 +2,7 @@ import django.contrib.auth.models
 import django.contrib.auth.validators
 from django.db import migrations, models
 import django.utils.timezone
+import uuid
 from fecfiler.shared.utilities import get_model_data
 import uuid
 
