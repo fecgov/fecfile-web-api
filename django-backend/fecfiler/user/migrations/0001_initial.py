@@ -3,6 +3,7 @@ import django.contrib.auth.validators
 from django.db import migrations, models
 import django.utils.timezone
 from fecfiler.shared.utilities import get_model_data
+import uuid
 
 
 def copy_users(apps, schema_editor):
@@ -12,6 +13,7 @@ def copy_users(apps, schema_editor):
     old_users = OldAccount.objects.using(db_alias).all()
     for old_user in old_users:
         user_data = get_model_data(old_user.__dict__, User)
+        user_data["id"] = uuid.uuid4()
         User.objects.create(**user_data)
 
 
@@ -28,11 +30,12 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.BigAutoField(
-                        auto_created=True,
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
                         primary_key=True,
                         serialize=False,
-                        verbose_name="ID",
+                        unique=True,
                     ),
                 ),
                 ("password", models.CharField(max_length=128, verbose_name="password")),

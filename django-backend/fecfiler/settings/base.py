@@ -47,7 +47,7 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    # "django.contrib.admin",
     "django.contrib.auth",
     "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
