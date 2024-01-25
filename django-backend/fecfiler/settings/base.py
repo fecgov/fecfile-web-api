@@ -35,7 +35,7 @@ SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 
 ROOT_URLCONF = "fecfiler.urls"
 WSGI_APPLICATION = "fecfiler.wsgi.application"
-AUTH_USER_MODEL = "authentication.Account"
+AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "fecfiler.validation",
     "fecfiler.web_services",
     "fecfiler.openfec",
+    "fecfiler.user",
 ]
 
 MIDDLEWARE = [
