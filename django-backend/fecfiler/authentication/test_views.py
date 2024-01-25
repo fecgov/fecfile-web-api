@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 from django.test import RequestFactory, TestCase
-from fecfiler.authentication.models import Account
+from django.contrib.auth import get_user_model
 from fecfiler.authentication.views import (
     handle_invalid_login,
     handle_valid_login,
@@ -14,15 +14,17 @@ from .views import (
     logout_redirect,
 )
 
+UserModel = get_user_model()
+
 
 class AuthenticationTest(TestCase):
     fixtures = ["test_accounts"]
     acc = None
 
     def setUp(self):
-        self.user = Account.objects.get(cmtee_id="C12345678")
+        self.user = UserModel.objects.get(cmtee_id="C12345678")
         self.factory = RequestFactory()
-        self.acc = Account.objects.get(email="unit_tester@test.com")
+        self.acc = UserModel.objects.get(email="unit_tester@test.com")
 
     def test_login_dot_gov_logout_happy_path(self):
         test_state = "test_state"

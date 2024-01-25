@@ -8,7 +8,7 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_COMMITTEE_ID_COOKIE_NAME,
+    # FFAPI_COMMITTEE_ID_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
@@ -48,10 +48,10 @@ def generate_username(uuid):
     return uuid
 
 
-def handle_valid_login(account):
-    logger.debug("Successful login: {}".format(account))
+def handle_valid_login(user):
+    logger.debug("Successful login: {}".format(user))
     return JsonResponse(
-        {"is_allowed": True, "committee_id": account.cmtee_id, "email": account.email},
+        {"is_allowed": True, "email": user.email},
         status=200,
         safe=False,
     )
@@ -70,7 +70,7 @@ def handle_invalid_login(username):
 
 
 def delete_user_logged_in_cookies(response):
-    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    # response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
@@ -81,12 +81,12 @@ def delete_user_logged_in_cookies(response):
 def login_redirect(request):
     request.session["user_id"] = request.user.pk
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_COMMITTEE_ID_COOKIE_NAME,
-        request.user.cmtee_id,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
+    # redirect.set_cookie(
+    #     FFAPI_COMMITTEE_ID_COOKIE_NAME,
+    #     request.user.cmtee_id,
+    #     domain=FFAPI_COOKIE_DOMAIN,
+    #     secure=True,
+    # )
     redirect.set_cookie(
         FFAPI_EMAIL_COOKIE_NAME,
         request.user.email,
