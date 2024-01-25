@@ -8,6 +8,12 @@ import uuid
 
 
 def copy_users(apps, schema_editor):
+    print(apps.get_models())
+    if not apps.is_installed(
+        "authentication"
+    ):  # "authentication" not in [app_name for app_name, app in apps.get_models()]:
+        print("no authentication app")
+        return
     OldAccount = apps.get_model("authentication", "Account")
     User = apps.get_model("user", "User")
     db_alias = schema_editor.connection.alias
@@ -54,6 +60,7 @@ class Migration(migrations.Migration):
                         verbose_name="superuser status",
                     ),
                 ),
+                ("cmtee_id", models.CharField(max_length=9)),
                 (
                     "username",
                     models.CharField(
