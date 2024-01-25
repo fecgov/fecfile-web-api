@@ -11,5 +11,7 @@ class User(AbstractUser):
         serialize=False,
         unique=True,
     )
+    first_name = models.CharField(max_length=150, blank=True, null=True)
+    last_name = models.CharField(max_length=150, blank=True, null=True)
     groups = None
     user_permissions = None
