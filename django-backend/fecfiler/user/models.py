@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
@@ -11,5 +12,9 @@ class User(AbstractUser):
         serialize=False,
         unique=True,
     )
+    first_name = models.CharField(
+        _("first name"), max_length=150, null=True, blank=True
+    )
+    last_name = models.CharField(_("last name"), max_length=150, null=True, blank=True)
     groups = None
     user_permissions = None
