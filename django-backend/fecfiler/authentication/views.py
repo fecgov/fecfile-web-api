@@ -14,7 +14,7 @@ from fecfiler.settings import (
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
     OIDC_OP_LOGOUT_ENDPOINT,
-    E2E_TESTING_LOGIN,
+    USERNAME_PASSWORD_LOGIN_AVAILABLE,
 )
 
 from rest_framework.response import Response
@@ -35,11 +35,11 @@ logger = logging.getLogger(__name__)
 
 class AccountViewSet(GenericViewSet, ListModelMixin):
     """
-        The Account ViewSet allows the user to retrieve the users in the same committee
+    The Account ViewSet allows the user to retrieve the users in the same committee
 
-        The CommitteeOwnedViewset could not be inherited due to the different structure
-        of a user object versus other objects.
-            (IE - having a "cmtee_id" field instead of "committee_id")
+    The CommitteeOwnedViewset could not be inherited due to the different structure
+    of a user object versus other objects.
+        (IE - having a "cmtee_id" field instead of "committee_id")
     """
 
     serializer_class = AccountSerializer
@@ -160,9 +160,9 @@ def logout_redirect(request):
 @require_http_methods(["GET", "POST"])
 def authenticate_login(request):
     if request.method == "GET":
-        return JsonResponse({"endpoint_available": E2E_TESTING_LOGIN})
+        return JsonResponse({"endpoint_available": USERNAME_PASSWORD_LOGIN_AVAILABLE})
 
-    if not E2E_TESTING_LOGIN:
+    if not USERNAME_PASSWORD_LOGIN_AVAILABLE:
         return JsonResponse(status=405, safe=False)
 
     username = request.data.get("username", None)
