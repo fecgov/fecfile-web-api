@@ -1,6 +1,5 @@
-from rest_framework import viewsets, mixins, filters
+from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from fecfiler.user.serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CommitteeAccount
