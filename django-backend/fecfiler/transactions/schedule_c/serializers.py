@@ -30,7 +30,7 @@ CONTACT_FIELDS = [
     'lender_candidate_district',
 ]
 
-def schedule_c_contact_fields(instance, representation):
+def add_schedule_c_contact_fields(instance, representation):
     if instance.contact_1:
         representation['lender_organization_name'] = instance.contact_1.name
         representation['lender_last_name'] = instance.contact_1.last_name
@@ -54,7 +54,6 @@ def schedule_c_contact_fields(instance, representation):
         representation['lender_candidate_office'] = instance.contact_2.candidate_office
         representation['lender_candidate_state'] = instance.contact_2.candidate_state
         representation['lender_candidate_district'] = instance.contact_2.candidate_district
-    return representation
 
 
 class ScheduleCSerializer(ModelSerializer):

@@ -586,18 +586,6 @@
     "comment": "Guarantor to move forward",
     "model": "transactions.schedulec2",
     "fields": {
-      "guarantor_last_name": "c",
-      "guarantor_first_name": "c",
-      "guarantor_middle_name": null,
-      "guarantor_prefix": null,
-      "guarantor_suffix": null,
-      "guarantor_street_1": "c",
-      "guarantor_street_2": null,
-      "guarantor_city": "c",
-      "guarantor_state": "CA",
-      "guarantor_zip": "11111",
-      "guarantor_employer": null,
-      "guarantor_occupation": null,
       "guaranteed_amount": "111.00"
     },
     "pk": "c299267c-6bfb-4ebf-ad0d-a2233d597718"
@@ -625,17 +613,6 @@
     "comment": "Debt to move forward",
     "model": "transactions.scheduled",
     "fields": {
-      "creditor_organization_name": "A PAC",
-      "creditor_last_name": null,
-      "creditor_first_name": null,
-      "creditor_middle_name": null,
-      "creditor_prefix": null,
-      "creditor_suffix": null,
-      "creditor_street_1": "107 S WEST ST",
-      "creditor_street_2": "SUITE 555",
-      "creditor_city": "ALEXANDRIA",
-      "creditor_state": "VA",
-      "creditor_zip": "22314",
       "incurred_amount": "3.00"
     },
     "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
@@ -666,17 +643,6 @@
     "comment": "Debt NOT to move forward",
     "model": "transactions.scheduled",
     "fields": {
-      "creditor_organization_name": "B PAC",
-      "creditor_last_name": null,
-      "creditor_first_name": null,
-      "creditor_middle_name": null,
-      "creditor_prefix": null,
-      "creditor_suffix": null,
-      "creditor_street_1": "107 S WEST ST",
-      "creditor_street_2": "SUITE 555",
-      "creditor_city": "ALEXANDRIA",
-      "creditor_state": "VA",
-      "creditor_zip": "22314",
       "incurred_amount": "3.00"
     },
     "pk": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718"
@@ -707,12 +673,6 @@
     "model": "transactions.scheduleb",
     "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
     "fields": {
-      "payee_organization_name": "1",
-      "payee_street_1": "1",
-      "payee_street_2": "1",
-      "payee_city": "1",
-      "payee_state": "AZ",
-      "payee_zip": "1",
       "expenditure_date": "2023-09-01",
       "expenditure_amount": "3.00",
       "expenditure_purpose_descrip": "sdfasdf"

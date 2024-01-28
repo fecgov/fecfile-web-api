@@ -29,7 +29,7 @@ CONTACT_FIELDS = [
     'so_candidate_state',
 ]
 
-def schedule_e_contact_fields(instance, representation):
+def add_schedule_e_contact_fields(instance, representation):
     if instance.contact_1:
         representation['payee_organization_name'] = instance.contact_1.name
         representation['payee_last_name'] = instance.contact_1.last_name
@@ -52,7 +52,6 @@ def schedule_e_contact_fields(instance, representation):
         representation['so_candidate_office'] = instance.contact_2.candidate_office
         representation['so_candidate_district'] = instance.contact_2.candidate_district
         representation['so_candidate_state'] = instance.contact_2.candidate_state
-    return representation
 
 
 class ScheduleESerializer(ModelSerializer):

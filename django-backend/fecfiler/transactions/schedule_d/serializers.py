@@ -20,7 +20,7 @@ CONTACT_FIELDS = [
     'creditor_zip',
 ]
 
-def schedule_d_contact_fields(instance, representation):
+def add_schedule_d_contact_fields(instance, representation):
     if instance.contact_1:
         representation['creditor_organization_name'] = instance.contact_1.name
         representation['creditor_last_name'] = instance.contact_1.last_name
@@ -33,7 +33,6 @@ def schedule_d_contact_fields(instance, representation):
         representation['creditor_city'] = instance.contact_1.city
         representation['creditor_state'] = instance.contact_1.state
         representation['creditor_zip'] = instance.contact_1.zip
-    return representation
 
 
 class ScheduleDSerializer(ModelSerializer):

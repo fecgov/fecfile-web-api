@@ -6,40 +6,40 @@
     "back_reference_sched_name": {},
     "entity_type": {},
     "guarantor_last_name": {
-        "path": "schedule_c2.guarantor_last_name"
+        "path": "contact_1.last_name"
     },
     "guarantor_first_name": {
-        "path": "schedule_c2.guarantor_first_name"
+        "path": "contact_1.first_name"
     },
     "guarantor_middle_name": {
-        "path": "schedule_c2.guarantor_middle_name"
+        "path": "contact_1.middle_name"
     },
     "guarantor_prefix": {
-        "path": "schedule_c2.guarantor_prefix"
+        "path": "contact_1.prefix"
     },
     "guarantor_suffix": {
-        "path": "schedule_c2.guarantor_suffix"
+        "path": "contact_1.suffix"
     },
     "guarantor_street_1": {
-        "path": "schedule_c2.guarantor_street_1"
+        "path": "contact_1.street_1"
     },
     "guarantor_street_2": {
-        "path": "schedule_c2.guarantor_street_2"
+        "path": "contact_1.street_2"
     },
     "guarantor_city": {
-        "path": "schedule_c2.guarantor_city"
+        "path": "contact_1.city"
     },
     "guarantor_state": {
-        "path": "schedule_c2.guarantor_state"
+        "path": "contact_1.state"
     },
     "guarantor_zip": {
-        "path": "schedule_c2.guarantor_zip"
+        "path": "contact_1.zip"
     },
     "guarantor_employer": {
-        "path": "schedule_c2.guarantor_employer"
+        "path": "contact_1.employer"
     },
     "guarantor_occupation": {
-        "path": "schedule_c2.guarantor_occupation"
+        "path": "contact_1.occupation"
     },
     "guaranteed_amount": {
         "path": "schedule_c2.guaranteed_amount"

@@ -20,12 +20,7 @@
         "model": "transactions.schedulea",
         "fields": {
             "contribution_amount": 1,
-            "contribution_date": "2022-01-01",
-            "contributor_organization_name": "original name",
-            "contributor_street_1": "original st",
-            "contributor_city": "original city",
-            "contributor_state": "original state",
-            "contributor_zip": "original zip"
+            "contribution_date": "2022-01-01"
         },
         "pk": "12345678-0000-0000-0000-9509df48e1aa"
     },
@@ -50,12 +45,7 @@
         "model": "transactions.scheduleb",
         "fields": {
             "expenditure_amount": 2,
-            "expenditure_date": "2022-01-01",
-            "payee_organization_name": "original name",
-            "payee_street_1": "original st",
-            "payee_city": "original city",
-            "payee_state": "original state",
-            "payee_zip": "original zip"
+            "expenditure_date": "2022-01-01"
         },
         "pk": "87654321-0000-0000-0000-9509df48e1aa"
     },
@@ -80,12 +70,7 @@
         "model": "transactions.schedulea",
         "fields": {
             "contribution_amount": 3,
-            "contribution_date": "2022-01-03",
-            "contributor_organization_name": "original name",
-            "contributor_street_1": "original st",
-            "contributor_city": "original city",
-            "contributor_state": "original state",
-            "contributor_zip": "original zip"
+            "contribution_date": "2022-01-03"
         },
         "pk": "33333333-0000-0000-0000-9509df48e1aa"
     },

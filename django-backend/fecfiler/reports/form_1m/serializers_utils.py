@@ -5,7 +5,7 @@ from fecfiler.reports.form_1m.models import Form1M
 # when fecfiler.reports.form_1m.serializers is imported into the
 # fecfiler.reports.serializers file, a circlular import failure is created.
 
-def form_1m_contact_fields(data, representation):
+def add_form_1m_contact_fields(data, representation):
     if data.get('contact_affiliated'):
         representation['affiliated_committee_fec_id'] = data['contact_affiliated']['committee_id']
         representation['affiliated_committee_name'] = data['contact_affiliated']['name']
@@ -59,4 +59,3 @@ def form_1m_contact_fields(data, representation):
         representation['V_candidate_office'] = data['contact_candidate_V']['candidate_office']
         representation['V_candidate_district'] = data['contact_candidate_V']['candidate_district']
         representation['V_candidate_state'] = data['contact_candidate_V']['candidate_state']
-    return representation

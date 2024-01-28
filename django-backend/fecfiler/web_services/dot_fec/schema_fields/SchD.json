@@ -7,37 +7,37 @@
     },
     "entity_type": {},
     "creditor_organization_name": {
-        "path": "schedule_d.creditor_organization_name"
+        "path": "contact_1.name"
     },
     "creditor_last_name": {
-        "path": "schedule_d.creditor_last_name"
+        "path": "contact_1.last_name"
     },
     "creditor_first_name": {
-        "path": "schedule_d.creditor_first_name"
+        "path": "contact_1.first_name"
     },
     "creditor_middle_name": {
-        "path": "schedule_d.creditor_middle_name"
+        "path": "contact_1.middle_name"
     },
     "creditor_prefix": {
-        "path": "schedule_d.creditor_prefix"
+        "path": "contact_1.prefix"
     },
     "creditor_suffix": {
-        "path": "schedule_d.creditor_suffix"
+        "path": "contact_1.suffix"
     },
     "creditor_street_1": {
-        "path": "schedule_d.creditor_street_1"
+        "path": "contact_1.street_1"
     },
     "creditor_street_2": {
-        "path": "schedule_d.creditor_street_2"
+        "path": "contact_1.street_2"
     },
     "creditor_city": {
-        "path": "schedule_d.creditor_city"
+        "path": "contact_1.city"
     },
     "creditor_state": {
-        "path": "schedule_d.creditor_state"
+        "path": "contact_1.state"
     },
     "creditor_zip": {
-        "path": "schedule_d.creditor_zip"
+        "path": "contact_1.zip"
     },
     "purpose_of_debt_or_obligation": {
         "path": "schedule_d.purpose_of_debt_or_obligation"

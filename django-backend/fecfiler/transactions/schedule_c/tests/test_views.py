@@ -33,18 +33,12 @@ class ScheduleCViewsTestCase(TestCase):
             committee_account_id="735db943-9446-462a-9be0-c820baadb622",
         )
         self.schedule_c = ScheduleC(
-            lender_organization_name="name",
-            lender_street_1="street",
-            lender_city="ville",
-            lender_state="MD",
-            lender_zip="111111",
             loan_amount=1234,
             loan_incurred_date="2023-01-01",
             loan_due_date="123",
             loan_interest_rate="123",
             secured=True,
             personal_funds=False,
-            lender_committee_id_number="C12345678",
         )
         self.schedule_c.save()
         self.loan.schedule_c = self.schedule_c

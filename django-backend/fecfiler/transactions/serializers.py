@@ -18,13 +18,13 @@ from rest_framework.serializers import (
     DecimalField,
 )
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer, schedule_a_contact_fields
-from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer, schedule_b_contact_fields
-from fecfiler.transactions.schedule_c.serializers import ScheduleCSerializer, schedule_c_contact_fields
-from fecfiler.transactions.schedule_c1.serializers import ScheduleC1Serializer, schedule_c1_contact_fields
-from fecfiler.transactions.schedule_c2.serializers import ScheduleC2Serializer, schedule_c2_contact_fields
-from fecfiler.transactions.schedule_d.serializers import ScheduleDSerializer, schedule_d_contact_fields
-from fecfiler.transactions.schedule_e.serializers import ScheduleESerializer, schedule_e_contact_fields
+from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer, add_schedule_a_contact_fields
+from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer, add_schedule_b_contact_fields
+from fecfiler.transactions.schedule_c.serializers import ScheduleCSerializer, add_schedule_c_contact_fields
+from fecfiler.transactions.schedule_c1.serializers import ScheduleC1Serializer, add_schedule_c1_contact_fields
+from fecfiler.transactions.schedule_c2.serializers import ScheduleC2Serializer, add_schedule_c2_contact_fields
+from fecfiler.transactions.schedule_d.serializers import ScheduleDSerializer, add_schedule_d_contact_fields
+from fecfiler.transactions.schedule_e.serializers import ScheduleESerializer, add_schedule_e_contact_fields
 
 
 logger = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ class TransactionSerializer(
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
-            representation = schedule_a_contact_fields(instance, representation)
+            add_schedule_a_contact_fields(instance, representation)
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
@@ -173,7 +173,7 @@ class TransactionSerializer(
                     representation[property] = schedule_a[property]
         if schedule_b:
             representation["aggregate_amount"] = representation.get("aggregate")
-            representation = schedule_b_contact_fields(instance, representation)
+            add_schedule_b_contact_fields(instance, representation)
 
             # For REDESIGNATED transactions, calculate the amount that has
             # been redesignated for the transaction
@@ -192,27 +192,27 @@ class TransactionSerializer(
             representation["loan_agreement_id"] = (
                 loan_agreement.id if loan_agreement else None
             )
-            representation = schedule_c_contact_fields(instance, representation)
+            add_schedule_c_contact_fields(instance, representation)
             for property in schedule_c:
                 if not representation.get(property):
                     representation[property] = schedule_c[property]
         if schedule_c1:
-            representation = schedule_c1_contact_fields(instance, representation)
+            add_schedule_c1_contact_fields(instance, representation)
             for property in schedule_c1:
                 if not representation.get(property):
                     representation[property] = schedule_c1[property]
         if schedule_c2:
-            representation = schedule_c2_contact_fields(instance, representation)
+            add_schedule_c2_contact_fields(instance, representation)
             for property in schedule_c2:
                 if not representation.get(property):
                     representation[property] = schedule_c2[property]
         if schedule_d:
-            representation = schedule_d_contact_fields(instance, representation)
+            add_schedule_d_contact_fields(instance, representation)
             for property in schedule_d:
                 if not representation.get(property):
                     representation[property] = schedule_d[property]
         if schedule_e:
-            representation = schedule_e_contact_fields(instance, representation)
+            add_schedule_e_contact_fields(instance, representation)
             for property in schedule_e:
                 if not representation.get(property):
                     representation[property] = schedule_e[property]

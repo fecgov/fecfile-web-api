@@ -21,12 +21,10 @@ class Form1MViewSet(ReportViewSet):
     serializer_class = Form1MSerializer
 
     def create(self, request):
-        report = super(ModelViewSet, self).create(request)
-        return report
+        return super(ModelViewSet, self).create(request)
 
     def update(self, request, pk=None):
-        report = super(ModelViewSet, self).update(request, pk)
-        return report
+        return super(ModelViewSet, self).update(request, pk)
 
     def partial_update(self, request, pk=None):
         return super(ModelViewSet, self).partial_update(request, pk)

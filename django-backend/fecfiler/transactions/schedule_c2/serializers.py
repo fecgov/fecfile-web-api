@@ -21,7 +21,7 @@ CONTACT_FIELDS = [
     'guarantor_occupation',
 ]
 
-def schedule_c2_contact_fields(instance, representation):
+def add_schedule_c2_contact_fields(instance, representation):
     if instance.contact_1:
         representation['guarantor_last_name'] = instance.contact_1.last_name
         representation['guarantor_first_name'] = instance.contact_1.first_name
@@ -35,7 +35,6 @@ def schedule_c2_contact_fields(instance, representation):
         representation['guarantor_zip'] = instance.contact_1.zip
         representation['guarantor_employer'] = instance.contact_1.employer
         representation['guarantor_occupation'] = instance.contact_1.occupation
-    return representation
 
 
 class ScheduleC2Serializer(ModelSerializer):

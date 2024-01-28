@@ -33,11 +33,6 @@ class ScheduleDViewsTestCase(TestCase):
             committee_account_id="735db943-9446-462a-9be0-c820baadb622",
         )
         self.schedule_d = ScheduleD(
-            creditor_organization_name="name",
-            creditor_street_1="street",
-            creditor_city="ville",
-            creditor_state="MD",
-            creditor_zip="111111",
             incurred_amount=1234,
         )
         self.schedule_d.save()

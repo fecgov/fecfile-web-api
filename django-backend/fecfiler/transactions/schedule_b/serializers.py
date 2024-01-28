@@ -34,7 +34,7 @@ CONTACT_FIELDS = [
     'beneficiary_committee_fec_id',
 ]
 
-def schedule_b_contact_fields(instance, representation):
+def add_schedule_b_contact_fields(instance, representation):
     if instance.contact_1:
         representation['payee_organization_name'] = instance.contact_1.name
         representation['payee_last_name'] = instance.contact_1.last_name
@@ -49,6 +49,7 @@ def schedule_b_contact_fields(instance, representation):
         representation['payee_zip'] = instance.contact_1.zip
         representation['payee_employer'] = instance.contact_1.employer
         representation['payee_occupation'] = instance.contact_1.occupation
+        representation['beneficiary_committee_name'] = instance.contact_1.name
         representation['beneficiary_committee_fec_id'] = instance.contact_1.committee_id
     if instance.contact_2:
         representation['beneficiary_candidate_first_name'] = instance.contact_2.first_name
@@ -61,9 +62,10 @@ def schedule_b_contact_fields(instance, representation):
         representation['beneficiary_candidate_state'] = instance.contact_2.candidate_state
         representation['beneficiary_candidate_district'] = instance.contact_2.candidate_district
     if instance.contact_3:
+        # If it exists, contact_3 committee info overrides the info from contact_1
+        # See IN_KIND_CONTRIBUTIONS transaction types
         representation['beneficiary_committee_name'] = instance.contact_3.name
         representation['beneficiary_committee_fec_id'] = instance.contact_3.committee_id
-    return representation
 
 
 class ScheduleBSerializer(ModelSerializer):

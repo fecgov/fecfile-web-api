@@ -33,7 +33,7 @@ CONTACT_FIELDS = [
     'donor_committee_fec_id', 
 ]
 
-def schedule_a_contact_fields(instance, representation):
+def add_schedule_a_contact_fields(instance, representation):
     if instance.contact_1:
         representation['contributor_organization_name'] = instance.contact_1.name
         representation['contributor_last_name'] = instance.contact_1.last_name
@@ -48,6 +48,7 @@ def schedule_a_contact_fields(instance, representation):
         representation['contributor_zip'] = instance.contact_1.zip
         representation['contributor_employer'] = instance.contact_1.employer
         representation['contributor_occupation'] = instance.contact_1.occupation
+        representation['donor_committee_name'] = instance.contact_1.name
         representation['donor_committee_fec_id'] = instance.contact_1.committee_id
     if instance.contact_2:
         representation['donor_candidate_fec_id'] = instance.contact_2.candidate_id
@@ -60,6 +61,7 @@ def schedule_a_contact_fields(instance, representation):
         representation['donor_candidate_state'] = instance.contact_2.candidate_state
         representation['donor_candidate_district'] = instance.contact_2.candidate_district
     if instance.contact_3:
+        # If it exists, contact_3 committee info overrides the info from contact_1
         representation['donor_committee_name'] = instance.contact_3.name
         representation['donor_committee_fec_id'] = instance.contact_3.committee_id
     return representation

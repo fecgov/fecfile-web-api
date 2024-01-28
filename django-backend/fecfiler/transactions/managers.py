@@ -129,7 +129,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
             )
             .filter(
-                # election_clause,
+                election_clause,
                 year_clause,
                 date_clause,
                 group_clause,

@@ -37,8 +37,8 @@ class TransactionViewsTestCase(TestCase):
     def test_save_transaction_pair(self):
         request = self.request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
-        self.assertEqual("John", transaction.schedule_a.contributor_first_name)
-        self.assertEqual("Smith", transaction.schedule_a.contributor_last_name)
+        self.assertEqual("John", transaction.contact_1.first_name)
+        self.assertEqual("Smith", transaction.contact_1.last_name)
 
     def test_update(self):
         request = self.request(self.payloads["IN_KIND"])
