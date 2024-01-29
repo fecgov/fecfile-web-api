@@ -33,7 +33,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 """
-Option for :py:const:`fecfiler.settings.base.ALTERNATIVE_LOGIN`. See :py:meth:`fecfiler.authentication.views.authenticate_login`
+Option for :py:const:`fecfiler.settings.base.ALTERNATIVE_LOGIN`.
+See :py:meth:`fecfiler.authentication.views.authenticate_login`
 """
 USERNAME_PASSWORD = "USERNAME_PASSWORD"
 

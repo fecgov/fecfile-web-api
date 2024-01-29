@@ -25,7 +25,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 """
-Enables alternative log in method. See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
+Enables alternative log in method.
+See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
 and :py:meth:`fecfiler.authentication.views.authenticate_login`
 """
 ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
