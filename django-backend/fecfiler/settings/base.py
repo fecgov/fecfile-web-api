@@ -24,10 +24,10 @@ CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
 
-# E2E Testing Login API
-# Defaults to False, overriden by local.py & e2e.py
-# Set to True until we're ready to deprecate the old login
-E2E_TESTING_LOGIN = True
+# Determines whether or not a user can login with a username/password combo
+USERNAME_PASSWORD_LOGIN_AVAILABLE = env.get_credential(
+    "USERNAME_PASSWORD_LOGIN_AVAILABLE", False
+)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))

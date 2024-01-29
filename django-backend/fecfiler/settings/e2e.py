@@ -20,9 +20,7 @@ LOGGING = {
     },
 }
 
-# E2E Testing Login API
 os.environ["DB_DOCKERFILE"] = "Dockerfile-e2e"
-E2E_TESTING_LOGIN = True
 
 try:
     from .local import *  # NOSONAR # noqa F401, F403
