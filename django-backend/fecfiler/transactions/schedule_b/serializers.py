@@ -34,6 +34,34 @@ CONTACT_FIELDS = [
     'beneficiary_committee_fec_id',
 ]
 
+# For these transaction types, the payee committee is used for the beneficiary committee.
+BENEFICIARY_COMMITTEE_USE_DONOR_TYPES = [
+    'TRANSFER_TO_AFFILIATES',
+    'CONTRIBUTION_TO_CANDIDATE',
+    'CONTRIBUTION_TO_CANDIDATE_VOID',
+    'CONTRIBUTION_TO_OTHER_COMMITTEE',
+    'CONTRIBUTION_TO_OTHER_COMMITTEE_VOID',
+    'INDIVIDUAL_REFUND_NON_CONTRIBUTION_ACCOUNT',
+    'BUSINESS_LABOR_REFUND_NON_CONTRIBUTION_ACCOUNT',
+    'OTHER_COMMITTEE_REFUND_NON_CONTRIBUTION_ACCOUNT',
+    'OTHER_COMMITTEE_REFUND_REFUND_NP_HEADQUARTERS_ACCOUNT',
+    'OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT',
+    'OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT',
+    'REFUND_PARTY_CONTRIBUTION',
+    'REFUND_PARTY_CONTRIBUTION_VOID',
+    'REFUND_PAC_CONTRIBUTION',
+    'REFUND_PAC_CONTRIBUTION_VOID',
+    'CONDUIT_EARMARK_OUT_DEPOSITED',
+    'CONDUIT_EARMARK_OUT_UNDEPOSITED',
+    'PAC_CONDUIT_EARMARK_OUT_DEPOSITED',
+    'PAC_CONDUIT_EARMARK_OUT_UNDEPOSITED',
+    'LOAN_MADE',
+    'PAC_IN_KIND_OUT',
+    'PARTY_IN_KIND_OUT',
+    'IN_KIND_TRANSFER_OUT',
+    'IN_KIND_TRANSFER_FEA_OUT',
+]
+
 def add_schedule_b_contact_fields(instance, representation):
     if instance.contact_1:
         representation['payee_organization_name'] = instance.contact_1.name
@@ -49,8 +77,9 @@ def add_schedule_b_contact_fields(instance, representation):
         representation['payee_zip'] = instance.contact_1.zip
         representation['payee_employer'] = instance.contact_1.employer
         representation['payee_occupation'] = instance.contact_1.occupation
-        representation['beneficiary_committee_name'] = instance.contact_1.name
-        representation['beneficiary_committee_fec_id'] = instance.contact_1.committee_id
+        if instance.transaction_type_identifier in BENEFICIARY_COMMITTEE_USE_DONOR_TYPES:
+            representation['beneficiary_committee_name'] = instance.contact_1.name
+            representation['beneficiary_committee_fec_id'] = instance.contact_1.committee_id
     if instance.contact_2:
         representation['beneficiary_candidate_first_name'] = instance.contact_2.first_name
         representation['beneficiary_candidate_last_name'] = instance.contact_2.last_name
@@ -62,8 +91,6 @@ def add_schedule_b_contact_fields(instance, representation):
         representation['beneficiary_candidate_state'] = instance.contact_2.candidate_state
         representation['beneficiary_candidate_district'] = instance.contact_2.candidate_district
     if instance.contact_3:
-        # If it exists, contact_3 committee info overrides the info from contact_1
-        # See IN_KIND_CONTRIBUTIONS transaction types
         representation['beneficiary_committee_name'] = instance.contact_3.name
         representation['beneficiary_committee_fec_id'] = instance.contact_3.committee_id
 
