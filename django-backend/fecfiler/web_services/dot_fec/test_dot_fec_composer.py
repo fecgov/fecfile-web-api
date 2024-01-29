@@ -8,7 +8,7 @@ from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
 
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_f99",
         "test_individual_receipt",
@@ -53,7 +53,7 @@ class DotFECSerializerTestCase(TestCase):
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")
-        free_text = content[content.find("[BEGINTEXT]"):]
+        free_text = content[content.find("[BEGINTEXT]") :]
         self.assertEqual(
             free_text,
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"

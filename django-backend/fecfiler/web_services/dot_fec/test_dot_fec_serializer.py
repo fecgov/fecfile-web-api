@@ -16,7 +16,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_individual_receipt",
         "test_memo_text",

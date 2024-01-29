@@ -1,12 +1,12 @@
 from django.test import TestCase
-from fecfiler.authentication.models import Account
+from fecfiler.user.models import User
 from rest_framework.request import HttpRequest, Request
 from fecfiler.transactions.serializers import TransactionSerializer
 
 
 class TransactionSerializerBaseTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_transaction_serializer",
     ]
@@ -15,9 +15,9 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.missing_type_transaction = {}
 
         self.mock_request = Request(HttpRequest())
-        user = Account()
-        user.cmtee_id = "C00277616"
-        self.mock_request.user = user
+        self.mock_request.user = User.objects.get(
+            id="12345678-aaaa-bbbb-cccc-111122223333"
+        )
 
     def test_no_transaction_type_identifier(self):
         serializer = TransactionSerializer(

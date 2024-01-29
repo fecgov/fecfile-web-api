@@ -3,7 +3,7 @@ from ..models import Form3X
 
 
 class F3XTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_reports"]
+    fixtures = ["C01234567_user_and_committee", "test_f3x_reports"]
 
     def setUp(self):
         self.valid_f3x_summary = Form3X(
@@ -42,7 +42,7 @@ class F3XTestCase(TestCase):
     def test_pull_report_forward(self):
         new_report = Form3X(
             form_type="F3XN",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_through_date="2007-03-31",
         )
 
