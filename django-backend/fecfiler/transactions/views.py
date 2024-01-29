@@ -40,6 +40,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
     )
 )
 
+
 class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination

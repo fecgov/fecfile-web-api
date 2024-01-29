@@ -50,6 +50,7 @@ def default_serializer(model_instance, field_name, mapping):
     value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
     return str(value) if value else ""
 
+
 """A map of model field types to their serializers.
 Pass the model instance and field name into the serializer to
 get a string representation in the FEC standard

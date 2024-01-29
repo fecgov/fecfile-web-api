@@ -29,6 +29,7 @@ CONTACT_FIELDS = [
     'so_candidate_state',
 ]
 
+
 def add_schedule_e_contact_fields(instance, representation):
     if instance.contact_1:
         representation['payee_organization_name'] = instance.contact_1.name

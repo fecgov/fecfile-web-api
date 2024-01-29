@@ -15,6 +15,7 @@ CONTACT_FIELDS = [
     'lender_zip',
 ]
 
+
 def add_schedule_c1_contact_fields(instance, representation):
     if instance.contact_1:
         representation['lender_organization_name'] = instance.contact_1.name

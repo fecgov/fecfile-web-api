@@ -1,13 +1,11 @@
 import logging
 
-from django.db import transaction
 from django.db.models import Q
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.validation import serializers
 from rest_framework.serializers import (
     IntegerField,
     UUIDField,
-    ModelSerializer,
 )
 from rest_framework.exceptions import ValidationError
 

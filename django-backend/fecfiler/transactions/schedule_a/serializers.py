@@ -30,7 +30,7 @@ CONTACT_FIELDS = [
     'donor_candidate_state',
     'donor_candidate_district',
     'donor_committee_name',
-    'donor_committee_fec_id', 
+    'donor_committee_fec_id',
 ]
 
 # For these transaction types, the contributor committee is used for the donor committee.
@@ -73,6 +73,7 @@ DONOR_COMMITTEE_USE_CONTRIBUTOR_TYPES = [
     'EARMARK_MEMO_CONVENTION_ACCOUNT',
     'EARMARK_MEMO_HEADQUARTERS_ACCOUNT',
 ]
+
 
 def add_schedule_a_contact_fields(instance, representation):
     if instance.contact_1:

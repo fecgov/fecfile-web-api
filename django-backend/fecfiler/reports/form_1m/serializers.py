@@ -3,7 +3,6 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
-from fecfiler.contacts.models import Contact
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField, DateField, UUIDField
 import logging

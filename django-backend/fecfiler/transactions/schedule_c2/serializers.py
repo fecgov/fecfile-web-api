@@ -21,6 +21,7 @@ CONTACT_FIELDS = [
     'guarantor_occupation',
 ]
 
+
 def add_schedule_c2_contact_fields(instance, representation):
     if instance.contact_1:
         representation['guarantor_last_name'] = instance.contact_1.last_name

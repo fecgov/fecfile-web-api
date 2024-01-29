@@ -62,6 +62,7 @@ BENEFICIARY_COMMITTEE_USE_DONOR_TYPES = [
     'IN_KIND_TRANSFER_FEA_OUT',
 ]
 
+
 def add_schedule_b_contact_fields(instance, representation):
     if instance.contact_1:
         representation['payee_organization_name'] = instance.contact_1.name
@@ -79,17 +80,25 @@ def add_schedule_b_contact_fields(instance, representation):
         representation['payee_occupation'] = instance.contact_1.occupation
         if instance.transaction_type_identifier in BENEFICIARY_COMMITTEE_USE_DONOR_TYPES:
             representation['beneficiary_committee_name'] = instance.contact_1.name
-            representation['beneficiary_committee_fec_id'] = instance.contact_1.committee_id
+            representation['beneficiary_committee_fec_id'] = (
+                instance.contact_1.committee_id
+            )
     if instance.contact_2:
         representation['beneficiary_candidate_first_name'] = instance.contact_2.first_name
         representation['beneficiary_candidate_last_name'] = instance.contact_2.last_name
-        representation['beneficiary_candidate_middle_name'] = instance.contact_2.middle_name
+        representation['beneficiary_candidate_middle_name'] = (
+            instance.contact_2.middle_name
+        )
         representation['beneficiary_candidate_prefix'] = instance.contact_2.prefix
         representation['beneficiary_candidate_suffix'] = instance.contact_2.suffix
         representation['beneficiary_candidate_fec_id'] = instance.contact_2.candidate_id
-        representation['beneficiary_candidate_office'] = instance.contact_2.candidate_office
+        representation['beneficiary_candidate_office'] = (
+            instance.contact_2.candidate_office
+        )
         representation['beneficiary_candidate_state'] = instance.contact_2.candidate_state
-        representation['beneficiary_candidate_district'] = instance.contact_2.candidate_district
+        representation['beneficiary_candidate_district'] = (
+            instance.contact_2.candidate_district
+        )
     if instance.contact_3:
         representation['beneficiary_committee_name'] = instance.contact_3.name
         representation['beneficiary_committee_fec_id'] = instance.contact_3.committee_id
