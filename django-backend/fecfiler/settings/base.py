@@ -231,7 +231,7 @@ def get_env_logging_config(prod=False):
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.processors.KeyValueRenderer(
-                    key_order=['timestamp', 'level', 'event', 'logger']
+                    key_order=["timestamp", "level", "event", "logger"]
                 ),
             },
         },
@@ -251,11 +251,11 @@ def get_env_logging_config(prod=False):
         logging_config["loggers"] = {
             "django_structlog": {
                 "handlers": ["cloud"],
-                "level": "DEBUG",
+                "level": "INFO",
             },
             "fecfiler": {
                 "handlers": ["cloud"],
-                "level": "DEBUG",
+                "level": "INFO",
             },
         }
     else:
@@ -291,6 +291,7 @@ def get_env_logging_processors(prod=False):
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.format_exc_info,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
