@@ -33,7 +33,7 @@ class F3XReportTestCase(TestCase):
             Decimal("150.00")  # line_21c
             + Decimal("22.00")  # line_22
             + Decimal("14.00")  # line_23
-            + Decimal("141.00")  # line_24
+            + Decimal("151.00")  # line_24
             + Decimal("0")  # line_25
             + Decimal("44.00")  # line_26
             + Decimal("31.00")  # line_27
@@ -46,7 +46,7 @@ class F3XReportTestCase(TestCase):
             summary_a["line_6d"]
             - summary_a["line_7"]
         )
-        self.assertEqual(summary_a["line_9"], Decimal("225.00"))
+        self.assertEqual(summary_a["line_9"], Decimal("215.00"))
         self.assertEqual(summary_a["line_10"], Decimal("250.00"))
         self.assertEqual(summary_a["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_a["line_11aii"], Decimal("3.77"))
@@ -76,7 +76,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_a["line_21c"], Decimal("150.00"))
         self.assertEqual(summary_a["line_22"], Decimal("22.00"))
         self.assertEqual(summary_a["line_23"], Decimal("14.00"))
-        self.assertEqual(summary_a["line_24"], Decimal("141.00"))
+        self.assertEqual(summary_a["line_24"], Decimal("151.00"))
         self.assertEqual(summary_a["line_26"], Decimal("44.00"))
         self.assertEqual(summary_a["line_27"], Decimal("31.00"))
         self.assertEqual(summary_a["line_28a"], Decimal("101.50"))
@@ -132,7 +132,7 @@ class F3XReportTestCase(TestCase):
             Decimal("250.00")  # line_21c
             + Decimal("122.00")  # line_22
             + Decimal("64.00")  # line_23
-            + Decimal("286.00")  # line_24
+            + Decimal("296.00")  # line_24
             + Decimal("0")  # line_25
             + Decimal("61.00")  # line_26
             + Decimal("41.00")  # line_27
@@ -169,7 +169,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_b["line_21c"], Decimal("250.00"))
         self.assertEqual(summary_b["line_22"], Decimal("122.00"))
         self.assertEqual(summary_b["line_23"], Decimal("64.00"))
-        self.assertEqual(summary_b["line_24"], Decimal("286.00"))
+        self.assertEqual(summary_b["line_24"], Decimal("296.00"))
         self.assertEqual(summary_b["line_26"], Decimal("61.00"))
         self.assertEqual(summary_b["line_27"], Decimal("41.00"))
         self.assertEqual(summary_b["line_28a"], Decimal("1101.50"))
