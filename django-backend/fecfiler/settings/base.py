@@ -251,11 +251,11 @@ def get_env_logging_config(prod=False):
         logging_config["loggers"] = {
             "django_structlog": {
                 "handlers": ["cloud"],
-                "level": "INFO",
+                "level": "DEBUG",
             },
             "fecfiler": {
                 "handlers": ["cloud"],
-                "level": "INFO",
+                "level": "DEBUG",
             },
         }
     else:
