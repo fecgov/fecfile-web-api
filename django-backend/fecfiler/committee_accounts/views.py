@@ -1,7 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
 from .models import CommitteeAccount
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 from fecfiler.settings import FFAPI_COMMITTEE_UUID_COOKIE_NAME, FFAPI_COOKIE_DOMAIN
