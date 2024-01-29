@@ -1,7 +1,9 @@
 {
     "form_type": {},
     "filer_committee_id_number": {},
-    "committee_name": {},
+    "committee_name": {
+        "path": "form_1m.committee_name"
+    },
     "street_1": {
         "path": "form_1m.street_1"
     },
@@ -21,6 +23,7 @@
         "path": "form_1m.committee_type"
     },
     "affiliated_date_form_f1_filed": {
+        "serializer": "DATE",
         "path": "form_1m.affiliated_date_form_f1_filed"
     },
     "affiliated_committee_fec_id": {
@@ -57,6 +60,7 @@
         "path": "form_1m.I_candidate_district"
     },
     "I_date_of_contribution": {
+        "serializer": "DATE",
         "path": "form_1m.I_date_of_contribution"
     },
     "II_candidate_id_number": {
@@ -87,6 +91,7 @@
         "path": "form_1m.II_candidate_district"
     },
     "II_date_of_contribution": {
+        "serializer": "DATE",
         "path": "form_1m.II_date_of_contribution"
     },
     "III_candidate_id_number": {
@@ -117,6 +122,7 @@
         "path": "form_1m.III_candidate_district"
     },
     "III_date_of_contribution": {
+        "serializer": "DATE",
         "path": "form_1m.III_date_of_contribution"
     },
     "IV_candidate_id_number": {
@@ -147,6 +153,7 @@
         "path": "form_1m.IV_candidate_district"
     },
     "IV_date_of_contribution": {
+        "serializer": "DATE",
         "path": "form_1m.IV_date_of_contribution"
     },
     "V_candidate_id_number": {
@@ -177,15 +184,27 @@
         "path": "form_1m.V_candidate_district"
     },
     "V_date_of_contribution": {
+        "serializer": "DATE",
         "path": "form_1m.V_date_of_contribution"
     },
-    "date_of_original_registration": {},
-    "date_of_51st_contributor": {},
-    "date_committee_met_requirements": {},
+    "date_of_original_registration": {
+        "serializer": "DATE",
+        "path": "form_1m.date_of_original_registration"
+    },
+    "date_of_51st_contributor": {
+        "serializer": "DATE",
+        "path": "form_1m.date_of_51st_contributor"
+    },
+    "date_committee_met_requirements": {
+        "serializer": "DATE",
+        "path": "form_1m.date_committee_met_requirements"
+    },
     "treasurer_last_name": {},
     "treasurer_first_name": {},
     "treasurer_middle_name": {},
     "treasurer_prefix": {},
     "treasurer_suffix": {},
-    "date_signed": {}
+    "date_signed": {
+        "serializer": "DATE"
+    }
 }
