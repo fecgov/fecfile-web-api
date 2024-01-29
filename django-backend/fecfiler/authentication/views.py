@@ -8,7 +8,7 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    # FFAPI_COMMITTEE_ID_COOKIE_NAME,
+    FFAPI_COMMITTEE_UUID_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
@@ -70,7 +70,7 @@ def handle_invalid_login(username):
 
 
 def delete_user_logged_in_cookies(response):
-    # response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_COMMITTEE_UUID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
@@ -80,12 +80,6 @@ def delete_user_logged_in_cookies(response):
 @require_http_methods(["GET"])
 def login_redirect(request):
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    # redirect.set_cookie(
-    #     FFAPI_COMMITTEE_ID_COOKIE_NAME,
-    #     request.user.cmtee_id,
-    #     domain=FFAPI_COOKIE_DOMAIN,
-    #     secure=True,
-    # )
     redirect.set_cookie(
         FFAPI_EMAIL_COOKIE_NAME,
         request.user.email,
