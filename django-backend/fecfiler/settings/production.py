@@ -15,9 +15,6 @@ structlog.configure(  # noqa
     cache_logger_on_first_use=True,
 )
 
-# TODO: I think this is swallowing exceptions
-REST_FRAMEWORK["EXCEPTION_HANDLER"] = "fecfiler.utils.custom_exception_handler"  # noqa
-
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
