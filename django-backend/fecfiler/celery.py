@@ -37,11 +37,7 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     # env.space will be None if we're local, and dev/stage/prod in cloud.gov
     logging.config.dictConfig(settings.get_env_logging_config(env.space))
 
-    structlog.configure(  # noqa
-        processors=settings.get_env_logging_processors(),
-        logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
-        cache_logger_on_first_use=True,
-    )
+    settings.configure_structlog()
 
 
 if env.get_service(name="fecfile-api-redis"):
