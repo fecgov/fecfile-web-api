@@ -28,9 +28,7 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 
 
 logger = logging.getLogger(__name__)
-MISSING_SCHEMA_NAME_ERROR = ValidationError(
-    {"schema_name": ["No schema_name provided"]}
-)
+MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
 
 
 class ScheduleASerializer(ModelSerializer):
@@ -146,6 +144,9 @@ class TransactionSerializer(
     name = CharField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    debt_incurred_amount = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     calendar_ytd_per_election_office = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -195,6 +196,7 @@ class TransactionSerializer(
                 "name",
                 "date",
                 "amount",
+                "debt_incurred_amount",
                 "aggregate",
                 "calendar_ytd_per_election_office",
                 "loan_payment_to_date",
@@ -226,9 +228,12 @@ class TransactionSerializer(
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            total = instance.reatt_redes_associations.filter(
-                schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
+                ).aggregate(Sum("amount"))["amount__sum"]
+                or 0.0
+            )
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
@@ -239,9 +244,12 @@ class TransactionSerializer(
 
             # For REDESIGNATED transactions, calculate the amount that has
             # been redesignated for the transaction
-            total = instance.reatt_redes_associations.filter(
-                schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-            ).aggregate(Sum("amount"))['amount__sum'] or 0.0
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
+                ).aggregate(Sum("amount"))["amount__sum"]
+                or 0.0
+            )
             representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:

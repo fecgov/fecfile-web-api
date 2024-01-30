@@ -48,6 +48,31 @@
         }
     },
     {
+        "comment": "SE within report dates, should count in Col. A",
+        "model": "transactions.schedulee",
+        "fields": {
+            "id": "2deda476-2167-4294-ac40-66906fd64209",
+            "expenditure_amount": 10,
+            "disbursement_date": "2005-01-30"
+        }
+    },
+    {
+        "comment": "SE within report dates, should count in Col. A",
+        "model": "transactions.transaction",
+        "fields": {
+            "id": "eb2728dc-261f-4621-97cd-ad15bf973305",
+            "schedule_e_id": "2deda476-2167-4294-ac40-66906fd64209",
+            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "debt_id": "d12aefe8-9b5f-4539-b7e5-d09000000001",
+            "_form_type": "SE",
+            "memo_code": false,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "transaction_type_identifier": "Transaction Type Identifier"
+        }
+    },
+    {
         "comment": "SE within year, should count in Col. B",
         "model": "transactions.schedulee",
         "fields": {
