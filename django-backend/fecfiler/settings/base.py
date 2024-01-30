@@ -296,7 +296,7 @@ def get_env_logging_processors(prod=False):
             structlog.processors.ExceptionRenderer(
                 structlog.tracebacks.ExceptionDictTransformer(
                     show_locals=False,
-                    max_frames=6
+                    max_frames=2
                 )
             ),
             structlog.processors.StackInfoRenderer(),
