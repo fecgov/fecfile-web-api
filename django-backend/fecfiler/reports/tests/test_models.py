@@ -4,7 +4,7 @@ from fecfiler.reports.models import Report
 
 
 class ReportModelTestCase(TestCase):
-    fixtures = ["test_committee_accounts", "test_f3x_reports", "test_f24_reports"]
+    fixtures = ["C01234567_user_and_committee", "test_f3x_reports", "test_f24_reports"]
 
     def setUp(self):
         self.missing_type_transaction = {}
