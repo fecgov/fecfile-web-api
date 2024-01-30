@@ -17,15 +17,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="user",
             name="first_name",
-            field=models.CharField(
-                blank=True, max_length=150, null=True, verbose_name="first name"
-            ),
+            field=models.CharField(blank=True, max_length=150, null=True),
         ),
         migrations.AlterField(
             model_name="user",
             name="last_name",
-            field=models.CharField(
-                blank=True, max_length=150, null=True, verbose_name="last name"
-            ),
+            field=models.CharField(blank=True, max_length=150, null=True),
         ),
     ]
