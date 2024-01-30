@@ -6,6 +6,7 @@ import os
 import dj_database_url
 import requests
 import structlog
+import sys
 
 from .env import env
 from corsheaders.defaults import default_headers
@@ -239,10 +240,12 @@ def get_env_logging_config(prod=False):
             "console": {
                 "class": "logging.StreamHandler",
                 "formatter": "plain_console",
+                "stream": sys.stdout,
             },
             "cloud": {
                 "class": "logging.StreamHandler",
                 "formatter": "json_formatter",
+                "stream": sys.stdout,
             },
         }
     }
