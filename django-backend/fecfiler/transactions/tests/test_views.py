@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
-from fecfiler.authentication.models import Account
+from fecfiler.user.models import User
 import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
@@ -9,7 +9,7 @@ from fecfiler.transactions.models import Transaction
 
 class TransactionViewsTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_transaction_views_transactions",
         "test_election_aggregation_data",
@@ -17,8 +17,7 @@ class TransactionViewsTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = Account()
-        self.user.cmtee_id = "C12345678"
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
             open("fecfiler/transactions/fixtures/view_payloads.json")
         )

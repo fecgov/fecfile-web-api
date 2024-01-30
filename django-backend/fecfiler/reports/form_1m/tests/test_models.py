@@ -4,6 +4,7 @@ import datetime
 
 
 class F1MTestCase(TestCase):
+    fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
         self.valid_form_1m = Form1M(
@@ -23,8 +24,7 @@ class F1MTestCase(TestCase):
         )
         self.assertIsInstance(form_1m_from_db, Form1M)
         self.assertEquals(
-            form_1m_from_db.affiliated_date_form_f1_filed,
-            datetime.date(2023, 11, 7)
+            form_1m_from_db.affiliated_date_form_f1_filed, datetime.date(2023, 11, 7)
         )
         form_1m_from_db.delete()
         self.assertRaises(

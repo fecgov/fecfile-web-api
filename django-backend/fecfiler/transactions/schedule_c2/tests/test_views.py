@@ -9,20 +9,20 @@ from fecfiler.reports.models import Report
 
 class ScheduleC2ViewsTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
     ]
 
     def setUp(self):
         self.report_1 = Report(
             form_type="F3XN",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-01-01",
             coverage_through_date="2023-01-02",
         )
         self.report_1.save()
         self.report_2 = Report(
             form_type="F3XN",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-02-01",
             coverage_through_date="2023-02-02",
         )
@@ -32,7 +32,7 @@ class ScheduleC2ViewsTestCase(TestCase):
             transaction_id="F487B9EDAD9A32E6CFEE",
             report_id=self.report_1.id,
             form_type="SC/9",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
         )
         self.schedule_c = ScheduleC(
             loan_amount=1234,
@@ -53,7 +53,7 @@ class ScheduleC2ViewsTestCase(TestCase):
             transaction_id="12345678123456781234",
             report_id=self.report_1.id,
             form_type="SC2/9",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
         )
         self.schedule_c2 = ScheduleC2(guaranteed_amount=10)
         self.schedule_c2.save()

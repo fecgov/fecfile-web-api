@@ -7,7 +7,7 @@ from decimal import Decimal
 
 class TransactionManagerTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_transaction_manager_transactions",
         "test_election_aggregation_data",

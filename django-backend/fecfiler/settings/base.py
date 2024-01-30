@@ -37,7 +37,7 @@ SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 
 ROOT_URLCONF = "fecfiler.urls"
 WSGI_APPLICATION = "fecfiler.wsgi.application"
-AUTH_USER_MODEL = "authentication.Account"
+AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -49,7 +49,7 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    # "django.contrib.admin",
     "django.contrib.auth",
     "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "fecfiler.validation",
     "fecfiler.web_services",
     "fecfiler.openfec",
+    "fecfiler.user",
 ]
 
 MIDDLEWARE = [
@@ -160,7 +161,7 @@ OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
 ALLOW_LOGOUT_GET_METHOD = True
 
 # TODO: Env vars?
-FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
+FFAPI_COMMITTEE_UUID_COOKIE_NAME = "ffapi_committee_uuid"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 

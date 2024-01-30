@@ -347,7 +347,9 @@ class Form3XSerializer(ReportSerializer):
         with transaction.atomic():
             form_3x_data = get_model_data(validated_data, Form3X)
             report_data = get_model_data(validated_data, Report)
-            form_3x_data["L6a_year_for_above_ytd"] = report_data["coverage_from_date"].year  # noqa: E501
+            form_3x_data["L6a_year_for_above_ytd"] = report_data[
+                "coverage_from_date"
+            ].year  # noqa: E501
             form_3x = Form3X.objects.create(**form_3x_data)
             report_data["form_3x_id"] = form_3x.id
             report = super().create(report_data)
@@ -366,11 +368,10 @@ class Form3XSerializer(ReportSerializer):
         """Raise a ValidationError if an F3X with the same report code
         exists for the same year
         """
-        request = self.context["request"]
-        committee_id = request.user.cmtee_id
+        committee = self.get_committee()
         number_of_collisions = Report.objects.filter(
             ~Q(id=(self.instance or Report()).id),
-            committee_account__committee_id=committee_id,
+            committee_account=committee,
             coverage_from_date__year=self.validated_data["coverage_from_date"].year,
             report_code=self.validated_data["report_code"],
         ).count()
