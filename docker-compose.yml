@@ -79,7 +79,7 @@ services:
     links:
       - redis
     environment:
-      USERNAME_PASSWORD_LOGIN_AVAILABLE: True
+      ALTERNATIVE_LOGIN: USERNAME_PASSWORD
       REDIS_URL: redis://redis:6379
       DATABASE_URL:
       FECFILE_TEST_DB_NAME:

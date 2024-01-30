@@ -24,10 +24,12 @@ CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
 
-# Determines whether or not a user can login with a username/password combo
-USERNAME_PASSWORD_LOGIN_AVAILABLE = env.get_credential(
-    "USERNAME_PASSWORD_LOGIN_AVAILABLE", False
-)
+"""
+Enables alternative log in method.
+See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
+and :py:meth:`fecfiler.authentication.views.authenticate_login`
+"""
+ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))

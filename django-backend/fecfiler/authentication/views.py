@@ -14,7 +14,7 @@ from fecfiler.settings import (
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
     OIDC_OP_LOGOUT_ENDPOINT,
-    USERNAME_PASSWORD_LOGIN_AVAILABLE,
+    ALTERNATIVE_LOGIN,
 )
 
 from rest_framework.response import Response
@@ -31,6 +31,12 @@ from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
+
+"""
+Option for :py:const:`fecfiler.settings.base.ALTERNATIVE_LOGIN`.
+See :py:meth:`fecfiler.authentication.views.authenticate_login`
+"""
+USERNAME_PASSWORD = "USERNAME_PASSWORD"
 
 
 class AccountViewSet(GenericViewSet, ListModelMixin):
@@ -159,10 +165,11 @@ def logout_redirect(request):
 @permission_classes([])
 @require_http_methods(["GET", "POST"])
 def authenticate_login(request):
+    endpoint_is_available = ALTERNATIVE_LOGIN == USERNAME_PASSWORD
     if request.method == "GET":
-        return JsonResponse({"endpoint_available": USERNAME_PASSWORD_LOGIN_AVAILABLE})
+        return JsonResponse({"endpoint_available": endpoint_is_available})
 
-    if not USERNAME_PASSWORD_LOGIN_AVAILABLE:
+    if not endpoint_is_available:
         return JsonResponse(status=405, safe=False)
 
     username = request.data.get("username", None)
