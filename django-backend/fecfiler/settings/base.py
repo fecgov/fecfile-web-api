@@ -276,10 +276,32 @@ def get_env_logging_config(prod=False):
     return logging_config
 
 
-def configure_structlog():
-    """Make structlog config callable so Celery can use it too"""
-    structlog.configure(
-        processors=[
+def get_env_logging_processors(prod=False):
+    """
+    get structlog processors
+    depending on environment
+    env.space will None on local.
+    We will need to set these explicitly for Celery too
+    """
+
+    if prod:
+        # JSON in production
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.format_exc_info,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ]
+
+    else:
+        # Remove format_exc_info to pretty-print exceptions localls
+        return [
             structlog.contextvars.merge_contextvars,
             structlog.stdlib.filter_by_level,
             structlog.processors.TimeStamper(fmt="iso"),
@@ -289,13 +311,8 @@ def configure_structlog():
             structlog.processors.StackInfoRenderer(),
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ],
-        logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
-        cache_logger_on_first_use=True,
-    )
+        ]
 
-
-configure_structlog()
 
 LOGGING = get_env_logging_config()
 
