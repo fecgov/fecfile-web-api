@@ -293,12 +293,7 @@ def get_env_logging_processors(prod=False):
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.ExceptionRenderer(
-                structlog.tracebacks.ExceptionDictTransformer(
-                    show_locals=False,
-                    max_frames=2
-                )
-            ),
+            structlog.processors.format_exc_info,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
