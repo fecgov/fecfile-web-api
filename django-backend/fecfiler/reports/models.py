@@ -190,6 +190,11 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     def amend(self):
         self.form_type = self.get_form_name() + "A"
         self.report_version = int(self.report_version or "0") + 1
+
+        if self.form_type == "F24A" and self.upload_submission is not None:
+            self.form_24.original_amendment_date = self.upload_submission.created
+            self.form_24.save()
+
         self.upload_submission = None
         self.save()
 

@@ -4,7 +4,6 @@ from django.db import migrations, models
 import django.utils.timezone
 import uuid
 from fecfiler.shared.utilities import get_model_data
-import uuid
 
 
 def copy_users(apps, schema_editor):
@@ -14,8 +13,8 @@ def copy_users(apps, schema_editor):
     ):  # "authentication" not in [app_name for app_name, app in apps.get_models()]:
         print("no authentication app")
         return
-    OldAccount = apps.get_model("authentication", "Account")
-    User = apps.get_model("user", "User")
+    OldAccount = apps.get_model("authentication", "Account")  # noqa
+    User = apps.get_model("user", "User")  # noqa
     db_alias = schema_editor.connection.alias
     old_users = OldAccount.objects.using(db_alias).all()
     for old_user in old_users:
@@ -56,7 +55,7 @@ class Migration(migrations.Migration):
                     "is_superuser",
                     models.BooleanField(
                         default=False,
-                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",  # noqa
                         verbose_name="superuser status",
                     ),
                 ),
@@ -67,7 +66,7 @@ class Migration(migrations.Migration):
                         error_messages={
                             "unique": "A user with that username already exists."
                         },
-                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",  # noqa
                         max_length=150,
                         unique=True,
                         validators=[
@@ -98,7 +97,7 @@ class Migration(migrations.Migration):
                     "is_staff",
                     models.BooleanField(
                         default=False,
-                        help_text="Designates whether the user can log into this admin site.",
+                        help_text="Designates whether the user can log into this admin site.",  # noqa
                         verbose_name="staff status",
                     ),
                 ),
@@ -106,7 +105,7 @@ class Migration(migrations.Migration):
                     "is_active",
                     models.BooleanField(
                         default=True,
-                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",  # noqa
                         verbose_name="active",
                     ),
                 ),
