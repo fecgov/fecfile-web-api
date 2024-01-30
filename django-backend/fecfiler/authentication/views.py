@@ -78,7 +78,6 @@ def delete_user_logged_in_cookies(response):
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
-    request.session["user_id"] = request.user.pk
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
     redirect.set_cookie(
         FFAPI_EMAIL_COOKIE_NAME,
