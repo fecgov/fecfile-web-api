@@ -8,7 +8,7 @@ class ReportIdSerializer(serializers.Serializer):
 
     def validate(self, data):
         request = self.context["request"]
-        committee_id = request.user.cmtee_id
+        committee_id = request.user.committeeaccount_set.first()
         report_result = Report.objects.filter(
             id=data["report_id"], committee_account__committee_id=committee_id
         )
