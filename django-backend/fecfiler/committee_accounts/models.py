@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.core.validators import RegexValidator
 from fecfiler.soft_delete.models import SoftDeleteModel
+from fecfiler.user.models import User
 
 COMMITTEE_ID_REGEX = RegexValidator(r"^C[0-9]{8}$", "invalid committee id format")
 
@@ -18,6 +19,11 @@ class CommitteeAccount(SoftDeleteModel):
     committee_id = models.CharField(
         max_length=9, unique=True, validators=[COMMITTEE_ID_REGEX]
     )
+    members = models.ManyToManyField(
+        User,
+        through="Membership",
+        through_fields=("committee_account", "user"),
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -27,6 +33,18 @@ class CommitteeAccount(SoftDeleteModel):
 
     def __str__(self):
         return self.committee_id
+
+
+class Membership(models.Model):
+    class CommitteeRole(models.TextChoices):
+        COMMITTEE_ADMINISTRATOR = "COMMITTEE_ADMINISTRATOR"
+        REVIEWER = "REVIEWER"
+
+    committee_account = models.ForeignKey(CommitteeAccount, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(
+        max_length=25, choices=CommitteeRole.choices, null=False, blank=False
+    )
 
 
 class CommitteeOwnedModel(models.Model):

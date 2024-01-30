@@ -1,10 +1,9 @@
 from unittest.mock import Mock
 from django.test import RequestFactory, TestCase
-from fecfiler.authentication.models import Account
+from django.contrib.auth import get_user_model
 from fecfiler.authentication.views import (
     handle_invalid_login,
     handle_valid_login,
-    update_last_login_time,
 )
 
 from .views import (
@@ -14,15 +13,16 @@ from .views import (
     logout_redirect,
 )
 
+UserModel = get_user_model()
+
 
 class AuthenticationTest(TestCase):
-    fixtures = ["test_accounts"]
-    acc = None
+    fixtures = ["C01234567_user_and_committee"]
+    user = None
 
     def setUp(self):
-        self.user = Account.objects.get(cmtee_id="C12345678")
+        self.user = UserModel.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
-        self.acc = Account.objects.get(email="unit_tester@test.com")
 
     def test_login_dot_gov_logout_happy_path(self):
         test_state = "test_state"
@@ -60,15 +60,10 @@ class AuthenticationTest(TestCase):
         retval = generate_username(test_uuid)
         self.assertEqual(test_uuid, retval)
 
-    def test_update_login_time(self):
-        prev_time = self.acc.last_login
-        update_last_login_time(self.acc)
-        self.assertNotEqual(self.acc.last_login, prev_time)
-
     def test_invalid_login(self):
         resp = handle_invalid_login("random_username")
         self.assertEqual(resp.status_code, 401)
 
     def test_valid_login(self):
-        resp = handle_valid_login(self.acc)
+        resp = handle_valid_login(self.user)
         self.assertEqual(resp.status_code, 200)

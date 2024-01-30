@@ -8,7 +8,7 @@ from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
 
 class DotFECSerializerTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_f99",
         "test_individual_receipt",

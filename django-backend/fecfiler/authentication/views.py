@@ -8,7 +8,7 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_COMMITTEE_ID_COOKIE_NAME,
+    FFAPI_COMMITTEE_UUID_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
@@ -18,15 +18,8 @@ from fecfiler.settings import (
 )
 
 from rest_framework.response import Response
-from rest_framework import filters, status
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin
-from django.db.models import Value, CharField
-from django.db.models.functions import Concat
-from .models import Account
-from .serializers import AccountSerializer
+from rest_framework import status
 from urllib.parse import urlencode
-from datetime import datetime
 from django.http import JsonResponse
 import logging
 
@@ -37,42 +30,6 @@ Option for :py:const:`fecfiler.settings.base.ALTERNATIVE_LOGIN`.
 See :py:meth:`fecfiler.authentication.views.authenticate_login`
 """
 USERNAME_PASSWORD = "USERNAME_PASSWORD"
-
-
-class AccountViewSet(GenericViewSet, ListModelMixin):
-    """
-    The Account ViewSet allows the user to retrieve the users in the same committee
-
-    The CommitteeOwnedViewset could not be inherited due to the different structure
-    of a user object versus other objects.
-        (IE - having a "cmtee_id" field instead of "committee_id")
-    """
-
-    serializer_class = AccountSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = [
-        "last_name",
-        "first_name",
-        "id",
-        "email",
-        "role",
-        "is_active",
-        "name",
-    ]
-    ordering = ["name"]
-
-    def get_queryset(self):
-        queryset = (
-            Account.objects.annotate(
-                name=Concat(
-                    "last_name", Value(", "), "first_name", output_field=CharField()
-                )
-            )
-            .filter(cmtee_id=self.request.user.cmtee_id)
-            .all()
-        )
-
-        return queryset
 
 
 def login_dot_gov_logout(request):
@@ -96,17 +53,10 @@ def generate_username(uuid):
     return uuid
 
 
-def update_last_login_time(account):
-    account.last_login = datetime.now()
-    account.save()
-
-
-def handle_valid_login(account):
-    update_last_login_time(account)
-
-    logger.debug("Successful login: {}".format(account))
+def handle_valid_login(user):
+    logger.debug("Successful login: {}".format(user))
     return JsonResponse(
-        {"is_allowed": True, "committee_id": account.cmtee_id, "email": account.email},
+        {"is_allowed": True, "email": user.email},
         status=200,
         safe=False,
     )
@@ -125,7 +75,7 @@ def handle_invalid_login(username):
 
 
 def delete_user_logged_in_cookies(response):
-    response.delete_cookie(FFAPI_COMMITTEE_ID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_COMMITTEE_UUID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
@@ -134,14 +84,7 @@ def delete_user_logged_in_cookies(response):
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
-    request.session["user_id"] = request.user.pk
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_COMMITTEE_ID_COOKIE_NAME,
-        request.user.cmtee_id,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
     redirect.set_cookie(
         FFAPI_EMAIL_COOKIE_NAME,
         request.user.email,

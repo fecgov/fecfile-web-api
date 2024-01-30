@@ -4,14 +4,14 @@ from .models import MemoText
 
 
 class MemoTextTestCase(TestCase):
-    fixtures = ["test_f3x_reports", "test_memo_text", "test_committee_accounts"]
+    fixtures = ["test_f3x_reports", "test_memo_text", "C01234567_user_and_committee"]
 
     def setUp(self):
         self.valid_memo_text = MemoText(
             id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
             rec_type="TEXT",
             text4000="tessst4",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
             report_id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
         )
 
