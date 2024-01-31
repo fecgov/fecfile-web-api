@@ -53,9 +53,10 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        committee_id = self.request.user.committeeaccount_set.first().id
+        committee = self.request.user.committeeaccount_set.first()
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee_id
+            committee_id=committee.committee_id,
+            committee_uuid=committee.id
         )
-        return queryset.filter(committee_account_id=committee_id)
+        return queryset.filter(committee_account_id=committee.id)
