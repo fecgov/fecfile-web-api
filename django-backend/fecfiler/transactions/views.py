@@ -300,7 +300,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
     
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
-    def save_transactions(self, request):
+    def save_reatt_redes_transactions(self, request):
         with db_transaction.atomic():
             if request.data[0].get("id", None) is not None:
                 saved_data = [self.save_transaction(data, request) for data in request.data]
