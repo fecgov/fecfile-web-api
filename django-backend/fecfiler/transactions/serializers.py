@@ -16,13 +16,6 @@ from rest_framework.serializers import (
     DateField,
     DecimalField,
 )
-from fecfiler.shared.transforms.schedule_a import add_schedule_a_contact_fields
-from fecfiler.shared.transforms.schedule_b import add_schedule_b_contact_fields
-from fecfiler.shared.transforms.schedule_c import add_schedule_c_contact_fields
-from fecfiler.shared.transforms.schedule_c1 import add_schedule_c1_contact_fields
-from fecfiler.shared.transforms.schedule_c2 import add_schedule_c2_contact_fields
-from fecfiler.shared.transforms.schedule_d import add_schedule_d_contact_fields
-from fecfiler.shared.transforms.schedule_e import add_schedule_e_contact_fields
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer
@@ -31,6 +24,13 @@ from fecfiler.transactions.schedule_c1.serializers import ScheduleC1Serializer
 from fecfiler.transactions.schedule_c2.serializers import ScheduleC2Serializer
 from fecfiler.transactions.schedule_d.serializers import ScheduleDSerializer
 from fecfiler.transactions.schedule_e.serializers import ScheduleESerializer
+from fecfiler.transactions.schedule_a.utils import add_schedule_a_contact_fields
+from fecfiler.transactions.schedule_b.utils import add_schedule_b_contact_fields
+from fecfiler.transactions.schedule_c.utils import add_schedule_c_contact_fields
+from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fields
+from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
+from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
+from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 
 
 logger = logging.getLogger(__name__)
