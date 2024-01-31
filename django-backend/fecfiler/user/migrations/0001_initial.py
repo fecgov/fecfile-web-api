@@ -31,7 +31,7 @@ def copy_users(apps, schema_editor):
     for old_user in old_users:
         user_data = get_model_data(old_user.__dict__, User)
         user_data["id"] = uuid.uuid4()
-        user_data["password"] = old_user["password"] or random_password(128)
+        user_data["password"] = old_user.password or random_password(128)
         User.objects.create(**user_data)
 
 
