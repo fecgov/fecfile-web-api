@@ -6,6 +6,7 @@ from ..serializers import (
 )
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
+from fecfiler.reports.form_1m.serializers_utils import add_form_1m_contact_fields
 
 
 class F1MSerializerTestCase(TestCase):
@@ -60,3 +61,20 @@ class F1MSerializerTestCase(TestCase):
         self.assertFalse(invalid_serializer.is_valid())
         self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["committee_type"])
+
+    def test_serializer_utils_to_representation(self):
+        data = dict(
+            contact_affiliated=dict(
+                committee_id='C000000009',
+                name="Affiliated Committee",
+            )
+        )
+
+        representation = dict(
+            committee_name="Elect Person"
+        )
+
+        representation = add_form_1m_contact_fields(data, representation)
+
+        assert(representation['affiliated_committee_name'] == 'Affilliated Committee',
+            'affiliated_committee_name was not updated')

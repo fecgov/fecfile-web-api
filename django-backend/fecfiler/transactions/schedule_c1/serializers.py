@@ -16,16 +16,6 @@ CONTACT_FIELDS = [
 ]
 
 
-def add_schedule_c1_contact_fields(instance, representation):
-    if instance.contact_1:
-        representation['lender_organization_name'] = instance.contact_1.name
-        representation['lender_street_1'] = instance.contact_1.street_1
-        representation['lender_street_2'] = instance.contact_1.street_2
-        representation['lender_city'] = instance.contact_1.city
-        representation['lender_state'] = instance.contact_1.state
-        representation['lender_zip'] = instance.contact_1.zip
-
-
 class ScheduleC1Serializer(ModelSerializer):
     lender_organization_name = CharField(required=False, allow_null=True)
     lender_street_1 = CharField(required=False, allow_null=True)

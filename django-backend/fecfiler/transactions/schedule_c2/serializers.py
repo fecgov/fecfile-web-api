@@ -22,22 +22,6 @@ CONTACT_FIELDS = [
 ]
 
 
-def add_schedule_c2_contact_fields(instance, representation):
-    if instance.contact_1:
-        representation['guarantor_last_name'] = instance.contact_1.last_name
-        representation['guarantor_first_name'] = instance.contact_1.first_name
-        representation['guarantor_middle_name'] = instance.contact_1.middle_name
-        representation['guarantor_prefix'] = instance.contact_1.prefix
-        representation['guarantor_suffix'] = instance.contact_1.suffix
-        representation['guarantor_street_1'] = instance.contact_1.street_1
-        representation['guarantor_street_2'] = instance.contact_1.street_2
-        representation['guarantor_city'] = instance.contact_1.city
-        representation['guarantor_state'] = instance.contact_1.state
-        representation['guarantor_zip'] = instance.contact_1.zip
-        representation['guarantor_employer'] = instance.contact_1.employer
-        representation['guarantor_occupation'] = instance.contact_1.occupation
-
-
 class ScheduleC2Serializer(ModelSerializer):
     guarantor_last_name = CharField(required=False, allow_null=True)
     guarantor_first_name = CharField(required=False, allow_null=True)

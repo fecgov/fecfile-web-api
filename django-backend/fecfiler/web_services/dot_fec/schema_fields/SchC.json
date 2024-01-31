@@ -7,37 +7,37 @@
     },
     "entity_type": {},
     "lender_organization_name": {
-        "path": "contact_1.name"
+        "path": "lender_organization_name"
     },
     "lender_last_name": {
-        "path": "contact_1.last_name"
+        "path": "lender_last_name"
     },
     "lender_first_name": {
-        "path": "contact_1.first_name"
+        "path": "lender_first_name"
     },
     "lender_middle_name": {
-        "path": "contact_1.middle_name"
+        "path": "lender_middle_name"
     },
     "lender_prefix": {
-        "path": "contact_1.prefix"
+        "path": "lender_prefix"
     },
     "lender_suffix": {
-        "path": "contact_1.suffix"
+        "path": "lender_suffix"
     },
     "lender_street_1": {
-        "path": "contact_1.street_1"
+        "path": "lender_street_1"
     },
     "lender_street_2": {
-        "path": "contact_1.street_2"
+        "path": "lender_street_2"
     },
     "lender_city": {
-        "path": "contact_1.city"
+        "path": "lender_city"
     },
     "lender_state": {
-        "path": "contact_1.state"
+        "path": "lender_state"
     },
     "lender_zip": {
-        "path": "contact_1.zip"
+        "path": "lender_zip"
     },
     "election_code": {
         "path": "schedule_c.election_code"
@@ -73,34 +73,34 @@
         "path": "schedule_c.personal_funds"
     },
     "lender_committee_id_number": {
-        "path": "contact_1.committee_id"
+        "path": "lender_committee_id_number"
     },
     "lender_candidate_id_number": {
-        "path": "contact_1.candidate_id"
+        "path": "lender_candidate_id_number"
     },
     "lender_candidate_last_name": {
-        "path": "contact_1.last_name"
+        "path": "lender_candidate_last_name"
     },
     "lender_candidate_first_name": {
-        "path": "contact_1.first_name"
+        "path": "lender_candidate_first_name"
     },
     "lender_candidate_middle_name": {
-        "path": "contact_1.middle_name"
+        "path": "lender_candidate_middle_name"
     },
     "lender_candidate_prefix": {
-        "path": "contact_1.prefix"
+        "path": "lender_candidate_prefix"
     },
     "lender_candidate_suffix": {
-        "path": "contact_1.suffix"
+        "path": "lender_candidate_suffix"
     },
     "lender_candidate_office": {
-        "path": "contact_1.candidate_office"
+        "path": "lender_candidate_office"
     },
     "lender_candidate_state": {
-        "path": "contact_1.candidate_state"
+        "path": "lender_candidate_state"
     },
     "lender_candidate_district": {
-        "path": "contact_1.candidate_district"
+        "path": "lender_candidate_district"
     },
     "memo_code": {
         "serializer": "BOOLEAN_X"

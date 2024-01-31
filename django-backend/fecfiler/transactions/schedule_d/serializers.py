@@ -21,21 +21,6 @@ CONTACT_FIELDS = [
 ]
 
 
-def add_schedule_d_contact_fields(instance, representation):
-    if instance.contact_1:
-        representation['creditor_organization_name'] = instance.contact_1.name
-        representation['creditor_last_name'] = instance.contact_1.last_name
-        representation['creditor_first_name'] = instance.contact_1.first_name
-        representation['creditor_middle_name'] = instance.contact_1.middle_name
-        representation['creditor_prefix'] = instance.contact_1.prefix
-        representation['creditor_suffix'] = instance.contact_1.suffix
-        representation['creditor_street_1'] = instance.contact_1.street_1
-        representation['creditor_street_2'] = instance.contact_1.street_2
-        representation['creditor_city'] = instance.contact_1.city
-        representation['creditor_state'] = instance.contact_1.state
-        representation['creditor_zip'] = instance.contact_1.zip
-
-
 class ScheduleDSerializer(ModelSerializer):
     creditor_organization_name = CharField(required=False, allow_null=True)
     creditor_last_name = CharField(required=False, allow_null=True)

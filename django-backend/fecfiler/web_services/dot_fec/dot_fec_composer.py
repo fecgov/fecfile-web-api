@@ -6,6 +6,13 @@ from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
 from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
+from fecfiler.shared.transforms.schedule_a import add_schedule_a_contact_fields
+from fecfiler.shared.transforms.schedule_b import add_schedule_b_contact_fields
+from fecfiler.shared.transforms.schedule_c import add_schedule_c_contact_fields
+from fecfiler.shared.transforms.schedule_c1 import add_schedule_c1_contact_fields
+from fecfiler.shared.transforms.schedule_c2 import add_schedule_c2_contact_fields
+from fecfiler.shared.transforms.schedule_d import add_schedule_d_contact_fields
+from fecfiler.shared.transforms.schedule_e import add_schedule_e_contact_fields
 
 import logging
 
@@ -52,11 +59,26 @@ def compose_transactions(report_id):
             )
             root = transactions.filter(id=root_id).first()
             transaction.itemized = root.itemized
-            # Assign child IE's thier parent's calendar ytd per election
+
+            if transaction.schedule_a:
+                add_schedule_a_contact_fields(transaction)
+            if transaction.schedule_b:
+                add_schedule_b_contact_fields(transaction)
+            if transaction.schedule_c:
+                add_schedule_c_contact_fields(transaction)
+            if transaction.schedule_c1:
+                add_schedule_c1_contact_fields(transaction)
+            if transaction.schedule_c2:
+                add_schedule_c2_contact_fields(transaction)
+            if transaction.schedule_d:
+                add_schedule_d_contact_fields(transaction)
             if transaction.schedule_e:
+                add_schedule_e_contact_fields(transaction)
+                # Assign child IE's their parent's calendar ytd per election
                 transaction.calendar_ytd_per_election_office = (
                     root.calendar_ytd_per_election_office
                 )
+
         return [t for t in transactions if t.itemized]
     else:
         logger.info(f"no transactions found for report: {report_id}")

@@ -7,37 +7,37 @@
     },
     "entity_type": {},
     "creditor_organization_name": {
-        "path": "contact_1.name"
+        "path": "creditor_organization_name"
     },
     "creditor_last_name": {
-        "path": "contact_1.last_name"
+        "path": "creditor_last_name"
     },
     "creditor_first_name": {
-        "path": "contact_1.first_name"
+        "path": "creditor_first_name"
     },
     "creditor_middle_name": {
-        "path": "contact_1.middle_name"
+        "path": "creditor_middle_name"
     },
     "creditor_prefix": {
-        "path": "contact_1.prefix"
+        "path": "creditor_prefix"
     },
     "creditor_suffix": {
-        "path": "contact_1.suffix"
+        "path": "creditor_suffix"
     },
     "creditor_street_1": {
-        "path": "contact_1.street_1"
+        "path": "creditor_street_1"
     },
     "creditor_street_2": {
-        "path": "contact_1.street_2"
+        "path": "creditor_street_2"
     },
     "creditor_city": {
-        "path": "contact_1.city"
+        "path": "creditor_city"
     },
     "creditor_state": {
-        "path": "contact_1.state"
+        "path": "creditor_state"
     },
     "creditor_zip": {
-        "path": "contact_1.zip"
+        "path": "creditor_zip"
     },
     "purpose_of_debt_or_obligation": {
         "path": "schedule_d.purpose_of_debt_or_obligation"

@@ -6,37 +6,37 @@
     "back_reference_sched_name": {},
     "entity_type": {},
     "payee_organization_name": {
-        "path": "contact_1.name"
+        "path": "payee_organization_name"
     },
     "payee_last_name": {
-        "path": "contact_1.last_name"
+        "path": "payee_last_name"
     },
     "payee_first_name": {
-        "path": "contact_1.first_name"
+        "path": "payee_first_name"
     },
     "payee_middle_name": {
-        "path": "contact_1.middle_name"
+        "path": "payee_middle_name"
     },
     "payee_prefix": {
-        "path": "contact_1.prefix"
+        "path": "payee_prefix"
     },
     "payee_suffix": {
-        "path": "contact_1.suffix"
+        "path": "payee_suffix"
     },
     "payee_street_1": {
-        "path": "contact_1.street_1"
+        "path": "payee_street_1"
     },
     "payee_street_2": {
-        "path": "contact_1.street_2"
+        "path": "payee_street_2"
     },
     "payee_city": {
-        "path": "contact_1.city"
+        "path": "payee_city"
     },
     "payee_state": {
-        "path": "contact_1.state"
+        "path": "payee_state"
     },
     "payee_zip": {
-        "path": "contact_1.zip"
+        "path": "payee_zip"
     },
     "election_code": {
         "path": "schedule_b.election_code"
@@ -61,37 +61,37 @@
         "path": "schedule_b.category_code"
     },
     "beneficiary_committee_fec_id": {
-        "path": "contact_1.committee_id"
+        "path": "beneficiary_committee_fec_id"
     },
     "beneficiary_committee_name": {
-        "path": "contact_1.name"
+        "path": "beneficiary_committee_name"
     },
     "beneficiary_candidate_fec_id": {
-        "path": "contact_2.candidate_id"
+        "path": "beneficiary_candidate_fec_id"
     },
     "beneficiary_candidate_last_name": {
-        "path": "contact_2.last_name"
+        "path": "beneficiary_candidate_last_name"
     },
     "beneficiary_candidate_first_name": {
-        "path": "contact_2.first_name"
+        "path": "beneficiary_candidate_first_name"
     },
     "beneficiary_candidate_middle_name": {
-        "path": "contact_2.middle_name"
+        "path": "beneficiary_candidate_middle_name"
     },
     "beneficiary_candidate_prefix": {
-        "path": "contact_2.prefix"
+        "path": "beneficiary_candidate_prefix"
     },
     "beneficiary_candidate_suffix": {
-        "path": "contact_2.suffix"
+        "path": "beneficiary_candidate_suffix"
     },
     "beneficiary_candidate_office": {
-        "path": "contact_2.candidate_office"
+        "path": "beneficiary_candidate_office"
     },
     "beneficiary_candidate_state": {
-        "path": "contact_2.candidate_state"
+        "path": "beneficiary_candidate_state"
     },
     "beneficiary_candidate_district": {
-        "path": "contact_2.candidate_district"
+        "path": "beneficiary_candidate_district"
     },
     "conduit_name": {
         "path": "schedule_b.conduit_name"

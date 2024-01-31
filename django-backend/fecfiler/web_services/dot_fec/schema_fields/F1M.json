@@ -27,161 +27,161 @@
         "path": "form_1m.affiliated_date_form_f1_filed"
     },
     "affiliated_committee_fec_id": {
-        "path": "affiliated_contact.committee_id"
+        "path": "affiliated_committee_fec_id"
     },
     "affiliated_committee_name": {
-        "path": "affiliated_contact.name"
+        "path": "affiliated_committee_name"
     },
     "I_candidate_id_number": {
-        "path": "contact_candidate_I.candidate_id"
+        "path": "I_candidate_id_number"
     },
     "I_candidate_last_name": {
-        "path": "contact_candidate_I.last_name"
+        "path": "I_candidate_last_name"
     },
     "I_candidate_first_name": {
-        "path": "contact_candidate_I.first_name"
+        "path": "I_candidate_first_name"
     },
     "I_candidate_middle_name": {
-        "path": "contact_candidate_I.middle_name"
+        "path": "I_candidate_middle_name"
     },
     "I_candidate_prefix": {
-        "path": "contact_candidate_I.prefix"
+        "path": "I_candidate_prefix"
     },
     "I_candidate_suffix": {
-        "path": "contact_candidate_I.suffix"
+        "path": "I_candidate_suffix"
     },
     "I_candidate_office": {
-        "path": "contact_candidate_I.candidate_office"
+        "path": "I_candidate_office"
     },
     "I_candidate_state": {
-        "path": "contact_candidate_I.candidate_state"
+        "path": "I_candidate_state"
     },
     "I_candidate_district": {
-        "path": "contact_candidate_I.candidate_district"
+        "path": "I_candidate_district"
     },
     "I_date_of_contribution": {
         "serializer": "DATE",
         "path": "form_1m.I_date_of_contribution"
     },
     "II_candidate_id_number": {
-        "path": "contact_candidate_II.candidate_id"
+        "path": "II_candidate_id_number"
     },
     "II_candidate_last_name": {
-        "path": "contact_candidate_II.last_name"
+        "path": "II_candidate_last_name"
     },
     "II_candidate_first_name": {
-        "path": "contact_candidate_II.first_name"
+        "path": "II_candidate_first_name"
     },
     "II_candidate_middle_name": {
-        "path": "contact_candidate_II.middle_name"
+        "path": "II_candidate_middle_name"
     },
     "II_candidate_prefix": {
-        "path": "contact_candidate_II.prefix"
+        "path": "II_candidate_prefix"
     },
     "II_candidate_suffix": {
-        "path": "contact_candidate_II.suffix"
+        "path": "II_candidate_suffix"
     },
     "II_candidate_office": {
-        "path": "contact_candidate_II.candidate_office"
+        "path": "II_candidate_office"
     },
     "II_candidate_state": {
-        "path": "contact_candidate_II.candidate_state"
+        "path": "II_candidate_state"
     },
     "II_candidate_district": {
-        "path": "contact_candidate_II.candidate_district"
+        "path": "II_candidate_district"
     },
     "II_date_of_contribution": {
         "serializer": "DATE",
         "path": "form_1m.II_date_of_contribution"
     },
     "III_candidate_id_number": {
-        "path": "contact_candidate_III.candidate_id"
+        "path": "III_candidate_id_number"
     },
     "III_candidate_last_name": {
-        "path": "contact_candidate_III.last_name"
+        "path": "III_candidate_last_name"
     },
     "III_candidate_first_name": {
-        "path": "contact_candidate_III.first_name"
+        "path": "III_candidate_first_name"
     },
     "III_candidate_middle_name": {
-        "path": "contact_candidate_III.middle_name"
+        "path": "III_candidate_middle_name"
     },
     "III_candidate_prefix": {
-        "path": "contact_candidate_III.prefix"
+        "path": "III_candidate_prefix"
     },
     "III_candidate_suffix": {
-        "path": "contact_candidate_III.suffix"
+        "path": "III_candidate_suffix"
     },
     "III_candidate_office": {
-        "path": "contact_candidate_III.candidate_office"
+        "path": "III_candidate_office"
     },
     "III_candidate_state": {
-        "path": "contact_candidate_III.candidate_state"
+        "path": "III_candidate_state"
     },
     "III_candidate_district": {
-        "path": "contact_candidate_III.candidate_district"
+        "path": "III_candidate_district"
     },
     "III_date_of_contribution": {
         "serializer": "DATE",
         "path": "form_1m.III_date_of_contribution"
     },
     "IV_candidate_id_number": {
-        "path": "contact_candidate_IV.candidate_id"
+        "path": "IV_candidate_id_number"
     },
     "IV_candidate_last_name": {
-        "path": "contact_candidate_IV.last_name"
+        "path": "IV_candidate_last_name"
     },
     "IV_candidate_first_name": {
-        "path": "contact_candidate_IV.first_name"
+        "path": "IV_candidate_first_name"
     },
     "IV_candidate_middle_name": {
-        "path": "contact_candidate_IV.middle_name"
+        "path": "IV_candidate_middle_name"
     },
     "IV_candidate_prefix": {
-        "path": "contact_candidate_IV.prefix"
+        "path": "IV_candidate_prefix"
     },
     "IV_candidate_suffix": {
-        "path": "contact_candidate_IV.suffix"
+        "path": "IV_candidate_suffix"
     },
     "IV_candidate_office": {
-        "path": "contact_candidate_IV.candidate_office"
+        "path": "IV_candidate_office"
     },
     "IV_candidate_state": {
-        "path": "contact_candidate_IV.candidate_state"
+        "path": "IV_candidate_state"
     },
     "IV_candidate_district": {
-        "path": "contact_candidate_IV.candidate_district"
+        "path": "IV_candidate_district"
     },
     "IV_date_of_contribution": {
         "serializer": "DATE",
         "path": "form_1m.IV_date_of_contribution"
     },
     "V_candidate_id_number": {
-        "path": "contact_candidate_V.candidate_id"
+        "path": "V_candidate_id_number"
     },
     "V_candidate_last_name": {
-        "path": "contact_candidate_V.last_name"
+        "path": "V_candidate_last_name"
     },
     "V_candidate_first_name": {
-        "path": "contact_candidate_V.first_name"
+        "path": "V_candidate_first_name"
     },
     "V_candidate_middle_name": {
-        "path": "contact_candidate_V.middle_name"
+        "path": "V_candidate_middle_name"
     },
     "V_candidate_prefix": {
-        "path": "contact_candidate_V.prefix"
+        "path": "V_candidate_prefix"
     },
     "V_candidate_suffix": {
-        "path": "contact_candidate_V.suffix"
+        "path": "V_candidate_suffix"
     },
     "V_candidate_office": {
-        "path": "contact_candidate_V.candidate_office"
+        "path": "V_candidate_office"
     },
     "V_candidate_state": {
-        "path": "contact_candidate_V.candidate_state"
+        "path": "V_candidate_state"
     },
     "V_candidate_district": {
-        "path": "contact_candidate_V.candidate_district"
+        "path": "V_candidate_district"
     },
     "V_date_of_contribution": {
         "serializer": "DATE",

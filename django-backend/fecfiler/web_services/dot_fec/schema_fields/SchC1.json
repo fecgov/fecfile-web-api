@@ -6,22 +6,22 @@
     "back_reference_sched_name": {},
     "entity_type": {},
     "lender_organization_name": {
-        "path": "contact_1.name"
+        "path": "lender_organization_name"
     },
     "lender_street_1": {
-        "path": "contact_1.street_1"
+        "path": "lender_street_1"
     },
     "lender_street_2": {
-        "path": "contact_1.street_2"
+        "path": "lender_street_2"
     },
     "lender_city": {
-        "path": "contact_1.city"
+        "path": "lender_city"
     },
     "lender_state": {
-        "path": "contact_1.state"
+        "path": "lender_state"
     },
     "lender_zip": {
-        "path": "contact_1.zip"
+        "path": "lender_zip"
     },
     "loan_amount": {
         "path": "schedule_c1.loan_amount"
