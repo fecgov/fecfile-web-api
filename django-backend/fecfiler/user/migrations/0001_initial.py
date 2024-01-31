@@ -4,21 +4,10 @@ from django.db import migrations, models
 import django.utils.timezone
 import uuid
 from fecfiler.shared.utilities import get_model_data
-from random import choice
-import string
-
-
-def random_password(size):
-    return "".join(
-        [
-            choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-            for n in range(size)
-        ]
-    )
+from django.core.management.utils import get_random_secret_key
 
 
 def copy_users(apps, schema_editor):
-    print(apps.get_models())
     if not apps.is_installed(
         "authentication"
     ):  # "authentication" not in [app_name for app_name, app in apps.get_models()]:
@@ -31,10 +20,8 @@ def copy_users(apps, schema_editor):
     for old_user in old_users:
         user_data = get_model_data(old_user.__dict__, User)
         user_data["id"] = uuid.uuid4()
-        user = User(**user_data)
-        if not user.password:
-            user.set_password(random_password(128))
-        user.save()
+        user_data["password"] = old_user.password or get_random_secret_key()
+        User.objects.create(**user_data)
 
 
 class Migration(migrations.Migration):
