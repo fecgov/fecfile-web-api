@@ -14,15 +14,18 @@ def create_memberships(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     users = User.objects.using(db_alias).all()
     for user in users:
-        committee = CommitteeAccount.objects.using(db_alias).get(
-            committee_id=user.cmtee_id
+        committee = (
+            CommitteeAccount.objects.using(db_alias)
+            .filter(committee_id=user.cmtee_id)
+            .first()
         )
-        membership = Membership(
-            user=user,
-            committee_account=committee,
-            role=MembershipModel.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-        )
-        membership.save()
+        if committee:
+            membership = Membership(
+                user=user,
+                committee_account=committee,
+                role=MembershipModel.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            )
+            membership.save()
 
 
 class Migration(migrations.Migration):
