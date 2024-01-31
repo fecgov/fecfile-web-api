@@ -7,14 +7,6 @@ from .base import *  # NOSONAR # noqa F401, F403
 DEBUG = False
 TEMPLATE_DEBUG = False
 
-LOGGING = get_env_logging_config(prod=True) # noqa
-
-structlog.configure(  # noqa
-    processors=get_env_logging_processors(prod=True), # noqa
-    logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
-    cache_logger_on_first_use=True,
-)
-
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True

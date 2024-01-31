@@ -21,6 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
+LINE = "LINE"
+JSON = "JSON"
+LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
@@ -213,7 +217,7 @@ REST_FRAMEWORK = {
 }
 
 
-def get_env_logging_config(prod=False):
+def get_logging_config(log_format=LINE):
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -250,33 +254,33 @@ def get_env_logging_config(prod=False):
         }
     }
 
-    if prod:
+    if log_format == LINE:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["cloud"],
-                "level": "INFO",
+                "handlers": ["console"],
+                "level": "DEBUG",
             },
             "fecfiler": {
-                "handlers": ["cloud"],
-                "level": "INFO",
+                "handlers": ["console"],
+                "level": "DEBUG",
             },
         }
     else:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["console"],
-                "level": "DEBUG",
+                "handlers": ["cloud"],
+                "level": "INFO",
             },
             "fecfiler": {
-                "handlers": ["console"],
-                "level": "DEBUG",
+                "handlers": ["cloud"],
+                "level": "INFO",
             },
         }
 
     return logging_config
 
 
-def get_env_logging_processors(prod=False):
+def get_env_logging_processors(log_format=LINE):
     """
     get structlog processors
     depending on environment
@@ -284,7 +288,20 @@ def get_env_logging_processors(prod=False):
     We will need to set these explicitly for Celery too
     """
 
-    if prod:
+    if log_format == LINE:
+        # Remove format_exc_info to pretty-print exceptions locally
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ]
+    else:
         # JSON in production
         return [
             structlog.contextvars.merge_contextvars,
@@ -299,22 +316,14 @@ def get_env_logging_processors(prod=False):
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ]
 
-    else:
-        # Remove format_exc_info to pretty-print exceptions localls
-        return [
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ]
 
+LOGGING = get_logging_config(LOG_FORMAT)
 
-LOGGING = get_env_logging_config()
+structlog.configure(  # noqa
+    processors=get_env_logging_processors(LOG_FORMAT), # noqa
+    logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
+    cache_logger_on_first_use=True,
+)
 
 DJANGO_STRUCTLOG_CELERY_ENABLED = True
 

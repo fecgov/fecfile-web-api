@@ -34,11 +34,13 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     Celery and environment-specific logging
     See https://django-structlog.readthedocs.io/en/latest/celery.html
     """
+    log_format = env.get_credential('LOG_FORMAT')
+
     # env.space will be None if we're local, and dev/stage/prod in cloud.gov
-    logging.config.dictConfig(settings.get_env_logging_config(env.space))
+    logging.config.dictConfig(settings.get_logging_config(log_format))
 
     structlog.configure(  # noqa
-        processors=settings.get_env_logging_processors(env.space),
+        processors=settings.get_env_logging_processors(log_format),
         logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
         cache_logger_on_first_use=True,
     )
