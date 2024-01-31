@@ -6,7 +6,7 @@ from ..serializers import (
 )
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
-from fecfiler.reports.form_1m.serializers_utils import add_form_1m_contact_fields
+from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 
 
 class F1MSerializerTestCase(TestCase):
@@ -65,7 +65,7 @@ class F1MSerializerTestCase(TestCase):
     def test_serializer_utils_to_representation(self):
         data = dict(
             contact_affiliated=dict(
-                committee_id='C000000009',
+                committee_id="C000000009",
                 name="Affiliated Committee",
             )
         )
@@ -74,7 +74,8 @@ class F1MSerializerTestCase(TestCase):
             committee_name="Elect Person"
         )
 
-        representation = add_form_1m_contact_fields(data, representation)
+        add_form_1m_contact_fields(data, representation)
 
-        assert(representation['affiliated_committee_name'] == 'Affilliated Committee',
-            'affiliated_committee_name was not updated')
+        self.assertEquals(
+            representation["affiliated_committee_name"], "Affiliated Committee"
+        )

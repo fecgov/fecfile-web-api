@@ -2,7 +2,9 @@ def add_form_1m_contact_fields(form_1m, representation):
 
     contact_key = 'contact_affiliated'
     if form_1m.get(contact_key):
-        representation['affiliated_committee_fec_id'] = form_1m[contact_key]['committee_id']
+        representation['affiliated_committee_fec_id'] = (
+            form_1m[contact_key]['committee_id']
+        )
         representation['affiliated_committee_name'] = form_1m[contact_key]['name']
 
     contact_key = 'contact_candidate_I'
@@ -14,7 +16,9 @@ def add_form_1m_contact_fields(form_1m, representation):
         representation['I_candidate_prefix'] = form_1m[contact_key]['prefix']
         representation['I_candidate_suffix'] = form_1m[contact_key]['suffix']
         representation['I_candidate_office'] = form_1m[contact_key]['candidate_office']
-        representation['I_candidate_district'] = form_1m[contact_key]['candidate_district']
+        representation['I_candidate_district'] = (
+            form_1m[contact_key]['candidate_district']
+        )
         representation['I_candidate_state'] = form_1m[contact_key]['candidate_state']
 
     contact_key = 'contact_candidate_II'
@@ -26,7 +30,9 @@ def add_form_1m_contact_fields(form_1m, representation):
         representation['II_candidate_prefix'] = form_1m[contact_key]['prefix']
         representation['II_candidate_suffix'] = form_1m[contact_key]['suffix']
         representation['II_candidate_office'] = form_1m[contact_key]['candidate_office']
-        representation['II_candidate_district'] = form_1m[contact_key]['candidate_district']
+        representation['II_candidate_district'] = (
+            form_1m[contact_key]['candidate_district']
+        )
         representation['II_candidate_state'] = form_1m[contact_key]['candidate_state']
 
     contact_key = 'contact_candidate_III'
@@ -38,7 +44,9 @@ def add_form_1m_contact_fields(form_1m, representation):
         representation['III_candidate_prefix'] = form_1m[contact_key]['prefix']
         representation['III_candidate_suffix'] = form_1m[contact_key]['suffix']
         representation['III_candidate_office'] = form_1m[contact_key]['candidate_office']
-        representation['III_candidate_district'] = form_1m[contact_key]['candidate_district']
+        representation['III_candidate_district'] = (
+            form_1m[contact_key]['candidate_district']
+        )
         representation['III_candidate_state'] = form_1m[contact_key]['candidate_state']
 
     contact_key = 'contact_candidate_IV'
@@ -50,7 +58,9 @@ def add_form_1m_contact_fields(form_1m, representation):
         representation['IV_candidate_prefix'] = form_1m[contact_key]['prefix']
         representation['IV_candidate_suffix'] = form_1m[contact_key]['suffix']
         representation['IV_candidate_office'] = form_1m[contact_key]['candidate_office']
-        representation['IV_candidate_district'] = form_1m[contact_key]['candidate_district']
+        representation['IV_candidate_district'] = (
+            form_1m[contact_key]['candidate_district']
+        )
         representation['IV_candidate_state'] = form_1m[contact_key]['candidate_state']
 
     contact_key = 'contact_candidate_V'
@@ -62,5 +72,7 @@ def add_form_1m_contact_fields(form_1m, representation):
         representation['V_candidate_prefix'] = form_1m[contact_key]['prefix']
         representation['V_candidate_suffix'] = form_1m[contact_key]['suffix']
         representation['V_candidate_office'] = form_1m[contact_key]['candidate_office']
-        representation['V_candidate_district'] = form_1m[contact_key]['candidate_district']
+        representation['V_candidate_district'] = (
+            form_1m[contact_key]['candidate_district']
+        )
         representation['V_candidate_state'] = form_1m[contact_key]['candidate_state']
