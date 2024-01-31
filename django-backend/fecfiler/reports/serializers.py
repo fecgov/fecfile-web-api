@@ -10,7 +10,6 @@ from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
     WebPrintSubmissionSerializer,
 )
-from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.form_3x.models import Form3X
@@ -18,7 +17,6 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
-from fecfiler.shared.utilities import get_model_data
 import logging
 
 

@@ -78,4 +78,3 @@ def add_schedule_a_contact_fields(instance, representation=None):
     else:
         for (k, v) in data.items():
             setattr(instance, k, v)
-        
