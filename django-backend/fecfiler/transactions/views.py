@@ -298,12 +298,13 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
-    
+
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
     def save_reatt_redes_transactions(self, request):
         with db_transaction.atomic():
             if request.data[0].get("id", None) is not None:
-                saved_data = [self.save_transaction(data, request) for data in request.data]
+                saved_data = [
+                    self.save_transaction(data, request) for data in request.data]
             else:
                 reatt_redes = self.save_transaction(request.data[0], request)
                 request.data[1]['reatt_redes'] = reatt_redes
@@ -313,7 +314,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 child['reatt_redes_id'] = reatt_redes.id
                 request.data[1]['children'] = [child]
                 to = self.save_transaction(request.data[1], request)
-                saved_data = [reatt_redes, to ]
+                saved_data = [reatt_redes, to]
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )

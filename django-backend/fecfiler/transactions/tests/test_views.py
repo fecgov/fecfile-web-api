@@ -15,6 +15,8 @@ class TransactionViewsTestCase(TestCase):
         "test_election_aggregation_data",
     ]
 
+    json_content_type = "application/json"
+
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
@@ -26,7 +28,7 @@ class TransactionViewsTestCase(TestCase):
         request = self.factory.post(
             "/api/v1/transactions",
             json.dumps(payload),
-            content_type="application/json",
+            content_type=self.json_content_type,
         )
         request.user = self.user
         request.data = deepcopy(payload)
@@ -172,7 +174,7 @@ class TransactionViewsTestCase(TestCase):
         request = self.factory.put(
             "/api/v1/transactions/multisave/",
             json.dumps(payload),
-            content_type="application/json",
+            content_type=self.json_content_type,
         )
         request.user = self.user
         request.data = deepcopy(payload)
@@ -192,7 +194,6 @@ class TransactionViewsTestCase(TestCase):
         txn3 = deepcopy(self.payloads["IN_KIND"])
         txn3["contributor_last_name"] = "three"
         txn2['children'] = [txn3]
-        txn2['reatt_redes'] = txn1
         payload = [txn1, txn2]
 
         view_set = TransactionViewSet()
@@ -200,14 +201,13 @@ class TransactionViewsTestCase(TestCase):
         request = self.factory.put(
             "/api/v1/transactions/multisave/",
             json.dumps(payload),
-            content_type="application/json",
+            content_type=self.json_content_type,
         )
         request.user = self.user
         request.data = deepcopy(payload)
         view_set.request = request
 
         view_set = TransactionViewSet()
-        response = view_set.save_transactions(self.request(payload))
+        response = view_set.save_reatt_redes_transactions(self.request(payload))
         transactions = response.data
         self.assertEqual(len(transactions), 2)
-        # self.assertEqual("one", transactions[0]["contributor_last_name"])
