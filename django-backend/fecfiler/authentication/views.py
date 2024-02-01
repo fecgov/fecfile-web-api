@@ -110,7 +110,7 @@ def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
     )
     response.set_cookie(
         FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
-        quote_plus(user.security_consent_date),
+        user.security_consent_date,
         domain=FFAPI_COOKIE_DOMAIN,
         secure=True,
     )
