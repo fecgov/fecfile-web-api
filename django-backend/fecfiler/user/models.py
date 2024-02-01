@@ -16,3 +16,4 @@ class User(AbstractUser):
     groups = None
     user_permissions = None
     login_dot_gov = False
+    security_consent_date = models.DateField(null=True, blank=True)

@@ -9,3 +9,4 @@ class CurrentUserSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     email = serializers.EmailField(read_only=True)
     login_dot_gov = serializers.BooleanField(read_only=True)
+    security_consent_date = serializers.DateField()

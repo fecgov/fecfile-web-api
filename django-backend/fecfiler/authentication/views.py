@@ -13,6 +13,7 @@ from fecfiler.settings import (
     FFAPI_FIRST_NAME_COOKIE_NAME,
     FFAPI_LAST_NAME_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
+    FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
@@ -107,12 +108,19 @@ def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
         domain=FFAPI_COOKIE_DOMAIN,
         secure=True,
     )
+    response.set_cookie(
+        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
+        quote_plus(user.security_consent_date),
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
 
 
 def delete_user_logged_in_cookies(response):
     response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_FIRST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_LAST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
