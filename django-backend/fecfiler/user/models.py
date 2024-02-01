@@ -15,3 +15,4 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, null=True, blank=True)
     groups = None
     user_permissions = None
+    login_dot_gov = False
