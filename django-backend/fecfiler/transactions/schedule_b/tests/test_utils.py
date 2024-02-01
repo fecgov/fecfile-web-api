@@ -21,7 +21,7 @@ class ScheduleBUtilsTestCase(TestCase):
         )
         self.assertEquals(representation['payee_last_name'], '1 last name')
         self.assertEquals(
-          representation['beneficiary_candidate_last_name'], '2 last name'
+            representation['beneficiary_candidate_last_name'], '2 last name'
         )
         self.assertEquals(representation['beneficiary_committee_name'], '3 name')
 
