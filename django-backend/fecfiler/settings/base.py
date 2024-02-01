@@ -22,7 +22,8 @@ DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
 LINE = "LINE"
-JSON = "JSON"
+KEY_VALUE = "KEY_VALUE"
+
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
@@ -236,7 +237,7 @@ def get_logging_config(log_format=LINE):
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["timestamp", "level", "event", "logger"]
+                    key_order=["level", "event", "logger"]
                 ),
             },
         },
@@ -248,7 +249,7 @@ def get_logging_config(log_format=LINE):
             },
             "cloud": {
                 "class": "logging.StreamHandler",
-                "formatter": "json_formatter",
+                "formatter": "key_value",
                 "stream": sys.stdout,
             },
         }
@@ -301,7 +302,7 @@ def get_env_logging_processors(log_format=LINE):
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ]
     else:
-        # JSON in production
+        # Key/Value in production
         return [
             structlog.contextvars.merge_contextvars,
             structlog.stdlib.filter_by_level,
