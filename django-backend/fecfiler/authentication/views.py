@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.http import require_http_methods
 from urllib.parse import quote_plus
@@ -58,25 +58,14 @@ def generate_username(uuid):
 
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
-    json_response = JsonResponse(
-        {"is_allowed": True, "email": user.email},
-        status=200,
-        safe=False,
-    )
-    set_user_logged_in_cookies_for_user(json_response, user, "false")
-    return json_response
+    response = HttpResponse()
+    set_user_logged_in_cookies_for_user(response, user, "false")
+    return response
 
 
 def handle_invalid_login(username):
     logger.debug("Unauthorized login attempt: {}".format(username))
-    return JsonResponse(
-        {
-            "is_allowed": False,
-            "status": "Unauthorized",
-            "message": "ID/Password combination invalid.",
-        },
-        status=401,
-    )
+    return HttpResponse('Unauthorized', status=401)
 
 
 def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
