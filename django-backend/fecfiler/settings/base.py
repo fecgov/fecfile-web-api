@@ -319,9 +319,9 @@ def get_env_logging_processors(log_format=LINE):
 
 LOGGING = get_logging_config(LOG_FORMAT)
 
-structlog.configure(  # noqa
-    processors=get_env_logging_processors(LOG_FORMAT), # noqa
-    logger_factory=structlog.stdlib.LoggerFactory(),  # noqa
+structlog.configure(
+    processors=get_env_logging_processors(LOG_FORMAT),
+    logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,
 )
 
