@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.http import require_http_methods
+from urllib.parse import quote_plus
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -79,24 +80,27 @@ def handle_invalid_login(username):
 
 
 def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
-    response.set_cookie(
-        FFAPI_FIRST_NAME_COOKIE_NAME,
-        user.first_name or '',
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    response.set_cookie(
-        FFAPI_LAST_NAME_COOKIE_NAME,
-        user.last_name or '',
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    response.set_cookie(
-        FFAPI_EMAIL_COOKIE_NAME,
-        user.email or '',
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
+    if user.first_name:
+        response.set_cookie(
+            FFAPI_FIRST_NAME_COOKIE_NAME,
+            quote_plus(user.first_name),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
+    if user.last_name:
+        response.set_cookie(
+            FFAPI_LAST_NAME_COOKIE_NAME,
+            quote_plus(user.last_name),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
+    if user.email:
+        response.set_cookie(
+            FFAPI_EMAIL_COOKIE_NAME,
+            quote_plus(user.email),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
     response.set_cookie(
         FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
         is_login_dot_gov,
