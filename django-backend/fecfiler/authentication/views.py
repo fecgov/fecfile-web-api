@@ -8,10 +8,6 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-    FFAPI_FIRST_NAME_COOKIE_NAME,
-    FFAPI_LAST_NAME_COOKIE_NAME,
-    FFAPI_EMAIL_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
@@ -75,45 +71,11 @@ def handle_invalid_login(username):
         status=401,
     )
 
-
-def delete_user_logged_in_cookies(response):
-    response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_FIRST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_LAST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
-
-
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
-    redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        "true",
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_FIRST_NAME_COOKIE_NAME,
-        request.user.first_name,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_LAST_NAME_COOKIE_NAME,
-        request.user.last_name,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_EMAIL_COOKIE_NAME,
-        request.user.email,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    return redirect
+    request.user.login_dot_gov = True
+    return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
 
 
 @api_view(["GET"])
@@ -121,7 +83,8 @@ def login_redirect(request):
 @permission_classes([])
 def logout_redirect(request):
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    delete_user_logged_in_cookies(response)
+    for cookie in request.COOKIES:
+        response.delete_cookie(cookie)
     return response
 
 
