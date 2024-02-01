@@ -16,10 +16,13 @@ class ScheduleBUtilsTestCase(TestCase):
         add_schedule_b_contact_fields(instance, representation)
 
         self.assertEquals(
-            representation['transaction_type_identifier'], 'REFUND_INDIVIDUAL_CONTRIBUTION'
+            representation['transaction_type_identifier'],
+            'REFUND_INDIVIDUAL_CONTRIBUTION'
         )
         self.assertEquals(representation['payee_last_name'], '1 last name')
-        self.assertEquals(representation['beneficiary_candidate_last_name'], '2 last name')
+        self.assertEquals(
+          representation['beneficiary_candidate_last_name'], '2 last name'
+        )
         self.assertEquals(representation['beneficiary_committee_name'], '3 name')
 
         # Test donor committee override
