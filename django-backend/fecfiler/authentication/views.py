@@ -57,11 +57,13 @@ def generate_username(uuid):
 
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
-    return JsonResponse(
+    json_response = JsonResponse(
         {"is_allowed": True, "email": user.email},
         status=200,
         safe=False,
     )
+    set_user_logged_in_cookies_for_user(json_response, user, "false")
+    return json_response
 
 
 def handle_invalid_login(username):
@@ -73,6 +75,33 @@ def handle_invalid_login(username):
             "message": "ID/Password combination invalid.",
         },
         status=401,
+    )
+
+
+def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
+    response.set_cookie(
+        FFAPI_FIRST_NAME_COOKIE_NAME,
+        user.first_name or '',
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    response.set_cookie(
+        FFAPI_LAST_NAME_COOKIE_NAME,
+        user.last_name or '',
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    response.set_cookie(
+        FFAPI_EMAIL_COOKIE_NAME,
+        user.email or '',
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    response.set_cookie(
+        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
+        is_login_dot_gov,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
     )
 
 
@@ -89,30 +118,7 @@ def delete_user_logged_in_cookies(response):
 @require_http_methods(["GET"])
 def login_redirect(request):
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        "true",
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_FIRST_NAME_COOKIE_NAME,
-        request.user.first_name,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_LAST_NAME_COOKIE_NAME,
-        request.user.last_name,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    redirect.set_cookie(
-        FFAPI_EMAIL_COOKIE_NAME,
-        request.user.email,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
+    set_user_logged_in_cookies_for_user(redirect, request.user, "true")
     return redirect
 
 
@@ -156,4 +162,6 @@ def authenticate_login(request):
 @require_http_methods(["GET"])
 def authenticate_logout(request):
     logout(request)
-    return Response({}, status=status.HTTP_204_NO_CONTENT)
+    response = Response({}, status=status.HTTP_204_NO_CONTENT)
+    delete_user_logged_in_cookies(response)
+    return response
