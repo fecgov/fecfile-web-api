@@ -110,7 +110,9 @@ def delete_user_logged_in_cookies(response):
     response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_FIRST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie(FFAPI_LAST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(
+        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN
+    )
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)

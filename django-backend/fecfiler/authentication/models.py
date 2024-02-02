@@ -64,7 +64,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     )
 
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
-    security_consent_date = models.DateTimeField(_("security consent date"), default=timezone.now)
     login_code_counter = models.CharField(max_length=1, blank=False, default=0)
     register_token = models.CharField(max_length=32, null=True, blank=True)
     personal_key = models.CharField(max_length=64, null=True, blank=True)
