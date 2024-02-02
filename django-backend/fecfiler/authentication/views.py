@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.http import require_http_methods
 from urllib.parse import quote_plus
@@ -59,28 +59,18 @@ def generate_username(uuid):
 
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
-    json_response = JsonResponse(
-        {"is_allowed": True, "email": user.email},
-        status=200,
-        safe=False,
-    )
-    set_user_logged_in_cookies_for_user(json_response, user, "false")
-    return json_response
+    user.login_dot_gov = False
+    response = HttpResponse()
+    set_user_logged_in_cookies_for_user(response, user)
+    return response
 
 
 def handle_invalid_login(username):
     logger.debug("Unauthorized login attempt: {}".format(username))
-    return JsonResponse(
-        {
-            "is_allowed": False,
-            "status": "Unauthorized",
-            "message": "ID/Password combination invalid.",
-        },
-        status=401,
-    )
+    return HttpResponse('Unauthorized', status=401)
 
 
-def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
+def set_user_logged_in_cookies_for_user(response, user):
     if user.first_name:
         response.set_cookie(
             FFAPI_FIRST_NAME_COOKIE_NAME,
@@ -104,7 +94,7 @@ def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
         )
     response.set_cookie(
         FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        is_login_dot_gov,
+        "true" if user.login_dot_gov else "false",
         domain=FFAPI_COOKIE_DOMAIN,
         secure=True,
     )
@@ -129,8 +119,9 @@ def delete_user_logged_in_cookies(response):
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
+    request.user.login_dot_gov = True
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    set_user_logged_in_cookies_for_user(redirect, request.user, "true")
+    set_user_logged_in_cookies_for_user(redirect, request.user)
     return redirect
 
 
