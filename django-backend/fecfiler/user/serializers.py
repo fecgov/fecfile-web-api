@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
-    security_consent_date = serializers.DateField()
     class Meta:
         model = User
         fields = [
