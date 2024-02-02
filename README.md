@@ -38,6 +38,8 @@ Proper values for the development variables are shown here as an example
 export DATABASE_URL="postgres://postgres:postgres@db/postgres"
 export FECFILE_TEST_DB_NAME="postgres"
 export DJANGO_SECRET_KEY="If_using_test_db_use_secret_key_in_cloud.gov"
+export FEC_API="https://api.open.fec.gov/v1/"
+export FEC_API_KEY="DEMO_KEY"
 ```
 
 ### Shut down the containers
