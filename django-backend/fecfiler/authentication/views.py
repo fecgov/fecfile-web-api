@@ -58,8 +58,9 @@ def generate_username(uuid):
 
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
+    user.login_dot_gov = False
     response = HttpResponse()
-    set_user_logged_in_cookies_for_user(response, user, "false")
+    set_user_logged_in_cookies_for_user(response, user)
     return response
 
 
@@ -68,7 +69,7 @@ def handle_invalid_login(username):
     return HttpResponse('Unauthorized', status=401)
 
 
-def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
+def set_user_logged_in_cookies_for_user(response, user):
     if user.first_name:
         response.set_cookie(
             FFAPI_FIRST_NAME_COOKIE_NAME,
@@ -92,7 +93,7 @@ def set_user_logged_in_cookies_for_user(response, user, is_login_dot_gov):
         )
     response.set_cookie(
         FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        is_login_dot_gov,
+        "true" if user.login_dot_gov else "false",
         domain=FFAPI_COOKIE_DOMAIN,
         secure=True,
     )
@@ -110,8 +111,9 @@ def delete_user_logged_in_cookies(response):
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
+    request.user.login_dot_gov = True
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    set_user_logged_in_cookies_for_user(redirect, request.user, "true")
+    set_user_logged_in_cookies_for_user(redirect, request.user)
     return redirect
 
 
