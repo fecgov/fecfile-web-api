@@ -39,6 +39,7 @@ export DATABASE_URL="postgres://postgres:postgres@db/postgres"
 export FECFILE_TEST_DB_NAME="postgres"
 export DJANGO_SECRET_KEY="If_using_test_db_use_secret_key_in_cloud.gov"
 export FEC_API="https://api.open.fec.gov/v1/"
+# Note - this API key has a very low rate limit - reach out to a team member or get a key at https://api.open.fec.gov/developers/
 export FEC_API_KEY="DEMO_KEY"
 ```
 
