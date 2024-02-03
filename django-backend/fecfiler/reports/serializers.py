@@ -16,10 +16,9 @@ from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Form3XSerializer(ModelSerializer):

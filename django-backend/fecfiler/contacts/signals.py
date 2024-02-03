@@ -9,9 +9,9 @@ We use signals to log saves to be consistent with delete logging
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Contact
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @receiver(post_save, sender=Contact)
@@ -21,9 +21,12 @@ def log_post_save(sender, instance, created, **kwargs):
         action = "created"
     elif instance.deleted:
         action = "deleted"
-    logger.info("Contact: %s was %s", str(instance), action)
+    logger.info(
+        f"Contact {action}",
+        contact_id=instance.id
+    )
 
 
 @receiver(post_delete, sender=Contact)
 def log_post_delete(sender, instance, **kwargs):
-    logger.info("Contact: %s was deleted", str(instance))
+    logger.info("Contact deleted", contact_id=instance.id)

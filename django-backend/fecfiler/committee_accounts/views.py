@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from .models import CommitteeAccount
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 from fecfiler.settings import FFAPI_COMMITTEE_UUID_COOKIE_NAME, FFAPI_COOKIE_DOMAIN
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -53,6 +53,10 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        committee_id = self.request.user.committeeaccount_set.first().id
+        committee = self.request.user.committeeaccount_set.first()
         queryset = super().get_queryset()
-        return queryset.filter(committee_account_id=committee_id)
+        structlog.contextvars.bind_contextvars(
+            committee_id=committee.committee_id,
+            committee_uuid=committee.id
+        )
+        return queryset.filter(committee_account_id=committee.id)

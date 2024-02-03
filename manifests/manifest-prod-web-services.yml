@@ -17,3 +17,4 @@ applications:
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      LOG_FORMAT: KEY_VALUE

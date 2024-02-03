@@ -1,4 +1,5 @@
-import logging
+import structlog
+
 import re
 from urllib.parse import urlencode
 from django.db import transaction
@@ -22,7 +23,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 default_max_fec_results = 10
 default_max_fecfile_results = 10

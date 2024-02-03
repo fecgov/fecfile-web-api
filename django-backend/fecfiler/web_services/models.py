@@ -3,9 +3,9 @@ import json
 import uuid
 from django.db import models
 from fecfiler.reports.models import Report, ReportMixin
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class DotFEC(ReportMixin):

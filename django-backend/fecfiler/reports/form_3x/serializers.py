@@ -11,13 +11,13 @@ from rest_framework.serializers import (
     DateField,
     BooleanField,
 )
-import logging
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
     {"report_code": ["Collision with existing report_code and year"]}
 )
-
-logger = logging.getLogger(__name__)
 
 
 class Form3XSerializer(ReportSerializer):

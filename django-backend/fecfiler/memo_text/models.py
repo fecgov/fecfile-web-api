@@ -4,10 +4,9 @@ from fecfiler.reports.models import ReportMixin
 from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
