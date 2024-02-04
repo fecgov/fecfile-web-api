@@ -6,9 +6,9 @@ from fecfiler.settings import (
 )
 from fecfiler.s3 import S3_SESSION
 from fecfiler.celery import CeleryStorageType
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def store_file(file_content, file_name, force_write_to_disk=False):

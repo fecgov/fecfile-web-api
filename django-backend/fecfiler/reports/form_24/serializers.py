@@ -7,10 +7,9 @@ from rest_framework.serializers import (
     CharField,
     DateField,
 )
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Form24Serializer(ReportSerializer):

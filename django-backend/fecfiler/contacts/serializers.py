@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from django.db.models import Q
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from .models import Contact
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def create_or_update_contact(validated_data: dict, contact_key):

@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models import Sum
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
@@ -31,10 +29,13 @@ from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fiel
 from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
+import structlog
 
+logger = structlog.get_logger(__name__)
 
-logger = logging.getLogger(__name__)
-MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
+MISSING_SCHEMA_NAME_ERROR = ValidationError(
+    {"schema_name": ["No schema_name provided"]}
+)
 
 SCHEDULE_SERIALIZERS = dict(
     A=ScheduleASerializer,

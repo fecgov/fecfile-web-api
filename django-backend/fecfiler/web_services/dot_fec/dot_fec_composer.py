@@ -13,10 +13,9 @@ from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fiel
 from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
+import structlog
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def compose_report(report_id, upload_submission_record_id):

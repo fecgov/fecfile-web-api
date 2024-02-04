@@ -10,9 +10,9 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 report_code_label_mapping = Case(
     When(report_code="Q1", then=Value("APRIL 15 (Q1)")),

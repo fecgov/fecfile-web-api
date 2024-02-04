@@ -1,4 +1,3 @@
-import logging
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 from rest_framework.decorators import action
@@ -20,8 +19,9 @@ from fecfiler.contacts.views import save_payload_contacts
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
@@ -270,6 +270,26 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def save_transactions(self, request):
         with db_transaction.atomic():
             saved_data = [self.save_transaction(data, request) for data in request.data]
+        return Response(
+            [TransactionSerializer().to_representation(data) for data in saved_data]
+        )
+
+    @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
+    def save_reatt_redes_transactions(self, request):
+        with db_transaction.atomic():
+            if request.data[0].get("id", None) is not None:
+                saved_data = [
+                    self.save_transaction(data, request) for data in request.data]
+            else:
+                reatt_redes = self.save_transaction(request.data[0], request)
+                request.data[1]['reatt_redes'] = reatt_redes
+                request.data[1]['reatt_redes_id'] = reatt_redes.id
+                child = request.data[1].get('children', [])[0]
+                child['reatt_redes'] = reatt_redes
+                child['reatt_redes_id'] = reatt_redes.id
+                request.data[1]['children'] = [child]
+                to = self.save_transaction(request.data[1], request)
+                saved_data = [reatt_redes, to]
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )

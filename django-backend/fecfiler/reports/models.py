@@ -10,10 +10,9 @@ from .form_3x.models import Form3X
 from .form_24.models import Form24
 from .form_99.models import Form99
 from .form_1m.models import Form1M
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Report(SoftDeleteModel, CommitteeOwnedModel):

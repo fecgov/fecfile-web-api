@@ -5,10 +5,9 @@ from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField, DateField, UUIDField
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 CONTACT_FIELDS = [
     'affiliated_committee_fec_id',

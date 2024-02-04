@@ -9,9 +9,9 @@ We use signals to log saves to be consistent with delete logging
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Report
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @receiver(post_save, sender=Report)
