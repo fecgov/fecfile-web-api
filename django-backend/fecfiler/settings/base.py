@@ -166,6 +166,7 @@ FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
 FFAPI_FIRST_NAME_COOKIE_NAME = "ffapi_first_name"
 FFAPI_LAST_NAME_COOKIE_NAME = "ffapi_last_name"
+FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME = "ffapi_security_consent_date"
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
