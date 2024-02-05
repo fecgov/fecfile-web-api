@@ -3,9 +3,9 @@ from django.db import transaction
 from fecfiler.validation import serializers
 from rest_framework.serializers import UUIDField, ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class MemoTextSerializer(

@@ -5,10 +5,68 @@ from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField, DateField, UUIDField
-import logging
+import structlog
 
+logger = structlog.get_logger(__name__)
 
-logger = logging.getLogger(__name__)
+CONTACT_FIELDS = [
+    'affiliated_committee_fec_id',
+    'affiliated_committee_name',
+    'I_candidate_id_number',
+    'I_candidate_last_name',
+    'I_candidate_first_name',
+    'I_candidate_middle_name',
+    'I_candidate_prefix',
+    'I_candidate_suffix',
+    'I_candidate_office',
+    'I_candidate_district',
+    'I_candidate_state',
+    'II_candidate_id_number',
+    'II_candidate_last_name',
+    'II_candidate_first_name',
+    'II_candidate_middle_name',
+    'II_candidate_prefix',
+    'II_candidate_suffix',
+    'II_candidate_office',
+    'II_candidate_district',
+    'II_candidate_state',
+    'III_candidate_id_number',
+    'III_candidate_last_name',
+    'III_candidate_first_name',
+    'III_candidate_middle_name',
+    'III_candidate_prefix',
+    'III_candidate_suffix',
+    'III_candidate_office',
+    'III_candidate_district',
+    'III_candidate_state',
+    'IV_candidate_id_number',
+    'IV_candidate_last_name',
+    'IV_candidate_first_name',
+    'IV_candidate_middle_name',
+    'IV_candidate_prefix',
+    'IV_candidate_suffix',
+    'IV_candidate_office',
+    'IV_candidate_district',
+    'IV_candidate_state',
+    'V_candidate_id_number',
+    'V_candidate_last_name',
+    'V_candidate_first_name',
+    'V_candidate_middle_name',
+    'V_candidate_prefix',
+    'V_candidate_suffix',
+    'V_candidate_office',
+    'V_candidate_district',
+    'V_candidate_state',
+]
+
+CONTACT_KEYS = [
+    'contact_affiliated',
+    'contact_candidate_I',
+    'contact_candidate_II',
+    'contact_candidate_III',
+    'contact_candidate_IV',
+    'contact_candidate_V',
+]
 
 
 class Form1MSerializer(ReportSerializer):
@@ -22,17 +80,17 @@ class Form1MSerializer(ReportSerializer):
     zip = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
 
-    contact_affiliated = ContactSerializer(allow_null=True, required=False)
-    contact_affiliated_id = UUIDField(required=False, allow_null=False)
-    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_affiliated = ContactSerializer(required=False, allow_null=True)
+    contact_affiliated_id = UUIDField(required=False, allow_null=True)
+    contact_candidate_I = ContactSerializer(required=False, allow_null=True)  # noqa: N815
     contact_candidate_I_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_II = ContactSerializer(required=False, allow_null=True)  # noqa: N815,E501
     contact_candidate_II_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_III = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_III = ContactSerializer(required=False, allow_null=True)  # noqa: N815,E501
     contact_candidate_III_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
+    contact_candidate_IV = ContactSerializer(required=False, allow_null=True)  # noqa: N815,E501
     contact_candidate_IV_id = UUIDField(required=False, allow_null=True)  # noqa: N815
-    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+    contact_candidate_V = ContactSerializer(required=False, allow_null=True)  # noqa: N815
     contact_candidate_V_id = UUIDField(required=False, allow_null=True)  # noqa: N815
 
     affiliated_date_form_f1_filed = DateField(required=False, allow_null=True)
@@ -94,6 +152,10 @@ class Form1MSerializer(ReportSerializer):
     V_candidate_district = CharField(required=False, allow_null=True)
     V_date_of_contribution = DateField(required=False, allow_null=True)
 
+    date_of_original_registration = DateField(required=False, allow_null=True)
+    date_of_51st_contributor = DateField(required=False, allow_null=True)
+    date_committee_met_requirements = DateField(required=False, allow_null=True)
+
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
         report = ReportSerializer(context=self.context).to_internal_value(data)
@@ -119,14 +181,7 @@ class Form1MSerializer(ReportSerializer):
             return super().update(instance, validated_data)
 
     def write_contacts(self, validated_data: dict):
-        for contact_key in [
-            "contact_affiliated",
-            "contact_candidate_I",
-            "contact_candidate_II",
-            "contact_candidate_III",
-            "contact_candidate_IV",
-            "contact_candidate_V",
-        ]:
+        for contact_key in CONTACT_KEYS:
             create_or_update_contact(validated_data, contact_key)
 
     def validate(self, data):
@@ -139,6 +194,7 @@ class Form1MSerializer(ReportSerializer):
         fields = (
             ReportSerializer.Meta.get_fields()
             + [f.name for f in Form1M._meta.get_fields() if f.name not in ["report"]]
+            + CONTACT_FIELDS
             + [
                 "fields_to_validate",
                 "contact_affiliated_id",

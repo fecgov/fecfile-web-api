@@ -2,7 +2,14 @@ from enum import Enum
 import os
 import ssl
 import cfenv
+import logging
+import structlog
+from django.conf import settings
 from celery import Celery
+from celery.signals import setup_logging
+from django_structlog.celery.steps import DjangoStructLogInitStep
+
+logger = structlog.get_logger(__name__)
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fecfiler.settings")
@@ -15,8 +22,29 @@ app = Celery("fecfiler")
 #   should have a `CELERY_` prefix.
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+# A step to initialize django-structlog
+app.steps['worker'].add(DjangoStructLogInitStep)
 
 env = cfenv.AppEnv()
+
+
+@setup_logging.connect
+def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
+    """
+    Celery and environment-specific logging
+    See https://django-structlog.readthedocs.io/en/latest/celery.html
+    """
+    log_format = env.get_credential('LOG_FORMAT')
+
+    logging.config.dictConfig(settings.get_logging_config(log_format))
+
+    structlog.configure(
+        processors=settings.get_env_logging_processors(log_format),
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
+
 if env.get_service(name="fecfile-api-redis"):
     app.conf["broker_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
     app.conf["redis_backend_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
@@ -32,4 +60,4 @@ class CeleryStorageType(Enum):
 
 @app.task(bind=True)
 def debug_task(self):
-    print(f"Request: {self.request!r}")
+    logger.debug(f"Request: {self.request!r}")

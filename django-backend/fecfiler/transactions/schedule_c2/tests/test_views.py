@@ -35,18 +35,12 @@ class ScheduleC2ViewsTestCase(TestCase):
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
         self.schedule_c = ScheduleC(
-            lender_organization_name="name",
-            lender_street_1="street",
-            lender_city="ville",
-            lender_state="MD",
-            lender_zip="111111",
             loan_amount=1234,
             loan_incurred_date="2023-01-01",
             loan_due_date="123",
             loan_interest_rate="123",
             secured=True,
             personal_funds=False,
-            lender_committee_id_number="C12345678",
         )
         self.schedule_c.save()
         self.loan.schedule_c = self.schedule_c
@@ -61,7 +55,7 @@ class ScheduleC2ViewsTestCase(TestCase):
             form_type="SC2/9",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
-        self.schedule_c2 = ScheduleC2(guarantor_last_name="smith", guaranteed_amount=10)
+        self.schedule_c2 = ScheduleC2(guaranteed_amount=10)
         self.schedule_c2.save()
         self.guarantor.schedule_c2 = self.schedule_c2
         self.guarantor.save()

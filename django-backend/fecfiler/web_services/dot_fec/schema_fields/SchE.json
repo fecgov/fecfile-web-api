@@ -9,38 +9,38 @@
     },
     "entity_type": {},
     "payee_organization_name": {
-        "path": "schedule_e.payee_organization_name"
+        "path": "payee_organization_name"
     },
     "payee_last_name": {
-        "path": "schedule_e.payee_last_name"
+        "path": "payee_last_name"
     },
     "payee_first_name": {
-        "path": "schedule_e.payee_first_name"
+        "path": "payee_first_name"
     },
     "payee_middle_name": {
-        "path": "schedule_e.payee_middle_name"
+        "path": "payee_middle_name"
     },
     "payee_prefix": {
-        "path": "schedule_e.payee_prefix"
+        "path": "payee_prefix"
     },
     "payee_suffix": {
-        "path": "schedule_e.payee_suffix"
+        "path": "payee_suffix"
     },
 
     "payee_street_1": {
-        "path": "schedule_e.payee_street_1"
+        "path": "payee_street_1"
     },
     "payee_street_2": {
-        "path": "schedule_e.payee_street_2"
+        "path": "payee_street_2"
     },
     "payee_city": {
-        "path": "schedule_e.payee_city"
+        "path": "payee_city"
     },
     "payee_state": {
-        "path": "schedule_e.payee_state"
+        "path": "payee_state"
     },
     "payee_zip": {
-        "path": "schedule_e.payee_zip"
+        "path": "payee_zip"
     },
     "election_code": {
         "path": "schedule_e.election_code"
@@ -75,31 +75,31 @@
         "path": "schedule_e.support_oppose_code"
     },
     "so_candidate_id_number": {
-        "path": "schedule_e.so_candidate_id_number"
+        "path": "so_candidate_id_number"
     },
     "so_candidate_last_name": {
-        "path": "schedule_e.so_candidate_last_name"
+        "path": "so_candidate_last_name"
     },
     "so_candidate_first_name": {
-        "path": "schedule_e.so_candidate_first_name"
+        "path": "so_candidate_first_name"
     },
     "so_candidate_middle_name": {
-        "path": "schedule_e.so_candidate_middle_name"
+        "path": "so_candidate_middle_name"
     },
     "so_candidate_prefix": {
-        "path": "schedule_e.so_candidate_prefix"
+        "path": "so_candidate_prefix"
     },
     "so_candidate_suffix": {
-        "path": "schedule_e.so_candidate_suffix"
+        "path": "so_candidate_suffix"
     },
     "so_candidate_office": {
-        "path": "schedule_e.so_candidate_office"
+        "path": "so_candidate_office"
     },
     "so_candidate_district": {
-        "path": "schedule_e.so_candidate_district"
+        "path": "so_candidate_district"
     },
     "so_candidate_state": {
-        "path": "schedule_e.so_candidate_state"
+        "path": "so_candidate_state"
     },
     "completing_last_name": {
         "path": "schedule_e.completing_last_name"
