@@ -15,7 +15,7 @@ from fecfiler.transactions.serializers import (
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.models import Contact
-from fecfiler.contacts.views import save_payload_contacts
+from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
@@ -227,11 +227,11 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 data=transaction_data, context={"request": request}
             )
 
-        contact_instances = save_payload_contacts(
-            transaction_data,
-            ['contact_1', 'contact_2', 'contact_3'],
-            request
-        )
+        contact_instances = {
+            contact_key: create_or_update_contact(transaction_data, contact_key)
+            for contact_key in ['contact_1', 'contact_2', 'contact_3']
+            if contact_key in transaction_data
+        }
         transaction_serializer.is_valid(raise_exception=True)
         schedule_serializer.is_valid(raise_exception=True)
 

@@ -39,28 +39,6 @@ def validate_and_sanitize_candidate(candidate_id):
     return candidate_id
 
 
-def save_payload_contacts(payload, contact_keys, request):
-    contact_instances = {}
-    for contact_key in contact_keys:
-        contact_data = payload.get(contact_key)
-        if contact_data:
-            if 'id' in contact_data:
-                contact_instance = Contact.objects.get(pk=contact_data['id'])
-                contact_serializer = ContactSerializer(
-                    contact_instance,
-                    data=contact_data,
-                    context={"request": request}
-                )
-            else:
-                contact_serializer = ContactSerializer(
-                    data=contact_data,
-                    context={"request": request}
-                )
-            contact_serializer.is_valid(raise_exception=True)
-            contact_instances[contact_key] = contact_serializer.save()
-    return contact_instances
-
-
 class ContactViewSet(CommitteeOwnedViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
