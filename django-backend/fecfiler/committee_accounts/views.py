@@ -34,13 +34,19 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"])
-    def activate_committee(self, request):
+    def activate(self, request, pk):
         committee = self.get_object()
         if not committee:
             return Response("Committee could not be activated", status=403)
         committee_uuid = committee.id
-        request.session["committee_uuid"] = committee_uuid
+        request.session["committee_uuid"] = str(committee_uuid)
         return Response("Committee activated")
+
+    @action(detail=False, methods=["get"])
+    def active(self, request):
+        committee_uuid = request.session["committee_uuid"]
+        committee = self.get_queryset().filter(id=committee_uuid).first()
+        return Response(self.get_serializer(committee).data)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
