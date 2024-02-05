@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
-from fecfiler.settings import FFAPI_COMMITTEE_UUID_COOKIE_NAME, FFAPI_COOKIE_DOMAIN
 import logging
 
 logger = logging.getLogger(__name__)
