@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
-from fecfiler.settings import FFAPI_COMMITTEE_UUID_COOKIE_NAME, FFAPI_COOKIE_DOMAIN
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -17,7 +16,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return CommitteeAccount.objects.filter(members=user)
 
     @action(detail=True, methods=["get"])
-    def users(self, request, pk):
+    def members(self, request, pk):
         committee = self.get_object()
         serializer_context = {"committee_id": committee.id}
         queryset = self.filter_queryset(committee.members.all())
@@ -34,20 +33,23 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"])
-    def activate_committee(self, request):
+    def activate(self, request, pk):
         committee = self.get_object()
+        if not committee:
+            return Response("Committee could not be activated", status=403)
         committee_uuid = committee.id
-        response = Response("Committee activated")
-        response.set_cookie(
-            FFAPI_COMMITTEE_UUID_COOKIE_NAME,
-            committee_uuid,
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        return response
+        request.session["committee_uuid"] = str(committee_uuid)
+        return Response("Committee activated")
+
+    @action(detail=False, methods=["get"])
+    def active(self, request):
+        committee_uuid = request.session["committee_uuid"]
+        committee = self.get_queryset().filter(id=committee_uuid).first()
+        return Response(self.get_serializer(committee).data)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
+
     """ModelViewSet for models using CommitteeOwnedModel
     Inherit this view set to filter the queryset by the user's committee
     """
