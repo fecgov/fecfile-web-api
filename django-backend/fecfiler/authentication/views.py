@@ -1,6 +1,7 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.http import require_http_methods
+from urllib.parse import quote_plus
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -8,8 +9,11 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_COMMITTEE_UUID_COOKIE_NAME,
+    FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
+    FFAPI_FIRST_NAME_COOKIE_NAME,
+    FFAPI_LAST_NAME_COOKIE_NAME,
     FFAPI_EMAIL_COOKIE_NAME,
+    FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
@@ -55,27 +59,60 @@ def generate_username(uuid):
 
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
-    return JsonResponse(
-        {"is_allowed": True, "email": user.email},
-        status=200,
-        safe=False,
-    )
+    user.login_dot_gov = False
+    response = HttpResponse()
+    set_user_logged_in_cookies_for_user(response, user)
+    return response
 
 
 def handle_invalid_login(username):
     logger.debug("Unauthorized login attempt: {}".format(username))
-    return JsonResponse(
-        {
-            "is_allowed": False,
-            "status": "Unauthorized",
-            "message": "ID/Password combination invalid.",
-        },
-        status=401,
+    return HttpResponse('Unauthorized', status=401)
+
+
+def set_user_logged_in_cookies_for_user(response, user):
+    if user.first_name:
+        response.set_cookie(
+            FFAPI_FIRST_NAME_COOKIE_NAME,
+            quote_plus(user.first_name),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
+    if user.last_name:
+        response.set_cookie(
+            FFAPI_LAST_NAME_COOKIE_NAME,
+            quote_plus(user.last_name),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
+    if user.email:
+        response.set_cookie(
+            FFAPI_EMAIL_COOKIE_NAME,
+            quote_plus(user.email),
+            domain=FFAPI_COOKIE_DOMAIN,
+            secure=True,
+        )
+    response.set_cookie(
+        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
+        "true" if user.login_dot_gov else "false",
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
+    response.set_cookie(
+        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
+        user.security_consent_date,
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
     )
 
 
 def delete_user_logged_in_cookies(response):
-    response.delete_cookie(FFAPI_COMMITTEE_UUID_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_FIRST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(FFAPI_LAST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie(
+        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN
+    )
     response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
@@ -84,13 +121,9 @@ def delete_user_logged_in_cookies(response):
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
+    request.user.login_dot_gov = True
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_EMAIL_COOKIE_NAME,
-        request.user.email,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
+    set_user_logged_in_cookies_for_user(redirect, request.user)
     return redirect
 
 
@@ -134,4 +167,6 @@ def authenticate_login(request):
 @require_http_methods(["GET"])
 def authenticate_logout(request):
     logout(request)
-    return Response({}, status=status.HTTP_204_NO_CONTENT)
+    response = Response({}, status=status.HTTP_204_NO_CONTENT)
+    delete_user_logged_in_cookies(response)
+    return response
