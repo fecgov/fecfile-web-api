@@ -8,7 +8,6 @@ from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.transactions.views import propagate_contact
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
@@ -241,7 +240,6 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
-            propagate_contact(None, self.get_object())
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(

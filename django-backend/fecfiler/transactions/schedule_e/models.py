@@ -10,17 +10,6 @@ class ScheduleE(models.Model):
         serialize=False,
         unique=True,
     )
-    payee_organization_name = models.TextField(null=True, blank=True)
-    payee_last_name = models.TextField(null=True, blank=True)
-    payee_first_name = models.TextField(null=True, blank=True)
-    payee_middle_name = models.TextField(null=True, blank=True)
-    payee_prefix = models.TextField(null=True, blank=True)
-    payee_suffix = models.TextField(null=True, blank=True)
-    payee_street_1 = models.TextField(null=True, blank=True)
-    payee_street_2 = models.TextField(null=True, blank=True)
-    payee_city = models.TextField(null=True, blank=True)
-    payee_state = models.TextField(null=True, blank=True)
-    payee_zip = models.TextField(null=True, blank=True)
     election_code = models.TextField(null=True, blank=True)
     election_other_description = models.TextField(null=True, blank=True)
     dissemination_date = models.DateField(null=True, blank=True)
@@ -32,15 +21,6 @@ class ScheduleE(models.Model):
     category_code = models.TextField(null=True, blank=True)
     payee_cmtte_fec_id_number = models.TextField(null=True, blank=True)
     support_oppose_code = models.TextField(null=True, blank=True)
-    so_candidate_id_number = models.TextField(null=True, blank=True)
-    so_candidate_last_name = models.TextField(null=True, blank=True)
-    so_candidate_first_name = models.TextField(null=True, blank=True)
-    so_candidate_middle_name = models.TextField(null=True, blank=True)
-    so_candidate_prefix = models.TextField(null=True, blank=True)
-    so_candidate_suffix = models.TextField(null=True, blank=True)
-    so_candidate_office = models.TextField(null=True, blank=True)
-    so_candidate_district = models.TextField(null=True, blank=True)
-    so_candidate_state = models.TextField(null=True, blank=True)
     completing_last_name = models.TextField(null=True, blank=True)
     completing_first_name = models.TextField(null=True, blank=True)
     completing_middle_name = models.TextField(null=True, blank=True)
@@ -54,22 +34,6 @@ class ScheduleE(models.Model):
 
     def get_transaction(self):
         return self.transaction_set.first()
-
-    def update_with_contact(self, contact):
-        transaction = self.get_transaction()
-        if contact.id == transaction.contact_1_id:
-            self.payee_organization_name = contact.name
-            self.payee_last_name = contact.last_name
-            self.payee_first_name = contact.first_name
-            self.payee_middle_name = contact.middle_name
-            self.payee_prefix = contact.prefix
-            self.payee_suffix = contact.suffix
-            self.payee_street_1 = contact.street_1
-            self.payee_street_2 = contact.street_2
-            self.payee_city = contact.city
-            self.payee_state = contact.state
-            self.payee_zip = contact.zip
-        self.save()
 
     class Meta:
         app_label = "transactions"

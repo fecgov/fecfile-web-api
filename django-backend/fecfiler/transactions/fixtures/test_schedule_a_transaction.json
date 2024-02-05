@@ -5,7 +5,7 @@
         "fields": {
             "contribution_amount": 1234.56
         },
-        "pk": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+        "pk": "474a1a10-da68-4d71-9a11-9509df48e1aa"
     },
     {
         "comment": "SA15 transaction with memo",

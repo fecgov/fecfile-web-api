@@ -19,12 +19,6 @@
         "model": "transactions.scheduleb",
         "pk": "00000000-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "payee_organization_name": "1",
-            "payee_street_1": "1",
-            "payee_street_2": "1",
-            "payee_city": "1",
-            "payee_state": "AZ",
-            "payee_zip": "1",
             "expenditure_date": "2023-09-01",
             "expenditure_amount": "3.00",
             "expenditure_purpose_descrip": "sdfasdf"
@@ -51,12 +45,6 @@
         "model": "transactions.scheduleb",
         "pk": "00000001-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "payee_organization_name": "1",
-            "payee_street_1": "1",
-            "payee_street_2": "1",
-            "payee_city": "1",
-            "payee_state": "AZ",
-            "payee_zip": "1",
             "expenditure_date": "2023-09-02",
             "expenditure_amount": "3.00",
             "expenditure_purpose_descrip": "sdfasdf"

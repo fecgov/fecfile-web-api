@@ -16,6 +16,7 @@ from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
+from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -127,6 +128,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     representation[property] = form_99[property]
         if form_1m:
             representation["report_type"] = "F1M"
+            add_form_1m_contact_fields(form_1m, representation)
             for property in form_1m:
                 if not representation.get(property):
                     representation[property] = form_1m[property]
