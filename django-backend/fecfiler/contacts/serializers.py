@@ -2,6 +2,7 @@ import structlog
 
 from django.db.models import Q
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
+from fecfiler.shared.utilities import get_model_data
 from fecfiler.validation import serializers
 from rest_framework.serializers import (
     IntegerField,
@@ -18,15 +19,16 @@ def create_or_update_contact(validated_data: dict, contact_key):
 
     contact_data = validated_data.pop(contact_key, None)
     contact_id = validated_data.get(contact_key + "_id", None)
-
     contact = None
 
-    if not contact_id and contact_data:
-        contact = Contact.objects.create(**contact_data)
-        validated_data[contact_key + "_id"] = contact.id
-    elif contact_data:
-        Contact.objects.filter(id=contact_id).update(**contact_data)
-        contact = Contact.objects.get(id=contact_id)
+    if contact_data:
+        contact_data = get_model_data(contact_data, Contact)
+        if contact_id:
+            Contact.objects.filter(id=contact_id).update(**contact_data)
+            contact = Contact.objects.get(id=contact_id)
+        else:
+            contact = Contact.objects.create(**contact_data)
+            validated_data[contact_key + "_id"] = contact.id
 
     return contact
 
