@@ -15,7 +15,10 @@ from .models import Contact
 logger = structlog.get_logger(__name__)
 
 
-def create_or_update_contact(validated_data: dict, contact_key):
+def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
+
+    if not user_committee_id:
+        raise Exception('Tried to save contact without user_committee_id')
 
     contact_data = validated_data.pop(contact_key, None)
     contact_id = validated_data.get(contact_key + "_id", None)
@@ -23,6 +26,9 @@ def create_or_update_contact(validated_data: dict, contact_key):
 
     if contact_data:
         contact_data = get_model_data(contact_data, Contact)
+        contact_data["committee_account_id"] = user_committee_id
+        contact_data.pop("committee_account", None)
+
         if contact_id:
             Contact.objects.filter(id=contact_id).update(**contact_data)
             contact = Contact.objects.get(id=contact_id)

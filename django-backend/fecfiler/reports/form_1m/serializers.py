@@ -182,7 +182,8 @@ class Form1MSerializer(ReportSerializer):
 
     def write_contacts(self, validated_data: dict):
         for contact_key in CONTACT_KEYS:
-            create_or_update_contact(validated_data, contact_key)
+            create_or_update_contact(validated_data, contact_key,
+                self.context["request"].session["committee_uuid"])
 
     def validate(self, data):
         self.context["fields_to_ignore"] = self.context.get(
