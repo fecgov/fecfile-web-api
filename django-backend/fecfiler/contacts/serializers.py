@@ -27,7 +27,8 @@ def create_or_update_contact(validated_data: dict, contact_key, user_committee_i
     if contact_data:
         contact_data = get_model_data(contact_data, Contact)
         contact_data["committee_account_id"] = user_committee_id
-        del contact_data["committee_account"]
+        if 'committee_account' in contact_data:
+            del contact_data["committee_account"]
 
         if contact_id:
             Contact.objects.filter(id=contact_id).update(**contact_data)
