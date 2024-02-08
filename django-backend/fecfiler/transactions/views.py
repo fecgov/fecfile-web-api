@@ -228,7 +228,8 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             )
 
         contact_instances = {
-            contact_key: create_or_update_contact(transaction_data, contact_key)
+            contact_key: create_or_update_contact(transaction_data, contact_key,
+                request.session["committee_uuid"])
             for contact_key in ['contact_1', 'contact_2', 'contact_3']
             if contact_key in transaction_data
         }
