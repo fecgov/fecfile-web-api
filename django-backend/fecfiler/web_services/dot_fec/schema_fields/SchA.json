@@ -6,37 +6,37 @@
     "back_reference_sched_name": {},
     "entity_type": {},
     "contributor_organization_name": {
-        "path": "schedule_a.contributor_organization_name"
+        "path": "contributor_organization_name"
     },
     "contributor_last_name": {
-        "path": "schedule_a.contributor_last_name"
+        "path": "contributor_last_name"
     },
     "contributor_first_name": {
-        "path": "schedule_a.contributor_first_name"
+        "path": "contributor_first_name"
     },
     "contributor_middle_name": {
-        "path": "schedule_a.contributor_middle_name"
+        "path": "contributor_middle_name"
     },
     "contributor_prefix": {
-        "path": "schedule_a.contributor_prefix"
+        "path": "contributor_prefix"
     },
     "contributor_suffix": {
-        "path": "schedule_a.contributor_suffix"
+        "path": "contributor_suffix"
     },
     "contributor_street_1": {
-        "path": "schedule_a.contributor_street_1"
+        "path": "contributor_street_1"
     },
     "contributor_street_2": {
-        "path": "schedule_a.contributor_street_2"
+        "path": "contributor_street_2"
     },
     "contributor_city": {
-        "path": "schedule_a.contributor_city"
+        "path": "contributor_city"
     },
     "contributor_state": {
-        "path": "schedule_a.contributor_state"
+        "path": "contributor_state"
     },
     "contributor_zip": {
-        "path": "schedule_a.contributor_zip"
+        "path": "contributor_zip"
     },
     "election_code": {
         "path": "schedule_a.election_code"
@@ -58,43 +58,43 @@
         "path": "schedule_a.contribution_purpose_descrip"
     },
     "contributor_employer": {
-        "path": "schedule_a.contributor_employer"
+        "path": "contributor_employer"
     },
     "contributor_occupation": {
-        "path": "schedule_a.contributor_occupation"
+        "path": "contributor_occupation"
     },
     "donor_committee_fec_id": {
-        "path": "schedule_a.donor_committee_fec_id"
+        "path": "donor_committee_fec_id"
     },
     "donor_committee_name": {
-        "path": "schedule_a.donor_committee_name"
+        "path": "donor_committee_name"
     },
     "donor_candidate_fec_id": {
-        "path": "schedule_a.donor_candidate_fec_id"
+        "path": "donor_candidate_fec_id"
     },
     "donor_candidate_last_name": {
-        "path": "schedule_a.donor_candidate_last_name"
+        "path": "donor_candidate_last_name"
     },
     "donor_candidate_first_name": {
-        "path": "schedule_a.donor_candidate_first_name"
+        "path": "donor_candidate_first_name"
     },
     "donor_candidate_middle_name": {
-        "path": "schedule_a.donor_candidate_middle_name"
+        "path": "donor_candidate_middle_name"
     },
     "donor_candidate_prefix": {
-        "path": "schedule_a.donor_candidate_prefix"
+        "path": "donor_candidate_prefix"
     },
     "donor_candidate_suffix": {
-        "path": "schedule_a.donor_candidate_suffix"
+        "path": "donor_candidate_suffix"
     },
     "donor_candidate_office": {
-        "path": "schedule_a.donor_candidate_office"
+        "path": "donor_candidate_office"
     },
     "donor_candidate_state": {
-        "path": "schedule_a.donor_candidate_state"
+        "path": "donor_candidate_state"
     },
     "donor_candidate_district": {
-        "path": "schedule_a.donor_candidate_district"
+        "path": "donor_candidate_district"
     },
     "conduit_name": {
         "path": "schedule_a.conduit_name"

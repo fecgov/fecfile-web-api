@@ -16,5 +16,14 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "fields": {
+            "id": "c00a5715-2fbe-4395-90e2-7c3b8119bada",
+            "committee_id": "C00277616",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
     }
 ]

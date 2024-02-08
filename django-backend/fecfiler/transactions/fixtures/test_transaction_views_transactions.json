@@ -12,19 +12,13 @@
             "country": "original country",
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z",
-            "committee_account_id": "735db943-9446-462a-9be0-c820baadb622"
+            "committee_account_id": "11111111-2222-3333-4444-555555555555"
         }
     },
     {
         "model": "transactions.scheduleb",
         "pk": "00000000-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "payee_organization_name": "1",
-            "payee_street_1": "1",
-            "payee_street_2": "1",
-            "payee_city": "1",
-            "payee_state": "AZ",
-            "payee_zip": "1",
             "expenditure_date": "2023-09-01",
             "expenditure_amount": "3.00",
             "expenditure_purpose_descrip": "sdfasdf"
@@ -34,7 +28,7 @@
         "model": "transactions.transaction",
         "pk": "00000000-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "committee_account": "11111111-2222-3333-4444-555555555555",
             "report": "1406535e-f99f-42c4-97a8-247904b7d297",
             "transaction_type_identifier": "OPERATING_EXPENDITURE",
             "aggregation_group": "GENERAL_DISBURSEMENT",
@@ -51,12 +45,6 @@
         "model": "transactions.scheduleb",
         "pk": "00000001-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "payee_organization_name": "1",
-            "payee_street_1": "1",
-            "payee_street_2": "1",
-            "payee_city": "1",
-            "payee_state": "AZ",
-            "payee_zip": "1",
             "expenditure_date": "2023-09-02",
             "expenditure_amount": "3.00",
             "expenditure_purpose_descrip": "sdfasdf"
@@ -66,7 +54,7 @@
         "model": "transactions.transaction",
         "pk": "00000001-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
-            "committee_account": "735db943-9446-462a-9be0-c820baadb622",
+            "committee_account": "11111111-2222-3333-4444-555555555555",
             "report": "1406535e-f99f-42c4-97a8-247904b7d297",
             "transaction_type_identifier": "OPERATING_EXPENDITURE",
             "aggregation_group": "GENERAL_DISBURSEMENT",

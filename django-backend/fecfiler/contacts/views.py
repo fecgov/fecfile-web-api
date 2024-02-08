@@ -1,4 +1,5 @@
-import logging
+import structlog
+
 import re
 from urllib.parse import urlencode
 from django.db import transaction
@@ -11,6 +12,7 @@ from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
 from fecfiler.transactions.views import propagate_contact
+from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
@@ -25,7 +27,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 default_max_fec_results = 10
 default_max_fecfile_results = 10
@@ -247,7 +249,6 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
-            propagate_contact(self.get_committee().id, None, self.get_object())
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(

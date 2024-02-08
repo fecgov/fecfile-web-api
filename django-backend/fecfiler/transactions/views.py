@@ -31,14 +31,16 @@ from fecfiler.transactions.serializers import (
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
+import structlog
 
 import os
 import psycopg2
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class TransactionListPagination(pagination.PageNumberPagination):
@@ -77,7 +79,6 @@ class TransactionViewSet(
         # Otherwise, use the view for reading
         committee = self.get_committee()
         model = get_read_model(committee)
-        print("AHOY")
         print(model.objects.all())
         queryset = filter_by_report(model.objects.all(), self)
 
@@ -114,16 +115,87 @@ class TransactionViewSet(
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def propagate_contacts(self, transaction):
-        committee_id = self.get_committee().id
-        contact_1 = Contact.objects.get(id=transaction.contact_1_id)
-        propagate_contact(committee_id, transaction, contact_1)
-        contact_2 = Contact.objects.filter(id=transaction.contact_2_id).first()
-        if contact_2:
-            propagate_contact(committee_id, transaction, contact_2)
-        contact_3 = Contact.objects.filter(id=transaction.contact_3_id).first()
-        if contact_3:
-            propagate_contact(committee_id, transaction, contact_3)
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return response
+
+    @action(detail=False, methods=["get"], url_path=r"previous/entity")
+    def previous_transaction_by_entity(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation"""
+        transaction_id = request.query_params.get("transaction_id", None)
+        try:
+            contact_1_id = request.query_params["contact_1_id"]
+            date = request.query_params["date"]
+            aggregation_group = request.query_params["aggregation_group"]
+        except Exception:
+            message = "contact_1_id, date, and aggregate_group are required params"
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
+
+    @action(detail=False, methods=["get"], url_path=r"previous/election")
+    def previous_transaction_by_election(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation and the same election"""
+        id = request.query_params.get("transaction_id", None)
+        try:
+            date = request.query_params["date"]
+            aggregation_group = request.query_params["aggregation_group"]
+            election_code = request.query_params["election_code"]
+            office = request.query_params["candidate_office"]
+            state = request.query_params.get("candidate_state", None)
+            if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
+                raise Exception()
+            district = request.query_params.get("candidate_district", None)
+            if office == Contact.CandidateOffice.HOUSE and not district:
+                raise Exception()
+        except Exception:
+            message = """date, aggregate_group, election_code, and candidate_office are required params.
+            candidate_state is required for HOUSE and SENATE.
+            candidate_district is required for HOUSE"""
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        return self.get_previous(
+            id, date, aggregation_group, None, election_code, office, state, district
+        )
+
+    def get_previous(
+        self,
+        transaction_id,
+        date,
+        aggregation_group,
+        contact_id=None,
+        election_code=None,
+        office=None,
+        state=None,
+        district=None,
+    ):
+        date = datetime.fromisoformat(date)
+        query = self.get_queryset().filter(
+            ~Q(id=transaction_id or None),
+            Q(date__year=date.year),
+            Q(date__lte=date),
+            Q(aggregation_group=aggregation_group),
+        )
+        if contact_id:
+            query = query.filter(Q(contact_1_id=contact_id))
+        else:
+            query = query.filter(
+                Q(schedule_e__election_code=election_code),
+                Q(contact_2__candidate_office=office),
+                Q(contact_2__candidate_state=state),
+                Q(contact_2__candidate_district=district),
+            )
+        query = query.order_by("-date", "-created")
+        previous_transaction = query.first()
+
+        if previous_transaction:
+            serializer = self.get_serializer(previous_transaction)
+            return Response(data=serializer.data)
+
+        response = {"message": "No previous transaction found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
         children = transaction_data.pop("children", [])
@@ -156,14 +228,19 @@ class TransactionViewSet(
                 data=transaction_data, context={"request": request}
             )
 
+        contact_instances = {
+            contact_key: create_or_update_contact(transaction_data, contact_key)
+            for contact_key in ["contact_1", "contact_2", "contact_3"]
+            if contact_key in transaction_data
+        }
         transaction_serializer.is_valid(raise_exception=True)
         schedule_serializer.is_valid(raise_exception=True)
 
         schedule_instance = schedule_serializer.save()
         transaction_instance = transaction_serializer.save(
-            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance}
+            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance},
+            **contact_instances
         )
-        self.propagate_contacts(transaction_instance)
 
         get_save_hook(transaction_instance)(
             transaction_instance,
@@ -212,88 +289,26 @@ class TransactionViewSet(
         response = super().list(request, *args, **kwargs)
         return response
 
-    def retrieve(self, request, *args, **kwargs):
-        response = super().retrieve(request, *args, **kwargs)
-        return response
-
-    @action(detail=False, methods=["get"], url_path=r"previous/entity")
-    def previous_transaction_by_entity(self, request):
-        """Retrieves transaction that comes before this transactions,
-        while being in the same group for aggregation"""
-        transaction_id = request.query_params.get("transaction_id", None)
-        try:
-            contact_1_id = request.query_params["contact_1_id"]
-            date = request.query_params["date"]
-            aggregation_group = request.query_params["aggregation_group"]
-        except Exception:
-            message = "contact_1_id, date, and aggregate_group are required params"
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-        return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
-
-    @action(detail=False, methods=["get"], url_path=r"previous/election")
-    def previous_transaction_by_election(self, request):
-        """Retrieves transaction that comes before this transactions,
-        while being in the same group for aggregation and the same election"""
-        id = request.query_params.get("transaction_id", None)
-        try:
-            date = request.query_params["date"]
-            aggregation_group = request.query_params["aggregation_group"]
-            election_code = request.query_params["election_code"]
-            office = request.query_params["candidate_office"]
-            state = request.query_params.get("candidate_state", None)
-            if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
-                raise Exception()
-            district = request.query_params.get("candidate_district", None)
-            if office == Contact.CandidateOffice.HOUSE and not district:
-                raise Exception()
-        except Exception:
-            message = """date, aggregate_group, election_code, and candidate_office are required params.
-            candidate_state is required for HOUSE and SENATE.
-            candidate_district is required for HOUSE"""
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-        return self.get_previous(
-            id, date, aggregation_group, None, election_code, office, state, district
+    @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
+    def save_reatt_redes_transactions(self, request):
+        with db_transaction.atomic():
+            if request.data[0].get("id", None) is not None:
+                saved_data = [
+                    self.save_transaction(data, request) for data in request.data
+                ]
+            else:
+                reatt_redes = self.save_transaction(request.data[0], request)
+                request.data[1]["reatt_redes"] = reatt_redes
+                request.data[1]["reatt_redes_id"] = reatt_redes.id
+                child = request.data[1].get("children", [])[0]
+                child["reatt_redes"] = reatt_redes
+                child["reatt_redes_id"] = reatt_redes.id
+                request.data[1]["children"] = [child]
+                to = self.save_transaction(request.data[1], request)
+                saved_data = [reatt_redes, to]
+        return Response(
+            [TransactionSerializer().to_representation(data) for data in saved_data]
         )
-
-    # I'd like to refactor this with keywords
-    def get_previous(
-        self,
-        transaction_id,
-        date,
-        aggregation_group,
-        contact_id=None,
-        election_code=None,
-        office=None,
-        state=None,
-        district=None,
-    ):
-        date = datetime.fromisoformat(date)
-        query = self.get_queryset().filter(
-            ~Q(id=transaction_id or None),
-            Q(date__year=date.year),
-            Q(date__lte=date),
-            Q(aggregation_group=aggregation_group),
-        )
-        if contact_id:
-            query = query.filter(Q(contact_1_id=contact_id))
-        else:
-            query = query.filter(
-                Q(schedule_e__election_code=election_code),
-                Q(schedule_e__so_candidate_office=office),
-                Q(schedule_e__so_candidate_state=state),
-                Q(schedule_e__so_candidate_district=district),
-            )
-        query = query.order_by("-date", "-created")
-        previous_transaction = query.first()
-
-        if previous_transaction:
-            serializer = self.get_serializer(previous_transaction)
-            return Response(data=serializer.data)
-
-        response = {"message": "No previous transaction found."}
-        return Response(response, status=status.HTTP_404_NOT_FOUND)
 
 
 def noop(transaction, is_existing):
@@ -308,16 +323,6 @@ def get_save_hook(transaction: Transaction):
         Schedule.D: schedule_d_save_hook,
     }
     return hooks.get(schedule_name, noop)
-
-
-def propagate_contact(committee_id, transaction, contact):
-    other_transactions = Transaction.objects.filter(
-        ~Q(id=getattr(transaction, "id", None)),
-        Q(Q(contact_1=contact) | Q(contact_2=contact) | Q(contact_3=contact)),
-    )
-    for other_transaction in other_transactions:
-        other_transaction.get_schedule().update_with_contact(contact)
-        other_transaction.save()
 
 
 def stringify_queryset(qs):

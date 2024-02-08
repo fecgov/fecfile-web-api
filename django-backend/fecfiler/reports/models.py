@@ -10,10 +10,9 @@ from .form_3x.models import Form3X
 from .form_24.models import Form24
 from .form_99.models import Form99
 from .form_1m.models import Form1M
-import logging
+import structlog
 
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Report(SoftDeleteModel, CommitteeOwnedModel):
@@ -43,9 +42,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     date_signed = models.DateField(null=True, blank=True)
     calculation_status = models.CharField(max_length=255, null=True, blank=True)
     calculation_token = models.UUIDField(  # Prevents race conditions in summary calc.
-        null=True,
-        blank=True,
-        default=None
+        null=True, blank=True, default=None
     )
 
     confirmation_email_1 = models.EmailField(
@@ -189,6 +186,17 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             if getattr(self, form_key, None):
                 return TABLE_TO_FORM.get(form_key)
 
+    def amend(self):
+        self.form_type = self.get_form_name() + "A"
+        self.report_version = int(self.report_version or "0") + 1
+
+        if self.form_type == "F24A" and self.upload_submission is not None:
+            self.form_24.original_amendment_date = self.upload_submission.created
+            self.form_24.save()
+
+        self.upload_submission = None
+        self.save()
+
 
 TABLE_TO_FORM = {
     "form_3x": "F3X",
@@ -210,11 +218,8 @@ class ReportMixin(models.Model):
             committee = self.report.committee_account
             report_date = self.report.coverage_from_date
             if report_date is not None:
-                report_year = report_date.year
-
                 reports_to_flag_for_recalculation = Report.objects.filter(
                     committee_account=committee,
-                    coverage_from_date__year=report_year,
                     coverage_from_date__gte=report_date,
                 )
             else:

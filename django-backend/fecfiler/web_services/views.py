@@ -12,10 +12,9 @@ from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
+import structlog
 
-import logging
-
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class WebServicesViewSet(viewsets.ViewSet):
@@ -52,7 +51,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Download the most recent .FEC created for a report
         Currently only useful for testing purposes
         """
-        committee_id = request.user.cmtee_id
+        committee_id = request.user.committeeaccount_set.first().committee_id
         dot_fec_record = DotFEC.objects.filter(
             report__id=report_id, report__committee_account__committee_id=committee_id
         ).order_by("-file_name")
@@ -94,7 +93,7 @@ class WebServicesViewSet(viewsets.ViewSet):
                 e_filing_password,
                 FEC_FILING_API,
                 False,
-                backdoor_code
+                backdoor_code,
             )
         ).apply_async(retry=False)
 

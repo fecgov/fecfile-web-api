@@ -15,9 +15,9 @@ from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
 
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @shared_task

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
-from fecfiler.authentication.models import Account
+from fecfiler.user.models import User
 import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
@@ -9,16 +9,17 @@ from fecfiler.transactions.models import Transaction
 
 class TransactionViewsTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_transaction_views_transactions",
         "test_election_aggregation_data",
     ]
 
+    json_content_type = "application/json"
+
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = Account()
-        self.user.cmtee_id = "C12345678"
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
             open("fecfiler/transactions/fixtures/view_payloads.json")
         )
@@ -27,7 +28,7 @@ class TransactionViewsTestCase(TestCase):
         request = self.factory.post(
             "/api/v1/transactions",
             json.dumps(payload),
-            content_type="application/json",
+            content_type=self.json_content_type,
         )
         request.user = self.user
         request.data = deepcopy(payload)
@@ -37,8 +38,8 @@ class TransactionViewsTestCase(TestCase):
     def test_save_transaction_pair(self):
         request = self.request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
-        self.assertEqual("John", transaction.schedule_a.contributor_first_name)
-        self.assertEqual("Smith", transaction.schedule_a.contributor_last_name)
+        self.assertEqual("John", transaction.contact_1.first_name)
+        self.assertEqual("Smith", transaction.contact_1.last_name)
 
     def test_update(self):
         request = self.request(self.payloads["IN_KIND"])
@@ -173,7 +174,7 @@ class TransactionViewsTestCase(TestCase):
         request = self.factory.put(
             "/api/v1/transactions/multisave/",
             json.dumps(payload),
-            content_type="application/json",
+            content_type=self.json_content_type,
         )
         request.user = self.user
         request.data = deepcopy(payload)
@@ -184,3 +185,29 @@ class TransactionViewsTestCase(TestCase):
         transactions = response.data
         self.assertEqual(len(transactions), 3)
         # self.assertEqual("one", transactions[0]["contributor_last_name"])
+
+    def test_reatt_redes_multisave_transactions(self):
+        txn1 = deepcopy(self.payloads["IN_KIND"])
+        txn1["contributor_last_name"] = "one"
+        txn2 = deepcopy(self.payloads["IN_KIND"])
+        txn2["contributor_last_name"] = "two"
+        txn3 = deepcopy(self.payloads["IN_KIND"])
+        txn3["contributor_last_name"] = "three"
+        txn2['children'] = [txn3]
+        payload = [txn1, txn2]
+
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        request = self.factory.put(
+            "/api/v1/transactions/multisave/",
+            json.dumps(payload),
+            content_type=self.json_content_type,
+        )
+        request.user = self.user
+        request.data = deepcopy(payload)
+        view_set.request = request
+
+        view_set = TransactionViewSet()
+        response = view_set.save_reatt_redes_transactions(self.request(payload))
+        transactions = response.data
+        self.assertEqual(len(transactions), 2)

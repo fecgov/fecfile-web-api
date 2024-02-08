@@ -1,0 +1,20 @@
+---
+applications:
+  - name: fecfile-web-services
+    instances: 2
+    stack: cflinuxfs4
+    buildpacks:
+      - python_buildpack
+    memory: 1G
+    no-route: true
+    health-check-type: process
+    command: bin/run-celery-worker.sh
+    services:
+      - fecfile-api-rds
+      - fecfile-api-s3
+      - fecfile-api-redis
+      - fecfile-api-creds-stage
+    env:
+      DISABLE_COLLECTSTATIC: 1
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      LOG_FORMAT: KEY_VALUE

@@ -11,7 +11,7 @@ from fecfiler.web_services.models import (
 
 class UploadSubmissionTestCase(TestCase):
     fixtures = [
-        "test_committee_accounts",
+        "C01234567_user_and_committee",
         "test_f3x_reports",
     ]
 
@@ -32,7 +32,8 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state,
+            FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.upload_submission_id, submission.id)
@@ -72,7 +73,8 @@ class UploadSubmissionTestCase(TestCase):
             "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         self.assertEqual(
-            submission.fecfile_task_state, FECSubmissionState.INITIALIZING.value,
+            submission.fecfile_task_state,
+            FECSubmissionState.INITIALIZING.value,
         )
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.webprint_submission_id, submission.id)

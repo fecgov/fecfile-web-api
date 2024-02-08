@@ -1,8 +1,28 @@
 from fecfiler.committee_accounts.models import CommitteeAccount
 from rest_framework import serializers, relations
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
+
+
+class CommitteeAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommitteeAccount
+        fields = "__all__"
+
+
+class CommitteeMemberSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    email = serializers.CharField()
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    role = serializers.SerializerMethodField()
+    is_active = serializers.BooleanField()
+
+    def get_role(self, object):
+        committee_id = self.context.get("committee_id")
+        return object.membership_set.get(committee_account_id=committee_id).role
 
 
 class CommitteeOwnedSerializer(serializers.ModelSerializer):
@@ -24,5 +44,4 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
 
     def get_committee(self):
         request = self.context["request"]
-        committee_id = request.user.cmtee_id
-        return CommitteeAccount.objects.get(committee_id=committee_id)
+        return request.user.committeeaccount_set.first()
