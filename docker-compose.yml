@@ -114,7 +114,7 @@ services:
      - "8089:8089"
     volumes:
       - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master -H https://fecfile-web-api-stage.app.cloud.gov
+    command: -f /mnt/locust/locustfile.py --master -H https://fecfile-web-api-dev.app.cloud.gov
     profiles: [locust]
     environment:
       LOCAL_TEST_USER:
