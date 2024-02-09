@@ -40,6 +40,9 @@ class F24SerializerTestCase(TestCase):
         self.mock_request.user = User.objects.get(
             id="12345678-aaaa-bbbb-cccc-111122223333"
         )
+        self.mock_request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555"
+        }
 
     def test_serializer_validate(self):
         valid_serializer = Form24Serializer(

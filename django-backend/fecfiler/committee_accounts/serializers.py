@@ -1,4 +1,5 @@
 from fecfiler.committee_accounts.models import CommitteeAccount
+from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework import serializers, relations
 import structlog
 
@@ -45,4 +46,10 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
 
     def get_committee(self):
         request = self.context["request"]
-        return request.user.committeeaccount_set.first()
+        committee_uuid = request.session["committee_uuid"]
+        committee = (
+            CommitteeAccount.objects.get_queryset().filter(id=committee_uuid).first()
+        )
+        if not committee:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee

@@ -33,6 +33,7 @@ class TransactionViewsTestCase(TestCase):
         request.user = self.user
         request.data = deepcopy(payload)
         request.query_params = params
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
         return request
 
     def xtest_save_transaction_pair(self):
@@ -150,6 +151,7 @@ class TransactionViewsTestCase(TestCase):
         request.user = self.user
         request.query_params = {}
         request.data = {}
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         view = TransactionViewSet
         view.request = request
@@ -193,7 +195,7 @@ class TransactionViewsTestCase(TestCase):
         txn2["contributor_last_name"] = "two"
         txn3 = deepcopy(self.payloads["IN_KIND"])
         txn3["contributor_last_name"] = "three"
-        txn2['children'] = [txn3]
+        txn2["children"] = [txn3]
         payload = [txn1, txn2]
 
         view_set = TransactionViewSet()

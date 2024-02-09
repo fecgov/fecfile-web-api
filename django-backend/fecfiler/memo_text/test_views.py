@@ -16,12 +16,18 @@ class MemoTextViewSetTest(TestCase):
             "/api/v1/memo-text/?report_id=b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
         response = MemoTextViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
 
     def test_create_new_report_memo_text(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
+        session = client.session._get_session_from_db()
+        session.session_data = client.session.encode(
+            {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        )
+        session.save()
         data = {
             "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "rec_type": "TEXT",
@@ -45,6 +51,11 @@ class MemoTextViewSetTest(TestCase):
     def test_create_existing_report_memo_text(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
+        session = client.session._get_session_from_db()
+        session.session_data = client.session.encode(
+            {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        )
+        session.save()
         data = {
             "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
             "rec_type": "TEXT",
