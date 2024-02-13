@@ -11,8 +11,6 @@ from rest_framework import viewsets
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
-from fecfiler.transactions.views import propagate_contact
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,

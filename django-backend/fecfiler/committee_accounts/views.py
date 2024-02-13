@@ -1,5 +1,7 @@
 from rest_framework import viewsets
+from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.transactions.models import get_read_model
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -41,6 +43,8 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response("Committee could not be activated", status=403)
         committee_uuid = committee.id
         request.session["committee_uuid"] = str(committee_uuid)
+        """ create view if it doesn't exist """
+        get_read_model(committee)
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
@@ -57,13 +61,15 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     """
 
     def get_queryset(self):
-        committee = self.request.user.committeeaccount_set.first()
-        queryset = super().get_queryset()
+        committee = self.get_committee()
         structlog.contextvars.bind_contextvars(
             committee_id=committee.committee_id, committee_uuid=committee.id
         )
-        return queryset.filter(committee_account_id=committee.id)
+        return super().get_queryset().filter(committee_account_id=committee.id)
 
     def get_committee(self):
-        committee_id = self.request.user.cmtee_id
-        return CommitteeAccount.objects.get(committee_id=committee_id)
+        committee_uuid = self.request.session["committee_uuid"]
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        if not committee:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee

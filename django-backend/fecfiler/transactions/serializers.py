@@ -239,33 +239,36 @@ class TransactionSerializer(
         # Assign the itemization value of the highest level parent for all transactions.
         # The itemization value of the parent (or any ancestor) is not yet calcuated
         # when retrieving this instance from the db.
-        if instance.parent_transaction:
-            if instance.parent_transaction.parent_transaction:
-                itemized = Transaction.objects.get(
-                    id=instance.parent_transaction.parent_transaction.id
-                ).itemized
-            else:
-                parent = Transaction.objects.get(id=instance.parent_transaction.id)
-                # Assign child IE's thier parent's calendar ytd per election
-                if instance.schedule_e:
-                    representation[
-                        "calendar_ytd_per_election_office"
-                    ] = parent.calendar_ytd_per_election_office
-                itemized = parent.itemized
-            representation["itemized"] = itemized
+        # if instance.parent_transaction:
+        #     if instance.parent_transaction.parent_transaction:
+        #         itemized = Transaction.objects.get(
+        #             id=instance.parent_transaction.parent_transaction.id
+        #         ).itemized
+        #     else:
+        #         parent = Transaction.objects.get(id=instance.parent_transaction.id)
+        #         # Assign child IE's thier parent's calendar ytd per election
+        #         if instance.schedule_e:
+        #             representation[
+        #                 "calendar_ytd_per_election_office"
+        #             ] = parent.calendar_ytd_per_election_office
+        #         itemized = parent.itemized
+        #     representation["itemized"] = itemized
 
         # represent parent
         if instance.parent_transaction:
+            print(f"PARENT:{instance.parent_transaction}")
             representation[
                 "parent_transaction"
             ] = TransactionSerializer().to_representation(instance.parent_transaction)
         # represent loan
         if instance.loan:
+            print("LOAN")
             representation["loan"] = TransactionSerializer().to_representation(
                 instance.loan
             )
         # represent debt
         if instance.debt:
+            print("DEBT")
             representation["debt"] = TransactionSerializer().to_representation(
                 instance.debt
             )

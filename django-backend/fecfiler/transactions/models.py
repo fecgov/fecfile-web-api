@@ -171,15 +171,22 @@ def get_read_model(committee):
     )
 
     class T(Transaction):
+        view_parent_transaction = models.ForeignKey(
+            "self",
+            db_column="parent_transaction_id",
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+        )
         report_id = models.UUIDField()
         schedule = models.TextField()
         line_label_order_key = models.TextField()
-        itemized = models.BooleanField()
+        _itemized = models.BooleanField()
         amount = models.DecimalField()
         date = models.DateField()
         effective_amount = models.DecimalField()
         aggregate = models.DecimalField()
-        calendar_ytd_per_election_office = models.DecimalField()
+        _calendar_ytd_per_election_office = models.DecimalField()
         loan_key = models.TextField()
         loan_payment_to_date = models.DecimalField()
         incurred_prior = models.DecimalField()
@@ -203,7 +210,9 @@ def get_read_model(committee):
                 .query.sql_with_params()
             )
             definition = cursor.mogrify(sql, params).decode("utf-8")
-            cursor.execute(f"CREATE VIEW {committee_transaction_view} as {definition}")
+            cursor.execute(
+                f"CREATE OR REPLACE VIEW {committee_transaction_view} as {definition}"
+            )
 
     return T
 

@@ -49,9 +49,9 @@ class TransactionManager(SoftDeleteManager):
     election_aggregate_window = {
         "partition_by": [
             F("schedule_e__election_code"),
-            F("schedule_e__so_candidate_office"),
-            F("schedule_e__so_candidate_state"),
-            F("schedule_e__so_candidate_district"),
+            F("contact_2__candidate_office"),
+            F("contact_2__candidate_state"),
+            F("contact_2__candidate_district"),
             F("date__year"),
             F("aggregation_group"),
         ],
@@ -491,32 +491,11 @@ class TransactionManager(SoftDeleteManager):
 
     # clause used to facilitate sorting on name as it's displayed
     DISPLAY_NAME_CLAUSE = Coalesce(
-        Coalesce(
-            "schedule_a__contributor_organization_name",
-            "schedule_b__payee_organization_name",
-            "schedule_c__lender_organization_name",
-            "schedule_c1__lender_organization_name",
-            "schedule_d__creditor_organization_name",
-            "schedule_e__payee_organization_name",
-        ),
+        "contact_1__name",
         Concat(
-            Coalesce(
-                "schedule_a__contributor_last_name",
-                "schedule_b__payee_last_name",
-                "schedule_c__lender_last_name",
-                "schedule_c2__guarantor_last_name",
-                "schedule_d__creditor_last_name",
-                "schedule_e__payee_last_name",
-            ),
+            "contact_1__last_name",
             Value("', '"),
-            Coalesce(
-                "schedule_a__contributor_first_name",
-                "schedule_b__payee_first_name",
-                "schedule_c__lender_first_name",
-                "schedule_c2__guarantor_first_name",
-                "schedule_d__creditor_first_name",
-                "schedule_e__payee_first_name",
-            ),
+            "contact_2__last_name",
             output_field=TextField(),
         ),
     )
@@ -605,7 +584,7 @@ class TransactionManager(SoftDeleteManager):
                 amount=self.AMOUNT_CLAUSE,
                 effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
                 aggregate=self.ENTITY_AGGREGGATE_CLAUSE(),
-                calendar_ytd_per_election_office=self.ELECTION_AGGREGATE_CLAUSE(),
+                _calendar_ytd_per_election_office=self.ELECTION_AGGREGATE_CLAUSE(),
                 incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
@@ -689,7 +668,7 @@ class TransactionManager(SoftDeleteManager):
                 #     ),  # F("balance_at_close"), F("loan_balance"), Value(Decimal(0.0))
                 # ),
                 line_label_order_key=F("_form_type"),
-                itemized=self.ITEMIZATION_CLAUSE(),
+                _itemized=self.ITEMIZATION_CLAUSE(),
                 # children=ArraySubquery(
                 #     super()
                 #     .get_queryset()
@@ -724,6 +703,15 @@ class TransactionViewManager(Manager):
                     ),
                 ),
                 balance=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                itemized=Coalesce(
+                    "view_parent_transaction__view_parent_transaction___itemized",
+                    "view_parent_transaction___itemized",
+                    "_itemized",
+                ),
+                calendar_ytd_per_election_office=Coalesce(
+                    "view_parent_transaction___calendar_ytd_per_election_office",
+                    "_calendar_ytd_per_election_office",
+                ),
             )
         )
 
