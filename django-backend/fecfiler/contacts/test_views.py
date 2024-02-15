@@ -176,6 +176,7 @@ class ContactViewSetTest(TestCase):
                     "created": "2022-02-09T00:00:00Z",
                     "updated": "2022-02-09T00:00:00Z",
                     "transaction_count": 0,
+                    "report_count": 0,
                 }
             ],
         }
