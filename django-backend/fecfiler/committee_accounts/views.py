@@ -1,4 +1,5 @@
 from rest_framework import viewsets, mixins
+from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount
@@ -55,10 +56,12 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        committee = self.request.user.committeeaccount_set.first()
+        committee_uuid = self.request.session["committee_uuid"]
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        if not committee:
+            raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id,
-            committee_uuid=committee.id
+            committee_id=committee.committee_id, committee_uuid=committee.id
         )
         return queryset.filter(committee_account_id=committee.id)
