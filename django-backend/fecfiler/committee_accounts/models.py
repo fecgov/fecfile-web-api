@@ -40,8 +40,16 @@ class Membership(models.Model):
         COMMITTEE_ADMINISTRATOR = "COMMITTEE_ADMINISTRATOR"
         REVIEWER = "REVIEWER"
 
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
     committee_account = models.ForeignKey(CommitteeAccount, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=False, on_delete=models.CASCADE)
+    pending_email = models.EmailField(null=True, blank=True)
     role = models.CharField(
         max_length=25, choices=CommitteeRole.choices, null=False, blank=False
     )
