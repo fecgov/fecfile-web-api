@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import CommitteeAccount
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 import structlog
+from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -47,6 +48,14 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee_uuid = request.session["committee_uuid"]
         committee = self.get_queryset().filter(id=committee_uuid).first()
         return Response(self.get_serializer(committee).data)
+    
+    @action(detail=True, methods=["delete"])
+    def remove_member(request, committee_id, member_email):
+        committee_uuid = request.session["committee_uuid"]
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        member = committee.members.filter(email=member_email).first()
+        member.delete()
+        return HttpResponse('Member removed')
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
