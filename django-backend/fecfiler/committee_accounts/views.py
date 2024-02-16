@@ -5,6 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
+from django.db.models.fields import TextField
+from django.db.models.functions import Coalesce, Concat
+from django.db.models import Q, Value
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -52,6 +55,7 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
 
 
 class CommitteeMembershipViewSet(viewsets.ModelViewSet):
+    serializer_class = CommitteeMembershipSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "name",
@@ -62,7 +66,24 @@ class CommitteeMembershipViewSet(viewsets.ModelViewSet):
     ]
     ordering = ["-created"]
 
-    queryset = Membership.objects.all()
+    queryset = Membership.objects.all().annotate(
+        name= Coalesce(
+            Concat(
+                "user__last_name",
+                Value(", "),
+                "user__first_name",
+                output_field=TextField(),
+            ),
+            Value(''),
+            output_field=TextField()
+        ),
+        email=Coalesce(
+            "user__email",
+            "pending_email",
+            output_field=TextField()
+        ),
+        is_active=~Q(user=None)
+    )
 
     @action(detail=True, methods=["get"])
     def members(self, request, pk):

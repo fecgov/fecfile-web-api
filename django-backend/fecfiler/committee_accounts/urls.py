@@ -10,4 +10,4 @@ members_router = DefaultRouter()
 members_router.register(r"", CommitteeMembershipViewSet)
 
 # The API URLs are now determined automatically by the router.
-urlpatterns = [path("committees/", include(committee_router.urls)), path("committees/", include(members_router.urls))]
+urlpatterns = [path(r"committees/", include(committee_router.urls)), path(r"committee-members/", include(members_router.urls))]

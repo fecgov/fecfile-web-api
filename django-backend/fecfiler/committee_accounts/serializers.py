@@ -69,7 +69,7 @@ class CommitteeMembershipSerializer(serializers.Serializer):
                 "user",
                 "pending_email"
             ]
-        ]
+        ] + ["name", "email"]
         read_only_fields = [
             "id",
             "created",

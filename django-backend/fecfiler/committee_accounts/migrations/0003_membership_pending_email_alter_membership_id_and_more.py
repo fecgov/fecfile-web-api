@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.db import migrations, models
+from django.utils import timezone
 import uuid
 
 
@@ -60,7 +61,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='membership',
             name='created',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            field=models.DateTimeField(auto_now_add=True, default=timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(

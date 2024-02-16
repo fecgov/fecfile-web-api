@@ -31,7 +31,9 @@
             "role": "COMMITTEE_ADMINISTRATOR",
             "committee_account_id": "11111111-2222-3333-4444-555555555555",
             "user_id": "12345678-aaaa-bbbb-cccc-111122223333",
-            "pending_email": null
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
         }
     }
 ]
