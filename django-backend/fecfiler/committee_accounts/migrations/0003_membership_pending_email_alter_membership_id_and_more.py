@@ -57,6 +57,17 @@ class Migration(migrations.Migration):
             name='user',
             field=models.ForeignKey(null=True, on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
+        migrations.AddField(
+            model_name='membership',
+            name='created',
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='membership',
+            name='updated',
+            field=models.DateTimeField(auto_now=True),
+        ),
         migrations.RunPython(
             migrations.RunPython.noop,
             delete_pending_memberships

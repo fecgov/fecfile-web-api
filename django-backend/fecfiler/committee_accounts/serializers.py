@@ -60,17 +60,20 @@ class CommitteeMembershipSerializer(serializers.Serializer):
     class Meta:
         model = Membership
 
-        def get_fields():
-            return [
-                f.name
-                for f in Membership._meta.get_fields()
-                if f.name
-                not in [
-                    "deleted",
-                    "user",
-                    "pending_email"
-                ]
+        fields = [
+            f.name
+            for f in Membership._meta.get_fields()
+            if f.name
+            not in [
+                "deleted",
+                "user",
+                "pending_email"
             ]
+        ]
+        read_only_fields = [
+            "id",
+            "created",
+        ]
 
 
 class CommitteeOwnedSerializer(serializers.ModelSerializer):

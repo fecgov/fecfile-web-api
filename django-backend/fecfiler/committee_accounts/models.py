@@ -53,6 +53,8 @@ class Membership(models.Model):
     role = models.CharField(
         max_length=25, choices=CommitteeRole.choices, null=False, blank=False
     )
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
 
 class CommitteeOwnedModel(models.Model):
