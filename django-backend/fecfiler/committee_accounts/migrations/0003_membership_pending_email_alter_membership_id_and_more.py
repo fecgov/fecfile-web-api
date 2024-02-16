@@ -9,6 +9,12 @@ def delete_pending_memberships(apps, schema_editor):
     Membership = apps.get_model("committee_accounts", "Membership")  # noqa
     Membership.objects.filter(user=None).delete()
 
+def generate_new_uuid(apps, schema_editor):
+    Membership = apps.get_model("committee_accounts", "Membership")  # noqa
+    for membership in Membership.objects.all():
+        membership.uuid = uuid.uuid4()
+        membership.save()
+
 
 class Migration(migrations.Migration):
 
@@ -26,21 +32,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='membership',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=False, serialize=False, unique=True)
+            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=False, serialize=False, unique=False)
+        ),
+        migrations.RunPython(
+            generate_new_uuid,
+            migrations.RunPython.noop,
         ),
         migrations.RemoveField(
             model_name='membership',
             name='id',
         ),
-        migrations.AlterField(
-            model_name='membership',
-            name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)
-        ),
         migrations.RenameField(
             model_name='membership',
             old_name='uuid',
             new_name='id'
+        ),
+        migrations.AlterField(
+            model_name='membership',
+            name='id',
+            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)
         ),
         migrations.AlterField(
             model_name='membership',
