@@ -119,10 +119,14 @@ class Tasks(TaskSet):
         }
         json = {
             "hasChangeOfAddress": "true",
-            "submitAlertText": "Are you sure you want to submit this form electronically? Please note that you cannot undo this action. Any changes needed will need to be filed as an amended report.",
+            "submitAlertText": "Are you sure you want to submit this form \
+                electronically? Please note that you cannot undo this action. \
+                Any changes needed will need to be filed as an amended report.",
             "schema": {
                 "$schema": "http://json-schema.org/draft-07/schema",
-                "$id": "https://github.com/fecgov/fecfile-validate/blob/main/schema/F3X.json",
+                "$id":
+                    "https://github.com/fecgov/fecfile-validate/\
+                     blob/main/schema/F3X.json",
                 "version": "8.3.0.1",
                 "title": "FEC F3X",
                 "type": "object",
@@ -1174,7 +1178,6 @@ class Tasks(TaskSet):
             json=json,
             timeout=timeout
         )
-
 
     @task
     def create_transaction(self):
