@@ -48,9 +48,9 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee_uuid = request.session["committee_uuid"]
         committee = self.get_queryset().filter(id=committee_uuid).first()
         return Response(self.get_serializer(committee).data)
-    
+
     @action(detail=True, methods=["delete"])
-    def remove_member(request, committee_id, member_email):
+    def remove_member(self, request, committee_id, member_email):
         committee_uuid = request.session["committee_uuid"]
         committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
         member = committee.members.filter(email=member_email).first()
@@ -71,6 +71,5 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
             raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id
-        )
+            committee_id=committee.committee_id, committee_uuid=committee.id)
         return queryset.filter(committee_account_id=committee.id)
