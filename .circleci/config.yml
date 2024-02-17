@@ -249,7 +249,8 @@ workflows:
             - dependency-check
           filters:
             branches:
-              only: /develop|release\/sprint-\d+|main/
+              # only: /develop|release\/sprint-\d+|main/
+              only: feature/601-test-mozilla-upstream
       - docs-build:
           requires:
             - test
