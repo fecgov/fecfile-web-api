@@ -187,7 +187,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             for fac in fec_api_committees
             if not any(
                 fac["id"] == ffc["committee_id"] for ffc in fecfile_committees
-            ) and fac["committee_id"] not in exclude_fec_ids
+            ) and fac["id"] not in exclude_fec_ids
         ]
         fec_api_committees = fec_api_committees[:max_fec_results]
         fecfile_committees = fecfile_committees[:max_fecfile_results]

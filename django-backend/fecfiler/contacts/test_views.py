@@ -10,10 +10,10 @@ from .views import ContactViewSet, DeletedContactsViewSet
 
 mock_results = {
     "results": [
-        {"name": "LNAME, FNAME I", "id": "P60012143", "office_sought": "P"},
+        {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
         {
             "name": "LNAME, FNAME",
-            "id": "P60012465",
+            "candidate_id": "P60012465",
             "office_sought": "P",
         },
     ]
@@ -100,10 +100,10 @@ class ContactViewSetTest(TestCase):
 
         expected_json = {
             "fec_api_candidates": [
-                {"name": "LNAME, FNAME I", "id": "P60012143", "office_sought": "P"},
+                {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
                 {
                     "name": "LNAME, FNAME",
-                    "id": "P60012465",
+                    "candidate_id": "P60012465",
                     "office_sought": "P",
                 },
             ],
