@@ -100,7 +100,7 @@ class ContactViewSetTest(TestCase):
 
         expected_json = {
             "fec_api_candidates": [
-                {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"}, # noqa: E501
+                {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},  # noqa: E501
                 {
                     "name": "LNAME, FNAME",
                     "candidate_id": "P60012465",
