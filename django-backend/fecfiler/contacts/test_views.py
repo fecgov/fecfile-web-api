@@ -91,7 +91,7 @@ class ContactViewSetTest(TestCase):
     def test_candidate_lookup_happy_path(self, mock_get):
         request = self.factory.get(
             "/api/v1/contacts/candidate_lookup?"
-            "q=test&max_fecfile_results=5&max_fec_results=5"
+            "q=test&max_fecfile_results=5&max_fec_results=5&exclude_fec_ids=P60012143"
         )
         request.user = self.user
         request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
@@ -100,7 +100,6 @@ class ContactViewSetTest(TestCase):
 
         expected_json = {
             "fec_api_candidates": [
-                {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},  # noqa: E501
                 {
                     "name": "LNAME, FNAME",
                     "candidate_id": "P60012465",
