@@ -239,7 +239,7 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  test: # This is the name of the workflow, feel free to change it to better match your workflow.
+  primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
       - test
       - dependency-check
@@ -247,10 +247,16 @@ workflows:
           requires:
             - test
             - dependency-check
+          filters:
+            branches:
+              only: /develop|release\/sprint-\d+|main/
       - docs-build:
           requires:
             - test
             - dependency-check
+          filters:
+            branches:
+              only: develop
       - docs-deploy:
           requires:
             - docs-build

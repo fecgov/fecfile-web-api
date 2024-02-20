@@ -58,9 +58,16 @@ class TransactionManager(SoftDeleteManager):
                     "schedule_b__expenditure_amount",
                     "schedule_c__loan_amount",
                     "schedule_c2__guaranteed_amount",
-                    "debt__schedule_d__incurred_amount",
                     "schedule_d__incurred_amount",
                     "schedule_e__expenditure_amount",
+                ),
+                debt_incurred_amount=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        debt__isnull=False,
+                        then=F("debt__schedule_d__incurred_amount"),
+                    ),
+                    default=F("amount"),
                 ),
                 effective_amount=self.get_amount_clause(),
             )
@@ -72,29 +79,29 @@ class TransactionManager(SoftDeleteManager):
             & Q(parent_transaction__isnull=True)
             & Q(schedule_e__election_code=OuterRef("schedule_e__election_code"))
             & Q(
-                schedule_e__so_candidate_office=OuterRef(
-                    "schedule_e__so_candidate_office"
+                contact_2__candidate_office=OuterRef(
+                    "contact_2__candidate_office"
                 )
             )
             & Q(
                 Q(
-                    schedule_e__so_candidate_state=OuterRef(
-                        "schedule_e__so_candidate_state"
+                    contact_2__candidate_state=OuterRef(
+                        "contact_2__candidate_state"
                     )
                 )
                 | (
-                    Q(schedule_e__so_candidate_state__isnull=True)
+                    Q(contact_2__candidate_state__isnull=True)
                     & Q(outer_candidate_state__isnull=True)
                 )
             )
             & (
                 Q(
-                    schedule_e__so_candidate_district=OuterRef(
-                        "schedule_e__so_candidate_district"
+                    contact_2__candidate_district=OuterRef(
+                        "contact_2__candidate_district"
                     )
                 )
                 | (
-                    Q(schedule_e__so_candidate_district__isnull=True)
+                    Q(contact_2__candidate_district__isnull=True)
                     & Q(outer_candidate_district__isnull=True)
                 )
             )
@@ -121,11 +128,11 @@ class TransactionManager(SoftDeleteManager):
         calendar_ytd_per_election_office_clause = (
             queryset.alias(  # Needed to get around null-matching bug with Q()
                 outer_candidate_district=ExpressionWrapper(
-                    OuterRef("schedule_e__so_candidate_district"),
+                    OuterRef("contact_2__candidate_district"),
                     output_field=TextField(),
                 ),
                 outer_candidate_state=ExpressionWrapper(
-                    OuterRef("schedule_e__so_candidate_state"), output_field=TextField()
+                    OuterRef("contact_2__candidate_state"), output_field=TextField()
                 ),
             )
             .filter(
@@ -133,6 +140,7 @@ class TransactionManager(SoftDeleteManager):
                 year_clause,
                 date_clause,
                 group_clause,
+                force_unaggregated_clause,
             )
             .values("committee_account_id")
             .annotate(calendar_ytd_per_election_office=Sum("effective_amount"))
@@ -165,9 +173,7 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                report__coverage_through_date__lt=OuterRef(
-                    "report__coverage_from_date"
-                ),
+                report__coverage_through_date__lt=OuterRef("report__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(

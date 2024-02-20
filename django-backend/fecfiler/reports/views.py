@@ -10,9 +10,9 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 report_code_label_mapping = Case(
     When(report_code="Q1", then=Value("APRIL 15 (Q1)")),
@@ -106,17 +106,10 @@ class ReportViewSet(CommitteeOwnedViewSet):
                 queryset = queryset.filter(form_1m__isnull=True)
         return queryset
 
-    @action(
-        detail=True,
-        methods=["post"],
-        url_name="amend",
-    )
+    @action(detail=True, methods=["post"], url_name="amend")
     def amend(self, request, pk):
         report = self.get_object()
-        report.form_type = "F3XA"
-        report.report_version = int(report.report_version or "0") + 1
-        report.upload_submission = None
-        report.save()
+        report.amend()
         return Response(f"amended {report}")
 
     @action(

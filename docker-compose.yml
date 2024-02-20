@@ -59,6 +59,7 @@ services:
       TEST_COMMITTEE_PASSWORD:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
+      LOG_FORMAT:
 
 
   api:
@@ -79,6 +80,7 @@ services:
     links:
       - redis
     environment:
+      ALTERNATIVE_LOGIN: USERNAME_PASSWORD
       REDIS_URL: redis://redis:6379
       DATABASE_URL:
       FECFILE_TEST_DB_NAME:
@@ -105,3 +107,4 @@ services:
       FEC_API:
       FEC_API_KEY:
       FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE:
+      LOG_FORMAT:

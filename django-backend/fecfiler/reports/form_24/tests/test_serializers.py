@@ -4,12 +4,12 @@ from fecfiler.reports.form_24.models import Form24
 from ..serializers import (
     Form24Serializer,
 )
-from fecfiler.authentication.models import Account
+from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
 
 
 class F24SerializerTestCase(TestCase):
-    fixtures = ["test_committee_accounts"]
+    fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
         self.valid_f24_report = {
@@ -37,9 +37,12 @@ class F24SerializerTestCase(TestCase):
         }
 
         self.mock_request = Request(HttpRequest())
-        user = Account()
-        user.cmtee_id = "C00277616"
-        self.mock_request.user = user
+        self.mock_request.user = User.objects.get(
+            id="12345678-aaaa-bbbb-cccc-111122223333"
+        )
+        self.mock_request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555"
+        }
 
     def test_serializer_validate(self):
         valid_serializer = Form24Serializer(

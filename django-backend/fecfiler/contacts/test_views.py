@@ -4,7 +4,7 @@ from django.test import RequestFactory, TestCase
 from rest_framework.test import force_authenticate
 import uuid
 
-from ..authentication.models import Account
+from fecfiler.user.models import User
 from .models import Contact
 from .views import ContactViewSet, DeletedContactsViewSet
 
@@ -53,17 +53,16 @@ def mocked_requests_get_committees(*args, **kwargs):
 
 
 class ContactViewSetTest(TestCase):
-    fixtures = ["test_contacts", "test_committee_accounts", "test_accounts"]
+    fixtures = ["test_contacts", "C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = Account.objects.get(cmtee_id="C12345678")
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
         request = self.factory.get(
-            "/api/v1/contacts/candidate?"
-            "candidate_id=P60012143"
+            "/api/v1/contacts/candidate?" "candidate_id=P60012143"
         )
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
@@ -95,6 +94,7 @@ class ContactViewSetTest(TestCase):
             "q=test&max_fecfile_results=5&max_fec_results=5"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
 
@@ -115,6 +115,7 @@ class ContactViewSetTest(TestCase):
 
     def test_committee_lookup_no_auth(self):
         request = self.factory.get("/api/v1/contacts/committee_lookup")
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
 
@@ -124,6 +125,7 @@ class ContactViewSetTest(TestCase):
     def test_committee_lookup_no_q(self, mock_get):
         request = self.factory.get("/api/v1/contacts/committee_lookup")
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
 
@@ -136,6 +138,7 @@ class ContactViewSetTest(TestCase):
             "q=test&max_fecfile_results=5&max_fec_results=5"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
 
@@ -147,7 +150,7 @@ class ContactViewSetTest(TestCase):
             "fecfile_committees": [
                 {
                     "deleted": None,
-                    "committee_account_id": "735db943-9446-462a-9be0-c820baadb622",
+                    "committee_account_id": "11111111-2222-3333-4444-555555555555",
                     "id": "a03a141a-d2df-402c-93c6-e705ec6007f3",
                     "type": "COM",
                     "candidate_id": None,
@@ -183,6 +186,7 @@ class ContactViewSetTest(TestCase):
     def test_individual_lookup_no_q(self):
         request = self.factory.get("/api/v1/contacts/individual_lookup")
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
 
@@ -193,6 +197,7 @@ class ContactViewSetTest(TestCase):
             "/api/v1/contacts/individual_lookup?" "q=Lastname&max_fecfile_results=5"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
 
@@ -204,6 +209,7 @@ class ContactViewSetTest(TestCase):
     def test_organization_lookup_no_q(self):
         request = self.factory.get("/api/v1/contacts/organization_lookup")
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
 
@@ -214,6 +220,7 @@ class ContactViewSetTest(TestCase):
             "/api/v1/contacts/organization_lookup?" "q=test&max_fecfile_results=5"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
 
@@ -235,6 +242,7 @@ class ContactViewSetTest(TestCase):
             "/api/v1/contacts/get_contact_id/?fec_id=test_fec_id"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
 
@@ -248,6 +256,7 @@ class ContactViewSetTest(TestCase):
             "/api/v1/contacts/get_contact_id/?fec_id=id_that_doesnt_exist"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
 
@@ -270,7 +279,7 @@ class ContactViewSetTest(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
         )
         contact.delete()
         deleted_contact = Contact.all_objects.get(
@@ -292,7 +301,7 @@ class ContactViewSetTest(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
-            committee_account_id="735db943-9446-462a-9be0-c820baadb622",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
         )
         request = self.factory.put(
             f"/api/v1/contacts/{str(contact.id)}/",
@@ -308,6 +317,7 @@ class ContactViewSetTest(TestCase):
             },
             "application/json",
         )
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
         force_authenticate(request, self.user)
         response = ContactViewSet.as_view({"put": "update"})(request, pk=contact.id)
         self.assertEqual(response.status_code, 200)

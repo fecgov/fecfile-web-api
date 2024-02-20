@@ -5,6 +5,8 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import requests
+import structlog
+import sys
 
 from .env import env
 from corsheaders.defaults import default_headers
@@ -19,15 +21,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
+LINE = "LINE"
+KEY_VALUE = "KEY_VALUE"
+
+LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
 
-# E2E Testing Login API
-# Defaults to False, overriden by local.py & e2e.py
-# Set to True until we're ready to deprecate the old login
-E2E_TESTING_LOGIN = True
+"""
+Enables alternative log in method.
+See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
+and :py:meth:`fecfiler.authentication.views.authenticate_login`
+"""
+ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
@@ -35,7 +44,7 @@ SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 
 ROOT_URLCONF = "fecfiler.urls"
 WSGI_APPLICATION = "fecfiler.wsgi.application"
-AUTH_USER_MODEL = "authentication.Account"
+AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -47,7 +56,7 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    # "django.contrib.admin",
     "django.contrib.auth",
     "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
@@ -58,9 +67,9 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
+    "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
-    "fecfiler.f3x_summaries",
     "fecfiler.reports",
     "fecfiler.transactions",
     "fecfiler.memo_text",
@@ -69,6 +78,7 @@ INSTALLED_APPS = [
     "fecfiler.validation",
     "fecfiler.web_services",
     "fecfiler.openfec",
+    "fecfiler.user",
 ]
 
 MIDDLEWARE = [
@@ -80,6 +90,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
 ]
 
 TEMPLATES = [
@@ -159,8 +170,12 @@ OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
 ALLOW_LOGOUT_GET_METHOD = True
 
 # TODO: Env vars?
-FFAPI_COMMITTEE_ID_COOKIE_NAME = "ffapi_committee_id"
+FFAPI_COMMITTEE_UUID_COOKIE_NAME = "ffapi_committee_uuid"
+FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
 FFAPI_EMAIL_COOKIE_NAME = "ffapi_email"
+FFAPI_FIRST_NAME_COOKIE_NAME = "ffapi_first_name"
+FFAPI_LAST_NAME_COOKIE_NAME = "ffapi_last_name"
+FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME = "ffapi_security_consent_date"
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
@@ -207,17 +222,114 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
-    },
-    "handlers": {
-        "default": {"class": "logging.StreamHandler", "formatter": "standard"},
-    },
-    "loggers": {"": {"handlers": ["default"], "level": "INFO", "propagate": True}},
-}
+
+def get_logging_config(log_format=LINE):
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "json_formatter": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.JSONRenderer(),
+            },
+            "plain_console": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=True,
+                    exception_formatter=structlog.dev.rich_traceback
+                ),
+            },
+            "key_value": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.KeyValueRenderer(
+                    key_order=["level", "event", "logger"]
+                ),
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+                "stream": sys.stdout,
+            },
+            "cloud": {
+                "class": "logging.StreamHandler",
+                "formatter": "key_value",
+                "stream": sys.stdout,
+            },
+        }
+    }
+
+    if log_format == LINE:
+        logging_config["loggers"] = {
+            "django_structlog": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+            "fecfiler": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
+        }
+    else:
+        logging_config["loggers"] = {
+            "django_structlog": {
+                "handlers": ["cloud"],
+                "level": "INFO",
+            },
+            "fecfiler": {
+                "handlers": ["cloud"],
+                "level": "INFO",
+            },
+        }
+
+    return logging_config
+
+
+def get_env_logging_processors(log_format=LINE):
+    """
+    get structlog processors
+    depending on environment
+    env.space will None on local.
+    We will need to set these explicitly for Celery too
+    """
+
+    if log_format == LINE:
+        # Remove format_exc_info to pretty-print exceptions locally
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ]
+    else:
+        # Key/Value in production
+        return [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.format_exc_info,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ]
+
+
+LOGGING = get_logging_config(LOG_FORMAT)
+
+structlog.configure(
+    processors=get_env_logging_processors(LOG_FORMAT),
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 """Celery configurations
 """

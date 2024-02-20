@@ -2,9 +2,6 @@
     {
         "model": "transactions.schedulec",
         "fields": {
-            "lender_organization_name": "test_string_value",
-            "lender_last_name": "test_string_value",
-            "lender_first_name": "test_string_value",
             "secured": true,
             "personal_funds": false
         },
@@ -25,9 +22,7 @@
     {
         "model": "transactions.schedulec",
         "fields": {
-            "lender_organization_name": "test_string_value2",
-            "lender_last_name": "test_string_value2",
-            "lender_first_name": "test_string_value2"
+            "loan_interest_rate": "7%"
         },
         "pk": "3fce473a-7939-4733-a0a8-298d16a058cd"
     },

@@ -5,9 +5,10 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
 from .serializers import Form3XSerializer
-import logging
+import structlog
+from rest_framework.response import Response
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class Form3XViewSet(ReportViewSet):
@@ -34,6 +35,14 @@ class Form3XViewSet(ReportViewSet):
             )
         )
         return JsonResponse(data, safe=False)
+
+    @action(detail=False, methods=["get"], url_path=r"future")
+    def future_form3x_reports(self, request):
+        json_date_string = request.GET.get('after', '')
+        data = list(
+            self.get_queryset().filter(coverage_through_date__gt=json_date_string)
+        )
+        return Response(Form3XSerializer(data, many=True).data)
 
     def create(self, request):
         return super(ModelViewSet, self).create(request)

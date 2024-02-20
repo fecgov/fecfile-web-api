@@ -4,9 +4,9 @@ from curses import ascii
 import os
 import json
 
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 CRLF_STR = str(chr(ascii.CR) + chr(ascii.LF))
 FS_STR = chr(ascii.FS)

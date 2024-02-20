@@ -1,0 +1,31 @@
+[
+  {
+    "model": "reports.Form24",
+    "fields": {
+      "id": "00000f24-d926-4e89-ad4b-000000000001",
+      "street_1": "test_string_value",
+      "street_2": "test_string_value",
+      "city": "test_string_value",
+      "state": "test_string_value",
+      "zip": "test_string_value",
+      "report_type_24_48": "24"
+    }
+  },
+  {
+    "model": "reports.report",
+    "fields": {
+      "id": "10000f24-d926-4e89-ad4b-000000000001",
+      "form_24_id": "00000f24-d926-4e89-ad4b-000000000001",
+      "committee_account_id": "11111111-2222-3333-4444-555555555555",
+      "form_type": "F24N",
+      "treasurer_last_name": "Lastname",
+      "treasurer_first_name": "Firstname",
+      "treasurer_middle_name": "test_string_value",
+      "treasurer_prefix": "test_string_value",
+      "treasurer_suffix": "test_string_value",
+      "date_signed": "2004-07-29",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    }
+  }
+]

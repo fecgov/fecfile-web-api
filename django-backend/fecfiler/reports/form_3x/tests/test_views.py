@@ -2,22 +2,23 @@ from django.test import TestCase, RequestFactory
 
 from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
-from fecfiler.authentication.models import Account
+from fecfiler.user.models import User
 
 from rest_framework.test import force_authenticate
 
 
 class Form3XViewSetTest(TestCase):
-    fixtures = ["test_f3x_reports", "test_committee_accounts", "test_accounts"]
+    fixtures = ["test_f3x_reports", "C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = Account.objects.get(cmtee_id="C12345678")
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
     def test_coverage_dates_happy_path(self):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/reports/form-f3x/coverage_dates")
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
 
         response = Form3XViewSet.as_view({"get": "coverage_dates"})(request)
 
@@ -52,6 +53,7 @@ class Form3XViewSetTest(TestCase):
             "/api/v1/reports/1406535e-f99f-42c4-97a8-247904b7d297/amend/"
         )
         request.user = self.user
+        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
         force_authenticate(request, self.user)
         view = Form3XViewSet.as_view({"post": "amend"})
         response = view(request, pk="1406535e-f99f-42c4-97a8-247904b7d297")

@@ -26,15 +26,15 @@ urlpatterns = [
             template_name="swagger-ui.html", url_name="schema"
         ),
     ),
+    re_path(BASE_V1_URL, include("fecfiler.committee_accounts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
-    # re_path(BASE_V1_URL, include("fecfiler.f3x_summaries.urls")),
     re_path(BASE_V1_URL, include("fecfiler.reports.urls")),
-    # re_path(BASE_V1_URL, include("fecfiler.scha_transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.memo_text.urls")),
     re_path(BASE_V1_URL, include("fecfiler.transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.authentication.urls")),
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),
     re_path(BASE_V1_URL, include("fecfiler.openfec.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
 ]
