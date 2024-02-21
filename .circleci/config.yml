@@ -254,9 +254,6 @@ workflows:
           requires:
             - test
             - dependency-check
-          filters:
-            branches:
-              only: develop
       - docs-deploy:
           requires:
             - docs-build
