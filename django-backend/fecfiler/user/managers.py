@@ -18,7 +18,6 @@ class UserManager(AbstractUserManager):
 
         for new_membership in pending_memberships:
             new_membership.user = new_user
-            new_membership.pending_email = None
             new_membership.save()
 
         return new_user
