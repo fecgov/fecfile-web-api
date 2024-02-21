@@ -54,7 +54,7 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
         return queryset.filter(committee_account_id=committee.id)
 
 
-class CommitteeMembershipViewSet(viewsets.ModelViewSet):
+class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
     serializer_class = CommitteeMembershipSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
@@ -66,49 +66,49 @@ class CommitteeMembershipViewSet(viewsets.ModelViewSet):
     ]
     ordering = ["-created"]
 
-    queryset = Membership.objects.all().annotate(
-        name= Coalesce(
-            Concat(
-                "user__last_name",
-                Value(", "),
-                "user__first_name",
-                output_field=TextField(),
+    queryset = Membership.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            name= Coalesce(
+                Concat(
+                    "user__last_name",
+                    Value(", "),
+                    "user__first_name",
+                    output_field=TextField(),
+                ),
+                Value(''),
+                output_field=TextField()
             ),
-            Value(''),
-            output_field=TextField()
-        ),
-        email=Coalesce(
-            "user__email",
-            "pending_email",
-            output_field=TextField()
-        ),
-        is_active=~Q(user=None)
-    )
-
-    @action(detail=True, methods=["get"])
-    def members(self, request, pk):
-        committee = self.get_object()
-        queryset = Membership.objects.filter(committee_account=committee)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = CommitteeMembershipSerializer(
-                page, many=True
-            )
-            return self.get_paginated_response(serializer.data)
-
-        serializer = CommitteeMembershipSerializer(
-            queryset, many=True
+            email=Coalesce(
+                "user__email",
+                "pending_email",
+                output_field=TextField()
+            ),
+            is_active=~Q(user=None)
         )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if 'page' in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"])
-    def add_member(self, request, pk):
-        committee = self.get_object()
-        queryset= Membership.objects.filter(committee_account=committee)
+    @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
+    def add_member(self, request):
+        committee_uuid = self.request.session["committee_uuid"]
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
 
         email = request.data.get('email', None)
         role = request.data.get('role', None)
 
+        # Check for necessary fields
         missing_fields = []
         if email is None or len(email) == 0:
             missing_fields.append("email")
@@ -119,20 +119,35 @@ class CommitteeMembershipViewSet(viewsets.ModelViewSet):
         if len(missing_fields) > 0:
             return Response(f"Missing fields: {', '.join(missing_fields)}", status=400)
 
-        if role not in Membership.CommitteeRole.choices:
+        # Check for valid role
+        choiceOf = False
+        for choice in Membership.CommitteeRole.choices:
+            if role in choice:
+                choiceOf = True
+                break
+        if not choiceOf:
             return Response(f"Invalid role", status=400)
 
+        # Check for pre-existing membership
+        matching_memberships = self.get_queryset().filter(Q(pending_email=email) | Q(user__email=email))
+        if matching_memberships.count() > 0:
+            return Response(f"This email is already a member", status=400)
+
+        # Create new membership
+        new_member = None
         matching_users = User.objects.filter(email=email)
         if matching_users.count() > 0:
             for user in matching_users:
-                added_member = committee.members.add(user)
-                added_member.role = role
-                added_member.save()
+                new_member = committee.members.add(user)
+                new_member.role = role
                 logger.info(f"Added existing user {email} to committee {committee.committee_id}")
         else:
-            Membership(
+            new_member = Membership(
                 committee_account=committee,
                 pending_email=email,
-                role=request.role
-            ).save()
+                role=role
+            )
             logger.info(f"Added pending membership for email {email} for committee {committee.committee_id}")
+
+        new_member.save()
+        return Response(CommitteeMembershipSerializer(new_member).data, status=200)
