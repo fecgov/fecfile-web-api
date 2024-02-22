@@ -1,0 +1,134 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
+==========================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_e.tests.test_utils
+
+.. autoclass:: ScheduleEUtilsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleEUtilsTestCase.__init__
+      ~ScheduleEUtilsTestCase.addClassCleanup
+      ~ScheduleEUtilsTestCase.addCleanup
+      ~ScheduleEUtilsTestCase.addTypeEqualityFunc
+      ~ScheduleEUtilsTestCase.assertAlmostEqual
+      ~ScheduleEUtilsTestCase.assertAlmostEquals
+      ~ScheduleEUtilsTestCase.assertContains
+      ~ScheduleEUtilsTestCase.assertCountEqual
+      ~ScheduleEUtilsTestCase.assertDictContainsSubset
+      ~ScheduleEUtilsTestCase.assertDictEqual
+      ~ScheduleEUtilsTestCase.assertEqual
+      ~ScheduleEUtilsTestCase.assertEquals
+      ~ScheduleEUtilsTestCase.assertFalse
+      ~ScheduleEUtilsTestCase.assertFieldOutput
+      ~ScheduleEUtilsTestCase.assertFormError
+      ~ScheduleEUtilsTestCase.assertFormSetError
+      ~ScheduleEUtilsTestCase.assertFormsetError
+      ~ScheduleEUtilsTestCase.assertGreater
+      ~ScheduleEUtilsTestCase.assertGreaterEqual
+      ~ScheduleEUtilsTestCase.assertHTMLEqual
+      ~ScheduleEUtilsTestCase.assertHTMLNotEqual
+      ~ScheduleEUtilsTestCase.assertIn
+      ~ScheduleEUtilsTestCase.assertInHTML
+      ~ScheduleEUtilsTestCase.assertIs
+      ~ScheduleEUtilsTestCase.assertIsInstance
+      ~ScheduleEUtilsTestCase.assertIsNone
+      ~ScheduleEUtilsTestCase.assertIsNot
+      ~ScheduleEUtilsTestCase.assertIsNotNone
+      ~ScheduleEUtilsTestCase.assertJSONEqual
+      ~ScheduleEUtilsTestCase.assertJSONNotEqual
+      ~ScheduleEUtilsTestCase.assertLess
+      ~ScheduleEUtilsTestCase.assertLessEqual
+      ~ScheduleEUtilsTestCase.assertListEqual
+      ~ScheduleEUtilsTestCase.assertLogs
+      ~ScheduleEUtilsTestCase.assertMultiLineEqual
+      ~ScheduleEUtilsTestCase.assertNoLogs
+      ~ScheduleEUtilsTestCase.assertNotAlmostEqual
+      ~ScheduleEUtilsTestCase.assertNotAlmostEquals
+      ~ScheduleEUtilsTestCase.assertNotContains
+      ~ScheduleEUtilsTestCase.assertNotEqual
+      ~ScheduleEUtilsTestCase.assertNotEquals
+      ~ScheduleEUtilsTestCase.assertNotIn
+      ~ScheduleEUtilsTestCase.assertNotIsInstance
+      ~ScheduleEUtilsTestCase.assertNotRegex
+      ~ScheduleEUtilsTestCase.assertNotRegexpMatches
+      ~ScheduleEUtilsTestCase.assertNumQueries
+      ~ScheduleEUtilsTestCase.assertQuerySetEqual
+      ~ScheduleEUtilsTestCase.assertQuerysetEqual
+      ~ScheduleEUtilsTestCase.assertRaises
+      ~ScheduleEUtilsTestCase.assertRaisesMessage
+      ~ScheduleEUtilsTestCase.assertRaisesRegex
+      ~ScheduleEUtilsTestCase.assertRaisesRegexp
+      ~ScheduleEUtilsTestCase.assertRedirects
+      ~ScheduleEUtilsTestCase.assertRegex
+      ~ScheduleEUtilsTestCase.assertRegexpMatches
+      ~ScheduleEUtilsTestCase.assertSequenceEqual
+      ~ScheduleEUtilsTestCase.assertSetEqual
+      ~ScheduleEUtilsTestCase.assertTemplateNotUsed
+      ~ScheduleEUtilsTestCase.assertTemplateUsed
+      ~ScheduleEUtilsTestCase.assertTrue
+      ~ScheduleEUtilsTestCase.assertTupleEqual
+      ~ScheduleEUtilsTestCase.assertURLEqual
+      ~ScheduleEUtilsTestCase.assertWarns
+      ~ScheduleEUtilsTestCase.assertWarnsMessage
+      ~ScheduleEUtilsTestCase.assertWarnsRegex
+      ~ScheduleEUtilsTestCase.assertXMLEqual
+      ~ScheduleEUtilsTestCase.assertXMLNotEqual
+      ~ScheduleEUtilsTestCase.assert_
+      ~ScheduleEUtilsTestCase.captureOnCommitCallbacks
+      ~ScheduleEUtilsTestCase.countTestCases
+      ~ScheduleEUtilsTestCase.debug
+      ~ScheduleEUtilsTestCase.defaultTestResult
+      ~ScheduleEUtilsTestCase.doClassCleanups
+      ~ScheduleEUtilsTestCase.doCleanups
+      ~ScheduleEUtilsTestCase.fail
+      ~ScheduleEUtilsTestCase.failIf
+      ~ScheduleEUtilsTestCase.failIfAlmostEqual
+      ~ScheduleEUtilsTestCase.failIfEqual
+      ~ScheduleEUtilsTestCase.failUnless
+      ~ScheduleEUtilsTestCase.failUnlessAlmostEqual
+      ~ScheduleEUtilsTestCase.failUnlessEqual
+      ~ScheduleEUtilsTestCase.failUnlessRaises
+      ~ScheduleEUtilsTestCase.id
+      ~ScheduleEUtilsTestCase.modify_settings
+      ~ScheduleEUtilsTestCase.run
+      ~ScheduleEUtilsTestCase.setUp
+      ~ScheduleEUtilsTestCase.setUpClass
+      ~ScheduleEUtilsTestCase.setUpTestData
+      ~ScheduleEUtilsTestCase.settings
+      ~ScheduleEUtilsTestCase.shortDescription
+      ~ScheduleEUtilsTestCase.skipTest
+      ~ScheduleEUtilsTestCase.subTest
+      ~ScheduleEUtilsTestCase.tearDown
+      ~ScheduleEUtilsTestCase.tearDownClass
+      ~ScheduleEUtilsTestCase.test_contacts_to_representation
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleEUtilsTestCase.available_apps
+      ~ScheduleEUtilsTestCase.databases
+      ~ScheduleEUtilsTestCase.fixtures
+      ~ScheduleEUtilsTestCase.longMessage
+      ~ScheduleEUtilsTestCase.maxDiff
+      ~ScheduleEUtilsTestCase.reset_sequences
+      ~ScheduleEUtilsTestCase.serialized_rollback
+   
+   

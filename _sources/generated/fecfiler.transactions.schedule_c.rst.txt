@@ -32,6 +32,8 @@ fecfiler.transactions.schedule\_c
    :recursive:
 
    fecfiler.transactions.schedule_c.models
+   fecfiler.transactions.schedule_c.serializers
    fecfiler.transactions.schedule_c.tests
+   fecfiler.transactions.schedule_c.utils
    fecfiler.transactions.schedule_c.views
 

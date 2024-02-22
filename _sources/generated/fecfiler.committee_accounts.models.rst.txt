@@ -24,6 +24,7 @@ fecfiler.committee\_accounts.models
    
       CommitteeAccount
       CommitteeOwnedModel
+      Membership
    
    
 

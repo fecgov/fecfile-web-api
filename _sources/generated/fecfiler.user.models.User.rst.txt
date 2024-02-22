@@ -1,0 +1,99 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.user.models.User
+=========================
+
+.. currentmodule:: fecfiler.user.models
+
+.. autoclass:: User
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~User.__init__
+      ~User.adelete
+      ~User.arefresh_from_db
+      ~User.asave
+      ~User.check
+      ~User.check_password
+      ~User.clean
+      ~User.clean_fields
+      ~User.date_error_message
+      ~User.delete
+      ~User.email_user
+      ~User.from_db
+      ~User.full_clean
+      ~User.get_all_permissions
+      ~User.get_constraints
+      ~User.get_deferred_fields
+      ~User.get_email_field_name
+      ~User.get_full_name
+      ~User.get_group_permissions
+      ~User.get_next_by_date_joined
+      ~User.get_previous_by_date_joined
+      ~User.get_session_auth_fallback_hash
+      ~User.get_session_auth_hash
+      ~User.get_short_name
+      ~User.get_user_permissions
+      ~User.get_username
+      ~User.has_module_perms
+      ~User.has_perm
+      ~User.has_perms
+      ~User.has_usable_password
+      ~User.natural_key
+      ~User.normalize_username
+      ~User.prepare_database_save
+      ~User.refresh_from_db
+      ~User.save
+      ~User.save_base
+      ~User.serializable_value
+      ~User.set_password
+      ~User.set_unusable_password
+      ~User.unique_error_message
+      ~User.validate_constraints
+      ~User.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~User.EMAIL_FIELD
+      ~User.REQUIRED_FIELDS
+      ~User.USERNAME_FIELD
+      ~User.committeeaccount_set
+      ~User.date_joined
+      ~User.email
+      ~User.first_name
+      ~User.groups
+      ~User.id
+      ~User.is_active
+      ~User.is_anonymous
+      ~User.is_authenticated
+      ~User.is_staff
+      ~User.is_superuser
+      ~User.last_login
+      ~User.last_name
+      ~User.login_dot_gov
+      ~User.membership_set
+      ~User.objects
+      ~User.password
+      ~User.pk
+      ~User.security_consent_date
+      ~User.user_permissions
+      ~User.username
+      ~User.username_validator
+   
+   

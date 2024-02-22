@@ -1,0 +1,6 @@
+fecfiler.settings.base.get\_logging\_config
+===========================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autofunction:: get_logging_config

@@ -40,7 +40,6 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
       ~ScheduleD.save_base
       ~ScheduleD.serializable_value
       ~ScheduleD.unique_error_message
-      ~ScheduleD.update_with_contact
       ~ScheduleD.validate_constraints
       ~ScheduleD.validate_unique
    
@@ -52,17 +51,6 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
 
    .. autosummary::
    
-      ~ScheduleD.creditor_city
-      ~ScheduleD.creditor_first_name
-      ~ScheduleD.creditor_last_name
-      ~ScheduleD.creditor_middle_name
-      ~ScheduleD.creditor_organization_name
-      ~ScheduleD.creditor_prefix
-      ~ScheduleD.creditor_state
-      ~ScheduleD.creditor_street_1
-      ~ScheduleD.creditor_street_2
-      ~ScheduleD.creditor_suffix
-      ~ScheduleD.creditor_zip
       ~ScheduleD.id
       ~ScheduleD.incurred_amount
       ~ScheduleD.objects

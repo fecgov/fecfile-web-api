@@ -34,5 +34,6 @@ fecfiler.reports.form\_1m
    fecfiler.reports.form_1m.models
    fecfiler.reports.form_1m.serializers
    fecfiler.reports.form_1m.tests
+   fecfiler.reports.form_1m.utils
    fecfiler.reports.form_1m.views
 

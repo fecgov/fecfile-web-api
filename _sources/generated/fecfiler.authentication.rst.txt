@@ -33,7 +33,6 @@ fecfiler.authentication
 
    fecfiler.authentication.migrations
    fecfiler.authentication.models
-   fecfiler.authentication.serializers
    fecfiler.authentication.test_views
    fecfiler.authentication.urls
    fecfiler.authentication.views

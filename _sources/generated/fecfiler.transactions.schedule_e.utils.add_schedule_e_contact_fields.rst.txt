@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_e.utils.add\_schedule\_e\_contact\_fields
+=========================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_e.utils
+
+.. autofunction:: add_schedule_e_contact_fields

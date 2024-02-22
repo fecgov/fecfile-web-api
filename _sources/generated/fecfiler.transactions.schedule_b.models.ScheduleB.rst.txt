@@ -40,7 +40,6 @@ fecfiler.transactions.schedule\_b.models.ScheduleB
       ~ScheduleB.save_base
       ~ScheduleB.serializable_value
       ~ScheduleB.unique_error_message
-      ~ScheduleB.update_with_contact
       ~ScheduleB.validate_constraints
       ~ScheduleB.validate_unique
    
@@ -52,17 +51,6 @@ fecfiler.transactions.schedule\_b.models.ScheduleB
 
    .. autosummary::
    
-      ~ScheduleB.beneficiary_candidate_district
-      ~ScheduleB.beneficiary_candidate_fec_id
-      ~ScheduleB.beneficiary_candidate_first_name
-      ~ScheduleB.beneficiary_candidate_last_name
-      ~ScheduleB.beneficiary_candidate_middle_name
-      ~ScheduleB.beneficiary_candidate_office
-      ~ScheduleB.beneficiary_candidate_prefix
-      ~ScheduleB.beneficiary_candidate_state
-      ~ScheduleB.beneficiary_candidate_suffix
-      ~ScheduleB.beneficiary_committee_fec_id
-      ~ScheduleB.beneficiary_committee_name
       ~ScheduleB.category_code
       ~ScheduleB.conduit_city
       ~ScheduleB.conduit_name
@@ -78,17 +66,6 @@ fecfiler.transactions.schedule\_b.models.ScheduleB
       ~ScheduleB.id
       ~ScheduleB.memo_text_description
       ~ScheduleB.objects
-      ~ScheduleB.payee_city
-      ~ScheduleB.payee_first_name
-      ~ScheduleB.payee_last_name
-      ~ScheduleB.payee_middle_name
-      ~ScheduleB.payee_organization_name
-      ~ScheduleB.payee_prefix
-      ~ScheduleB.payee_state
-      ~ScheduleB.payee_street_1
-      ~ScheduleB.payee_street_2
-      ~ScheduleB.payee_suffix
-      ~ScheduleB.payee_zip
       ~ScheduleB.pk
       ~ScheduleB.reattribution_redesignation_tag
       ~ScheduleB.reference_to_si_or_sl_system_code_that_identifies_the_account

@@ -44,6 +44,7 @@ fecfiler
    fecfiler.shared
    fecfiler.transactions
    fecfiler.urls
+   fecfiler.user
    fecfiler.utils
    fecfiler.validation
    fecfiler.web_services

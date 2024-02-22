@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.migrations.0002\_membership.create\_memberships
+============================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.migrations.0002_membership
+
+.. autofunction:: create_memberships

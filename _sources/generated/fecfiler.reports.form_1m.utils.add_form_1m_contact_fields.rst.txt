@@ -1,0 +1,6 @@
+fecfiler.reports.form\_1m.utils.add\_form\_1m\_contact\_fields
+==============================================================
+
+.. currentmodule:: fecfiler.reports.form_1m.utils
+
+.. autofunction:: add_form_1m_contact_fields

@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.serializers.CommitteeAccountSerializer
+===================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.serializers
+
+.. autoclass:: CommitteeAccountSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeAccountSerializer.__init__
+      ~CommitteeAccountSerializer.bind
+      ~CommitteeAccountSerializer.build_field
+      ~CommitteeAccountSerializer.build_nested_field
+      ~CommitteeAccountSerializer.build_property_field
+      ~CommitteeAccountSerializer.build_relational_field
+      ~CommitteeAccountSerializer.build_standard_field
+      ~CommitteeAccountSerializer.build_unknown_field
+      ~CommitteeAccountSerializer.build_url_field
+      ~CommitteeAccountSerializer.create
+      ~CommitteeAccountSerializer.fail
+      ~CommitteeAccountSerializer.get_attribute
+      ~CommitteeAccountSerializer.get_default
+      ~CommitteeAccountSerializer.get_default_field_names
+      ~CommitteeAccountSerializer.get_extra_kwargs
+      ~CommitteeAccountSerializer.get_field_names
+      ~CommitteeAccountSerializer.get_fields
+      ~CommitteeAccountSerializer.get_initial
+      ~CommitteeAccountSerializer.get_unique_for_date_validators
+      ~CommitteeAccountSerializer.get_unique_together_validators
+      ~CommitteeAccountSerializer.get_uniqueness_extra_kwargs
+      ~CommitteeAccountSerializer.get_validators
+      ~CommitteeAccountSerializer.get_value
+      ~CommitteeAccountSerializer.include_extra_kwargs
+      ~CommitteeAccountSerializer.is_valid
+      ~CommitteeAccountSerializer.many_init
+      ~CommitteeAccountSerializer.run_validation
+      ~CommitteeAccountSerializer.run_validators
+      ~CommitteeAccountSerializer.save
+      ~CommitteeAccountSerializer.to_internal_value
+      ~CommitteeAccountSerializer.to_representation
+      ~CommitteeAccountSerializer.update
+      ~CommitteeAccountSerializer.validate
+      ~CommitteeAccountSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeAccountSerializer.context
+      ~CommitteeAccountSerializer.data
+      ~CommitteeAccountSerializer.default_error_messages
+      ~CommitteeAccountSerializer.default_validators
+      ~CommitteeAccountSerializer.errors
+      ~CommitteeAccountSerializer.fields
+      ~CommitteeAccountSerializer.initial
+      ~CommitteeAccountSerializer.root
+      ~CommitteeAccountSerializer.serializer_field_mapping
+      ~CommitteeAccountSerializer.url_field_name
+      ~CommitteeAccountSerializer.validated_data
+      ~CommitteeAccountSerializer.validators
+   
+   

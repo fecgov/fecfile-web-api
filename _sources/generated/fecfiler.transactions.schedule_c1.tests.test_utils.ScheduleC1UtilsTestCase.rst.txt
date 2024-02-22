@@ -1,0 +1,134 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.schedule\_c1.tests.test\_utils.ScheduleC1UtilsTestCase
+============================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c1.tests.test_utils
+
+.. autoclass:: ScheduleC1UtilsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScheduleC1UtilsTestCase.__init__
+      ~ScheduleC1UtilsTestCase.addClassCleanup
+      ~ScheduleC1UtilsTestCase.addCleanup
+      ~ScheduleC1UtilsTestCase.addTypeEqualityFunc
+      ~ScheduleC1UtilsTestCase.assertAlmostEqual
+      ~ScheduleC1UtilsTestCase.assertAlmostEquals
+      ~ScheduleC1UtilsTestCase.assertContains
+      ~ScheduleC1UtilsTestCase.assertCountEqual
+      ~ScheduleC1UtilsTestCase.assertDictContainsSubset
+      ~ScheduleC1UtilsTestCase.assertDictEqual
+      ~ScheduleC1UtilsTestCase.assertEqual
+      ~ScheduleC1UtilsTestCase.assertEquals
+      ~ScheduleC1UtilsTestCase.assertFalse
+      ~ScheduleC1UtilsTestCase.assertFieldOutput
+      ~ScheduleC1UtilsTestCase.assertFormError
+      ~ScheduleC1UtilsTestCase.assertFormSetError
+      ~ScheduleC1UtilsTestCase.assertFormsetError
+      ~ScheduleC1UtilsTestCase.assertGreater
+      ~ScheduleC1UtilsTestCase.assertGreaterEqual
+      ~ScheduleC1UtilsTestCase.assertHTMLEqual
+      ~ScheduleC1UtilsTestCase.assertHTMLNotEqual
+      ~ScheduleC1UtilsTestCase.assertIn
+      ~ScheduleC1UtilsTestCase.assertInHTML
+      ~ScheduleC1UtilsTestCase.assertIs
+      ~ScheduleC1UtilsTestCase.assertIsInstance
+      ~ScheduleC1UtilsTestCase.assertIsNone
+      ~ScheduleC1UtilsTestCase.assertIsNot
+      ~ScheduleC1UtilsTestCase.assertIsNotNone
+      ~ScheduleC1UtilsTestCase.assertJSONEqual
+      ~ScheduleC1UtilsTestCase.assertJSONNotEqual
+      ~ScheduleC1UtilsTestCase.assertLess
+      ~ScheduleC1UtilsTestCase.assertLessEqual
+      ~ScheduleC1UtilsTestCase.assertListEqual
+      ~ScheduleC1UtilsTestCase.assertLogs
+      ~ScheduleC1UtilsTestCase.assertMultiLineEqual
+      ~ScheduleC1UtilsTestCase.assertNoLogs
+      ~ScheduleC1UtilsTestCase.assertNotAlmostEqual
+      ~ScheduleC1UtilsTestCase.assertNotAlmostEquals
+      ~ScheduleC1UtilsTestCase.assertNotContains
+      ~ScheduleC1UtilsTestCase.assertNotEqual
+      ~ScheduleC1UtilsTestCase.assertNotEquals
+      ~ScheduleC1UtilsTestCase.assertNotIn
+      ~ScheduleC1UtilsTestCase.assertNotIsInstance
+      ~ScheduleC1UtilsTestCase.assertNotRegex
+      ~ScheduleC1UtilsTestCase.assertNotRegexpMatches
+      ~ScheduleC1UtilsTestCase.assertNumQueries
+      ~ScheduleC1UtilsTestCase.assertQuerySetEqual
+      ~ScheduleC1UtilsTestCase.assertQuerysetEqual
+      ~ScheduleC1UtilsTestCase.assertRaises
+      ~ScheduleC1UtilsTestCase.assertRaisesMessage
+      ~ScheduleC1UtilsTestCase.assertRaisesRegex
+      ~ScheduleC1UtilsTestCase.assertRaisesRegexp
+      ~ScheduleC1UtilsTestCase.assertRedirects
+      ~ScheduleC1UtilsTestCase.assertRegex
+      ~ScheduleC1UtilsTestCase.assertRegexpMatches
+      ~ScheduleC1UtilsTestCase.assertSequenceEqual
+      ~ScheduleC1UtilsTestCase.assertSetEqual
+      ~ScheduleC1UtilsTestCase.assertTemplateNotUsed
+      ~ScheduleC1UtilsTestCase.assertTemplateUsed
+      ~ScheduleC1UtilsTestCase.assertTrue
+      ~ScheduleC1UtilsTestCase.assertTupleEqual
+      ~ScheduleC1UtilsTestCase.assertURLEqual
+      ~ScheduleC1UtilsTestCase.assertWarns
+      ~ScheduleC1UtilsTestCase.assertWarnsMessage
+      ~ScheduleC1UtilsTestCase.assertWarnsRegex
+      ~ScheduleC1UtilsTestCase.assertXMLEqual
+      ~ScheduleC1UtilsTestCase.assertXMLNotEqual
+      ~ScheduleC1UtilsTestCase.assert_
+      ~ScheduleC1UtilsTestCase.captureOnCommitCallbacks
+      ~ScheduleC1UtilsTestCase.countTestCases
+      ~ScheduleC1UtilsTestCase.debug
+      ~ScheduleC1UtilsTestCase.defaultTestResult
+      ~ScheduleC1UtilsTestCase.doClassCleanups
+      ~ScheduleC1UtilsTestCase.doCleanups
+      ~ScheduleC1UtilsTestCase.fail
+      ~ScheduleC1UtilsTestCase.failIf
+      ~ScheduleC1UtilsTestCase.failIfAlmostEqual
+      ~ScheduleC1UtilsTestCase.failIfEqual
+      ~ScheduleC1UtilsTestCase.failUnless
+      ~ScheduleC1UtilsTestCase.failUnlessAlmostEqual
+      ~ScheduleC1UtilsTestCase.failUnlessEqual
+      ~ScheduleC1UtilsTestCase.failUnlessRaises
+      ~ScheduleC1UtilsTestCase.id
+      ~ScheduleC1UtilsTestCase.modify_settings
+      ~ScheduleC1UtilsTestCase.run
+      ~ScheduleC1UtilsTestCase.setUp
+      ~ScheduleC1UtilsTestCase.setUpClass
+      ~ScheduleC1UtilsTestCase.setUpTestData
+      ~ScheduleC1UtilsTestCase.settings
+      ~ScheduleC1UtilsTestCase.shortDescription
+      ~ScheduleC1UtilsTestCase.skipTest
+      ~ScheduleC1UtilsTestCase.subTest
+      ~ScheduleC1UtilsTestCase.tearDown
+      ~ScheduleC1UtilsTestCase.tearDownClass
+      ~ScheduleC1UtilsTestCase.test_contacts_to_representation
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScheduleC1UtilsTestCase.available_apps
+      ~ScheduleC1UtilsTestCase.databases
+      ~ScheduleC1UtilsTestCase.fixtures
+      ~ScheduleC1UtilsTestCase.longMessage
+      ~ScheduleC1UtilsTestCase.maxDiff
+      ~ScheduleC1UtilsTestCase.reset_sequences
+      ~ScheduleC1UtilsTestCase.serialized_rollback
+   
+   

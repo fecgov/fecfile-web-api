@@ -32,6 +32,7 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.create_or_update_memo
       ~TransactionSerializer.fail
       ~TransactionSerializer.get_attribute
+      ~TransactionSerializer.get_committee
       ~TransactionSerializer.get_default
       ~TransactionSerializer.get_default_field_names
       ~TransactionSerializer.get_extra_kwargs
@@ -58,7 +59,6 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.update
       ~TransactionSerializer.validate
       ~TransactionSerializer.validate_empty_values
-      ~TransactionSerializer.write_contacts
    
    
 

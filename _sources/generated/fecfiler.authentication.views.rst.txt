@@ -8,6 +8,13 @@ fecfiler.authentication.views
   
    
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+      :toctree:                                          
+   
+      logger
+   
    
 
    
@@ -26,19 +33,11 @@ fecfiler.authentication.views
       login_dot_gov_logout
       login_redirect
       logout_redirect
-      update_last_login_time
+      set_user_logged_in_cookies_for_user
    
    
 
    
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-      :toctree:                                          
-      :template: custom-class-template.rst               
-   
-      AccountViewSet
    
    
 

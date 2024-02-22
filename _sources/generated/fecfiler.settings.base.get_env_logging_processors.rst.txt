@@ -1,0 +1,6 @@
+fecfiler.settings.base.get\_env\_logging\_processors
+====================================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autofunction:: get_env_logging_processors

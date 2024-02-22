@@ -1,0 +1,134 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.shared.test\_logging.LoggingTestCase
+=============================================
+
+.. currentmodule:: fecfiler.shared.test_logging
+
+.. autoclass:: LoggingTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LoggingTestCase.__init__
+      ~LoggingTestCase.addClassCleanup
+      ~LoggingTestCase.addCleanup
+      ~LoggingTestCase.addTypeEqualityFunc
+      ~LoggingTestCase.assertAlmostEqual
+      ~LoggingTestCase.assertAlmostEquals
+      ~LoggingTestCase.assertContains
+      ~LoggingTestCase.assertCountEqual
+      ~LoggingTestCase.assertDictContainsSubset
+      ~LoggingTestCase.assertDictEqual
+      ~LoggingTestCase.assertEqual
+      ~LoggingTestCase.assertEquals
+      ~LoggingTestCase.assertFalse
+      ~LoggingTestCase.assertFieldOutput
+      ~LoggingTestCase.assertFormError
+      ~LoggingTestCase.assertFormSetError
+      ~LoggingTestCase.assertFormsetError
+      ~LoggingTestCase.assertGreater
+      ~LoggingTestCase.assertGreaterEqual
+      ~LoggingTestCase.assertHTMLEqual
+      ~LoggingTestCase.assertHTMLNotEqual
+      ~LoggingTestCase.assertIn
+      ~LoggingTestCase.assertInHTML
+      ~LoggingTestCase.assertIs
+      ~LoggingTestCase.assertIsInstance
+      ~LoggingTestCase.assertIsNone
+      ~LoggingTestCase.assertIsNot
+      ~LoggingTestCase.assertIsNotNone
+      ~LoggingTestCase.assertJSONEqual
+      ~LoggingTestCase.assertJSONNotEqual
+      ~LoggingTestCase.assertLess
+      ~LoggingTestCase.assertLessEqual
+      ~LoggingTestCase.assertListEqual
+      ~LoggingTestCase.assertLogs
+      ~LoggingTestCase.assertMultiLineEqual
+      ~LoggingTestCase.assertNoLogs
+      ~LoggingTestCase.assertNotAlmostEqual
+      ~LoggingTestCase.assertNotAlmostEquals
+      ~LoggingTestCase.assertNotContains
+      ~LoggingTestCase.assertNotEqual
+      ~LoggingTestCase.assertNotEquals
+      ~LoggingTestCase.assertNotIn
+      ~LoggingTestCase.assertNotIsInstance
+      ~LoggingTestCase.assertNotRegex
+      ~LoggingTestCase.assertNotRegexpMatches
+      ~LoggingTestCase.assertNumQueries
+      ~LoggingTestCase.assertQuerySetEqual
+      ~LoggingTestCase.assertQuerysetEqual
+      ~LoggingTestCase.assertRaises
+      ~LoggingTestCase.assertRaisesMessage
+      ~LoggingTestCase.assertRaisesRegex
+      ~LoggingTestCase.assertRaisesRegexp
+      ~LoggingTestCase.assertRedirects
+      ~LoggingTestCase.assertRegex
+      ~LoggingTestCase.assertRegexpMatches
+      ~LoggingTestCase.assertSequenceEqual
+      ~LoggingTestCase.assertSetEqual
+      ~LoggingTestCase.assertTemplateNotUsed
+      ~LoggingTestCase.assertTemplateUsed
+      ~LoggingTestCase.assertTrue
+      ~LoggingTestCase.assertTupleEqual
+      ~LoggingTestCase.assertURLEqual
+      ~LoggingTestCase.assertWarns
+      ~LoggingTestCase.assertWarnsMessage
+      ~LoggingTestCase.assertWarnsRegex
+      ~LoggingTestCase.assertXMLEqual
+      ~LoggingTestCase.assertXMLNotEqual
+      ~LoggingTestCase.assert_
+      ~LoggingTestCase.captureOnCommitCallbacks
+      ~LoggingTestCase.countTestCases
+      ~LoggingTestCase.debug
+      ~LoggingTestCase.defaultTestResult
+      ~LoggingTestCase.doClassCleanups
+      ~LoggingTestCase.doCleanups
+      ~LoggingTestCase.fail
+      ~LoggingTestCase.failIf
+      ~LoggingTestCase.failIfAlmostEqual
+      ~LoggingTestCase.failIfEqual
+      ~LoggingTestCase.failUnless
+      ~LoggingTestCase.failUnlessAlmostEqual
+      ~LoggingTestCase.failUnlessEqual
+      ~LoggingTestCase.failUnlessRaises
+      ~LoggingTestCase.id
+      ~LoggingTestCase.modify_settings
+      ~LoggingTestCase.run
+      ~LoggingTestCase.setUp
+      ~LoggingTestCase.setUpClass
+      ~LoggingTestCase.setUpTestData
+      ~LoggingTestCase.settings
+      ~LoggingTestCase.shortDescription
+      ~LoggingTestCase.skipTest
+      ~LoggingTestCase.subTest
+      ~LoggingTestCase.tearDown
+      ~LoggingTestCase.tearDownClass
+      ~LoggingTestCase.test_logs
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LoggingTestCase.available_apps
+      ~LoggingTestCase.databases
+      ~LoggingTestCase.fixtures
+      ~LoggingTestCase.longMessage
+      ~LoggingTestCase.maxDiff
+      ~LoggingTestCase.reset_sequences
+      ~LoggingTestCase.serialized_rollback
+   
+   

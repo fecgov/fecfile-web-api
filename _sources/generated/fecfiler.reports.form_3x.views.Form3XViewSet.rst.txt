@@ -32,6 +32,7 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.dispatch
       ~Form3XViewSet.filter_queryset
       ~Form3XViewSet.finalize_response
+      ~Form3XViewSet.future_form3x_reports
       ~Form3XViewSet.get_authenticate_header
       ~Form3XViewSet.get_authenticators
       ~Form3XViewSet.get_content_negotiator

@@ -40,7 +40,6 @@ fecfiler.transactions.schedule\_c2.models.ScheduleC2
       ~ScheduleC2.save_base
       ~ScheduleC2.serializable_value
       ~ScheduleC2.unique_error_message
-      ~ScheduleC2.update_with_contact
       ~ScheduleC2.validate_constraints
       ~ScheduleC2.validate_unique
    
@@ -53,18 +52,6 @@ fecfiler.transactions.schedule\_c2.models.ScheduleC2
    .. autosummary::
    
       ~ScheduleC2.guaranteed_amount
-      ~ScheduleC2.guarantor_city
-      ~ScheduleC2.guarantor_employer
-      ~ScheduleC2.guarantor_first_name
-      ~ScheduleC2.guarantor_last_name
-      ~ScheduleC2.guarantor_middle_name
-      ~ScheduleC2.guarantor_occupation
-      ~ScheduleC2.guarantor_prefix
-      ~ScheduleC2.guarantor_state
-      ~ScheduleC2.guarantor_street_1
-      ~ScheduleC2.guarantor_street_2
-      ~ScheduleC2.guarantor_suffix
-      ~ScheduleC2.guarantor_zip
       ~ScheduleC2.id
       ~ScheduleC2.objects
       ~ScheduleC2.pk

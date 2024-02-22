@@ -49,58 +49,11 @@ fecfiler.reports.form\_1m.models.Form1M
 
    .. autosummary::
    
-      ~Form1M.III_candidate_district
-      ~Form1M.III_candidate_first_name
-      ~Form1M.III_candidate_id_number
-      ~Form1M.III_candidate_last_name
-      ~Form1M.III_candidate_middle_name
-      ~Form1M.III_candidate_office
-      ~Form1M.III_candidate_prefix
-      ~Form1M.III_candidate_state
-      ~Form1M.III_candidate_suffix
       ~Form1M.III_date_of_contribution
-      ~Form1M.II_candidate_district
-      ~Form1M.II_candidate_first_name
-      ~Form1M.II_candidate_id_number
-      ~Form1M.II_candidate_last_name
-      ~Form1M.II_candidate_middle_name
-      ~Form1M.II_candidate_office
-      ~Form1M.II_candidate_prefix
-      ~Form1M.II_candidate_state
-      ~Form1M.II_candidate_suffix
       ~Form1M.II_date_of_contribution
-      ~Form1M.IV_candidate_district
-      ~Form1M.IV_candidate_first_name
-      ~Form1M.IV_candidate_id_number
-      ~Form1M.IV_candidate_last_name
-      ~Form1M.IV_candidate_middle_name
-      ~Form1M.IV_candidate_office
-      ~Form1M.IV_candidate_prefix
-      ~Form1M.IV_candidate_state
-      ~Form1M.IV_candidate_suffix
       ~Form1M.IV_date_of_contribution
-      ~Form1M.I_candidate_district
-      ~Form1M.I_candidate_first_name
-      ~Form1M.I_candidate_id_number
-      ~Form1M.I_candidate_last_name
-      ~Form1M.I_candidate_middle_name
-      ~Form1M.I_candidate_office
-      ~Form1M.I_candidate_prefix
-      ~Form1M.I_candidate_state
-      ~Form1M.I_candidate_suffix
       ~Form1M.I_date_of_contribution
-      ~Form1M.V_candidate_district
-      ~Form1M.V_candidate_first_name
-      ~Form1M.V_candidate_id_number
-      ~Form1M.V_candidate_last_name
-      ~Form1M.V_candidate_middle_name
-      ~Form1M.V_candidate_office
-      ~Form1M.V_candidate_prefix
-      ~Form1M.V_candidate_state
-      ~Form1M.V_candidate_suffix
       ~Form1M.V_date_of_contribution
-      ~Form1M.affiliated_committee_fec_id
-      ~Form1M.affiliated_committee_name
       ~Form1M.affiliated_date_form_f1_filed
       ~Form1M.city
       ~Form1M.committee_name
@@ -117,6 +70,9 @@ fecfiler.reports.form\_1m.models.Form1M
       ~Form1M.contact_candidate_I_id
       ~Form1M.contact_candidate_V
       ~Form1M.contact_candidate_V_id
+      ~Form1M.date_committee_met_requirements
+      ~Form1M.date_of_51st_contributor
+      ~Form1M.date_of_original_registration
       ~Form1M.id
       ~Form1M.objects
       ~Form1M.pk

@@ -113,6 +113,7 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.subTest
       ~F1MSerializerTestCase.tearDown
       ~F1MSerializerTestCase.tearDownClass
+      ~F1MSerializerTestCase.test_contacts_to_representation
       ~F1MSerializerTestCase.test_serializer_validate
    
    

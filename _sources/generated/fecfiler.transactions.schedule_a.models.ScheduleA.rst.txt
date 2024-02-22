@@ -40,7 +40,6 @@ fecfiler.transactions.schedule\_a.models.ScheduleA
       ~ScheduleA.save_base
       ~ScheduleA.serializable_value
       ~ScheduleA.unique_error_message
-      ~ScheduleA.update_with_contact
       ~ScheduleA.validate_constraints
       ~ScheduleA.validate_unique
    
@@ -61,30 +60,6 @@ fecfiler.transactions.schedule\_a.models.ScheduleA
       ~ScheduleA.contribution_amount
       ~ScheduleA.contribution_date
       ~ScheduleA.contribution_purpose_descrip
-      ~ScheduleA.contributor_city
-      ~ScheduleA.contributor_employer
-      ~ScheduleA.contributor_first_name
-      ~ScheduleA.contributor_last_name
-      ~ScheduleA.contributor_middle_name
-      ~ScheduleA.contributor_occupation
-      ~ScheduleA.contributor_organization_name
-      ~ScheduleA.contributor_prefix
-      ~ScheduleA.contributor_state
-      ~ScheduleA.contributor_street_1
-      ~ScheduleA.contributor_street_2
-      ~ScheduleA.contributor_suffix
-      ~ScheduleA.contributor_zip
-      ~ScheduleA.donor_candidate_district
-      ~ScheduleA.donor_candidate_fec_id
-      ~ScheduleA.donor_candidate_first_name
-      ~ScheduleA.donor_candidate_last_name
-      ~ScheduleA.donor_candidate_middle_name
-      ~ScheduleA.donor_candidate_office
-      ~ScheduleA.donor_candidate_prefix
-      ~ScheduleA.donor_candidate_state
-      ~ScheduleA.donor_candidate_suffix
-      ~ScheduleA.donor_committee_fec_id
-      ~ScheduleA.donor_committee_name
       ~ScheduleA.election_code
       ~ScheduleA.election_other_description
       ~ScheduleA.id

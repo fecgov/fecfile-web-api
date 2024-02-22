@@ -33,4 +33,7 @@ fecfiler.reports.migrations
 
    fecfiler.reports.migrations.0001_initial
    fecfiler.reports.migrations.0002_initial
+   fecfiler.reports.migrations.0003_update_f24_amendment_date
+   fecfiler.reports.migrations.0004_form1m_date_committee_met_requirements_and_more
+   fecfiler.reports.migrations.0005_remove_form1m_iii_candidate_district_and_more
 

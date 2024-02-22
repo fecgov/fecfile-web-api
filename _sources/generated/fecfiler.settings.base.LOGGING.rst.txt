@@ -1,6 +1,0 @@
-fecfiler.settings.base.LOGGING
-==============================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: LOGGING

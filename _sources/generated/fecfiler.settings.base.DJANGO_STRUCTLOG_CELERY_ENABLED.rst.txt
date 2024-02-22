@@ -1,0 +1,6 @@
+fecfiler.settings.base.DJANGO\_STRUCTLOG\_CELERY\_ENABLED
+=========================================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: DJANGO_STRUCTLOG_CELERY_ENABLED

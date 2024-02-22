@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.tests.test\_models.ReportModelTestCase
+=======================================================
+
+.. currentmodule:: fecfiler.reports.tests.test_models
+
+.. autoclass:: ReportModelTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportModelTestCase.__init__
+      ~ReportModelTestCase.addClassCleanup
+      ~ReportModelTestCase.addCleanup
+      ~ReportModelTestCase.addTypeEqualityFunc
+      ~ReportModelTestCase.assertAlmostEqual
+      ~ReportModelTestCase.assertAlmostEquals
+      ~ReportModelTestCase.assertContains
+      ~ReportModelTestCase.assertCountEqual
+      ~ReportModelTestCase.assertDictContainsSubset
+      ~ReportModelTestCase.assertDictEqual
+      ~ReportModelTestCase.assertEqual
+      ~ReportModelTestCase.assertEquals
+      ~ReportModelTestCase.assertFalse
+      ~ReportModelTestCase.assertFieldOutput
+      ~ReportModelTestCase.assertFormError
+      ~ReportModelTestCase.assertFormSetError
+      ~ReportModelTestCase.assertFormsetError
+      ~ReportModelTestCase.assertGreater
+      ~ReportModelTestCase.assertGreaterEqual
+      ~ReportModelTestCase.assertHTMLEqual
+      ~ReportModelTestCase.assertHTMLNotEqual
+      ~ReportModelTestCase.assertIn
+      ~ReportModelTestCase.assertInHTML
+      ~ReportModelTestCase.assertIs
+      ~ReportModelTestCase.assertIsInstance
+      ~ReportModelTestCase.assertIsNone
+      ~ReportModelTestCase.assertIsNot
+      ~ReportModelTestCase.assertIsNotNone
+      ~ReportModelTestCase.assertJSONEqual
+      ~ReportModelTestCase.assertJSONNotEqual
+      ~ReportModelTestCase.assertLess
+      ~ReportModelTestCase.assertLessEqual
+      ~ReportModelTestCase.assertListEqual
+      ~ReportModelTestCase.assertLogs
+      ~ReportModelTestCase.assertMultiLineEqual
+      ~ReportModelTestCase.assertNoLogs
+      ~ReportModelTestCase.assertNotAlmostEqual
+      ~ReportModelTestCase.assertNotAlmostEquals
+      ~ReportModelTestCase.assertNotContains
+      ~ReportModelTestCase.assertNotEqual
+      ~ReportModelTestCase.assertNotEquals
+      ~ReportModelTestCase.assertNotIn
+      ~ReportModelTestCase.assertNotIsInstance
+      ~ReportModelTestCase.assertNotRegex
+      ~ReportModelTestCase.assertNotRegexpMatches
+      ~ReportModelTestCase.assertNumQueries
+      ~ReportModelTestCase.assertQuerySetEqual
+      ~ReportModelTestCase.assertQuerysetEqual
+      ~ReportModelTestCase.assertRaises
+      ~ReportModelTestCase.assertRaisesMessage
+      ~ReportModelTestCase.assertRaisesRegex
+      ~ReportModelTestCase.assertRaisesRegexp
+      ~ReportModelTestCase.assertRedirects
+      ~ReportModelTestCase.assertRegex
+      ~ReportModelTestCase.assertRegexpMatches
+      ~ReportModelTestCase.assertSequenceEqual
+      ~ReportModelTestCase.assertSetEqual
+      ~ReportModelTestCase.assertTemplateNotUsed
+      ~ReportModelTestCase.assertTemplateUsed
+      ~ReportModelTestCase.assertTrue
+      ~ReportModelTestCase.assertTupleEqual
+      ~ReportModelTestCase.assertURLEqual
+      ~ReportModelTestCase.assertWarns
+      ~ReportModelTestCase.assertWarnsMessage
+      ~ReportModelTestCase.assertWarnsRegex
+      ~ReportModelTestCase.assertXMLEqual
+      ~ReportModelTestCase.assertXMLNotEqual
+      ~ReportModelTestCase.assert_
+      ~ReportModelTestCase.captureOnCommitCallbacks
+      ~ReportModelTestCase.countTestCases
+      ~ReportModelTestCase.debug
+      ~ReportModelTestCase.defaultTestResult
+      ~ReportModelTestCase.doClassCleanups
+      ~ReportModelTestCase.doCleanups
+      ~ReportModelTestCase.fail
+      ~ReportModelTestCase.failIf
+      ~ReportModelTestCase.failIfAlmostEqual
+      ~ReportModelTestCase.failIfEqual
+      ~ReportModelTestCase.failUnless
+      ~ReportModelTestCase.failUnlessAlmostEqual
+      ~ReportModelTestCase.failUnlessEqual
+      ~ReportModelTestCase.failUnlessRaises
+      ~ReportModelTestCase.id
+      ~ReportModelTestCase.modify_settings
+      ~ReportModelTestCase.run
+      ~ReportModelTestCase.setUp
+      ~ReportModelTestCase.setUpClass
+      ~ReportModelTestCase.setUpTestData
+      ~ReportModelTestCase.settings
+      ~ReportModelTestCase.shortDescription
+      ~ReportModelTestCase.skipTest
+      ~ReportModelTestCase.subTest
+      ~ReportModelTestCase.tearDown
+      ~ReportModelTestCase.tearDownClass
+      ~ReportModelTestCase.test_amending
+      ~ReportModelTestCase.test_amending_f24
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportModelTestCase.available_apps
+      ~ReportModelTestCase.databases
+      ~ReportModelTestCase.fixtures
+      ~ReportModelTestCase.longMessage
+      ~ReportModelTestCase.maxDiff
+      ~ReportModelTestCase.reset_sequences
+      ~ReportModelTestCase.serialized_rollback
+   
+   

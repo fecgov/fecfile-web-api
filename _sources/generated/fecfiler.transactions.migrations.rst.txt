@@ -32,4 +32,5 @@ fecfiler.transactions.migrations
    :recursive:
 
    fecfiler.transactions.migrations.0001_initial
+   fecfiler.transactions.migrations.0002_remove_schedulea_contributor_city_and_more
 

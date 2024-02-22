@@ -1,0 +1,6 @@
+fecfiler.settings.base.CSRF\_TRUSTED\_ORIGINS
+=============================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: CSRF_TRUSTED_ORIGINS

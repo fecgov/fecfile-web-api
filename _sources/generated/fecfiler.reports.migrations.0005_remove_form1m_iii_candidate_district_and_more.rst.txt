@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.migrations.0005\_remove\_form1m\_iii\_candidate\_district\_and\_more
+=====================================================================================
+
+.. automodule:: fecfiler.reports.migrations.0005_remove_form1m_iii_candidate_district_and_more
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

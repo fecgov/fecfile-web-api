@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0003\_update\_f24\_amendment\_date.update\_f24\_original\_amendment\_date
+=====================================================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0003_update_f24_amendment_date
+
+.. autofunction:: update_f24_original_amendment_date

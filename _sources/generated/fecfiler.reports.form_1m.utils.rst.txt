@@ -1,0 +1,33 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.form\_1m.utils
+===============================
+
+.. automodule:: fecfiler.reports.form_1m.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      add_form_1m_contact_fields
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

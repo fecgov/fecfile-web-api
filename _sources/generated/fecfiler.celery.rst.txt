@@ -12,6 +12,13 @@ fecfiler.celery
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      receiver_setup_logging
+   
    
 
    

@@ -65,6 +65,7 @@ fecfiler.memo\_text.models.MemoText
       ~MemoText.report
       ~MemoText.report_id
       ~MemoText.text4000
+      ~MemoText.text_prefix
       ~MemoText.transaction_id_number
       ~MemoText.transaction_set
       ~MemoText.transaction_uuid

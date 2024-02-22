@@ -37,5 +37,6 @@ fecfiler.committee\_accounts
    fecfiler.committee_accounts.serializers
    fecfiler.committee_accounts.signals
    fecfiler.committee_accounts.test_models
+   fecfiler.committee_accounts.urls
    fecfiler.committee_accounts.views
 

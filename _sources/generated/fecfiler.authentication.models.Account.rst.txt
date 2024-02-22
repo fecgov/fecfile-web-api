@@ -94,7 +94,6 @@ fecfiler.authentication.models.Account
       ~Account.is_superuser
       ~Account.last_login
       ~Account.last_name
-      ~Account.logentry_set
       ~Account.login_code_counter
       ~Account.objects
       ~Account.password

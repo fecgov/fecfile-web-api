@@ -1,0 +1,78 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.user.serializers.CurrentUserSerializer
+===============================================
+
+.. currentmodule:: fecfiler.user.serializers
+
+.. autoclass:: CurrentUserSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CurrentUserSerializer.__init__
+      ~CurrentUserSerializer.bind
+      ~CurrentUserSerializer.build_field
+      ~CurrentUserSerializer.build_nested_field
+      ~CurrentUserSerializer.build_property_field
+      ~CurrentUserSerializer.build_relational_field
+      ~CurrentUserSerializer.build_standard_field
+      ~CurrentUserSerializer.build_unknown_field
+      ~CurrentUserSerializer.build_url_field
+      ~CurrentUserSerializer.create
+      ~CurrentUserSerializer.fail
+      ~CurrentUserSerializer.get_attribute
+      ~CurrentUserSerializer.get_default
+      ~CurrentUserSerializer.get_default_field_names
+      ~CurrentUserSerializer.get_extra_kwargs
+      ~CurrentUserSerializer.get_field_names
+      ~CurrentUserSerializer.get_fields
+      ~CurrentUserSerializer.get_initial
+      ~CurrentUserSerializer.get_unique_for_date_validators
+      ~CurrentUserSerializer.get_unique_together_validators
+      ~CurrentUserSerializer.get_uniqueness_extra_kwargs
+      ~CurrentUserSerializer.get_validators
+      ~CurrentUserSerializer.get_value
+      ~CurrentUserSerializer.include_extra_kwargs
+      ~CurrentUserSerializer.is_valid
+      ~CurrentUserSerializer.many_init
+      ~CurrentUserSerializer.run_validation
+      ~CurrentUserSerializer.run_validators
+      ~CurrentUserSerializer.save
+      ~CurrentUserSerializer.to_internal_value
+      ~CurrentUserSerializer.to_representation
+      ~CurrentUserSerializer.update
+      ~CurrentUserSerializer.validate
+      ~CurrentUserSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CurrentUserSerializer.context
+      ~CurrentUserSerializer.data
+      ~CurrentUserSerializer.default_error_messages
+      ~CurrentUserSerializer.default_validators
+      ~CurrentUserSerializer.errors
+      ~CurrentUserSerializer.fields
+      ~CurrentUserSerializer.initial
+      ~CurrentUserSerializer.root
+      ~CurrentUserSerializer.serializer_field_mapping
+      ~CurrentUserSerializer.url_field_name
+      ~CurrentUserSerializer.validated_data
+      ~CurrentUserSerializer.validators
+   
+   

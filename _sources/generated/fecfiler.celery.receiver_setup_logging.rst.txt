@@ -1,0 +1,6 @@
+fecfiler.celery.receiver\_setup\_logging
+========================================
+
+.. currentmodule:: fecfiler.celery
+
+.. autofunction:: receiver_setup_logging

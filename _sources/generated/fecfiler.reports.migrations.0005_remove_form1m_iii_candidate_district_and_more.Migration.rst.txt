@@ -1,0 +1,43 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.migrations.0005\_remove\_form1m\_iii\_candidate\_district\_and\_more.Migration
+===============================================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0005_remove_form1m_iii_candidate_district_and_more
+
+.. autoclass:: Migration
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Migration.__init__
+      ~Migration.apply
+      ~Migration.mutate_state
+      ~Migration.suggest_name
+      ~Migration.unapply
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Migration.atomic
+      ~Migration.dependencies
+      ~Migration.initial
+      ~Migration.operations
+      ~Migration.replaces
+      ~Migration.run_before
+   
+   

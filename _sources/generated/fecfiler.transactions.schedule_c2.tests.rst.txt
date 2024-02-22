@@ -31,6 +31,6 @@ fecfiler.transactions.schedule\_c2.tests
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.transactions.schedule_c2.tests.test_models
+   fecfiler.transactions.schedule_c2.tests.test_utils
    fecfiler.transactions.schedule_c2.tests.test_views
 

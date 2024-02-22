@@ -118,7 +118,6 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.test_login_dot_gov_login_redirect
       ~AuthenticationTest.test_login_dot_gov_logout_happy_path
       ~AuthenticationTest.test_login_dot_gov_logout_redirect
-      ~AuthenticationTest.test_update_login_time
       ~AuthenticationTest.test_valid_login
    
    
@@ -129,7 +128,6 @@ fecfiler.authentication.test\_views.AuthenticationTest
 
    .. autosummary::
    
-      ~AuthenticationTest.acc
       ~AuthenticationTest.available_apps
       ~AuthenticationTest.databases
       ~AuthenticationTest.fixtures
@@ -137,5 +135,6 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.maxDiff
       ~AuthenticationTest.reset_sequences
       ~AuthenticationTest.serialized_rollback
+      ~AuthenticationTest.user
    
    

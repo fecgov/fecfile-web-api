@@ -22,6 +22,8 @@ fecfiler.committee\_accounts.serializers
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      CommitteeAccountSerializer
+      CommitteeMemberSerializer
       CommitteeOwnedSerializer
    
    

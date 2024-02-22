@@ -40,7 +40,6 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.save_base
       ~ScheduleC.serializable_value
       ~ScheduleC.unique_error_message
-      ~ScheduleC.update_with_contact
       ~ScheduleC.validate_constraints
       ~ScheduleC.validate_unique
    
@@ -55,27 +54,6 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.election_code
       ~ScheduleC.election_other_description
       ~ScheduleC.id
-      ~ScheduleC.lender_candidate_district
-      ~ScheduleC.lender_candidate_first_name
-      ~ScheduleC.lender_candidate_id_number
-      ~ScheduleC.lender_candidate_last_name
-      ~ScheduleC.lender_candidate_middle_name
-      ~ScheduleC.lender_candidate_office
-      ~ScheduleC.lender_candidate_prefix
-      ~ScheduleC.lender_candidate_state
-      ~ScheduleC.lender_candidate_suffix
-      ~ScheduleC.lender_city
-      ~ScheduleC.lender_committee_id_number
-      ~ScheduleC.lender_first_name
-      ~ScheduleC.lender_last_name
-      ~ScheduleC.lender_middle_name
-      ~ScheduleC.lender_organization_name
-      ~ScheduleC.lender_prefix
-      ~ScheduleC.lender_state
-      ~ScheduleC.lender_street_1
-      ~ScheduleC.lender_street_2
-      ~ScheduleC.lender_suffix
-      ~ScheduleC.lender_zip
       ~ScheduleC.loan_amount
       ~ScheduleC.loan_due_date
       ~ScheduleC.loan_incurred_date
