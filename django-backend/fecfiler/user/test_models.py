@@ -3,10 +3,10 @@ from .models import User
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 
 
-class CommitteeAccountTestCase(TestCase):
+class UserModelTestCase(TestCase):
     fixtures = ["test_committee_accounts"]
 
-    def test_get_contact(self):
+    def test_redeem_pending_membership(self):
         committee_account = CommitteeAccount.objects.create(
             committee_id="C87654321",
         )
