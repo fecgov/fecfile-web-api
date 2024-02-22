@@ -70,7 +70,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
     def get_queryset(self):
         return super().get_queryset().annotate(
-            name= Coalesce(
+            name=Coalesce(
                 Concat(
                     "user__last_name",
                     Value(", "),
@@ -120,18 +120,20 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
             return Response(f"Missing fields: {', '.join(missing_fields)}", status=400)
 
         # Check for valid role
-        choiceOf = False
+        choice_of = False
         for choice in Membership.CommitteeRole.choices:
             if role in choice:
-                choiceOf = True
+                choice_of = True
                 break
-        if not choiceOf:
-            return Response(f"Invalid role", status=400)
+        if not choice_of:
+            return Response("Invalid role", status=400)
 
         # Check for pre-existing membership
-        matching_memberships = self.get_queryset().filter(Q(pending_email=email) | Q(user__email=email))
+        matching_memberships = self.get_queryset().filter(
+            Q(pending_email=email) | Q(user__email=email)
+        )
         if matching_memberships.count() > 0:
-            return Response(f"This email is already a member", status=400)
+            return Response("This email is already a member", status=400)
 
         # Create new membership
         new_member = None
@@ -140,14 +142,26 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
             for user in matching_users:
                 new_member = committee.members.add(user)
                 new_member.role = role
-                logger.info(f"Added existing user {email} to committee {committee.committee_id}")
+                logger.info(
+                    f"""Added existing user {
+                        email
+                    } to committee {
+                        committee.committee_id
+                    }"""
+                )
         else:
             new_member = Membership(
                 committee_account=committee,
                 pending_email=email,
                 role=role
             )
-            logger.info(f"Added pending membership for email {email} for committee {committee.committee_id}")
+            logger.info(
+                f"""Added pending membership for email {
+                    email
+                } for committee {
+                    committee.committee_id
+                }"""
+            )
 
         new_member.save()
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)

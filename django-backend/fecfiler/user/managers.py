@@ -14,7 +14,11 @@ class UserManager(AbstractUserManager):
             pending_email=obj_data['email']
         )
 
-        logger.info(f"New User Created: {obj_data['email']} - {pending_memberships.count()} Pending Memberships")
+        logger.info(
+            f"""New User Created: {
+                obj_data['email']} - {pending_memberships.count()
+            } Pending Memberships"""
+        )
 
         for new_membership in pending_memberships:
             new_membership.user = new_user

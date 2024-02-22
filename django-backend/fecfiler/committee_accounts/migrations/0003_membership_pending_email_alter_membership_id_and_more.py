@@ -10,6 +10,7 @@ def delete_pending_memberships(apps, schema_editor):
     Membership = apps.get_model("committee_accounts", "Membership")  # noqa
     Membership.objects.filter(user=None).delete()
 
+
 def generate_new_uuid(apps, schema_editor):
     Membership = apps.get_model("committee_accounts", "Membership")  # noqa
     for membership in Membership.objects.all():
@@ -33,7 +34,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='membership',
             name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=False, serialize=False, unique=False)
+            field=models.UUIDField(
+                default=uuid.uuid4,
+                editable=False,
+                primary_key=False,
+                serialize=False,
+                unique=False
+            )
         ),
         migrations.RunPython(
             generate_new_uuid,
@@ -51,12 +58,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='membership',
             name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)
+            field=models.UUIDField(
+                default=uuid.uuid4,
+                editable=False,
+                primary_key=True,
+                serialize=False,
+                unique=True
+            )
         ),
         migrations.AlterField(
             model_name='membership',
             name='user',
-            field=models.ForeignKey(null=True, on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
             model_name='membership',
