@@ -16,7 +16,6 @@ def test_celery(request):
 
 
 urlpatterns = [
-    re_path(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(
         r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"
     ),
