@@ -133,7 +133,10 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
             Q(pending_email=email) | Q(user__email=email)
         )
         if matching_memberships.count() > 0:
-            return Response("This email is taken by an existing membership to this committee", status=400)
+            return Response(
+                "This email is taken by an existing membership to this committee",
+                status=400
+            )
 
         # Create new membership
         user = User.objects.filter(email=email).first()
