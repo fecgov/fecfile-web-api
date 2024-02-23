@@ -133,35 +133,24 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
             Q(pending_email=email) | Q(user__email=email)
         )
         if matching_memberships.count() > 0:
-            return Response("This email is already a member", status=400)
+            return Response("This email is taken by an existing membership to this committee", status=400)
 
         # Create new membership
-        new_member = None
-        matching_users = User.objects.filter(email=email)
-        if matching_users.count() > 0:
-            for user in matching_users:
-                new_member = committee.members.add(user)
-                new_member.role = role
-                logger.info(
-                    f"""Added existing user {
-                        email
-                    } to committee {
-                        committee.committee_id
-                    }"""
-                )
-        else:
-            new_member = Membership(
-                committee_account=committee,
-                pending_email=email,
-                role=role
-            )
-            logger.info(
-                f"""Added pending membership for email {
-                    email
-                } for committee {
-                    committee.committee_id
-                }"""
-            )
+        user = User.objects.filter(email=email).first()
 
+        membership_args = {
+            "committee_account": committee,
+            "role": role,
+            "user": user
+        }
+
+        if user is None:
+            membership_args["pending_email"] = email
+
+        new_member = Membership(**membership_args)
         new_member.save()
+
+        member_type = "existing user" if user else "pending membership for"
+        logger.info(f'Added {member_type} "{email}" to committee {committee}')
+
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
