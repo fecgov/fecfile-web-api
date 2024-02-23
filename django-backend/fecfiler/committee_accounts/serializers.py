@@ -12,50 +12,29 @@ class CommitteeAccountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CommitteeMemberSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    email = serializers.CharField()
-    username = serializers.CharField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    role = serializers.SerializerMethodField()
-    is_active = serializers.BooleanField()
-
-    def get_role(self, object):
-        committee_id = self.context.get("committee_id")
-        return object.membership_set.get(committee_account_id=committee_id).role
-
-
 class CommitteeMembershipSerializer(serializers.Serializer):
-    id = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
-    role = serializers.CharField()
-    is_active = serializers.SerializerMethodField()
+    role = serializers.ChoiceField(choices=Membership.CommitteeRole)
 
-    def get_id(self, object):
-        if object.user is not None:
-            return object.user.id
-        return object.id
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
 
-    def get_email(self, object):
-        if object.user is not None:
-            return object.user.email
-        return object.pending_email
+        if instance.user is not None:
+            representation.update({
+                'id': instance.user.id,
+                'email': instance.user.email,
+                'username': instance.user.username,
+                'name': f"{instance.user.last_name}, {instance.user.first_name}",
+            })
+        else:
+            representation.update({
+                'id': instance.id,
+                'email': instance.pending_email,
+                'username': '',
+                'name': '',
+            })
 
-    def get_username(self, object):
-        if object.user is not None:
-            return object.user.username
-        return ''
-
-    def get_name(self, object):
-        if object.user is not None:
-            return f"{object.user.last_name}, {object.user.first_name}"
-        return ''
-
-    def get_is_active(self, object):
-        return object.user is not None
+        representation['is_active'] = instance.user is not None
+        return representation
 
     class Meta:
         model = Membership
