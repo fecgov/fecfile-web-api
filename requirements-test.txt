@@ -5,3 +5,4 @@ jsonschema==3.2
 safety
 liccheck==0.6.2
 sphinx==7.2.6
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
