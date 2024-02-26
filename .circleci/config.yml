@@ -50,6 +50,7 @@ jobs:
     docker:
       - image: cimg/python:3.10-node
       - image: cimg/postgres:12.8
+      - image: cimg/redis:6.2.6
 
     steps:
       - run:
@@ -63,6 +64,9 @@ jobs:
             exit 0
 
       - checkout
+
+      - run:
+          command: redis-server --port 6379
 
       - run:
           name: Create unified requirements so CircleCI can cache them
