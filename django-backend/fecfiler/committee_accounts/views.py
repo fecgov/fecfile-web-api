@@ -2,8 +2,9 @@ from rest_framework import viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CommitteeAccount
+from .models import CommitteeAccount, Membership
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
+from fecfiler.openfec.views import retrieve_recent_f1
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -47,6 +48,23 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee_uuid = request.session["committee_uuid"]
         committee = self.get_queryset().filter(id=committee_uuid).first()
         return Response(self.get_serializer(committee).data)
+
+    @action(detail=False, methods=["post"])
+    def register(self, request):
+        email = request.user.email
+        committee_id = request.data.get("committee_id")
+        if not committee_id:
+            raise Exception("no committee_id provided")
+        f1 = retrieve_recent_f1(committee_id)
+        if not f1 or f1.email != email:
+            raise Exception("could not register committee")
+        account = CommitteeAccount.objects.create(committee_id=committee_id)
+        Membership.objects.create(
+            committee_account=account,
+            user=request.user,
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
+        return account
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):

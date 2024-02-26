@@ -2,7 +2,6 @@ from rest_framework import viewsets
 from django.http.response import HttpResponse, HttpResponseServerError
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.mock_openfec.views import MockOpenfecViewSet
 from fecfiler.mock_openfec.mock_endpoints import query_filings
 import requests
 from fecfiler.settings import (
@@ -20,7 +19,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class OpenfecViewSet(viewsets.ModelViewSet):
+class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=True)
     def committee(self, request, pk=None):
         cids_to_override = (
@@ -59,20 +58,8 @@ class OpenfecViewSet(viewsets.ModelViewSet):
             return HttpResponse(resp)
 
     @action(detail=True)
-    def filings(self, request, pk=None):
-        headers = {"Content-Type": "application/json"}
-        params = {"api_key": FEC_API_KEY, "committee_id": pk, "sort": "-receipt_date"}
-
-        resp = requests.get(f"{FEC_API}efile/filings/", headers=headers, params=params)
-        retval = get_recent_f1_from_openfec_resp(resp)
-        if not retval:
-            params["per_page"] = 1
-            params["page"] = 1
-            params["form_type"] = "F1"
-            resp = requests.get(f"{FEC_API}filings/", headers=headers, params=params)
-            retval = get_recent_f1_from_openfec_resp(resp)
-
-        return Response(retval)
+    def f1_filing(self, request, pk=None):
+        return Response(retrieve_recent_f1(pk))
 
     @action(detail=False)
     def query_filings(self, request):
@@ -93,23 +80,25 @@ class OpenfecViewSet(viewsets.ModelViewSet):
         return Response(response)
 
 
-def get_recent_f1_from_openfec_resp(resp: requests.Response):
-    if resp:
-        try:
-            filing_list = resp.json()["results"]
-            return next(
-                (
-                    filing
-                    for filing in filing_list
-                    if filing["form_type"].startswith("F1")
-                ),
-                None,
-            )
-        except Exception as error:
-            logger.error(
-                f"Failed to process response from {resp.url} due to error: {str(error)}"
-            )
-    return None
+def retrieve_recent_f1(committee_id):
+    """Gets the most recent F1 filing
+    First checks the realtime enpdpoint for a recent F1 filing.  If none is found, a request is
+    made to a different endpoint that is updated nightly.  The realtime endpoint will have
+    more recent filings, but does not provide filings older than 6 months.
+    The nightly endpoint keeps a longer history"""
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": FEC_API_KEY,
+        "committee_id": committee_id,
+        "sort": "-receipt_date",
+        "form_type": "F1",
+    }
+    endpoints = [f"{FEC_API}efile/filings/", f"{FEC_API}filings/"]
+    for endpoint in endpoints:
+        response = requests.get(endpoint, headers=headers, params=params).json()
+        results = response["results"]
+        if len(results) > 0:
+            return results[0]
 
 
 def get_test_efo_mock_committee_account(committee_id):
