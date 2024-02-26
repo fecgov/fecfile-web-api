@@ -82,10 +82,10 @@ class OpenfecViewSet(viewsets.GenericViewSet):
 
 def retrieve_recent_f1(committee_id):
     """Gets the most recent F1 filing
-    First checks the realtime enpdpoint for a recent F1 filing.  If none is found, a request is
-    made to a different endpoint that is updated nightly.  The realtime endpoint will have
-    more recent filings, but does not provide filings older than 6 months.
-    The nightly endpoint keeps a longer history"""
+    First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
+    a request is made to a different endpoint that is updated nightly.
+    The realtime endpoint will have more recent filings, but does not provide
+    filings older than 6 months. The nightly endpoint keeps a longer history"""
     headers = {"Content-Type": "application/json"}
     params = {
         "api_key": settings.FEC_API_KEY,

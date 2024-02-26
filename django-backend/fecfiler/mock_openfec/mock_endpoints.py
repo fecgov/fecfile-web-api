@@ -1,4 +1,3 @@
-from rest_framework.response import Response
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import json
 import redis
