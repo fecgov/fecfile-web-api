@@ -14,6 +14,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
+from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -62,8 +63,7 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
             raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id
-        )
+            committee_id=committee.committee_id, committee_uuid=committee.id)
         return queryset.filter(committee_account_id=committee.id)
 
 
@@ -189,7 +189,6 @@ def register_committee(committee_id, user):
     existing_account = CommitteeAccount.objects.filter(
         committee_id=committee_id
     ).first()
-    print(f"existing: {existing_account}, f1_email: {f1_email}, email: {email}")
     if existing_account or f1_email != email:
         raise Exception("could not register committee")
     account = CommitteeAccount.objects.create(committee_id=committee_id)
@@ -199,3 +198,11 @@ def register_committee(committee_id, user):
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
     )
     return account
+  
+  
+@action(detail=True, methods=["delete"],
+        url_path="remove-member", url_name="remove_member")
+def remove_member(self, request, pk):
+    member = self.get_object()
+    member.delete()
+    return HttpResponse('Member removed')
