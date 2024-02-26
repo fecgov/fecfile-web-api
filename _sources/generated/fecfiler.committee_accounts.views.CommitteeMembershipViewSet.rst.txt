@@ -69,6 +69,7 @@ fecfiler.committee\_accounts.views.CommitteeMembershipViewSet
       ~CommitteeMembershipViewSet.perform_update
       ~CommitteeMembershipViewSet.permission_denied
       ~CommitteeMembershipViewSet.raise_uncaught_exception
+      ~CommitteeMembershipViewSet.remove_member
       ~CommitteeMembershipViewSet.retrieve
       ~CommitteeMembershipViewSet.reverse_action
       ~CommitteeMembershipViewSet.setup
