@@ -34,4 +34,5 @@ fecfiler.user.migrations
    fecfiler.user.migrations.0001_initial
    fecfiler.user.migrations.0002_remove_user_cmtee_id
    fecfiler.user.migrations.0003_user_security_consent_date
+   fecfiler.user.migrations.0004_alter_user_managers
 

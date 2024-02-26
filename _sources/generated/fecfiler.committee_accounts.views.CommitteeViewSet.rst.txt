@@ -57,7 +57,6 @@ fecfiler.committee\_accounts.views.CommitteeViewSet
       ~CommitteeViewSet.initial
       ~CommitteeViewSet.initialize_request
       ~CommitteeViewSet.list
-      ~CommitteeViewSet.members
       ~CommitteeViewSet.options
       ~CommitteeViewSet.paginate_queryset
       ~CommitteeViewSet.perform_authentication

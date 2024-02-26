@@ -1,0 +1,110 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.user.managers.UserManager
+==================================
+
+.. currentmodule:: fecfiler.user.managers
+
+.. autoclass:: UserManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UserManager.__init__
+      ~UserManager.aaggregate
+      ~UserManager.abulk_create
+      ~UserManager.abulk_update
+      ~UserManager.acontains
+      ~UserManager.acount
+      ~UserManager.acreate
+      ~UserManager.aearliest
+      ~UserManager.aexists
+      ~UserManager.aexplain
+      ~UserManager.afirst
+      ~UserManager.aget
+      ~UserManager.aget_or_create
+      ~UserManager.aggregate
+      ~UserManager.ain_bulk
+      ~UserManager.aiterator
+      ~UserManager.alast
+      ~UserManager.alatest
+      ~UserManager.alias
+      ~UserManager.all
+      ~UserManager.annotate
+      ~UserManager.aupdate
+      ~UserManager.aupdate_or_create
+      ~UserManager.bulk_create
+      ~UserManager.bulk_update
+      ~UserManager.check
+      ~UserManager.complex_filter
+      ~UserManager.contains
+      ~UserManager.contribute_to_class
+      ~UserManager.count
+      ~UserManager.create
+      ~UserManager.create_superuser
+      ~UserManager.create_user
+      ~UserManager.dates
+      ~UserManager.datetimes
+      ~UserManager.db_manager
+      ~UserManager.deconstruct
+      ~UserManager.defer
+      ~UserManager.difference
+      ~UserManager.distinct
+      ~UserManager.earliest
+      ~UserManager.exclude
+      ~UserManager.exists
+      ~UserManager.explain
+      ~UserManager.extra
+      ~UserManager.filter
+      ~UserManager.first
+      ~UserManager.from_queryset
+      ~UserManager.get
+      ~UserManager.get_by_natural_key
+      ~UserManager.get_or_create
+      ~UserManager.get_queryset
+      ~UserManager.in_bulk
+      ~UserManager.intersection
+      ~UserManager.iterator
+      ~UserManager.last
+      ~UserManager.latest
+      ~UserManager.make_random_password
+      ~UserManager.none
+      ~UserManager.normalize_email
+      ~UserManager.only
+      ~UserManager.order_by
+      ~UserManager.prefetch_related
+      ~UserManager.raw
+      ~UserManager.reverse
+      ~UserManager.select_for_update
+      ~UserManager.select_related
+      ~UserManager.union
+      ~UserManager.update
+      ~UserManager.update_or_create
+      ~UserManager.using
+      ~UserManager.values
+      ~UserManager.values_list
+      ~UserManager.with_perm
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UserManager.auto_created
+      ~UserManager.creation_counter
+      ~UserManager.db
+      ~UserManager.use_in_migrations
+   
+   

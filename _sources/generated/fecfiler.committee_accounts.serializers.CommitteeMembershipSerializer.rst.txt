@@ -1,0 +1,62 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.serializers.CommitteeMembershipSerializer
+======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.serializers
+
+.. autoclass:: CommitteeMembershipSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeMembershipSerializer.__init__
+      ~CommitteeMembershipSerializer.bind
+      ~CommitteeMembershipSerializer.create
+      ~CommitteeMembershipSerializer.fail
+      ~CommitteeMembershipSerializer.get_attribute
+      ~CommitteeMembershipSerializer.get_default
+      ~CommitteeMembershipSerializer.get_fields
+      ~CommitteeMembershipSerializer.get_initial
+      ~CommitteeMembershipSerializer.get_validators
+      ~CommitteeMembershipSerializer.get_value
+      ~CommitteeMembershipSerializer.is_valid
+      ~CommitteeMembershipSerializer.many_init
+      ~CommitteeMembershipSerializer.run_validation
+      ~CommitteeMembershipSerializer.run_validators
+      ~CommitteeMembershipSerializer.save
+      ~CommitteeMembershipSerializer.to_internal_value
+      ~CommitteeMembershipSerializer.to_representation
+      ~CommitteeMembershipSerializer.update
+      ~CommitteeMembershipSerializer.validate
+      ~CommitteeMembershipSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeMembershipSerializer.context
+      ~CommitteeMembershipSerializer.data
+      ~CommitteeMembershipSerializer.default_error_messages
+      ~CommitteeMembershipSerializer.default_validators
+      ~CommitteeMembershipSerializer.errors
+      ~CommitteeMembershipSerializer.fields
+      ~CommitteeMembershipSerializer.initial
+      ~CommitteeMembershipSerializer.root
+      ~CommitteeMembershipSerializer.validated_data
+      ~CommitteeMembershipSerializer.validators
+   
+   

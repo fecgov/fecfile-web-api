@@ -1,0 +1,111 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.views.CommitteeMembershipViewSet
+=============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autoclass:: CommitteeMembershipViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeMembershipViewSet.__init__
+      ~CommitteeMembershipViewSet.add_member
+      ~CommitteeMembershipViewSet.as_view
+      ~CommitteeMembershipViewSet.check_object_permissions
+      ~CommitteeMembershipViewSet.check_permissions
+      ~CommitteeMembershipViewSet.check_throttles
+      ~CommitteeMembershipViewSet.create
+      ~CommitteeMembershipViewSet.destroy
+      ~CommitteeMembershipViewSet.determine_version
+      ~CommitteeMembershipViewSet.dispatch
+      ~CommitteeMembershipViewSet.filter_queryset
+      ~CommitteeMembershipViewSet.finalize_response
+      ~CommitteeMembershipViewSet.get_authenticate_header
+      ~CommitteeMembershipViewSet.get_authenticators
+      ~CommitteeMembershipViewSet.get_content_negotiator
+      ~CommitteeMembershipViewSet.get_exception_handler
+      ~CommitteeMembershipViewSet.get_exception_handler_context
+      ~CommitteeMembershipViewSet.get_extra_action_url_map
+      ~CommitteeMembershipViewSet.get_extra_actions
+      ~CommitteeMembershipViewSet.get_format_suffix
+      ~CommitteeMembershipViewSet.get_object
+      ~CommitteeMembershipViewSet.get_paginated_response
+      ~CommitteeMembershipViewSet.get_parser_context
+      ~CommitteeMembershipViewSet.get_parsers
+      ~CommitteeMembershipViewSet.get_permissions
+      ~CommitteeMembershipViewSet.get_queryset
+      ~CommitteeMembershipViewSet.get_renderer_context
+      ~CommitteeMembershipViewSet.get_renderers
+      ~CommitteeMembershipViewSet.get_serializer
+      ~CommitteeMembershipViewSet.get_serializer_class
+      ~CommitteeMembershipViewSet.get_serializer_context
+      ~CommitteeMembershipViewSet.get_success_headers
+      ~CommitteeMembershipViewSet.get_throttles
+      ~CommitteeMembershipViewSet.get_view_description
+      ~CommitteeMembershipViewSet.get_view_name
+      ~CommitteeMembershipViewSet.handle_exception
+      ~CommitteeMembershipViewSet.http_method_not_allowed
+      ~CommitteeMembershipViewSet.initial
+      ~CommitteeMembershipViewSet.initialize_request
+      ~CommitteeMembershipViewSet.list
+      ~CommitteeMembershipViewSet.options
+      ~CommitteeMembershipViewSet.paginate_queryset
+      ~CommitteeMembershipViewSet.partial_update
+      ~CommitteeMembershipViewSet.perform_authentication
+      ~CommitteeMembershipViewSet.perform_content_negotiation
+      ~CommitteeMembershipViewSet.perform_create
+      ~CommitteeMembershipViewSet.perform_destroy
+      ~CommitteeMembershipViewSet.perform_update
+      ~CommitteeMembershipViewSet.permission_denied
+      ~CommitteeMembershipViewSet.raise_uncaught_exception
+      ~CommitteeMembershipViewSet.retrieve
+      ~CommitteeMembershipViewSet.reverse_action
+      ~CommitteeMembershipViewSet.setup
+      ~CommitteeMembershipViewSet.throttled
+      ~CommitteeMembershipViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeMembershipViewSet.allowed_methods
+      ~CommitteeMembershipViewSet.authentication_classes
+      ~CommitteeMembershipViewSet.basename
+      ~CommitteeMembershipViewSet.default_response_headers
+      ~CommitteeMembershipViewSet.description
+      ~CommitteeMembershipViewSet.detail
+      ~CommitteeMembershipViewSet.filter_backends
+      ~CommitteeMembershipViewSet.http_method_names
+      ~CommitteeMembershipViewSet.lookup_field
+      ~CommitteeMembershipViewSet.lookup_url_kwarg
+      ~CommitteeMembershipViewSet.name
+      ~CommitteeMembershipViewSet.ordering
+      ~CommitteeMembershipViewSet.ordering_fields
+      ~CommitteeMembershipViewSet.paginator
+      ~CommitteeMembershipViewSet.parser_classes
+      ~CommitteeMembershipViewSet.permission_classes
+      ~CommitteeMembershipViewSet.queryset
+      ~CommitteeMembershipViewSet.renderer_classes
+      ~CommitteeMembershipViewSet.schema
+      ~CommitteeMembershipViewSet.settings
+      ~CommitteeMembershipViewSet.suffix
+      ~CommitteeMembershipViewSet.throttle_classes
+      ~CommitteeMembershipViewSet.versioning_class
+      ~CommitteeMembershipViewSet.view_is_async
+   
+   

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.migrations.0003\_membership\_pending\_email\_alter\_membership\_id\_and\_more.delete\_pending\_memberships
+=======================================================================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.migrations.0003_membership_pending_email_alter_membership_id_and_more
+
+.. autofunction:: delete_pending_memberships

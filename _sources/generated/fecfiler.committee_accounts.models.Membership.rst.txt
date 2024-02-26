@@ -32,6 +32,10 @@ fecfiler.committee\_accounts.models.Membership
       ~Membership.full_clean
       ~Membership.get_constraints
       ~Membership.get_deferred_fields
+      ~Membership.get_next_by_created
+      ~Membership.get_next_by_updated
+      ~Membership.get_previous_by_created
+      ~Membership.get_previous_by_updated
       ~Membership.get_role_display
       ~Membership.prepare_database_save
       ~Membership.refresh_from_db
@@ -52,10 +56,13 @@ fecfiler.committee\_accounts.models.Membership
    
       ~Membership.committee_account
       ~Membership.committee_account_id
+      ~Membership.created
       ~Membership.id
       ~Membership.objects
+      ~Membership.pending_email
       ~Membership.pk
       ~Membership.role
+      ~Membership.updated
       ~Membership.user
       ~Membership.user_id
    

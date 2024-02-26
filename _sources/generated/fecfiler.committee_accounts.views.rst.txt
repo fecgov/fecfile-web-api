@@ -22,6 +22,7 @@ fecfiler.committee\_accounts.views
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      CommitteeMembershipViewSet
       CommitteeOwnedViewSet
       CommitteeViewSet
    

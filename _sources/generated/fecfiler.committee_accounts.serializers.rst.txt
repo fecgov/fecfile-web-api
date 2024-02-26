@@ -23,7 +23,7 @@ fecfiler.committee\_accounts.serializers
       :template: custom-class-template.rst               
    
       CommitteeAccountSerializer
-      CommitteeMemberSerializer
+      CommitteeMembershipSerializer
       CommitteeOwnedSerializer
    
    
