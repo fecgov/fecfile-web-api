@@ -6,7 +6,9 @@ from .models import CommitteeAccount, Membership
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
+from fecfiler.web_services.dot_fec.dot_fec_serializer import CRLF_STR, FS_STR
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
+import requests
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -54,17 +56,30 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     @action(detail=False, methods=["post"])
     def register(self, request):
         email = request.user.email
+        f1_email = None
         committee_id = request.data.get("committee_id")
         if not committee_id:
             raise Exception("no committee_id provided")
         if MOCK_OPENFEC_REDIS_URL:
             f1 = recent_f1(committee_id)
+            f1_email = (f1 or {}).get("email")
         else:
             f1 = retrieve_recent_f1(committee_id)
+            dot_fec_url = (f1 or {}).get("fec_url")
+            if dot_fec_url:
+                response = requests.get(
+                    dot_fec_url,
+                    headers={"User-Agent": ""},
+                )
+                dot_fec_content = response.content.decode("utf-8")
+                f1_line = dot_fec_content.split("\n")[1]
+                f1_email = f1_line.split(FS_STR)[11]
+
         existing_account = CommitteeAccount.objects.filter(
             committee_id=committee_id
         ).first()
-        if existing_account or not f1 or f1.get("email") != email:
+        print(f"existing: {existing_account}, f1_email: {f1_email}, email: {email}")
+        if existing_account or f1_email != email:
             raise Exception("could not register committee")
         account = CommitteeAccount.objects.create(committee_id=committee_id)
         Membership.objects.create(
@@ -76,7 +91,6 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
-
     """ModelViewSet for models using CommitteeOwnedModel
     Inherit this view set to filter the queryset by the user's committee
     """
