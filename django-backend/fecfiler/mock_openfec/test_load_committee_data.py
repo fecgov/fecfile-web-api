@@ -12,7 +12,6 @@ class LoadTestDataCommandTest(TestCase):
 
     def test_load_test_data(self):
         call_command("load_committee_data")
-        print(f"MOCK_OPENFEC {MOCK_OPENFEC}")
         redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY)
         self.assertEqual(len(committee_data), 1)
