@@ -6,7 +6,7 @@ from .models import CommitteeAccount, Membership
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.web_services.dot_fec.dot_fec_serializer import CRLF_STR, FS_STR
+from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import requests
 import structlog
@@ -69,7 +69,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             if dot_fec_url:
                 response = requests.get(
                     dot_fec_url,
-                    headers={"User-Agent": ""},
+                    headers={"User-Agent": "fecfile-api"},
                 )
                 dot_fec_content = response.content.decode("utf-8")
                 f1_line = dot_fec_content.split("\n")[1]
