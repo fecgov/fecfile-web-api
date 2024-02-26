@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
+from fecfiler.user.managers import UserManager
 
 
 class User(AbstractUser):
@@ -17,3 +18,5 @@ class User(AbstractUser):
     user_permissions = None
     login_dot_gov = False
     security_consent_date = models.DateField(null=True, blank=True)
+
+    objects = UserManager()
