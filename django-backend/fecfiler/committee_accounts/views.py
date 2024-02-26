@@ -42,38 +42,11 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     @action(detail=False, methods=["post"])
     def register(self, request):
-        email = request.user.email
-        f1_email = None
         committee_id = request.data.get("committee_id")
         if not committee_id:
             raise Exception("no committee_id provided")
-        if MOCK_OPENFEC_REDIS_URL:
-            f1 = recent_f1(committee_id)
-            f1_email = (f1 or {}).get("email")
-        else:
-            f1 = retrieve_recent_f1(committee_id)
-            dot_fec_url = (f1 or {}).get("fec_url")
-            if dot_fec_url:
-                response = requests.get(
-                    dot_fec_url,
-                    headers={"User-Agent": "fecfile-api"},
-                )
-                dot_fec_content = response.content.decode("utf-8")
-                f1_line = dot_fec_content.split("\n")[1]
-                f1_email = f1_line.split(FS_STR)[11]
+        account = register_committee(committee_id, request.user)
 
-        existing_account = CommitteeAccount.objects.filter(
-            committee_id=committee_id
-        ).first()
-        print(f"existing: {existing_account}, f1_email: {f1_email}, email: {email}")
-        if existing_account or f1_email != email:
-            raise Exception("could not register committee")
-        account = CommitteeAccount.objects.create(committee_id=committee_id)
-        Membership.objects.create(
-            committee_account=account,
-            user=request.user,
-            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-        )
         return Response(account)
 
 
@@ -193,3 +166,36 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
         logger.info(f'Added {member_type} "{email}" to committee {committee}')
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
+
+
+def register_committee(committee_id, user):
+    email = user.email
+
+    if MOCK_OPENFEC_REDIS_URL:
+        f1 = recent_f1(committee_id)
+        f1_email = (f1 or {}).get("email")
+    else:
+        f1 = retrieve_recent_f1(committee_id)
+        dot_fec_url = (f1 or {}).get("fec_url")
+        if dot_fec_url:
+            response = requests.get(
+                dot_fec_url,
+                headers={"User-Agent": "fecfile-api"},
+            )
+            dot_fec_content = response.content.decode("utf-8")
+            f1_line = dot_fec_content.split("\n")[1]
+            f1_email = f1_line.split(FS_STR)[11]
+
+    existing_account = CommitteeAccount.objects.filter(
+        committee_id=committee_id
+    ).first()
+    print(f"existing: {existing_account}, f1_email: {f1_email}, email: {email}")
+    if existing_account or f1_email != email:
+        raise Exception("could not register committee")
+    account = CommitteeAccount.objects.create(committee_id=committee_id)
+    Membership.objects.create(
+        committee_account=account,
+        user=user,
+        role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+    )
+    return account
