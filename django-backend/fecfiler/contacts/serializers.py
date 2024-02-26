@@ -53,6 +53,9 @@ class ContactSerializer(
     # Contains the number of transactions linked to the contact
     transaction_count = IntegerField(required=False)
 
+    # Contains the number of reports directly linked to the contact (e.g. F1M)
+    report_count = IntegerField(required=False)
+
     def get_schema_name(self, data):
         return f"Contact_{self.contact_value[data.get('type', None)]}"
 
@@ -91,17 +94,21 @@ class ContactSerializer(
             ]
         ]
         fields.append("transaction_count")
+        fields.append("report_count")
         read_only_fields = [
             "uuid",
             "deleted",
             "created",
             "updated",
             "transaction_count",
+            "report_count",
         ]
 
     def to_internal_value(self, data):
-        # Remove the transaction_count because it is an annotated field
+        # Remove the transaction_count and report_count because they are annotated fields
         # delivered to the front end.
         if "transaction_count" in data:
             del data["transaction_count"]
+        if "report_count" in data:
+            del data["report_count"]
         return super().to_internal_value(data)
