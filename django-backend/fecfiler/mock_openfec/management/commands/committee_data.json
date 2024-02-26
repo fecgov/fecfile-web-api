@@ -1,0 +1,13 @@
+[
+    {
+        "committee_id": "C12345678",
+        "committee_name": "Test Committee",
+        "committee_type": "O",
+        "form_type": "F1",
+        "pdf_url": "https://docquery.fec.gov/pdf/161/201601019004427161/201601019004427161.pdf",
+        "receipt_date": "2024-01-01T00:00:00",
+        "report_year": 2024,
+        "treasurer_name": "Last, First",
+        "update_date": "2024-01-01"
+    }
+]
