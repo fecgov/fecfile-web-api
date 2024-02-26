@@ -1,7 +1,9 @@
 from django.test import RequestFactory, TestCase
-from fecfiler.committee_accounts.views import register_committee, CommitteeMembershipViewSet
+from fecfiler.committee_accounts.views import register_committee, \
+    CommitteeMembershipViewSet
 from fecfiler.user.models import User
 from django.core.management import call_command
+
 
 class CommitteeAccountsViewsTest(TestCase):
 

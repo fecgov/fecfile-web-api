@@ -198,8 +198,8 @@ def register_committee(committee_id, user):
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
     )
     return account
-  
-  
+
+
 @action(detail=True, methods=["delete"],
         url_path="remove-member", url_name="remove_member")
 def remove_member(self, request, pk):
