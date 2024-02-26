@@ -54,19 +54,19 @@ class OpenfecViewSetTest(TestCase):
             )
 
     def test_get_filings_invalid_resp(self):
-        request = self.factory.get("/api/v1/openfec/C00100230/filings/")
+        request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
         request.user = self.user
         with patch("fecfiler.openfec.views.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = None
-            response = OpenfecViewSet.as_view({"get": "filings"})(
+            response = OpenfecViewSet.as_view({"get": "f1_filing"})(
                 request, pk="C00100230"
             )
             self.assertEqual(response.status_code, 200)
 
     def test_get_filings_happy_path(self):
-        request = self.factory.get("/api/v1/openfec/C00100230/filings/")
+        request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
         request.user = self.user
         with patch("fecfiler.openfec.views.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
@@ -75,7 +75,7 @@ class OpenfecViewSetTest(TestCase):
             mock_response_object["results"] = [{}]
             mock_response_object["results"][0]["form_type"] = "F1"
             mock_response.json.return_value = mock_response_object
-            response = OpenfecViewSet.as_view({"get": "filings"})(
+            response = OpenfecViewSet.as_view({"get": "f1_filing"})(
                 request, pk="C00100230"
             )
             self.assertEqual(response.status_code, 200)

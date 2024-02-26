@@ -8,6 +8,7 @@
         "receipt_date": "2024-01-01T00:00:00",
         "report_year": 2024,
         "treasurer_name": "Last, First",
-        "update_date": "2024-01-01"
+        "update_date": "2024-01-01",
+        "email": "test@fec.gov"
     }
 ]

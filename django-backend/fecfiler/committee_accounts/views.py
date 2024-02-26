@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from .serializers import CommitteeAccountSerializer, CommitteeMemberSerializer
 from fecfiler.openfec.views import retrieve_recent_f1
+from fecfiler.mock_openfec.mock_endpoints import recent_f1
+from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -55,8 +57,14 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee_id = request.data.get("committee_id")
         if not committee_id:
             raise Exception("no committee_id provided")
-        f1 = retrieve_recent_f1(committee_id)
-        if not f1 or f1.email != email:
+        if MOCK_OPENFEC_REDIS_URL:
+            f1 = recent_f1(committee_id)
+        else:
+            f1 = retrieve_recent_f1(committee_id)
+        existing_account = CommitteeAccount.objects.filter(
+            committee_id=committee_id
+        ).first()
+        if existing_account or not f1 or f1.get("email") != email:
             raise Exception("could not register committee")
         account = CommitteeAccount.objects.create(committee_id=committee_id)
         Membership.objects.create(
@@ -64,7 +72,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             user=request.user,
             role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         )
-        return account
+        return Response(account)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):

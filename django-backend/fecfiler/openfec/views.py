@@ -7,7 +7,7 @@ import requests
 from fecfiler.settings import (
     FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE,
     FEC_API_KEY,
-    MOCK_OPENFEC_URL,
+    MOCK_OPENFEC_REDIS_URL,
     BASE_DIR,
     FEC_API,
 )
@@ -65,7 +65,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     def query_filings(self, request):
         query = request.query_params.get("query")
         form_type = request.query_params.get("form_type")
-        if MOCK_OPENFEC_URL:
+        if MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
         else:
             params = {

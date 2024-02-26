@@ -18,9 +18,19 @@ def query_filings(query, form_type):
             if query in committee.get("committee_id")
             or query in committee.get("committee_name")
         ]
-        print(filtered_committee_data)
         return {  # same as api.open.fec.gov
             "api_version": "1.0",
             "results": filtered_committee_data,
             "pagination": {"pages": 1, "per_page": 20, "count": 1, "page": 1},
         }
+
+
+def recent_f1(committee_id):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        return next(
+            committee
+            for committee in committees
+            if committee.get("committee_id") == committee_id
+        )
