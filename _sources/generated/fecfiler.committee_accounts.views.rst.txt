@@ -12,6 +12,13 @@ fecfiler.committee\_accounts.views
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      register_committee
+   
    
 
    

@@ -37,6 +37,7 @@ fecfiler
    fecfiler.contacts
    fecfiler.dcf_importer
    fecfiler.memo_text
+   fecfiler.mock_openfec
    fecfiler.openfec
    fecfiler.reports
    fecfiler.s3

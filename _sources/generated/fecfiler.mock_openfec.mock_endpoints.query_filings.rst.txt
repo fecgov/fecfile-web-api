@@ -1,0 +1,6 @@
+fecfiler.mock\_openfec.mock\_endpoints.query\_filings
+=====================================================
+
+.. currentmodule:: fecfiler.mock_openfec.mock_endpoints
+
+.. autofunction:: query_filings

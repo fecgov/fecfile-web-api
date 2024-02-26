@@ -25,11 +25,9 @@ fecfiler.openfec.views.OpenfecViewSet
       ~OpenfecViewSet.check_permissions
       ~OpenfecViewSet.check_throttles
       ~OpenfecViewSet.committee
-      ~OpenfecViewSet.create
-      ~OpenfecViewSet.destroy
       ~OpenfecViewSet.determine_version
       ~OpenfecViewSet.dispatch
-      ~OpenfecViewSet.filings
+      ~OpenfecViewSet.f1_filing
       ~OpenfecViewSet.filter_queryset
       ~OpenfecViewSet.finalize_response
       ~OpenfecViewSet.get_authenticate_header
@@ -51,7 +49,6 @@ fecfiler.openfec.views.OpenfecViewSet
       ~OpenfecViewSet.get_serializer
       ~OpenfecViewSet.get_serializer_class
       ~OpenfecViewSet.get_serializer_context
-      ~OpenfecViewSet.get_success_headers
       ~OpenfecViewSet.get_throttles
       ~OpenfecViewSet.get_view_description
       ~OpenfecViewSet.get_view_name
@@ -59,22 +56,16 @@ fecfiler.openfec.views.OpenfecViewSet
       ~OpenfecViewSet.http_method_not_allowed
       ~OpenfecViewSet.initial
       ~OpenfecViewSet.initialize_request
-      ~OpenfecViewSet.list
       ~OpenfecViewSet.options
       ~OpenfecViewSet.paginate_queryset
-      ~OpenfecViewSet.partial_update
       ~OpenfecViewSet.perform_authentication
       ~OpenfecViewSet.perform_content_negotiation
-      ~OpenfecViewSet.perform_create
-      ~OpenfecViewSet.perform_destroy
-      ~OpenfecViewSet.perform_update
       ~OpenfecViewSet.permission_denied
+      ~OpenfecViewSet.query_filings
       ~OpenfecViewSet.raise_uncaught_exception
-      ~OpenfecViewSet.retrieve
       ~OpenfecViewSet.reverse_action
       ~OpenfecViewSet.setup
       ~OpenfecViewSet.throttled
-      ~OpenfecViewSet.update
    
    
 

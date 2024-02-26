@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fecfiler.reports" href="fecfiler.reports.html" />
-    <link rel="prev" title="fecfiler.openfec.views.get_test_efo_mock_committee_accounts" href="fecfiler.openfec.views.get_test_efo_mock_committee_accounts.html" />
+    <link rel="prev" title="fecfiler.openfec.views.retrieve_recent_f1" href="fecfiler.openfec.views.retrieve_recent_f1.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.openfec.views.OpenfecViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.openfec.views.</span></span><span class="sig-name descname"><span class="pre">OpenfecViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.openfec.views.OpenfecViewSet" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.openfec.views.OpenfecViewSet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.openfec.views.OpenfecViewSet.__init__" title="Link to this definition">¶</a></dt>
@@ -66,19 +66,13 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">committee</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.determine_version" title="fecfiler.openfec.views.OpenfecViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.dispatch" title="fecfiler.openfec.views.OpenfecViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filings</span></code>(request[, pk])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">f1_filing</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.filter_queryset" title="fecfiler.openfec.views.OpenfecViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
@@ -144,32 +138,26 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_serializer_context" title="fecfiler.openfec.views.OpenfecViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
 <td><p>Extra context provided to the serializer class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_throttles" title="fecfiler.openfec.views.OpenfecViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_throttles" title="fecfiler.openfec.views.OpenfecViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_view_description" title="fecfiler.openfec.views.OpenfecViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_view_description" title="fecfiler.openfec.views.OpenfecViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
 <td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_view_name" title="fecfiler.openfec.views.OpenfecViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.get_view_name" title="fecfiler.openfec.views.OpenfecViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
 <td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.handle_exception" title="fecfiler.openfec.views.OpenfecViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.handle_exception" title="fecfiler.openfec.views.OpenfecViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
 <td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.http_method_not_allowed" title="fecfiler.openfec.views.OpenfecViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.http_method_not_allowed" title="fecfiler.openfec.views.OpenfecViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.initial" title="fecfiler.openfec.views.OpenfecViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.initial" title="fecfiler.openfec.views.OpenfecViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.initialize_request" title="fecfiler.openfec.views.OpenfecViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.initialize_request" title="fecfiler.openfec.views.OpenfecViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.options" title="fecfiler.openfec.views.OpenfecViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
@@ -177,31 +165,19 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.paginate_queryset" title="fecfiler.openfec.views.OpenfecViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
 <td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.perform_authentication" title="fecfiler.openfec.views.OpenfecViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.perform_authentication" title="fecfiler.openfec.views.OpenfecViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
 <td><p>Perform authentication on the incoming request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.perform_content_negotiation" title="fecfiler.openfec.views.OpenfecViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.perform_content_negotiation" title="fecfiler.openfec.views.OpenfecViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
 <td><p>Determine which renderer and media type to use render the response.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_create</span></code>(serializer)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_destroy</span></code>(instance)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_update</span></code>(serializer)</p></td>
-<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.permission_denied" title="fecfiler.openfec.views.OpenfecViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
 <td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_filings</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.reverse_action" title="fecfiler.openfec.views.OpenfecViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
@@ -212,9 +188,6 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.throttled" title="fecfiler.openfec.views.OpenfecViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -637,14 +610,15 @@ will instead be performed lazily, the first time either
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.openfec.apps.html">fecfiler.openfec.apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.openfec.test_views.html">fecfiler.openfec.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.openfec.urls.html">fecfiler.openfec.urls</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.openfec.views.html">fecfiler.openfec.views</a><ul class="current">
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.openfec.views.get_recent_f1_from_openfec_resp.html">fecfiler.openfec.views.get_recent_f1_from_openfec_resp</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.openfec.views.get_test_efo_mock_committee_account.html">fecfiler.openfec.views.get_test_efo_mock_committee_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.openfec.views.get_test_efo_mock_committee_accounts.html">fecfiler.openfec.views.get_test_efo_mock_committee_accounts</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.openfec.views.retrieve_recent_f1.html">fecfiler.openfec.views.retrieve_recent_f1</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.openfec.views.OpenfecViewSet</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet"><code class="docutils literal notranslate"><span class="pre">OpenfecViewSet</span></code></a><ul>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.openfec.views.OpenfecViewSet.__init__"><code class="docutils literal notranslate"><span class="pre">OpenfecViewSet.__init__()</span></code></a></li>
@@ -727,7 +701,7 @@ will instead be performed lazily, the first time either
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.openfec.html">fecfiler.openfec</a><ul>
   <li><a href="fecfiler.openfec.views.html">fecfiler.openfec.views</a><ul>
-      <li>Previous: <a href="fecfiler.openfec.views.get_test_efo_mock_committee_accounts.html" title="previous chapter">fecfiler.openfec.views.get_test_efo_mock_committee_accounts</a></li>
+      <li>Previous: <a href="fecfiler.openfec.views.retrieve_recent_f1.html" title="previous chapter">fecfiler.openfec.views.retrieve_recent_f1</a></li>
       <li>Next: <a href="fecfiler.reports.html" title="next chapter">fecfiler.reports</a></li>
   </ul></li>
   </ul></li>
