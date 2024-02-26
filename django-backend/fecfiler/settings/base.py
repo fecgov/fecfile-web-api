@@ -379,3 +379,5 @@ FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
 if MOCK_OPENFEC == "redis":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
+else:
+    MOCK_OPENFEC_REDIS_URL = None
