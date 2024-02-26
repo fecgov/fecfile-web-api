@@ -160,10 +160,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
     @action(detail=True, methods=["delete"],
             url_path="remove-member", url_name="remove_member")
     def remove_member(self, request, pk):
-        committee_uuid = request.session["committee_uuid"]
-        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
-        member = committee.members.filter(id=pk).first()
-        if member is None:
-            return HttpResponse("No member found", 500)
+        member = self.get_object()
         member.delete()
         return HttpResponse('Member removed')
