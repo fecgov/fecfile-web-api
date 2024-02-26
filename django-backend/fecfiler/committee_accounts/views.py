@@ -36,14 +36,6 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee = self.get_queryset().filter(id=committee_uuid).first()
         return Response(self.get_serializer(committee).data)
 
-    @action(detail=True, methods=["delete"])
-    def remove_member(self, request, committee_id, member_email):
-        committee_uuid = request.session["committee_uuid"]
-        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
-        member = committee.members.filter(email=member_email).first()
-        member.delete()
-        return HttpResponse('Member removed')
-
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
 
@@ -164,3 +156,14 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
         logger.info(f'Added {member_type} "{email}" to committee {committee}')
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
+
+    @action(detail=True, methods=["delete"],
+            url_path="remove-member", url_name="remove_member")
+    def remove_member(self, request, pk):
+        committee_uuid = request.session["committee_uuid"]
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        member = committee.members.filter(id=pk).first()
+        if member is None:
+            return HttpResponse("No member found", 500)
+        member.delete()
+        return HttpResponse('Member removed')

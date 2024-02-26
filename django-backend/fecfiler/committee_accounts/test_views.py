@@ -1,9 +1,9 @@
 from fecfiler.user.models import User
 from django.test import RequestFactory, TestCase
-from .views import CommitteeViewSet
+from .views import CommitteeMembershipViewSet
 
 
-class CommitteeViewSetTest(TestCase):
+class CommitteeMemberViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
@@ -12,11 +12,12 @@ class CommitteeViewSetTest(TestCase):
 
     def test_remove_member(self):
         request = self.factory.get(
-            "/api/v1/committees/C87654321/member/test@fec.gov")
+            "/api/v1/committee-members/12345678-aaaa-bbbb-cccc-111122223333/remove-member"
+        )
         request.user = self.user
         request.session = {
             "committee_uuid": "11111111-2222-3333-4444-555555555555"}
         request.method = "DELETE"
-        response = CommitteeViewSet.remove_member(
-            self, request, "C01234567", "test@fec.gov")
+        response = CommitteeMembershipViewSet.remove_member(
+            self, request, "12345678-aaaa-bbbb-cccc-111122223333")
         self.assertEqual(response.status_code, 200)
