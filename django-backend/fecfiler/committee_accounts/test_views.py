@@ -1,11 +1,13 @@
 from django.test import TestCase
 from fecfiler.committee_accounts.views import register_committee
 from fecfiler.user.models import User
+from django.core.management import call_command
 
 
 class CommitteeAccountsViewsTest(TestCase):
 
     def setUp(self):
+        call_command("load_committee_data")
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
         self.other_user = User.objects.create(email="test@fec.com", username="com")
 
