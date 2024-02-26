@@ -20,7 +20,7 @@ class CommitteeMembershipSerializer(serializers.Serializer):
 
         if instance.user is not None:
             representation.update({
-                'id': instance.user.id,
+                'id': instance.id,
                 'email': instance.user.email,
                 'username': instance.user.username,
                 'name': f"{instance.user.last_name}, {instance.user.first_name}",

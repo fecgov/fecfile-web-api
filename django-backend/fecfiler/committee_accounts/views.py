@@ -9,6 +9,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
+from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -49,8 +50,7 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
             raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id
-        )
+            committee_id=committee.committee_id, committee_uuid=committee.id)
         return queryset.filter(committee_account_id=committee.id)
 
 
@@ -156,3 +156,10 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
         logger.info(f'Added {member_type} "{email}" to committee {committee}')
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
+
+    @action(detail=True, methods=["delete"],
+            url_path="remove-member", url_name="remove_member")
+    def remove_member(self, request, pk):
+        member = self.get_object()
+        member.delete()
+        return HttpResponse('Member removed')
