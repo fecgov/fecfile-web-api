@@ -25,3 +25,4 @@ applications:
       LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/login-redirect
       LOGOUT_REDIRECT_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/logout-redirect
       LOG_FORMAT: KEY_VALUE
+      MOCK_OPENFEC: REDIS

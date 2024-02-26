@@ -4,13 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.mock_openfec.mock_endpoints import query_filings
 import requests
-from fecfiler.settings import (
-    FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE,
-    FEC_API_KEY,
-    MOCK_OPENFEC_REDIS_URL,
-    BASE_DIR,
-    FEC_API,
-)
+import fecfiler.settings as settings
 
 import os
 import json
@@ -23,8 +17,12 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=True)
     def committee(self, request, pk=None):
         cids_to_override = (
-            list(map(str.strip, FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE.split(",")))
-            if FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE
+            list(
+                map(
+                    str.strip, settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE.split(",")
+                )
+            )
+            if settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE
             else []
         )
         cid_to_override = next((cid for cid in cids_to_override if cid == pk), None)
@@ -54,7 +52,9 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 )
                 return HttpResponseServerError()
         else:
-            resp = requests.get(f"{FEC_API}committee/{pk}/?api_key={FEC_API_KEY}")
+            resp = requests.get(
+                f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
+            )
             return HttpResponse(resp)
 
     @action(detail=True)
@@ -65,17 +65,17 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     def query_filings(self, request):
         query = request.query_params.get("query")
         form_type = request.query_params.get("form_type")
-        if MOCK_OPENFEC_REDIS_URL:
+        if settings.MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
         else:
             params = {
-                "api_key": FEC_API_KEY,
+                "api_key": settings.FEC_API_KEY,
                 "q_filer": query,
                 "sort": "-receipt_date",
                 "form_type": form_type,
                 "most_recent": True,
             }
-            fec_response = requests.get(f"{FEC_API}filings/", params)
+            fec_response = requests.get(f"{settings.FEC_API}filings/", params)
             response = fec_response.json()
         return Response(response)
 
@@ -88,12 +88,12 @@ def retrieve_recent_f1(committee_id):
     The nightly endpoint keeps a longer history"""
     headers = {"Content-Type": "application/json"}
     params = {
-        "api_key": FEC_API_KEY,
+        "api_key": settings.FEC_API_KEY,
         "committee_id": committee_id,
         "sort": "-receipt_date",
         "form_type": "F1",
     }
-    endpoints = [f"{FEC_API}efile/filings/", f"{FEC_API}filings/"]
+    endpoints = [f"{settings.FEC_API}efile/filings/", f"{settings.FEC_API}filings/"]
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
         results = response["results"]
@@ -116,7 +116,7 @@ def get_test_efo_mock_committee_account(committee_id):
 def get_test_efo_mock_committee_accounts():
     mock_committee_accounts_file = "committee_accounts.json"
     mock_committee_accounts_file_path = os.path.join(
-        BASE_DIR, "openfec/test_efo_mock_data/", mock_committee_accounts_file
+        settings.BASE_DIR, "openfec/test_efo_mock_data/", mock_committee_accounts_file
     )
     with open(mock_committee_accounts_file_path) as fp:
         return json.load(fp)

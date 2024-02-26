@@ -24,9 +24,9 @@ class OpenfecViewSetTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_get_committee_override_data_not_found(self):
-        with patch("fecfiler.openfec.views.base") as base:
-            base.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C12345678"
-            base.BASE_DIR = "fecfiler/"
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C12345678"
+            settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
             response = OpenfecViewSet.as_view({"get": "committee"})(
@@ -35,9 +35,9 @@ class OpenfecViewSetTest(TestCase):
             self.assertEqual(response.status_code, 500)
 
     def test_get_committee_override_happy_path(self):
-        with patch("fecfiler.openfec.views.base") as base:
-            base.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C00100230"
-            base.BASE_DIR = "fecfiler/"
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C00100230"
+            settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C00100230/committee/")
             request.user = self.user
             response = OpenfecViewSet.as_view({"get": "committee"})(
@@ -59,7 +59,7 @@ class OpenfecViewSetTest(TestCase):
         with patch("fecfiler.openfec.views.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = None
+            mock_response.json.return_value = {"results": []}
             response = OpenfecViewSet.as_view({"get": "f1_filing"})(
                 request, pk="C00100230"
             )
