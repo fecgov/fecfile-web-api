@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = "Load mock committee data into redis"
 
     def add_arguments(self, parser):
-        parser.add_argument("--s3")
+        parser.add_argument("--s3", action="store_true")
 
     def handle(self, *args, **options):
         if MOCK_OPENFEC_REDIS_URL:

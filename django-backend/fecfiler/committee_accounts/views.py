@@ -48,7 +48,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             raise Exception("no committee_id provided")
         account = register_committee(committee_id, request.user)
 
-        return Response(account)
+        return Response(CommitteeAccountSerializer(account).data)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
@@ -63,7 +63,8 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
             raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id)
+            committee_id=committee.committee_id, committee_uuid=committee.id
+        )
         return queryset.filter(committee_account_id=committee.id)
 
 
@@ -167,12 +168,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
-    @action(detail=True, methods=["delete"],
-        url_path="remove-member", url_name="remove_member")
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="remove-member",
+        url_name="remove_member",
+    )
     def remove_member(self, request, pk):
         member = self.get_object()
         member.delete()
-        return HttpResponse('Member removed')
+        return HttpResponse("Member removed")
 
 
 def register_committee(committee_id, user):
