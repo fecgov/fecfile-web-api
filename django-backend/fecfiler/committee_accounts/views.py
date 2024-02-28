@@ -1,3 +1,4 @@
+from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
@@ -166,13 +167,9 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
-    @action(
-        detail=True,
-        methods=["delete"],
-        url_path="remove-member",
-        url_name="remove_member",
-    )
-    def remove_member(self, request, pk):
+    @action(detail=True, methods=["delete"],
+            url_path="remove-member", url_name="remove_member")
+    def remove_member(self, request, pk: UUID):
         member = self.get_object()
         member.delete()
         return HttpResponse("Member removed")
