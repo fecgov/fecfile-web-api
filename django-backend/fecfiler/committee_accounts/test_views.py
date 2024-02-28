@@ -1,5 +1,6 @@
 from uuid import UUID
 from django.test import RequestFactory, TestCase
+from fecfiler.committee_accounts.models import Membership
 from fecfiler.committee_accounts.views import register_committee, \
     CommitteeMembershipViewSet
 from fecfiler.user.models import User
@@ -36,7 +37,7 @@ class CommitteeAccountsViewsTest(TestCase):
 
 
 class CommitteeMemberViewSetTest(TestCase):
-    fixtures = ["C01234567_user_and_committee"]
+    fixtures = ["C01234567_user_and_committee", "unaffiliated_users"]
 
     def setUp(self):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
@@ -58,3 +59,93 @@ class CommitteeMemberViewSetTest(TestCase):
         response = view.remove_member(
             request, membership_uuid)
         self.assertEqual(response.status_code, 200)
+
+    def test_add_pending_membership(self):
+        view = CommitteeMembershipViewSet()
+        request = self.factory.get("/api/v1/committee-members/add-member")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": UUID('11111111-2222-3333-4444-555555555555')
+        }
+        request.method = "POST"
+        request.data = {
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            "email": "this_email_doesnt_match_any_preexisting_user@test.com"
+        }
+        view.request = request
+        response = view.add_member(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data['email'],
+            'this_email_doesnt_match_any_preexisting_user@test.com'
+        )
+        self.assertEqual(response.data['is_active'], False)
+
+    def test_add_membership_for_preexisting_user(self):
+        # This test covers a bug found by QA where adding a membership
+        # for a pre-existing user was triggering a 500 server error
+
+        view = CommitteeMembershipViewSet()
+        request = self.factory.get("/api/v1/committee-members/add-member")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": UUID('11111111-2222-3333-4444-555555555555')
+        }
+        request.method = "POST"
+        request.data = {
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            "email": 'test_user_0001@fec.gov'
+        }
+        view.request = request
+        response = view.add_member(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['email'], 'test_user_0001@fec.gov')
+        self.assertEqual(response.data['is_active'], True)
+
+    def test_add_membership_requires_correct_parameters(self):
+        view = CommitteeMembershipViewSet()
+        request = self.factory.get("/api/v1/committee-members/add-member")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": UUID('11111111-2222-3333-4444-555555555555')
+        }
+        request.method = "POST"
+
+        request.data = {
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        }
+        view.request = request
+        response = view.add_member(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'Missing fields: email')
+
+        request.data = {
+            "email": "an_email@fec.gov"
+        }
+        view.request = request
+        response = view.add_member(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'Missing fields: role')
+
+        request.data = {
+            "email": "an_email@fec.gov",
+            "role": "A Random String"
+        }
+        view.request = request
+        response = view.add_member(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'Invalid role')
+
+        request.data = {
+            "email": "test@fec.gov",
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+        }
+        view.request = request
+        response = view.add_member(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data,
+            "This email is taken by an existing membership to this committee"
+        )

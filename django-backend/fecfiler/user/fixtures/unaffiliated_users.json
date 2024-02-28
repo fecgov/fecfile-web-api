@@ -1,0 +1,34 @@
+[
+    {
+        "model": "user.user",
+        "pk": "abcdef12-aaaa-bbbb-cccc-000000000001",
+        "fields": {
+            "password": "pbkdf2_sha256$this0is0a0fake0password0it0doesnt0match0anything0at0all0it0just0needs0big=",
+            "is_superuser": false,
+            "email": "test_user_0001@fec.gov",
+            "username": "test_user_0001@fec.gov",
+            "first_name": "First",
+            "last_name": "Last",
+            "last_login": "2022-05-02T13:44:07.324Z",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-09-28T15:22:56.477Z"
+        }
+    },
+    {
+        "model": "user.user",
+        "pk": "abcdef12-aaaa-bbbb-cccc-000000000002",
+        "fields": {
+            "password": "pbkdf2_sha256$this0is0a0fake0password0it0doesnt0match0anything0at0all0it0just0needs0big=",
+            "is_superuser": false,
+            "email": "test_user_0002@fec.gov",
+            "username": "test_user_0002fec.gov",
+            "first_name": "First",
+            "last_name": "Last",
+            "last_login": "2022-05-02T13:44:07.324Z",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-09-28T15:22:56.477Z"
+        }
+    }
+]
