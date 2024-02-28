@@ -154,9 +154,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         membership_args = (
             {"committee_account": committee, "role": role, "user": user}
-            | {"pending_email": email}
-            if user is None
-            else {}
+            | ({"pending_email": email} if user is None else {})
         )  # Add pending email to args only if there is no user
 
         new_member = Membership(**membership_args)
