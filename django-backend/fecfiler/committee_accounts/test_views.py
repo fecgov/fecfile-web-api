@@ -134,3 +134,12 @@ class CommitteeMemberViewSetTest(TestCase):
         response = view.add_member(request)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, 'Invalid role')
+
+        request.data = {
+            "email": "test@fec.gov",
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+        }
+        view.request = request
+        response = view.add_member(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, "This email is taken by an existing membership to this committee")
