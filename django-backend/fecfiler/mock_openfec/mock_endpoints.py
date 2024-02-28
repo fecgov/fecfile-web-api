@@ -10,7 +10,7 @@ if MOCK_OPENFEC_REDIS_URL:
 def query_filings(query, form_type):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
-        committees = json.loads(committee_data) or []
+        committees = json.loads(committee_data or "[]")
         filtered_committee_data = [
             committee
             for committee in committees
