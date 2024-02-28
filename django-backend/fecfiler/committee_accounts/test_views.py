@@ -83,6 +83,9 @@ class CommitteeMemberViewSetTest(TestCase):
         self.assertEqual(response.data['is_active'], False)
 
     def test_add_membership_for_preexisting_user(self):
+        # This test covers a bug found by QA where adding a membership
+        # for a pre-existing user was triggering a 500 server error
+
         view = CommitteeMembershipViewSet()
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
