@@ -113,6 +113,9 @@ fecfiler.committee\_accounts.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.subTest
       ~CommitteeMemberViewSetTest.tearDown
       ~CommitteeMemberViewSetTest.tearDownClass
+      ~CommitteeMemberViewSetTest.test_add_membership_for_preexisting_user
+      ~CommitteeMemberViewSetTest.test_add_membership_requires_correct_parameters
+      ~CommitteeMemberViewSetTest.test_add_pending_membership
       ~CommitteeMemberViewSetTest.test_remove_member
    
    
