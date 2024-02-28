@@ -113,7 +113,7 @@ fecfiler.committee\_accounts.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.subTest
       ~CommitteeMemberViewSetTest.tearDown
       ~CommitteeMemberViewSetTest.tearDownClass
-      ~CommitteeMemberViewSetTest.ztest_remove_member
+      ~CommitteeMemberViewSetTest.test_remove_member
    
    
 
