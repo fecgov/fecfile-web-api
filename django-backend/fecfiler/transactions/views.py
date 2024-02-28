@@ -20,7 +20,6 @@ from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
 import structlog
-
 logger = structlog.get_logger(__name__)
 
 
@@ -204,13 +203,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
-        transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
+        transaction_data["reatt_redes"] = transaction_data.get(
+            "reatt_redes_id", None)
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
         is_existing = "id" in transaction_data
         if is_existing:
-            transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
+            transaction_instance = Transaction.objects.get(
+                pk=transaction_data["id"])
             transaction_serializer = TransactionSerializer(
                 transaction_instance,
                 data=transaction_data,
@@ -229,7 +230,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         contact_instances = {
             contact_key: create_or_update_contact(transaction_data, contact_key,
-                request.session["committee_uuid"])
+                                                  request.session["committee_uuid"])
             for contact_key in ['contact_1', 'contact_2', 'contact_3']
             if contact_key in transaction_data
         }
@@ -270,9 +271,11 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     @action(detail=False, methods=["put"], url_path=r"multisave")
     def save_transactions(self, request):
         with db_transaction.atomic():
-            saved_data = [self.save_transaction(data, request) for data in request.data]
+            saved_data = [self.save_transaction(
+                data, request) for data in request.data]
         return Response(
-            [TransactionSerializer().to_representation(data) for data in saved_data]
+            [TransactionSerializer().to_representation(data)
+             for data in saved_data]
         )
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -292,7 +295,8 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
         return Response(
-            [TransactionSerializer().to_representation(data) for data in saved_data]
+            [TransactionSerializer().to_representation(data)
+             for data in saved_data]
         )
 
 
