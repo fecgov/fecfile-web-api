@@ -27,3 +27,6 @@ git+https://github.com/fecgov/mozilla-django-oidc.git@main#egg=mozilla_django_oi
 zeep==4.2.1
 django-structlog[celery]==7.1.0
 rich==13.7.0
+certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
+jinja2>=3.1.3 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.31.0 # not directly required, pinned by Snyk to avoid a vulnerability
