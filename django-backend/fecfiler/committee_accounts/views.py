@@ -49,7 +49,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             raise Exception("no committee_id provided")
         account = register_committee(committee_id, request.user)
 
-        return Response(account)
+        return Response(CommitteeAccountSerializer(account).data)
 
 
 class CommitteeOwnedViewSet(viewsets.ModelViewSet):
@@ -64,7 +64,8 @@ class CommitteeOwnedViewSet(viewsets.ModelViewSet):
             raise SuspiciousSession("session has invalid committee_uuid")
         queryset = super().get_queryset()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id)
+            committee_id=committee.committee_id, committee_uuid=committee.id
+        )
         return queryset.filter(committee_account_id=committee.id)
 
 
@@ -155,9 +156,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         membership_args = (
             {"committee_account": committee, "role": role, "user": user}
-            | {"pending_email": email}
-            if user is None
-            else {}
+            | ({"pending_email": email} if user is None else {})
         )  # Add pending email to args only if there is no user
 
         new_member = Membership(**membership_args)
@@ -173,7 +172,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
     def remove_member(self, request, pk: UUID):
         member = self.get_object()
         member.delete()
-        return HttpResponse('Member removed')
+        return HttpResponse("Member removed")
 
 
 def register_committee(committee_id, user):

@@ -14,8 +14,8 @@ def query_filings(query, form_type):
         filtered_committee_data = [
             committee
             for committee in committees
-            if query in committee.get("committee_id")
-            or query in committee.get("committee_name")
+            if query.upper() in committee.get("committee_id").upper()
+            or query.upper() in committee.get("committee_name").upper()
         ]
         return {  # same as api.open.fec.gov
             "api_version": "1.0",
