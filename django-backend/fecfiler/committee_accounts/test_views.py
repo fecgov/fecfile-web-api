@@ -110,7 +110,6 @@ class CommitteeMemberViewSetTest(TestCase):
         }
         request.method = "POST"
 
-
         request.data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         }
