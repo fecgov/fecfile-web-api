@@ -5,9 +5,6 @@ from fecfiler.committee_accounts.views import register_committee, \
     CommitteeMembershipViewSet
 from fecfiler.user.models import User
 from django.core.management import call_command
-import structlog
-
-logger = structlog.get_logger(__name__)
 
 
 class CommitteeAccountsViewsTest(TestCase):
