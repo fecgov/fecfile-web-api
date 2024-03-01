@@ -1,3 +1,4 @@
+from uuid import UUID
 import structlog
 
 import re
@@ -18,16 +19,18 @@ from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
-
+from fecfiler.transactions.models import Transaction
 from .models import Contact
 from .serializers import ContactSerializer
+from fecfiler.transactions.serializers import TransactionSerializer
 
 logger = structlog.get_logger(__name__)
 
 default_max_fec_results = 10
 default_max_fecfile_results = 10
 max_allowed_results = 100
-NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharField())
+NAME_CLAUSE = Concat("first_name", Value(
+    " "), "last_name", output_field=CharField())
 NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )
@@ -263,6 +266,16 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .first()
         )
         return Response(match.id if match else "")
+
+    @action(detail=True, url_path="transactions")
+    def get_contact_transactions(self, request, pk: UUID):
+        transactions = Transaction.objects.filter(
+            Q(contact_1=pk) | Q(contact_2=pk) | Q(contact_3=pk))
+        responses = []
+        serializer = TransactionSerializer()
+        for t in transactions:
+            responses.append(serializer.to_representation(t))
+        return Response(responses)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
