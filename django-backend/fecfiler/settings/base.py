@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "fecfiler.web_services",
     "fecfiler.openfec",
     "fecfiler.user",
+    "fecfiler.mock_openfec",
 ]
 
 MIDDLEWARE = [
@@ -377,3 +378,10 @@ FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 
 SILKY_PYTHON_PROFILER = True
+
+"""MOCK OPENFEC settings"""
+MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
+if MOCK_OPENFEC == "REDIS":
+    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
+else:
+    MOCK_OPENFEC_REDIS_URL = None

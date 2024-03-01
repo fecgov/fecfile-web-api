@@ -15,7 +15,10 @@ from .models import Contact
 logger = structlog.get_logger(__name__)
 
 
-def create_or_update_contact(validated_data: dict, contact_key):
+def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
+
+    if not user_committee_id:
+        raise Exception('Tried to save contact without user_committee_id')
 
     contact_data = validated_data.pop(contact_key, None)
     contact_id = validated_data.get(contact_key + "_id", None)
@@ -23,6 +26,9 @@ def create_or_update_contact(validated_data: dict, contact_key):
 
     if contact_data:
         contact_data = get_model_data(contact_data, Contact)
+        contact_data["committee_account_id"] = user_committee_id
+        contact_data.pop("committee_account", None)
+
         if contact_id:
             Contact.objects.filter(id=contact_id).update(**contact_data)
             contact = Contact.objects.get(id=contact_id)
@@ -46,6 +52,9 @@ class ContactSerializer(
 
     # Contains the number of transactions linked to the contact
     transaction_count = IntegerField(required=False)
+
+    # Contains the number of reports directly linked to the contact (e.g. F1M)
+    report_count = IntegerField(required=False)
 
     def get_schema_name(self, data):
         return f"Contact_{self.contact_value[data.get('type', None)]}"
@@ -85,17 +94,21 @@ class ContactSerializer(
             ]
         ]
         fields.append("transaction_count")
+        fields.append("report_count")
         read_only_fields = [
             "uuid",
             "deleted",
             "created",
             "updated",
             "transaction_count",
+            "report_count",
         ]
 
     def to_internal_value(self, data):
-        # Remove the transaction_count because it is an annotated field
+        # Remove the transaction_count and report_count because they are annotated fields
         # delivered to the front end.
         if "transaction_count" in data:
             del data["transaction_count"]
+        if "report_count" in data:
+            del data["report_count"]
         return super().to_internal_value(data)

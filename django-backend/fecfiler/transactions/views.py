@@ -229,7 +229,9 @@ class TransactionViewSet(
             )
 
         contact_instances = {
-            contact_key: create_or_update_contact(transaction_data, contact_key)
+            contact_key: create_or_update_contact(
+                transaction_data, contact_key, request.session["committee_uuid"]
+            )
             for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
         }
@@ -253,14 +255,14 @@ class TransactionViewSet(
                 child_transaction.parent_transaction_id = transaction_instance.id
                 child_transaction.save()
             else:
-                child_transaction_data[
-                    "parent_transaction_id"
-                ] = transaction_instance.id
+                child_transaction_data["parent_transaction_id"] = (
+                    transaction_instance.id
+                )
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
-                    child_transaction_data[
-                        "contact_1_id"
-                    ] = transaction_instance.contact_1_id
+                    child_transaction_data["contact_1_id"] = (
+                        transaction_instance.contact_1_id
+                    )
                     del child_transaction_data["contact_1"]
 
                 self.save_transaction(child_transaction_data, request)
