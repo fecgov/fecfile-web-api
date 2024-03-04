@@ -1,6 +1,9 @@
 from django.http import HttpResponseServerError
 from fecfiler.authentication.views import delete_user_logged_in_cookies
 from rest_framework.views import exception_handler
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def custom_exception_handler(exc, context):
@@ -22,7 +25,7 @@ def custom_exception_handler(exc, context):
     # Do not allow an error response body unless validation
     data = getattr(response, 'data')
     exception_type = type(exc)
-    print(data)
+    logger.error("Error: {}".format(data))
     if data and "ValidationError" not in str(exception_type):
         response.data = None
 
