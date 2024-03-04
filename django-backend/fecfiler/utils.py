@@ -19,7 +19,7 @@ def custom_exception_handler(exc, context):
     # to the login page due to the 403, any cookies
     # (such as indicating committee id) are removed to
     # allow for a clean new login.
-    if response is not None and response.status_code == 403:
+    if response.status_code == 403:
         delete_user_logged_in_cookies(response)
 
     # Do not allow an error response body unless validation
