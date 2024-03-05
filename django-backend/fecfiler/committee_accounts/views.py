@@ -70,13 +70,13 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
 
     def get_committee(self):
         committee_uuid = self.request.session["committee_uuid"]
-        return CommitteeAccount.objects.filter(id=committee_uuid).first()
+        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
         if not committee:
             raise SuspiciousSession("session has invalid committee_uuid")
         return committee
 
 
-class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModdelViewSet):
+class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["name", "email", "role", "is_active", "created"]

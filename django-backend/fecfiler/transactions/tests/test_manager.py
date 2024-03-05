@@ -1,6 +1,12 @@
 from django.test import TestCase
+from django.db.models import QuerySet
 
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, Schedule
+from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.transactions.managers import TransactionManager
+from fecfiler.transactions.tests.utils import create_test_transaction
 import uuid
 from decimal import Decimal
 
@@ -64,3 +70,23 @@ class TransactionManagerTestCase(TestCase):
 
     # def test_fast(self):
     #     Transaction.objects.get_owned_data()
+
+    def test_transaction_view(self):
+        committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        contact_1 = Contact.objects.create(committee_account_id=committee.id)
+        transaction_data = [
+            {"contribution_date": "2023-01-01", "contribution_amount": "123.45"},
+            {"contribution_date": "2024-01-01", "contribution_amount": "100.00"},
+            {"contribution_date": "2024-01-01", "contribution_amount": "200.00"},
+        ]
+        transactions = [
+            create_test_transaction(
+                "INDIVIDUAL_RECEIPT", ScheduleA, committee, contact_1, data=transaction
+            )
+            for transaction in transaction_data
+        ]
+
+        view: QuerySet = Transaction.objects.transaction_view()
+        view = view.filter(committee_account_id=committee.id)
+        self.assertEqual(view[0].aggregate, 123.45)
+        self.assertEqual(view[2].aggregate, 300)
