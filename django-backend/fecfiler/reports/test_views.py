@@ -49,6 +49,6 @@ class CommitteeMemberViewSetTest(TestCase):
         response = view.list(request)
         try:
             response.data['results']  # A non-paginated response will throw an error here
-            self.assertTrue(False)
-        except:
-            self.assertTrue(True)
+            self.assertTrue(response is None)
+        except TypeError:
+            self.assertTrue(response is not None)
