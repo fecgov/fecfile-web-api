@@ -2,7 +2,6 @@ from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.user.models import User
-from django.core.management import call_command
 
 
 class CommitteeMemberViewSetTest(TestCase):
