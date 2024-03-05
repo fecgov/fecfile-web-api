@@ -38,6 +38,7 @@ def compose_report(report_id, upload_submission_record_id):
 
 
 def compose_transactions(report_id):
+    report = Report.objects.get(id=report_id)
     transactions = Transaction.objects.filter(report_id=report_id)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
@@ -78,7 +79,7 @@ def compose_transactions(report_id):
                     root.calendar_ytd_per_election_office
                 )
 
-        return [t for t in transactions if t.itemized]
+        return [t for t in transactions if (t.itemized or report.form_24 is not None)]
     else:
         logger.info(f"no transactions found for report: {report_id}")
         return []
