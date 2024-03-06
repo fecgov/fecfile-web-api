@@ -1,6 +1,4 @@
-from uuid import UUID
 import structlog
-
 import re
 from urllib.parse import urlencode
 from django.db import transaction
@@ -19,10 +17,8 @@ from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
-from fecfiler.transactions.models import Transaction
 from .models import Contact
 from .serializers import ContactSerializer
-from fecfiler.transactions.serializers import TransactionSerializer
 
 logger = structlog.get_logger(__name__)
 
@@ -266,16 +262,6 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .first()
         )
         return Response(match.id if match else "")
-
-    @action(detail=True, url_path="transactions")
-    def get_contact_transactions(self, request, pk: UUID):
-        transactions = Transaction.objects.filter(
-            Q(contact_1=pk) | Q(contact_2=pk) | Q(contact_3=pk))
-        responses = []
-        serializer = TransactionSerializer()
-        for t in transactions:
-            responses.append(serializer.to_representation(t))
-        return Response(responses)
 
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
