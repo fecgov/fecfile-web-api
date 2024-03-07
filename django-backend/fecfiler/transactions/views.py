@@ -20,7 +20,6 @@ from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
 import structlog
-
 logger = structlog.get_logger(__name__)
 
 
