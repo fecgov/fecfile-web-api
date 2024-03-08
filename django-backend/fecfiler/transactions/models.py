@@ -1,7 +1,7 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.models import ReportMixin
+from fecfiler.reports.models import Report
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -17,7 +17,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -51,6 +51,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         blank=True,
         related_name="reatt_redes_associations",
     )
+    reports = models.ManyToManyField(
+        Report,
+        through="TransactionReport",
+        through_fields=["transaction", "report"]
+    )
 
     # The _form_type value in the db may or may not be correct based on whether
     # the transaction is itemized or not. For some transactions, the form_type
@@ -73,6 +78,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
+
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
 
@@ -158,6 +164,20 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
+
+
+class TransactionReport(CommitteeOwnedModel):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
 
 TABLE_TO_SCHEDULE = {

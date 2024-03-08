@@ -57,6 +57,7 @@ class TransactionSerializer(
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
 
     id = UUIDField(required=False)
+    report = ReportSerializer(read_only=True)
     report_id = UUIDField(required=True, allow_null=False)
 
     schedule_a = ScheduleASerializer(read_only=True)
@@ -73,8 +74,6 @@ class TransactionSerializer(
     contact_2 = ContactSerializer(read_only=True)
     contact_3_id = UUIDField(required=False, allow_null=True)
     contact_3 = ContactSerializer(read_only=True)
-
-    report = ReportSerializer(read_only=True)
 
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
@@ -302,3 +301,11 @@ class TransactionSerializer(
         )
         super().validate(data_to_validate)
         return data
+
+
+class TransactionReportSerializer(CommitteeOwnedSerializer):
+    id = UUIDField(required=False)
+    report = ReportSerializer(read_only=True)
+    report_id = UUIDField(required=True, allow_null=False)
+    transaction = TransactionSerializer(read_only=True)
+    transaction_id = UUIDField(required=True, allow_null=False)
