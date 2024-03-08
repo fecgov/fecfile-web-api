@@ -2,7 +2,7 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
-from django.core.exceptions import BadRequest
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
@@ -155,9 +155,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
         # Create new membership
         user = User.objects.filter(email=email).first()
 
-        membership_args = (
-            {"committee_account": committee, "role": role, "user": user}
-            | ({"pending_email": email} if user is None else {})
+        membership_args = {
+            "committee_account": committee,
+            "role": role,
+            "user": user,
+        } | (
+            {"pending_email": email} if user is None else {}
         )  # Add pending email to args only if there is no user
 
         new_member = Membership(**membership_args)
@@ -168,8 +171,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
-    @action(detail=True, methods=["delete"],
-            url_path="remove-member", url_name="remove_member")
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="remove-member",
+        url_name="remove_member",
+    )
     def remove_member(self, request, pk: UUID):
         member = self.get_object()
         member.delete()
@@ -198,7 +205,7 @@ def register_committee(committee_id, user):
         committee_id=committee_id
     ).first()
     if existing_account or f1_email != email:
-        raise BadRequest("could not register committee")
+        raise ValidationError("could not register committee")
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
         committee_account=account,
