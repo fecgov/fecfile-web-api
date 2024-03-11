@@ -1,7 +1,4 @@
-from fecfiler.user.views import UserViewSet
-
 from django.test import RequestFactory, TestCase
-from rest_framework.test import force_authenticate
 from rest_framework.test import APIClient
 
 from fecfiler.user.models import User
