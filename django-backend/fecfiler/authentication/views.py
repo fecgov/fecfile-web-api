@@ -1,7 +1,6 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.http import require_http_methods
-from urllib.parse import quote_plus
 from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
@@ -9,12 +8,6 @@ from rest_framework.decorators import (
 )
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
-    FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-    FFAPI_FIRST_NAME_COOKIE_NAME,
-    FFAPI_LAST_NAME_COOKIE_NAME,
-    FFAPI_EMAIL_COOKIE_NAME,
-    FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
-    FFAPI_COOKIE_DOMAIN,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
     OIDC_OP_LOGOUT_ENDPOINT,
@@ -60,7 +53,6 @@ def generate_username(uuid):
 def handle_valid_login(user):
     logger.debug("Successful login: {}".format(user))
     response = HttpResponse()
-    set_user_logged_in_cookies_for_user(response, user)
     return response
 
 
@@ -69,58 +61,15 @@ def handle_invalid_login(username):
     return HttpResponse('Unauthorized', status=401)
 
 
-def set_user_logged_in_cookies_for_user(response, user):
-    if user.first_name:
-        response.set_cookie(
-            FFAPI_FIRST_NAME_COOKIE_NAME,
-            quote_plus(user.first_name),
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-    if user.last_name:
-        response.set_cookie(
-            FFAPI_LAST_NAME_COOKIE_NAME,
-            quote_plus(user.last_name),
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-    if user.email:
-        response.set_cookie(
-            FFAPI_EMAIL_COOKIE_NAME,
-            quote_plus(user.email),
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-    response.set_cookie(
-        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    response.set_cookie(
-        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME,
-        user.security_consent_date,
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-
-
 def delete_user_logged_in_cookies(response):
-    response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_FIRST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(FFAPI_LAST_NAME_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie(
-        FFAPI_SECURITY_CONSENT_DATE_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN
-    )
-    response.delete_cookie(FFAPI_EMAIL_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
-    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("oidc_state")
+    response.delete_cookie("csrftoken")
 
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    set_user_logged_in_cookies_for_user(redirect, request.user)
     return redirect
 
 
