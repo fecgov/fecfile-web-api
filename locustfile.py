@@ -1,14 +1,22 @@
 """Load testing for the FECFile API and web app. Run from command directory using the
 
+*Run tests locally:*
+Environment variables:
+Ask team about what to set for
+`LOCAL_TEST_USER` and `LOCAL_TEST_PWD`
+
 `docker-compose --profile locust up -d`
 
 Go to http://0.0.0.0:8089/ to run tests.
 
 Recommended tests:
+5 users / 1 ramp-up rate
 100 users / 1 ramp-up rate
 500 users / 5 ramp-up rate
 
-*Run on other spaces:*
+Advanced settings: Run time 5m
+
+*Run tests on other spaces:*
 Log in to that environment, and get the session ID from the header and update the
 OIDC_SESSION_ID environment variable on your local machine
 
@@ -18,11 +26,7 @@ Modifying docker-compose:
 Scale up using docker:
 docker-compose --profile locust up -d --scale locust-follower=4
 
-Environment variables:
-Ask team about what to set for
-`LOCAL_TEST_USER` and `LOCAL_TEST_PWD`
-
-Get `OIDC_SESSION_ID` from an authenticated sesion
+Go to http://0.0.0.0:8089/ to run tests.
 
 """
 
@@ -86,17 +90,27 @@ class Tasks(TaskSet):
                 "user-agent": "Locust testing",
             }
         else:
-            response = self.client.post(
+            login_response = self.client.post(
                 "/api/v1/user/login/authenticate",
                 json={"username": TEST_USER, "password": TEST_PWD}
             )
-            csrftoken = response.cookies.get('csrftoken')
+            csrftoken = login_response.cookies.get('csrftoken')
             self.client.headers = {
                 "X-CSRFToken": csrftoken
             }
+            committees = self.fetch_ids("committees", "id")
+            committee_uuid = committees[0]
+            print("committee_uuid", committee_uuid)
+            activate_response = self.client.post(
+                f"/api/v1/committees/{committee_uuid}/activate/"
+            )
+            print("activate_response.status_code", activate_response.status_code)
             if len(self.fetch_ids("reports", "id")) < 10:
                 logging.info("Not enough reports, creating some")
                 self.create_report()
+            if len(self.fetch_ids("transactions", "id")) < 10:
+                logging.info("Not enough transactions, creating some")
+                self.create_transaction()
             self.create_contact()
 
         self.reports = self.fetch_ids("reports", "id")
@@ -165,7 +179,6 @@ class Tasks(TaskSet):
             timeout=timeout
         )
 
-    @task
     def create_transaction(self):
         contact_id = random.choice(self.contacts)
         fields_to_validate = [
