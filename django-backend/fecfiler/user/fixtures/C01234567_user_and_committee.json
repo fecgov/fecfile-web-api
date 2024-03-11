@@ -26,11 +26,14 @@
     },
     {
         "model": "committee_accounts.Membership",
-        "pk": "99",
+        "pk": "136a21f2-66fe-4d56-89e9-0d1d4612741c",
         "fields": {
             "role": "COMMITTEE_ADMINISTRATOR",
             "committee_account_id": "11111111-2222-3333-4444-555555555555",
-            "user_id": "12345678-aaaa-bbbb-cccc-111122223333"
+            "user_id": "12345678-aaaa-bbbb-cccc-111122223333",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
         }
     }
 ]

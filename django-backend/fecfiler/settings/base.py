@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "fecfiler.web_services",
     "fecfiler.openfec",
     "fecfiler.user",
+    "fecfiler.mock_openfec",
 ]
 
 MIDDLEWARE = [
@@ -235,8 +236,7 @@ def get_logging_config(log_format=LINE):
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.dev.ConsoleRenderer(
-                    colors=True,
-                    exception_formatter=structlog.dev.rich_traceback
+                    colors=True, exception_formatter=structlog.dev.rich_traceback
                 ),
             },
             "key_value": {
@@ -257,7 +257,7 @@ def get_logging_config(log_format=LINE):
                 "formatter": "key_value",
                 "stream": sys.stdout,
             },
-        }
+        },
     }
 
     if log_format == LINE:
@@ -374,3 +374,10 @@ FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = env.get_credential(
 )
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
+
+"""MOCK OPENFEC settings"""
+MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
+if MOCK_OPENFEC == "REDIS":
+    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
+else:
+    MOCK_OPENFEC_REDIS_URL = None

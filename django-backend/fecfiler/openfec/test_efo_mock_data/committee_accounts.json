@@ -87,7 +87,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title5",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100248",
@@ -177,7 +178,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title8",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100271",
@@ -237,7 +239,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title10",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "H"
     },
     {
         "committee_id": "C00100297",
@@ -357,7 +360,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title15",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100495",
@@ -447,7 +451,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title18",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100529",
@@ -477,7 +482,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title19",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "W"
     },
     {
         "committee_id": "C00100537",
@@ -507,7 +513,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title20",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Y"
     },
     {
         "committee_id": "C00100362",

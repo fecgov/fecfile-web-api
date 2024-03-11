@@ -58,6 +58,14 @@ class ContactViewSet(CommitteeOwnedViewSet):
             + Count("contact_2_transaction_set")
             + Count("contact_3_transaction_set"),
         )
+        .annotate(
+            report_count=Count("contact_affiliated_transaction_set")
+            + Count("contact_candidate_I_transaction_set")
+            + Count("contact_candidate_II_transaction_set")
+            + Count("contact_candidate_III_transaction_set")
+            + Count("contact_candidate_IV_transaction_set")
+            + Count("contact_candidate_V_transaction_set")
+        )
         .alias(
             sort_name=Concat(
                 "name", "last_name", Value(" "), "first_name", output_field=CharField()
@@ -98,6 +106,10 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
         max_fecfile_results, max_fec_results = self.get_max_results(request)
         office = request.GET.get("office", "")
+        exclude_fec_ids = request.GET.get("exclude_fec_ids").split(',') \
+            if request.GET.get("exclude_fec_ids") else []
+        exclude_ids = request.GET.get("exclude_ids").split(',') \
+            if request.GET.get("exclude_ids") else []
         params = {"q": q, "api_key": FEC_API_KEY}
         if office:
             params["office"] = office
@@ -121,6 +133,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
                     | (Q(full_name_fwd__regex=term) | Q(full_name_bwd__regex=term))
                 )
             )
+            .exclude(id__in=exclude_ids)
             .values()
             .order_by("-candidate_id")
         )
@@ -133,7 +146,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             for fac in fec_api_candidates
             if not any(
                 fac["candidate_id"] == ffc["candidate_id"] for ffc in fecfile_candidates
-            )
+            ) and fac["candidate_id"] not in exclude_fec_ids
         ]
         return_value = {
             "fec_api_candidates": fec_api_candidates[:max_fec_results],
@@ -150,6 +163,10 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
         max_fecfile_results, max_fec_results = self.get_max_results(request)
 
+        exclude_fec_ids = request.GET.get("exclude_fec_ids").split(',') \
+            if request.GET.get("exclude_fec_ids") else []
+        exclude_ids = request.GET.get("exclude_ids").split(',') \
+            if request.GET.get("exclude_ids") else []
         params = urlencode({"q": q, "api_key": FEC_API_KEY})
         json_results = requests.get(
             FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
@@ -160,6 +177,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             .filter(
                 Q(type="COM") & (Q(committee_id__icontains=q) | Q(name__icontains=q))
             )
+            .exclude(id__in=exclude_ids)
             .values()
             .order_by("-committee_id")
         )
@@ -167,7 +185,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
         fec_api_committees = [
             fac
             for fac in fec_api_committees
-            if not any(fac["id"] == ffc["committee_id"] for ffc in fecfile_committees)
+            if not any(
+                fac["id"] == ffc["committee_id"] for ffc in fecfile_committees
+            ) and fac["id"] not in exclude_fec_ids
         ]
         fec_api_committees = fec_api_committees[:max_fec_results]
         fecfile_committees = fecfile_committees[:max_fecfile_results]
@@ -188,6 +208,8 @@ class ContactViewSet(CommitteeOwnedViewSet):
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
 
         max_fecfile_results, _ = self.get_max_results(request)
+        exclude_ids = request.GET.get("exclude_ids").split(',') \
+            if request.GET.get("exclude_ids") else []
 
         fecfile_individuals = list(
             self.get_queryset()
@@ -199,6 +221,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
                 Q(type="IND")
                 & (Q(full_name_fwd__regex=term) | Q(full_name_bwd__regex=term))
             )
+            .exclude(id__in=exclude_ids)
             .values()
             .order_by(Lower("last_name").desc())[:max_fecfile_results]
         )
@@ -215,10 +238,13 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return HttpResponseBadRequest()
 
         max_fecfile_results, _ = self.get_max_results(request)
+        exclude_ids = request.GET.get("exclude_ids").split(',') \
+            if request.GET.get("exclude_ids") else []
 
         fecfile_organizations = list(
             self.get_queryset()
             .filter(Q(type="ORG") & Q(name__icontains=q))
+            .exclude(id__in=exclude_ids)
             .values()
             .order_by("-name")[:max_fecfile_results]
         )

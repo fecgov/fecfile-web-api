@@ -1,4 +1,4 @@
-from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework import serializers, relations
 import structlog
@@ -12,18 +12,47 @@ class CommitteeAccountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CommitteeMemberSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    email = serializers.CharField()
-    username = serializers.CharField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    role = serializers.SerializerMethodField()
-    is_active = serializers.BooleanField()
+class CommitteeMembershipSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=Membership.CommitteeRole)
 
-    def get_role(self, object):
-        committee_id = self.context.get("committee_id")
-        return object.membership_set.get(committee_account_id=committee_id).role
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if instance.user is not None:
+            representation.update({
+                'id': instance.id,
+                'email': instance.user.email,
+                'username': instance.user.username,
+                'name': f"{instance.user.last_name}, {instance.user.first_name}",
+            })
+        else:
+            representation.update({
+                'id': instance.id,
+                'email': instance.pending_email,
+                'username': '',
+                'name': '',
+            })
+
+        representation['is_active'] = instance.user is not None
+        return representation
+
+    class Meta:
+        model = Membership
+
+        fields = [
+            f.name
+            for f in Membership._meta.get_fields()
+            if f.name
+            not in [
+                "deleted",
+                "user",
+                "pending_email"
+            ]
+        ] + ["name", "email"]
+        read_only_fields = [
+            "id",
+            "created",
+        ]
 
 
 class CommitteeOwnedSerializer(serializers.ModelSerializer):
