@@ -105,16 +105,23 @@ class Tasks(TaskSet):
                 f"/api/v1/committees/{committee_uuid}/activate/"
             )
             print("activate_response.status_code", activate_response.status_code)
-            if len(self.fetch_ids("reports", "id")) < 10:
+            print('self.fetch_ids("reports", "id")')
+            print(self.fetch_ids("reports", "id"))
+            self.reports = self.fetch_ids("reports", "id")
+            self.contacts = self.fetch_ids("contacts", "id")
+            if len(self.reports) < 10:
                 logging.info("Not enough reports, creating some")
                 self.create_report()
+            if len(self.contacts) < 10:
+                logging.info("Not enough contacts, creating some")
+                self.create_contact()
             if len(self.fetch_ids("transactions", "id")) < 10:
                 logging.info("Not enough transactions, creating some")
                 self.create_transaction()
-            self.create_contact()
 
         self.reports = self.fetch_ids("reports", "id")
         self.contacts = self.fetch_ids("contacts", "id")
+
 
     def create_report(self):
         report = generate_random_report()
@@ -295,9 +302,18 @@ class Tasks(TaskSet):
         )
 
     def fetch_ids(self, endpoint, key):
-        response = self.client.get(f"/api/v1/{endpoint}", name=f"preload_{endpoint}_ids")
+        params = {
+            "page": 1,
+            "ordering": "form_type",
+        }
+        response = self.client.get(
+            f"/api/v1/{endpoint}",
+            params=params,
+            name=f"preload_{endpoint}_ids"
+        )
+        print("response.json()", response.json())
         if response.status_code == 200:
-            return [result[key] for result in response.json()["results"]]
+            return [result.get(key) for result in response.json()["results"]]
         else:
             logging.error(f"{response.status_code} error fetching pre-load id")
 
