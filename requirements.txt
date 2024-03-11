@@ -23,7 +23,7 @@ pytz==2022.6
 retry==0.9.2
 static3==0.7.0
 django-otp==1.1.4
-git+https://github.com/fecgov/mozilla-django-oidc.git@main#egg=mozilla_django_oidc
+git+https://github.com/fecgov/mozilla-django-oidc.git@bbf2a4567cf65e08430e513a1c2b628a30bd9979#egg=mozilla_django_oidc
 zeep==4.2.1
 django-structlog[celery]==7.1.0
 rich==13.7.0
