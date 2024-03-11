@@ -10,6 +10,7 @@ logger = structlog.get_logger(__name__)
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
+    logger.exception("Exception", exc=exc)
     response = exception_handler(exc, context)
 
     if response is None:
