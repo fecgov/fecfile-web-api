@@ -2,6 +2,7 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
+from django.core.exceptions import BadRequest
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
@@ -197,7 +198,7 @@ def register_committee(committee_id, user):
         committee_id=committee_id
     ).first()
     if existing_account or f1_email != email:
-        raise Exception("could not register committee")
+        raise BadRequest("could not register committee")
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
         committee_account=account,
