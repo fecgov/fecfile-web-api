@@ -37,11 +37,11 @@ def update_in_future_reports(transaction):
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
-    del transaction_copy["report"]
+    del transaction_copy["reports"]
     del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
