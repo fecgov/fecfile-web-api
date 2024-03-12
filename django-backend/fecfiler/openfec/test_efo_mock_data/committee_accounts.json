@@ -87,7 +87,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title5",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100248",
@@ -177,7 +178,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title8",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100271",
@@ -358,7 +360,8 @@
         "custodian_state": "AL",
         "custodian_zip": "12345",
         "custodian_name_title": "test_title15",
-        "custodian_phone": "8175212197"
+        "custodian_phone": "8175212197",
+        "committee_type": "Q"
     },
     {
         "committee_id": "C00100495",
