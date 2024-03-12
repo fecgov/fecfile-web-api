@@ -155,9 +155,10 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
-                # primary_report__coverage_through_date__lte=OuterRef(
-                #     "primary_report__coverage_through_date"
-                # ),
+                reports__form_3x_id__isnull=False,
+                reports__coverage_through_date__lt=OuterRef(
+                    "reports__coverage_from_date"
+                ),
             )
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
@@ -174,7 +175,10 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                # primary_report__coverage_through_date__lt=OuterRef("primary_report__coverage_from_date"),
+                reports__form_3x_id__isnull=False,
+                reports__coverage_through_date__lt=OuterRef(
+                    "reports__coverage_from_date"
+                ),
             )
             .values("committee_account_id")
             .annotate(
@@ -187,7 +191,8 @@ class TransactionManager(SoftDeleteManager):
                 ~Q(debt_id=OuterRef("id")),
                 debt__transaction_id=OuterRef("transaction_id"),
                 schedule_d__isnull=True,
-                # date__lt=OuterRef("primary_report__coverage_from_date"),
+                reports__form_3x_id__isnull=False,
+                date__lt=OuterRef("reports__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(debt_payments_prior=Sum("amount"))
