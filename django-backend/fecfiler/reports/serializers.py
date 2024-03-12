@@ -163,6 +163,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "transaction",
                     "dotfec",
                     "report",
+                    "reporttransaction"
                 ]
             ] + ["report_status", "fields_to_validate", "report_code_label", "is_first"]
 

@@ -92,7 +92,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         previous_report = self.get_previous_report()
 
         if previous_report:
-            loans_to_pull_forward = previous_report.transaction_set.filter(
+            loans_to_pull_forward = previous_report.transactions.filter(
                 ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
                 ~Q(memo_code=True),
                 schedule_c_id__isnull=False,
@@ -108,8 +108,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
         loan.schedule_c_id = self.save_copy(loan.schedule_c)
         loan.memo_text_id = self.save_copy(loan.memo_text)
-        loan.report_id = self.id
-        loan.report = self
+        loan.reports.add(self)
         # The loan_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
         loan.loan_id = loan.loan_id if loan.loan_id else loan.id
@@ -123,8 +122,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     def pull_forward_loan_guarantor(self, loan_guarantor, loan):
         loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
         loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
-        loan_guarantor.report_id = self.id
-        loan_guarantor.report = self
+        loan_guarantor.reports.add(self)
         loan_guarantor.parent_transaction_id = loan.id
         loan_guarantor.parent_transaction = loan
         self.save_copy(loan_guarantor)
@@ -133,7 +131,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         previous_report = self.get_previous_report()
 
         if previous_report:
-            debts_to_pull_forward = previous_report.transaction_set.filter(
+            debts_to_pull_forward = previous_report.transactions.filter(
                 ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
                 ~Q(memo_code=True),
                 schedule_d_id__isnull=False,
@@ -145,8 +143,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     def pull_forward_debt(self, debt):
         debt.schedule_d.incurred_amount = Decimal(0)
         debt.schedule_d_id = self.save_copy(debt.schedule_d)
-        debt.report_id = self.id
-        debt.report = self
+        debt.reports.add(self)
         # The debt_id should point to the original debt transaction
         # even if the debt is pulled forward multiple times.
         debt.debt_id = debt.debt_id if debt.debt_id else debt.id

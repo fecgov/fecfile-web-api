@@ -115,6 +115,7 @@ class TransactionSerializer(
                     "debt_associations",
                     "loan_associations",
                     "reatt_redes_associations",  # reattribution/redesignation
+                    "reporttransaction",
                     "_form_type",
                 ]
             ] + [
@@ -269,6 +270,14 @@ class TransactionSerializer(
             representation["reatt_redes"] = TransactionSerializer().to_representation(
                 instance.reatt_redes
             )
+
+        representation["reports"] = []
+        representation["report_ids"] = []
+        for report in instance.reports.all():
+            representation["reports"].append(ReportSerializer().to_representation(
+                report
+            ))
+            representation["report_ids"].append(report.id)
 
         return representation
 

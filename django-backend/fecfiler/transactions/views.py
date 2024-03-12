@@ -263,6 +263,13 @@ class TransactionViewSet(CommitteeOwnedViewSet):
             **contact_instances
         )
 
+
+        for report_id in report_ids:
+            if not transaction_instance.reports.filter(id=report_id).exists():
+                matching_report =  Report.objects.get(id=report_id)
+                if matching_report:
+                    transaction_instance.reports.add(matching_report)
+
         get_save_hook(transaction_instance)(
             transaction_instance,
             is_existing,
@@ -286,14 +293,7 @@ class TransactionViewSet(CommitteeOwnedViewSet):
 
                 self.save_transaction(child_transaction_data, request)
 
-        saved_transaction = self.queryset.get(id=transaction_instance.id)
-        for report_id in report_ids:
-            if not saved_transaction.reports.filter(id=report_id).exists():
-                matching_report =  Report.objects.get(id=report_id)
-                if matching_report:
-                    saved_transaction.reports.add(matching_report)
-
-        return saved_transaction
+        return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave")
     def save_transactions(self, request):

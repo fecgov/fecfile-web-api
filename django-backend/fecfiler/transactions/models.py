@@ -59,7 +59,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     reports = models.ManyToManyField(
         'reports.Report',
         through="reports.ReportTransaction",
-        through_fields=["transaction", "report"]
+        through_fields=["transaction", "report"],
+        related_name='transactions'
     )
 
     # The _form_type value in the db may or may not be correct based on whether
