@@ -26,6 +26,7 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
+from fecfiler.reports.models import ReportTransaction
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -69,7 +70,7 @@ class TransactionManager(SoftDeleteManager):
                     ),
                     default=F("amount"),
                 ),
-                effective_amount=self.get_amount_clause(),
+                effective_amount=self.get_amount_clause()
             )
         )
 
@@ -154,9 +155,9 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
-                report__coverage_through_date__lte=OuterRef(
-                    "report__coverage_through_date"
-                ),
+                # primary_report__coverage_through_date__lte=OuterRef(
+                #     "primary_report__coverage_through_date"
+                # ),
             )
             .values("committee_account_id")
             .annotate(payment_to_date=Sum("amount"))
@@ -173,7 +174,7 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                report__coverage_through_date__lt=OuterRef("report__coverage_from_date"),
+                # primary_report__coverage_through_date__lt=OuterRef("primary_report__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(
@@ -186,7 +187,7 @@ class TransactionManager(SoftDeleteManager):
                 ~Q(debt_id=OuterRef("id")),
                 debt__transaction_id=OuterRef("transaction_id"),
                 schedule_d__isnull=True,
-                date__lt=OuterRef("report__coverage_from_date"),
+                # date__lt=OuterRef("primary_report__coverage_from_date"),
             )
             .values("committee_account_id")
             .annotate(debt_payments_prior=Sum("amount"))

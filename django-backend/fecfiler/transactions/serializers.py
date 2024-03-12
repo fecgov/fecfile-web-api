@@ -57,8 +57,6 @@ class TransactionSerializer(
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
 
     id = UUIDField(required=False)
-    report = ReportSerializer(read_only=True)
-    report_id = UUIDField(required=True, allow_null=False)
 
     schedule_a = ScheduleASerializer(read_only=True)
     schedule_b = ScheduleBSerializer(read_only=True)
@@ -124,7 +122,6 @@ class TransactionSerializer(
                 "debt_id",
                 "loan_id",
                 "reatt_redes_id",
-                "report_id",
                 "contact_1_id",
                 "contact_2_id",
                 "contact_3_id",

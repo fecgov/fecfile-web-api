@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import Report
+from .models import Report, ReportTransaction
 from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
@@ -126,7 +126,7 @@ class ReportViewSet(CommitteeOwnedViewSet):
 
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
-        transaction_count = Transaction.objects.filter(
+        transaction_count = ReportTransaction.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()
         memo_count = MemoText.objects.filter(

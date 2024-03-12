@@ -1,7 +1,6 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.models import Report
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -51,9 +50,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         blank=True,
         related_name="reatt_redes_associations",
     )
+    # primary_report = models.ForeignKey(
+    #     'reports.Report',
+    #     on_delete=models.CASCADE,
+    #     null=True,
+    #     blank=True,
+    # )
     reports = models.ManyToManyField(
-        Report,
-        through="TransactionReport",
+        'reports.Report',
+        through="reports.ReportTransaction",
         through_fields=["transaction", "report"]
     )
 
@@ -164,20 +169,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
-
-
-class TransactionReport(CommitteeOwnedModel):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-        serialize=False,
-        unique=True,
-    )
-    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
-    report = models.ForeignKey(Report, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
 
 
 TABLE_TO_SCHEDULE = {

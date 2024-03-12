@@ -234,3 +234,17 @@ class ReportMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class ReportTransaction(CommitteeOwnedModel):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    transaction = models.ForeignKey('transactions.Transaction', on_delete=models.CASCADE)
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

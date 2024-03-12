@@ -14,6 +14,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -40,7 +41,7 @@ DISPLAY_NAME_CLAUSE = Coalesce(
 )
 
 
-class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
+class TransactionViewSet(CommitteeOwnedViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
@@ -63,6 +64,15 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     queryset = Transaction.objects.all()
 
     def get_queryset(self):
+        report_id = (
+            (
+                self.request.query_params.get("report_id")
+                or self.request.data.get("report_id")
+            )
+            if self.request
+            else None
+        )
+
         queryset = (
             super()
             .get_queryset()
@@ -70,6 +80,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 name=DISPLAY_NAME_CLAUSE,
             )
         )
+        if report_id:
+            queryset = queryset.filter(
+                reports=report_id
+            )
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
             schedules_to_include = schedule_filters.split(",")
@@ -201,6 +215,7 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
         transaction_data["parent_transaction"] = transaction_data.get(
@@ -271,7 +286,14 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
                 self.save_transaction(child_transaction_data, request)
 
-        return self.queryset.get(id=transaction_instance.id)
+        saved_transaction = self.queryset.get(id=transaction_instance.id)
+        for report_id in report_ids:
+            if not saved_transaction.reports.filter(id=report_id).exists():
+                matching_report =  Report.objects.get(id=report_id)
+                if matching_report:
+                    saved_transaction.reports.add(matching_report)
+
+        return saved_transaction
 
     @action(detail=False, methods=["put"], url_path=r"multisave")
     def save_transactions(self, request):
@@ -303,6 +325,41 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             [TransactionSerializer().to_representation(data)
              for data in saved_data]
         )
+
+    @action(detail=False, methods=["put"], url_path=r"add_report")
+    def add_report(self, request):
+        if request.data["transaction_id"] and request.data["report_id"]:
+            report = Report.objects.get(id=request.data["report_id"])
+            if report:
+                transaction = Transaction.objects.get(id=request.data["transaction_id"])
+                if transaction:
+                    transaction.reports.add(report)
+                    return Response("Report added to transaction")
+                else:
+                    return Response("No transaction matching id provided", status_code=202)
+            else:
+                return Response("No report matching id provided", status_code=202)
+        else:
+            return Response("Invalid payload: report_id and transaction_id are required", status_code=400)
+
+    @action(detail=False, methods=["put"], url_path=r"remove_report")
+    def remove_report(self, request):
+        if request.data["transaction_id"] and request.data["report_id"]:
+            report = Report.objects.get(id=request.data["report_id"])
+            if report:
+                transaction = Transaction.objects.get(id=request.data["transaction_id"])
+                if transaction:
+                    if transaction.reports.filter(id=report.id).exists():
+                        transaction.reports.remove(report)
+                        return Response("Report removed from transaction")
+                    else:
+                        return Response("The transaction is not paired with the provided report", status_code=202)
+                else:
+                    return Response("No transaction matching id provided", status_code=202)
+            else:
+                return Response("No report matching id provided", status_code=202)
+        else:
+            return Response("Invalid payload: report_id and transaction_id are required", status_code=400)
 
 
 def noop(transaction, is_existing):
