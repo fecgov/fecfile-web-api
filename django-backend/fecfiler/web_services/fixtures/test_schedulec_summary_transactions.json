@@ -145,7 +145,7 @@
         "model": "reports.reporttransaction",
         "fields": {
           "transaction_id": "c12aefe8-9b5f-4539-b7e5-c10000000002",
-          "report_id": "c12aefe8-9b5f-4539-b7e5-c10000000002",
+          "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
           "created": "2022-02-09T00:00:00.000Z",
           "updated": "2022-02-09T00:00:00.000Z"
         }
