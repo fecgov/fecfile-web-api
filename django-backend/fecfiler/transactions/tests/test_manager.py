@@ -88,5 +88,5 @@ class TransactionManagerTestCase(TestCase):
 
         view: QuerySet = Transaction.objects.transaction_view()
         view = view.filter(committee_account_id=committee.id)
-        self.assertEqual(view[0].aggregate, 123.45)
-        self.assertEqual(view[2].aggregate, 300)
+        self.assertEqual(view[0].aggregate, Decimal("123.45"))
+        self.assertEqual(view[2].aggregate, Decimal("300"))

@@ -17,11 +17,12 @@ from decimal import Decimal
 
 
 def create_test_transaction(type, schedule, committee, contact=None, data=None):
-    schedule = create_schedule(schedule, data)
+    schedule_object = create_schedule(schedule, data)
     transaction = Transaction.objects.create(
+        transaction_type_identifier=type,
         committee_account=committee,
-        contact=contact,
-        **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule}
+        contact_1=contact,
+        **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
     )
     return transaction
 
