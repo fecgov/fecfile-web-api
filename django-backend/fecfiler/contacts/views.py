@@ -1,5 +1,4 @@
 import structlog
-
 import re
 from urllib.parse import urlencode
 from django.db import transaction
@@ -21,7 +20,6 @@ from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
-
 from .models import Contact
 from .serializers import ContactSerializer
 
@@ -30,7 +28,8 @@ logger = structlog.get_logger(__name__)
 default_max_fec_results = 10
 default_max_fecfile_results = 10
 max_allowed_results = 100
-NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharField())
+NAME_CLAUSE = Concat("first_name", Value(
+    " "), "last_name", output_field=CharField())
 NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )

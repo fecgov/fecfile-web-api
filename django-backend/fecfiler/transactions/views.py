@@ -92,10 +92,16 @@ class TransactionViewSet(
             )
 
         parent_id = self.request.query_params.get("parent")
-        # if parent_id:
-        #     queryset = queryset.filter(parent_transaction_id=parent_id)
+        if parent_id:
+            queryset = queryset.filter(parent_transaction_id=parent_id)
 
-        print(queryset.query)
+        contact_id = self.request.query_params.get("contact")
+        if contact_id:
+            queryset = queryset.filter(
+                Q(contact_1=contact_id)
+                | Q(contact_2=contact_id)
+                | Q(contact_3=contact_id)
+            )
         return queryset
 
     @silk_profile(name="CREATE TRANSACTION")

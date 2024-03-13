@@ -4,6 +4,7 @@ from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import get_read_model
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
@@ -207,11 +208,15 @@ def register_committee(committee_id, user):
             f1_line = dot_fec_content.split("\n")[1]
             f1_email = f1_line.split(FS_STR)[11]
 
+    if f1_email != email:
+        raise ValidationError(f"Email {email} does not match committee email")
+
     existing_account = CommitteeAccount.objects.filter(
         committee_id=committee_id
     ).first()
-    if existing_account or f1_email != email:
-        raise Exception("could not register committee")
+    if existing_account:
+        raise ValidationError(f"Committee {committee_id} already registered")
+
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
         committee_account=account,
