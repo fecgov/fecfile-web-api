@@ -14,7 +14,8 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
             reports__id=report.id, loan_id=transaction.parent_transaction.id
@@ -26,7 +27,8 @@ def create_in_future_reports(transaction):
 
 
 def update_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id

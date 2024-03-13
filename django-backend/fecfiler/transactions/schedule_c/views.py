@@ -15,14 +15,16 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction: Transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
         report.pull_forward_loan(transaction_copy)
 
 
 def update_in_future_reports(transaction: Transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
     del transaction_copy["report"]
