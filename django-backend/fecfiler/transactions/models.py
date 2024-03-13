@@ -187,6 +187,7 @@ def get_read_model(committee):
         effective_amount = models.DecimalField()
         aggregate = models.DecimalField()
         _calendar_ytd_per_election_office = models.DecimalField()
+        back_reference_tran_id_number = models.TextField()
         loan_key = models.TextField()
         loan_payment_to_date = models.DecimalField()
         incurred_prior = models.DecimalField()

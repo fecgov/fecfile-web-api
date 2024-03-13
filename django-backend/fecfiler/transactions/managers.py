@@ -489,6 +489,15 @@ class TransactionManager(SoftDeleteManager):
             output_field=DecimalField(),
         )
 
+    def BACK_REFERENCE_CLAUSE(self):
+        return Coalesce(
+            F("reatt_redes__transaction_id"),
+            F("parent_transaction__transaction_id"),
+            F("debt__transaction_id"),
+            F("loan__transaction_id"),
+            Value(None),
+        )
+
     # clause used to facilitate sorting on name as it's displayed
     DISPLAY_NAME_CLAUSE = Coalesce(
         "contact_1__name",
@@ -584,6 +593,7 @@ class TransactionManager(SoftDeleteManager):
                 amount=self.AMOUNT_CLAUSE,
                 effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
                 aggregate=self.ENTITY_AGGREGGATE_CLAUSE(),
+                back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE(),
                 _calendar_ytd_per_election_office=self.ELECTION_AGGREGATE_CLAUSE(),
                 incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
