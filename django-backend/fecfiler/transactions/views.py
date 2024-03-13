@@ -82,7 +82,7 @@ class TransactionViewSet(CommitteeOwnedViewSet):
         )
         if report_id:
             queryset = queryset.filter(
-                reports=report_id
+                reports__id=report_id
             )
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:

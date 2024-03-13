@@ -39,7 +39,7 @@ def compose_report(report_id, upload_submission_record_id):
 
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.filter(report_id=report_id)
+    transactions = Transaction.objects.filter(reports__id=report_id)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""

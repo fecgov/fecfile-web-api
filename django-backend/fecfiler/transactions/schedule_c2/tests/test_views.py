@@ -30,7 +30,7 @@ class ScheduleC2ViewsTestCase(TestCase):
         self.loan = Transaction(
             transaction_type_identifier="LOAN_BY_COMMITTEE",
             transaction_id="F487B9EDAD9A32E6CFEE",
-            report_id=self.report_1.id,
+            reports__id=self.report_1.id,
             form_type="SC/9",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
@@ -51,7 +51,7 @@ class ScheduleC2ViewsTestCase(TestCase):
             parent_transaction_id=self.loan.id,
             transaction_type_identifier="C2_LOAN_GUARANTOR",
             transaction_id="12345678123456781234",
-            report_id=self.report_1.id,
+            reports__id=self.report_1.id,
             form_type="SC2/9",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
@@ -63,21 +63,21 @@ class ScheduleC2ViewsTestCase(TestCase):
     def test_create_guarantor_in_future_report(self):
         c2_hook(self.guarantor, False)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_c2__isnull=False
+            reports__id=self.report_2.id, schedule_c2__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
 
     def test_update_guarantor_in_future_report(self):
         c2_hook(self.guarantor, False)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_c2__isnull=False
+            reports__id=self.report_2.id, schedule_c2__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
 
         self.guarantor.schedule_c2.guaranteed_amount = 5
         c2_hook(self.guarantor, True)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_c2__isnull=False
+            reports__id=self.report_2.id, schedule_c2__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_c2.guaranteed_amount, 5)

@@ -17,7 +17,7 @@ def create_in_future_reports(transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
-            report_id=report.id, loan_id=transaction.parent_transaction.id
+            reports__id=report.id, loan_id=transaction.parent_transaction.id
         )
         if loan_query.count():
             report.pull_forward_loan_guarantor(
@@ -33,7 +33,7 @@ def update_in_future_reports(transaction):
     del transaction_copy["report"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 

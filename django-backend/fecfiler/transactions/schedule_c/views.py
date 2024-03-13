@@ -29,7 +29,7 @@ def update_in_future_reports(transaction: Transaction):
     del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
@@ -73,7 +73,7 @@ def update_memo_text_in_future_reports(
                     "rec_type": "TEXT",
                     "transaction_id_number": transaction_to_update.transaction_id,
                     "text4000": transaction.memo_text.text4000,
-                    "report_id": transaction.report.id,
+                    "report_id": transaction.reports[0].id,
                     "committee_account_id": transaction_to_update.committee_account.id,
                     "transaction_uuid": transaction_to_update.id,
                     "is_report_level_memo": False,

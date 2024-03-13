@@ -15,7 +15,7 @@ class TransactionManagerTestCase(TestCase):
 
     def test_order_of_transactions(self):
         transactions = Transaction.objects.filter(
-            report="1406535e-f99f-42c4-97a8-247904b7d297"
+            reports__id="1406535e-f99f-42c4-97a8-247904b7d297"
         )
         transaction_one = transactions[0]
         self.assertEqual(transaction_one.schedule, Schedule.A.value.value)

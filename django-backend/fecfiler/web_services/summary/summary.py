@@ -31,7 +31,7 @@ class SummaryService:
         return column_a, column_b
 
     def calculate_summary_column_a(self):
-        report_transactions = Transaction.objects.filter(report_id=self.report.id)
+        report_transactions = Transaction.objects.filter(reports__id=self.report.id)
         column_a = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
             line_11aii=self.get_line("SA11AII"),

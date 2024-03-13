@@ -28,7 +28,7 @@ class ScheduleCViewsTestCase(TestCase):
         self.loan = Transaction(
             transaction_type_identifier="LOAN_BY_COMMITTEE",
             transaction_id="F487B9EDAD9A32E6CFEE",
-            report_id=self.report_1.id,
+            reports__id=self.report_1.id,
             form_type="SC/9",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
@@ -46,16 +46,16 @@ class ScheduleCViewsTestCase(TestCase):
 
     def test_create_loan_in_future_report(self):
         save_hook(self.loan, False)
-        carried_over = Transaction.objects.filter(report_id=self.report_2.id)
+        carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
         self.assertEqual(carried_over.count(), 1)
 
     def test_update_loan_in_future_report(self):
         save_hook(self.loan, False)
-        carried_over = Transaction.objects.filter(report_id=self.report_2.id)
+        carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
         self.assertEqual(carried_over.count(), 1)
 
         self.loan.schedule_c.loan_amount = 4321
         save_hook(self.loan, True)
-        carried_over = Transaction.objects.filter(report_id=self.report_2.id)
+        carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_c.loan_amount, 4321)

@@ -28,7 +28,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.debt = Transaction(
             transaction_type_identifier="DEBT_OWED_BY_COMMITTEE",
             transaction_id="F487B9EDAD9A32E6CFEE",
-            report_id=self.report_1.id,
+            reports__id=self.report_1.id,
             form_type="SD10",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
@@ -42,7 +42,7 @@ class ScheduleDViewsTestCase(TestCase):
     def test_create_guarantor_in_future_report(self):
         save_hook(self.debt, False)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_d__isnull=False
+            reports__id=self.report_2.id, schedule_d__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_d.incurred_amount, 0)
@@ -50,14 +50,14 @@ class ScheduleDViewsTestCase(TestCase):
     def test_update_guarantor_in_future_report(self):
         save_hook(self.debt, False)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_d__isnull=False
+            reports__id=self.report_2.id, schedule_d__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
 
         self.debt.schedule_d.incurred_amount = 5
         save_hook(self.debt, True)
         carried_over = Transaction.objects.filter(
-            report_id=self.report_2.id, schedule_d__isnull=False
+            reports__id=self.report_2.id, schedule_d__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
         # incurred amounts are independent across reports so they would not be updated
