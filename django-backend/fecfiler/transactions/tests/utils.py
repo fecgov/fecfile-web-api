@@ -16,12 +16,26 @@ import uuid
 from decimal import Decimal
 
 
-def create_test_transaction(type, schedule, committee, contact=None, data=None):
+def create_schedule_a(type, committee, contact, date, amount, group="GENERAL"):
+    return create_test_transaction(
+        type,
+        ScheduleA,
+        committee,
+        contact,
+        group=group,
+        data={"contribution_date": date, "contribution_amount": amount},
+    )
+
+
+def create_test_transaction(
+    type, schedule, committee, contact=None, group=None, data=None
+):
     schedule_object = create_schedule(schedule, data)
     transaction = Transaction.objects.create(
         transaction_type_identifier=type,
         committee_account=committee,
         contact_1=contact,
+        aggregation_group=group,
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
     )
     return transaction

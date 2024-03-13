@@ -509,6 +509,45 @@ class TransactionManager(SoftDeleteManager):
         ),
     )
 
+    def LOAN_KEY_CLAUSE(self):
+        return Case(
+            When(
+                Q(loan_id__isnull=False)
+                & Q(
+                    schedule__in=[
+                        Schedule.A.value,
+                        Schedule.B.value,
+                        Schedule.E.value,
+                    ]
+                )
+                & Q(
+                    transaction_type_identifier__in=[
+                        "'LOAN_REPAYMENT_RECEIVED'",
+                        "'LOAN_REPAYMENT_MADE'",
+                    ]
+                ),
+                then=Concat(F("loan__transaction_id"), F("date")),
+            ),
+            When(
+                schedule_c__isnull=False,
+                then=Concat(F("transaction_id"), F("report__coverage_from_date")),
+            ),
+            default=None,
+            output_field=TextField(),
+        )
+
+    def LOAN_PAYMENT_CLAUSE(self):
+        return Window(
+            expression=Sum("effective_amount"), **self.loan_payment_window
+        ) - Case(
+            When(
+                schedule_c__isnull=False,
+                then=F("effective_amount"),
+            ),
+            default=Value(0.0),
+            output_field=DecimalField(),
+        )
+
     def INCURRED_PRIOR_CLAUSE(self):
         return Case(
             When(
@@ -598,44 +637,8 @@ class TransactionManager(SoftDeleteManager):
                 incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
-                loan_key=Case(
-                    When(
-                        Q(loan_id__isnull=False)
-                        & Q(
-                            schedule__in=[
-                                Schedule.A.value,
-                                Schedule.B.value,
-                                Schedule.E.value,
-                            ]
-                        )
-                        & Q(
-                            transaction_type_identifier__in=[
-                                "'LOAN_REPAYMENT_RECEIVED'",
-                                "'LOAN_REPAYMENT_MADE'",
-                            ]
-                        ),
-                        then=Concat(F("loan__transaction_id"), F("date")),
-                    ),
-                    When(
-                        schedule_c__isnull=False,
-                        then=Concat(
-                            F("transaction_id"), F("report__coverage_from_date")
-                        ),
-                    ),
-                    default=None,
-                    output_field=TextField(),
-                ),
-                loan_payment_to_date=Window(
-                    expression=Sum("effective_amount"), **self.loan_payment_window
-                )
-                - Case(
-                    When(
-                        schedule_c__isnull=False,
-                        then=F("effective_amount"),
-                    ),
-                    default=Value(0.0),
-                    output_field=DecimalField(),
-                ),
+                loan_key=self.LOAN_KEY_CLAUSE(),
+                loan_payment_to_date=self.LOAN_PAYMENT_CLAUSE(),
                 # do after view: loan_balance=F("amount") - F("loan_payment_to_date"),
                 # debt_key=Case(
                 #     When(
@@ -712,7 +715,10 @@ class TransactionViewManager(Manager):
                         - F("payment_amount"),
                     ),
                 ),
-                balance=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                balance=When(
+                    schedule_d__isnull=False,
+                    then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                ),
                 itemized=Coalesce(
                     "view_parent_transaction__view_parent_transaction___itemized",
                     "view_parent_transaction___itemized",

@@ -6,7 +6,7 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.managers import TransactionManager
-from fecfiler.transactions.tests.utils import create_test_transaction
+from fecfiler.transactions.tests.utils import create_test_transaction, create_schedule_a
 import uuid
 from decimal import Decimal
 
@@ -68,25 +68,59 @@ class TransactionManagerTestCase(TestCase):
         refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
         self.assertEqual(refund.line_label, "21(b)")
 
-    # def test_fast(self):
-    #     Transaction.objects.get_owned_data()
+
+class TransactionViewTestCase(TestCase):
+    def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_transaction_view(self):
-        committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        contact_1 = Contact.objects.create(committee_account_id=committee.id)
-        transaction_data = [
-            {"contribution_date": "2023-01-01", "contribution_amount": "123.45"},
-            {"contribution_date": "2024-01-01", "contribution_amount": "100.00"},
-            {"contribution_date": "2024-01-01", "contribution_amount": "200.00"},
+        indiviual_reciepts = [
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL"},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL"},
+            {"date": "2024-01-01", "amount": "200.00", "group": "GENERAL"},
+            {"date": "2024-01-01", "amount": "100.00", "group": "OTHER"},
         ]
-        transactions = [
-            create_test_transaction(
-                "INDIVIDUAL_RECEIPT", ScheduleA, committee, contact_1, data=transaction
+        for receipt_data in indiviual_reciepts:
+            create_schedule_a(
+                "IDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                receipt_data["group"],
             )
-            for transaction in transaction_data
-        ]
 
         view: QuerySet = Transaction.objects.transaction_view()
-        view = view.filter(committee_account_id=committee.id)
+        view = view.filter(committee_account_id=self.committee.id)
         self.assertEqual(view[0].aggregate, Decimal("123.45"))
         self.assertEqual(view[2].aggregate, Decimal("300"))
+        self.assertEqual(view[3].aggregate, Decimal("100"))
+
+    def test_transaction_view_parent(self):
+        partnership_receipt = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="100.00",
+        )
+        parnership_attribution = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="100.00",
+        )
+        # set parent
+        parnership_attribution.parent_transaction = partnership_receipt
+        parnership_attribution.save()
+
+        view: QuerySet = Transaction.objects.transaction_view()
+        view = view.filter(
+            committee_account_id=self.committee.id,
+            transaction_type_identifier="PARTNERSHIP_ATTRIBUTION",
+        )
+        self.assertEqual(
+            view[0].back_reference_tran_id_number, partnership_receipt.transaction_id
+        )
