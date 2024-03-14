@@ -1,4 +1,5 @@
 from django.test import TestCase
+from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.views import save_hook
 from fecfiler.transactions.models import Transaction
@@ -11,11 +12,14 @@ class ScheduleDViewsTestCase(TestCase):
     ]
 
     def setUp(self):
+        self.form3x = Form3X()
+        self.form3x.save()
         self.report_1 = Report(
             form_type="F3XN",
             committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-01-01",
             coverage_through_date="2023-01-02",
+            form_3x=self.form3x
         )
         self.report_1.save()
         self.report_2 = Report(
@@ -23,12 +27,12 @@ class ScheduleDViewsTestCase(TestCase):
             committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-02-01",
             coverage_through_date="2023-02-02",
+            form_3x=self.form3x
         )
         self.report_2.save()
         self.debt = Transaction(
             transaction_type_identifier="DEBT_OWED_BY_COMMITTEE",
             transaction_id="F487B9EDAD9A32E6CFEE",
-            reports__id=self.report_1.id,
             form_type="SD10",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
@@ -38,6 +42,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.schedule_d.save()
         self.debt.schedule_d = self.schedule_d
         self.debt.save()
+        self.debt.reports.add(self.report_1)
 
     def test_create_guarantor_in_future_report(self):
         save_hook(self.debt, False)
