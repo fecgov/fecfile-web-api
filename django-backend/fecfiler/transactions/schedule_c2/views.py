@@ -20,6 +20,9 @@ def create_in_future_reports(transaction):
         loan_query = Transaction.objects.filter(
             reports__id=report.id, loan_id=transaction.parent_transaction.id
         )
+        loan_query = report.transactions.filter(
+            loan_id=transaction.parent_transaction.id
+        )
         if loan_query.count():
             report.pull_forward_loan_guarantor(
                 copy.deepcopy(transaction), loan_query.first()
@@ -32,7 +35,7 @@ def update_in_future_reports(transaction):
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
-    del transaction_copy["report"]
+    del transaction_copy["reports"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
         reports__id__in=models.Subquery(future_reports.values("id")),

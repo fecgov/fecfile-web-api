@@ -53,6 +53,7 @@ class ScheduleC2ViewsTestCase(TestCase):
         c_hook(self.loan, False)
 
         self.guarantor = Transaction(
+            parent_transaction=self.loan,
             parent_transaction_id=self.loan.id,
             transaction_type_identifier="C2_LOAN_GUARANTOR",
             transaction_id="12345678123456781234",
