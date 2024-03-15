@@ -24,14 +24,6 @@ class ScheduleC2ViewsTestCase(TestCase):
             form_3x=self.form3x
         )
         self.report_1.save()
-        self.report_2 = Report(
-            form_type="F3XN",
-            committee_account_id="11111111-2222-3333-4444-555555555555",
-            coverage_from_date="2023-02-01",
-            coverage_through_date="2023-02-02",
-            form_3x=self.form3x
-        )
-        self.report_2.save()
         self.loan = Transaction(
             transaction_type_identifier="LOAN_BY_COMMITTEE",
             transaction_id="F487B9EDAD9A32E6CFEE",
@@ -50,7 +42,15 @@ class ScheduleC2ViewsTestCase(TestCase):
         self.loan.schedule_c = self.schedule_c
         self.loan.save()
         self.loan.reports.add(self.report_1)
-        c_hook(self.loan, False)
+
+        self.report_2 = Report(
+            form_type="F3XN",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+            coverage_from_date="2023-02-01",
+            coverage_through_date="2023-02-02",
+            form_3x=self.form3x
+        )
+        self.report_2.save()
 
         self.guarantor = Transaction(
             parent_transaction=self.loan,

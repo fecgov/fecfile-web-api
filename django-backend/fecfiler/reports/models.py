@@ -108,11 +108,11 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
         loan.schedule_c_id = self.save_copy(loan.schedule_c)
         loan.memo_text_id = self.save_copy(loan.memo_text)
-        loan.reports.set([self])
         # The loan_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
         loan.loan_id = loan.loan_id if loan.loan_id else loan.id
         self.save_copy(loan)
+
         for child in loan_children:
             # If child is a guarantor transaction, copy it
             # and link it to the new loan
@@ -122,7 +122,6 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     def pull_forward_loan_guarantor(self, loan_guarantor, loan):
         loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
         loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
-        loan_guarantor.reports.set([self])
         loan_guarantor.parent_transaction_id = loan.id
         loan_guarantor.parent_transaction = loan
         self.save_copy(loan_guarantor)
@@ -143,7 +142,6 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     def pull_forward_debt(self, debt):
         debt.schedule_d.incurred_amount = Decimal(0)
         debt.schedule_d_id = self.save_copy(debt.schedule_d)
-        debt.reports.set([self])
         # The debt_id should point to the original debt transaction
         # even if the debt is pulled forward multiple times.
         debt.debt_id = debt.debt_id if debt.debt_id else debt.id
@@ -165,6 +163,9 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             fkey.pk = fkey.id = None
             fkey._state.adding = True
             fkey.save()
+            if hasattr(fkey, "reports"):
+                fkey.reports.set([self])
+                update_recalculation(self)
             return fkey.id
         return None
 
@@ -202,6 +203,23 @@ TABLE_TO_FORM = {
     "form_1m": "F1M",
 }
 
+def update_recalculation(report: Report):
+    if report:
+        committee = report.committee_account
+        report_date = report.coverage_from_date
+        if report_date is not None:
+            reports_to_flag_for_recalculation = Report.objects.filter(
+                committee_account=committee,
+                coverage_from_date__gte=report_date,
+            )
+        else:
+            reports_to_flag_for_recalculation = [report]
+
+        for report_to_recalc in reports_to_flag_for_recalculation:
+            report_to_recalc.calculation_status = None
+            report_to_recalc.save()
+            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+
 
 class ReportMixin(models.Model):
     """Abstract model for tracking reports"""
@@ -211,22 +229,7 @@ class ReportMixin(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if self.report:
-            committee = self.report.committee_account
-            report_date = self.report.coverage_from_date
-            if report_date is not None:
-                reports_to_flag_for_recalculation = Report.objects.filter(
-                    committee_account=committee,
-                    coverage_from_date__gte=report_date,
-                )
-            else:
-                reports_to_flag_for_recalculation = [self.report]
-
-            for report in reports_to_flag_for_recalculation:
-                report.calculation_status = None
-                report.save()
-                logger.info(f"Report: {report.id} marked for recalcuation")
-
+        # update_recalculation(self.report)  # TODO: Do we need this for non-transaction models?
         super(ReportMixin, self).save(*args, **kwargs)
 
     class Meta:

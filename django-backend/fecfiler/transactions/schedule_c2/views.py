@@ -20,9 +20,6 @@ def create_in_future_reports(transaction):
         loan_query = Transaction.objects.filter(
             reports__id=report.id, loan_id=transaction.parent_transaction.id
         )
-        loan_query = report.transactions.filter(
-            loan_id=transaction.parent_transaction.id
-        )
         if loan_query.count():
             report.pull_forward_loan_guarantor(
                 copy.deepcopy(transaction), loan_query.first()

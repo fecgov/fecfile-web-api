@@ -1,6 +1,7 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+from fecfiler.reports.models import update_recalculation
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import TransactionManager, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -166,7 +167,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
+
         super(Transaction, self).save(*args, **kwargs)
+
+        for report in self.reports.all():
+            update_recalculation(report)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]

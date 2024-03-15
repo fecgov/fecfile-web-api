@@ -8,7 +8,7 @@ from django.db.models import Q, Value
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.reports.views import ReportViewMixin
+from fecfiler.reports.models import update_recalculation
 from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE, Schedule
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
@@ -269,6 +269,7 @@ class TransactionViewSet(CommitteeOwnedViewSet):
                 matching_report =  Report.objects.get(id=report_id)
                 if matching_report:
                     transaction_instance.reports.add(matching_report)
+                    update_recalculation(matching_report)
 
         get_save_hook(transaction_instance)(
             transaction_instance,
@@ -334,6 +335,7 @@ class TransactionViewSet(CommitteeOwnedViewSet):
                 transaction = Transaction.objects.get(id=request.data["transaction_id"])
                 if transaction:
                     transaction.reports.add(report)
+                    update_recalculation(report)
                     return Response("Report added to transaction")
                 else:
                     return Response("No transaction matching id provided", status_code=202)
