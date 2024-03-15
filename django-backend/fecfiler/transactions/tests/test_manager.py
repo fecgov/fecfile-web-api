@@ -6,7 +6,11 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.managers import TransactionManager
-from fecfiler.transactions.tests.utils import create_test_transaction, create_schedule_a
+from fecfiler.transactions.tests.utils import (
+    create_test_transaction,
+    create_schedule_a,
+    create_ie,
+)
 import uuid
 from decimal import Decimal
 
@@ -124,3 +128,73 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(
             view[0].back_reference_tran_id_number, partnership_receipt.transaction_id
         )
+
+    def test_election_aggregate(self):
+        candidate_a = Contact.objects.create(
+            committee_account_id=self.committee.id,
+            candidate_office="H",
+            candidate_state="MD",
+            candidate_district="99",
+        )
+        candidate_b = Contact.objects.create(
+            committee_account_id=self.committee.id,
+            candidate_office="H",
+            candidate_state="MD",
+            candidate_district="99",
+        )
+        candidate_c = Contact.objects.create(
+            committee_account_id=self.committee.id,
+            candidate_office="P",
+        )
+        ies = [
+            {  # same election previous year
+                "date": "2023-01-01",
+                "amount": "123.45",
+                "contact": candidate_a,
+                "code": "H2024",
+            },
+            {  # same election same year
+                "date": "2024-01-01",
+                "amount": "1.00",
+                "contact": candidate_a,
+                "code": "H2024",
+            },
+            {  # same election same year
+                "date": "2024-01-02",
+                "amount": "1.00",
+                "contact": candidate_a,
+                "code": "H2024",
+            },
+            {  # same election same year
+                "date": "2024-01-02",
+                "amount": "2.00",
+                "contact": candidate_b,
+                "code": "H2024",
+            },
+            {  # different election same year
+                "date": "2024-01-03",
+                "amount": "3.00",
+                "contact": candidate_c,
+                "code": "H2024",
+            },
+            {  # different election same year
+                "date": "2024-01-04",
+                "amount": "4.00",
+                "contact": candidate_a,
+                "code": "Z2024",
+            },
+        ]
+
+        for ie in ies:
+            create_ie(
+                self.committee, ie["contact"], ie["date"], ie["amount"], ie["code"]
+            )
+
+        view: QuerySet = Transaction.objects.transaction_view()
+        view = view.filter(committee_account_id=self.committee.id)
+        self.assertEqual(view[0]._calendar_ytd_per_election_office, Decimal("123.45"))
+        self.assertEqual(view[1]._calendar_ytd_per_election_office, Decimal("1.00"))
+        self.assertEqual(view[2]._calendar_ytd_per_election_office, Decimal("2.00"))
+        self.assertEqual(view[3]._calendar_ytd_per_election_office, Decimal("4.00"))
+        self.assertEqual(view[4]._calendar_ytd_per_election_office, Decimal("3.00"))
+        self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))

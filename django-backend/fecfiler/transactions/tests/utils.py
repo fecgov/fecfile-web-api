@@ -21,20 +21,35 @@ def create_schedule_a(type, committee, contact, date, amount, group="GENERAL"):
         type,
         ScheduleA,
         committee,
-        contact,
+        contact_1=contact,
         group=group,
         data={"contribution_date": date, "contribution_amount": amount},
     )
 
 
+def create_ie(committee, contact, date, amount, code):
+    return create_test_transaction(
+        "INDEPENDENT_EXPENDITURE",
+        ScheduleE,
+        committee,
+        contact_2=contact,
+        data={
+            "disbursement_date": date,
+            "expenditure_amount": amount,
+            "election_code": code,
+        },
+    )
+
+
 def create_test_transaction(
-    type, schedule, committee, contact=None, group=None, data=None
+    type, schedule, committee, contact_1=None, contact_2=None, group=None, data=None
 ):
     schedule_object = create_schedule(schedule, data)
     transaction = Transaction.objects.create(
         transaction_type_identifier=type,
         committee_account=committee,
-        contact_1=contact,
+        contact_1=contact_1,
+        contact_2=contact_2,
         aggregation_group=group,
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
     )
