@@ -10,10 +10,11 @@ logger = structlog.get_logger(__name__)
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
-    logger.exception("Exception", exc=exc)
+
     response = exception_handler(exc, context)
 
     if response is None:
+        logger.error(f"Error: {exc}")
         return HttpResponseServerError()
 
     # Delete user cookies on forbidden http response.
@@ -25,7 +26,7 @@ def custom_exception_handler(exc, context):
         delete_user_logged_in_cookies(response)
 
     # Do not allow an error response body unless validation
-    data = getattr(response, 'data')
+    data = getattr(response, "data")
     exception_type = type(exc)
     logger.error(f"Error: {data}")
     if data and exception_type is not ValidationError:
