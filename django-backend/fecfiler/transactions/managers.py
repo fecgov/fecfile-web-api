@@ -715,9 +715,11 @@ class TransactionViewManager(Manager):
                         - F("payment_amount"),
                     ),
                 ),
-                balance=When(
-                    schedule_d__isnull=False,
-                    then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                balance=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                    ),
                 ),
                 itemized=Coalesce(
                     "view_parent_transaction__view_parent_transaction___itemized",
