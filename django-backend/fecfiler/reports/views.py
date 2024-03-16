@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from .models import Report, ReportTransaction
+from .models import Report
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
 import structlog
+from functools import reduce
 
 logger = structlog.get_logger(__name__)
 
