@@ -370,7 +370,6 @@ class TransactionViewSet(CommitteeOwnedViewSet):
                 status=404
             )
 
-        breakpoint()
         transaction.reports.remove(report)
         update_recalculation(report)
         return Response("Transaction removed from report")
