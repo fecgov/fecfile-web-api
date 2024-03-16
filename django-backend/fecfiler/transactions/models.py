@@ -51,12 +51,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         blank=True,
         related_name="reatt_redes_associations",
     )
-    # primary_report = models.ForeignKey(
-    #     'reports.Report',
-    #     on_delete=models.CASCADE,
-    #     null=True,
-    #     blank=True,
-    # )
     reports = models.ManyToManyField(
         'reports.Report',
         through="reports.ReportTransaction",
