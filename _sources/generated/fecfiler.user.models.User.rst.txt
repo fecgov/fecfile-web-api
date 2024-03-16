@@ -86,12 +86,11 @@ fecfiler.user.models.User
       ~User.is_superuser
       ~User.last_login
       ~User.last_name
-      ~User.login_dot_gov
       ~User.membership_set
       ~User.objects
       ~User.password
       ~User.pk
-      ~User.security_consent_date
+      ~User.security_consent_exp_date
       ~User.user_permissions
       ~User.username
       ~User.username_validator

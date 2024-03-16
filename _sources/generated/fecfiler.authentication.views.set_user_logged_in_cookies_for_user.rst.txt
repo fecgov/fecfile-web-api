@@ -1,6 +1,0 @@
-fecfiler.authentication.views.set\_user\_logged\_in\_cookies\_for\_user
-=======================================================================
-
-.. currentmodule:: fecfiler.authentication.views
-
-.. autofunction:: set_user_logged_in_cookies_for_user

@@ -36,6 +36,7 @@ fecfiler.user
    fecfiler.user.models
    fecfiler.user.serializers
    fecfiler.user.test_models
+   fecfiler.user.test_views
    fecfiler.user.urls
    fecfiler.user.views
 

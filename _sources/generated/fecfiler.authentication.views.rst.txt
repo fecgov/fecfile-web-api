@@ -33,7 +33,6 @@ fecfiler.authentication.views
       login_dot_gov_logout
       login_redirect
       logout_redirect
-      set_user_logged_in_cookies_for_user
    
    
 

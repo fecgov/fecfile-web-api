@@ -36,7 +36,7 @@
 <h1>fecfiler.user.models.User<a class="headerlink" href="#fecfiler-user-models-user" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.user.models.User">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.user.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_login</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_superuser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_staff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_joined</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">security_consent_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.user.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_login</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_superuser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_staff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_joined</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">security_consent_exp_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractUser</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.__init__">
@@ -225,31 +225,28 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_name</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">login_dot_gov</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">membership_set</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">membership_set</span></code></p></td>
 <td><p>Accessor to the related objects manager on the reverse side of a many-to-one relation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">objects</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">objects</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pk</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pk</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">security_consent_date</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">security_consent_exp_date</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.models.User.user_permissions" title="fecfiler.user.models.User.user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.models.User.user_permissions" title="fecfiler.user.models.User.user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username_validator</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username_validator</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -557,6 +554,7 @@ failed.</p>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.user.serializers.html">fecfiler.user.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_models.html">fecfiler.user.test_models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_views.html">fecfiler.user.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.user.urls.html">fecfiler.user.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.user.views.html">fecfiler.user.views</a></li>
 </ul>
