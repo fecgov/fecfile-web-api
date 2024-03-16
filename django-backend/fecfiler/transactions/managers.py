@@ -26,7 +26,6 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
-from fecfiler.reports.models import ReportTransaction
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""

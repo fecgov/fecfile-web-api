@@ -263,10 +263,9 @@ class TransactionViewSet(CommitteeOwnedViewSet):
             **contact_instances
         )
 
-
         for report_id in report_ids:
             if not transaction_instance.reports.filter(id=report_id).exists():
-                matching_report =  Report.objects.get(id=report_id)
+                matching_report = Report.objects.get(id=report_id)
                 if matching_report:
                     transaction_instance.reports.add(matching_report)
                     update_recalculation(matching_report)
@@ -332,36 +331,57 @@ class TransactionViewSet(CommitteeOwnedViewSet):
         if request.data["transaction_id"] and request.data["report_id"]:
             report = Report.objects.get(id=request.data["report_id"])
             if report:
-                transaction = Transaction.objects.get(id=request.data["transaction_id"])
+                transaction = Transaction.objects.get(
+                    id=request.data["transaction_id"]
+                )
                 if transaction:
                     transaction.reports.add(report)
                     update_recalculation(report)
                     return Response("Report added to transaction")
                 else:
-                    return Response("No transaction matching id provided", status_code=202)
+                    return Response(
+                        "No transaction matching id provided",
+                        status_code=202
+                    )
             else:
-                return Response("No report matching id provided", status_code=202)
+                return Response(
+                    "No report matching id provided",
+                    status_code=202
+                )
         else:
-            return Response("Invalid payload: report_id and transaction_id are required", status_code=400)
+            return Response(
+                "Invalid payload: report_id and transaction_id are required",
+                status_code=400
+            )
 
     @action(detail=False, methods=["put"], url_path=r"remove_report")
     def remove_report(self, request):
         if request.data["transaction_id"] and request.data["report_id"]:
             report = Report.objects.get(id=request.data["report_id"])
             if report:
-                transaction = Transaction.objects.get(id=request.data["transaction_id"])
+                transaction = Transaction.objects.get(
+                    id=request.data["transaction_id"]
+                )
                 if transaction:
                     if transaction.reports.filter(id=report.id).exists():
                         transaction.reports.remove(report)
                         return Response("Report removed from transaction")
                     else:
-                        return Response("The transaction is not paired with the provided report", status_code=202)
+                        return Response(
+                            "The transaction is not paired with "
+                            "the provided report", status_code=202
+                        )
                 else:
-                    return Response("No transaction matching id provided", status_code=202)
+                    return Response(
+                        "No transaction matching id provided", status_code=202)
             else:
-                return Response("No report matching id provided", status_code=202)
+                return Response(
+                    "No report matching id provided", status_code=202)
         else:
-            return Response("Invalid payload: report_id and transaction_id are required", status_code=400)
+            return Response(
+                "Invalid payload: report_id and transaction_id are required",
+                status_code=400
+            )
 
 
 def noop(transaction, is_existing):

@@ -12,7 +12,7 @@ class ScheduleCViewsTestCase(TestCase):
     ]
 
     def setUp(self):
-        self.form_3x=Form3X()
+        self.form_3x = Form3X()
         self.form_3x.save()
         self.report_1 = Report(
             form_type="F3XN",

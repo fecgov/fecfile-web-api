@@ -203,6 +203,7 @@ TABLE_TO_FORM = {
     "form_1m": "F1M",
 }
 
+
 def update_recalculation(report: Report):
     if report:
         committee = report.committee_account
@@ -218,7 +219,9 @@ def update_recalculation(report: Report):
         for report_to_recalc in reports_to_flag_for_recalculation:
             report_to_recalc.calculation_status = None
             report_to_recalc.save()
-            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+            logger.info(
+                f"Report: {report_to_recalc.id} marked for recalcuation"
+            )
 
 
 class ReportMixin(models.Model):
@@ -229,7 +232,6 @@ class ReportMixin(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # update_recalculation(self.report)  # TODO: Do we need this for non-transaction models?
         super(ReportMixin, self).save(*args, **kwargs)
 
     class Meta:

@@ -17,7 +17,8 @@ class ScheduleD(models.Model):
     )
 
     def get_date(self):
-        return self.get_transaction().reports.filter(form_3x__isnull=False).first().coverage_through_date
+        return self.get_transaction().reports.filter(
+            form_3x__isnull=False).first().coverage_through_date
 
     def get_transaction(self):
         return self.transaction_set.first()

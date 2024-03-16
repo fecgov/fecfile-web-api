@@ -4,7 +4,6 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
 from .models import Report, ReportTransaction
-from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission

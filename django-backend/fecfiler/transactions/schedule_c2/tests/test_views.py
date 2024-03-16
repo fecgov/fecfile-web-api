@@ -1,7 +1,6 @@
 from django.test import TestCase
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.schedule_c.models import ScheduleC
-from fecfiler.transactions.schedule_c.views import save_hook as c_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as c2_hook
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.models import Transaction
