@@ -238,7 +238,7 @@ class ReportMixin(models.Model):
         abstract = True
 
 
-class ReportTransaction(CommitteeOwnedModel):
+class ReportTransaction(models.Model):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,

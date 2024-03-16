@@ -326,62 +326,54 @@ class TransactionViewSet(CommitteeOwnedViewSet):
              for data in saved_data]
         )
 
-    @action(detail=False, methods=["put"], url_path=r"add_report")
-    def add_report(self, request):
-        if request.data["transaction_id"] and request.data["report_id"]:
-            report = Report.objects.get(id=request.data["report_id"])
-            if report:
-                transaction = Transaction.objects.get(
-                    id=request.data["transaction_id"]
-                )
-                if transaction:
-                    transaction.reports.add(report)
-                    update_recalculation(report)
-                    return Response("Report added to transaction")
-                else:
-                    return Response(
-                        "No transaction matching id provided",
-                        status_code=202
-                    )
-            else:
-                return Response(
-                    "No report matching id provided",
-                    status_code=202
-                )
-        else:
+    @action(detail=False, methods=["put"], url_path=r"add-transaction")
+    def add_transaction_to_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
             return Response(
-                "Invalid payload: report_id and transaction_id are required",
-                status_code=400
+                "No report matching id provided",
+                status=404
             )
 
-    @action(detail=False, methods=["put"], url_path=r"remove_report")
-    def remove_report(self, request):
-        if request.data["transaction_id"] and request.data["report_id"]:
-            report = Report.objects.get(id=request.data["report_id"])
-            if report:
-                transaction = Transaction.objects.get(
-                    id=request.data["transaction_id"]
-                )
-                if transaction:
-                    if transaction.reports.filter(id=report.id).exists():
-                        transaction.reports.remove(report)
-                        return Response("Report removed from transaction")
-                    else:
-                        return Response(
-                            "The transaction is not paired with "
-                            "the provided report", status_code=202
-                        )
-                else:
-                    return Response(
-                        "No transaction matching id provided", status_code=202)
-            else:
-                return Response(
-                    "No report matching id provided", status_code=202)
-        else:
-            return Response(
-                "Invalid payload: report_id and transaction_id are required",
-                status_code=400
+        try:
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id")
             )
+        except Transaction.DoesNotExist:
+            return Response(
+                "No transaction matching id provided",
+                status=404
+            )
+
+        transaction.reports.add(report)
+        update_recalculation(report)
+        return Response("Transaction added to report")
+
+    @action(detail=False, methods=["put"], url_path=r"remove-transaction")
+    def remove_transaction_from_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
+            return Response(
+                "No report matching id provided",
+                status=404
+            )
+
+        try:
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id")
+            )
+        except Transaction.DoesNotExist:
+            return Response(
+                "No transaction matching id provided",
+                status=404
+            )
+
+        breakpoint()
+        transaction.reports.remove(report)
+        update_recalculation(report)
+        return Response("Transaction removed from report")
 
 
 def noop(transaction, is_existing):
