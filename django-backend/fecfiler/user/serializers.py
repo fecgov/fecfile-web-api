@@ -12,10 +12,8 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "security_consent_date",
-            "login_dot_gov",
+            "security_consent_exp_date",
         ]
         read_only_fields = [
             "email",
-            "login_dot_gov",
         ]

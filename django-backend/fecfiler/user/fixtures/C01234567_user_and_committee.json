@@ -12,7 +12,8 @@
             "last_login": "2022-05-02T13:44:07.324Z",
             "is_staff": false,
             "is_active": true,
-            "date_joined": "2020-09-28T15:22:56.477Z"
+            "date_joined": "2020-09-28T15:22:56.477Z",
+            "security_consent_exp_date": "2024-03-12"
         }
     },
     {
