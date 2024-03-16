@@ -125,9 +125,9 @@ class ReportViewSet(CommitteeOwnedViewSet):
 
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
-        transaction_count = ReportTransaction.objects.filter(
-            report__committee_account__committee_id=committee_id
-        ).count()
+        transaction_count = reduce(
+            lambda a, b: a + b, [r.transactions.count() for r in reports]
+        )
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()

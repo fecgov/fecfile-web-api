@@ -156,7 +156,7 @@ class TransactionManager(SoftDeleteManager):
                 ],
                 reports__form_3x_id__isnull=False,
                 reports__coverage_through_date__lt=OuterRef(
-                    "reports__coverage_from_date"
+                    "reports__coverage_through_date"
                 ),
             )
             .values("committee_account_id")
