@@ -63,7 +63,7 @@ def handle_invalid_login(username):
 
 
 def delete_user_logged_in_cookies(response):
-    response.delete_cookie("oidc_state", domain=FFAPI_COOKIE_DOMAIN)
+    response.delete_cookie("oidc_state")
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
 
 
