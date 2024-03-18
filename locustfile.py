@@ -122,7 +122,6 @@ class Tasks(TaskSet):
         self.reports = self.fetch_ids("reports", "id")
         self.contacts = self.fetch_ids("contacts", "id")
 
-
     def create_report(self):
         report = generate_random_report()
         fields_to_validate = [
