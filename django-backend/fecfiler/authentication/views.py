@@ -12,6 +12,7 @@ from fecfiler.settings import (
     LOGOUT_REDIRECT_URL,
     OIDC_OP_LOGOUT_ENDPOINT,
     ALTERNATIVE_LOGIN,
+    FFAPI_COOKIE_DOMAIN,
 )
 
 from rest_framework.response import Response
@@ -63,7 +64,7 @@ def handle_invalid_login(username):
 
 def delete_user_logged_in_cookies(response):
     response.delete_cookie("oidc_state")
-    response.delete_cookie("csrftoken")
+    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
 
 
 @api_view(["GET"])
