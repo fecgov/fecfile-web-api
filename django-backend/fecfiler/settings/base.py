@@ -26,6 +26,7 @@ KEY_VALUE = "KEY_VALUE"
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 
+CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = [
     env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
 ]
@@ -168,6 +169,8 @@ OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
 ALLOW_LOGOUT_GET_METHOD = True
+
+FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
