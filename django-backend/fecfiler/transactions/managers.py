@@ -154,8 +154,8 @@ class TransactionManager(SoftDeleteManager):
                     "LOAN_REPAYMENT_RECEIVED",
                     "LOAN_REPAYMENT_MADE",
                 ],
-                reports__form_3x_id__isnull=False,
-                reports__coverage_through_date__lt=OuterRef(
+                reports__coverage_through_date__isnull=False,
+                reports__coverage_through_date__lte=OuterRef(
                     "reports__coverage_through_date"
                 ),
             )
@@ -174,7 +174,7 @@ class TransactionManager(SoftDeleteManager):
             queryset.filter(
                 ~Q(debt_id=OuterRef("id")),
                 transaction_id=OuterRef("transaction_id"),
-                reports__form_3x_id__isnull=False,
+                reports__coverage_through_date__isnull=False,
                 reports__coverage_through_date__lt=OuterRef(
                     "reports__coverage_from_date"
                 ),
@@ -190,7 +190,6 @@ class TransactionManager(SoftDeleteManager):
                 ~Q(debt_id=OuterRef("id")),
                 debt__transaction_id=OuterRef("transaction_id"),
                 schedule_d__isnull=True,
-                reports__form_3x_id__isnull=False,
                 date__lt=OuterRef("reports__coverage_from_date"),
             )
             .values("committee_account_id")
