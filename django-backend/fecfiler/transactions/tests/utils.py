@@ -27,6 +27,17 @@ def create_schedule_a(type, committee, contact, date, amount, group="GENERAL"):
     )
 
 
+def create_schedule_b(type, committee, contact, date, amount, group="GENERAL"):
+    return create_test_transaction(
+        type,
+        ScheduleA,
+        committee,
+        contact_1=contact,
+        group=group,
+        data={"contribution_date": date, "contribution_amount": amount},
+    )
+
+
 def create_ie(committee, contact, date, amount, code):
     return create_test_transaction(
         "INDEPENDENT_EXPENDITURE",
@@ -38,6 +49,16 @@ def create_ie(committee, contact, date, amount, code):
             "expenditure_amount": amount,
             "election_code": code,
         },
+    )
+
+
+def create_debt(committee, contact, incurred_amount):
+    return create_test_transaction(
+        "DEBT_OWED_BY_COMMITTEE",
+        ScheduleD,
+        committee,
+        contact_1=contact,
+        data={"incurred_amount": incurred_amount},
     )
 
 

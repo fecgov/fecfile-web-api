@@ -6,10 +6,14 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.managers import TransactionManager
+from fecfiler.reports.tests.utils import create_form3x
+
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
+    create_schedule_b,
     create_schedule_a,
     create_ie,
+    create_debt,
 )
 import uuid
 from decimal import Decimal
@@ -198,3 +202,35 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[3]._calendar_ytd_per_election_office, Decimal("4.00"))
         self.assertEqual(view[4]._calendar_ytd_per_election_office, Decimal("3.00"))
         self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))
+
+    def test_debts(self):
+        q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        q2_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
+        original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
+        original_debt.report = q1_report
+        original_debt.save()
+        first_repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            Decimal("1.23"),
+            "GENERAL_DISBURSEMENT",
+        )
+        first_repayment.debt = original_debt
+        first_repayment.save()
+        second_repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            Decimal("2.27"),
+            "GENERAL_DISBURSEMENT",
+        )
+        second_repayment.debt = original_debt
+        second_repayment.save()
+        view: QuerySet = Transaction.objects.transaction_view()
+        original_debt_view = view.filter(id=original_debt.id).first()
+        self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
+        self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
+        self.assertEqual(original_debt_view.payment_amount, Decimal("3.51"))

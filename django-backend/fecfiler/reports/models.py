@@ -92,9 +92,12 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         previous_report = self.get_previous_report()
 
         if previous_report:
-            loans_to_pull_forward = previous_report.transaction_set.filter(
+            loans_to_pull_forward = get_read_model(
+                previous_report.committee_account
+            ).filter(
                 ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
                 ~Q(memo_code=True),
+                report=previous_report,
                 schedule_c_id__isnull=False,
             )
 
