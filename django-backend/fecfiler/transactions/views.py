@@ -14,7 +14,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -267,7 +267,18 @@ class TransactionViewSet(CommitteeOwnedViewSet):
             if not transaction_instance.reports.filter(id=report_id).exists():
                 matching_report = Report.objects.get(id=report_id)
                 if matching_report:
-                    transaction_instance.reports.add(matching_report)
+                    if not ReportTransaction.objects.filter(
+                        transaction_id=transaction_instance.id,
+                        report_id=report_id
+                    ).exists:
+                        new_link = ReportTransaction(
+                            transaction_id=transaction_instance.id,
+                            report_id=report_id
+                        )
+                        new_link.save()
+                        logger.info(f"Report Transaction link created {report_id}, {transaction_instance.id}")
+
+                    # transaction_instance.reports.add(matching_report)
                     update_recalculation(matching_report)
 
         get_save_hook(transaction_instance)(
