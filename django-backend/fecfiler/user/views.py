@@ -9,8 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.GenericViewSet):
-    @action(detail=False, methods=["PUT"], serializer_class=CurrentUserSerializer)
+    @action(detail=False, methods=["GET", "PUT"], serializer_class=CurrentUserSerializer)
     def current(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
         if request.method == 'PUT':
             serializer = self.get_serializer(request.user, data=request.data)
             if serializer.is_valid():

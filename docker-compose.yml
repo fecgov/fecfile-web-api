@@ -61,7 +61,6 @@ services:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
 
-
   api:
     build:
       context: './'
@@ -109,3 +108,27 @@ services:
       FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
+
+  locust-leader:
+    image: locustio/locust
+    ports:
+     - "8089:8089"
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H http://fecfile-api:8080
+    profiles: [locust]
+    environment:
+      LOCAL_TEST_USER:
+      LOCAL_TEST_PWD:
+      OIDC_SESSION_ID:
+
+  locust-follower:
+    image: locustio/locust
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust-leader -L DEBUG
+    profiles: [locust]
+    environment:
+      LOCAL_TEST_USER:
+      LOCAL_TEST_PWD:
+      OIDC_SESSION_ID:

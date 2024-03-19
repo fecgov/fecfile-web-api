@@ -208,14 +208,19 @@ def register_committee(committee_id, user):
             f1_line = dot_fec_content.split("\n")[1]
             f1_email = f1_line.split(FS_STR)[11]
 
+    failure_reason = None
     if f1_email != email:
-        raise ValidationError(f"Email {email} does not match committee email")
+        failure_reason = f"Email {email} does not match committee email"
 
     existing_account = CommitteeAccount.objects.filter(
         committee_id=committee_id
     ).first()
     if existing_account:
-        raise ValidationError(f"Committee {committee_id} already registered")
+        failure_reason = f"Committee {committee_id} already registered"
+
+    if failure_reason:
+        logger.error(f"Failure to register committee: {failure_reason}")
+        raise ValidationError("could not register committee")
 
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
