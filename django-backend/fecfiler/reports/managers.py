@@ -20,6 +20,7 @@ class ReportManager(SoftDeleteManager):
         queryset = (
             super()
             .get_queryset()
+            .distinct() # Remove duplicates caused by multiple transaction foreign key links
             .annotate(
                 report_type=Case(
                     When(form_3x__isnull=False, then=ReportType.F3X.value),
