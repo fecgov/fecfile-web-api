@@ -1,4 +1,5 @@
 from fecfiler.transactions.models import get_read_model, Transaction
+from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
@@ -55,6 +56,7 @@ def carry_forward_loans(report):
 
 
 def carry_forward_loan(loan, report):
+    print("AHOY CARRY FORWARD LOAN")
     # Save children as they are lost from the loan object
     # when the loan is saved
     original_children = copy.deepcopy(loan.children)
@@ -92,29 +94,4 @@ def carry_forward_loan(loan, report):
         # If child is a guarantor transaction, copy it
         # and link it to the new loan
         if child.schedule_c2 is not None:
-            save_copy(
-                Transaction(
-                    **model_to_dict(
-                        child,
-                        fields=[f.name for f in Transaction._meta.fields],
-                        exclude=[
-                            "committee_account",
-                            "report",
-                            "parent_transaction",
-                            "contact_1",
-                            "contact_2",
-                            "contact_3",
-                            "schedule_c2",
-                        ],
-                    )
-                ),
-                {
-                    "schedule_c2": save_copy(child.schedule_c2),
-                    "memo_text": (
-                        save_copy(child.memo_text) if child.memo_text else None
-                    ),
-                    "committee_account_id": loan.committee_account_id,
-                    "report_id": report.id,
-                    "parent_transaction_id": new_loan.id,
-                },
-            )
+            carry_forward_guarantor(report, new_loan, child)

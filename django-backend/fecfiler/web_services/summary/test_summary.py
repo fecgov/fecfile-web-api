@@ -28,19 +28,6 @@ class F3XReportTestCase(TestCase):
             Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
         )
         self.assertEqual(
-            summary_a["line_7"],
-            Decimal("150.00")  # line_21c
-            + Decimal("22.00")  # line_22
-            + Decimal("14.00")  # line_23
-            + Decimal("151.00")  # line_24
-            + Decimal("0")  # line_25
-            + Decimal("44.00")  # line_26
-            + Decimal("31.00")  # line_27
-            + Decimal(101.50 + 201.50 + 301.50)  # line_28d
-            + Decimal("201.50")  # line_29
-            + Decimal("102.25"),  # line_30c
-        )
-        self.assertEqual(
             summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"]
         )
         self.assertEqual(summary_a["line_9"], Decimal("215.00"))
@@ -104,6 +91,20 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             summary_a["line_38"],
             Decimal("150.00") - Decimal("2125.79"),  # line_36  # line_37
+        )
+
+        self.assertEqual(
+            summary_a["line_7"],
+            Decimal("150.00")  # line_21c
+            + Decimal("22.00")  # line_22
+            + Decimal("14.00")  # line_23
+            + Decimal("151.00")  # line_24
+            + Decimal("0")  # line_25
+            + Decimal("44.00")  # line_26
+            + Decimal("31.00")  # line_27
+            + Decimal(101.50 + 201.50 + 301.50)  # line_28d
+            + Decimal("201.50")  # line_29
+            + Decimal("102.25"),  # line_30c
         )
 
     def test_calculate_summary_column_b(self):

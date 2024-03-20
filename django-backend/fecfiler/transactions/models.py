@@ -197,6 +197,7 @@ def get_read_model(committee_uuid):
         incurred_prior = models.DecimalField()
         payment_prior = models.DecimalField()
         payment_amount = models.DecimalField()
+        name = models.TextField()
 
         objects = TransactionViewManager()
 

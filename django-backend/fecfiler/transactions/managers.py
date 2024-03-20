@@ -503,8 +503,8 @@ class TransactionManager(SoftDeleteManager):
         "contact_1__name",
         Concat(
             "contact_1__last_name",
-            Value("', '"),
-            "contact_2__last_name",
+            Value(", "),
+            "contact_1__first_name",
             output_field=TextField(),
         ),
     )
