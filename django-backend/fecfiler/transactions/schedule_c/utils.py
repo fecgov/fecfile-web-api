@@ -84,6 +84,7 @@ def carry_forward_loan(loan, report):
                     "contact_2",
                     "contact_3",
                     "schedule_c",
+                    "loan",
                 ],
             )
         ),

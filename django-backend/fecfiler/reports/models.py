@@ -89,6 +89,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
+        from fecfiler.transactions.schedule_d.utils import carry_forward_debts
 
         # Record if the is a create or update operation
         create_action = self.created is None
@@ -100,50 +101,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             # loan guarantors
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
-                # self.pull_forward_loans()
-                # self.pull_forward_debts()
-
-    def pull_forward_debts(self):
-        previous_report = self.get_previous_report()
-
-        if previous_report:
-            debts_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
-                ~Q(memo_code=True),
-                schedule_d_id__isnull=False,
-            )
-
-            for debt in debts_to_pull_forward:
-                self.pull_forward_debt(debt)
-
-    def pull_forward_debt(self, debt):
-        debt.schedule_d.incurred_amount = Decimal(0)
-        debt.schedule_d_id = self.save_copy(debt.schedule_d)
-        debt.report_id = self.id
-        debt.report = self
-        # The debt_id should point to the original debt transaction
-        # even if the debt is pulled forward multiple times.
-        debt.debt_id = debt.debt_id if debt.debt_id else debt.id
-        self.save_copy(debt)
-
-    def get_previous_report(self):
-        return (
-            Report.objects.get_queryset()
-            .filter(
-                committee_account=self.committee_account,
-                coverage_through_date__lt=self.coverage_through_date,
-            )
-            .order_by("coverage_through_date")
-            .last()
-        )
-
-    def save_copy(self, fkey):
-        if fkey:
-            fkey.pk = fkey.id = None
-            fkey._state.adding = True
-            fkey.save()
-            return fkey.id
-        return None
+                carry_forward_debts(self)
 
     def get_future_in_progress_reports(
         self,

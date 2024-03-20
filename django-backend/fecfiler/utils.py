@@ -37,7 +37,6 @@ def custom_exception_handler(exc, context):
 
 
 def save_copy(instance, data={}):
-    print(f"{(instance.__dict__)}")
     if instance:
         for field, value in data.items():
             setattr(instance, field, value)
