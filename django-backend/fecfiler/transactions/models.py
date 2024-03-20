@@ -169,9 +169,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
 def get_read_model(committee_uuid):
 
-    committee_transaction_view = (
-        f"transaction_view__{str(committee_uuid).replace('-','_')}"
-    )
+    committee_transaction_view = get_committee_view_name(committee_uuid)
 
     class T(Transaction):
         view_parent_transaction = models.ForeignKey(
@@ -203,23 +201,11 @@ def get_read_model(committee_uuid):
         class Meta:
             db_table = committee_transaction_view
 
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "select * from pg_views where viewname = %s;", [committee_transaction_view]
-        )
-        if not cursor.fetchone():
-            # create veiw
-            sql, params = (
-                Transaction.objects.transaction_view()
-                .filter(committee_account_id=committee_uuid)
-                .query.sql_with_params()
-            )
-            definition = cursor.mogrify(sql, params).decode("utf-8")
-            cursor.execute(
-                f"CREATE OR REPLACE VIEW {committee_transaction_view} as {definition}"
-            )
-
     return T
+
+
+def get_committee_view_name(committee_uuid):
+        return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
 TABLE_TO_SCHEDULE = {
