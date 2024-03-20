@@ -509,6 +509,22 @@ class TransactionManager(SoftDeleteManager):
         ),
     )
 
+    FORM_TYPE_CLAUSE = Case(
+        When(_form_type="SA11AI", _itemized=False, then=Value("SA11AII")),
+        When(_form_type="SA11AII", _itemized=True, then=Value("SA11AI")),
+        When(
+            transaction_type_identifier="C2_LOAN_GUARANTOR",
+            loan__transaction_type_identifier=("LOAN_BY_COMMITTEE"),
+            then=Value("SC2/9"),
+        ),
+        When(
+            transaction_type_identifier="C2_LOAN_GUARANTOR",
+            then=Value("SC2/10"),
+        ),
+        default=F("_form_type"),
+        output_field=TextField(),
+    )
+
     def LOAN_KEY_CLAUSE(self):
         return Case(
             When(
@@ -688,6 +704,7 @@ class TransactionManager(SoftDeleteManager):
                 #     .filter(parent_transaction_id=OuterRef("id"))
                 #     .values("id")
                 # ),
+                form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
             )

@@ -187,6 +187,7 @@ def get_read_model(committee_uuid):
         _itemized = models.BooleanField()
         amount = models.DecimalField()
         date = models.DateField()
+        form_type = models.TextField()
         effective_amount = models.DecimalField()
         aggregate = models.DecimalField()
         _calendar_ytd_per_election_office = models.DecimalField()
