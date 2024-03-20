@@ -269,7 +269,6 @@ class TransactionViewSet(CommitteeOwnedViewSet):
             f"linked to report(s): {', '.join(report_ids)}"
         )
 
-
         get_save_hook(transaction_instance)(
             transaction_instance,
             is_existing,
