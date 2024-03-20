@@ -13,7 +13,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, update_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
