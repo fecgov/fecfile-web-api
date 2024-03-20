@@ -79,7 +79,6 @@ class TransactionViewSet(
         # Otherwise, use the view for reading
         committee_uuid = self.get_committee_uuid()
         model = get_read_model(committee_uuid)
-        print(model.objects.all())
         queryset = filter_by_report(model.objects.all(), self)
 
         schedule_filters = self.request.query_params.get("schedules")
@@ -294,8 +293,6 @@ class TransactionViewSet(
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-        response = super().list(request, *args, **kwargs)
-        return response
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
     def save_reatt_redes_transactions(self, request):

@@ -372,6 +372,7 @@ FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 
 SILKY_PYTHON_PROFILER = True
+SILKY_META = True
 
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
