@@ -8,13 +8,12 @@ from django.db.models import Q, Value
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.reports.models import update_recalculation
 from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE, Schedule
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, update_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -263,12 +262,12 @@ class TransactionViewSet(CommitteeOwnedViewSet):
             **contact_instances
         )
 
-        for report_id in report_ids:
-            if not transaction_instance.reports.filter(id=report_id).exists():
-                matching_report = Report.objects.get(id=report_id)
-                if matching_report:
-                    transaction_instance.reports.add(matching_report)
-                    update_recalculation(matching_report)
+        # Link the transaction to all the reports it references in report_ids
+        transaction_instance.reports.set(report_ids)
+        logger.info(
+            f"Transaction {transaction_instance.id} "
+            f"linked to report(s): {', '.join(report_ids)}"
+        )
 
         get_save_hook(transaction_instance)(
             transaction_instance,

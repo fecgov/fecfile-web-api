@@ -36,6 +36,8 @@ class TransactionManager(SoftDeleteManager):
         queryset = (
             super()
             .get_queryset()
+            .distinct()  # Remove duplicates caused by multiple report
+                         # foreign key links
             .annotate(
                 schedule=Case(
                     When(schedule_a__isnull=False, then=Schedule.A.value),
