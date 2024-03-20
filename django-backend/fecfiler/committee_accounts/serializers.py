@@ -19,21 +19,25 @@ class CommitteeMembershipSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
 
         if instance.user is not None:
-            representation.update({
-                'id': instance.id,
-                'email': instance.user.email,
-                'username': instance.user.username,
-                'name': f"{instance.user.last_name}, {instance.user.first_name}",
-            })
+            representation.update(
+                {
+                    "id": instance.id,
+                    "email": instance.user.email,
+                    "username": instance.user.username,
+                    "name": f"{instance.user.last_name}, {instance.user.first_name}",
+                }
+            )
         else:
-            representation.update({
-                'id': instance.id,
-                'email': instance.pending_email,
-                'username': '',
-                'name': '',
-            })
+            representation.update(
+                {
+                    "id": instance.id,
+                    "email": instance.pending_email,
+                    "username": "",
+                    "name": "",
+                }
+            )
 
-        representation['is_active'] = instance.user is not None
+        representation["is_active"] = instance.user is not None
         return representation
 
     class Meta:
@@ -42,12 +46,7 @@ class CommitteeMembershipSerializer(serializers.Serializer):
         fields = [
             f.name
             for f in Membership._meta.get_fields()
-            if f.name
-            not in [
-                "deleted",
-                "user",
-                "pending_email"
-            ]
+            if f.name not in ["deleted", "user", "pending_email"]
         ] + ["name", "email"]
         read_only_fields = [
             "id",
@@ -69,15 +68,12 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         """Extract committee_id from request to assign the corresponding
         CommitteeAccount as the owner of the object
         """
-        data["committee_account"] = self.get_committee().id
+        data["committee_account"] = self.get_committee_uuid()
         return super().to_internal_value(data)
 
-    def get_committee(self):
+    def get_committee_uuid(self):
         request = self.context["request"]
-        committee_uuid = request.session["committee_uuid"]
-        committee = (
-            CommitteeAccount.objects.get_queryset().filter(id=committee_uuid).first()
-        )
-        if not committee:
+        get_committee_uuid = request.session["committee_uuid"]
+        if not get_committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
-        return committee
+        return get_committee_uuid

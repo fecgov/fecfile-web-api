@@ -715,6 +715,12 @@ class TransactionViewManager(Manager):
                         - F("payment_amount"),
                     ),
                 ),
+                loan_balance=Case(
+                    When(
+                        schedule_c__isnull=False,
+                        then=F("amount") - F("loan_payment_to_date"),
+                    ),
+                ),
                 balance=Case(
                     When(
                         schedule_d__isnull=False,

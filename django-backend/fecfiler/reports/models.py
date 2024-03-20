@@ -75,7 +75,21 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
     objects = ReportManager()
 
+    @property
+    def previous_report(self):
+        return (
+            Report.objects.get_queryset()
+            .filter(
+                committee_account=self.committee_account,
+                coverage_through_date__lt=self.coverage_from_date,
+            )
+            .order_by("coverage_through_date")
+            .last()
+        )
+
     def save(self, *args, **kwargs):
+        from fecfiler.transactions.schedule_c.utils import carry_forward_loans
+
         # Record if the is a create or update operation
         create_action = self.created is None
 
@@ -85,52 +99,9 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             # Pull forward any loans with non-zero balances along with their
             # loan guarantors
             if create_action and self.coverage_through_date:
-                self.pull_forward_loans()
-                self.pull_forward_debts()
-
-    def pull_forward_loans(self):
-        previous_report = self.get_previous_report()
-
-        if previous_report:
-            loans_to_pull_forward = get_read_model(
-                previous_report.committee_account
-            ).filter(
-                ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
-                ~Q(memo_code=True),
-                report=previous_report,
-                schedule_c_id__isnull=False,
-            )
-
-            for loan in loans_to_pull_forward:
-                self.pull_forward_loan(loan)
-
-    def pull_forward_loan(self, loan):
-        # Save children as they are lost from the loan object
-        # when the loan is saved
-        loan_children = copy.deepcopy(loan.children)
-
-        loan.schedule_c_id = self.save_copy(loan.schedule_c)
-        loan.memo_text_id = self.save_copy(loan.memo_text)
-        loan.report_id = self.id
-        loan.report = self
-        # The loan_id should point to the original loan transaction
-        # even if the loan is pulled forward multiple times.
-        loan.loan_id = loan.loan_id if loan.loan_id else loan.id
-        self.save_copy(loan)
-        for child in loan_children:
-            # If child is a guarantor transaction, copy it
-            # and link it to the new loan
-            if child.schedule_c2_id:
-                self.pull_forward_loan_guarantor(child, loan)
-
-    def pull_forward_loan_guarantor(self, loan_guarantor, loan):
-        loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
-        loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
-        loan_guarantor.report_id = self.id
-        loan_guarantor.report = self
-        loan_guarantor.parent_transaction_id = loan.id
-        loan_guarantor.parent_transaction = loan
-        self.save_copy(loan_guarantor)
+                carry_forward_loans(self)
+                # self.pull_forward_loans()
+                # self.pull_forward_debts()
 
     def pull_forward_debts(self):
         previous_report = self.get_previous_report()

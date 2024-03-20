@@ -137,6 +137,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
                 return TABLE_TO_SCHEDULE[schedule_key]
         return None
 
+    @property
+    def children(self):
+        return self.transaction_set.all()
+
     def get_schedule(self):
         for schedule_key in [
             "schedule_a",
@@ -163,11 +167,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         indexes = [models.Index(fields=["_form_type"])]
 
 
-def get_read_model(committee):
-    committee_id = committee.id
+def get_read_model(committee_uuid):
 
     committee_transaction_view = (
-        f"transaction_view__{str(committee_id).replace('-','_')}"
+        f"transaction_view__{str(committee_uuid).replace('-','_')}"
     )
 
     class T(Transaction):
@@ -207,7 +210,7 @@ def get_read_model(committee):
             # create veiw
             sql, params = (
                 Transaction.objects.transaction_view()
-                .filter(committee_account_id=committee_id)
+                .filter(committee_account_id=committee_uuid)
                 .query.sql_with_params()
             )
             definition = cursor.mogrify(sql, params).decode("utf-8")

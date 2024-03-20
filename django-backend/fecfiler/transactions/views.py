@@ -77,8 +77,8 @@ class TransactionViewSet(
             return super().get_queryset()
 
         # Otherwise, use the view for reading
-        committee = self.get_committee()
-        model = get_read_model(committee)
+        committee_uuid = self.get_committee_uuid()
+        model = get_read_model(committee_uuid)
         print(model.objects.all())
         queryset = filter_by_report(model.objects.all(), self)
 

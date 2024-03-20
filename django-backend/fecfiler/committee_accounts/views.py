@@ -35,10 +35,10 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee = self.get_object()
         if not committee:
             return Response("Committee could not be activated", status=403)
-        committee_uuid = committee.id
-        request.session["committee_uuid"] = str(committee_uuid)
+        request.session["committee_id"] = str(committee.committee_id)
+        request.session["committee_uuid"] = str(committee.id)
         """ create view if it doesn't exist """
-        get_read_model(committee)
+        get_read_model(committee.id)
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
@@ -63,18 +63,24 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     """
 
     def get_queryset(self):
-        committee = self.get_committee()
+        committee_uuid = self.get_committee_uuid()
+        committee_id = self.get_committee_id()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id
+            committee_id=committee_id, committee_uuid=committee_id
         )
-        return super().get_queryset().filter(committee_account_id=committee.id)
+        return super().get_queryset().filter(committee_account_id=committee_uuid)
 
-    def get_committee(self):
+    def get_committee_uuid(self):
         committee_uuid = self.request.session["committee_uuid"]
-        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
-        if not committee:
+        if not committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
-        return committee
+        return committee_uuid
+
+    def get_committee_id(self):
+        committee_id = self.request.session["committee_id"]
+        if not committee_id:
+            raise SuspiciousSession("session has invalid committee_id")
+        return committee_id
 
 
 class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
