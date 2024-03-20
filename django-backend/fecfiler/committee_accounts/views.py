@@ -3,7 +3,7 @@ from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.transactions.models import get_read_model
+from fecfiler.transactions.models import Transaction, get_committee_view_name, get_read_model
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -17,6 +17,7 @@ from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializ
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
+from django.db import connection
 import structlog
 from django.http import HttpResponse
 
@@ -234,4 +235,20 @@ def register_committee(committee_id, user):
         user=user,
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
     )
+
+    create_committee_view(account.id)
     return account
+
+
+def create_committee_view(committee_uuid):
+    view_name = get_committee_view_name(committee_uuid)
+    with connection.cursor() as cursor:
+        sql, params = (
+            Transaction.objects.transaction_view()
+            .filter(committee_account_id=committee_uuid)
+            .query.sql_with_params()
+        )
+        definition = cursor.mogrify(sql, params).decode("utf-8")
+        cursor.execute(
+            f"CREATE OR REPLACE VIEW {view_name} as {definition}"
+        )
