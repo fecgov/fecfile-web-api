@@ -39,7 +39,6 @@ def update_in_future_reports(transaction):
         report_id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
-    print("foo")
 
     schedule_c2_copy = copy.deepcopy(model_to_dict(transaction.schedule_c2))
     schedule_c2s_to_update = ScheduleC2.objects.filter(
