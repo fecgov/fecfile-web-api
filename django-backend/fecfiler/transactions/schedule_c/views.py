@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 import copy
@@ -18,7 +19,7 @@ def create_in_future_reports(transaction: Transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
-        report.pull_forward_loan(transaction_copy)
+        carry_forward_loan(transaction_copy, report)
 
 
 def update_in_future_reports(transaction: Transaction):
