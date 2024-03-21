@@ -181,7 +181,6 @@ def get_read_model(committee_uuid):
         )
         report_id = models.UUIDField()
         schedule = models.TextField()
-        line_label_order_key = models.TextField()
         _itemized = models.BooleanField()
         amount = models.DecimalField()
         date = models.DateField()
@@ -206,7 +205,7 @@ def get_read_model(committee_uuid):
 
 
 def get_committee_view_name(committee_uuid):
-        return f"transaction_view__{str(committee_uuid).replace('-','_')}"
+    return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
 TABLE_TO_SCHEDULE = {

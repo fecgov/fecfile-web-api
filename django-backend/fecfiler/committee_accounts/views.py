@@ -3,7 +3,11 @@ from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.transactions.models import Transaction, get_committee_view_name, get_read_model
+from fecfiler.transactions.models import (
+    Transaction,
+    get_committee_view_name,
+    get_read_model,
+)
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -250,5 +254,6 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(
-            f"CREATE OR REPLACE VIEW {view_name} as {definition}"
+            f"DROP VIEW IF EXISTS {view_name};"
+            + f"CREATE  VIEW {view_name} as {definition}"
         )

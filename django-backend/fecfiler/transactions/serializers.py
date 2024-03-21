@@ -154,7 +154,7 @@ class TransactionSerializer(
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"RENDERING {instance.id}")
+        # print(f"RENDERING {instance.id}")
         schedule_a = representation.pop("schedule_a")
         schedule_b = representation.pop("schedule_b")
         schedule_c = representation.pop("schedule_c")
@@ -242,19 +242,19 @@ class TransactionSerializer(
 
         # represent parent
         if instance.parent_transaction:
-            print(f"PARENT:{instance.parent_transaction}")
+            # print(f"PARENT:{instance.parent_transaction}")
             representation["parent_transaction"] = (
                 TransactionSerializer().to_representation(instance.parent_transaction)
             )
         # represent loan
         if instance.loan:
-            print("LOAN")
+            # print("LOAN")
             representation["loan"] = TransactionSerializer().to_representation(
                 instance.loan
             )
         # represent debt
         if instance.debt:
-            print("DEBT")
+            # print("DEBT")
             representation["debt"] = TransactionSerializer().to_representation(
                 instance.debt
             )
