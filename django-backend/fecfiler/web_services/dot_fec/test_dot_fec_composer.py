@@ -3,6 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from .dot_fec_composer import compose_dot_fec, add_row_to_content
+from fecfiler.committee_accounts.views import create_committee_view
 from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
 
 
@@ -16,6 +17,7 @@ class DotFECSerializerTestCase(TestCase):
     ]
 
     def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
@@ -53,7 +55,7 @@ class DotFECSerializerTestCase(TestCase):
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")
-        free_text = content[content.find("[BEGINTEXT]"):]
+        free_text = content[content.find("[BEGINTEXT]") :]
         self.assertEqual(
             free_text,
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"

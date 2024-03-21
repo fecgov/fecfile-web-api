@@ -1,7 +1,8 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.reports.models import Report
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.models import get_read_model
+from fecfiler.committee_accounts.views import create_committee_view
 from .summary import SummaryService
 
 
@@ -17,8 +18,12 @@ class F3XReportTestCase(TestCase):
         "test_contacts",
     ]
 
+    def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
+
     def test_calculate_summary_column_a(self):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
 
@@ -112,8 +117,10 @@ class F3XReportTestCase(TestCase):
         summary_service = SummaryService(f3x)
         _, summary_b = summary_service.calculate_summary()
 
-        t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
-        self.assertEqual(t.itemized, False)
+        debt = get_read_model(f3x.committee_account.id).objects.get(
+            id="aaaaaaaa-4d75-46f0-bce2-111000000001"
+        )
+        self.assertEqual(debt.itemized, False)
 
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(

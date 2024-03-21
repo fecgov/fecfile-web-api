@@ -59,7 +59,7 @@ class TransactionManager(SoftDeleteManager):
         "frame": RowRange(None, 0),
     }
     loan_payment_window = {
-        "partition_by": [F("debt_id")],
+        "partition_by": [F("loan_id")],
         "order_by": ["loan_key"],
         "frame": RowRange(None, 0),
     }
@@ -438,6 +438,7 @@ class TransactionManager(SoftDeleteManager):
             transaction_type_identifier__in=schedule_b_refunds,
             then=F("amount") * Value(Decimal(-1)),
         ),
+        When(schedule_c__isnull=False, then=None),
         default="amount",
         output_field=DecimalField(),
     )
@@ -466,9 +467,9 @@ class TransactionManager(SoftDeleteManager):
         "schedule_b__expenditure_amount",
         "schedule_c__loan_amount",
         "schedule_c2__guaranteed_amount",
+        "schedule_e__expenditure_amount",
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
-        "schedule_e__expenditure_amount",
     )
 
     def ENTITY_AGGREGGATE_CLAUSE(self):
@@ -538,8 +539,8 @@ class TransactionManager(SoftDeleteManager):
                 )
                 & Q(
                     transaction_type_identifier__in=[
-                        "'LOAN_REPAYMENT_RECEIVED'",
-                        "'LOAN_REPAYMENT_MADE'",
+                        "LOAN_REPAYMENT_RECEIVED",
+                        "LOAN_REPAYMENT_MADE",
                     ]
                 ),
                 then=Concat(F("loan__transaction_id"), F("date")),
@@ -553,15 +554,13 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def LOAN_PAYMENT_CLAUSE(self):
-        return Window(
-            expression=Sum("effective_amount"), **self.loan_payment_window
-        ) - Case(
+        return Case(
             When(
                 schedule_c__isnull=False,
-                then=F("effective_amount"),
-            ),
-            default=Value(0.0),
-            output_field=DecimalField(),
+                then=Window(
+                    expression=Sum("effective_amount"), **self.loan_payment_window
+                ),
+            )
         )
 
     def INCURRED_PRIOR_CLAUSE(self):
@@ -735,13 +734,18 @@ class TransactionViewManager(Manager):
                 loan_balance=Case(
                     When(
                         schedule_c__isnull=False,
-                        then=F("amount") - F("loan_payment_to_date"),
+                        then=F("amount")
+                        - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
                     ),
                 ),
                 balance=Case(
                     When(
                         schedule_d__isnull=False,
                         then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                    ),
+                    When(
+                        schedule_c__isnull=False,
+                        then=Coalesce(F("loan_balance"), Decimal(0)),
                     ),
                 ),
                 itemized=Coalesce(

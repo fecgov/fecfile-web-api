@@ -5,6 +5,7 @@ import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class TransactionViewsTestCase(TestCase):
@@ -18,6 +19,7 @@ class TransactionViewsTestCase(TestCase):
     json_content_type = "application/json"
 
     def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.factory = RequestFactory()
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
@@ -48,14 +50,14 @@ class TransactionViewsTestCase(TestCase):
         updated_payload = deepcopy(self.payloads["IN_KIND"])
         updated_payload["id"] = str(transaction.id)
         updated_payload["contribution_amount"] = 999
-        updated_payload["children"][0]["id"] = str(transaction.transaction_set[0].id)
+        updated_payload["children"][0]["id"] = str(transaction.children[0].id)
         updated_payload["children"][0]["expenditure_amount"] = 999
         request = self.request(updated_payload)
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_transaction = Transaction.objects.get(id=transaction.id)
         self.assertEqual(updated_transaction.schedule_a.contribution_amount, 999)
         self.assertEqual(
-            updated_transaction.transaction_set[0].schedule_b.expenditure_amount, 999
+            updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
     def test_get_queryset(self):
@@ -159,6 +161,7 @@ class TransactionViewsTestCase(TestCase):
             request, pk="aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35"
         )
         transaction = response.data
+        print(f"AHOY {transaction}")
         self.assertEqual(transaction.get("calendar_ytd_per_election_office"), 58.00)
 
     def test_multisave_transactions(self):
