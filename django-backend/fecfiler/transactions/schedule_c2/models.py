@@ -17,9 +17,5 @@ class ScheduleC2(models.Model):
     def get_transaction(self):
         return self.transaction_set.first()
 
-    def get_date(self):
-        return self.get_transaction().reports.filter(
-            form_3x__isnull=False).first().coverage_through_date
-
     class Meta:
         app_label = "transactions"

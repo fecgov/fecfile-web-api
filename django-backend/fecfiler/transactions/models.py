@@ -52,10 +52,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         related_name="reatt_redes_associations",
     )
     reports = models.ManyToManyField(
-        'reports.Report',
+        "reports.Report",
         through="reports.ReportTransaction",
         through_fields=["transaction", "report"],
-        related_name='transactions'
+        related_name="transactions",
     )
 
     # The _form_type value in the db may or may not be correct based on whether
@@ -153,9 +153,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         ]:
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
-
-    def get_date(self):
-        return self.get_schedule().get_date()
 
     def save(self, *args, **kwargs):
         if self.memo_text:
