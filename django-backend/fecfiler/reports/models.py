@@ -231,9 +231,6 @@ class ReportMixin(models.Model):
         "reports.Report", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    def save(self, *args, **kwargs):
-        super(ReportMixin, self).save(*args, **kwargs)
-
     class Meta:
         abstract = True
 

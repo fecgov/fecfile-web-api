@@ -264,6 +264,8 @@ class TransactionViewSet(CommitteeOwnedViewSet):
 
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
+        for report_id in report_ids:
+            update_recalculation(Report.objects.get(id=report_id))
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
