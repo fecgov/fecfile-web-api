@@ -121,7 +121,10 @@ CORS_ALLOW_CREDENTIALS = True
 DATABASES = {
     # Be sure to set the DATABASE_URL environment variable on your local
     # development machine so that the local database can be connected to.
-    "default": dj_database_url.config()
+    "default": dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Override default test name
