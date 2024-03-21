@@ -250,7 +250,8 @@ workflows:
             - dependency-check
           filters:
             branches:
-              only: /develop|release\/sprint-\d+|main/
+              # only: /develop|release\/sprint-\d+|main/
+              only: mod/release-sprint-38-conn-max-age
       - docs-build:
           requires:
             - test

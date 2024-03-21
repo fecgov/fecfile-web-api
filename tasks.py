@@ -49,7 +49,8 @@ def _detect_space(repo, branch=None):
 
 DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
-    ("stage", lambda _, branch: branch.startswith("release")),
+    # ("stage", lambda _, branch: branch.startswith("release")),
+    ("stage", lambda _, branch: branch == "mod/release-sprint-38-conn-max-age"),
     ("dev", lambda _, branch: branch == "develop"),
 )
 
