@@ -27,7 +27,6 @@ def add_schedule_c2_contact_fields(instance, representation=None):
 
 
 def carry_forward_guarantor(report, new_loan, guarantor):
-    print("AHOY CARRY FORWARD GUARANTOR")
     save_copy(
         Transaction(
             **model_to_dict(

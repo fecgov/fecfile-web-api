@@ -22,11 +22,13 @@ from decimal import Decimal
 
 class TransactionViewTestCase(TestCase):
     def setUp(self):
+        print("SETUP")
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         create_committee_view(self.committee.id)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_transaction_view(self):
+        print(f"AHOY{self.committee.id}")
         indiviual_reciepts = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL"},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL"},
@@ -50,6 +52,7 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
+        print(f"AHOY{self.committee.id}")
 
         unaggregated = create_test_transaction(
             "IDIVIDUAL_RECEIPT",
@@ -84,6 +87,7 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[1].aggregate, Decimal("200"))
 
     def test_transaction_view_parent(self):
+        print(f"AHOY{self.committee.id}")
         partnership_receipt = create_schedule_a(
             "PARTNERSHIP_RECEIPT",
             self.committee,
@@ -112,6 +116,7 @@ class TransactionViewTestCase(TestCase):
         )
 
     def test_refund_aggregate(self):
+        print(f"AHOY{self.committee.id}")
         create_schedule_a(
             "IDIVIDUAL_RECEIPT",
             self.committee,
@@ -134,6 +139,7 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[1].aggregate, Decimal("23.00"))
 
     def test_election_aggregate(self):
+        print(f"AHOY{self.committee.id}")
         candidate_a = Contact.objects.create(
             committee_account_id=self.committee.id,
             candidate_office="H",
@@ -204,8 +210,8 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))
 
     def test_debts(self):
+        print(f"AHOY{self.committee.id}")
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
-        q2_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
         original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
         original_debt.report = q1_report
         original_debt.save()
@@ -229,7 +235,8 @@ class TransactionViewTestCase(TestCase):
         )
         second_repayment.debt = original_debt
         second_repayment.save()
-        view: QuerySet = Transaction.objects.transaction_view()
+
+        view = get_read_model(self.committee.id).objects.all()
         original_debt_view = view.filter(id=original_debt.id).first()
         self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
@@ -273,6 +280,8 @@ class TransactionViewTestCase(TestCase):
             "GENERAL_DISBURSEMENT",
             "SB21B",
         )
+
+        print(f"AHOY line_label {self.committee.id}")
         view = get_read_model(self.committee.id).objects.all()
         self.assertEqual(getattr(view[0], "line_label"), "11(a)i")
         self.assertEqual(getattr(view[1], "line_label"), "11(a)ii")

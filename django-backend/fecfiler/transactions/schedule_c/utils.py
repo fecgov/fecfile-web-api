@@ -56,7 +56,6 @@ def carry_forward_loans(report):
 
 
 def carry_forward_loan(loan, report):
-    print("AHOY CARRY FORWARD LOAN")
     # Save children as they are lost from the loan object
     # when the loan is saved
     original_children = copy.deepcopy(loan.children)

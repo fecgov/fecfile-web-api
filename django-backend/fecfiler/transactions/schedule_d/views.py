@@ -11,7 +11,6 @@ from fecfiler.transactions.models import Transaction
 
 
 def save_hook(transaction: Transaction, is_existing):
-    print("AHOY SAVE_HOOK: DEBT")
     if not is_existing:
         create_in_future_reports(transaction)
     else:
@@ -19,7 +18,6 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    print("AHOY create_in_future: DEBT")
     future_reports = transaction.report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
@@ -27,7 +25,6 @@ def create_in_future_reports(transaction):
 
 
 def update_in_future_reports(transaction):
-    print("AHOY update_in_future: DEBT")
     future_reports = transaction.report.get_future_in_progress_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))

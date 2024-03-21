@@ -45,7 +45,6 @@ def carry_forward_debts(report):
 
 
 def carry_forward_debt(debt, report):
-    print("AHOY CARRY FORWARD DEBT")
     debt_data = {
         "schedule_d": save_copy(debt.schedule_d, {"incurred_amount": Decimal(0)}),
         "contact_1_id": debt.contact_1_id,

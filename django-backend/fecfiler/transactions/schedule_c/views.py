@@ -8,7 +8,6 @@ import copy
 
 
 def save_hook(transaction: Transaction, is_existing):
-    print("AHOY SAVE_HOOK: LOAN")
     if not transaction.memo_code:
         if not is_existing:
             create_in_future_reports(transaction)
@@ -17,7 +16,6 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction: Transaction):
-    print("AHOY create_in_future: LOAN")
     future_reports = transaction.report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:

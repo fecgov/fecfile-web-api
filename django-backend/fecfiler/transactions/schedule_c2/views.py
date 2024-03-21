@@ -7,7 +7,6 @@ import copy
 
 
 def save_hook(transaction: Transaction, is_existing):
-    print("AHOY SAVE_HOOK: GUARANTOR")
     if not transaction.parent_transaction.memo_code:
         if not is_existing:
             create_in_future_reports(transaction)
@@ -16,7 +15,6 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    print("AHOY create_in_future: GUARANTOR")
     future_reports = transaction.report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(

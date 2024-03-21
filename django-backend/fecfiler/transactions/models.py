@@ -205,6 +205,8 @@ def get_read_model(committee_uuid):
 
 
 def get_committee_view_name(committee_uuid):
+
+    print(f"get_committee_view_name{committee_uuid}")
     return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
