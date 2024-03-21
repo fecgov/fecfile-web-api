@@ -135,18 +135,17 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
 
-        response = view_set.previous_transaction_by_election(
-            self.request(
-                {},
-                {
-                    "date": "2023-10-31",
-                    "aggregation_group": "INDEPENDENT_EXPENDITURE",
-                    "election_code": "C2012",
-                    "candidate_office": "S",
-                    "candidate_state": "AK",
-                },
-            )
+        view_set.request = self.request(
+            {},
+            {
+                "date": "2023-10-31",
+                "aggregation_group": "INDEPENDENT_EXPENDITURE",
+                "election_code": "C2012",
+                "candidate_office": "S",
+                "candidate_state": "AK",
+            },
         )
+        response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.data["date"], "2023-10-31")
 
     def test_inherited_election_aggregate(self):

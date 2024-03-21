@@ -68,11 +68,6 @@ class TransactionManager(SoftDeleteManager):
         "order_by": ["loan_key"],
         "frame": RowRange(None, 0),
     }
-    debt_payment_window = {
-        "partition_by": [F("debt_id")],
-        "order_by": ["debt_key"],
-        "frame": RowRange(None, 0),
-    }
 
     def get_queryset(self):
         return super().get_queryset()
@@ -133,23 +128,15 @@ class TransactionManager(SoftDeleteManager):
         "schedule_d__incurred_amount",
     )
 
+    AGGREGATE = Case(
+        When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
+    )
+
     def ENTITY_AGGREGGATE_CLAUSE(self):
-        return Window(
-            expression=Sum("effective_amount"), **self.entity_aggregate_window
-        ) - Case(
-            When(force_unaggregated=True, then=F("effective_amount")),
-            default=Value(0.0),
-            output_field=DecimalField(),
-        )
+        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):
-        return Window(
-            expression=Sum("effective_amount"), **self.election_aggregate_window
-        ) - Case(
-            When(force_unaggregated=True, then=F("effective_amount")),
-            default=Value(0.0),
-            output_field=DecimalField(),
-        )
+        return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
 
     BACK_REFERENCE_CLAUSE = Coalesce(
         F("reatt_redes__transaction_id"),
