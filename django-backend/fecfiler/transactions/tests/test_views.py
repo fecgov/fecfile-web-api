@@ -18,8 +18,12 @@ class TransactionViewsTestCase(TestCase):
 
     json_content_type = "application/json"
 
+    @classmethod
+    def setUpClass(cls):
+        return super().setUpClass()
+
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
+        print("SETUP TEST_VEW")
         self.factory = RequestFactory()
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
