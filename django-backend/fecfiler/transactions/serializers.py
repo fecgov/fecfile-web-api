@@ -173,13 +173,15 @@ class TransactionSerializer(
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            # total = (
-            #     instance.reatt_redes_associations.filter(
-            #         schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-            #     ).aggregate(Sum("amount"))["amount__sum"]
-            #     or 0.0
-            # )
-            # representation["reatt_redes_total"] = str(total)
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
+                ).aggregate(Sum("schedule_a__contribution_amount"))[
+                    "schedule_a__contribution_amount__sum"
+                ]
+                or 0.0
+            )
+            representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
                 if not representation.get(property):
@@ -190,13 +192,15 @@ class TransactionSerializer(
 
             # # For REDESIGNATED transactions, calculate the amount that has
             # # been redesignated for the transaction
-            # total = (
-            #     instance.reatt_redes_associations.filter(
-            #         schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-            #     ).aggregate(Sum("amount"))["amount__sum"]
-            #     or 0.0
-            # )
-            # representation["reatt_redes_total"] = str(total)
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
+                ).aggregate(Sum("schedule_b__expenditure_amount"))[
+                    "schedule_b__expenditure_amount__sum"
+                ]
+                or 0.0
+            )
+            representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:
                 if not representation.get(property):
@@ -236,30 +240,12 @@ class TransactionSerializer(
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
 
-        # Assign the itemization value of the highest level parent for all transactions.
-        # The itemization value of the parent (or any ancestor) is not yet calcuated
-        # when retrieving this instance from the db.
-        # if instance.parent_transaction:
-        #     if instance.parent_transaction.parent_transaction:
-        #         itemized = Transaction.objects.get(
-        #             id=instance.parent_transaction.parent_transaction.id
-        #         ).itemized
-        #     else:
-        #         parent = Transaction.objects.get(id=instance.parent_transaction.id)
-        #         # Assign child IE's thier parent's calendar ytd per election
-        #         if instance.schedule_e:
-        #             representation[
-        #                 "calendar_ytd_per_election_office"
-        #             ] = parent.calendar_ytd_per_election_office
-        #         itemized = parent.itemized
-        #     representation["itemized"] = itemized
-
         # represent parent
         if instance.parent_transaction:
             print(f"PARENT:{instance.parent_transaction}")
-            representation[
-                "parent_transaction"
-            ] = TransactionSerializer().to_representation(instance.parent_transaction)
+            representation["parent_transaction"] = (
+                TransactionSerializer().to_representation(instance.parent_transaction)
+            )
         # represent loan
         if instance.loan:
             print("LOAN")
