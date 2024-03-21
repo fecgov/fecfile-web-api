@@ -3,6 +3,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.views import save_hook
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class ScheduleDViewsTestCase(TestCase):
@@ -11,6 +12,7 @@ class ScheduleDViewsTestCase(TestCase):
     ]
 
     def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.report_1 = Report(
             form_type="F3XN",
             committee_account_id="11111111-2222-3333-4444-555555555555",

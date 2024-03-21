@@ -57,7 +57,8 @@ class CommitteeMemberViewSetTest(TestCase):
         )
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555")
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "DELETE"
         request.query_params = dict()
@@ -71,7 +72,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555")
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "POST"
         request.data = {
@@ -96,7 +98,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555")
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "POST"
         request.data = {
@@ -115,7 +118,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555")
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "POST"
 

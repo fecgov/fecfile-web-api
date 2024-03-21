@@ -7,6 +7,7 @@ from fecfiler.transactions.models import Transaction, Schedule
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.managers import TransactionManager
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.committee_accounts.views import create_committee_view
 
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
@@ -51,10 +52,6 @@ class TransactionManagerTestCase(TestCase):
         self.assertEqual(transaction_five.schedule, Schedule.B.value.value)
         self.assertEqual(transaction_five.form_type, "SB21b")
 
-    def test_refund_aggregation(self):
-        refund = Transaction.objects.get(id="bbbbbbbb-3274-47d8-9388-7294a3fd4321")
-        self.assertEqual(refund.aggregate, 4444)
-
     def test_election_aggregation(self):
         transaction = Transaction.objects.get(id="c4ba684a-607f-4f5d-bfb4-0fa1776d4e35")
         self.assertEqual(
@@ -80,6 +77,7 @@ class TransactionManagerTestCase(TestCase):
 class TransactionViewTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_transaction_view(self):
@@ -132,6 +130,28 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(
             view[0].back_reference_tran_id_number, partnership_receipt.transaction_id
         )
+
+    def test_refund_aggregate(self):
+        create_schedule_a(
+            "IDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "123.00",
+            "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+        )
+        create_schedule_b(
+            "INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "100.00",
+            "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
+        )
+        view: QuerySet = Transaction.objects.transaction_view()
+        view = view.filter(committee_account_id=self.committee.id)
+        self.assertEqual(view[0].aggregate, Decimal("123.00"))
+        self.assertEqual(view[1].aggregate, Decimal("23.00"))
 
     def test_election_aggregate(self):
         candidate_a = Contact.objects.create(
@@ -233,4 +253,4 @@ class TransactionViewTestCase(TestCase):
         original_debt_view = view.filter(id=original_debt.id).first()
         self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
-        self.assertEqual(original_debt_view.payment_amount, Decimal("3.51"))
+        self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))

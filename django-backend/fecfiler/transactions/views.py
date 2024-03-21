@@ -73,7 +73,12 @@ class TransactionViewSet(
 
     def get_queryset(self):
         # Use the table if writing
-        if self.action in ["create", "update", "delete", "save_transactions"]:
+        if hasattr(self, "action") and self.action in [
+            "create",
+            "update",
+            "delete",
+            "save_transactions",
+        ]:
             return super().get_queryset()
 
         # Otherwise, use the view for reading
@@ -83,7 +88,9 @@ class TransactionViewSet(
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
-            schedules_to_include = schedule_filters.split(",")
+            schedules_to_include = (
+                schedule_filters.split(",") if schedule_filters else []
+            )
             queryset = queryset.filter(
                 schedule__in=[
                     Schedule[schedule].value for schedule in schedules_to_include
