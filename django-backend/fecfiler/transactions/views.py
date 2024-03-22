@@ -71,6 +71,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         else:  # Otherwise, use the view for reading
             committee_uuid = self.get_committee_uuid()
             model = get_read_model(committee_uuid)
+            queryset = model.objects
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -79,7 +80,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if self.request
             else None
         )
-        queryset = model.filter(reports__id=report_id) if report_id else model
+        queryset = queryset.filter(reports__id=report_id) if report_id else queryset
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
@@ -108,8 +109,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            transaction_view = self.get_queryset().get(id=saved_transaction.id)
-        return Response(TransactionSerializer().to_representation(transaction_view))
+            print(f"transaction ID: {saved_transaction.id}")
+        # transaction_view = self.get_queryset().get(id=saved_transaction.id)
+        return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
@@ -250,6 +252,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             **contact_instances,
         )
 
+        print(f"ABOUT TO LINK TRANSACTION: {transaction_instance} {report_ids}")
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
         for report_id in report_ids:

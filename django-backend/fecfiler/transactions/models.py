@@ -187,7 +187,6 @@ def get_read_model(committee_uuid):
             null=True,
             blank=True,
         )
-        report_id = models.UUIDField()
         schedule = models.TextField()
         _itemized = models.BooleanField()
         amount = models.DecimalField()
