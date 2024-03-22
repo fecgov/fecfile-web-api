@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_c2.utils.carry\_forward\_guarantor
+==================================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c2.utils
+
+.. autofunction:: carry_forward_guarantor

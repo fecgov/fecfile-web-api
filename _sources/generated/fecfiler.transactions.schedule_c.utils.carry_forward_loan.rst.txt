@@ -1,0 +1,6 @@
+fecfiler.transactions.schedule\_c.utils.carry\_forward\_loan
+============================================================
+
+.. currentmodule:: fecfiler.transactions.schedule_c.utils
+
+.. autofunction:: carry_forward_loan

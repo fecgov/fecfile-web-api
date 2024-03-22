@@ -37,12 +37,12 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.reports.views.ReportViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.reports.views.</span></span><span class="sig-name descname"><span class="pre">ReportViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.views.ReportViewSet" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html#fecfiler.committee_accounts.views.CommitteeOwnedViewSet" title="fecfiler.committee_accounts.views.CommitteeOwnedViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewSet</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
 <p>This viewset automatically provides <cite>list</cite>, <cite>create</cite>, <cite>retrieve</cite>,
 <cite>update</cite> and <cite>destroy</cite> actions.</p>
-<p>Note that this ViewSet inherits from CommitteeOwnedViewSet
+<p>Note that this ViewSet inherits from CommitteeOwnedViewMixin
 The queryset will be further limited by the user’s committee
-in CommitteeOwnedViewSet’s implementation of get_queryset()</p>
+in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.reports.views.ReportViewSet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.views.ReportViewSet.__init__" title="Link to this definition">¶</a></dt>
@@ -94,6 +94,12 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewSet.get_authenticators" title="fecfiler.reports.views.ReportViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewSet.get_content_negotiator" title="fecfiler.reports.views.ReportViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
@@ -668,6 +674,7 @@ will instead be performed lazily, the first time either
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.tests.html">fecfiler.reports.tests</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.urls.html">fecfiler.reports.urls</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.reports.views.html">fecfiler.reports.views</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.views.filter_by_report.html">fecfiler.reports.views.filter_by_report</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.views.get_status_mapping.html">fecfiler.reports.views.get_status_mapping</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.views.ReportViewMixin.html">fecfiler.reports.views.ReportViewMixin</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.reports.views.ReportViewSet</a><ul>

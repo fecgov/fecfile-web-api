@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.utils.create\_ie
+============================================
+
+.. currentmodule:: fecfiler.transactions.tests.utils
+
+.. autofunction:: create_ie

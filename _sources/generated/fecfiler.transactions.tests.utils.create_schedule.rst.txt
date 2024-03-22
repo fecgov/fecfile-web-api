@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.utils.create\_schedule
+==================================================
+
+.. currentmodule:: fecfiler.transactions.tests.utils
+
+.. autofunction:: create_schedule

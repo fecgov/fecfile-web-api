@@ -31,7 +31,7 @@ fecfiler.reports.form\_99.serializers.Form99Serializer
       ~Form99Serializer.create
       ~Form99Serializer.fail
       ~Form99Serializer.get_attribute
-      ~Form99Serializer.get_committee
+      ~Form99Serializer.get_committee_uuid
       ~Form99Serializer.get_default
       ~Form99Serializer.get_default_field_names
       ~Form99Serializer.get_extra_kwargs

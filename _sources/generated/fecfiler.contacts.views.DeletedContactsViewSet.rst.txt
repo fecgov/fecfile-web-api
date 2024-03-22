@@ -24,14 +24,14 @@ fecfiler.contacts.views.DeletedContactsViewSet
       ~DeletedContactsViewSet.check_object_permissions
       ~DeletedContactsViewSet.check_permissions
       ~DeletedContactsViewSet.check_throttles
-      ~DeletedContactsViewSet.create
-      ~DeletedContactsViewSet.destroy
       ~DeletedContactsViewSet.determine_version
       ~DeletedContactsViewSet.dispatch
       ~DeletedContactsViewSet.filter_queryset
       ~DeletedContactsViewSet.finalize_response
       ~DeletedContactsViewSet.get_authenticate_header
       ~DeletedContactsViewSet.get_authenticators
+      ~DeletedContactsViewSet.get_committee_id
+      ~DeletedContactsViewSet.get_committee_uuid
       ~DeletedContactsViewSet.get_content_negotiator
       ~DeletedContactsViewSet.get_exception_handler
       ~DeletedContactsViewSet.get_exception_handler_context
@@ -49,7 +49,6 @@ fecfiler.contacts.views.DeletedContactsViewSet
       ~DeletedContactsViewSet.get_serializer
       ~DeletedContactsViewSet.get_serializer_class
       ~DeletedContactsViewSet.get_serializer_context
-      ~DeletedContactsViewSet.get_success_headers
       ~DeletedContactsViewSet.get_throttles
       ~DeletedContactsViewSet.get_view_description
       ~DeletedContactsViewSet.get_view_name
@@ -60,20 +59,14 @@ fecfiler.contacts.views.DeletedContactsViewSet
       ~DeletedContactsViewSet.list
       ~DeletedContactsViewSet.options
       ~DeletedContactsViewSet.paginate_queryset
-      ~DeletedContactsViewSet.partial_update
       ~DeletedContactsViewSet.perform_authentication
       ~DeletedContactsViewSet.perform_content_negotiation
-      ~DeletedContactsViewSet.perform_create
-      ~DeletedContactsViewSet.perform_destroy
-      ~DeletedContactsViewSet.perform_update
       ~DeletedContactsViewSet.permission_denied
       ~DeletedContactsViewSet.raise_uncaught_exception
       ~DeletedContactsViewSet.restore
-      ~DeletedContactsViewSet.retrieve
       ~DeletedContactsViewSet.reverse_action
       ~DeletedContactsViewSet.setup
       ~DeletedContactsViewSet.throttled
-      ~DeletedContactsViewSet.update
    
    
 

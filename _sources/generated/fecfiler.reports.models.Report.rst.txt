@@ -39,18 +39,11 @@ fecfiler.reports.models.Report
       ~Report.get_next_by_updated
       ~Report.get_previous_by_created
       ~Report.get_previous_by_updated
-      ~Report.get_previous_report
       ~Report.hard_delete
       ~Report.prepare_database_save
-      ~Report.pull_forward_debt
-      ~Report.pull_forward_debts
-      ~Report.pull_forward_loan
-      ~Report.pull_forward_loan_guarantor
-      ~Report.pull_forward_loans
       ~Report.refresh_from_db
       ~Report.save
       ~Report.save_base
-      ~Report.save_copy
       ~Report.serializable_value
       ~Report.unique_error_message
       ~Report.validate_constraints
@@ -90,6 +83,7 @@ fecfiler.reports.models.Report
       ~Report.memotext_set
       ~Report.objects
       ~Report.pk
+      ~Report.previous_report
       ~Report.report_code
       ~Report.report_id
       ~Report.report_version

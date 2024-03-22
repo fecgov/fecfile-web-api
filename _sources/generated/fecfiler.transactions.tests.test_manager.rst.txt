@@ -22,7 +22,7 @@ fecfiler.transactions.tests.test\_manager
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      TransactionManagerTestCase
+      TransactionViewTestCase
    
    
 

@@ -13,7 +13,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.views.register_committee" href="fecfiler.committee_accounts.views.register_committee.html" />
+    <link rel="next" title="fecfiler.committee_accounts.views.create_committee_view" href="fecfiler.committee_accounts.views.create_committee_view.html" />
     <link rel="prev" title="fecfiler.committee_accounts.urls" href="fecfiler.committee_accounts.urls.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -37,7 +37,10 @@
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.register_committee.html#fecfiler.committee_accounts.views.register_committee" title="fecfiler.committee_accounts.views.register_committee"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_committee</span></code></a>(committee_id, user)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_view.html#fecfiler.committee_accounts.views.create_committee_view" title="fecfiler.committee_accounts.views.create_committee_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_committee_view</span></code></a>(committee_uuid)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.register_committee.html#fecfiler.committee_accounts.views.register_committee" title="fecfiler.committee_accounts.views.register_committee"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_committee</span></code></a>(committee_id, user)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -48,7 +51,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMembershipViewSet.html#fecfiler.committee_accounts.views.CommitteeMembershipViewSet" title="fecfiler.committee_accounts.views.CommitteeMembershipViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeMembershipViewSet</span></code></a>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html#fecfiler.committee_accounts.views.CommitteeOwnedViewSet" title="fecfiler.committee_accounts.views.CommitteeOwnedViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeOwnedViewSet</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>(**kwargs)</p></td>
 <td><p>ModelViewSet for models using CommitteeOwnedModel Inherit this view set to filter the queryset by the user's committee</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeViewSet.html#fecfiler.committee_accounts.views.CommitteeViewSet" title="fecfiler.committee_accounts.views.CommitteeViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeViewSet</span></code></a>(**kwargs)</p></td>
@@ -82,6 +85,7 @@
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.apps.html">fecfiler.committee_accounts.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.management.html">fecfiler.committee_accounts.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.migrations.html">fecfiler.committee_accounts.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.models.html">fecfiler.committee_accounts.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.serializers.html">fecfiler.committee_accounts.serializers</a></li>
@@ -90,9 +94,10 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_views.html">fecfiler.committee_accounts.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.urls.html">fecfiler.committee_accounts.urls</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.views</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_view.html">fecfiler.committee_accounts.views.create_committee_view</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.register_committee.html">fecfiler.committee_accounts.views.register_committee</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMembershipViewSet.html">fecfiler.committee_accounts.views.CommitteeMembershipViewSet</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html">fecfiler.committee_accounts.views.CommitteeOwnedViewSet</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html">fecfiler.committee_accounts.views.CommitteeOwnedViewMixin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeViewSet.html">fecfiler.committee_accounts.views.CommitteeViewSet</a></li>
 </ul>
 </li>
@@ -128,7 +133,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
       <li>Previous: <a href="fecfiler.committee_accounts.urls.html" title="previous chapter">fecfiler.committee_accounts.urls</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.views.register_committee.html" title="next chapter">fecfiler.committee_accounts.views.register_committee</a></li>
+      <li>Next: <a href="fecfiler.committee_accounts.views.create_committee_view.html" title="next chapter">fecfiler.committee_accounts.views.create_committee_view</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

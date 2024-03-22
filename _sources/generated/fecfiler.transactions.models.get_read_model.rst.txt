@@ -1,0 +1,6 @@
+fecfiler.transactions.models.get\_read\_model
+=============================================
+
+.. currentmodule:: fecfiler.transactions.models
+
+.. autofunction:: get_read_model

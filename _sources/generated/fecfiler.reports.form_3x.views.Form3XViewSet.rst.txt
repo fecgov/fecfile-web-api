@@ -35,6 +35,8 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.future_form3x_reports
       ~Form3XViewSet.get_authenticate_header
       ~Form3XViewSet.get_authenticators
+      ~Form3XViewSet.get_committee_id
+      ~Form3XViewSet.get_committee_uuid
       ~Form3XViewSet.get_content_negotiator
       ~Form3XViewSet.get_exception_handler
       ~Form3XViewSet.get_exception_handler_context

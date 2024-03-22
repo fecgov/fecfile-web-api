@@ -1,0 +1,26 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.management
+=======================================
+
+.. automodule:: fecfiler.committee_accounts.management
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

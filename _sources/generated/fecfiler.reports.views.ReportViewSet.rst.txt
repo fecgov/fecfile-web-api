@@ -33,6 +33,8 @@ fecfiler.reports.views.ReportViewSet
       ~ReportViewSet.finalize_response
       ~ReportViewSet.get_authenticate_header
       ~ReportViewSet.get_authenticators
+      ~ReportViewSet.get_committee_id
+      ~ReportViewSet.get_committee_uuid
       ~ReportViewSet.get_content_negotiator
       ~ReportViewSet.get_exception_handler
       ~ReportViewSet.get_exception_handler_context

@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.views.</span></span><span class="sig-name descname"><span class="pre">TransactionViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html#fecfiler.committee_accounts.views.CommitteeOwnedViewSet" title="fecfiler.committee_accounts.views.CommitteeOwnedViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewSet</span></code></a>, <a class="reference internal" href="fecfiler.reports.views.ReportViewMixin.html#fecfiler.reports.views.ReportViewMixin" title="fecfiler.reports.views.ReportViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReportViewMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>, <a class="reference internal" href="fecfiler.reports.views.ReportViewMixin.html#fecfiler.reports.views.ReportViewMixin" title="fecfiler.reports.views.ReportViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReportViewMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.__init__" title="Link to this definition">¶</a></dt>
@@ -86,6 +86,12 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_authenticators" title="fecfiler.transactions.views.TransactionViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_content_negotiator" title="fecfiler.transactions.views.TransactionViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
@@ -680,6 +686,7 @@ while being in the same group for aggregation</p>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.management.html">fecfiler.transactions.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.managers.html">fecfiler.transactions.managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.models.html">fecfiler.transactions.models</a></li>
@@ -697,6 +704,7 @@ while being in the same group for aggregation</p>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.views.get_save_hook.html">fecfiler.transactions.views.get_save_hook</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.views.noop.html">fecfiler.transactions.views.noop</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.views.stringify_queryset.html">fecfiler.transactions.views.stringify_queryset</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.views.TransactionListPagination.html">fecfiler.transactions.views.TransactionListPagination</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.transactions.views.TransactionViewSet</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet</span></code></a><ul>

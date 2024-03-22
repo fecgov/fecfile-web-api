@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.contacts.views.</span></span><span class="sig-name descname"><span class="pre">ContactViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html#fecfiler.committee_accounts.views.CommitteeOwnedViewSet" title="fecfiler.committee_accounts.views.CommitteeOwnedViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewSet</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
 <p>This viewset automatically provides <cite>list</cite>, <cite>create</cite>, <cite>retrieve</cite>,
 <cite>update</cite> and <cite>destroy</cite> actions.</p>
 <dl class="py method">
@@ -97,6 +97,12 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.get_authenticators" title="fecfiler.contacts.views.ContactViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_contact_id</span></code>(request)</p></td>
 <td><p></p></td>
@@ -621,9 +627,9 @@ will instead be performed lazily, the first time either
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.serializer_class">
 <span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.serializer_class" title="Link to this definition">¶</a></dt>
-<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewSet
+<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewMixin
 The queryset will be further limmited by the user’s committee
-in CommitteeOwnedViewSet’s implementation of get_queryset()</p>
+in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
 <p>alias of <a class="reference internal" href="fecfiler.contacts.serializers.ContactSerializer.html#fecfiler.contacts.serializers.ContactSerializer" title="fecfiler.contacts.serializers.ContactSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContactSerializer</span></code></a></p>
 </dd></dl>
 

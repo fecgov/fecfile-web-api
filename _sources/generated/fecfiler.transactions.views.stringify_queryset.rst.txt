@@ -1,0 +1,6 @@
+fecfiler.transactions.views.stringify\_queryset
+===============================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: stringify_queryset

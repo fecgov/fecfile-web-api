@@ -1,0 +1,6 @@
+fecfiler.reports.tests.utils.create\_test\_report
+=================================================
+
+.. currentmodule:: fecfiler.reports.tests.utils
+
+.. autofunction:: create_test_report

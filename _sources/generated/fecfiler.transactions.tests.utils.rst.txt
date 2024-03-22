@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.tests.utils
+=================================
+
+.. automodule:: fecfiler.transactions.tests.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      create_debt
+      create_ie
+      create_schedule
+      create_schedule_a
+      create_schedule_b
+      create_test_transaction
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

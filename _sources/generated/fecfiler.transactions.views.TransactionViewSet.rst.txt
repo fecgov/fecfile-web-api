@@ -32,6 +32,8 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.finalize_response
       ~TransactionViewSet.get_authenticate_header
       ~TransactionViewSet.get_authenticators
+      ~TransactionViewSet.get_committee_id
+      ~TransactionViewSet.get_committee_uuid
       ~TransactionViewSet.get_content_negotiator
       ~TransactionViewSet.get_exception_handler
       ~TransactionViewSet.get_exception_handler_context

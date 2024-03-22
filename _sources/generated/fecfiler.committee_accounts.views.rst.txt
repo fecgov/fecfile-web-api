@@ -17,6 +17,7 @@ fecfiler.committee\_accounts.views
    .. autosummary::
       :toctree:                                          
    
+      create_committee_view
       register_committee
    
    
@@ -30,7 +31,7 @@ fecfiler.committee\_accounts.views
       :template: custom-class-template.rst               
    
       CommitteeMembershipViewSet
-      CommitteeOwnedViewSet
+      CommitteeOwnedViewMixin
       CommitteeViewSet
    
    

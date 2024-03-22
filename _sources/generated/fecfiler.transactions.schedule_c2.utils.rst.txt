@@ -18,6 +18,7 @@ fecfiler.transactions.schedule\_c2.utils
       :toctree:                                          
    
       add_schedule_c2_contact_fields
+      carry_forward_guarantor
    
    
 

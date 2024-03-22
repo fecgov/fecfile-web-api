@@ -1,0 +1,6 @@
+fecfiler.reports.views.filter\_by\_report
+=========================================
+
+.. currentmodule:: fecfiler.reports.views
+
+.. autofunction:: filter_by_report

@@ -18,6 +18,8 @@ fecfiler.transactions.schedule\_d.utils
       :toctree:                                          
    
       add_schedule_d_contact_fields
+      carry_forward_debt
+      carry_forward_debts
    
    
 

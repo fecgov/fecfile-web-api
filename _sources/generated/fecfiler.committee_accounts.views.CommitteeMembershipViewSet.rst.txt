@@ -33,6 +33,8 @@ fecfiler.committee\_accounts.views.CommitteeMembershipViewSet
       ~CommitteeMembershipViewSet.finalize_response
       ~CommitteeMembershipViewSet.get_authenticate_header
       ~CommitteeMembershipViewSet.get_authenticators
+      ~CommitteeMembershipViewSet.get_committee_id
+      ~CommitteeMembershipViewSet.get_committee_uuid
       ~CommitteeMembershipViewSet.get_content_negotiator
       ~CommitteeMembershipViewSet.get_exception_handler
       ~CommitteeMembershipViewSet.get_exception_handler_context

@@ -1,0 +1,96 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.views.CommitteeOwnedViewMixin
+==========================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autoclass:: CommitteeOwnedViewMixin
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeOwnedViewMixin.__init__
+      ~CommitteeOwnedViewMixin.as_view
+      ~CommitteeOwnedViewMixin.check_object_permissions
+      ~CommitteeOwnedViewMixin.check_permissions
+      ~CommitteeOwnedViewMixin.check_throttles
+      ~CommitteeOwnedViewMixin.determine_version
+      ~CommitteeOwnedViewMixin.dispatch
+      ~CommitteeOwnedViewMixin.filter_queryset
+      ~CommitteeOwnedViewMixin.finalize_response
+      ~CommitteeOwnedViewMixin.get_authenticate_header
+      ~CommitteeOwnedViewMixin.get_authenticators
+      ~CommitteeOwnedViewMixin.get_committee_id
+      ~CommitteeOwnedViewMixin.get_committee_uuid
+      ~CommitteeOwnedViewMixin.get_content_negotiator
+      ~CommitteeOwnedViewMixin.get_exception_handler
+      ~CommitteeOwnedViewMixin.get_exception_handler_context
+      ~CommitteeOwnedViewMixin.get_extra_action_url_map
+      ~CommitteeOwnedViewMixin.get_extra_actions
+      ~CommitteeOwnedViewMixin.get_format_suffix
+      ~CommitteeOwnedViewMixin.get_object
+      ~CommitteeOwnedViewMixin.get_paginated_response
+      ~CommitteeOwnedViewMixin.get_parser_context
+      ~CommitteeOwnedViewMixin.get_parsers
+      ~CommitteeOwnedViewMixin.get_permissions
+      ~CommitteeOwnedViewMixin.get_queryset
+      ~CommitteeOwnedViewMixin.get_renderer_context
+      ~CommitteeOwnedViewMixin.get_renderers
+      ~CommitteeOwnedViewMixin.get_serializer
+      ~CommitteeOwnedViewMixin.get_serializer_class
+      ~CommitteeOwnedViewMixin.get_serializer_context
+      ~CommitteeOwnedViewMixin.get_throttles
+      ~CommitteeOwnedViewMixin.get_view_description
+      ~CommitteeOwnedViewMixin.get_view_name
+      ~CommitteeOwnedViewMixin.handle_exception
+      ~CommitteeOwnedViewMixin.http_method_not_allowed
+      ~CommitteeOwnedViewMixin.initial
+      ~CommitteeOwnedViewMixin.initialize_request
+      ~CommitteeOwnedViewMixin.options
+      ~CommitteeOwnedViewMixin.paginate_queryset
+      ~CommitteeOwnedViewMixin.perform_authentication
+      ~CommitteeOwnedViewMixin.perform_content_negotiation
+      ~CommitteeOwnedViewMixin.permission_denied
+      ~CommitteeOwnedViewMixin.raise_uncaught_exception
+      ~CommitteeOwnedViewMixin.reverse_action
+      ~CommitteeOwnedViewMixin.setup
+      ~CommitteeOwnedViewMixin.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeOwnedViewMixin.allowed_methods
+      ~CommitteeOwnedViewMixin.authentication_classes
+      ~CommitteeOwnedViewMixin.default_response_headers
+      ~CommitteeOwnedViewMixin.filter_backends
+      ~CommitteeOwnedViewMixin.http_method_names
+      ~CommitteeOwnedViewMixin.lookup_field
+      ~CommitteeOwnedViewMixin.lookup_url_kwarg
+      ~CommitteeOwnedViewMixin.paginator
+      ~CommitteeOwnedViewMixin.parser_classes
+      ~CommitteeOwnedViewMixin.permission_classes
+      ~CommitteeOwnedViewMixin.queryset
+      ~CommitteeOwnedViewMixin.renderer_classes
+      ~CommitteeOwnedViewMixin.schema
+      ~CommitteeOwnedViewMixin.serializer_class
+      ~CommitteeOwnedViewMixin.settings
+      ~CommitteeOwnedViewMixin.throttle_classes
+      ~CommitteeOwnedViewMixin.versioning_class
+      ~CommitteeOwnedViewMixin.view_is_async
+   
+   

@@ -31,7 +31,7 @@ fecfiler.reports.form\_1m.serializers.Form1MSerializer
       ~Form1MSerializer.create
       ~Form1MSerializer.fail
       ~Form1MSerializer.get_attribute
-      ~Form1MSerializer.get_committee
+      ~Form1MSerializer.get_committee_uuid
       ~Form1MSerializer.get_default
       ~Form1MSerializer.get_default_field_names
       ~Form1MSerializer.get_extra_kwargs

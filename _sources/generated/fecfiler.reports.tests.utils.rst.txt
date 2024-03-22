@@ -1,0 +1,35 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.tests.utils
+============================
+
+.. automodule:: fecfiler.reports.tests.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      create_form
+      create_form3x
+      create_test_report
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

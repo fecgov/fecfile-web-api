@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.views.create\_committee\_view
+==========================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autofunction:: create_committee_view

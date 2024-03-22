@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.utils.create\_test\_transaction
+===========================================================
+
+.. currentmodule:: fecfiler.transactions.tests.utils
+
+.. autofunction:: create_test_transaction

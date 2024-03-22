@@ -1,0 +1,113 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.managers.TransactionViewManager
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.managers
+
+.. autoclass:: TransactionViewManager
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionViewManager.LINE_LABEL_CLAUSE
+      ~TransactionViewManager.LINE_LABEL_ORDER_CLAUSE
+      ~TransactionViewManager.ORDER_KEY_CLAUSE
+      ~TransactionViewManager.__init__
+      ~TransactionViewManager.aaggregate
+      ~TransactionViewManager.abulk_create
+      ~TransactionViewManager.abulk_update
+      ~TransactionViewManager.acontains
+      ~TransactionViewManager.acount
+      ~TransactionViewManager.acreate
+      ~TransactionViewManager.aearliest
+      ~TransactionViewManager.aexists
+      ~TransactionViewManager.aexplain
+      ~TransactionViewManager.afirst
+      ~TransactionViewManager.aget
+      ~TransactionViewManager.aget_or_create
+      ~TransactionViewManager.aggregate
+      ~TransactionViewManager.ain_bulk
+      ~TransactionViewManager.aiterator
+      ~TransactionViewManager.alast
+      ~TransactionViewManager.alatest
+      ~TransactionViewManager.alias
+      ~TransactionViewManager.all
+      ~TransactionViewManager.annotate
+      ~TransactionViewManager.aupdate
+      ~TransactionViewManager.aupdate_or_create
+      ~TransactionViewManager.bulk_create
+      ~TransactionViewManager.bulk_update
+      ~TransactionViewManager.check
+      ~TransactionViewManager.complex_filter
+      ~TransactionViewManager.contains
+      ~TransactionViewManager.contribute_to_class
+      ~TransactionViewManager.count
+      ~TransactionViewManager.create
+      ~TransactionViewManager.dates
+      ~TransactionViewManager.datetimes
+      ~TransactionViewManager.db_manager
+      ~TransactionViewManager.deconstruct
+      ~TransactionViewManager.defer
+      ~TransactionViewManager.difference
+      ~TransactionViewManager.distinct
+      ~TransactionViewManager.earliest
+      ~TransactionViewManager.exclude
+      ~TransactionViewManager.exists
+      ~TransactionViewManager.explain
+      ~TransactionViewManager.extra
+      ~TransactionViewManager.filter
+      ~TransactionViewManager.first
+      ~TransactionViewManager.from_queryset
+      ~TransactionViewManager.get
+      ~TransactionViewManager.get_or_create
+      ~TransactionViewManager.get_queryset
+      ~TransactionViewManager.in_bulk
+      ~TransactionViewManager.intersection
+      ~TransactionViewManager.iterator
+      ~TransactionViewManager.last
+      ~TransactionViewManager.latest
+      ~TransactionViewManager.none
+      ~TransactionViewManager.only
+      ~TransactionViewManager.order_by
+      ~TransactionViewManager.prefetch_related
+      ~TransactionViewManager.raw
+      ~TransactionViewManager.reverse
+      ~TransactionViewManager.select_for_update
+      ~TransactionViewManager.select_related
+      ~TransactionViewManager.union
+      ~TransactionViewManager.update
+      ~TransactionViewManager.update_or_create
+      ~TransactionViewManager.using
+      ~TransactionViewManager.values
+      ~TransactionViewManager.values_list
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionViewManager.A
+      ~TransactionViewManager.A_11
+      ~TransactionViewManager.B
+      ~TransactionViewManager.C
+      ~TransactionViewManager.D
+      ~TransactionViewManager.E
+      ~TransactionViewManager.auto_created
+      ~TransactionViewManager.creation_counter
+      ~TransactionViewManager.db
+      ~TransactionViewManager.use_in_migrations
+   
+   

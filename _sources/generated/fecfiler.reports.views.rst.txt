@@ -17,6 +17,7 @@ fecfiler.reports.views
    .. autosummary::
       :toctree:                                          
    
+      filter_by_report
       get_status_mapping
    
    

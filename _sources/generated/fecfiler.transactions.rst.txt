@@ -32,6 +32,7 @@ fecfiler.transactions
    :recursive:
 
    fecfiler.transactions.apps
+   fecfiler.transactions.management
    fecfiler.transactions.managers
    fecfiler.transactions.migrations
    fecfiler.transactions.models

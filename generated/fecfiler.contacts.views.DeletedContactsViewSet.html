@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.DeletedContactsViewSet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.contacts.views.</span></span><span class="sig-name descname"><span class="pre">DeletedContactsViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.views.DeletedContactsViewSet" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewSet.html#fecfiler.committee_accounts.views.CommitteeOwnedViewSet" title="fecfiler.committee_accounts.views.CommitteeOwnedViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewSet</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.DeletedContactsViewSet.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.views.DeletedContactsViewSet.__init__" title="Link to this definition">¶</a></dt>
@@ -63,12 +63,6 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.check_throttles" title="fecfiler.contacts.views.DeletedContactsViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
-</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.determine_version" title="fecfiler.contacts.views.DeletedContactsViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
 </tr>
@@ -86,6 +80,12 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_authenticators" title="fecfiler.contacts.views.DeletedContactsViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_content_negotiator" title="fecfiler.contacts.views.DeletedContactsViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
@@ -138,41 +138,35 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_serializer_context" title="fecfiler.contacts.views.DeletedContactsViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
 <td><p>Extra context provided to the serializer class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_throttles" title="fecfiler.contacts.views.DeletedContactsViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_throttles" title="fecfiler.contacts.views.DeletedContactsViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_view_description" title="fecfiler.contacts.views.DeletedContactsViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_view_description" title="fecfiler.contacts.views.DeletedContactsViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
 <td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_view_name" title="fecfiler.contacts.views.DeletedContactsViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.get_view_name" title="fecfiler.contacts.views.DeletedContactsViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
 <td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.handle_exception" title="fecfiler.contacts.views.DeletedContactsViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.handle_exception" title="fecfiler.contacts.views.DeletedContactsViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
 <td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.http_method_not_allowed" title="fecfiler.contacts.views.DeletedContactsViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.http_method_not_allowed" title="fecfiler.contacts.views.DeletedContactsViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.initial" title="fecfiler.contacts.views.DeletedContactsViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.initial" title="fecfiler.contacts.views.DeletedContactsViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.initialize_request" title="fecfiler.contacts.views.DeletedContactsViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.initialize_request" title="fecfiler.contacts.views.DeletedContactsViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.options" title="fecfiler.contacts.views.DeletedContactsViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.options" title="fecfiler.contacts.views.DeletedContactsViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.paginate_queryset" title="fecfiler.contacts.views.DeletedContactsViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.paginate_queryset" title="fecfiler.contacts.views.DeletedContactsViewSet.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
 <td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_update</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.perform_authentication" title="fecfiler.contacts.views.DeletedContactsViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
 <td><p>Perform authentication on the incoming request.</p></td>
@@ -180,25 +174,13 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.perform_content_negotiation" title="fecfiler.contacts.views.DeletedContactsViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
 <td><p>Determine which renderer and media type to use render the response.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_create</span></code>(serializer)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_destroy</span></code>(instance)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_update</span></code>(serializer)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.permission_denied" title="fecfiler.contacts.views.DeletedContactsViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.permission_denied" title="fecfiler.contacts.views.DeletedContactsViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
 <td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore</span></code>(request)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.reverse_action" title="fecfiler.contacts.views.DeletedContactsViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
@@ -209,9 +191,6 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.views.DeletedContactsViewSet.throttled" title="fecfiler.contacts.views.DeletedContactsViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request, *args, **kwargs)</p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>

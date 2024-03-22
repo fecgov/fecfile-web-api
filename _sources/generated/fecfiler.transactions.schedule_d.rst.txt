@@ -31,6 +31,7 @@ fecfiler.transactions.schedule\_d
    :template: custom-module-template.rst                 
    :recursive:
 
+   fecfiler.transactions.schedule_d.managers
    fecfiler.transactions.schedule_d.models
    fecfiler.transactions.schedule_d.serializers
    fecfiler.transactions.schedule_d.tests
