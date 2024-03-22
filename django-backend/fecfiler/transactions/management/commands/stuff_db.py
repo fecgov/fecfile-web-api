@@ -19,7 +19,7 @@ class Command(BaseCommand):
         # create committee
         committee = CommitteeAccount.objects.create(committee_id="C12123434")
         # create user
-        Account.objects.create(cmtee_id="C12123434", password="test")
+        Account.objects.create(cmtee_id="C12123434")
         # create a report
         f3x = Form3X.objects.create()
         report = Report.objects.create(

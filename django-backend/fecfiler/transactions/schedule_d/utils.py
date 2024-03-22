@@ -1,10 +1,8 @@
 from fecfiler.transactions.models import get_read_model, Transaction
-from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
 from decimal import Decimal
-import copy
 
 
 def add_schedule_d_contact_fields(instance, representation=None):
