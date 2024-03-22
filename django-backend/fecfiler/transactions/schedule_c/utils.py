@@ -4,7 +4,6 @@ from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
 from decimal import Decimal
-import copy
 
 
 def add_schedule_c_contact_fields(instance, representation=None):
