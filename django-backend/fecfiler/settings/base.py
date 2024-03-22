@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
-    "silk",
     "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
@@ -85,7 +84,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -371,8 +369,6 @@ FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = env.get_credential(
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 
-SILKY_PYTHON_PROFILER = True
-SILKY_META = True
 
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
