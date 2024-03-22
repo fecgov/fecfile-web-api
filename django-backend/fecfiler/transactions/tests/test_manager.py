@@ -26,8 +26,8 @@ class TransactionViewTestCase(TestCase):
         indiviual_reciepts = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL"},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL"},
-            {"date": "2024-01-01", "amount": "200.00", "group": "GENERAL"},
-            {"date": "2024-01-01", "amount": "100.00", "group": "OTHER"},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL"},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER"},
         ]
         for receipt_data in indiviual_reciepts:
             create_schedule_a(
@@ -40,10 +40,13 @@ class TransactionViewTestCase(TestCase):
             )
 
         view: QuerySet = Transaction.objects.transaction_view()
-        view = view.filter(committee_account_id=self.committee.id)
-        self.assertEqual(view[0].aggregate, Decimal("123.45"))
-        self.assertEqual(view[2].aggregate, Decimal("300"))
-        self.assertEqual(view[3].aggregate, Decimal("100"))
+        transactions = (
+            view.filter(committee_account_id=self.committee.id).all().order_by("date")
+        )
+
+        self.assertEqual(transactions[0].aggregate, Decimal("123.45"))
+        self.assertEqual(transactions[2].aggregate, Decimal("300"))
+        self.assertEqual(transactions[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
 
@@ -74,10 +77,12 @@ class TransactionViewTestCase(TestCase):
         )
 
         view: QuerySet = Transaction.objects.transaction_view()
-        view = view.filter(committee_account_id=self.committee.id)
-        self.assertEqual(view[0].aggregate, Decimal("0"))
-        self.assertEqual(view[0].force_unaggregated, True)
-        self.assertEqual(view[1].aggregate, Decimal("200"))
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "date"
+        )
+        self.assertEqual(transactions[0].aggregate, Decimal("0"))
+        self.assertEqual(transactions[0].force_unaggregated, True)
+        self.assertEqual(transactions[1].aggregate, Decimal("200"))
 
     def test_transaction_view_parent(self):
         partnership_receipt = create_schedule_a(
@@ -120,14 +125,16 @@ class TransactionViewTestCase(TestCase):
             "INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT",
             self.committee,
             self.contact_1,
-            "2024-01-01",
+            "2024-01-02",
             "100.00",
             "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
         )
         view: QuerySet = Transaction.objects.transaction_view()
-        view = view.filter(committee_account_id=self.committee.id)
-        self.assertEqual(view[0].aggregate, Decimal("123.00"))
-        self.assertEqual(view[1].aggregate, Decimal("23.00"))
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "date"
+        )
+        self.assertEqual(transactions[0].aggregate, Decimal("123.00"))
+        self.assertEqual(transactions[1].aggregate, Decimal("23.00"))
 
     def test_election_aggregate(self):
         candidate_a = Contact.objects.create(
@@ -166,19 +173,19 @@ class TransactionViewTestCase(TestCase):
                 "code": "H2024",
             },
             {  # same election same year
-                "date": "2024-01-02",
+                "date": "2024-01-03",
                 "amount": "2.00",
                 "contact": candidate_b,
                 "code": "H2024",
             },
             {  # different election same year
-                "date": "2024-01-03",
+                "date": "2024-01-04",
                 "amount": "3.00",
                 "contact": candidate_c,
                 "code": "H2024",
             },
             {  # different election same year
-                "date": "2024-01-04",
+                "date": "2024-01-05",
                 "amount": "4.00",
                 "contact": candidate_a,
                 "code": "Z2024",
@@ -191,13 +198,27 @@ class TransactionViewTestCase(TestCase):
             )
 
         view: QuerySet = Transaction.objects.transaction_view()
-        view = view.filter(committee_account_id=self.committee.id)
-        self.assertEqual(view[0]._calendar_ytd_per_election_office, Decimal("123.45"))
-        self.assertEqual(view[1]._calendar_ytd_per_election_office, Decimal("1.00"))
-        self.assertEqual(view[2]._calendar_ytd_per_election_office, Decimal("2.00"))
-        self.assertEqual(view[3]._calendar_ytd_per_election_office, Decimal("4.00"))
-        self.assertEqual(view[4]._calendar_ytd_per_election_office, Decimal("3.00"))
-        self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "date"
+        )
+        self.assertEqual(
+            transactions[0]._calendar_ytd_per_election_office, Decimal("123.45")
+        )
+        self.assertEqual(
+            transactions[1]._calendar_ytd_per_election_office, Decimal("1.00")
+        )
+        self.assertEqual(
+            transactions[2]._calendar_ytd_per_election_office, Decimal("2.00")
+        )
+        self.assertEqual(
+            transactions[3]._calendar_ytd_per_election_office, Decimal("4.00")
+        )
+        self.assertEqual(
+            transactions[4]._calendar_ytd_per_election_office, Decimal("3.00")
+        )
+        self.assertEqual(
+            transactions[5]._calendar_ytd_per_election_office, Decimal("4.00")
+        )
 
     def test_debts(self):
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})

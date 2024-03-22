@@ -252,7 +252,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             **contact_instances,
         )
 
-        print(f"ABOUT TO LINK TRANSACTION: {transaction_instance} {report_ids}")
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
         for report_id in report_ids:
