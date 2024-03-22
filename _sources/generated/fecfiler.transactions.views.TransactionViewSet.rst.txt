@@ -20,6 +20,7 @@ fecfiler.transactions.views.TransactionViewSet
    .. autosummary::
    
       ~TransactionViewSet.__init__
+      ~TransactionViewSet.add_transaction_to_report
       ~TransactionViewSet.as_view
       ~TransactionViewSet.check_object_permissions
       ~TransactionViewSet.check_permissions
@@ -73,6 +74,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.previous_transaction_by_election
       ~TransactionViewSet.previous_transaction_by_entity
       ~TransactionViewSet.raise_uncaught_exception
+      ~TransactionViewSet.remove_transaction_from_report
       ~TransactionViewSet.retrieve
       ~TransactionViewSet.reverse_action
       ~TransactionViewSet.save_reatt_redes_transactions

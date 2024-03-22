@@ -31,7 +31,6 @@ fecfiler.transactions.models.Transaction
       ~Transaction.from_db
       ~Transaction.full_clean
       ~Transaction.get_constraints
-      ~Transaction.get_date
       ~Transaction.get_deferred_fields
       ~Transaction.get_next_by_created
       ~Transaction.get_next_by_updated
@@ -91,8 +90,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.reatt_redes
       ~Transaction.reatt_redes_associations
       ~Transaction.reatt_redes_id
-      ~Transaction.report
-      ~Transaction.report_id
+      ~Transaction.reports
+      ~Transaction.reporttransaction_set
       ~Transaction.schedule_a
       ~Transaction.schedule_a_id
       ~Transaction.schedule_b

@@ -87,7 +87,8 @@ fecfiler.reports.models.Report
       ~Report.report_code
       ~Report.report_id
       ~Report.report_version
-      ~Report.transaction_set
+      ~Report.reporttransaction_set
+      ~Report.transactions
       ~Report.treasurer_first_name
       ~Report.treasurer_last_name
       ~Report.treasurer_middle_name

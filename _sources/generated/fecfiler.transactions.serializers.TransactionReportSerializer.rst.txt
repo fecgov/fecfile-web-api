@@ -1,0 +1,79 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.serializers.TransactionReportSerializer
+=============================================================
+
+.. currentmodule:: fecfiler.transactions.serializers
+
+.. autoclass:: TransactionReportSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionReportSerializer.__init__
+      ~TransactionReportSerializer.bind
+      ~TransactionReportSerializer.build_field
+      ~TransactionReportSerializer.build_nested_field
+      ~TransactionReportSerializer.build_property_field
+      ~TransactionReportSerializer.build_relational_field
+      ~TransactionReportSerializer.build_standard_field
+      ~TransactionReportSerializer.build_unknown_field
+      ~TransactionReportSerializer.build_url_field
+      ~TransactionReportSerializer.create
+      ~TransactionReportSerializer.fail
+      ~TransactionReportSerializer.get_attribute
+      ~TransactionReportSerializer.get_committee_uuid
+      ~TransactionReportSerializer.get_default
+      ~TransactionReportSerializer.get_default_field_names
+      ~TransactionReportSerializer.get_extra_kwargs
+      ~TransactionReportSerializer.get_field_names
+      ~TransactionReportSerializer.get_fields
+      ~TransactionReportSerializer.get_initial
+      ~TransactionReportSerializer.get_unique_for_date_validators
+      ~TransactionReportSerializer.get_unique_together_validators
+      ~TransactionReportSerializer.get_uniqueness_extra_kwargs
+      ~TransactionReportSerializer.get_validators
+      ~TransactionReportSerializer.get_value
+      ~TransactionReportSerializer.include_extra_kwargs
+      ~TransactionReportSerializer.is_valid
+      ~TransactionReportSerializer.many_init
+      ~TransactionReportSerializer.run_validation
+      ~TransactionReportSerializer.run_validators
+      ~TransactionReportSerializer.save
+      ~TransactionReportSerializer.to_internal_value
+      ~TransactionReportSerializer.to_representation
+      ~TransactionReportSerializer.update
+      ~TransactionReportSerializer.validate
+      ~TransactionReportSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionReportSerializer.context
+      ~TransactionReportSerializer.data
+      ~TransactionReportSerializer.default_error_messages
+      ~TransactionReportSerializer.default_validators
+      ~TransactionReportSerializer.errors
+      ~TransactionReportSerializer.fields
+      ~TransactionReportSerializer.initial
+      ~TransactionReportSerializer.root
+      ~TransactionReportSerializer.serializer_field_mapping
+      ~TransactionReportSerializer.url_field_name
+      ~TransactionReportSerializer.validated_data
+      ~TransactionReportSerializer.validators
+   
+   

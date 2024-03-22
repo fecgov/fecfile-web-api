@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0004\_report\_transactions\_link\_table.add\_link\_table
+=========================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0004_report_transactions_link_table
+
+.. autofunction:: add_link_table

@@ -113,8 +113,8 @@ fecfiler.transactions.schedule\_d.tests.test\_views.ScheduleDViewsTestCase
       ~ScheduleDViewsTestCase.subTest
       ~ScheduleDViewsTestCase.tearDown
       ~ScheduleDViewsTestCase.tearDownClass
-      ~ScheduleDViewsTestCase.test_create_guarantor_in_future_report
-      ~ScheduleDViewsTestCase.test_update_guarantor_in_future_report
+      ~ScheduleDViewsTestCase.test_create_debt_in_future_report
+      ~ScheduleDViewsTestCase.test_update_debt_in_future_report
    
    
 

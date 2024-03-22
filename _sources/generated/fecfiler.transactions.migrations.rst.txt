@@ -34,4 +34,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0001_initial
    fecfiler.transactions.migrations.0002_remove_schedulea_contributor_city_and_more
    fecfiler.transactions.migrations.0003_alter_transaction_parent_transaction
+   fecfiler.transactions.migrations.0004_report_transactions_link_table
 
