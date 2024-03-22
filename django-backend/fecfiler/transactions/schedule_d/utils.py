@@ -34,7 +34,7 @@ def carry_forward_debts(report):
         ).objects.filter(
             ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
             ~Q(memo_code=True),
-            report=report.previous_report,
+            reports=report.previous_report,
             schedule_d_id__isnull=False,
         )
 
@@ -48,7 +48,6 @@ def carry_forward_debt(debt, report):
         "contact_1_id": debt.contact_1_id,
         "contact_2_id": debt.contact_2_id,
         "contact_3_id": debt.contact_3_id,
-        "report_id": report.id,
         "committee_account_id": debt.committee_account_id,
         # The debt_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.

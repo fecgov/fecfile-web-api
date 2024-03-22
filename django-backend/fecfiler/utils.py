@@ -47,6 +47,6 @@ def save_copy(instance, data={}, links={}):
         instance._state.adding = True
         instance.save()
         for link_name, link in links.items():
-            instance[link_name].set(link)
+            getattr(instance, link_name).set(link)
         return instance
     return None
