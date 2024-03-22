@@ -323,7 +323,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
 
-    @action(detail=False, methods=["put"], url_path=r"add-transaction")
+    @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
         try:
             report = Report.objects.get(id=request.data.get("report_id"))
@@ -339,7 +339,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         update_recalculation(report)
         return Response("Transaction added to report")
 
-    @action(detail=False, methods=["put"], url_path=r"remove-transaction")
+    @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
         try:
             report = Report.objects.get(id=request.data.get("report_id"))
