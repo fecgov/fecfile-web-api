@@ -2,7 +2,6 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import (
     Transaction,
     get_committee_view_name,
