@@ -561,12 +561,22 @@
     "pk": "3799267c-6bfb-4ebf-ad0d-a2233d597718"
   },
   {
+    "comment": "Link between a transaction and a report",
+    "model": "reports.reporttransaction",
+    "fields": {
+      "transaction_id": "474a1a10-da68-4d71-9a11-9509df48e1dd",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-111111111111"
+  },
+  {
     "comment": "Loan to move forward",
     "model": "transactions.transaction",
     "fields": {
-      "id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+      "id": "474a1a10-da68-4d71-9a11-9509df48e1dd",
       "committee_account_id": "11111111-2222-3333-4444-555555555555",
-      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
       "transaction_type_identifier": "LOAN_RECEIVED_FROM_INDIVIDUAL",
       "schedule_c_id": "3799267c-6bfb-4ebf-ad0d-a2233d597718",
       "aggregation_group": null,
@@ -591,13 +601,23 @@
     "pk": "c299267c-6bfb-4ebf-ad0d-a2233d597718"
   },
   {
+    "comment": "Link between a transaction and a report",
+    "model": "reports.reporttransaction",
+    "fields": {
+      "transaction_id": "90e268b5-ee0a-40e9-bc0b-459c097d46d7",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-222222222222"
+  },
+  {
     "comment": "Gurarantor to move forward",
     "model": "transactions.transaction",
     "fields": {
       "id": "90e268b5-ee0a-40e9-bc0b-459c097d46d7",
       "committee_account_id": "11111111-2222-3333-4444-555555555555",
-      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-      "parent_transaction_id": "474a1a10-da68-4d71-9a11-9509df48e1aa",
+      "parent_transaction_id": "474a1a10-da68-4d71-9a11-9509df48e1dd",
       "transaction_type_identifier": "C2_LOAN_GUARANTOR",
       "schedule_c2_id": "c299267c-6bfb-4ebf-ad0d-a2233d597718",
       "aggregation_group": null,
@@ -618,12 +638,22 @@
     "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
   },
   {
+    "comment": "Link between a transaction and a report",
+    "model": "reports.reporttransaction",
+    "fields": {
+      "transaction_id": "474a1a10-da68-4d71-9a11-9509df4ddddd",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-333333333333"
+  },
+  {
     "comment": "Debt to move forward",
     "model": "transactions.transaction",
     "fields": {
       "id": "474a1a10-da68-4d71-9a11-9509df4ddddd",
       "committee_account_id": "11111111-2222-3333-4444-555555555555",
-      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
       "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
       "schedule_d_id": "dddd267c-6bfb-4ebf-ad0d-a2233d597718",
       "aggregation_group": null,
@@ -648,12 +678,22 @@
     "pk": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718"
   },
   {
+    "comment": "Link between a transaction and a report",
+    "model": "reports.reporttransaction",
+    "fields": {
+      "transaction_id": "474a1a10-da68-4d71-9a11-9509df4dddcc",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "created": "2022-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-444444444444"
+  },
+  {
     "comment": "Debt NOT to move forward",
     "model": "transactions.transaction",
     "fields": {
       "id": "474a1a10-da68-4d71-9a11-9509df4dddcc",
       "committee_account_id": "11111111-2222-3333-4444-555555555555",
-      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
       "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
       "schedule_d_id": "ccdd267c-6bfb-4ebf-ad0d-a2233d597718",
       "aggregation_group": null,
@@ -679,12 +719,22 @@
     }
   },
   {
-    "model": "transactions.transaction",
-    "pk": "dbdbdbdb-62f7-4a11-ac8e-27ea2afa9491",
+    "comment": "Link between a transaction and a report",
+    "model": "reports.reporttransaction",
     "fields": {
+      "transaction_id": "474a1a10-da68-4d71-9a11-cccccccccccc",
+      "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+      "created": "2023-02-09T00:00:00.000Z",
+      "updated": "2022-02-09T00:00:00.000Z"
+    },
+    "pk": "3799267c-6bfb-4ebf-ad0d-555555555555"
+  },
+  {
+    "model": "transactions.transaction",
+    "fields": {
+      "id": "474a1a10-da68-4d71-9a11-cccccccccccc",
       "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
-      "report": "1406535e-f99f-42c4-97a8-247904b7d297",
       "transaction_type_identifier": "OPERATING_EXPENDITURE",
       "aggregation_group": "GENERAL_DISBURSEMENT",
       "debt": "474a1a10-da68-4d71-9a11-9509df4dddcc",

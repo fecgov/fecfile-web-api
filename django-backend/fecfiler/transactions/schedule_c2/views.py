@@ -15,10 +15,11 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
-            report_id=report.id, loan_id=transaction.parent_transaction.id
+            reports__id=report.id, loan_id=transaction.parent_transaction.id
         )
         if loan_query.count():
             carry_forward_guarantor(
@@ -27,14 +28,15 @@ def create_in_future_reports(transaction):
 
 
 def update_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
-    del transaction_copy["report"]
+    del transaction_copy["reports"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 

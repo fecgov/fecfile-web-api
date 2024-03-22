@@ -100,6 +100,7 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
                 carry_forward_debts(self)
+                update_recalculation(self)
 
     def get_future_in_progress_reports(
         self,
@@ -136,6 +137,24 @@ TABLE_TO_FORM = {
 }
 
 
+def update_recalculation(report: Report):
+    if report:
+        committee = report.committee_account
+        report_date = report.coverage_from_date
+        if report_date is not None:
+            reports_to_flag_for_recalculation = Report.objects.filter(
+                committee_account=committee,
+                coverage_from_date__gte=report_date,
+            )
+        else:
+            reports_to_flag_for_recalculation = [report]
+
+        for report_to_recalc in reports_to_flag_for_recalculation:
+            report_to_recalc.calculation_status = None
+            report_to_recalc.save()
+            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+
+
 class ReportMixin(models.Model):
     """Abstract model for tracking reports"""
 
@@ -143,24 +162,21 @@ class ReportMixin(models.Model):
         "reports.Report", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    def save(self, *args, **kwargs):
-        if self.report:
-            committee = self.report.committee_account
-            report_date = self.report.coverage_from_date
-            if report_date is not None:
-                reports_to_flag_for_recalculation = Report.objects.filter(
-                    committee_account=committee,
-                    coverage_from_date__gte=report_date,
-                )
-            else:
-                reports_to_flag_for_recalculation = [self.report]
-
-            for report in reports_to_flag_for_recalculation:
-                report.calculation_status = None
-                report.save()
-                logger.info(f"Report: {report.id} marked for recalcuation")
-
-        super(ReportMixin, self).save(*args, **kwargs)
-
     class Meta:
         abstract = True
+
+
+class ReportTransaction(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    transaction = models.ForeignKey(
+        "transactions.Transaction", on_delete=models.CASCADE
+    )
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

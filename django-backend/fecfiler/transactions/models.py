@@ -1,7 +1,7 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.models import ReportMixin
+from fecfiler.reports.models import update_recalculation
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import (
     TransactionManager,
@@ -21,7 +21,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -58,6 +58,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         blank=True,
         related_name="reatt_redes_associations",
     )
+    reports = models.ManyToManyField(
+        "reports.Report",
+        through="reports.ReportTransaction",
+        through_fields=["transaction", "report"],
+        related_name="transactions",
+    )
 
     # The _form_type value in the db may or may not be correct based on whether
     # the transaction is itemized or not. For some transactions, the form_type
@@ -80,6 +86,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
+
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
 
@@ -154,14 +161,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
-    def get_date(self):
-        return self.get_schedule().get_date()
-
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
+
         super(Transaction, self).save(*args, **kwargs)
+
+        for report in self.reports.all():
+            update_recalculation(report)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
@@ -179,7 +187,6 @@ def get_read_model(committee_uuid):
             null=True,
             blank=True,
         )
-        report_id = models.UUIDField()
         schedule = models.TextField()
         _itemized = models.BooleanField()
         amount = models.DecimalField()

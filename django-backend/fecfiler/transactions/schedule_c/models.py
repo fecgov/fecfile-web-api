@@ -23,9 +23,6 @@ class ScheduleC(models.Model):
     personal_funds = models.BooleanField(null=True, blank=True, default=False)
     memo_text_description = models.TextField(null=True, blank=True)
 
-    def get_date(self):
-        return self.get_transaction().report.coverage_through_date
-
     def get_transaction(self):
         return self.transaction_set.first()
 

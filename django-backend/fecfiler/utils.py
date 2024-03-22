@@ -10,6 +10,10 @@ logger = structlog.get_logger(__name__)
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
+
+    # somebody please bring back my exceptions
+    # if exc:
+    #     raise exc
     response = exception_handler(exc, context)
 
     if response is None:
@@ -34,7 +38,7 @@ def custom_exception_handler(exc, context):
     return response
 
 
-def save_copy(instance, data={}):
+def save_copy(instance, data={}, links={}):
     if instance:
         for field, value in data.items():
             setattr(instance, field, value)
@@ -42,5 +46,7 @@ def save_copy(instance, data={}):
         instance.id = None
         instance._state.adding = True
         instance.save()
+        for link_name, link in links.items():
+            getattr(instance, link_name).set(link)
         return instance
     return None

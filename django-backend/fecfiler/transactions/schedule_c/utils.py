@@ -4,7 +4,6 @@ from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
 from decimal import Decimal
-import copy
 
 
 def add_schedule_c_contact_fields(instance, representation=None):
@@ -47,7 +46,7 @@ def carry_forward_loans(report):
         ).objects.filter(
             ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
             ~Q(memo_code=True),
-            report=report.previous_report,
+            reports=report.previous_report,
             schedule_c_id__isnull=False,
         )
 
@@ -56,16 +55,15 @@ def carry_forward_loans(report):
 
 
 def carry_forward_loan(loan, report):
-    # Save children as they are lost from the loan object
-    # when the loan is saved
-    original_children = copy.deepcopy(loan.children)
+    # force evaluation of lazy query. if not, the loan.children
+    # will be a different queryset after the copy is saved
+    original_children = list(loan.children)
     loan_data = {
         "schedule_c": save_copy(loan.schedule_c),
         "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
         "contact_3_id": loan.contact_3_id,
-        "report_id": report.id,
         "committee_account_id": loan.committee_account_id,
         # The loan_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
@@ -88,6 +86,7 @@ def carry_forward_loan(loan, report):
             )
         ),
         loan_data,
+        links={"reports": [report]},
     )
 
     for child in original_children:

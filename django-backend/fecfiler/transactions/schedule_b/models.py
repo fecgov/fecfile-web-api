@@ -33,9 +33,6 @@ class ScheduleB(models.Model):
 
     reattribution_redesignation_tag = models.TextField(null=True, blank=True)
 
-    def get_date(self):
-        return self.expenditure_date
-
     def get_transaction(self):
         return self.transaction_set.first()
 

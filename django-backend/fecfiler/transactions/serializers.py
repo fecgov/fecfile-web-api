@@ -57,7 +57,6 @@ class TransactionSerializer(
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
 
     id = UUIDField(required=False)
-    report_id = UUIDField(required=True, allow_null=False)
 
     schedule_a = ScheduleASerializer(read_only=True)
     schedule_b = ScheduleBSerializer(read_only=True)
@@ -73,8 +72,6 @@ class TransactionSerializer(
     contact_2 = ContactSerializer(read_only=True)
     contact_3_id = UUIDField(required=False, allow_null=True)
     contact_3 = ContactSerializer(read_only=True)
-
-    report = ReportSerializer(read_only=True)
 
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
@@ -116,6 +113,7 @@ class TransactionSerializer(
                     "debt_associations",
                     "loan_associations",
                     "reatt_redes_associations",  # reattribution/redesignation
+                    "reporttransaction",
                     "_form_type",
                 ]
             ] + [
@@ -123,7 +121,6 @@ class TransactionSerializer(
                 "debt_id",
                 "loan_id",
                 "reatt_redes_id",
-                "report_id",
                 "contact_1_id",
                 "contact_2_id",
                 "contact_3_id",
@@ -260,6 +257,14 @@ class TransactionSerializer(
                 instance.reatt_redes
             )
 
+        representation["reports"] = []
+        representation["report_ids"] = []
+        for report in instance.reports.all():
+            representation["reports"].append(ReportSerializer().to_representation(
+                report
+            ))
+            representation["report_ids"].append(report.id)
+
         return representation
 
     def validate(self, data):
@@ -288,3 +293,11 @@ class TransactionSerializer(
         )
         super().validate(data_to_validate)
         return data
+
+
+class TransactionReportSerializer(CommitteeOwnedSerializer):
+    id = UUIDField(required=False)
+    report = ReportSerializer(read_only=True)
+    report_id = UUIDField(required=True, allow_null=False)
+    transaction = TransactionSerializer(read_only=True)
+    transaction_id = UUIDField(required=True, allow_null=False)

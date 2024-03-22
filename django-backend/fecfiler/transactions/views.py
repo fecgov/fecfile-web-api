@@ -8,7 +8,6 @@ from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
-from fecfiler.reports.views import ReportViewMixin, filter_by_report
 from fecfiler.transactions.models import (
     Transaction,
     SCHEDULE_TO_TABLE,
@@ -19,6 +18,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
+from fecfiler.reports.models import Report, update_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -37,11 +37,7 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class TransactionViewSet(
-    CommitteeOwnedViewMixin,
-    ReportViewMixin,
-    ModelViewSet,
-):
+class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
@@ -68,12 +64,20 @@ class TransactionViewSet(
             "delete",
             "save_transactions",
         ]:
-            return super().get_queryset()
-
-        # Otherwise, use the view for reading
-        committee_uuid = self.get_committee_uuid()
-        model = get_read_model(committee_uuid)
-        queryset = filter_by_report(model.objects.all(), self)
+            queryset = super().get_queryset()
+        else:  # Otherwise, use the view for reading
+            committee_uuid = self.get_committee_uuid()
+            model = get_read_model(committee_uuid)
+            queryset = model.objects
+        report_id = (
+            (
+                self.request.query_params.get("report_id")
+                or self.request.data.get("report_id")
+            )
+            if self.request
+            else None
+        )
+        queryset = queryset.filter(reports__id=report_id) if report_id else queryset
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
@@ -102,8 +106,9 @@ class TransactionViewSet(
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            transaction_view = self.get_queryset().get(id=saved_transaction.id)
-        return Response(TransactionSerializer().to_representation(transaction_view))
+            print(f"transaction ID: {saved_transaction.id}")
+        # transaction_view = self.get_queryset().get(id=saved_transaction.id)
+        return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
@@ -197,6 +202,7 @@ class TransactionViewSet(
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
         transaction_data["parent_transaction"] = transaction_data.get(
@@ -240,7 +246,16 @@ class TransactionViewSet(
         schedule_instance = schedule_serializer.save()
         transaction_instance = transaction_serializer.save(
             **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance},
-            **contact_instances
+            **contact_instances,
+        )
+
+        # Link the transaction to all the reports it references in report_ids
+        transaction_instance.reports.set(report_ids)
+        for report_id in report_ids:
+            update_recalculation(Report.objects.get(id=report_id))
+        logger.info(
+            f"Transaction {transaction_instance.id} "
+            f"linked to report(s): {', '.join(report_ids)}"
         )
 
         get_save_hook(transaction_instance)(
@@ -307,6 +322,38 @@ class TransactionViewSet(
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
+
+    @action(detail=False, methods=["put"], url_path=r"add-transaction")
+    def add_transaction_to_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
+            return Response("No report matching id provided", status=404)
+
+        try:
+            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+        except Transaction.DoesNotExist:
+            return Response("No transaction matching id provided", status=404)
+
+        transaction.reports.add(report)
+        update_recalculation(report)
+        return Response("Transaction added to report")
+
+    @action(detail=False, methods=["put"], url_path=r"remove-transaction")
+    def remove_transaction_from_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
+            return Response("No report matching id provided", status=404)
+
+        try:
+            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+        except Transaction.DoesNotExist:
+            return Response("No transaction matching id provided", status=404)
+
+        transaction.reports.remove(report)
+        update_recalculation(report)
+        return Response("Transaction removed from report")
 
 
 def noop(transaction, is_existing):

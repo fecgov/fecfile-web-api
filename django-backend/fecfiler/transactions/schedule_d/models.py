@@ -16,9 +16,6 @@ class ScheduleD(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
-    def get_date(self):
-        return self.get_transaction().report.coverage_through_date
-
     def get_transaction(self):
         return self.transaction_set.first()
 

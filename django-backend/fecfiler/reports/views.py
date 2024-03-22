@@ -127,7 +127,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
         transaction_count = Transaction.objects.filter(
-            report__committee_account__committee_id=committee_id
+            committee_account__committee_id=committee_id
         ).count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id

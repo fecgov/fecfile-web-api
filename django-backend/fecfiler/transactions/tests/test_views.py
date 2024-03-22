@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
+from rest_framework import status
 from fecfiler.user.models import User
+from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
@@ -211,17 +213,91 @@ class TransactionViewsTestCase(TestCase):
         payload = [txn1, txn2]
 
         view_set = TransactionViewSet()
-        view_set.format_kwarg = {}
-        request = self.factory.put(
-            "/api/v1/transactions/multisave/",
-            json.dumps(payload),
-            content_type=self.json_content_type,
-        )
-        request.user = self.user
-        request.data = deepcopy(payload)
-        view_set.request = request
-
-        view_set = TransactionViewSet()
         response = view_set.save_reatt_redes_transactions(self.request(payload))
         transactions = response.data
         self.assertEqual(len(transactions), 2)
+
+    def test_add_transaction_to_report(self):
+        report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        transaction_id = "474a1a10-da68-4d71-9a11-cccccccccccc"
+
+        payload = {
+            "transaction_id": transaction_id,
+            "report_id": report_id
+        }
+        view_set = TransactionViewSet()
+        response = view_set.add_transaction_to_report(self.request(payload))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Transaction added to report")
+
+        # Verify that the report is added to the transaction
+        transaction = Transaction.objects.get(id=transaction_id)
+        self.assertEqual(transaction.reports.count(), 1)
+        self.assertEqual(str(transaction.reports.first().id), report_id)
+
+        # Verify that the report has the transaction
+        report = Report.objects.get(id=report_id)
+        transaction_ids = [str(t.id) for t in report.transactions.all()]
+        self.assertIn(transaction_id, transaction_ids)
+
+        # Verify response when no transaction id provided
+        payload['transaction_id'] = None
+        response = view_set.add_transaction_to_report(self.request(payload))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data,
+            "No transaction matching id provided"
+        )
+
+        # Verify response when non existing report id provided
+        payload['transaction_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload['report_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        response = view_set.add_transaction_to_report(self.request(payload))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data,
+            "No report matching id provided"
+        )
+
+    def test_remove_transaction_from_report(self):
+        report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        transaction_id = "0b0b9776-df8b-4f5f-b4c5-d751167417e7"
+
+        payload = {
+            "transaction_id": transaction_id,
+            "report_id": report_id
+        }
+        view_set = TransactionViewSet()
+        response = view_set.remove_transaction_from_report(self.request(payload))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Transaction removed from report")
+
+        # Verify that the report is added to the transaction
+        transaction = Transaction.objects.get(id=transaction_id)
+        self.assertEqual(transaction.reports.count(), 0)
+
+        # Verify that the report does not have the transaction
+        report = Report.objects.get(id=report_id)
+        transaction_ids = [str(t.id) for t in report.transactions.all()]
+        self.assertNotIn(str(transaction_id), transaction_ids)
+
+        # Verify response when no transaction id provided
+        payload['transaction_id'] = None
+        response = view_set.remove_transaction_from_report(self.request(payload))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data,
+            "No transaction matching id provided"
+        )
+
+        # Verify response when non existing report id provided
+        payload['transaction_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload['report_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        response = view_set.remove_transaction_from_report(self.request(payload))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.data,
+            "No report matching id provided"
+        )

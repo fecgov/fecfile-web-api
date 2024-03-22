@@ -33,7 +33,7 @@ class SummaryService:
     def calculate_summary_column_a(self):
         transaction_view_model = get_read_model(self.report.committee_account_id)
         report_transactions = transaction_view_model.objects.filter(
-            report_id=self.report.id
+            reports__id=self.report.id
         )
         column_a = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
