@@ -46,7 +46,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.debt.save()
         self.debt.reports.add(self.report_1)
 
-    def test_create_guarantor_in_future_report(self):
+    def test_create_debt_in_future_report(self):
         save_hook(self.debt, False)
         carried_over = Transaction.objects.filter(
             reports__id=self.report_2.id, schedule_d__isnull=False
@@ -54,7 +54,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_d.incurred_amount, 0)
 
-    def test_update_guarantor_in_future_report(self):
+    def test_update_debt_in_future_report(self):
         save_hook(self.debt, False)
         carried_over = Transaction.objects.filter(
             reports__id=self.report_2.id, schedule_d__isnull=False

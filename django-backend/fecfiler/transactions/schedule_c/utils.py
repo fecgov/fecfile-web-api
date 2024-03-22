@@ -56,9 +56,9 @@ def carry_forward_loans(report):
 
 
 def carry_forward_loan(loan, report):
-    # Save children as they are lost from the loan object
-    # when the loan is saved
-    original_children = copy.deepcopy(loan.children)
+    # force evaluation of lazy query. if not, the loan.children
+    # will be a different queryset after the copy is saved
+    original_children = list(loan.children)
     loan_data = {
         "schedule_c": save_copy(loan.schedule_c),
         "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
