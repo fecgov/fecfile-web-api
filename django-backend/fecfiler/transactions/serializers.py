@@ -84,9 +84,7 @@ class TransactionSerializer(
     name = CharField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    debt_incurred_amount = DecimalField(
-        max_digits=11, decimal_places=2, read_only=True
-    )
+    debt_incurred_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     calendar_ytd_per_election_office = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -160,8 +158,10 @@ class TransactionSerializer(
         schedule_c2 = representation.pop("schedule_c2")
         schedule_d = representation.pop("schedule_d")
         schedule_e = representation.pop("schedule_e")
-        if instance.children.count() > 0:
-            representation["children"] = [child.id for child in instance.children]
+        if instance.transaction_set.count() > 0:
+            representation["children"] = [
+                child.id for child in instance.transaction_set.all()
+            ]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
@@ -172,7 +172,9 @@ class TransactionSerializer(
             total = (
                 instance.reatt_redes_associations.filter(
                     schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-                ).aggregate(Sum("amount"))["amount__sum"]
+                ).aggregate(Sum("schedule_a__contribution_amount"))[
+                    "schedule_a__contribution_amount__sum"
+                ]
                 or 0.0
             )
             representation["reatt_redes_total"] = str(total)
@@ -184,12 +186,14 @@ class TransactionSerializer(
             representation["aggregate_amount"] = representation.get("aggregate")
             add_schedule_b_contact_fields(instance, representation)
 
-            # For REDESIGNATED transactions, calculate the amount that has
-            # been redesignated for the transaction
+            # # For REDESIGNATED transactions, calculate the amount that has
+            # # been redesignated for the transaction
             total = (
                 instance.reatt_redes_associations.filter(
                     schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-                ).aggregate(Sum("amount"))["amount__sum"]
+                ).aggregate(Sum("schedule_b__expenditure_amount"))[
+                    "schedule_b__expenditure_amount__sum"
+                ]
                 or 0.0
             )
             representation["reatt_redes_total"] = str(total)
@@ -199,7 +203,7 @@ class TransactionSerializer(
                     representation[property] = schedule_b[property]
         if schedule_c:
             add_schedule_c_contact_fields(instance, representation)
-            loan_agreement = instance.children.filter(
+            loan_agreement = instance.transaction_set.filter(
                 transaction_type_identifier="C1_LOAN_AGREEMENT"
             ).first()
             representation["loan_agreement_id"] = (
@@ -232,29 +236,11 @@ class TransactionSerializer(
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
 
-        # Assign the itemization value of the highest level parent for all transactions.
-        # The itemization value of the parent (or any ancestor) is not yet calcuated
-        # when retrieving this instance from the db.
-        if instance.parent_transaction:
-            if instance.parent_transaction.parent_transaction:
-                itemized = Transaction.objects.get(
-                    id=instance.parent_transaction.parent_transaction.id
-                ).itemized
-            else:
-                parent = Transaction.objects.get(id=instance.parent_transaction.id)
-                # Assign child IE's thier parent's calendar ytd per election
-                if instance.schedule_e:
-                    representation[
-                        "calendar_ytd_per_election_office"
-                    ] = parent.calendar_ytd_per_election_office
-                itemized = parent.itemized
-            representation["itemized"] = itemized
-
         # represent parent
         if instance.parent_transaction:
-            representation[
-                "parent_transaction"
-            ] = TransactionSerializer().to_representation(instance.parent_transaction)
+            representation["parent_transaction"] = (
+                TransactionSerializer().to_representation(instance.parent_transaction)
+            )
         # represent loan
         if instance.loan:
             representation["loan"] = TransactionSerializer().to_representation(

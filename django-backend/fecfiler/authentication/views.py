@@ -12,6 +12,8 @@ from fecfiler.settings import (
     LOGOUT_REDIRECT_URL,
     OIDC_OP_LOGOUT_ENDPOINT,
     ALTERNATIVE_LOGIN,
+    FFAPI_COOKIE_DOMAIN,
+    FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
 )
 
 from rest_framework.response import Response
@@ -62,14 +64,21 @@ def handle_invalid_login(username):
 
 
 def delete_user_logged_in_cookies(response):
+    response.delete_cookie(FFAPI_LOGIN_DOT_GOV_COOKIE_NAME, domain=FFAPI_COOKIE_DOMAIN)
     response.delete_cookie("oidc_state")
-    response.delete_cookie("csrftoken")
+    response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
 
 
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
     redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    redirect.set_cookie(
+        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
+        "true",
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
+    )
     return redirect
 
 

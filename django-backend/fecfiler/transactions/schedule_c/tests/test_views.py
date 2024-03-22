@@ -4,6 +4,7 @@ from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c.views import save_hook
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class ScheduleCViewsTestCase(TestCase):
@@ -12,6 +13,7 @@ class ScheduleCViewsTestCase(TestCase):
     ]
 
     def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.form_3x = Form3X()
         self.form_3x.save()
         self.report_1 = Report(
@@ -19,7 +21,7 @@ class ScheduleCViewsTestCase(TestCase):
             committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-01-01",
             coverage_through_date="2023-01-02",
-            form_3x=self.form_3x
+            form_3x=self.form_3x,
         )
         self.report_1.save()
         self.report_2 = Report(
@@ -27,7 +29,7 @@ class ScheduleCViewsTestCase(TestCase):
             committee_account_id="11111111-2222-3333-4444-555555555555",
             coverage_from_date="2023-02-01",
             coverage_through_date="2023-02-02",
-            form_3x=self.form_3x
+            form_3x=self.form_3x,
         )
         self.report_2.save()
         self.loan = Transaction(

@@ -9,7 +9,7 @@ class CommitteeMemberViewSetTest(TestCase):
         "C01234567_user_and_committee",
         "test_f3x_reports",
         "test_f24_reports",
-        "test_f99_reports"
+        "test_f99_reports",
     ]
 
     def setUp(self):
@@ -18,36 +18,36 @@ class CommitteeMemberViewSetTest(TestCase):
 
     def test_list_paginated(self):
         view = ReportViewSet()
-        view.format_kwarg = 'format'
-        request = self.factory.get(
-            "/api/v1/reports"
-        )
+        view.format_kwarg = "format"
+        request = self.factory.get("/api/v1/reports")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID('11111111-2222-3333-4444-555555555555')
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "GET"
-        request.query_params = {'page': 1}
+        request.query_params = {"page": 1}
         view.request = request
         response = view.list(request)
-        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(len(response.data["results"]), 10)
 
     def test_list_no_pagination(self):
         view = ReportViewSet()
-        view.format_kwarg = 'format'
-        request = self.factory.get(
-            "/api/v1/reports"
-        )
+        view.format_kwarg = "format"
+        request = self.factory.get("/api/v1/reports")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID('11111111-2222-3333-4444-555555555555')
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
         }
         request.method = "GET"
         request.query_params = {}
         view.request = request
         response = view.list(request)
         try:
-            response.data['results']  # A non-paginated response will throw an error here
+            response.data[
+                "results"
+            ]  # A non-paginated response will throw an error here
             self.assertTrue(response is None)
         except TypeError:
             self.assertTrue(response is not None)

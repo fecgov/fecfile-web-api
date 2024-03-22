@@ -7,6 +7,7 @@ import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class TransactionViewsTestCase(TestCase):
@@ -19,7 +20,13 @@ class TransactionViewsTestCase(TestCase):
 
     json_content_type = "application/json"
 
+    @classmethod
+    def setUpClass(cls):
+        return super().setUpClass()
+
     def setUp(self):
+        print("SETUP TEST_VEW")
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.factory = RequestFactory()
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
@@ -35,7 +42,10 @@ class TransactionViewsTestCase(TestCase):
         request.user = self.user
         request.data = deepcopy(payload)
         request.query_params = params
-        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
         return request
 
     def test_save_transaction_pair(self):
@@ -132,18 +142,17 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
 
-        response = view_set.previous_transaction_by_election(
-            self.request(
-                {},
-                {
-                    "date": "2023-10-31",
-                    "aggregation_group": "INDEPENDENT_EXPENDITURE",
-                    "election_code": "C2012",
-                    "candidate_office": "S",
-                    "candidate_state": "AK",
-                },
-            )
+        view_set.request = self.request(
+            {},
+            {
+                "date": "2023-10-31",
+                "aggregation_group": "INDEPENDENT_EXPENDITURE",
+                "election_code": "C2012",
+                "candidate_office": "S",
+                "candidate_state": "AK",
+            },
         )
+        response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.data["date"], "2023-10-31")
 
     def test_inherited_election_aggregate(self):
@@ -153,7 +162,10 @@ class TransactionViewsTestCase(TestCase):
         request.user = self.user
         request.query_params = {}
         request.data = {}
-        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
 
         view = TransactionViewSet
         view.request = request
@@ -161,7 +173,7 @@ class TransactionViewsTestCase(TestCase):
             request, pk="aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35"
         )
         transaction = response.data
-        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), 58.00)
+        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "58.00")
 
     def test_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
