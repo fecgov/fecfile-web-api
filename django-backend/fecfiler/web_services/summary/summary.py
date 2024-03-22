@@ -1,5 +1,5 @@
 from decimal import Decimal
-from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.models import get_read_model
 from fecfiler.reports.models import Report
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce

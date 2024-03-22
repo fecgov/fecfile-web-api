@@ -1,8 +1,6 @@
 import uuid
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
-from decimal import Decimal
-import copy
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager

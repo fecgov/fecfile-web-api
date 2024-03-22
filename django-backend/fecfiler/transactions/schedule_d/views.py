@@ -1,12 +1,8 @@
 from django.db import models
 from django.forms.models import model_to_dict
-from decimal import Decimal
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.utils import carry_forward_debt
 import copy
-
-from django.db.models import Q
-
 from fecfiler.transactions.models import Transaction
 
 

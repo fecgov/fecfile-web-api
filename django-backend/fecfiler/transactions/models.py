@@ -1,4 +1,4 @@
-from django.db import models, connection
+from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.reports.models import ReportMixin
@@ -17,7 +17,6 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 import uuid
 import structlog
-import types
 
 logger = structlog.get_logger(__name__)
 

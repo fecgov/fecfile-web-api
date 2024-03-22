@@ -1,14 +1,11 @@
 from django.test import TestCase
 from django.db.models import QuerySet
-
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.contacts.models import Contact
-from fecfiler.transactions.models import Transaction, Schedule, get_read_model
+from fecfiler.transactions.models import Transaction, get_read_model
 from fecfiler.transactions.schedule_a.models import ScheduleA
-from fecfiler.transactions.managers import TransactionManager
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.views import create_committee_view
-
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
     create_schedule_b,
@@ -16,7 +13,6 @@ from fecfiler.transactions.tests.utils import (
     create_ie,
     create_debt,
 )
-import time
 from decimal import Decimal
 
 
@@ -35,7 +31,7 @@ class TransactionViewTestCase(TestCase):
         ]
         for receipt_data in indiviual_reciepts:
             create_schedule_a(
-                "IDIVIDUAL_RECEIPT",
+                "INDIVIDUAL_RECEIPT",
                 self.committee,
                 self.contact_1,
                 receipt_data["date"],
@@ -51,8 +47,8 @@ class TransactionViewTestCase(TestCase):
 
     def test_force_unaggregated(self):
 
-        unaggregated = create_test_transaction(
-            "IDIVIDUAL_RECEIPT",
+        unaggregated = create_test_transaction(  # noqa F841
+            "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
             self.contact_1,
@@ -65,7 +61,7 @@ class TransactionViewTestCase(TestCase):
             {"force_unaggregated": True},
         )
         create_test_transaction(
-            "IDIVIDUAL_RECEIPT",
+            "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
             self.contact_1,
@@ -113,7 +109,7 @@ class TransactionViewTestCase(TestCase):
 
     def test_refund_aggregate(self):
         create_schedule_a(
-            "IDIVIDUAL_RECEIPT",
+            "INDIVIDUAL_RECEIPT",
             self.committee,
             self.contact_1,
             "2024-01-01",

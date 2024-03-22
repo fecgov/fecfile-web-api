@@ -13,7 +13,7 @@ from fecfiler.transactions.schedule_e.managers import (
     over_two_hundred_types as schedule_e_over_two_hundred_types,
     line_labels as line_labels_e,
 )
-from django.db.models.functions import Coalesce, Concat, Lag
+from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
     Subquery,
@@ -26,13 +26,10 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
-    ExpressionWrapper,
     RowRange,
     Window,
     Manager,
 )
-from django.db.models.expressions import RawSQL
-from django.contrib.postgres.expressions import ArraySubquery
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
@@ -72,7 +69,7 @@ class TransactionManager(SoftDeleteManager):
     def get_queryset(self):
         return super().get_queryset()
 
-    def ITEMIZATION_CLAUSE(self):
+    def ITEMIZATION_CLAUSE(self):  # noqa N802
         over_two_hundred_types = (
             schedule_a_over_two_hundred_types
             + schedule_b_over_two_hundred_types
@@ -99,7 +96,7 @@ class TransactionManager(SoftDeleteManager):
         output_field=DecimalField(),
     )
 
-    def SCHEDULE_CLAUSE(self):
+    def SCHEDULE_CLAUSE(self):  # noqa N802
         return Case(
             When(schedule_a__isnull=False, then=Schedule.A.value),
             When(schedule_b__isnull=False, then=Schedule.B.value),
@@ -132,10 +129,10 @@ class TransactionManager(SoftDeleteManager):
         When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
     )
 
-    def ENTITY_AGGREGGATE_CLAUSE(self):
+    def ENTITY_AGGREGGATE_CLAUSE(self):  # noqa N802
         return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
 
-    def ELECTION_AGGREGATE_CLAUSE(self):
+    def ELECTION_AGGREGATE_CLAUSE(self):  # noqa N802
         return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
 
     BACK_REFERENCE_CLAUSE = Coalesce(
@@ -181,7 +178,7 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def LOAN_KEY_CLAUSE(self):
+    def LOAN_KEY_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 Q(loan_id__isnull=False)
@@ -208,7 +205,7 @@ class TransactionManager(SoftDeleteManager):
             output_field=TextField(),
         )
 
-    def LOAN_PAYMENT_CLAUSE(self):
+    def LOAN_PAYMENT_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 schedule_c__isnull=False,
@@ -218,7 +215,7 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-    def INCURRED_PRIOR_CLAUSE(self):
+    def INCURRED_PRIOR_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 schedule_d__isnull=False,
@@ -247,7 +244,7 @@ class TransactionManager(SoftDeleteManager):
             default=None,
         )
 
-    def PAYMENT_PRIOR_CLAUSE(self):
+    def PAYMENT_PRIOR_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 schedule_d__isnull=False,
@@ -272,7 +269,7 @@ class TransactionManager(SoftDeleteManager):
             default=None,
         )
 
-    def PAYMENT_AMOUNT_CLAUSE(self):
+    def PAYMENT_AMOUNT_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 schedule_d__isnull=False,
@@ -371,7 +368,7 @@ class TransactionViewManager(Manager):
             .order_by("order_key")
         )
 
-    def ORDER_KEY_CLAUSE(self):
+    def ORDER_KEY_CLAUSE(self):  # noqa N802
         return Case(
             When(
                 parent_transaction__isnull=False,
@@ -418,13 +415,13 @@ class TransactionViewManager(Manager):
     D = ["SD9", "SD10"]
     E = ["SE"]
 
-    def LINE_LABEL_ORDER_CLAUSE(self):
+    def LINE_LABEL_ORDER_CLAUSE(self):  # noqa N802
         order = self.C + self.D + self.A_11 + self.A + self.B + self.E
         return Case(
             *[When(form_type=line, then=Value(i)) for i, line in enumerate(order)]
         )
 
-    def LINE_LABEL_CLAUSE(self):
+    def LINE_LABEL_CLAUSE(self):  # noqa N802
         label_map = {
             **line_labels_a,
             **line_labels_b,

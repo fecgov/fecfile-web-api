@@ -64,7 +64,7 @@ def carry_forward_loan(loan, report):
         "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
-        "contact_2_id": loan.contact_2_id,
+        "contact_3_id": loan.contact_3_id,
         "report_id": report.id,
         "committee_account_id": loan.committee_account_id,
         # The loan_id should point to the original loan transaction

@@ -1,23 +1,13 @@
-import logging
 from silk.profiling.profiler import silk_profile
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 
-from django.core.paginator import Paginator as DjangoPaginator
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.mixins import (
-    CreateModelMixin,
-    UpdateModelMixin,
-    ListModelMixin,
-    RetrieveModelMixin,
-)
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q, Value
-from django.db.models.fields import TextField
-from django.db.models.functions import Coalesce, Concat
+from django.db.models import Q
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.reports.views import ReportViewMixin, filter_by_report
 from fecfiler.transactions.models import (

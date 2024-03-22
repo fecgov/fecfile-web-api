@@ -10,4 +10,6 @@ class Command(BaseCommand):
         for committee in CommitteeAccount.objects.all():
             create_committee_view(committee.id)
 
-        self.stdout.write(self.style.SUCCESS("Successfully created/updated committee views"))
+        self.stdout.write(self.style.SUCCESS(
+            "Successfully created/updated committee views")
+        )

@@ -1,9 +1,5 @@
-from django.test import TestCase
-from django.db.models import QuerySet, Model
-
-from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.contacts.models import Contact
-from fecfiler.transactions.models import Transaction, Schedule
+from django.db.models import Model
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
@@ -11,9 +7,6 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
-from fecfiler.transactions.managers import TransactionManager
-import uuid
-from decimal import Decimal
 
 
 def create_schedule_a(

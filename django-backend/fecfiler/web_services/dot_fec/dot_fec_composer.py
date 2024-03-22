@@ -1,7 +1,7 @@
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.models import get_read_model
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR

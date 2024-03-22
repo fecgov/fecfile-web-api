@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 for i in range(num_a)
             ]
         )
-        schedule_a_transactions = Transaction.objects.bulk_create(
+        schedule_a_transactions = Transaction.objects.bulk_create(  # noqa F841
             [
                 Transaction(
                     schedule_a_id=schedule_as[i].id,

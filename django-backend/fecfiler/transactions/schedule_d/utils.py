@@ -49,7 +49,7 @@ def carry_forward_debt(debt, report):
         "schedule_d": save_copy(debt.schedule_d, {"incurred_amount": Decimal(0)}),
         "contact_1_id": debt.contact_1_id,
         "contact_2_id": debt.contact_2_id,
-        "contact_2_id": debt.contact_2_id,
+        "contact_3_id": debt.contact_3_id,
         "report_id": report.id,
         "committee_account_id": debt.committee_account_id,
         # The debt_id should point to the original loan transaction
