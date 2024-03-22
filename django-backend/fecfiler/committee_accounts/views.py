@@ -2,7 +2,7 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import (
     Transaction,
     get_committee_view_name,
@@ -11,6 +11,7 @@ from fecfiler.transactions.models import (
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
@@ -252,8 +253,7 @@ def create_committee_view(committee_uuid):
             .query.sql_with_params()
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
-
         cursor.execute(
-            "DROP VIEW IF EXISTS %s ; CREATE  VIEW %s as %s",
-            (view_name, view_name, definition),
+            f"DROP VIEW IF EXISTS {view_name};"
+            f"CREATE  VIEW {view_name} as {definition}"
         )
