@@ -1,4 +1,3 @@
-from silk.profiling.profiler import silk_profile
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
 
@@ -100,14 +99,12 @@ class TransactionViewSet(
             )
         return queryset
 
-    @silk_profile(name="CREATE TRANSACTION")
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             transaction_view = self.get_queryset().get(id=saved_transaction.id)
         return Response(TransactionSerializer().to_representation(transaction_view))
 
-    @silk_profile(name="UPDATE TRANSACTION")
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
@@ -279,7 +276,6 @@ class TransactionViewSet(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
 
-    @silk_profile(name="LIST TRANSACTIONS")
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
