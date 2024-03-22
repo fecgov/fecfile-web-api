@@ -24,6 +24,7 @@ class TransactionViewsTestCase(TestCase):
 
     def setUp(self):
         print("SETUP TEST_VEW")
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.factory = RequestFactory()
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.payloads = json.load(
