@@ -47,7 +47,7 @@ def carry_forward_loans(report):
         ).objects.filter(
             ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
             ~Q(memo_code=True),
-            report=report.previous_report,
+            reports=report.previous_report,
             schedule_c_id__isnull=False,
         )
 
@@ -65,7 +65,6 @@ def carry_forward_loan(loan, report):
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
         "contact_3_id": loan.contact_3_id,
-        "report_id": report.id,
         "committee_account_id": loan.committee_account_id,
         # The loan_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
@@ -88,6 +87,7 @@ def carry_forward_loan(loan, report):
             )
         ),
         loan_data,
+        links={"reports": [report]},
     )
 
     for child in original_children:

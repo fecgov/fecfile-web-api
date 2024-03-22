@@ -55,4 +55,5 @@ def carry_forward_guarantor(report, new_loan, guarantor):
             "report_id": report.id,
             "parent_transaction_id": new_loan.id,
         },
+        links={"reports": [report]},
     )

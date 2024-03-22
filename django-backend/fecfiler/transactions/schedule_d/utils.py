@@ -71,4 +71,5 @@ def carry_forward_debt(debt, report):
             )
         ),
         debt_data,
+        links={"reports": [report]},
     )
