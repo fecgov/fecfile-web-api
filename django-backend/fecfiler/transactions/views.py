@@ -1,15 +1,20 @@
 from django.db import transaction as db_transaction
 from rest_framework import filters, pagination
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q, Value
-from django.db.models.fields import TextField
-from django.db.models.functions import Coalesce, Concat
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
-from fecfiler.reports.views import ReportViewMixin
-from fecfiler.transactions.models import Transaction, SCHEDULE_TO_TABLE, Schedule
+from django.db.models import Q
+from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
+from fecfiler.reports.views import ReportViewMixin, filter_by_report
+from fecfiler.transactions.models import (
+    Transaction,
+    SCHEDULE_TO_TABLE,
+    Schedule,
+    get_read_model,
+)
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
@@ -20,6 +25,10 @@ from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
 import structlog
+
+import os
+import psycopg2
+
 logger = structlog.get_logger(__name__)
 
 
@@ -28,19 +37,11 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-# clause used to facilitate sorting on name as it's displayed
-DISPLAY_NAME_CLAUSE = Coalesce(
-    "contact_1__name",
-    Concat(
-        "contact_1__last_name",
-        Value(", "),
-        "contact_1__first_name",
-        output_field=TextField(),
-    )
-)
-
-
-class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
+class TransactionViewSet(
+    CommitteeOwnedViewMixin,
+    ReportViewMixin,
+    ModelViewSet,
+):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
@@ -57,38 +58,33 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         "back_reference_tran_id_number",
     ]
     ordering = ["-created"]
-
-    # Allow requests to filter transactions output based on schedule type by
-    # passing a query parameter
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects
 
     def get_queryset(self):
-        queryset = (
-            super()
-            .get_queryset()
-            .annotate(
-                name=DISPLAY_NAME_CLAUSE,
-            )
-        )
+        # Use the table if writing
+        if hasattr(self, "action") and self.action in [
+            "create",
+            "update",
+            "delete",
+            "save_transactions",
+        ]:
+            return super().get_queryset()
+
+        # Otherwise, use the view for reading
+        committee_uuid = self.get_committee_uuid()
+        model = get_read_model(committee_uuid)
+        queryset = filter_by_report(model.objects.all(), self)
+
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
-            schedules_to_include = schedule_filters.split(",")
-            # All transactions are included by default, here we remove those
-            # that are not identified in the schedules query param
-            if "A" not in schedules_to_include:
-                queryset = queryset.filter(schedule_a__isnull=True)
-            if "B" not in schedules_to_include:
-                queryset = queryset.filter(schedule_b__isnull=True)
-            if "C" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c__isnull=True)
-            if "C1" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c1__isnull=True)
-            if "C2" not in schedules_to_include:
-                queryset = queryset.filter(schedule_c2__isnull=True)
-            if "D" not in schedules_to_include:
-                queryset = queryset.filter(schedule_d__isnull=True)
-            if "E" not in schedules_to_include:
-                queryset = queryset.filter(schedule_e__isnull=True)
+            schedules_to_include = (
+                schedule_filters.split(",") if schedule_filters else []
+            )
+            queryset = queryset.filter(
+                schedule__in=[
+                    Schedule[schedule].value for schedule in schedules_to_include
+                ]
+            )
 
         parent_id = self.request.query_params.get("parent")
         if parent_id:
@@ -96,14 +92,18 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
 
         contact_id = self.request.query_params.get("contact")
         if contact_id:
-            queryset = queryset.filter(Q(contact_1=contact_id) | Q(
-                contact_2=contact_id) | Q(contact_3=contact_id))
+            queryset = queryset.filter(
+                Q(contact_1=contact_id)
+                | Q(contact_2=contact_id)
+                | Q(contact_3=contact_id)
+            )
         return queryset
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+            transaction_view = self.get_queryset().get(id=saved_transaction.id)
+        return Response(TransactionSerializer().to_representation(transaction_view))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
@@ -113,10 +113,6 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-        return response
 
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
@@ -208,15 +204,13 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
         )
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
-        transaction_data["reatt_redes"] = transaction_data.get(
-            "reatt_redes_id", None)
+        transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
         is_existing = "id" in transaction_data
         if is_existing:
-            transaction_instance = Transaction.objects.get(
-                pk=transaction_data["id"])
+            transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
             transaction_serializer = TransactionSerializer(
                 transaction_instance,
                 data=transaction_data,
@@ -234,9 +228,10 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
             )
 
         contact_instances = {
-            contact_key: create_or_update_contact(transaction_data, contact_key,
-                                                  request.session["committee_uuid"])
-            for contact_key in ['contact_1', 'contact_2', 'contact_3']
+            contact_key: create_or_update_contact(
+                transaction_data, contact_key, request.session["committee_uuid"]
+            )
+            for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
         }
         transaction_serializer.is_valid(raise_exception=True)
@@ -259,14 +254,14 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
                 child_transaction.parent_transaction_id = transaction_instance.id
                 child_transaction.save()
             else:
-                child_transaction_data[
-                    "parent_transaction_id"
-                ] = transaction_instance.id
+                child_transaction_data["parent_transaction_id"] = (
+                    transaction_instance.id
+                )
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
-                    child_transaction_data[
-                        "contact_1_id"
-                    ] = transaction_instance.contact_1_id
+                    child_transaction_data["contact_1_id"] = (
+                        transaction_instance.contact_1_id
+                    )
                     del child_transaction_data["contact_1"]
 
                 self.save_transaction(child_transaction_data, request)
@@ -276,32 +271,41 @@ class TransactionViewSet(CommitteeOwnedViewSet, ReportViewMixin):
     @action(detail=False, methods=["put"], url_path=r"multisave")
     def save_transactions(self, request):
         with db_transaction.atomic():
-            saved_data = [self.save_transaction(
-                data, request) for data in request.data]
+            saved_data = [self.save_transaction(data, request) for data in request.data]
         return Response(
-            [TransactionSerializer().to_representation(data)
-             for data in saved_data]
+            [TransactionSerializer().to_representation(data) for data in saved_data]
         )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
     def save_reatt_redes_transactions(self, request):
         with db_transaction.atomic():
             if request.data[0].get("id", None) is not None:
                 saved_data = [
-                    self.save_transaction(data, request) for data in request.data]
+                    self.save_transaction(data, request) for data in request.data
+                ]
             else:
                 reatt_redes = self.save_transaction(request.data[0], request)
-                request.data[1]['reatt_redes'] = reatt_redes
-                request.data[1]['reatt_redes_id'] = reatt_redes.id
-                child = request.data[1].get('children', [])[0]
-                child['reatt_redes'] = reatt_redes
-                child['reatt_redes_id'] = reatt_redes.id
-                request.data[1]['children'] = [child]
+                request.data[1]["reatt_redes"] = reatt_redes
+                request.data[1]["reatt_redes_id"] = reatt_redes.id
+                child = request.data[1].get("children", [])[0]
+                child["reatt_redes"] = reatt_redes
+                child["reatt_redes_id"] = reatt_redes.id
+                request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
         return Response(
-            [TransactionSerializer().to_representation(data)
-             for data in saved_data]
+            [TransactionSerializer().to_representation(data) for data in saved_data]
         )
 
 
@@ -317,3 +321,20 @@ def get_save_hook(transaction: Transaction):
         Schedule.D: schedule_d_save_hook,
     }
     return hooks.get(schedule_name, noop)
+
+
+def stringify_queryset(qs):
+    database_uri = os.environ.get("DATABASE_URL")
+    if not database_uri:
+        print(
+            """Environment variable DATABASE_URL not found.
+            Please check your settings and try again"""
+        )
+        exit(1)
+    print("Testing connection...")
+    conn = psycopg2.connect(database_uri)
+    sql, params = qs.query.sql_with_params()
+    with conn.cursor() as cursor:
+        s = cursor.mogrify(sql, params)
+    conn.close()
+    return s

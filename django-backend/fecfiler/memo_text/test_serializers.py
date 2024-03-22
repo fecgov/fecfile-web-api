@@ -29,7 +29,8 @@ class MemoTextSerializerTestCase(TestCase):
             id="12345678-aaaa-bbbb-cccc-111122223333"
         )
         self.mock_request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555"
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
         }
 
     def test_serializer_validate(self):

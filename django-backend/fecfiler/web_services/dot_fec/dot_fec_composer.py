@@ -1,7 +1,7 @@
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.models import get_read_model
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
@@ -39,7 +39,8 @@ def compose_report(report_id, upload_submission_record_id):
 
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.filter(report_id=report_id)
+    transaction_view_model = get_read_model(report.committee_account_id)
+    transactions = transaction_view_model.objects.filter(report_id=report_id)
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
@@ -53,9 +54,11 @@ def compose_transactions(report_id):
                 transaction.parent_transaction.parent_transaction.id
                 if transaction.parent_transaction
                 and transaction.parent_transaction.parent_transaction
-                else transaction.parent_transaction.id
-                if transaction.parent_transaction
-                else transaction.id
+                else (
+                    transaction.parent_transaction.id
+                    if transaction.parent_transaction
+                    else transaction.id
+                )
             )
             root = transactions.filter(id=root_id).first()
             transaction.itemized = root.itemized
@@ -172,7 +175,7 @@ def get_schema_name(schedule):
         Schedule.C1.value.value: "SchC1",
         Schedule.C2.value.value: "SchC2",
         Schedule.D.value.value: "SchD",
-        Schedule.E.value.value: "SchE"
+        Schedule.E.value.value: "SchE",
     }.get(schedule)
 
 

@@ -6,7 +6,10 @@ import requests
 from django.db.models import CharField, Q, Value, Count
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from rest_framework import viewsets
+from fecfiler.committee_accounts.views import (
+    CommitteeOwnedViewMixin,
+)
 from fecfiler.settings import (
     FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
     FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
@@ -38,7 +41,7 @@ def validate_and_sanitize_candidate(candidate_id):
     return candidate_id
 
 
-class ContactViewSet(CommitteeOwnedViewSet):
+class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -46,9 +49,9 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
     serializer_class = ContactSerializer
 
-    """Note that this ViewSet inherits from CommitteeOwnedViewSet
+    """Note that this ViewSet inherits from CommitteeOwnedViewMixin
     The queryset will be further limmited by the user's committee
-    in CommitteeOwnedViewSet's implementation of get_queryset()
+    in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
     queryset = (
@@ -90,10 +93,14 @@ class ContactViewSet(CommitteeOwnedViewSet):
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
         try:
-            url = (FEC_API_CANDIDATE_ENDPOINT
-                   + validate_and_sanitize_candidate(candidate_id) + "/")
-            return JsonResponse(requests.get(url, params=urlencode(
-                {"api_key": FEC_API_KEY})).json())
+            url = (
+                FEC_API_CANDIDATE_ENDPOINT
+                + validate_and_sanitize_candidate(candidate_id)
+                + "/"
+            )
+            return JsonResponse(
+                requests.get(url, params=urlencode({"api_key": FEC_API_KEY})).json()
+            )
         except AssertionError:
             return HttpResponseBadRequest()
 
@@ -268,7 +275,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
             return super().update(request, *args, **kwargs)
 
     def get_int_param_value(
-            self, request, param_name: str, default_param_value: int, max_param_value: int
+        self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
         if request:
             param_val = request.GET.get(param_name, "")
@@ -294,7 +301,7 @@ class ContactViewSet(CommitteeOwnedViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewSet,
+    CommitteeOwnedViewMixin,
     mixins.ListModelMixin,
     GenericViewSet,
 ):

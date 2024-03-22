@@ -2,6 +2,7 @@ from django.db import models
 from fecfiler.transactions.models import Transaction
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
+from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 import copy
 
 
@@ -20,8 +21,8 @@ def create_in_future_reports(transaction):
             report_id=report.id, loan_id=transaction.parent_transaction.id
         )
         if loan_query.count():
-            report.pull_forward_loan_guarantor(
-                copy.deepcopy(transaction), loan_query.first()
+            carry_forward_guarantor(
+                report, loan_query.first(), copy.deepcopy(transaction)
             )
 
 

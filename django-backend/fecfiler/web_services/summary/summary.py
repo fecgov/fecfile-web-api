@@ -1,5 +1,5 @@
 from decimal import Decimal
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.models import get_read_model
 from fecfiler.reports.models import Report
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
@@ -31,7 +31,10 @@ class SummaryService:
         return column_a, column_b
 
     def calculate_summary_column_a(self):
-        report_transactions = Transaction.objects.filter(report_id=self.report.id)
+        transaction_view_model = get_read_model(self.report.committee_account_id)
+        report_transactions = transaction_view_model.objects.filter(
+            report_id=self.report.id
+        )
         column_a = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
             line_11aii=self.get_line("SA11AII"),
@@ -129,7 +132,8 @@ class SummaryService:
         report_date = self.report.coverage_through_date
         report_year = report_date.year
 
-        ytd_transactions = Transaction.objects.filter(
+        transaction_view_model = get_read_model(self.report.committee_account_id)
+        ytd_transactions = transaction_view_model.objects.filter(
             committee_account=committee,
             date__year=report_year,
             date__lte=report_date,
@@ -224,15 +228,21 @@ class SummaryService:
         ).order_by("coverage_from_date")
 
         if reports_from_prior_years.count() > 0:
-            column_b["line_6a"] = reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd  # noqa: E501
+            column_b["line_6a"] = (
+                reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd
+            )  # noqa: E501
         elif self.previous_report:
-            column_b["line_6a"] = self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd  # noqa: E501
+            column_b["line_6a"] = (
+                self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            )  # noqa: E501
         else:
             # user defined cash on hand
             column_b["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
         if self.previous_report:
-            column_a["line_6b"] = self.previous_report.form_3x.L8_cash_on_hand_at_close_period  # noqa: E501
+            column_a["line_6b"] = (
+                self.previous_report.form_3x.L8_cash_on_hand_at_close_period
+            )  # noqa: E501
         else:
             # user defined cash on hand
             column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd

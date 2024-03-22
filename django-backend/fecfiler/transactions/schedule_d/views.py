@@ -1,21 +1,14 @@
 from django.db import models
 from django.forms.models import model_to_dict
-from decimal import Decimal
 from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.transactions.schedule_d.utils import carry_forward_debt
 import copy
-
-from django.db.models import Q
-
 from fecfiler.transactions.models import Transaction
 
 
 def save_hook(transaction: Transaction, is_existing):
     if not is_existing:
-        if Transaction.objects.filter(
-            ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
-            id=transaction.id,
-        ).count():
-            create_in_future_reports(transaction)
+        create_in_future_reports(transaction)
     else:
         update_in_future_reports(transaction)
 
@@ -24,7 +17,7 @@ def create_in_future_reports(transaction):
     future_reports = transaction.report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
-        report.pull_forward_debt(transaction_copy)
+        carry_forward_debt(transaction_copy, report)
 
 
 def update_in_future_reports(transaction):
