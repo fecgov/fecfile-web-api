@@ -320,7 +320,6 @@ class TransactionManager(SoftDeleteManager):
 
 class TransactionViewManager(Manager):
     def get_queryset(self):
-        print(f"get_queryset view {self.model._meta.db_table}")
         return (
             super()
             .get_queryset()

@@ -23,12 +23,10 @@ from decimal import Decimal
 class TransactionViewTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        print(f"SETUP {self.committee.id}")
         create_committee_view(self.committee.id)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_transaction_view(self):
-        print(f"TEST TRAMSACION VIEW {self.committee.id}")
         indiviual_reciepts = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL"},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL"},
@@ -52,7 +50,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
-        print(f"TEST FORCE UNAGGREGATED {self.committee.id}")
 
         unaggregated = create_test_transaction(
             "IDIVIDUAL_RECEIPT",
@@ -87,7 +84,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[1].aggregate, Decimal("200"))
 
     def test_transaction_view_parent(self):
-        print(f"TEST PARENT {self.committee.id}")
         partnership_receipt = create_schedule_a(
             "PARTNERSHIP_RECEIPT",
             self.committee,
@@ -116,7 +112,6 @@ class TransactionViewTestCase(TestCase):
         )
 
     def test_refund_aggregate(self):
-        print(f"REFUND {self.committee.id}")
         create_schedule_a(
             "IDIVIDUAL_RECEIPT",
             self.committee,
@@ -139,7 +134,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[1].aggregate, Decimal("23.00"))
 
     def test_election_aggregate(self):
-        print(f"ELECTION{self.committee.id}")
         candidate_a = Contact.objects.create(
             committee_account_id=self.committee.id,
             candidate_office="H",
@@ -210,7 +204,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))
 
     def test_debts(self):
-        print(f"DEBTS{self.committee.id}")
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
         original_debt.report = q1_report
@@ -283,7 +276,6 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
 
-        print(f" line_label {self.committee.id}")
         view = get_read_model(self.committee.id).objects.all()
         self.assertEqual(view[0].line_label, "11(a)(i)")
         self.assertEqual(view[1].line_label, "11(a)(i)")

@@ -17,6 +17,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 import uuid
 import structlog
+import types
 
 logger = structlog.get_logger(__name__)
 
@@ -200,13 +201,12 @@ def get_read_model(committee_uuid):
 
         class Meta:
             db_table = committee_transaction_view
+            app_label = committee_transaction_view
 
     return T
 
 
 def get_committee_view_name(committee_uuid):
-
-    print(f"get_committee_view_name{committee_uuid}")
     return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
