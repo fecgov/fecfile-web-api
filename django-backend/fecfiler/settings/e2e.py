@@ -1,4 +1,4 @@
-from .base import *  # NOSONAR # noqa F401, F403
+from .base import *  # NOSONAR # noqa: F401, F403
 import os
 
 # These settings are for local development only.
@@ -23,6 +23,6 @@ LOGGING = {
 os.environ["DB_DOCKERFILE"] = "Dockerfile-e2e"
 
 try:
-    from .local import *  # NOSONAR # noqa F401, F403
+    from .local import *  # NOSONAR # noqa: F401, F403
 except ImportError:
     pass

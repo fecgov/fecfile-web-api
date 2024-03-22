@@ -47,7 +47,7 @@ class TransactionViewTestCase(TestCase):
 
     def test_force_unaggregated(self):
 
-        unaggregated = create_test_transaction(  # noqa F841
+        unaggregated = create_test_transaction(  # noqa: F841
             "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
