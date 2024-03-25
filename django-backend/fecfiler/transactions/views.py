@@ -252,7 +252,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
         for report_id in report_ids:
-            update_recalculation(Report.objects.get(id=report_id))
+            report = Report.objects.get(id=report_id)
+            if (
+                transaction_instance.schedule_c or transaction_instance.schedule_d
+            ) and report.coverage_from_date:
+                schedule_instance.report_coverage_from = report.coverage_from_date
+            update_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"

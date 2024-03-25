@@ -23,6 +23,9 @@ class ScheduleC(models.Model):
     personal_funds = models.BooleanField(null=True, blank=True, default=False)
     memo_text_description = models.TextField(null=True, blank=True)
 
+    # saved on schedule record to avoid joining on report
+    report_coverage_from_date = models.DateField(null=True, blank=True)
+
     def get_transaction(self):
         return self.transaction_set.first()
 

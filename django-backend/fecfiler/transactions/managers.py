@@ -199,7 +199,9 @@ class TransactionManager(SoftDeleteManager):
             ),
             When(
                 schedule_c__isnull=False,
-                then=Concat(F("transaction_id"), F("reports__coverage_from_date")),
+                then=Concat(
+                    F("transaction_id"), F("schedule_c__report_coverage_from_date")
+                ),
             ),
             default=None,
             output_field=TextField(),
@@ -227,8 +229,8 @@ class TransactionManager(SoftDeleteManager):
                             .filter(
                                 ~Q(debt_id=OuterRef("id")),
                                 transaction_id=OuterRef("transaction_id"),
-                                reports__coverage_through_date__lt=OuterRef(
-                                    "reports__coverage_from_date"
+                                schedule_d__report_coverage_from_date__lt=OuterRef(
+                                    "schedule_d__report_coverage_from_date"
                                 ),
                             )
                             .values("committee_account_id")
@@ -257,7 +259,7 @@ class TransactionManager(SoftDeleteManager):
                             ~Q(debt_id=OuterRef("id")),
                             debt__transaction_id=OuterRef("transaction_id"),
                             schedule_d__isnull=True,
-                            date__lt=OuterRef("reports__coverage_from_date"),
+                            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
                         )
                         .values("committee_account_id")
                         .annotate(debt_payments_prior=Sum("amount"))
