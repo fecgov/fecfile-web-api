@@ -256,7 +256,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if (
                 transaction_instance.schedule_c or transaction_instance.schedule_d
             ) and report.coverage_from_date:
-                schedule_instance.report_coverage_from = report.coverage_from_date
+                schedule_instance.report_coverage_from_date = report.coverage_from_date
             update_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "

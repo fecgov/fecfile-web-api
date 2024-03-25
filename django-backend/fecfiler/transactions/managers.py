@@ -295,7 +295,6 @@ class TransactionManager(SoftDeleteManager):
         return (
             super()
             .get_queryset()
-            .distinct()
             .annotate(
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,

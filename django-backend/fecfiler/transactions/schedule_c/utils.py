@@ -59,7 +59,9 @@ def carry_forward_loan(loan, report):
     # will be a different queryset after the copy is saved
     original_children = list(loan.children)
     loan_data = {
-        "schedule_c": save_copy(loan.schedule_c),
+        "schedule_c": save_copy(
+            loan.schedule_c, {"report_coverage_from_date": report.coverage_from_date}
+        ),
         "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
