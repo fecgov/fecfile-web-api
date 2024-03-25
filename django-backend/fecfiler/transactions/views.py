@@ -253,9 +253,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance.reports.set(report_ids)
         for report_id in report_ids:
             report = Report.objects.get(id=report_id)
-            if (
-                transaction_instance.schedule_c or transaction_instance.schedule_d
-            ) and report.coverage_from_date:
+            if transaction_instance.schedule_c and report.coverage_through_date:
+                schedule_instance.report_coverage_through_date = (
+                    report.coverage_through_date
+                )
+            if (transaction_instance.schedule_d) and report.coverage_from_date:
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
             update_recalculation(report)
         logger.info(

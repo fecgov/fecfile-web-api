@@ -24,7 +24,7 @@ class ScheduleC(models.Model):
     memo_text_description = models.TextField(null=True, blank=True)
 
     # saved on schedule record to avoid joining on report
-    report_coverage_from_date = models.DateField(null=True, blank=True)
+    report_coverage_through_date = models.DateField(null=True, blank=True)
 
     def get_transaction(self):
         return self.transaction_set.first()

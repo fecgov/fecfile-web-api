@@ -10,11 +10,17 @@ def set_coverage_date(apps, schema_editor):
     for transaction in transaction_model.objects.filter(
         Q(schedule_c__isnull=False) | Q(schedule_d__isnull=False)
     ):
-        for report in transaction.reports:
-            if report.coverage_from_date:
-                schedule = transaction.schedule_d or transaction.schedule_c
-                schedule.report_coverage_from_date = report.coverage_from_date
-                schedule.save()
+        for report in transaction.reports.all():
+            if report.coverage_from_date and transaction.schedule_d:
+                transaction.schedule_d.report_coverage_from_date = (
+                    report.coverage_from_date
+                )
+                transaction.schedule_d.save()
+            if report.coverage_through_date and transaction.schedule_c:
+                transaction.schedule_c.report_coverage_through_date = (
+                    report.coverage_through_date
+                )
+                transaction.schedule_c.save()
         transaction.save()
 
 
@@ -28,7 +34,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="schedulec",
-            name="report_coverage_from_date",
+            name="report_coverage_through_date",
             field=DateField(blank=True, null=True),
         ),
         migrations.AddField(

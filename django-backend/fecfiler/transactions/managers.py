@@ -200,7 +200,7 @@ class TransactionManager(SoftDeleteManager):
             When(
                 schedule_c__isnull=False,
                 then=Concat(
-                    F("transaction_id"), F("schedule_c__report_coverage_from_date")
+                    F("transaction_id"), F("schedule_c__report_coverage_through_date")
                 ),
             ),
             default=None,

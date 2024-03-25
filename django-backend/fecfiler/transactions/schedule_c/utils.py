@@ -60,7 +60,8 @@ def carry_forward_loan(loan, report):
     original_children = list(loan.children)
     loan_data = {
         "schedule_c": save_copy(
-            loan.schedule_c, {"report_coverage_from_date": report.coverage_from_date}
+            loan.schedule_c,
+            {"report_coverage_through_date": report.coverage_through_date},
         ),
         "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
