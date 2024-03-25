@@ -61,7 +61,13 @@ class TransactionManager(SoftDeleteManager):
         "frame": RowRange(None, 0),
     }
     loan_payment_window = {
-        "partition_by": [F("loan_id")],
+        "partition_by": [
+            Case(
+                When(loan_id__isnull=False, then=F("loan_id")),
+                When(schedule_c__isnull=False, then=F("id")),
+                default=None,
+            )
+        ],
         "order_by": ["loan_key"],
         "frame": RowRange(None, 0),
     }
