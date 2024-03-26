@@ -55,3 +55,17 @@ over_two_hundred_types = [
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
     "IN_KIND_RECEIPT",
 ]
+
+line_labels = {
+    "SA11A": "11(a)",
+    "SA11AI": "11(a)(i)",
+    "SA11AII": "11(a)(ii)",
+    "SA11B": "11(b)",
+    "SA11C": "11(c)",
+    "SA12": "12",
+    "SA13": "13",
+    "SA14": "14",
+    "SA15": "15",
+    "SA16": "16",
+    "SA17": "17",
+}

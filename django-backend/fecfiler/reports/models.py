@@ -1,8 +1,6 @@
 import uuid
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
-from decimal import Decimal
-import copy
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
@@ -75,7 +73,22 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
     objects = ReportManager()
 
+    @property
+    def previous_report(self):
+        return (
+            Report.objects.get_queryset()
+            .filter(
+                committee_account=self.committee_account,
+                coverage_through_date__lt=self.coverage_from_date,
+            )
+            .order_by("coverage_through_date")
+            .last()
+        )
+
     def save(self, *args, **kwargs):
+        from fecfiler.transactions.schedule_c.utils import carry_forward_loans
+        from fecfiler.transactions.schedule_d.utils import carry_forward_debts
+
         # Record if the is a create or update operation
         create_action = self.created is None
 
@@ -85,91 +98,9 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
             # Pull forward any loans with non-zero balances along with their
             # loan guarantors
             if create_action and self.coverage_through_date:
-                self.pull_forward_loans()
-                self.pull_forward_debts()
-
-    def pull_forward_loans(self):
-        previous_report = self.get_previous_report()
-
-        if previous_report:
-            loans_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
-                ~Q(memo_code=True),
-                schedule_c_id__isnull=False,
-            )
-
-            for loan in loans_to_pull_forward:
-                self.pull_forward_loan(loan)
-
-    def pull_forward_loan(self, loan):
-        # Save children as they are lost from the loan object
-        # when the loan is saved
-        loan_children = copy.deepcopy(loan.children)
-
-        loan.schedule_c_id = self.save_copy(loan.schedule_c)
-        loan.memo_text_id = self.save_copy(loan.memo_text)
-        loan.report_id = self.id
-        loan.report = self
-        # The loan_id should point to the original loan transaction
-        # even if the loan is pulled forward multiple times.
-        loan.loan_id = loan.loan_id if loan.loan_id else loan.id
-        self.save_copy(loan)
-        for child in loan_children:
-            # If child is a guarantor transaction, copy it
-            # and link it to the new loan
-            if child.schedule_c2_id:
-                self.pull_forward_loan_guarantor(child, loan)
-
-    def pull_forward_loan_guarantor(self, loan_guarantor, loan):
-        loan_guarantor.schedule_c2_id = self.save_copy(loan_guarantor.schedule_c2)
-        loan_guarantor.memo_text_id = self.save_copy(loan_guarantor.memo_text)
-        loan_guarantor.report_id = self.id
-        loan_guarantor.report = self
-        loan_guarantor.parent_transaction_id = loan.id
-        loan_guarantor.parent_transaction = loan
-        self.save_copy(loan_guarantor)
-
-    def pull_forward_debts(self):
-        previous_report = self.get_previous_report()
-
-        if previous_report:
-            debts_to_pull_forward = previous_report.transaction_set.filter(
-                ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
-                ~Q(memo_code=True),
-                schedule_d_id__isnull=False,
-            )
-
-            for debt in debts_to_pull_forward:
-                self.pull_forward_debt(debt)
-
-    def pull_forward_debt(self, debt):
-        debt.schedule_d.incurred_amount = Decimal(0)
-        debt.schedule_d_id = self.save_copy(debt.schedule_d)
-        debt.report_id = self.id
-        debt.report = self
-        # The debt_id should point to the original debt transaction
-        # even if the debt is pulled forward multiple times.
-        debt.debt_id = debt.debt_id if debt.debt_id else debt.id
-        self.save_copy(debt)
-
-    def get_previous_report(self):
-        return (
-            Report.objects.get_queryset()
-            .filter(
-                committee_account=self.committee_account,
-                coverage_through_date__lt=self.coverage_through_date,
-            )
-            .order_by("coverage_through_date")
-            .last()
-        )
-
-    def save_copy(self, fkey):
-        if fkey:
-            fkey.pk = fkey.id = None
-            fkey._state.adding = True
-            fkey.save()
-            return fkey.id
-        return None
+                carry_forward_loans(self)
+                carry_forward_debts(self)
+                update_recalculation(self)
 
     def get_future_in_progress_reports(
         self,
@@ -206,6 +137,24 @@ TABLE_TO_FORM = {
 }
 
 
+def update_recalculation(report: Report):
+    if report:
+        committee = report.committee_account
+        report_date = report.coverage_from_date
+        if report_date is not None:
+            reports_to_flag_for_recalculation = Report.objects.filter(
+                committee_account=committee,
+                coverage_from_date__gte=report_date,
+            )
+        else:
+            reports_to_flag_for_recalculation = [report]
+
+        for report_to_recalc in reports_to_flag_for_recalculation:
+            report_to_recalc.calculation_status = None
+            report_to_recalc.save()
+            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+
+
 class ReportMixin(models.Model):
     """Abstract model for tracking reports"""
 
@@ -213,24 +162,21 @@ class ReportMixin(models.Model):
         "reports.Report", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    def save(self, *args, **kwargs):
-        if self.report:
-            committee = self.report.committee_account
-            report_date = self.report.coverage_from_date
-            if report_date is not None:
-                reports_to_flag_for_recalculation = Report.objects.filter(
-                    committee_account=committee,
-                    coverage_from_date__gte=report_date,
-                )
-            else:
-                reports_to_flag_for_recalculation = [self.report]
-
-            for report in reports_to_flag_for_recalculation:
-                report.calculation_status = None
-                report.save()
-                logger.info(f"Report: {report.id} marked for recalcuation")
-
-        super(ReportMixin, self).save(*args, **kwargs)
-
     class Meta:
         abstract = True
+
+
+class ReportTransaction(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    transaction = models.ForeignKey(
+        "transactions.Transaction", on_delete=models.CASCADE
+    )
+    report = models.ForeignKey(Report, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

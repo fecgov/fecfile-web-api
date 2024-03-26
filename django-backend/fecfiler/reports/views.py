@@ -1,8 +1,8 @@
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.viewsets import GenericViewSet
-from fecfiler.committee_accounts.views import CommitteeOwnedViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.web_services.models import FECSubmissionState, FECStatus
@@ -60,14 +60,14 @@ def get_status_mapping():
     )
 
 
-class ReportViewSet(CommitteeOwnedViewSet):
+class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
 
-    Note that this ViewSet inherits from CommitteeOwnedViewSet
+    Note that this ViewSet inherits from CommitteeOwnedViewMixin
     The queryset will be further limited by the user's committee
-    in CommitteeOwnedViewSet's implementation of get_queryset()
+    in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
     queryset = (
@@ -127,7 +127,7 @@ class ReportViewSet(CommitteeOwnedViewSet):
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
         transaction_count = Transaction.objects.filter(
-            report__committee_account__committee_id=committee_id
+            committee_account__committee_id=committee_id
         ).count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
@@ -178,13 +178,16 @@ class ReportViewSet(CommitteeOwnedViewSet):
 
 class ReportViewMixin(GenericViewSet):
     def get_queryset(self):
-        report_id = (
-            (
-                self.request.query_params.get("report_id")
-                or self.request.data.get("report_id")
-            )
-            if self.request
-            else None
+        return filter_by_report(super().get_queryset(), self)
+
+
+def filter_by_report(queryset, viewset):
+    report_id = (
+        (
+            viewset.request.query_params.get("report_id")
+            or viewset.request.data.get("report_id")
         )
-        queryset = super().get_queryset()
-        return queryset.filter(report_id=report_id) if report_id else queryset
+        if viewset.request
+        else None
+    )
+    return queryset.filter(report_id=report_id) if report_id else queryset

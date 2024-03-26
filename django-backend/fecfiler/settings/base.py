@@ -369,6 +369,7 @@ FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = env.get_credential(
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 
+
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
 if MOCK_OPENFEC == "REDIS":

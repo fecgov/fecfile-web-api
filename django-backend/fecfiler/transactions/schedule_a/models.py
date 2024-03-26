@@ -35,8 +35,5 @@ class ScheduleA(models.Model):
     class Meta:
         app_label = "transactions"
 
-    def get_date(self):
-        return self.contribution_date
-
     def get_transaction(self):
         return self.transaction_set.first()

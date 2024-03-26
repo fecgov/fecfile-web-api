@@ -29,9 +29,6 @@ class ScheduleE(models.Model):
     date_signed = models.DateField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
 
-    def get_date(self):
-        return self.get_transaction().report.coverage_though_date
-
     def get_transaction(self):
         return self.transaction_set.first()
 

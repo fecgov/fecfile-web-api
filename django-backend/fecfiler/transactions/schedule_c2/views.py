@@ -2,6 +2,7 @@ from django.db import models
 from fecfiler.transactions.models import Transaction
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
+from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 import copy
 
 
@@ -14,26 +15,28 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
-            report_id=report.id, loan_id=transaction.parent_transaction.id
+            reports__id=report.id, loan_id=transaction.parent_transaction.id
         )
         if loan_query.count():
-            report.pull_forward_loan_guarantor(
-                copy.deepcopy(transaction), loan_query.first()
+            carry_forward_guarantor(
+                report, loan_query.first(), copy.deepcopy(transaction)
             )
 
 
 def update_in_future_reports(transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
-    del transaction_copy["report"]
+    del transaction_copy["reports"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 

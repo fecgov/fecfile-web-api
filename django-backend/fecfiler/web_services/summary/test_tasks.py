@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.test import TestCase
 from .tasks import CalculationState, calculate_summary
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.models import Report
 
 
@@ -11,6 +12,9 @@ class F3XSerializerTestCase(TestCase):
         "test_f3x_reports",
         "test_schedulea_summary_transactions",
     ]
+
+    def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
 
     def test_summary_task(self):
         report_id = calculate_summary("not_an_existing_report")

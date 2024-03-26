@@ -16,7 +16,10 @@ class MemoTextViewSetTest(TestCase):
             "/api/v1/memo-text/?report_id=b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         )
         request.user = self.user
-        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
         response = MemoTextViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
 

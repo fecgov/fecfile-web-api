@@ -2,6 +2,11 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
+from fecfiler.transactions.models import (
+    Transaction,
+    get_committee_view_name,
+    get_read_model,
+)
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,6 +20,7 @@ from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializ
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
+from django.db import connection
 import structlog
 from django.http import HttpResponse
 
@@ -33,8 +39,10 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee = self.get_object()
         if not committee:
             return Response("Committee could not be activated", status=403)
-        committee_uuid = committee.id
-        request.session["committee_uuid"] = str(committee_uuid)
+        request.session["committee_id"] = str(committee.committee_id)
+        request.session["committee_uuid"] = str(committee.id)
+        """ create view if it doesn't exist """
+        get_read_model(committee.id)
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
@@ -53,24 +61,33 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return Response(CommitteeAccountSerializer(account).data)
 
 
-class CommitteeOwnedViewSet(viewsets.ModelViewSet):
+class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     """ModelViewSet for models using CommitteeOwnedModel
     Inherit this view set to filter the queryset by the user's committee
     """
 
     def get_queryset(self):
-        committee_uuid = self.request.session["committee_uuid"]
-        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
-        if not committee:
-            raise SuspiciousSession("session has invalid committee_uuid")
-        queryset = super().get_queryset()
+        committee_uuid = self.get_committee_uuid()
+        committee_id = self.get_committee_id()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee.committee_id, committee_uuid=committee.id
+            committee_id=committee_id, committee_uuid=committee_id
         )
-        return queryset.filter(committee_account_id=committee.id)
+        return super().get_queryset().filter(committee_account_id=committee_uuid)
+
+    def get_committee_uuid(self):
+        committee_uuid = self.request.session["committee_uuid"]
+        if not committee_uuid:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee_uuid
+
+    def get_committee_id(self):
+        committee_id = self.request.session["committee_id"]
+        if not committee_id:
+            raise SuspiciousSession("session has invalid committee_id")
+        return committee_id
 
 
-class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
+class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["name", "email", "role", "is_active", "created"]
@@ -201,14 +218,19 @@ def register_committee(committee_id, user):
             f1_line = dot_fec_content.split("\n")[1]
             f1_email = f1_line.split(FS_STR)[11]
 
+    failure_reason = None
     if f1_email != email:
-        raise ValidationError(f"Email {email} does not match committee email")
+        failure_reason = f"Email {email} does not match committee email"
 
     existing_account = CommitteeAccount.objects.filter(
         committee_id=committee_id
     ).first()
     if existing_account:
-        raise ValidationError(f"Committee {committee_id} already registered")
+        failure_reason = f"Committee {committee_id} already registered"
+
+    if failure_reason:
+        logger.error(f"Failure to register committee: {failure_reason}")
+        raise ValidationError("could not register committee")
 
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
@@ -216,4 +238,21 @@ def register_committee(committee_id, user):
         user=user,
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
     )
+
+    create_committee_view(account.id)
     return account
+
+
+def create_committee_view(committee_uuid):
+    view_name = get_committee_view_name(committee_uuid)
+    with connection.cursor() as cursor:
+        sql, params = (
+            Transaction.objects.transaction_view()
+            .filter(committee_account_id=committee_uuid)
+            .query.sql_with_params()
+        )
+        definition = cursor.mogrify(sql, params).decode("utf-8")
+        cursor.execute(
+            f"DROP VIEW IF EXISTS {view_name};"
+            f"CREATE  VIEW {view_name} as {definition}"
+        )

@@ -18,7 +18,10 @@ class Form3XViewSetTest(TestCase):
         self.assertEqual(True, True)
         request = self.factory.get("/api/v1/reports/form-f3x/coverage_dates")
         request.user = self.user
-        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
 
         response = Form3XViewSet.as_view({"get": "coverage_dates"})(request)
 
@@ -53,7 +56,10 @@ class Form3XViewSetTest(TestCase):
             "/api/v1/reports/1406535e-f99f-42c4-97a8-247904b7d297/amend/"
         )
         request.user = self.user
-        request.session = {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
         force_authenticate(request, self.user)
         view = Form3XViewSet.as_view({"post": "amend"})
         response = view(request, pk="1406535e-f99f-42c4-97a8-247904b7d297")

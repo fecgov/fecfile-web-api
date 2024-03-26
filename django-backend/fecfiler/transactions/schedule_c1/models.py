@@ -63,8 +63,5 @@ class ScheduleC1(models.Model):
     # button and is not part of the C1 spec
     line_of_credit = models.BooleanField(null=True, blank=True, default=False)
 
-    def get_date(self):
-        return self.loan_incurred_date
-
     class Meta:
         app_label = "transactions"

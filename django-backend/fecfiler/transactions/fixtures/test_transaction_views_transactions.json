@@ -25,11 +25,20 @@
         }
     },
     {
+        "comment": "Link between a transaction and a report",
+        "model": "reports.reporttransaction",
+        "fields": {
+          "transaction_id": "00000000-62f7-4a11-ac8e-27ea2afa9491",
+          "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+          "created": "2022-02-09T00:00:00.000Z",
+          "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
         "model": "transactions.transaction",
         "pk": "00000000-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
             "committee_account": "11111111-2222-3333-4444-555555555555",
-            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
             "transaction_type_identifier": "OPERATING_EXPENDITURE",
             "aggregation_group": "GENERAL_DISBURSEMENT",
             "_form_type": "SB21B",
@@ -51,11 +60,20 @@
         }
     },
     {
+        "comment": "Link between a transaction and a report",
+        "model": "reports.reporttransaction",
+        "fields": {
+          "transaction_id": "00000001-62f7-4a11-ac8e-27ea2afa9491",
+          "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+          "created": "2022-02-09T00:00:00.000Z",
+          "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
         "model": "transactions.transaction",
         "pk": "00000001-62f7-4a11-ac8e-27ea2afa9491",
         "fields": {
             "committee_account": "11111111-2222-3333-4444-555555555555",
-            "report": "1406535e-f99f-42c4-97a8-247904b7d297",
             "transaction_type_identifier": "OPERATING_EXPENDITURE",
             "aggregation_group": "GENERAL_DISBURSEMENT",
             "_form_type": "SB21B",

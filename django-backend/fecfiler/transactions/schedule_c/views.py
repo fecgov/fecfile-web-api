@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c.models import ScheduleC
+from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 import copy
@@ -15,21 +16,23 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction: Transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
-        report.pull_forward_loan(transaction_copy)
+        carry_forward_loan(transaction_copy, report)
 
 
 def update_in_future_reports(transaction: Transaction):
-    future_reports = transaction.report.get_future_in_progress_reports()
+    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
-    del transaction_copy["report"]
+    del transaction_copy["reports"]
     del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        report_id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=models.Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
@@ -73,7 +76,7 @@ def update_memo_text_in_future_reports(
                     "rec_type": "TEXT",
                     "transaction_id_number": transaction_to_update.transaction_id,
                     "text4000": transaction.memo_text.text4000,
-                    "report_id": transaction.report.id,
+                    "report_id": transaction.reports[0].id,
                     "committee_account_id": transaction_to_update.committee_account.id,
                     "transaction_uuid": transaction_to_update.id,
                     "is_report_level_memo": False,
