@@ -56,6 +56,7 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
       ~ScheduleD.pk
       ~ScheduleD.purpose_of_debt_or_obligation
       ~ScheduleD.receipt_line_number
+      ~ScheduleD.report_coverage_from_date
       ~ScheduleD.transaction_set
    
    

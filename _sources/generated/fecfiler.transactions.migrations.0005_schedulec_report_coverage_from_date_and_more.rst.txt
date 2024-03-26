@@ -1,0 +1,41 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0005\_schedulec\_report\_coverage\_from\_date\_and\_more
+=========================================================================================
+
+.. automodule:: fecfiler.transactions.migrations.0005_schedulec_report_coverage_from_date_and_more
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      set_coverage_date
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

@@ -62,6 +62,7 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.personal_funds
       ~ScheduleC.pk
       ~ScheduleC.receipt_line_number
+      ~ScheduleC.report_coverage_through_date
       ~ScheduleC.secured
       ~ScheduleC.transaction_set
    

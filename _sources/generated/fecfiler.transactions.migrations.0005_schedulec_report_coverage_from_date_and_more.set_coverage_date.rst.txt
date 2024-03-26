@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0005\_schedulec\_report\_coverage\_from\_date\_and\_more.set\_coverage\_date
+=============================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0005_schedulec_report_coverage_from_date_and_more
+
+.. autofunction:: set_coverage_date

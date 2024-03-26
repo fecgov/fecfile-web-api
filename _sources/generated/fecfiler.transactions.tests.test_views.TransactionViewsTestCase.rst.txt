@@ -122,6 +122,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_multisave_transactions
       ~TransactionViewsTestCase.test_reatt_redes_multisave_transactions
       ~TransactionViewsTestCase.test_remove_transaction_from_report
+      ~TransactionViewsTestCase.test_save_debt
       ~TransactionViewsTestCase.test_save_transaction_pair
       ~TransactionViewsTestCase.test_update
    
