@@ -257,8 +257,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_through_date = (
                     report.coverage_through_date
                 )
+                schedule_instance.save()
             if (transaction_instance.schedule_d) and report.coverage_from_date:
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
+                schedule_instance.save()
+
             update_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
