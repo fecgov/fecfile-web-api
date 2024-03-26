@@ -2,6 +2,7 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins
 from django.contrib.sessions.exceptions import SuspiciousSession
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
@@ -154,9 +155,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
         # Create new membership
         user = User.objects.filter(email=email).first()
 
-        membership_args = (
-            {"committee_account": committee, "role": role, "user": user}
-            | ({"pending_email": email} if user is None else {})
+        membership_args = {
+            "committee_account": committee,
+            "role": role,
+            "user": user,
+        } | (
+            {"pending_email": email} if user is None else {}
         )  # Add pending email to args only if there is no user
 
         new_member = Membership(**membership_args)
@@ -167,8 +171,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewSet):
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
-    @action(detail=True, methods=["delete"],
-            url_path="remove-member", url_name="remove_member")
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="remove-member",
+        url_name="remove_member",
+    )
     def remove_member(self, request, pk: UUID):
         member = self.get_object()
         member.delete()
@@ -193,11 +201,15 @@ def register_committee(committee_id, user):
             f1_line = dot_fec_content.split("\n")[1]
             f1_email = f1_line.split(FS_STR)[11]
 
+    if f1_email != email:
+        raise ValidationError(f"Email {email} does not match committee email")
+
     existing_account = CommitteeAccount.objects.filter(
         committee_id=committee_id
     ).first()
-    if existing_account or f1_email != email:
-        raise Exception("could not register committee")
+    if existing_account:
+        raise ValidationError(f"Committee {committee_id} already registered")
+
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
         committee_account=account,
