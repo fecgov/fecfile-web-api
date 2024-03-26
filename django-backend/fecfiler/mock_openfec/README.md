@@ -32,9 +32,11 @@ configure `MOCK_OPENFEC_REDIS_URL` to the `REDIS_URL`
 
 # Local Development
 
-`MOCK_OPENFEC` is set to `REDIS` in the docker-compose.yml already, and the Dockerfile runs the load_committee_data command, so nothing is needed to use what's in committee_accounts.json.
+`MOCK_OPENFEC` is set to `REDIS` in the docker-compose.yml already, and the Dockerfile runs the load_committee_data and load_committee_details commands, so nothing is needed to use what's in committee_data.json and committee_details.json.
 
-If you want to change the data in the redis cache, you can modify `fecfiler/mock_openfec/management/commands/committee_data.json`, then from your docker instance's shell (I use `docker exec -it fecfile-api /bin/bash`) call `python manage.py load_committee_data`. This will load whatever you have in committee_data.json into redis to be used in this module
+If you want to change the COMMITTEE_DATA in the redis cache, you can modify `fecfiler/mock_openfec/management/commands/committee_data.json`, then from your docker instance's shell (I use `docker exec -it fecfile-api /bin/bash`) call `python manage.py load_committee_data`. This will load whatever you have in committee_data.json into redis to be used in this module
+
+If you want to change the COMMITTEE_DETAILS in the redis cache, you can modify `fecfiler/mock_openfec/management/commands/committee_details.json`, then from your docker instance's shell (I use `docker exec -it fecfile-api /bin/bash`) call `python manage.py load_committee_details`. This will load whatever you have in committee_details.json into redis to be used in this module
 
 # Deployed Instances
 
@@ -45,6 +47,12 @@ cf rt fecfile-web-api --command "python django-backend/manage.py load_committee_
 ```
 
 Notice the `--s3` flag on the load_commmittee_data command
+
+likewise, to change the mock committee details you will do the same for the committee details as such:
+
+```aws s3 cp committee-details.json s3://<bucket>/mock_committee_details.json --profile dev
+cf rt fecfile-web-api --command "python django-backend/manage.py load_committee_details --s3" --name "load committee details"
+```
 
 Here is documentation for provisioning yourself an access key to s3: https://cloud.gov/docs/services/s3/#interacting-with-your-s3-bucket-from-outside-cloudgov DO NOT use the same key the application is using to access s3. Provision one for yourself for tracability
 You can get the aws cli here: https://aws.amazon.com/cli/

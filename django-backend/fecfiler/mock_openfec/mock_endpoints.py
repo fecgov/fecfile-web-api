@@ -3,8 +3,35 @@ import json
 import redis
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
+COMMITTEE_DETAILS_REDIS_KEY = "COMMITTEE_DETAILS"
 if MOCK_OPENFEC_REDIS_URL:
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
+
+
+def committee(committee_id):
+    if redis_instance:
+        committee_details = redis_instance.get(COMMITTEE_DETAILS_REDIS_KEY) or ""
+        committees = json.loads(committee_details) or []
+        committee = next(
+            (
+                committee
+                for committee in committees
+                if committee.get("committee_id") == committee_id
+            ),
+            None,
+        )
+        if committee:
+            return {  # same as api.open.fec.gov
+                "api_version": "1.0",
+                "results": [committee],
+                "pagination": {
+                    "pages": 1,
+                    "per_page": 20,
+                    "count": 1,
+                    "page": 1,
+                },
+            }
+        return None
 
 
 def query_filings(query, form_type):
