@@ -134,6 +134,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
+
 # OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
