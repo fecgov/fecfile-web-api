@@ -11,6 +11,8 @@ from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmi
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
 import structlog
+from django.db import connection
+
 
 logger = structlog.get_logger(__name__)
 
@@ -124,7 +126,8 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
             )
 
-        reports = Report.objects.filter(committee_account__committee_id=committee_id)
+        reports = Report.objects.filter(
+            committee_account__committee_id=committee_id)
         report_count = reports.count()
         transaction_count = Transaction.objects.filter(
             committee_account__committee_id=committee_id
@@ -174,6 +177,67 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="can_delete",
+    )
+    def can_delete(self, request):
+        report_id = (request.query_params.get("report_id")
+                     or request.data.get("report_id"))
+        report_id = report_id.replace("-", "")
+        with connection.cursor() as cursor:
+            query = f"""
+                select rr.* from reports_reporttransaction rr 
+                WHERE rr.report_id = '{report_id}' 
+                AND (
+                    rr.transaction_id in (
+                    SELECT id
+                    FROM transactions_transaction tt
+                    WHERE tt.reatt_redes_id IS NOT NULL 
+                    AND (
+                    SELECT rr.report_id FROM reports_reporttransaction rr WHERE rr.transaction_id = tt.id
+                    ) != (
+                    SELECT rr.report_id FROM reports_reporttransaction rr WHERE rr.transaction_id = tt.reatt_redes_id
+                    ))
+                    OR
+                    (rr.transaction_id in (select parent_transaction_id from transactions_transaction tt where tt.parent_transaction_id is not null)
+                )
+            );
+            """
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            result = len(rows) == 0
+            if (result):
+                query = f"""
+                select form_type from reports_report where id in (
+                    SELECT report_id 
+                    FROM reports_reporttransaction
+                    WHERE transaction_id IN (
+                        SELECT transaction_id
+                        FROM reports_reporttransaction
+                        WHERE report_id = '{report_id}'
+                    ) AND transaction_id IN (
+                        SELECT transaction_id
+                        FROM reports_reporttransaction
+                        GROUP BY transaction_id
+                        HAVING COUNT(*) > 1
+                    )
+                ) and id != '{report_id}';
+                """
+                logger.warn(query)
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                if (len(rows) != 0):
+                    for row in rows:
+                        logger.warn(row[0])
+                        if row[0] == 'F24N':
+                            result = False
+                            break
+
+        return Response({'result': result})
 
 
 class ReportViewMixin(GenericViewSet):
