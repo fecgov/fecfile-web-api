@@ -40,6 +40,7 @@ import math
 from locust import between, task, TaskSet, user
 import locust_data_generator
 
+
 TEST_USER = os.environ.get("LOCAL_TEST_USER")
 TEST_PWD = os.environ.get("LOCAL_TEST_PWD")
 SESSION_ID = os.environ.get("OIDC_SESSION_ID")
@@ -53,10 +54,11 @@ WANTED_CONTACTS = 100
 WANTED_TRANSACTIONS = 500
 SINGLE_TO_TRIPLE_RATIO = 9/10
 
-SCHEDULES = ["A", "B,E", "C,D"]
+SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
 # Avoid "Too many open files" error
 resource.setrlimit(resource.RLIMIT_NOFILE, (10000, 999999))
+
 
 def get_json_data(name):
     directory = os.path.dirname(os.path.abspath(__file__))
@@ -70,7 +72,6 @@ def get_json_data(name):
             logging.error(f"Unable to retrieve locust data from file {filename}")
 
     return []
-
 
 class Tasks(TaskSet):
     report_ids = []
@@ -307,7 +308,6 @@ class Tasks(TaskSet):
             timeout=TIMEOUT,
             params=params
         )
-
 
 class Swarm(user.HttpUser):
     tasks = [Tasks]

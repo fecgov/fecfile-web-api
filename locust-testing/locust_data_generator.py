@@ -43,7 +43,6 @@ def generate_form_3x(count=1, collision_maximum=1000):
 
     return form_3x_list
 
-
 def generate_contacts(count=1):
     street_names = ["Main", "Test", "Place", "Home", "Domain", "Victory", "Word"]
     street_types = ["St", "Dr", "Ln", "Way"]
@@ -71,7 +70,6 @@ def generate_contacts(count=1):
             "occupation": "Job"
         } for _ in range(count)
     ]
-
 
 def generate_single_transactions(count=1, contacts=None, report_ids=None):
     transactions = []
@@ -101,15 +99,14 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "contributor_employer": contact["employer"],
             "contributor_occupation": contact["occupation"],
             "memo_code": None,
-            "contact": contact,
-            "contact_id": contact.get("id", None),
+            "contact_1": contact,
+            "contact_1_id": contact.get("id", None),
             "schedule_id": "A"
         }
 
         transactions.append(new_transaction)
 
     return transactions
-
 
 def generate_triple_transactions(count=1, contacts=None, report_ids=None):
     triple_transactions = []
@@ -129,7 +126,6 @@ def save_json(values, name="data"):
     file = open(full_filename, "w")
     file.write(json.dumps(values))
     file.close()
-
 
 class LocustDataGenerator:
     form3x_count = 0
@@ -172,7 +168,6 @@ class LocustDataGenerator:
             save_json(self.single_transaction_list, "single-transactions")
         if self.triple_transaction_count > 0:
             save_json(self.triple_transaction_list, "triple-transactions")
-
 
 if __name__ == "__main__":
     import argparse
