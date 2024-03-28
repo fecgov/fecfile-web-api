@@ -19,7 +19,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
         year = randrange(1000, 9999)
         hashable_date = f"{year}, {quarter}"
         if (hashable_date in dates_taken):
-            collision_count+=1
+            collision_count += 1
             continue
 
         dates_taken.add(hashable_date)
@@ -43,6 +43,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
 
     return form_3x_list
 
+
 def generate_contacts(count=1):
     street_names = ["Main", "Test", "Place", "Home", "Domain", "Victory", "Word"]
     street_types = ["St", "Dr", "Ln", "Way"]
@@ -51,10 +52,12 @@ def generate_contacts(count=1):
     prefixes = ["Mr", "Mrs", "Ms", "Mz", "Sir", None]
     suffixes = ["I", "II", "III", "IV", "V", None]
 
-    return [
-        {
+    contacts = []
+    for _ in range(count):
+        street_1 = f"{randrange(1, 999)} {choice(street_names)} {choice(street_types)}"
+        contacts.append({
             "type": "IND",
-            "street_1": f"{randrange(100, 999)} {choice(street_names)} {choice(street_types)}",
+            "street_1": street_1,
             "city": "Testville",
             "state": "AK",
             "zip": "12345",
@@ -68,8 +71,10 @@ def generate_contacts(count=1):
             "telephone": None,
             "employer": "Business Inc.",
             "occupation": "Job"
-        } for _ in range(count)
-    ]
+        })
+
+    return contacts
+
 
 def generate_single_transactions(count=1, contacts=None, report_ids=None):
     transactions = []
@@ -94,7 +99,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "contributor_state": contact["state"],
             "contributor_zip": contact["zip"],
             "contribution_date": "2024-02-01",
-            "contribution_amount": randrange(25,10000),
+            "contribution_amount": randrange(25, 10000),
             "contribution_purpose_descrip": None,
             "contributor_employer": contact["employer"],
             "contributor_occupation": contact["occupation"],
@@ -107,6 +112,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
         transactions.append(new_transaction)
 
     return transactions
+
 
 def generate_triple_transactions(count=1, contacts=None, report_ids=None):
     triple_transactions = []
@@ -127,6 +133,7 @@ def save_json(values, name="data"):
     file.write(json.dumps(values))
     file.close()
 
+
 class LocustDataGenerator:
     form3x_count = 0
     form3x_list = []
@@ -143,10 +150,15 @@ class LocustDataGenerator:
             self.contact_count = int(args.contacts)
             self.single_transaction_count = int(args.single_transactions)
             self.triple_transaction_count = int(args.triple_transactions)
-        except:
+        except ValueError:
             print("Non-integer value passed as argument")
 
-        if self.form3x_count + self.contact_count + self.single_transaction_count + self.triple_transaction_count == 0:
+        if sum(
+            self.form3x_count,
+            self.contact_count,
+            self.single_transaction_count,
+            self.triple_transaction_count
+         ) == 0:
             print("No arguments provided.  Run with --help or -h for instructions")
 
     def build(self):
@@ -155,9 +167,15 @@ class LocustDataGenerator:
         if self.contact_count > 0:
             self.contact_list = generate_contacts(self.contact_count)
         if self.single_transaction_count > 0:
-            self.single_transaction_list = generate_single_transactions(self.single_transaction_count, self.contact_list)
+            self.single_transaction_list = generate_single_transactions(
+                self.single_transaction_count,
+                self.contact_list
+            )
         if self.triple_transaction_count > 0:
-            self.triple_transaction_list = generate_triple_transactions(self.triple_transaction_count, self.contact_list)
+            self.triple_transaction_list = generate_triple_transactions(
+                self.triple_transaction_count,
+                self.contact_list
+            )
 
     def dump(self):
         if self.form3x_count > 0:
@@ -169,11 +187,12 @@ class LocustDataGenerator:
         if self.triple_transaction_count > 0:
             save_json(self.triple_transaction_list, "triple-transactions")
 
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="This script generates test data as json files for use in locust swarm testing"
+        description="This script generates json test data for use in locust testing"
     )
     parser.add_argument(
         "--form-3x",

@@ -52,7 +52,7 @@ TIMEOUT = 30  # seconds
 WANTED_REPORTS = 10
 WANTED_CONTACTS = 100
 WANTED_TRANSACTIONS = 500
-SINGLE_TO_TRIPLE_RATIO = 9/10
+SINGLE_TO_TRIPLE_RATIO = 9 / 10
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
@@ -68,10 +68,11 @@ def get_json_data(name):
         try:
             file = open(full_filename, "r")
             return json.loads(file.read())
-        except:
+        except (IOError, ValueError):
             logging.error(f"Unable to retrieve locust data from file {filename}")
 
     return []
+
 
 class Tasks(TaskSet):
     report_ids = []
@@ -118,7 +119,7 @@ class Tasks(TaskSet):
                 logging.info("Not enough transactions, creating some")
                 difference = WANTED_TRANSACTIONS - transaction_count
                 singles_needed = math.ceil(difference * SINGLE_TO_TRIPLE_RATIO)
-                triples_needed = math.ceil(difference * (1-SINGLE_TO_TRIPLE_RATIO))
+                triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
                 self.create_single_transactions(singles_needed)
                 self.create_triple_transactions(triples_needed)
 
@@ -169,7 +170,11 @@ class Tasks(TaskSet):
         transactions = get_json_data("single-transactions")
         if len(transactions) < count:
             difference = count - len(transactions)
-            transactions += locust_data_generator.generate_single_transactions(difference, self.contacts, self.report_ids)
+            transactions += locust_data_generator.generate_single_transactions(
+                difference,
+                self.contacts,
+                self.report_ids
+            )
 
         for transaction in transactions[:count]:
             self.create_transaction(transaction)
@@ -178,7 +183,11 @@ class Tasks(TaskSet):
         transactions = get_json_data("triple-transactions")
         if len(transactions) < count:
             difference = count - len(transactions)
-            transactions += locust_data_generator.generate_triple_transactions(difference, self.contacts, self.report_ids)
+            transactions += locust_data_generator.generate_triple_transactions(
+                difference,
+                self.contacts,
+                self.report_ids
+            )
 
         for transaction in transactions[:count]:
             self.create_transaction(transaction)
@@ -229,7 +238,7 @@ class Tasks(TaskSet):
         results = self.scrape_endpoint(endpoint)
         for result in results:
             value = result.get(key, None)
-            if value != None:
+            if value is not None:
                 values.append(value)
 
         return values
@@ -240,7 +249,7 @@ class Tasks(TaskSet):
         response = self.get_page(endpoint)
         if response.status_code == 200:
             results = response.json().get("results", [])
-        while response.status_code == 200 and response.json()["next"] != None:
+        while response.status_code == 200 and response.json()["next"] is not None:
             results += response.json().get("results", [])
             page += 1
             response = self.get_page(endpoint, page=page)
@@ -308,6 +317,7 @@ class Tasks(TaskSet):
             timeout=TIMEOUT,
             params=params
         )
+
 
 class Swarm(user.HttpUser):
     tasks = [Tasks]
