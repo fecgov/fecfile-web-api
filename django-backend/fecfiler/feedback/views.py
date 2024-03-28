@@ -20,7 +20,7 @@ class FeedbackViewSet(viewsets.ViewSet):
         serializer = FeedbackSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        title = "User feedback on " + request.META.get("Referer")
+        title = "User feedback on " + serializer.validated_data["location"]
 
         body = (
             "## What were you trying to do and how can we improve it?\n %s \n\n"
@@ -33,8 +33,8 @@ class FeedbackViewSet(viewsets.ViewSet):
             serializer.validated_data["action"],
             serializer.validated_data["feedback"],
             serializer.validated_data["about"],
-            request.META.get("Referer"),
-            request.META["User-Agent"],
+            serializer.validated_data["location"],
+            request.META["HTTP_USER_AGENT"],
         )
 
         client = github3.login(token=FECFILE_GITHUB_TOKEN)
