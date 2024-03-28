@@ -129,9 +129,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         reports = Report.objects.filter(
             committee_account__committee_id=committee_id)
         report_count = reports.count()
-        transaction_count = Transaction.objects.filter(
+        transactions = Transaction.objects.filter(
             committee_account__committee_id=committee_id
-        ).count()
+        )
+        transaction_count = transactions.count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()
@@ -152,6 +153,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
         reports.hard_delete()
+        transactions.hard_delete()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -189,20 +191,24 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report_id = report_id.replace("-", "")
         with connection.cursor() as cursor:
             query = f"""
-                select rr.* from reports_reporttransaction rr 
-                WHERE rr.report_id = '{report_id}' 
+                select rr.* from reports_reporttransaction rr
+                WHERE rr.report_id = '{report_id}'
                 AND (
                     rr.transaction_id in (
                     SELECT id
                     FROM transactions_transaction tt
-                    WHERE tt.reatt_redes_id IS NOT NULL 
+                    WHERE tt.reatt_redes_id IS NOT NULL
                     AND (
-                    SELECT rr.report_id FROM reports_reporttransaction rr WHERE rr.transaction_id = tt.id
+                    SELECT rr.report_id FROM reports_reporttransaction rr
+                    WHERE rr.transaction_id = tt.id
                     ) != (
-                    SELECT rr.report_id FROM reports_reporttransaction rr WHERE rr.transaction_id = tt.reatt_redes_id
+                    SELECT rr.report_id FROM reports_reporttransaction rr
+                    WHERE rr.transaction_id = tt.reatt_redes_id
                     ))
                     OR
-                    (rr.transaction_id in (select parent_transaction_id from transactions_transaction tt where tt.parent_transaction_id is not null)
+                    (rr.transaction_id in (select parent_transaction_id
+                    FROM transactions_transaction tt
+                    WHERE tt.parent_transaction_id is not null)
                 )
             );
             """
@@ -213,7 +219,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if (result):
                 query = f"""
                 select form_type from reports_report where id in (
-                    SELECT report_id 
+                    SELECT report_id
                     FROM reports_reporttransaction
                     WHERE transaction_id IN (
                         SELECT transaction_id
