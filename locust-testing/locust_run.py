@@ -30,14 +30,12 @@ Go to http://0.0.0.0:8089/ to run tests.
 
 """
 
-import copy
 import os
 import resource
 import logging
 import random
 import json
 import math
-from time import sleep
 
 from locust import between, task, TaskSet, user
 import locust_data_generator
@@ -206,13 +204,12 @@ class Tasks(TaskSet):
             t["report_ids"] = [report_id]
             t["contact_1_id"] = random.choice(self.contacts)["id"]
 
-            children = copy.deepcopy(t["children"])
-            while len(children) > 0:
-                child = children.pop(0)
+            for child in t["children"]:
                 child["report_ids"] = [report_id]
                 child["contact_1_id"] = random.choice(self.contacts)["id"]
-                if len(child["children"]) > 0:
-                    children += copy.deepcopy(child["children"])
+                for grandchild in child["children"]:
+                    grandchild["report_ids"] = [report_id]
+                    grandchild["contact_1_id"] = random.choice(self.contacts)["id"]
 
     def create_transaction(self, transaction):
         fields_to_validate = [
