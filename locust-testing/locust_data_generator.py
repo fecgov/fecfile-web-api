@@ -73,17 +73,17 @@ def generate_contacts(count=1):
     ]
 
 
-def generate_single_transactions(count=1, contacts=[None], report_ids=[None]):
+def generate_single_transactions(count=1, contacts=None, report_ids=None):
     transactions = []
     for _ in range(count):
-        contact = choice(contacts) if len(contacts) > 0 else generate_contacts()[0]
+        contact = choice(contacts) if contacts else generate_contacts()[0]
         new_transaction = {
             "children": [],
             "form_type": "SA11AI",
             "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "aggregation_group": "GENERAL",
             "schema_name": "INDIVIDUAL_RECEIPT",
-            "report_id": choice(report_ids),
+            "report_ids": [choice(report_ids)] if report_ids else None,
             "entity_type": "IND",
             "contributor_last_name": contact["last_name"],
             "contributor_first_name": contact["first_name"],
@@ -111,7 +111,7 @@ def generate_single_transactions(count=1, contacts=[None], report_ids=[None]):
     return transactions
 
 
-def generate_triple_transactions(count=1, contacts=[None], report_ids=[None]):
+def generate_triple_transactions(count=1, contacts=None, report_ids=None):
     triple_transactions = []
     for _ in range(count):
         a, b, c = generate_single_transactions(3, contacts, report_ids)
