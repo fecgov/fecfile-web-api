@@ -30,12 +30,14 @@ Go to http://0.0.0.0:8089/ to run tests.
 
 """
 
+import copy
 import os
 import resource
 import logging
 import random
 import json
 import math
+from time import sleep
 
 from locust import between, task, TaskSet, user
 import locust_data_generator
@@ -67,7 +69,10 @@ def get_json_data(name):
     if os.path.isfile(full_filename):
         try:
             file = open(full_filename, "r")
-            return json.loads(file.read())
+            values = json.loads(file.read())
+            file.close()
+            logging.info(f"Retrieved {len(values)} items from {filename}")
+            return values
         except (IOError, ValueError):
             logging.error(f"Unable to retrieve locust data from file {filename}")
 
@@ -138,7 +143,7 @@ class Tasks(TaskSet):
             "fields_to_validate": fields_to_validate
         }
 
-        reports = get_json_data("form3x")
+        reports = get_json_data("form-3x")
         if len(reports) < count:
             reports = locust_data_generator.generate_form_3x(count - len(reports))
 
@@ -168,6 +173,7 @@ class Tasks(TaskSet):
 
     def create_single_transactions(self, count=1):
         transactions = get_json_data("single-transactions")
+        self.patch_prebuilt_transactions(transactions)
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_single_transactions(
@@ -181,6 +187,7 @@ class Tasks(TaskSet):
 
     def create_triple_transactions(self, count=1):
         transactions = get_json_data("triple-transactions")
+        self.patch_prebuilt_transactions(transactions)
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_triple_transactions(
@@ -191,6 +198,21 @@ class Tasks(TaskSet):
 
         for transaction in transactions[:count]:
             self.create_transaction(transaction)
+
+    def patch_prebuilt_transactions(self, transactions):
+        for t in transactions:
+            report_id = random.choice(self.report_ids)
+
+            t["report_ids"] = [report_id]
+            t["contact_1_id"] = random.choice(self.contacts)["id"]
+
+            children = copy.deepcopy(t["children"])
+            while len(children) > 0:
+                child = children.pop(0)
+                child["report_ids"] = [report_id]
+                child["contact_1_id"] = random.choice(self.contacts)["id"]
+                if len(child["children"]) > 0:
+                    children += copy.deepcopy(child["children"])
 
     def create_transaction(self, transaction):
         fields_to_validate = [
