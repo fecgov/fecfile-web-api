@@ -153,12 +153,12 @@ class LocustDataGenerator:
         except ValueError:
             print("Non-integer value passed as argument")
 
-        if sum(
+        if sum([
             self.form3x_count,
             self.contact_count,
             self.single_transaction_count,
             self.triple_transaction_count
-         ) == 0:
+        ]) == 0:
             print("No arguments provided.  Run with --help or -h for instructions")
 
     def build(self):
