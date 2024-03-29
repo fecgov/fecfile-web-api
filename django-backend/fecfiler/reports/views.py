@@ -233,12 +233,11 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     )
                 ) and id != '{report_id}';
                 """
-                logger.warn(query)
+
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 if (len(rows) != 0):
                     for row in rows:
-                        logger.warn(row[0])
                         if row[0] == 'F24N':
                             result = False
                             break

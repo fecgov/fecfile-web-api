@@ -2,6 +2,9 @@ from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.user.models import User
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeMemberViewSetTest(TestCase):
@@ -51,3 +54,19 @@ class CommitteeMemberViewSetTest(TestCase):
             self.assertTrue(response is None)
         except TypeError:
             self.assertTrue(response is not None)
+
+    def test_can_delete(self):
+        view = ReportViewSet()
+        view.format_kwarg = "format"
+        request = self.factory.get("/api/v1/reports")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        request.method = "GET"
+        request.query_params = {
+            'report_id': 'b6d60d2d-d926-4e89-ad4b-c47d152a66ae'}
+        response = view.can_delete(request)
+
+        self.assertTrue(response.data['result'])
