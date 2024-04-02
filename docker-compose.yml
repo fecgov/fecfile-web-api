@@ -108,6 +108,7 @@ services:
       FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
+      FECFILE_GITHUB_TOKEN:
 
   locust-leader:
     image: locustio/locust
