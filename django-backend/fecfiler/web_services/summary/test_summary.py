@@ -1,7 +1,8 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.reports.models import Report
-from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.models import get_read_model
+from fecfiler.committee_accounts.views import create_committee_view
 from .summary import SummaryService
 
 
@@ -17,8 +18,12 @@ class F3XReportTestCase(TestCase):
         "test_contacts",
     ]
 
+    def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
+
     def test_calculate_summary_column_a(self):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
 
@@ -26,19 +31,6 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(
             summary_a["line_6d"],
             Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
-        )
-        self.assertEqual(
-            summary_a["line_7"],
-            Decimal("150.00")  # line_21c
-            + Decimal("22.00")  # line_22
-            + Decimal("14.00")  # line_23
-            + Decimal("151.00")  # line_24
-            + Decimal("0")  # line_25
-            + Decimal("44.00")  # line_26
-            + Decimal("31.00")  # line_27
-            + Decimal(101.50 + 201.50 + 301.50)  # line_28d
-            + Decimal("201.50")  # line_29
-            + Decimal("102.25"),  # line_30c
         )
         self.assertEqual(
             summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"]
@@ -106,13 +98,29 @@ class F3XReportTestCase(TestCase):
             Decimal("150.00") - Decimal("2125.79"),  # line_36  # line_37
         )
 
+        self.assertEqual(
+            summary_a["line_7"],
+            Decimal("150.00")  # line_21c
+            + Decimal("22.00")  # line_22
+            + Decimal("14.00")  # line_23
+            + Decimal("151.00")  # line_24
+            + Decimal("0")  # line_25
+            + Decimal("44.00")  # line_26
+            + Decimal("31.00")  # line_27
+            + Decimal(101.50 + 201.50 + 301.50)  # line_28d
+            + Decimal("201.50")  # line_29
+            + Decimal("102.25"),  # line_30c
+        )
+
     def test_calculate_summary_column_b(self):
         f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
         summary_service = SummaryService(f3x)
         _, summary_b = summary_service.calculate_summary()
 
-        t = Transaction.objects.get(id="aaaaaaaa-4d75-46f0-bce2-111000000001")
-        self.assertEqual(t.itemized, False)
+        debt = get_read_model(f3x.committee_account.id).objects.get(
+            id="aaaaaaaa-4d75-46f0-bce2-111000000001"
+        )
+        self.assertEqual(debt.itemized, False)
 
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(

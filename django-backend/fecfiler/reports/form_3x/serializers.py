@@ -368,10 +368,10 @@ class Form3XSerializer(ReportSerializer):
         """Raise a ValidationError if an F3X with the same report code
         exists for the same year
         """
-        committee = self.get_committee()
+        committee_uuid = self.get_committee_uuid()
         number_of_collisions = Report.objects.filter(
             ~Q(id=(self.instance or Report()).id),
-            committee_account=committee,
+            committee_account=committee_uuid,
             coverage_from_date__year=self.validated_data["coverage_from_date"].year,
             report_code=self.validated_data["report_code"],
         ).count()

@@ -15,9 +15,8 @@ class ScheduleD(models.Model):
     incurred_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-
-    def get_date(self):
-        return self.get_transaction().report.coverage_through_date
+    # saved on schedule record to avoid joining on report
+    report_coverage_from_date = models.DateField(null=True, blank=True)
 
     def get_transaction(self):
         return self.transaction_set.first()

@@ -9,3 +9,5 @@ over_two_hundred_types = [
     "INDEPENDENT_EXPENDITURE_STAFF_REIMBURSEMENT_MEMO",
     "MULTISTATE_INDPENDENT_EXPENDITURE",
 ]
+
+line_labels = {"SE": "24"}

@@ -58,3 +58,16 @@ refunds = [
     "OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT",
     "OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT",
 ]
+
+line_labels = {
+    "SB21B": "21(b)",
+    "SB22": "22",
+    "SB23": "23",
+    "SB26": "26",
+    "SB27": "27",
+    "SB28A": "28(a)",
+    "SB28B": "28(b)",
+    "SB28C": "28(c)",
+    "SB29": "29",
+    "SB30B": "30(b)",
+}

@@ -1,9 +1,13 @@
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from fecfiler.reports.models import ReportMixin
+from fecfiler.reports.models import update_recalculation
 from fecfiler.shared.utilities import generate_fec_uid
-from fecfiler.transactions.managers import TransactionManager, Schedule
+from fecfiler.transactions.managers import (
+    TransactionManager,
+    TransactionViewManager,
+    Schedule,
+)
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
@@ -17,7 +21,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
+class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -28,7 +32,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     transaction_type_identifier = models.TextField(null=True, blank=True)
     aggregation_group = models.TextField(null=True, blank=True)
     parent_transaction = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     debt = models.ForeignKey(
         "self",
@@ -50,6 +57,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         null=True,
         blank=True,
         related_name="reatt_redes_associations",
+    )
+    reports = models.ManyToManyField(
+        "reports.Report",
+        through="reports.ReportTransaction",
+        through_fields=["transaction", "report"],
+        related_name="transactions",
     )
 
     # The _form_type value in the db may or may not be correct based on whether
@@ -73,6 +86,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     )
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
+
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
 
@@ -124,15 +138,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     objects = TransactionManager()
 
-    @property
-    def children(self):
-        return self.transaction_set.all()
-
     def get_schedule_name(self):
         for schedule_key in TABLE_TO_SCHEDULE:
             if getattr(self, schedule_key, None):
                 return TABLE_TO_SCHEDULE[schedule_key]
         return None
+
+    @property
+    def children(self):
+        return self.transaction_set.all()
 
     def get_schedule(self):
         for schedule_key in [
@@ -147,17 +161,59 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
-    def get_date(self):
-        return self.get_schedule().get_date()
-
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
+
         super(Transaction, self).save(*args, **kwargs)
+
+        for report in self.reports.all():
+            update_recalculation(report)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
+
+
+def get_read_model(committee_uuid):
+
+    committee_transaction_view = get_committee_view_name(committee_uuid)
+
+    class T(Transaction):
+        view_parent_transaction = models.ForeignKey(
+            "self",
+            db_column="parent_transaction_id",
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+        )
+        schedule = models.TextField()
+        _itemized = models.BooleanField()
+        amount = models.DecimalField()
+        date = models.DateField()
+        form_type = models.TextField()
+        effective_amount = models.DecimalField()
+        aggregate = models.DecimalField()
+        _calendar_ytd_per_election_office = models.DecimalField()
+        back_reference_tran_id_number = models.TextField()
+        loan_key = models.TextField()
+        loan_payment_to_date = models.DecimalField()
+        incurred_prior = models.DecimalField()
+        payment_prior = models.DecimalField()
+        payment_amount = models.DecimalField()
+        name = models.TextField()
+
+        objects = TransactionViewManager()
+
+        class Meta:
+            db_table = committee_transaction_view
+            app_label = committee_transaction_view
+
+    return T
+
+
+def get_committee_view_name(committee_uuid):
+    return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
 TABLE_TO_SCHEDULE = {

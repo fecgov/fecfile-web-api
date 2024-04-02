@@ -5,6 +5,7 @@ from .dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.reports.models import Report
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class DotFECSubmitterTestCase(TestCase):
@@ -14,6 +15,7 @@ class DotFECSubmitterTestCase(TestCase):
     ]
 
     def setUp(self):
+        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.f3x = Report.objects.filter(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).first()
