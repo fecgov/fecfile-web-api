@@ -3,15 +3,14 @@ import json
 import redis
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
-COMMITTEE_DETAILS_REDIS_KEY = "COMMITTEE_DETAILS"
 if MOCK_OPENFEC_REDIS_URL:
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
 
 
 def committee(committee_id):
     if redis_instance:
-        committee_details = redis_instance.get(COMMITTEE_DETAILS_REDIS_KEY) or ""
-        committees = json.loads(committee_details) or []
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
         committee = next(
             (
                 committee
