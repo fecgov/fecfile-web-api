@@ -244,7 +244,7 @@ workflows:
     jobs:
       - test
       - dependency-check
-      - run:
+      - deploy-job:
           requires:
             - test
             - dependency-check
