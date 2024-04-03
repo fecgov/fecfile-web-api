@@ -126,9 +126,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
-        transaction_count = Transaction.objects.filter(
+        transactions = Transaction.objects.filter(
             committee_account__committee_id=committee_id
-        ).count()
+        )
+        transaction_count = transactions.count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()
@@ -149,6 +150,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
         reports.hard_delete()
+        transactions.hard_delete()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):

@@ -124,11 +124,6 @@ DATABASES = {
     "default": dj_database_url.config()
 }
 
-# Override default test name
-DATABASES["default"]["TEST"] = {
-    "NAME": os.environ.get("FECFILE_TEST_DB_NAME", "postgres")
-}
-
 # Connection string for connecting directly
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
