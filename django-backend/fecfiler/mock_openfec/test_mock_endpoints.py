@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.management import call_command
-from fecfiler.mock_openfec.mock_endpoints import query_filings, committee
+from fecfiler.mock_openfec.mock_endpoints import query_filings
 
 
 class MockEndpointsTest(TestCase):

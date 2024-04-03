@@ -48,7 +48,7 @@ class OpenfecViewSetTest(TestCase):
             self.assertEqual(
                 response.data["results"][0]["committee_name"], "Test Committee"
             )
-            self.assertEqual(response.data["results"][0]["committee_type"],"O")
+            self.assertEqual(response.data["results"][0]["committee_type"], "O")
 
     def test_get_filings_invalid_resp(self):
         request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
