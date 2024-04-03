@@ -6,7 +6,7 @@ docker container.  The user can then visit http://localhost:8089/ to start a tes
 
 The instructions for running tests with Locust follow:
 
-## (Optional) Prepare Testing Data
+## (Optional) Prepare testing data
 
 If you want a measure of consistency when testing with locust, you can pre-generate Contacts,
 Reports, and Transactions for use in Locust testing.  These will be stored in .json files in
@@ -19,7 +19,7 @@ determined randomly at run-time.
 You can generate these .json files by running `python locust-testing/locust_data_generator.py`
 Run the script with the `-h` flag for additional information.
 
-## Setup - Environment Variables
+## Setup - Environment variables
 
 - `LOCAL_TEST_USER`
   - Committee ID concatenated with email
@@ -35,11 +35,8 @@ Run the script with the `-h` flag for additional information.
   - Determines the proportion of transactions that will be created as single transactions
  (having no children) vs. triple transactions (with child and grandchild transactions)
 
-## Setup - Local Testing
 
-2. Run the command `docker-compose --profile locust up` to spin up the testing environment
-
-## Setup - Remote Testing
+## Setup - Additional steps for remote testing
 
 1. Set an additional environment variable:
 - `OIDC_SESSION_ID`
@@ -51,13 +48,14 @@ Run the script with the `-h` flag for additional information.
 - As an example, this is what you would set in order to target DEV:
   - `-f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov`
 
-3. Run the command `docker-compose --profile locust up` to spin up the testing environment
+## Running Tests
+
+1. Run the command `docker-compose --profile locust up` to spin up the testing environment
 - (Optional) Scale up using docker by adding `--scale locust-follower=4` to the end
 
-## Running Tests
-Go to http://localhost:8089/ to run tests.
+2. Go to http://localhost:8089/ in your browser of choice to run tests.
 
-Recommended tests:
+### Recommended tests:
 - 5 users / 1 ramp-up rate
 - 100 users / 1 ramp-up rate
 - 500 users / 5 ramp-up rate
