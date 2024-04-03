@@ -177,11 +177,11 @@ class TransactionViewsTestCase(TestCase):
 
     def test_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
-        txn1["contributor_last_name"] = "one"
+        txn1["contact_1"]["last_name"] = "one"
         txn2 = deepcopy(self.payloads["IN_KIND"])
-        txn2["contributor_last_name"] = "two"
+        txn2["contact_1"]["last_name"] = "two"
         txn3 = deepcopy(self.payloads["IN_KIND"])
-        txn3["contributor_last_name"] = "three"
+        txn3["contact_1"]["last_name"] = "three"
 
         payload = [txn1, txn2, txn3]
 
@@ -200,7 +200,7 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.save_transactions(self.request(payload))
         transactions = response.data
         self.assertEqual(len(transactions), 3)
-        # self.assertEqual("one", transactions[0]["contributor_last_name"])
+        self.assertEqual("one", transactions[0]["contributor_last_name"])
 
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
@@ -221,10 +221,7 @@ class TransactionViewsTestCase(TestCase):
         report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         transaction_id = "474a1a10-da68-4d71-9a11-cccccccccccc"
 
-        payload = {
-            "transaction_id": transaction_id,
-            "report_id": report_id
-        }
+        payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
         response = view_set.add_transaction_to_report(self.request(payload))
 
@@ -242,32 +239,23 @@ class TransactionViewsTestCase(TestCase):
         self.assertIn(transaction_id, transaction_ids)
 
         # Verify response when no transaction id provided
-        payload['transaction_id'] = None
+        payload["transaction_id"] = None
         response = view_set.add_transaction_to_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(
-            response.data,
-            "No transaction matching id provided"
-        )
+        self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
-        payload['transaction_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
-        payload['report_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["transaction_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
         response = view_set.add_transaction_to_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(
-            response.data,
-            "No report matching id provided"
-        )
+        self.assertEqual(response.data, "No report matching id provided")
 
     def test_remove_transaction_from_report(self):
         report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         transaction_id = "0b0b9776-df8b-4f5f-b4c5-d751167417e7"
 
-        payload = {
-            "transaction_id": transaction_id,
-            "report_id": report_id
-        }
+        payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
         response = view_set.remove_transaction_from_report(self.request(payload))
 
@@ -284,20 +272,28 @@ class TransactionViewsTestCase(TestCase):
         self.assertNotIn(str(transaction_id), transaction_ids)
 
         # Verify response when no transaction id provided
-        payload['transaction_id'] = None
+        payload["transaction_id"] = None
         response = view_set.remove_transaction_from_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(
-            response.data,
-            "No transaction matching id provided"
-        )
+        self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
-        payload['transaction_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
-        payload['report_id'] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["transaction_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
         response = view_set.remove_transaction_from_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "No report matching id provided")
+
+    def test_save_debt(self):
+        payload = self.payloads["DEBT"]
+        view_set = TransactionViewSet()
+        response = view_set.create(self.request(payload))
+        report_coverage_from_date = Report.objects.get(
+            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+        ).coverage_from_date
+        debt_id = response.data["id"]
+        self.assertEqual(response.status_code, 200)
+        debt = Transaction.objects.get(id=debt_id)
         self.assertEqual(
-            response.data,
-            "No report matching id provided"
+            debt.schedule_d.report_coverage_from_date, report_coverage_from_date
         )
