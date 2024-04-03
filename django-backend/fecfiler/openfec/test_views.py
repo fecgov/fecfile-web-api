@@ -44,7 +44,7 @@ class OpenfecViewSetTest(TestCase):
                 request, pk="C12345678"
             )
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data["results"][0]["committee_id"], "C00100230")
+            self.assertEqual(response.data["results"][0]["committee_id"], "C12345678")
             self.assertEqual(
                 response.data["results"][0]["committee_name"], "Test Committee"
             )
