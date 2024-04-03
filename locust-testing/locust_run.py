@@ -1,35 +1,3 @@
-"""Load testing for the FECFile API and web app. Run from command directory using the
-
-*Run tests locally:*
-Environment variables:
-Ask team about what to set for
-`LOCAL_TEST_USER` and `LOCAL_TEST_PWD`
-
-`docker-compose --profile locust up -d`
-
-Go to http://0.0.0.0:8089/ to run tests.
-
-Recommended tests:
-5 users / 1 ramp-up rate
-100 users / 1 ramp-up rate
-500 users / 5 ramp-up rate
-
-Advanced settings: Run time 5m
-
-*Run tests on other spaces:*
-Log in to that environment, and get the session ID from the header and update the
-OIDC_SESSION_ID environment variable on your local machine
-
-Modifying docker-compose:
--f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov
-
-Scale up using docker:
-docker-compose --profile locust up -d --scale locust-follower=4
-
-Go to http://0.0.0.0:8089/ to run tests.
-
-"""
-
 import os
 import resource
 import logging
@@ -49,10 +17,10 @@ SESSION_ID = os.environ.get("OIDC_SESSION_ID")
 TIMEOUT = 30  # seconds
 
 # item counts
-WANTED_REPORTS = 10
-WANTED_CONTACTS = 100
-WANTED_TRANSACTIONS = 500
-SINGLE_TO_TRIPLE_RATIO = 9 / 10
+WANTED_REPORTS = os.environ.get("LOCUST_WANTED_REPORTS", 10)
+WANTED_CONTACTS = os.environ.get("LOCUST_WANTED_CONTACTS", 100)
+WANTED_TRANSACTIONS = os.environ.get("LOCUST_WANTED_TRANSACTIONS", 500)
+SINGLE_TO_TRIPLE_RATIO = os.environ.get("LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO", 9 / 10)
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
