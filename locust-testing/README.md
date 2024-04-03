@@ -11,28 +11,28 @@ The instructions for running tests with Locust follow:
 If you want a measure of consistency when testing with locust, you can pre-generate Contacts,
 Reports, and Transactions for use in Locust testing.  These will be stored in .json files in
 the locust-data subdirectory, with separate files for each resource (e.g, `contacts.locust.json`).
-If .json files are present, locust testing will preferentially pull resources from them before
-creating additional resources randomly as needed.  Inter-resource links (such as the Contact for
-a Transaction or which Report a Transaction is associated with) are not pre-generated and are
-instead determined randomly at run-time.
+If the script finds .json files, locust testing will preferentially pull resources from them
+before creating additional resources randomly as needed.  Inter-resource links (such as the
+`contact_id` and `report_id` fields on a transaction) are not pre-generated and are instead
+determined randomly at run-time.
 
-You can generate these .json files by running `python locust-testing/locust_data_generator.py`;
-run with the `-h` flag for additional information.
+You can generate these .json files by running `python locust-testing/locust_data_generator.py`
+Run the script with the `-h` flag for additional information.
 
 ## Setup - Environment Variables
 
 - `LOCAL_TEST_USER`
- - Committee ID concatenated with email
+  - Committee ID concatenated with email
 - `LOCAL_TEST_PWD`
- - The password corresponding to the user data in the preceeding variable
+  - The password corresponding to the user data in the preceeding variable
 - `LOCUST_WANTED_REPORTS` (Optional. Default: 10)
- - Determines the number of Report records stored in the API before running locust tasks
+  - Determines the number of Report records stored in the API before running locust tasks
 - `LOCUST_WANTED_CONTACTS` (Optional. Default: 100)
- - Determines the number of Contact records stored in the API before running locust tasks
+  - Determines the number of Contact records stored in the API before running locust tasks
 - `LOCUST_WANTED_TRANSACTIONS` (Optional. Default: 500)
- - Determines the number of Transaction records stored in the API before running locust tasks
+  - Determines the number of Transaction records stored in the API before running locust tasks
 - `LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO` (Optional. Default: 9 / 10)
- - Determines the proportion of transactions that will be created as single transactions
+  - Determines the proportion of transactions that will be created as single transactions
  (having no children) vs. triple transactions (with child and grandchild transactions)
 
 ## Setup - Local Testing
@@ -43,13 +43,13 @@ run with the `-h` flag for additional information.
 
 1. Set an additional environment variable:
 - `OIDC_SESSION_ID`
- - Used to log locust followers into the remote testing environment as part of testing
- - You can get the value for this by logging into the desired testing environment with cloud.gov
+  - Used to log locust followers into the remote testing environment as part of testing
+  - You can get the value for this by logging into the desired testing environment with cloud.gov
  and retrieving the session ID from any subsequent request header.
 
 2. Set the target API service for testing in [docker-compose.yml](https://github.com/fecgov/fecfile-web-api/blob/develop/docker-compose.yml#L118):
 - As an example, this is what you would set in order to target DEV:
- - `-f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov`
+  - `-f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov`
 
 3. Run the command `docker-compose --profile locust up` to spin up the testing environment
 - (Optional) Scale up using docker by adding `--scale locust-follower=4` to the end
