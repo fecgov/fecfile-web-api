@@ -25,18 +25,16 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_override_data_not_found(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C87654321"
             settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C87654321/committee/")
             request.user = self.user
             response = OpenfecViewSet.as_view({"get": "committee"})(
-                request, pk="C12345678"
+                request, pk="C87654321"
             )
             self.assertEqual(response.status_code, 500)
 
     def test_get_committee_override_happy_path(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C12345678"
             settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
