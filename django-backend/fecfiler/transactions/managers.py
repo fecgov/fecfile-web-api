@@ -314,7 +314,10 @@ class TransactionManager(SoftDeleteManager):
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=self.LOAN_KEY_CLAUSE(),
-                loan_payment_to_date=self.LOAN_PAYMENT_CLAUSE(),
+                loan_payment_to_date=Coalesce(
+                    self.LOAN_PAYMENT_CLAUSE(),
+                    Value(Decimal(0))
+                ),
                 _itemized=self.ITEMIZATION_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
