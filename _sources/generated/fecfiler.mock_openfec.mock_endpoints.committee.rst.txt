@@ -1,0 +1,6 @@
+fecfiler.mock\_openfec.mock\_endpoints.committee
+================================================
+
+.. currentmodule:: fecfiler.mock_openfec.mock_endpoints
+
+.. autofunction:: committee

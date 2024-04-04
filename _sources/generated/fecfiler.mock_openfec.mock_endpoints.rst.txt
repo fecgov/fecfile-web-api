@@ -17,6 +17,7 @@ fecfiler.mock\_openfec.mock\_endpoints
    .. autosummary::
       :toctree:                                          
    
+      committee
       query_filings
       recent_f1
    
