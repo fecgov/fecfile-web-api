@@ -20,6 +20,9 @@ def committee(committee_id):
             None,
         )
         if committee:
+            # rename key so we can use same mock data for both 
+            # query_filings and committee details endpoints
+            committee['name'] = committee.pop('committee_name')
             return {  # same as api.open.fec.gov
                 "api_version": "1.0",
                 "results": [committee],
