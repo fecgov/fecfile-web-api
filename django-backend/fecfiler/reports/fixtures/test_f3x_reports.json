@@ -733,6 +733,7 @@
     "model": "transactions.transaction",
     "fields": {
       "id": "474a1a10-da68-4d71-9a11-cccccccccccc",
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "OPERATING_EXPENDITURE",
       "aggregation_group": "GENERAL_DISBURSEMENT",

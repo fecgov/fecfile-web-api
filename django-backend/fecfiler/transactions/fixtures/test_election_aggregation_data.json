@@ -245,6 +245,7 @@
     "model": "transactions.transaction",
     "pk": "0b0b9776-df8b-4f5f-b4c5-d751167417e7",
     "fields": {
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
       "aggregation_group": "GENERAL",
@@ -287,6 +288,7 @@
     "model": "transactions.transaction",
     "pk": "18d1d052-ee32-4679-bb9b-11ea88ca2c12",
     "fields": {
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "INDEPENDENT_EXPENDITURE_STAFF_REIMBURSEMENT",
       "aggregation_group": "INDEPENDENT_EXPENDITURE",
@@ -329,6 +331,7 @@
     "model": "transactions.transaction",
     "pk": "a92359eb-b3a4-495c-8ed0-5e3afa655212",
     "fields": {
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "INDEPENDENT_EXPENDITURE",
       "aggregation_group": "INDEPENDENT_EXPENDITURE",
@@ -372,6 +375,7 @@
     "model": "transactions.transaction",
     "pk": "aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35",
     "fields": {
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "INDEPENDENT_EXPENDITURE",
       "aggregation_group": "INDEPENDENT_EXPENDITURE",
@@ -414,6 +418,7 @@
     "model": "transactions.transaction",
     "pk": "c4ba684a-607f-4f5d-bfb4-0fa1776d4e35",
     "fields": {
+      "deleted": null,
       "committee_account": "11111111-2222-3333-4444-555555555555",
       "transaction_type_identifier": "INDEPENDENT_EXPENDITURE",
       "aggregation_group": "INDEPENDENT_EXPENDITURE",

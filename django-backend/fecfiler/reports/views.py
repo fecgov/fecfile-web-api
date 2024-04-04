@@ -125,8 +125,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
             )
 
-        reports = Report.objects.filter(
-            committee_account__committee_id=committee_id)
+        reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
         transactions = Transaction.objects.filter(
             committee_account__committee_id=committee_id
@@ -152,7 +151,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
         reports.delete()
-        transactions.delete()
+        transactions.hard_delete()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -168,8 +167,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(
-            self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset())
         if "page" in request.query_params:
             page = self.paginate_queryset(queryset)
             if page is not None:
