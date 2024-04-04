@@ -7,6 +7,35 @@ if MOCK_OPENFEC_REDIS_URL:
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
 
 
+def committee(committee_id):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        committee = next(
+            (
+                committee
+                for committee in committees
+                if committee.get("committee_id") == committee_id
+            ),
+            None,
+        )
+        if committee:
+            # rename key so we can use same mock data for both
+            # query_filings and committee details endpoints
+            committee['name'] = committee.pop('committee_name')
+            return {  # same as api.open.fec.gov
+                "api_version": "1.0",
+                "results": [committee],
+                "pagination": {
+                    "pages": 1,
+                    "per_page": 20,
+                    "count": 1,
+                    "page": 1,
+                },
+            }
+        return None
+
+
 def query_filings(query, form_type):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""

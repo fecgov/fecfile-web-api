@@ -25,33 +25,28 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_override_data_not_found(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C12345678"
+            settings.BASE_DIR = "fecfiler/"
+            request = self.factory.get("/api/v1/openfec/C87654321/committee/")
+            request.user = self.user
+            response = OpenfecViewSet.as_view({"get": "committee"})(
+                request, pk="C87654321"
+            )
+            self.assertEqual(response.status_code, 500)
+
+    def test_get_committee_override_happy_path(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
             settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
             response = OpenfecViewSet.as_view({"get": "committee"})(
                 request, pk="C12345678"
             )
-            self.assertEqual(response.status_code, 500)
-
-    def test_get_committee_override_happy_path(self):
-        with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = "C00100230"
-            settings.BASE_DIR = "fecfiler/"
-            request = self.factory.get("/api/v1/openfec/C00100230/committee/")
-            request.user = self.user
-            response = OpenfecViewSet.as_view({"get": "committee"})(
-                request, pk="C00100230"
-            )
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data["results"][0]["committee_id"], "C00100230")
+            self.assertEqual(response.data["results"][0]["committee_id"], "C12345678")
             self.assertEqual(
-                response.data["results"][0]["name"], "TEST_COMMITTEE_NAME5"
+                response.data["results"][0]["name"], "Test Committee"
             )
-            self.assertEqual(
-                response.data["results"][0]["committee_type_full"],
-                "TEST_COMMITTEE_TYPE5",
-            )
+            self.assertEqual(response.data["results"][0]["committee_type"], "O")
 
     def test_get_filings_invalid_resp(self):
         request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
