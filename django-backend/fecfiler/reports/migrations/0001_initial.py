@@ -44,7 +44,8 @@ class Migration(migrations.Migration):
                     "affiliated_committee_fec_id",
                     models.TextField(blank=True, null=True),
                 ),
-                ("affiliated_committee_name", models.TextField(blank=True, null=True)),
+                ("affiliated_committee_name",
+                 models.TextField(blank=True, null=True)),
                 ("I_candidate_id_number", models.TextField(blank=True, null=True)),
                 ("I_candidate_last_name", models.TextField(blank=True, null=True)),
                 ("I_candidate_first_name", models.TextField(blank=True, null=True)),
@@ -74,7 +75,8 @@ class Migration(migrations.Migration):
                 ("III_candidate_id_number", models.TextField(blank=True, null=True)),
                 ("III_candidate_last_name", models.TextField(blank=True, null=True)),
                 ("III_candidate_first_name", models.TextField(blank=True, null=True)),
-                ("III_candidate_middle_name", models.TextField(blank=True, null=True)),
+                ("III_candidate_middle_name",
+                 models.TextField(blank=True, null=True)),
                 ("III_candidate_prefix", models.TextField(blank=True, null=True)),
                 ("III_candidate_suffix", models.TextField(blank=True, null=True)),
                 (
@@ -793,7 +795,6 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Report",
             fields=[
-                ("deleted", models.DateTimeField(blank=True, null=True)),
                 (
                     "id",
                     models.UUIDField(

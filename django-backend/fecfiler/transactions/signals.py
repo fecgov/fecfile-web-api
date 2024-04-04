@@ -19,8 +19,6 @@ def log_post_save(sender, instance, created, **kwargs):
     action = "updated"
     if created:
         action = "created"
-    elif instance.deleted:
-        action = "deleted"
     schedule = instance.get_schedule_name()
     logger.info(
         f"{schedule} Transaction: {instance.id} "

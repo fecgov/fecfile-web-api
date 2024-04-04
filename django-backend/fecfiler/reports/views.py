@@ -11,7 +11,6 @@ from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmi
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
 import structlog
-from django.db import connection
 
 
 logger = structlog.get_logger(__name__)
@@ -152,8 +151,8 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"Upload Submissions: {upload_submission_count}")
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
-        reports.hard_delete()
-        transactions.hard_delete()
+        reports.delete()
+        transactions.delete()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -169,8 +168,8 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
+        queryset = self.filter_queryset(
+            self.get_queryset())
         if "page" in request.query_params:
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -179,70 +178,6 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="can_delete",
-    )
-    def can_delete(self, request):
-        report_id = (request.query_params.get("report_id")
-                     or request.data.get("report_id"))
-        report_id = report_id.replace("-", "")
-        with connection.cursor() as cursor:
-            query = f"""
-                select rr.* from reports_reporttransaction rr
-                WHERE rr.report_id = '{report_id}'
-                AND (
-                    rr.transaction_id in (
-                    SELECT id
-                    FROM transactions_transaction tt
-                    WHERE tt.reatt_redes_id IS NOT NULL
-                    AND (
-                    SELECT rr.report_id FROM reports_reporttransaction rr
-                    WHERE rr.transaction_id = tt.id
-                    ) != (
-                    SELECT rr.report_id FROM reports_reporttransaction rr
-                    WHERE rr.transaction_id = tt.reatt_redes_id
-                    ))
-                    OR
-                    (rr.transaction_id in (select parent_transaction_id
-                    FROM transactions_transaction tt
-                    WHERE tt.parent_transaction_id is not null)
-                )
-            );
-            """
-            cursor.execute(query)
-            rows = cursor.fetchall()
-
-            result = len(rows) == 0
-            if (result):
-                query = f"""
-                select form_type from reports_report where id in (
-                    SELECT report_id
-                    FROM reports_reporttransaction
-                    WHERE transaction_id IN (
-                        SELECT transaction_id
-                        FROM reports_reporttransaction
-                        WHERE report_id = '{report_id}'
-                    ) AND transaction_id IN (
-                        SELECT transaction_id
-                        FROM reports_reporttransaction
-                        GROUP BY transaction_id
-                        HAVING COUNT(*) > 1
-                    )
-                ) and id != '{report_id}';
-                """
-
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                if (len(rows) != 0):
-                    for row in rows:
-                        if row[0] == 'F24N':
-                            result = False
-                            break
-
-        return Response({'result': result})
 
 
 class ReportViewMixin(GenericViewSet):

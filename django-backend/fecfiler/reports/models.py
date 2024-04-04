@@ -1,7 +1,6 @@
 import uuid
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
-from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -13,7 +12,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Report(SoftDeleteModel, CommitteeOwnedModel):
+class Report(CommitteeOwnedModel):
     """Generated model from json schema"""
 
     id = models.UUIDField(
@@ -38,7 +37,8 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
     treasurer_prefix = models.TextField(null=True, blank=True)
     treasurer_suffix = models.TextField(null=True, blank=True)
     date_signed = models.DateField(null=True, blank=True)
-    calculation_status = models.CharField(max_length=255, null=True, blank=True)
+    calculation_status = models.CharField(
+        max_length=255, null=True, blank=True)
     calculation_token = models.UUIDField(  # Prevents race conditions in summary calc.
         null=True, blank=True, default=None
     )
@@ -66,10 +66,14 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         blank=True,
     )
 
-    form_3x = models.ForeignKey(Form3X, on_delete=models.CASCADE, null=True, blank=True)
-    form_24 = models.ForeignKey(Form24, on_delete=models.CASCADE, null=True, blank=True)
-    form_99 = models.ForeignKey(Form99, on_delete=models.CASCADE, null=True, blank=True)
-    form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
+    form_3x = models.ForeignKey(
+        Form3X, on_delete=models.CASCADE, null=True, blank=True)
+    form_24 = models.ForeignKey(
+        Form24, on_delete=models.CASCADE, null=True, blank=True)
+    form_99 = models.ForeignKey(
+        Form99, on_delete=models.CASCADE, null=True, blank=True)
+    form_1m = models.ForeignKey(
+        Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
 
@@ -128,6 +132,14 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
         self.upload_submission = None
         self.save()
 
+    def delete(self):
+        links = ReportTransaction.objects.filter(report=self)
+        for link in links:
+            link.transaction.delete()
+            link.delete()
+
+        super(CommitteeOwnedModel, self).delete()
+
 
 TABLE_TO_FORM = {
     "form_3x": "F3X",
@@ -152,7 +164,8 @@ def update_recalculation(report: Report):
         for report_to_recalc in reports_to_flag_for_recalculation:
             report_to_recalc.calculation_status = None
             report_to_recalc.save()
-            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+            logger.info(
+                f"Report: {report_to_recalc.id} marked for recalcuation")
 
 
 class ReportMixin(models.Model):

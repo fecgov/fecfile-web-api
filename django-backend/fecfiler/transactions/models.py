@@ -1,5 +1,4 @@
 from django.db import models
-from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.reports.models import update_recalculation
 from fecfiler.shared.utilities import generate_fec_uid
@@ -21,7 +20,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Transaction(SoftDeleteModel, CommitteeOwnedModel):
+class Transaction(CommitteeOwnedModel):
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,

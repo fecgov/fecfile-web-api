@@ -84,16 +84,21 @@ class TransactionSerializer(
     name = CharField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    debt_incurred_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    debt_incurred_amount = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     calendar_ytd_per_election_office = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    beginning_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
-    payment_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    loan_payment_to_date = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True)
+    loan_balance = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True)
+    beginning_balance = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True)
+    payment_amount = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True)
     balance_at_close = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
@@ -108,7 +113,6 @@ class TransactionSerializer(
                 for f in Transaction._meta.get_fields()
                 if f.name
                 not in [
-                    "deleted",
                     "transaction",
                     "debt_associations",
                     "loan_associations",
@@ -164,7 +168,8 @@ class TransactionSerializer(
             ]
 
         if schedule_a:
-            representation["contribution_aggregate"] = representation.get("aggregate")
+            representation["contribution_aggregate"] = representation.get(
+                "aggregate")
             add_schedule_a_contact_fields(instance, representation)
 
             # For REATTRIBUTED transactions, calculate the amount that has
@@ -183,7 +188,8 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_a[property]
         if schedule_b:
-            representation["aggregate_amount"] = representation.get("aggregate")
+            representation["aggregate_amount"] = representation.get(
+                "aggregate")
             add_schedule_b_contact_fields(instance, representation)
 
             # # For REDESIGNATED transactions, calculate the amount that has
@@ -269,7 +275,8 @@ class TransactionSerializer(
 
     def validate(self, data):
         initial_data = getattr(self, "initial_data")
-        schedule_serializer = SCHEDULE_SERIALIZERS[initial_data.get("schedule_id")]
+        schedule_serializer = SCHEDULE_SERIALIZERS[initial_data.get(
+            "schedule_id")]
         data_to_validate = OrderedDict(
             [
                 (field_name, (field.run_validation(field.get_value(initial_data))))

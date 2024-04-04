@@ -1,4 +1,4 @@
-from .models import Report
+from .models import Report, ReportTransaction
 from rest_framework.serializers import (
     ModelSerializer,
     CharField,
@@ -17,6 +17,7 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
+from django.db.models import OuterRef, Subquery, Exists, Q, Count
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -24,35 +25,24 @@ logger = structlog.get_logger(__name__)
 
 class Form3XSerializer(ModelSerializer):
     class Meta:
-        fields = [
-            f.name
-            for f in Form3X._meta.get_fields()
-            if f.name not in ["deleted", "report"]
-        ]
+        fields = [f.name for f in Form3X._meta.get_fields() if f.name not in ["report"]]
         model = Form3X
 
 
 class Form24Serializer(ModelSerializer):
     class Meta:
-        fields = [
-            f.name
-            for f in Form24._meta.get_fields()
-            if f.name not in ["deleted", "report"]
-        ]
+        fields = [f.name for f in Form24._meta.get_fields() if f.name not in ["report"]]
         model = Form24
 
 
 class Form99Serializer(ModelSerializer):
     class Meta:
-        fields = [
-            f.name
-            for f in Form99._meta.get_fields()
-            if f.name not in ["deleted", "report"]
-        ]
+        fields = [f.name for f in Form99._meta.get_fields() if f.name not in ["report"]]
         model = Form99
 
 
 class Form1MSerializer(ModelSerializer):
+
     contact_affiliated_id = UUIDField(allow_null=True, required=False)
     contact_candidate_I_id = UUIDField(allow_null=True, required=False)  # noqa: N815
     contact_candidate_II_id = UUIDField(allow_null=True, required=False)  # noqa: N815
@@ -60,17 +50,26 @@ class Form1MSerializer(ModelSerializer):
     contact_candidate_IV_id = UUIDField(allow_null=True, required=False)  # noqa: N815
     contact_candidate_V_id = UUIDField(allow_null=True, required=False)  # noqa: N815
     contact_affiliated = ContactSerializer(allow_null=True, required=False)
-    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
-    contact_candidate_II = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
-    contact_candidate_III = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
-    contact_candidate_IV = ContactSerializer(allow_null=True, required=False)  # noqa: N815,E501
-    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
+
+    contact_candidate_I = ContactSerializer(  # noqa: N815
+        allow_null=True, required=False
+    )
+    contact_candidate_II = ContactSerializer(  # noqa: N815
+        allow_null=True, required=False
+    )
+    contact_candidate_III = ContactSerializer(  # noqa: N815
+        allow_null=True, required=False
+    )
+    contact_candidate_IV = ContactSerializer(  # noqa: N815
+        allow_null=True, required=False
+    )
+    contact_candidate_V = ContactSerializer(  # noqa: N815
+        allow_null=True, required=False
+    )
 
     class Meta:
         fields = [
-            f.name
-            for f in Form1M._meta.get_fields()
-            if f.name not in ["deleted", "report"]
+            f.name for f in Form1M._meta.get_fields() if f.name not in ["report"]
         ] + [
             "contact_affiliated_id",
             "contact_candidate_I_id",
@@ -137,7 +136,60 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
+        representation["can_delete"] = self.can_delete(representation)
+
         return representation
+
+    def can_delete(self, representation):
+        is_form_3x = representation["report_type"] == "F3X"
+
+        future_reports_query = ReportTransaction.objects.filter(
+            Exists(
+                Subquery(
+                    ReportTransaction.objects.filter(
+                        ~Q(report_id=representation["id"]),
+                        Q(
+                            Q(transaction__reatt_redes_id=OuterRef("transaction_id"))
+                            | Q(
+                                transaction__parent_transaction_id=OuterRef(
+                                    "transaction_id"
+                                )
+                            )
+                            | Q(transaction__debt_id=OuterRef("transaction_id"))
+                            | Q(transaction__loan_id=OuterRef("transaction_id"))
+                        ),
+                    )
+                ),
+            ),
+            report_id=representation["id"],
+        )
+
+        exists_queries = Exists(future_reports_query)
+
+        if is_form_3x:
+            # Get the transaction_id for a specific report_id
+            transaction_ids_for_report = ReportTransaction.objects.filter(
+                report_id=representation["id"]
+            ).values("transaction_id")
+
+            # Get the transaction_id that appears more than once
+            duplicate_transaction_ids = (
+                ReportTransaction.objects.values("transaction_id")
+                .annotate(transaction_count=Count("transaction_id"))
+                .filter(transaction_count__gt=1)
+                .values("transaction_id")
+            )
+
+            # Check if any of the transaction_ids
+            # for the specific report_id appear more than once
+            report_link_query = ReportTransaction.objects.filter(
+                Q(transaction_id__in=Subquery(transaction_ids_for_report)),
+                Q(transaction_id__in=Subquery(duplicate_transaction_ids)),
+            )
+
+            exists_queries = Exists(report_link_query) | Exists(future_reports_query)
+
+        return not (ReportTransaction.objects.filter(exists_queries).exists())
 
     def validate(self, data):
         self._context = self.context.copy()
@@ -155,7 +207,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 for f in Report._meta.get_fields()
                 if f.name
                 not in [
-                    "deleted",
                     "uploadsubmission",
                     "webprintsubmission",
                     "committee_name",
@@ -163,9 +214,9 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "transaction",
                     "dotfec",
                     "report",
-                    "reporttransaction"
+                    "reporttransaction",
                 ]
             ] + ["report_status", "fields_to_validate", "report_code_label", "is_first"]
 
         fields = get_fields()
-        read_only_fields = ["id", "deleted", "created", "updated", "is_first"]
+        read_only_fields = ["id", "created", "updated", "is_first"]
