@@ -12,6 +12,7 @@ from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, Q, CharField
 import structlog
 
+
 logger = structlog.get_logger(__name__)
 
 report_code_label_mapping = Case(
@@ -149,7 +150,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"Upload Submissions: {upload_submission_count}")
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
-        reports.hard_delete()
+        reports.delete()
         transactions.hard_delete()
         return Response(f"Deleted {report_count} Reports")
 
@@ -167,7 +168,6 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
         if "page" in request.query_params:
             page = self.paginate_queryset(queryset)
             if page is not None:

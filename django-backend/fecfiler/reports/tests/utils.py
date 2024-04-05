@@ -10,6 +10,10 @@ def create_form3x(committee, coverage_from, coverage_through, data):
     return create_test_report(Form3X, committee, coverage_from, coverage_through, data)
 
 
+def create_form24(committee, coverage_from, coverage_through, data):
+    return create_test_report(Form24, committee, coverage_from, coverage_through, data)
+
+
 def create_test_report(
     form, committee, coverage_from=None, coverage_through=None, data=None
 ):

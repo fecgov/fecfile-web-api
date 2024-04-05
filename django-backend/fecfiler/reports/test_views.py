@@ -2,6 +2,9 @@ from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.user.models import User
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeMemberViewSetTest(TestCase):

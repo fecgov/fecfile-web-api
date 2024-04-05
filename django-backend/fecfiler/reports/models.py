@@ -1,7 +1,6 @@
 import uuid
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
-from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -13,7 +12,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Report(SoftDeleteModel, CommitteeOwnedModel):
+class Report(CommitteeOwnedModel):
     """Generated model from json schema"""
 
     id = models.UUIDField(
@@ -127,6 +126,18 @@ class Report(SoftDeleteModel, CommitteeOwnedModel):
 
         self.upload_submission = None
         self.save()
+
+    def delete(self):
+        if not self.form_24:
+            """only delete transactions if the report is the source of the
+            tranaction"""
+            from fecfiler.transactions.models import Transaction
+
+            Transaction.objects.filter(reports=self).delete()
+
+        """delete report-transaction links"""
+        ReportTransaction.objects.filter(report=self).delete()
+        super(CommitteeOwnedModel, self).delete()
 
 
 TABLE_TO_FORM = {

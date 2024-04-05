@@ -19,8 +19,7 @@ def log_post_save(sender, instance, created, **kwargs):
     action = "updated"
     if created:
         action = "created"
-    elif instance.deleted:
-        action = "deleted"
+
     logger.info(f"{instance.form_type} Report: {instance.id} was {action}")
 
 
