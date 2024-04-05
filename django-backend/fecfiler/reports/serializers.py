@@ -17,7 +17,7 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
-from django.db.models import OuterRef, Subquery, Exists, Q, Count
+from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
 
 logger = structlog.get_logger(__name__)
