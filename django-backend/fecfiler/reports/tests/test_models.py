@@ -30,3 +30,18 @@ class ReportModelTestCase(TestCase):
             f24_report.form_24.original_amendment_date, new_upload_submission.created
         )
         self.assertEquals(f24_report.form_type, "F24A")
+
+    def test_delete(self):
+        f24_report = Report.objects.get(id="10000f24-d926-4e89-ad4b-000000000001")
+        f24_report.delete()
+
+        self.assertFalse(
+            Report.objects.filter(id="10000f24-d926-4e89-ad4b-000000000001").exists()
+        )
+
+        f3x_report = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x_report.delete()
+
+        self.assertFalse(
+            Report.objects.filter(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae").exists()
+        )
