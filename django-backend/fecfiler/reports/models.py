@@ -128,11 +128,15 @@ class Report(CommitteeOwnedModel):
         self.save()
 
     def delete(self):
-        links = ReportTransaction.objects.filter(report=self)
-        for link in links:
-            link.transaction.delete()
-            link.delete()
+        if not self.form_24:
+            """only delete transactions if the report is the source of the
+            tranaction"""
+            from fecfiler.transactions.models import Transaction
 
+            Transaction.objects.filter(reports=self).delete()
+
+        """delete report-transaction links"""
+        ReportTransaction.objects.filter(report=self).delete()
         super(CommitteeOwnedModel, self).delete()
 
 
