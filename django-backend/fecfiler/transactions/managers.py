@@ -216,13 +216,16 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def LOAN_PAYMENT_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_c__isnull=False,
-                then=Window(
-                    expression=Sum("effective_amount"), **self.loan_payment_window
-                ),
-            )
+        return Coalesce(
+            Case(
+                When(
+                    schedule_c__isnull=False,
+                    then=Window(
+                        expression=Sum("effective_amount"), **self.loan_payment_window
+                    ),
+                )
+            ),
+            Value(Decimal(0)),
         )
 
     def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
@@ -314,10 +317,7 @@ class TransactionManager(SoftDeleteManager):
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=self.LOAN_KEY_CLAUSE(),
-                loan_payment_to_date=Coalesce(
-                    self.LOAN_PAYMENT_CLAUSE(),
-                    Value(Decimal(0))
-                ),
+                loan_payment_to_date=self.LOAN_PAYMENT_CLAUSE(),
                 _itemized=self.ITEMIZATION_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
