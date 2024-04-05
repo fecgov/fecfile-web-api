@@ -8,7 +8,7 @@ applications:
     buildpacks:
       - python_buildpack
     command: bin/run-api.sh
-    memory: 1G
+    memory: 2G
     services:
       - fecfile-api-rds
       - fecfile-api-s3
