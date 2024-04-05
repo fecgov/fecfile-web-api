@@ -37,8 +37,7 @@ class Report(CommitteeOwnedModel):
     treasurer_prefix = models.TextField(null=True, blank=True)
     treasurer_suffix = models.TextField(null=True, blank=True)
     date_signed = models.DateField(null=True, blank=True)
-    calculation_status = models.CharField(
-        max_length=255, null=True, blank=True)
+    calculation_status = models.CharField(max_length=255, null=True, blank=True)
     calculation_token = models.UUIDField(  # Prevents race conditions in summary calc.
         null=True, blank=True, default=None
     )
@@ -66,14 +65,10 @@ class Report(CommitteeOwnedModel):
         blank=True,
     )
 
-    form_3x = models.ForeignKey(
-        Form3X, on_delete=models.CASCADE, null=True, blank=True)
-    form_24 = models.ForeignKey(
-        Form24, on_delete=models.CASCADE, null=True, blank=True)
-    form_99 = models.ForeignKey(
-        Form99, on_delete=models.CASCADE, null=True, blank=True)
-    form_1m = models.ForeignKey(
-        Form1M, on_delete=models.CASCADE, null=True, blank=True)
+    form_3x = models.ForeignKey(Form3X, on_delete=models.CASCADE, null=True, blank=True)
+    form_24 = models.ForeignKey(Form24, on_delete=models.CASCADE, null=True, blank=True)
+    form_99 = models.ForeignKey(Form99, on_delete=models.CASCADE, null=True, blank=True)
+    form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
 
@@ -164,8 +159,7 @@ def update_recalculation(report: Report):
         for report_to_recalc in reports_to_flag_for_recalculation:
             report_to_recalc.calculation_status = None
             report_to_recalc.save()
-            logger.info(
-                f"Report: {report_to_recalc.id} marked for recalcuation")
+            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
 
 
 class ReportMixin(models.Model):
