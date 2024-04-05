@@ -1,3 +1,4 @@
+from fecfiler.soft_delete.managers import SoftDeleteManager
 from fecfiler.transactions.schedule_a.managers import (
     over_two_hundred_types as schedule_a_over_two_hundred_types,
     line_labels as line_labels_a,
@@ -37,7 +38,7 @@ from .schedule_b.managers import refunds as schedule_b_refunds
 but are called different names"""
 
 
-class TransactionManager(Manager):
+class TransactionManager(SoftDeleteManager):
     entity_aggregate_window = {
         "partition_by": [
             F("contact_1_id"),
@@ -207,7 +208,7 @@ class TransactionManager(Manager):
                 then=Concat(
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
-                    Value("LOAN")
+                    Value("LOAN"),
                 ),
             ),
             default=None,
@@ -242,8 +243,7 @@ class TransactionManager(Manager):
                             )
                             .values("committee_account_id")
                             .annotate(
-                                incurred_prior=Sum(
-                                    "schedule_d__incurred_amount"),
+                                incurred_prior=Sum("schedule_d__incurred_amount"),
                             )
                             .values("incurred_prior")
                         )
@@ -267,8 +267,7 @@ class TransactionManager(Manager):
                             ~Q(debt_id=OuterRef("id")),
                             debt__transaction_id=OuterRef("transaction_id"),
                             schedule_d__isnull=True,
-                            date__lt=OuterRef(
-                                "schedule_d__report_coverage_from_date"),
+                            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
                         )
                         .values("committee_account_id")
                         .annotate(debt_payments_prior=Sum("amount"))
@@ -356,8 +355,7 @@ class TransactionViewManager(Manager):
                 balance=Case(
                     When(
                         schedule_d__isnull=False,
-                        then=Coalesce(F("balance_at_close"),
-                                      Value(Decimal(0.0))),
+                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
                     ),
                     When(
                         schedule_c__isnull=False,
