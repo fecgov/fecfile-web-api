@@ -28,6 +28,7 @@ fecfiler.reports.serializers.ReportSerializer
       ~ReportSerializer.build_standard_field
       ~ReportSerializer.build_unknown_field
       ~ReportSerializer.build_url_field
+      ~ReportSerializer.can_delete
       ~ReportSerializer.create
       ~ReportSerializer.fail
       ~ReportSerializer.get_attribute

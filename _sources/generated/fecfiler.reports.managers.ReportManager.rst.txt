@@ -68,7 +68,6 @@ fecfiler.reports.managers.ReportManager
       ~ReportManager.get
       ~ReportManager.get_or_create
       ~ReportManager.get_queryset
-      ~ReportManager.hard_delete
       ~ReportManager.in_bulk
       ~ReportManager.intersection
       ~ReportManager.iterator

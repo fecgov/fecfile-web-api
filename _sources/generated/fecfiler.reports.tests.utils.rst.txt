@@ -18,6 +18,7 @@ fecfiler.reports.tests.utils
       :toctree:                                          
    
       create_form
+      create_form24
       create_form3x
       create_test_report
    

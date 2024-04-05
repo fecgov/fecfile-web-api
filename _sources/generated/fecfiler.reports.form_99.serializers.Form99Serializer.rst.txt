@@ -28,6 +28,7 @@ fecfiler.reports.form\_99.serializers.Form99Serializer
       ~Form99Serializer.build_standard_field
       ~Form99Serializer.build_unknown_field
       ~Form99Serializer.build_url_field
+      ~Form99Serializer.can_delete
       ~Form99Serializer.create
       ~Form99Serializer.fail
       ~Form99Serializer.get_attribute

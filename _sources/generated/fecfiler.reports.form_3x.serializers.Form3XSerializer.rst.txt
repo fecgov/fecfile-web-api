@@ -28,6 +28,7 @@ fecfiler.reports.form\_3x.serializers.Form3XSerializer
       ~Form3XSerializer.build_standard_field
       ~Form3XSerializer.build_unknown_field
       ~Form3XSerializer.build_url_field
+      ~Form3XSerializer.can_delete
       ~Form3XSerializer.create
       ~Form3XSerializer.fail
       ~Form3XSerializer.get_attribute

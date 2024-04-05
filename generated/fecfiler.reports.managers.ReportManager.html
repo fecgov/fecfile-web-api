@@ -37,16 +37,16 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.reports.managers.ReportManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.reports.managers.</span></span><span class="sig-name descname"><span class="pre">ReportManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.managers.ReportManager" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SoftDeleteManager</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.reports.managers.ReportManager.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.managers.ReportManager.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.managers.ReportManager.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.__init__" title="fecfiler.reports.managers.ReportManager.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.__init__" title="fecfiler.reports.managers.ReportManager.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aaggregate</span></code>(*args, **kwargs)</p></td>
@@ -193,64 +193,61 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.get_queryset" title="fecfiler.reports.managers.ReportManager.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
 <td><p>Return a new QuerySet object.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.in_bulk" title="fecfiler.reports.managers.ReportManager.in_bulk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_bulk</span></code></a>([id_list, field_name])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.in_bulk" title="fecfiler.reports.managers.ReportManager.in_bulk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_bulk</span></code></a>([id_list, field_name])</p></td>
 <td><p>Return a dictionary mapping each of the given IDs to the object with that ID.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code>(*other_qs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersection</span></code>(*other_qs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.iterator" title="fecfiler.reports.managers.ReportManager.iterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterator</span></code></a>([chunk_size])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.iterator" title="fecfiler.reports.managers.ReportManager.iterator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterator</span></code></a>([chunk_size])</p></td>
 <td><p>An iterator over the results from applying this QuerySet to the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.last" title="fecfiler.reports.managers.ReportManager.last"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.last" title="fecfiler.reports.managers.ReportManager.last"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last</span></code></a>()</p></td>
 <td><p>Return the last object of a query or None if no match is found.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.latest" title="fecfiler.reports.managers.ReportManager.latest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">latest</span></code></a>(*fields)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.latest" title="fecfiler.reports.managers.ReportManager.latest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">latest</span></code></a>(*fields)</p></td>
 <td><p>Return the latest object according to fields (if given) or by the model's Meta.get_latest_by.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.none" title="fecfiler.reports.managers.ReportManager.none"><code class="xref py py-obj docutils literal notranslate"><span class="pre">none</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.none" title="fecfiler.reports.managers.ReportManager.none"><code class="xref py py-obj docutils literal notranslate"><span class="pre">none</span></code></a>()</p></td>
 <td><p>Return an empty QuerySet.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.only" title="fecfiler.reports.managers.ReportManager.only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">only</span></code></a>(*fields)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.only" title="fecfiler.reports.managers.ReportManager.only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">only</span></code></a>(*fields)</p></td>
 <td><p>Essentially, the opposite of defer().</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.order_by" title="fecfiler.reports.managers.ReportManager.order_by"><code class="xref py py-obj docutils literal notranslate"><span class="pre">order_by</span></code></a>(*field_names)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.order_by" title="fecfiler.reports.managers.ReportManager.order_by"><code class="xref py py-obj docutils literal notranslate"><span class="pre">order_by</span></code></a>(*field_names)</p></td>
 <td><p>Return a new QuerySet instance with the ordering changed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.prefetch_related" title="fecfiler.reports.managers.ReportManager.prefetch_related"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefetch_related</span></code></a>(*lookups)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.prefetch_related" title="fecfiler.reports.managers.ReportManager.prefetch_related"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prefetch_related</span></code></a>(*lookups)</p></td>
 <td><p>Return a new QuerySet instance that will prefetch the specified Many-To-One and Many-To-Many related objects when the QuerySet is evaluated.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raw</span></code>(raw_query[, params, translations, using])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raw</span></code>(raw_query[, params, translations, using])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.reverse" title="fecfiler.reports.managers.ReportManager.reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.reverse" title="fecfiler.reports.managers.ReportManager.reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code></a>()</p></td>
 <td><p>Reverse the ordering of the QuerySet.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.select_for_update" title="fecfiler.reports.managers.ReportManager.select_for_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_for_update</span></code></a>([nowait, skip_locked, of, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.select_for_update" title="fecfiler.reports.managers.ReportManager.select_for_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_for_update</span></code></a>([nowait, skip_locked, of, ...])</p></td>
 <td><p>Return a new QuerySet instance that will select objects with a FOR UPDATE lock.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.select_related" title="fecfiler.reports.managers.ReportManager.select_related"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_related</span></code></a>(*fields)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.select_related" title="fecfiler.reports.managers.ReportManager.select_related"><code class="xref py py-obj docutils literal notranslate"><span class="pre">select_related</span></code></a>(*fields)</p></td>
 <td><p>Return a new QuerySet instance that will select related objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">union</span></code>(*other_qs[, all])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">union</span></code>(*other_qs[, all])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.update" title="fecfiler.reports.managers.ReportManager.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.update" title="fecfiler.reports.managers.ReportManager.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(**kwargs)</p></td>
 <td><p>Update all elements in the current QuerySet, setting all the given fields to the appropriate values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.update_or_create" title="fecfiler.reports.managers.ReportManager.update_or_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_or_create</span></code></a>([defaults])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.update_or_create" title="fecfiler.reports.managers.ReportManager.update_or_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_or_create</span></code></a>([defaults])</p></td>
 <td><p>Look up an object with the given kwargs, updating one with defaults if it exists, otherwise create a new one.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.using" title="fecfiler.reports.managers.ReportManager.using"><code class="xref py py-obj docutils literal notranslate"><span class="pre">using</span></code></a>(alias)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.managers.ReportManager.using" title="fecfiler.reports.managers.ReportManager.using"><code class="xref py py-obj docutils literal notranslate"><span class="pre">using</span></code></a>(alias)</p></td>
 <td><p>Select which database this QuerySet should execute against.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>(*fields, **expressions)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>(*fields, **expressions)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_list</span></code>(*fields[, flat, named])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values_list</span></code>(*fields[, flat, named])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

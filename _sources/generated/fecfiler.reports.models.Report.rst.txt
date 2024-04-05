@@ -39,7 +39,6 @@ fecfiler.reports.models.Report
       ~Report.get_next_by_updated
       ~Report.get_previous_by_created
       ~Report.get_previous_by_updated
-      ~Report.hard_delete
       ~Report.prepare_database_save
       ~Report.refresh_from_db
       ~Report.save
@@ -57,7 +56,6 @@ fecfiler.reports.models.Report
 
    .. autosummary::
    
-      ~Report.all_objects
       ~Report.calculation_status
       ~Report.calculation_token
       ~Report.committee_account
@@ -68,7 +66,6 @@ fecfiler.reports.models.Report
       ~Report.coverage_through_date
       ~Report.created
       ~Report.date_signed
-      ~Report.deleted
       ~Report.dotfec_set
       ~Report.form_1m
       ~Report.form_1m_id
