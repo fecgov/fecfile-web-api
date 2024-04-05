@@ -143,7 +143,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     def can_delete(self, representation):
         """can delete if there exist no transactions in this report
         where any transactions in a different report back reference to them"""
-        return representation["report_type"] == "F24" or not (
+        no_check = ["F24", "F1M", "F99"]
+        return representation["report_type"] in no_check or not (
             ReportTransaction.objects.filter(
                 Exists(
                     Subquery(
