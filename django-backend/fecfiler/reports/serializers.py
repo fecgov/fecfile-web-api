@@ -141,55 +141,35 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
         return representation
 
     def can_delete(self, representation):
-        is_form_3x = representation["report_type"] == "F3X"
-
-        future_reports_query = ReportTransaction.objects.filter(
-            Exists(
-                Subquery(
-                    ReportTransaction.objects.filter(
-                        ~Q(report_id=representation["id"]),
-                        Q(
-                            Q(transaction__reatt_redes_id=OuterRef("transaction_id"))
-                            | Q(
-                                transaction__parent_transaction_id=OuterRef(
-                                    "transaction_id"
+        """can delete if there exist no transactions in this report
+        where any transactions in a different report back reference to them"""
+        return representation["report_type"] == "F24" or not (
+            ReportTransaction.objects.filter(
+                Exists(
+                    Subquery(
+                        ReportTransaction.objects.filter(
+                            ~Q(report_id=representation["id"]),
+                            Q(
+                                Q(transaction__id=OuterRef("transaction_id"))
+                                | Q(
+                                    transaction__reatt_redes_id=OuterRef(
+                                        "transaction_id"
+                                    )
                                 )
-                            )
-                            | Q(transaction__debt_id=OuterRef("transaction_id"))
-                            | Q(transaction__loan_id=OuterRef("transaction_id"))
-                        ),
+                                | Q(
+                                    transaction__parent_transaction_id=OuterRef(
+                                        "transaction_id"
+                                    )
+                                )
+                                | Q(transaction__debt_id=OuterRef("transaction_id"))
+                                | Q(transaction__loan_id=OuterRef("transaction_id"))
+                            ),
+                        )
                     )
                 ),
-            ),
-            report_id=representation["id"],
+                report_id=representation["id"],
+            ).exists()
         )
-
-        exists_queries = Exists(future_reports_query)
-
-        if is_form_3x:
-            # Get the transaction_id for a specific report_id
-            transaction_ids_for_report = ReportTransaction.objects.filter(
-                report_id=representation["id"]
-            ).values("transaction_id")
-
-            # Get the transaction_id that appears more than once
-            duplicate_transaction_ids = (
-                ReportTransaction.objects.values("transaction_id")
-                .annotate(transaction_count=Count("transaction_id"))
-                .filter(transaction_count__gt=1)
-                .values("transaction_id")
-            )
-
-            # Check if any of the transaction_ids
-            # for the specific report_id appear more than once
-            report_link_query = ReportTransaction.objects.filter(
-                Q(transaction_id__in=Subquery(transaction_ids_for_report)),
-                Q(transaction_id__in=Subquery(duplicate_transaction_ids)),
-            )
-
-            exists_queries = Exists(report_link_query) | Exists(future_reports_query)
-
-        return not (ReportTransaction.objects.filter(exists_queries).exists())
 
     def validate(self, data):
         self._context = self.context.copy()
