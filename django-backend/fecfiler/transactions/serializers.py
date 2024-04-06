@@ -260,9 +260,9 @@ class TransactionSerializer(
         representation["reports"] = []
         representation["report_ids"] = []
         for report in instance.reports.all():
-            representation["reports"].append(ReportSerializer().to_representation(
-                report
-            ))
+            representation["reports"].append(
+                ReportSerializer().to_representation(report)
+            )
             representation["report_ids"].append(report.id)
 
         return representation

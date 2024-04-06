@@ -208,7 +208,7 @@ class TransactionManager(SoftDeleteManager):
                 then=Concat(
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
-                    Value("LOAN")
+                    Value("LOAN"),
                 ),
             ),
             default=None,

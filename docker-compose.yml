@@ -1,9 +1,9 @@
-version: '3'
+version: "3"
 
 services:
   db:
     build:
-      context: './db'
+      context: "./db"
       dockerfile: ${DB_DOCKERFILE:-Dockerfile}
       args:
         ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
@@ -22,13 +22,13 @@ services:
   redis:
     image: redis:6.2-alpine
     ports:
-      - '6379:6379'
+      - "6379:6379"
     command: redis-server
 
   api-worker:
     build:
-      context: './'
-      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
+      context: "./"
+      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
@@ -63,8 +63,8 @@ services:
 
   api:
     build:
-      context: './'
-      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
+      context: "./"
+      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
     image: fecfile-api
     container_name: fecfile-api
     volumes:
@@ -105,7 +105,6 @@ services:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       FEC_API:
       FEC_API_KEY:
-      FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
@@ -113,10 +112,10 @@ services:
   locust-leader:
     image: locustio/locust
     ports:
-     - "8089:8089"
+      - "8089:8089"
     volumes:
       - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master -H http://fecfile-api:8080
+    command: -f /mnt/locust/locust-testing/locust_run.py --master -H http://fecfile-api:8080
     profiles: [locust]
     environment:
       LOCAL_TEST_USER:
@@ -127,7 +126,7 @@ services:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --worker --master-host locust-leader -L DEBUG
+    command: -f /mnt/locust/locust-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
     profiles: [locust]
     environment:
       LOCAL_TEST_USER:

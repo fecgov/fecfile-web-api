@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/dev/topics/db/models/#overriding-predefined-mo
 
 We use signals to log saves to be consistent with delete logging
 """
+
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Transaction
