@@ -67,7 +67,6 @@ class ContactViewSetTest(TestCase):
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
 
-        expected_json = mock_results
         self.assertEqual(response.status_code, 400)
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
