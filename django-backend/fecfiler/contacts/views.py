@@ -92,11 +92,11 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     @action(detail=False)
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
+        if not candidate_id:
+            return HttpResponseBadRequest()
         try:
-            url = (
-                FEC_API_CANDIDATE_ENDPOINT
-                + validate_and_sanitize_candidate(candidate_id)
-                + "/"
+            url = FEC_API_CANDIDATE_ENDPOINT.format(
+                validate_and_sanitize_candidate(candidate_id)
             )
             return JsonResponse(
                 requests.get(url, params=urlencode({"api_key": FEC_API_KEY})).json()
