@@ -48,9 +48,6 @@ def carry_forward_guarantor(report, new_loan, guarantor):
             "contact_2_id": guarantor.contact_2_id,
             "contact_3_id": guarantor.contact_3_id,
             "schedule_c2": save_copy(guarantor.schedule_c2),
-            "memo_text": (
-                save_copy(guarantor.memo_text) if guarantor.memo_text else None
-            ),
             "committee_account_id": new_loan.committee_account_id,
             "report_id": report.id,
             "parent_transaction_id": new_loan.id,
