@@ -60,6 +60,17 @@ class ContactViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    def test_candidate_no_candidate_id(self, mock_get):
+        request = self.factory.get(
+            "/api/v1/contacts/candidate"
+        )
+        request.user = self.user
+        response = ContactViewSet.as_view({"get": "candidate"})(request)
+
+        expected_json = mock_results
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
         request = self.factory.get(
             "/api/v1/contacts/candidate?" "candidate_id=P60012143"
