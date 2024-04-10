@@ -95,12 +95,17 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if not candidate_id:
             return HttpResponseBadRequest()
         try:
+            headers = {"Content-Type": "application/json"}
+            params = {
+                "api_key": FEC_API_KEY,
+                "sort": "-two_year_period",
+            }
             url = FEC_API_CANDIDATE_ENDPOINT.format(
                 validate_and_sanitize_candidate(candidate_id)
             )
-            return JsonResponse(
-                requests.get(url, params=urlencode({"api_key": FEC_API_KEY})).json()
-            )
+            response = requests.get(url, headers=headers, params=params).json()
+            results = response["results"]
+            return Response(results[0] if len(results) > 0 else [])
         except AssertionError:
             return HttpResponseBadRequest()
 
