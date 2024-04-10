@@ -138,14 +138,10 @@ class Report(CommitteeOwnedModel):
         """delete report-transaction links"""
         ReportTransaction.objects.filter(report=self).delete()
 
-        for field in self._meta.fields:
-            if (
-                isinstance(field, models.ForeignKey)
-                and field.remote_field.on_delete == models.CASCADE
-            ):
-                foreign_key = getattr(self, field.name)
-                if foreign_key:
-                    foreign_key.delete()
+        for form_key in TABLE_TO_FORM:
+            form = getattr(self, form_key)
+            if form:
+                form.delete()
 
         super(CommitteeOwnedModel, self).delete()
 
