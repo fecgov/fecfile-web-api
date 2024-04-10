@@ -61,9 +61,7 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_no_candidate_id(self, mock_get):
-        request = self.factory.get(
-            "/api/v1/contacts/candidate"
-        )
+        request = self.factory.get("/api/v1/contacts/candidate")
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
 
@@ -77,7 +75,11 @@ class ContactViewSetTest(TestCase):
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
 
-        expected_json = mock_results
+        expected_json = {
+            "name": "LNAME, FNAME I",
+            "candidate_id": "P60012143",
+            "office_sought": "P",
+        }
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
@@ -272,9 +274,7 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_contact_id_finds_contact(self):
-        request = self.factory.get(
-            "/api/v1/contacts/get_contact_id/?fec_id=test_fec_id"
-        )
+        request = self.factory.get("/api/v1/contacts/get_contact_id/?fec_id=test_fec_id")
         request.user = self.user
         request.session = {
             "committee_uuid": "11111111-2222-3333-4444-555555555555",

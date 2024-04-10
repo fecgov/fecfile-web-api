@@ -105,7 +105,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             )
             response = requests.get(url, headers=headers, params=params).json()
             results = response["results"]
-            return Response(results[0] if len(results) > 0 else [])
+            return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
 
