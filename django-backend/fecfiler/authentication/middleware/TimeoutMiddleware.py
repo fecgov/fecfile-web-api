@@ -6,7 +6,7 @@ from fecfiler.settings import (
     FFAPI_COOKIE_DOMAIN,
 )
 
-class AuthTimeoutMiddleware:
+class TimeoutMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
