@@ -17,6 +17,7 @@ def set_aggregation_group_to_none_for_ie_memos(apps, schema_editor):
         transaction.aggregation_group = None
         transaction.save()
 
+
 def reverse_removing_aggregation_group_for_ie_memos(apps, schema_editor):
     transaction_model = apps.get_model("transactions", "Transaction")
 
