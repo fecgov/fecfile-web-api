@@ -18,7 +18,7 @@ class TimeoutMiddleware:
             response.set_cookie(
                 FFAPI_TIMEOUT_COOKIE_NAME,
                 parse_http_date_safe(session_cookie.get("expires")),
-                max_age=session_cookie.get("max_age"),
+                max_age=session_cookie.get("max-age"),
                 expires=session_cookie.get("expires"),
                 domain=FFAPI_COOKIE_DOMAIN,
                 secure=True,
