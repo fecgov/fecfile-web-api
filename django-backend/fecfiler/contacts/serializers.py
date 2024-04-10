@@ -58,27 +58,30 @@ class ContactSerializer(
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         query = Contact.objects.filter(
-            Q(
-                Exists(
-                    Transaction.objects.filter(
-                        Q(contact_1_id=OuterRef("id"))
-                        | Q(contact_2_id=OuterRef("id"))
-                        | Q(contact_3_id=OuterRef("id"))
+            Q(id=representation["id"]),
+            (
+                Q(
+                    Exists(
+                        Transaction.objects.filter(
+                            Q(contact_1_id=OuterRef("id"))
+                            | Q(contact_2_id=OuterRef("id"))
+                            | Q(contact_3_id=OuterRef("id"))
+                        )
                     )
                 )
-            )
-            | Q(
-                Exists(
-                    Form1M.objects.filter(
-                        Q(contact_affiliated_id=OuterRef("id"))
-                        | Q(contact_candidate_I_id=OuterRef("id"))
-                        | Q(contact_candidate_II_id=OuterRef("id"))
-                        | Q(contact_candidate_III_id=OuterRef("id"))
-                        | Q(contact_candidate_IV_id=OuterRef("id"))
-                        | Q(contact_candidate_V_id=OuterRef("id"))
+                | Q(
+                    Exists(
+                        Form1M.objects.filter(
+                            Q(contact_affiliated_id=OuterRef("id"))
+                            | Q(contact_candidate_I_id=OuterRef("id"))
+                            | Q(contact_candidate_II_id=OuterRef("id"))
+                            | Q(contact_candidate_III_id=OuterRef("id"))
+                            | Q(contact_candidate_IV_id=OuterRef("id"))
+                            | Q(contact_candidate_V_id=OuterRef("id"))
+                        )
                     )
                 )
-            )
+            ),
         )
 
         representation["has_transaction_or_report"] = query.exists()
