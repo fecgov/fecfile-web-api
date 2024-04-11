@@ -19,6 +19,7 @@ from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
+from fecfiler.web_services.models import FECSubmissionState, FECStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -136,6 +137,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
+        representation["report_status"] = self.get_status_mapping(instance)
         representation["can_delete"] = self.can_delete(representation)
 
         return representation
@@ -144,33 +146,49 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
         """can delete if there exist no transactions in this report
         where any transactions in a different report back reference to them"""
         no_check = ["F24", "F1M", "F99"]
-        return representation["report_type"] in no_check or not (
-            ReportTransaction.objects.filter(
-                Exists(
-                    Subquery(
-                        ReportTransaction.objects.filter(
-                            ~Q(report_id=representation["id"]),
-                            Q(
-                                Q(transaction__id=OuterRef("transaction_id"))
-                                | Q(
-                                    transaction__reatt_redes_id=OuterRef(
-                                        "transaction_id"
+        return representation["report_status"] == "In progress" and (
+            representation["report_type"] in no_check
+            or not (
+                ReportTransaction.objects.filter(
+                    Exists(
+                        Subquery(
+                            ReportTransaction.objects.filter(
+                                ~Q(report_id=representation["id"]),
+                                Q(
+                                    Q(transaction__id=OuterRef("transaction_id"))
+                                    | Q(
+                                        transaction__reatt_redes_id=OuterRef(
+                                            "transaction_id"
+                                        )
                                     )
-                                )
-                                | Q(
-                                    transaction__parent_transaction_id=OuterRef(
-                                        "transaction_id"
+                                    | Q(
+                                        transaction__parent_transaction_id=OuterRef(
+                                            "transaction_id"
+                                        )
                                     )
-                                )
-                                | Q(transaction__debt_id=OuterRef("transaction_id"))
-                                | Q(transaction__loan_id=OuterRef("transaction_id"))
-                            ),
+                                    | Q(transaction__debt_id=OuterRef("transaction_id"))
+                                    | Q(transaction__loan_id=OuterRef("transaction_id"))
+                                ),
+                            )
                         )
-                    )
-                ),
-                report_id=representation["id"],
-            ).exists()
+                    ),
+                    report_id=representation["id"],
+                ).exists()
+            )
         )
+
+    def get_status_mapping(self, instance):
+        if instance.upload_submission is None:
+            return "In progress"
+        if instance.upload_submission.fec_status == FECStatus.ACCEPTED:
+            return "Submission success"
+        if (
+            instance.upload_submission.fec_status == FECSubmissionState.FAILED
+            or instance.upload_submission.fec_status == FECStatus.REJECTED
+        ):
+            return "Submission failure"
+
+        return "Submission pending"
 
     def validate(self, data):
         self._context = self.context.copy()
