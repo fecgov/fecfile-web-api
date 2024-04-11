@@ -5,12 +5,16 @@ from ..serializers import (
 )
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.web_services.models import FECStatus, FECSubmissionState, UploadSubmission
 
 
 class F3XSerializerTestCase(TestCase):
     fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.valid_f3x_report = {
             "form_type": "F3XN",
             "treasurer_last_name": "Validlastname",
@@ -66,3 +70,29 @@ class F3XSerializerTestCase(TestCase):
         self.assertRaises(
             type(COVERAGE_DATE_REPORT_CODE_COLLISION), valid_serializer.save
         )
+
+    def test_get_status_mapping(self):
+        valid_serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        valid_serializer.is_valid()
+        representation = valid_serializer.to_representation(f3x_report)
+        self.assertEquals(representation["report_status"], "In progress")
+
+        f3x_report.upload_submission = UploadSubmission()
+        representation = valid_serializer.to_representation(f3x_report)
+        self.assertEquals(representation["report_status"], "Submission pending")
+
+        f3x_report.upload_submission.fec_status = FECStatus.ACCEPTED
+        representation = valid_serializer.to_representation(f3x_report)
+        self.assertEquals(representation["report_status"], "Submission success")
+
+        f3x_report.upload_submission.fec_status = FECSubmissionState.FAILED
+        representation = valid_serializer.to_representation(f3x_report)
+        self.assertEquals(representation["report_status"], "Submission failure")
+
+        f3x_report.upload_submission.fec_status = FECStatus.REJECTED
+        representation = valid_serializer.to_representation(f3x_report)
+        self.assertEquals(representation["report_status"], "Submission failure")
