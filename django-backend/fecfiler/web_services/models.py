@@ -27,7 +27,7 @@ class DotFEC(ReportMixin):
         db_table = "dot_fecs"
 
 
-class FECSubmissionState(Enum):
+class FECSubmissionState(str, Enum):
     """States of submission to FEC
     Can be used for Webload and WebPrint"""
 
@@ -41,7 +41,7 @@ class FECSubmissionState(Enum):
         return str(self.value)
 
 
-class FECStatus(Enum):
+class FECStatus(str, Enum):
     ACCEPTED = "ACCEPTED"  # Webload
     COMPLETED = "COMPLETED"  # WebPrint
     PROCESSING = "PROCESSING"
