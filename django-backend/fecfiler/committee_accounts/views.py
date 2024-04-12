@@ -254,5 +254,5 @@ def create_committee_view(committee_uuid):
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(
             f"DROP VIEW IF EXISTS {view_name};"
-            f"CREATE  VIEW {view_name} as {definition}"
+            f"CREATE MATERIALIZED VIEW {view_name} as {definition}"
         )
