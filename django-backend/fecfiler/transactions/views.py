@@ -108,14 +108,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             print(f"transaction ID: {saved_transaction.id}")
-            if not request.query_params.get("no_refresh"):
+            if not request.query_params.get("no_view_refresh"):
                 refresh_committee_view(saved_transaction.committee_account_id)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            if not request.query_params.get("no_refresh"):
+            if not request.query_params.get("no_view_refresh"):
                 refresh_committee_view(saved_transaction.committee_account_id)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
@@ -333,7 +333,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
-            if not request.query_params.get("no_refresh"):
+            if not request.query_params.get("no_view_refresh"):
                 refresh_committee_view(saved_data[0].committee_account_id)
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
