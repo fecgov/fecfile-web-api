@@ -1,4 +1,4 @@
-from django.db import transaction as db_transaction
+from django.db import transaction as db_transaction, connection
 from rest_framework import filters, pagination
 
 from rest_framework.decorators import action
@@ -21,6 +21,7 @@ from fecfiler.transactions.serializers import (
 from fecfiler.reports.models import Report, update_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
+from fecfiler.transactions.models import get_committee_view_name
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
@@ -107,12 +108,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             print(f"transaction ID: {saved_transaction.id}")
-        # transaction_view = self.get_queryset().get(id=saved_transaction.id)
+            if not request.query_params.get("no_refresh"):
+                refresh_committee_view(saved_transaction.committee_account_id)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
+            if not request.query_params.get("no_refresh"):
+                refresh_committee_view(saved_transaction.committee_account_id)
         return Response(TransactionSerializer().to_representation(saved_transaction))
 
     def partial_update(self, request, pk=None):
@@ -329,6 +333,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
+            if not request.query_params.get("no_refresh"):
+                refresh_committee_view(saved_data[0].committee_account_id)
         return Response(
             [TransactionSerializer().to_representation(data) for data in saved_data]
         )
@@ -395,3 +401,10 @@ def stringify_queryset(qs):
         s = cursor.mogrify(sql, params)
     conn.close()
     return s
+
+
+def refresh_committee_view(committee_uuid):
+    view_name = get_committee_view_name(committee_uuid)
+    with connection.cursor() as cursor:
+        cursor.execute(f"REFRESH MATERIALIZED VIEW {view_name};")
+    logger.info(f"Refreshed materialized view for committee {committee_uuid}")

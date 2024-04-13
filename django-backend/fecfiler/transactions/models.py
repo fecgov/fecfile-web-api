@@ -1,4 +1,4 @@
-from django.db import models, connection
+from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.reports.models import update_recalculation
@@ -171,8 +171,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         for report in self.reports.all():
             update_recalculation(report)
 
-        refresh_committee_view(self.committee_account_id)
-
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
 
@@ -216,13 +214,6 @@ def get_read_model(committee_uuid):
 
 def get_committee_view_name(committee_uuid):
     return f"transaction_view__{str(committee_uuid).replace('-','_')}"
-
-
-def refresh_committee_view(committee_uuid):
-    view_name = get_committee_view_name(committee_uuid)
-    with connection.cursor() as cursor:
-        cursor.execute(f"REFRESH MATERIALIZED VIEW {view_name};")
-    logger.info(f"Refreshed materialized view for committee {committee_uuid}")
 
 
 TABLE_TO_SCHEDULE = {
