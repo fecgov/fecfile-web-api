@@ -149,6 +149,15 @@ class TransactionSerializer(
         fields = get_fields()
         read_only_fields = ["children"]
 
+    def to_internal_value(self, data):
+        if data.get("schedule_a"):
+            data["transaction_amount"] = data.get("contribution_amount")
+            data["transaction_date"] = data.get("contribution_date")
+        if data.get("scheduleba"):
+            data["expenditure_amount"] = data.get("contribution_amount")
+            data["expenditure_date"] = data.get("contribution_date")
+        return super().to_internal_value(data)
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a")
@@ -164,6 +173,10 @@ class TransactionSerializer(
             ]
 
         if schedule_a:
+            representation["contribution_amount"] = representation.get(
+                "transaction_amount"
+            )
+            representation["contribution_date"] = representation.get("transaction_date")
             representation["contribution_aggregate"] = representation.get("aggregate")
             add_schedule_a_contact_fields(instance, representation)
 
@@ -183,6 +196,10 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_a[property]
         if schedule_b:
+            representation["expenditure_amount"] = representation.get(
+                "transaction_amount"
+            )
+            representation["expenditure_date"] = representation.get("transaction_date")
             representation["aggregate_amount"] = representation.get("aggregate")
             add_schedule_b_contact_fields(instance, representation)
 
@@ -202,6 +219,9 @@ class TransactionSerializer(
                 if not representation.get(property):
                     representation[property] = schedule_b[property]
         if schedule_c:
+            representation["expenditure_amount"] = representation.get(
+                "transaction_amount"
+            )
             add_schedule_c_contact_fields(instance, representation)
             loan_agreement = instance.transaction_set.filter(
                 transaction_type_identifier="C1_LOAN_AGREEMENT"

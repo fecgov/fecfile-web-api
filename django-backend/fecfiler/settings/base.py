@@ -80,10 +80,12 @@ INSTALLED_APPS = [
     "fecfiler.openfec",
     "fecfiler.user",
     "fecfiler.mock_openfec",
+    "silk",
 ]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    "silk.middleware.SilkyMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

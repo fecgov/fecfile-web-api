@@ -36,4 +36,5 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
+    re_path(r"^silk", include("silk.urls")),
 ]

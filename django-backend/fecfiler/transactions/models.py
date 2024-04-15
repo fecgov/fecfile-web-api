@@ -136,6 +136,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         ScheduleE, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    transaction_date = models.DateField(null=True, blank=True)
+    transaction_amount = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+
     objects = TransactionManager()
 
     def get_schedule_name(self):

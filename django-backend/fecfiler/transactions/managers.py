@@ -113,23 +113,25 @@ class TransactionManager(SoftDeleteManager):
             When(schedule_e__isnull=False, then=Schedule.E.value),
         )
 
-    DATE_CLAUSE = Coalesce(
-        "schedule_a__contribution_date",
-        "schedule_b__expenditure_date",
-        "schedule_c__loan_incurred_date",
-        "schedule_e__disbursement_date",
-        "schedule_e__dissemination_date",
-    )
+    DATE_CLAUSE = F("transaction_date")
+    AMOUNT_CLAUSE = F("transaction_amount")
+    # DATE_CLAUSE = Coalesce(
+    #     "schedule_a__contribution_date",
+    #     "schedule_b__expenditure_date",
+    #     "schedule_c__loan_incurred_date",
+    #     "schedule_e__disbursement_date",
+    #     "schedule_e__dissemination_date",
+    # )
 
-    AMOUNT_CLAUSE = Coalesce(
-        "schedule_a__contribution_amount",
-        "schedule_b__expenditure_amount",
-        "schedule_c__loan_amount",
-        "schedule_c2__guaranteed_amount",
-        "schedule_e__expenditure_amount",
-        "debt__schedule_d__incurred_amount",
-        "schedule_d__incurred_amount",
-    )
+    # AMOUNT_CLAUSE = Coalesce(
+    #     "schedule_a__contribution_amount",
+    #     "schedule_b__expenditure_amount",
+    #     "schedule_c__loan_amount",
+    #     "schedule_c2__guaranteed_amount",
+    #     "schedule_e__expenditure_amount",
+    #     "debt__schedule_d__incurred_amount",
+    #     "schedule_d__incurred_amount",
+    # )
 
     AGGREGATE = Case(
         When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
@@ -219,10 +221,12 @@ class TransactionManager(SoftDeleteManager):
         return Case(
             When(
                 schedule_c__isnull=False,
-                then=Coalesce(Window(
-                    expression=Sum("effective_amount"),
-                    **self.loan_payment_window
-                ), Value(Decimal(0)))
+                then=Coalesce(
+                    Window(
+                        expression=Sum("effective_amount"), **self.loan_payment_window
+                    ),
+                    Value(Decimal(0)),
+                ),
             )
         )
 
