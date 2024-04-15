@@ -149,9 +149,9 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.to_internal_value" title="fecfiler.contacts.serializers.ContactSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
-<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
+<td><p>Extract committee_id from request to assign the corresponding CommitteeAccount as the owner of the object</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.to_representation" title="fecfiler.contacts.serializers.ContactSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.to_representation" title="fecfiler.contacts.serializers.ContactSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance[, depth])</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
@@ -189,22 +189,25 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.fields" title="fecfiler.contacts.serializers.ContactSerializer.fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code></a></p></td>
 <td><p>field_instance}.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_transaction_or_report</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.root" title="fecfiler.contacts.serializers.ContactSerializer.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.contacts.serializers.ContactSerializer.root" title="fecfiler.contacts.serializers.ContactSerializer.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
 <td><p>Returns the top-level serializer for this field.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validators</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -513,12 +516,13 @@ be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.contacts.serializers.ContactSerializer.to_internal_value">
 <span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.serializers.ContactSerializer.to_internal_value" title="Link to this definition">¶</a></dt>
-<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
+<dd><p>Extract committee_id from request to assign the corresponding
+CommitteeAccount as the owner of the object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.contacts.serializers.ContactSerializer.to_representation">
-<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.serializers.ContactSerializer.to_representation" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.contacts.serializers.ContactSerializer.to_representation" title="Link to this definition">¶</a></dt>
 <dd><p>Object instance -&gt; Dict of primitive datatypes.</p>
 </dd></dl>
 

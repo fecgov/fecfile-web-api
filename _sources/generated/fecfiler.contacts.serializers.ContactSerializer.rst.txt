@@ -74,6 +74,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.default_validators
       ~ContactSerializer.errors
       ~ContactSerializer.fields
+      ~ContactSerializer.has_transaction_or_report
       ~ContactSerializer.initial
       ~ContactSerializer.root
       ~ContactSerializer.serializer_field_mapping
