@@ -1,12 +1,11 @@
-from fecfiler.soft_delete.managers import SoftDeleteManager
-from django.db.models import Case, When, Value, OuterRef, Exists
+from django.db.models import Case, When, Value, OuterRef, Exists, Manager
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
 but are called different names"""
 
 
-class ReportManager(SoftDeleteManager):
+class ReportManager(Manager):
     def get_queryset(self):
         older_f3x = (
             super()
@@ -20,8 +19,6 @@ class ReportManager(SoftDeleteManager):
         queryset = (
             super()
             .get_queryset()
-            .distinct()  # Remove duplicates caused by multiple transaction
-                         # foreign key links
             .annotate(
                 report_type=Case(
                     When(form_3x__isnull=False, then=ReportType.F3X.value),

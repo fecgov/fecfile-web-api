@@ -1,13 +1,11 @@
 from rest_framework import viewsets
-from django.http.response import HttpResponse, HttpResponseServerError
+from django.http.response import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.mock_openfec.mock_endpoints import query_filings
+from fecfiler.mock_openfec.mock_endpoints import query_filings, committee
 import requests
 import fecfiler.settings as settings
 
-import os
-import json
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -16,46 +14,13 @@ logger = structlog.get_logger(__name__)
 class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=True)
     def committee(self, request, pk=None):
-        cids_to_override = (
-            list(
-                map(
-                    str.strip, settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE.split(",")
-                )
-            )
-            if settings.FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE
-            else []
+        response = committee(pk)
+        if response:
+            return Response(response)
+        response = requests.get(
+            f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
         )
-        cid_to_override = next((cid for cid in cids_to_override if cid == pk), None)
-        if cid_to_override:
-            mock_committee_account = get_test_efo_mock_committee_account(
-                cid_to_override
-            )
-            if mock_committee_account:
-                return Response(
-                    {  # same as api.open.fec.gov
-                        "api_version": "1.0",
-                        "results": [
-                            mock_committee_account,
-                        ],
-                        "pagination": {
-                            "pages": 1,
-                            "per_page": 20,
-                            "count": 1,
-                            "page": 1,
-                        },
-                    }
-                )
-            else:
-                logger.error(
-                    "Failed to find mock committee account data for "
-                    "committee id to override: " + cid_to_override
-                )
-                return HttpResponseServerError()
-        else:
-            resp = requests.get(
-                f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
-            )
-            return HttpResponse(resp)
+        return HttpResponse(response)
 
     @action(detail=True)
     def f1_filing(self, request, pk=None):
@@ -99,24 +64,3 @@ def retrieve_recent_f1(committee_id):
         results = response["results"]
         if len(results) > 0:
             return results[0]
-
-
-def get_test_efo_mock_committee_account(committee_id):
-    mock_committee_accounts = get_test_efo_mock_committee_accounts()
-    return next(
-        (
-            committee
-            for committee in mock_committee_accounts
-            if committee["committee_id"] == committee_id
-        ),
-        None,
-    )
-
-
-def get_test_efo_mock_committee_accounts():
-    mock_committee_accounts_file = "committee_accounts.json"
-    mock_committee_accounts_file_path = os.path.join(
-        settings.BASE_DIR, "openfec/test_efo_mock_data/", mock_committee_accounts_file
-    )
-    with open(mock_committee_accounts_file_path) as fp:
-        return json.load(fp)

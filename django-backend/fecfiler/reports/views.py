@@ -5,12 +5,12 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from fecfiler.transactions.models import Transaction
-from fecfiler.web_services.models import FECSubmissionState, FECStatus
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
-from django.db.models import Case, Value, When, Q, CharField
+from django.db.models import Case, Value, When
 import structlog
+
 
 logger = structlog.get_logger(__name__)
 
@@ -43,23 +43,6 @@ report_code_label_mapping = Case(
 )
 
 
-def get_status_mapping():
-    """returns Django Case that determines report status based on upload submission"""
-    upload_exists = Q(upload_submission__isnull=False)
-    success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
-    failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED) | Q(
-        upload_submission__fec_status=FECStatus.REJECTED
-    )
-
-    return Case(
-        When(success, then=Value("Submission success")),
-        When(failed, then=Value("Submission failure")),
-        When(upload_exists, then=Value("Submission pending")),
-        default=Value("In progress"),
-        output_field=CharField(),
-    )
-
-
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -70,11 +53,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
-    queryset = (
-        Report.objects.annotate(report_code_label=report_code_label_mapping)
-        .annotate(report_status=get_status_mapping())
-        .all()
-    )
+    queryset = Report.objects.annotate(
+        report_code_label=report_code_label_mapping
+    ).all()
 
     serializer_class = ReportSerializer
     filter_backends = [filters.OrderingFilter]
@@ -126,9 +107,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
-        transaction_count = Transaction.objects.filter(
+        transactions = Transaction.objects.filter(
             committee_account__committee_id=committee_id
-        ).count()
+        )
+        transaction_count = transactions.count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
         ).count()
@@ -148,7 +130,8 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"Upload Submissions: {upload_submission_count}")
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
-        reports.hard_delete()
+        reports.delete()
+        transactions.hard_delete()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -165,7 +148,6 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
         if "page" in request.query_params:
             page = self.paginate_queryset(queryset)
             if page is not None:

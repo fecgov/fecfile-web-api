@@ -206,7 +206,9 @@ class TransactionManager(SoftDeleteManager):
             When(
                 schedule_c__isnull=False,
                 then=Concat(
-                    F("transaction_id"), F("schedule_c__report_coverage_through_date")
+                    F("transaction_id"),
+                    F("schedule_c__report_coverage_through_date"),
+                    Value("LOAN"),
                 ),
             ),
             default=None,
@@ -217,9 +219,10 @@ class TransactionManager(SoftDeleteManager):
         return Case(
             When(
                 schedule_c__isnull=False,
-                then=Window(
-                    expression=Sum("effective_amount"), **self.loan_payment_window
-                ),
+                then=Coalesce(Window(
+                    expression=Sum("effective_amount"),
+                    **self.loan_payment_window
+                ), Value(Decimal(0)))
             )
         )
 

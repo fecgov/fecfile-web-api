@@ -124,11 +124,6 @@ DATABASES = {
     "default": dj_database_url.config()
 }
 
-# Override default test name
-DATABASES["default"]["TEST"] = {
-    "NAME": os.environ.get("FECFILE_TEST_DB_NAME", "postgres")
-}
-
 # Connection string for connecting directly
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -363,9 +358,6 @@ AWS_REGION = env.get_credential("AWS_REGION")
 FEC_API = env.get_credential("FEC_API")
 FEC_API_KEY = env.get_credential("FEC_API_KEY")
 FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
-FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE = env.get_credential(
-    "FEC_API_COMMITTEE_LOOKUP_IDS_OVERRIDE"
-)
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
 

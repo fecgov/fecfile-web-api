@@ -398,4 +398,4 @@ class Form3XSerializer(ReportSerializer):
             + ["fields_to_validate", "is_first"]
         )
 
-        read_only_fields = ["id", "deleted", "created", "updated", "is_first"]
+        read_only_fields = ["id", "created", "updated", "is_first"]

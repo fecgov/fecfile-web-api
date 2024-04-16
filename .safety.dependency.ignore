@@ -8,6 +8,5 @@
 # Example:
 # 40104 2022-01-15
 #
-63687 2024-05-01 # gitpython <3.1.41
-64227 2024-05-01 # jinja2 <3.1.3
-64976 2024-05-01 # django < 4.2.10
+65771 2024-06-29 # https://github.com/fecgov/fecfile-web-api/issues/803
+
