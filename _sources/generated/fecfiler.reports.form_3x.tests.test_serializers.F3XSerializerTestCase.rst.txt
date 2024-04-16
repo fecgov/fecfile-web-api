@@ -113,6 +113,7 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.subTest
       ~F3XSerializerTestCase.tearDown
       ~F3XSerializerTestCase.tearDownClass
+      ~F3XSerializerTestCase.test_get_status_mapping
       ~F3XSerializerTestCase.test_serializer_validate
       ~F3XSerializerTestCase.test_used_report_code
    

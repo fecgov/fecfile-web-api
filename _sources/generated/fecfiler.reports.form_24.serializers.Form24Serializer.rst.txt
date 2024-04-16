@@ -41,6 +41,7 @@ fecfiler.reports.form\_24.serializers.Form24Serializer
       ~Form24Serializer.get_foreign_key_fields
       ~Form24Serializer.get_initial
       ~Form24Serializer.get_schema_name
+      ~Form24Serializer.get_status_mapping
       ~Form24Serializer.get_unique_for_date_validators
       ~Form24Serializer.get_unique_together_validators
       ~Form24Serializer.get_uniqueness_extra_kwargs

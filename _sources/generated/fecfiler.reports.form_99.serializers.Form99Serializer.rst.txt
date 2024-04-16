@@ -41,6 +41,7 @@ fecfiler.reports.form\_99.serializers.Form99Serializer
       ~Form99Serializer.get_foreign_key_fields
       ~Form99Serializer.get_initial
       ~Form99Serializer.get_schema_name
+      ~Form99Serializer.get_status_mapping
       ~Form99Serializer.get_unique_for_date_validators
       ~Form99Serializer.get_unique_together_validators
       ~Form99Serializer.get_uniqueness_extra_kwargs
