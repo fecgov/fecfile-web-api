@@ -1,11 +1,13 @@
+from django.forms import BooleanField
+from django.db.models import Exists, OuterRef, Q
+from fecfiler.transactions.models import Transaction
+from fecfiler.reports.models import Form1M
 import structlog
 
-from django.db.models import Q
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.shared.utilities import get_model_data
 from fecfiler.validation import serializers
 from rest_framework.serializers import (
-    IntegerField,
     UUIDField,
 )
 from rest_framework.exceptions import ValidationError
@@ -18,7 +20,7 @@ logger = structlog.get_logger(__name__)
 def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
 
     if not user_committee_id:
-        raise Exception('Tried to save contact without user_committee_id')
+        raise Exception("Tried to save contact without user_committee_id")
 
     contact_data = validated_data.pop(contact_key, None)
     contact_id = validated_data.get(contact_key + "_id", None)
@@ -51,10 +53,40 @@ class ContactSerializer(
     )
 
     # Contains the number of transactions linked to the contact
-    transaction_count = IntegerField(required=False)
+    has_transaction_or_report = BooleanField(required=False)
 
-    # Contains the number of reports directly linked to the contact (e.g. F1M)
-    report_count = IntegerField(required=False)
+    def to_representation(self, instance, depth=0):
+        representation = super().to_representation(instance)
+        query = Contact.objects.filter(
+            Q(id=representation["id"]),
+            (
+                Q(
+                    Exists(
+                        Transaction.objects.filter(
+                            Q(contact_1_id=OuterRef("id"))
+                            | Q(contact_2_id=OuterRef("id"))
+                            | Q(contact_3_id=OuterRef("id"))
+                        )
+                    )
+                )
+                | Q(
+                    Exists(
+                        Form1M.objects.filter(
+                            Q(contact_affiliated_id=OuterRef("id"))
+                            | Q(contact_candidate_I_id=OuterRef("id"))
+                            | Q(contact_candidate_II_id=OuterRef("id"))
+                            | Q(contact_candidate_III_id=OuterRef("id"))
+                            | Q(contact_candidate_IV_id=OuterRef("id"))
+                            | Q(contact_candidate_V_id=OuterRef("id"))
+                        )
+                    )
+                )
+            ),
+        )
+
+        representation["has_transaction_or_report"] = query.exists()
+
+        return representation
 
     def get_schema_name(self, data):
         return f"Contact_{self.contact_value[data.get('type', None)]}"
@@ -93,22 +125,9 @@ class ContactSerializer(
                 "contact_candidate_V_transaction_set",
             ]
         ]
-        fields.append("transaction_count")
-        fields.append("report_count")
         read_only_fields = [
             "uuid",
             "deleted",
             "created",
             "updated",
-            "transaction_count",
-            "report_count",
         ]
-
-    def to_internal_value(self, data):
-        # Remove the transaction_count and report_count because they are annotated fields
-        # delivered to the front end.
-        if "transaction_count" in data:
-            del data["transaction_count"]
-        if "report_count" in data:
-            del data["report_count"]
-        return super().to_internal_value(data)

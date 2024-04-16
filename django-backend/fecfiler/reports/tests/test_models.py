@@ -1,6 +1,6 @@
 from django.test import TestCase
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, Form24, Form3X
 from fecfiler.reports.tests.utils import create_form3x, create_form24
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import create_ie
@@ -42,9 +42,11 @@ class ReportModelTestCase(TestCase):
 
     def test_delete(self):
         f24_report = create_form24(self.committee, "2024-01-01", "2024-02-01", {})
-        f24_id = f24_report.id
+        f24_report_id = f24_report.id
+        f24_id = f24_report.form_24.id
         f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
-        f3x_id = f3x_report.id
+        f3x_report_id = f3x_report.id
+        f3x_id = f3x_report.form_3x.id
         candidate_a = Contact.objects.create(
             committee_account_id=self.committee.id,
             candidate_office="H",
@@ -52,17 +54,19 @@ class ReportModelTestCase(TestCase):
             candidate_district="99",
         )
         ie = create_ie(self.committee, candidate_a, "2023-01-01", "123.45", "H2024")
-        ie.reports.set([f24_id, f3x_id])
+        ie.reports.set([f24_report_id, f3x_report_id])
         ie.save()
         ie_id = ie.id
 
         f24_report.delete()
         ie = Transaction.all_objects.filter(id=ie_id).first()
         self.assertIsNone(ie.deleted)
-        self.assertFalse(Report.objects.filter(id=f24_id).exists())
+        self.assertFalse(Report.objects.filter(id=f24_report_id).exists())
+        self.assertFalse(Form24.objects.filter(id=f24_id).exists())
 
         f3x_report.delete()
-        self.assertFalse(Report.objects.filter(id=f3x_id).exists())
+        self.assertFalse(Report.objects.filter(id=f3x_report_id).exists())
+        self.assertFalse(Form3X.objects.filter(id=f3x_id).exists())
 
         ie = Transaction.all_objects.filter(id=ie_id).first()
         self.assertIsNotNone(ie.deleted)
