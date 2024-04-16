@@ -137,6 +137,12 @@ class Report(CommitteeOwnedModel):
 
         """delete report-transaction links"""
         ReportTransaction.objects.filter(report=self).delete()
+
+        for form_key in TABLE_TO_FORM:
+            form = getattr(self, form_key)
+            if form:
+                form.delete()
+
         super(CommitteeOwnedModel, self).delete()
 
 
