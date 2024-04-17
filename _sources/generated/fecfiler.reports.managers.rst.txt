@@ -12,6 +12,13 @@ fecfiler.reports.managers
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_status_mapping
+   
    
 
    

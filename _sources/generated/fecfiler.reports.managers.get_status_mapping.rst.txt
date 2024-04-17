@@ -1,0 +1,6 @@
+fecfiler.reports.managers.get\_status\_mapping
+==============================================
+
+.. currentmodule:: fecfiler.reports.managers
+
+.. autofunction:: get_status_mapping
