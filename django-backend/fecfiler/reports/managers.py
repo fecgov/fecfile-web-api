@@ -27,7 +27,8 @@ def get_status_mapping():
         When(failed, then=Value("Submission failure")),
         # the report has been sent to efo, we are waiting on a response
         When(upload_exists, then=Value("Submission pending")),
-        # the report is in progress because there is no upload_submission associated with it
+        # the report is in progress because there is no
+        # upload_submission associated with it
         default=Value("In progress"),
         output_field=CharField(),
     )

@@ -19,7 +19,6 @@ from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
-from fecfiler.web_services.models import FECSubmissionState, FECStatus
 
 logger = structlog.get_logger(__name__)
 
