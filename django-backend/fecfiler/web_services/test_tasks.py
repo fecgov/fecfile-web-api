@@ -1,5 +1,6 @@
+import base64
 from django.test import TestCase
-from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
+from .tasks import create_dot_fec, get_dot_fec, submit_to_fec, submit_to_webprint
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from .models import (
@@ -156,3 +157,15 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             webprint_submission.fec_image_url, "https://www.fec.gov/static/img/seal.svg"
         )
+
+    def test_get_dot_fec(self):
+        dot_fec_id = create_dot_fec(
+            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            force_write_to_disk=True,
+        )
+        dot_fec_record = DotFEC.objects.filter(id=dot_fec_id).first()
+        file_name = dot_fec_record.file_name
+        file_content_base64 = get_dot_fec(file_name)
+        file_content_bytes = base64.b64decode(file_content_base64)
+        content_string = file_content_bytes.decode("utf-8")
+        self.assertIn("F3XN", content_string)
