@@ -1,0 +1,62 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.feedback.serializers.FeedbackSerializer
+================================================
+
+.. currentmodule:: fecfiler.feedback.serializers
+
+.. autoclass:: FeedbackSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FeedbackSerializer.__init__
+      ~FeedbackSerializer.bind
+      ~FeedbackSerializer.create
+      ~FeedbackSerializer.fail
+      ~FeedbackSerializer.get_attribute
+      ~FeedbackSerializer.get_default
+      ~FeedbackSerializer.get_fields
+      ~FeedbackSerializer.get_initial
+      ~FeedbackSerializer.get_validators
+      ~FeedbackSerializer.get_value
+      ~FeedbackSerializer.is_valid
+      ~FeedbackSerializer.many_init
+      ~FeedbackSerializer.run_validation
+      ~FeedbackSerializer.run_validators
+      ~FeedbackSerializer.save
+      ~FeedbackSerializer.to_internal_value
+      ~FeedbackSerializer.to_representation
+      ~FeedbackSerializer.update
+      ~FeedbackSerializer.validate
+      ~FeedbackSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FeedbackSerializer.context
+      ~FeedbackSerializer.data
+      ~FeedbackSerializer.default_error_messages
+      ~FeedbackSerializer.default_validators
+      ~FeedbackSerializer.errors
+      ~FeedbackSerializer.fields
+      ~FeedbackSerializer.initial
+      ~FeedbackSerializer.root
+      ~FeedbackSerializer.validated_data
+      ~FeedbackSerializer.validators
+   
+   

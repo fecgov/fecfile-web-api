@@ -1,0 +1,86 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.feedback.views.FeedbackViewSet
+=======================================
+
+.. currentmodule:: fecfiler.feedback.views
+
+.. autoclass:: FeedbackViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FeedbackViewSet.__init__
+      ~FeedbackViewSet.as_view
+      ~FeedbackViewSet.check_object_permissions
+      ~FeedbackViewSet.check_permissions
+      ~FeedbackViewSet.check_throttles
+      ~FeedbackViewSet.determine_version
+      ~FeedbackViewSet.dispatch
+      ~FeedbackViewSet.finalize_response
+      ~FeedbackViewSet.get_authenticate_header
+      ~FeedbackViewSet.get_authenticators
+      ~FeedbackViewSet.get_content_negotiator
+      ~FeedbackViewSet.get_exception_handler
+      ~FeedbackViewSet.get_exception_handler_context
+      ~FeedbackViewSet.get_extra_action_url_map
+      ~FeedbackViewSet.get_extra_actions
+      ~FeedbackViewSet.get_format_suffix
+      ~FeedbackViewSet.get_parser_context
+      ~FeedbackViewSet.get_parsers
+      ~FeedbackViewSet.get_permissions
+      ~FeedbackViewSet.get_renderer_context
+      ~FeedbackViewSet.get_renderers
+      ~FeedbackViewSet.get_throttles
+      ~FeedbackViewSet.get_view_description
+      ~FeedbackViewSet.get_view_name
+      ~FeedbackViewSet.handle_exception
+      ~FeedbackViewSet.http_method_not_allowed
+      ~FeedbackViewSet.initial
+      ~FeedbackViewSet.initialize_request
+      ~FeedbackViewSet.options
+      ~FeedbackViewSet.perform_authentication
+      ~FeedbackViewSet.perform_content_negotiation
+      ~FeedbackViewSet.permission_denied
+      ~FeedbackViewSet.raise_uncaught_exception
+      ~FeedbackViewSet.reverse_action
+      ~FeedbackViewSet.setup
+      ~FeedbackViewSet.submit_feedback
+      ~FeedbackViewSet.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FeedbackViewSet.allowed_methods
+      ~FeedbackViewSet.authentication_classes
+      ~FeedbackViewSet.basename
+      ~FeedbackViewSet.default_response_headers
+      ~FeedbackViewSet.description
+      ~FeedbackViewSet.detail
+      ~FeedbackViewSet.http_method_names
+      ~FeedbackViewSet.name
+      ~FeedbackViewSet.parser_classes
+      ~FeedbackViewSet.permission_classes
+      ~FeedbackViewSet.renderer_classes
+      ~FeedbackViewSet.schema
+      ~FeedbackViewSet.settings
+      ~FeedbackViewSet.suffix
+      ~FeedbackViewSet.throttle_classes
+      ~FeedbackViewSet.versioning_class
+      ~FeedbackViewSet.view_is_async
+   
+   
