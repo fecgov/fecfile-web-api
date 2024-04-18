@@ -1,8 +1,37 @@
-from django.db.models import Case, When, Value, OuterRef, Exists, Manager
+from django.db.models import Case, When, Value, OuterRef, Exists, Manager, Q, CharField
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
 but are called different names"""
+
+
+def get_status_mapping():
+    """returns Django Case that determines report status based on upload submission"""
+    from fecfiler.web_services.models import FECSubmissionState, FECStatus
+
+    # there is an upload record, meaning the user submitted the report, but it could
+    # be at any stage in the process
+    upload_exists = Q(upload_submission__isnull=False)
+    # if the `fec_status` is ACCEPTED, efo has accepted the submission
+    success = Q(upload_submission__fec_status=FECStatus.ACCEPTED)
+    # if the `fecfile_task_state` is FAILED, there was an error in one of our tasks
+    # if the `fec_status` is REJECTED, efo deemed the submission to not be successful
+    failed = Q(upload_submission__fecfile_task_state=FECSubmissionState.FAILED) | Q(
+        upload_submission__fec_status=FECStatus.REJECTED
+    )
+
+    return Case(
+        # the report was submitted and efo returned a "success"
+        When(success, then=Value("Submission success")),
+        # the submission failed either on our side or efo's side
+        When(failed, then=Value("Submission failure")),
+        # the report has been sent to efo, we are waiting on a response
+        When(upload_exists, then=Value("Submission pending")),
+        # the report is in progress because there is no
+        # upload_submission associated with it
+        default=Value("In progress"),
+        output_field=CharField(),
+    )
 
 
 class ReportManager(Manager):
@@ -27,6 +56,8 @@ class ReportManager(Manager):
                     When(form_1m__isnull=False, then=ReportType.F1M.value),
                 ),
                 is_first=~Exists(older_f3x),
+                # report status must be in queryset because it is sorted on
+                report_status=get_status_mapping(),
             )
         )
         return queryset

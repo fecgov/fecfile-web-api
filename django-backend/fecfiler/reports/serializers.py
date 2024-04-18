@@ -144,32 +144,35 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
         """can delete if there exist no transactions in this report
         where any transactions in a different report back reference to them"""
         no_check = ["F24", "F1M", "F99"]
-        return representation["report_type"] in no_check or not (
-            ReportTransaction.objects.filter(
-                Exists(
-                    Subquery(
-                        ReportTransaction.objects.filter(
-                            ~Q(report_id=representation["id"]),
-                            Q(
-                                Q(transaction__id=OuterRef("transaction_id"))
-                                | Q(
-                                    transaction__reatt_redes_id=OuterRef(
-                                        "transaction_id"
+        return representation["report_status"] == "In progress" and (
+            representation["report_type"] in no_check
+            or not (
+                ReportTransaction.objects.filter(
+                    Exists(
+                        Subquery(
+                            ReportTransaction.objects.filter(
+                                ~Q(report_id=representation["id"]),
+                                Q(
+                                    Q(transaction__id=OuterRef("transaction_id"))
+                                    | Q(
+                                        transaction__reatt_redes_id=OuterRef(
+                                            "transaction_id"
+                                        )
                                     )
-                                )
-                                | Q(
-                                    transaction__parent_transaction_id=OuterRef(
-                                        "transaction_id"
+                                    | Q(
+                                        transaction__parent_transaction_id=OuterRef(
+                                            "transaction_id"
+                                        )
                                     )
-                                )
-                                | Q(transaction__debt_id=OuterRef("transaction_id"))
-                                | Q(transaction__loan_id=OuterRef("transaction_id"))
-                            ),
+                                    | Q(transaction__debt_id=OuterRef("transaction_id"))
+                                    | Q(transaction__loan_id=OuterRef("transaction_id"))
+                                ),
+                            )
                         )
-                    )
-                ),
-                report_id=representation["id"],
-            ).exists()
+                    ),
+                    report_id=representation["id"],
+                ).exists()
+            )
         )
 
     def validate(self, data):
