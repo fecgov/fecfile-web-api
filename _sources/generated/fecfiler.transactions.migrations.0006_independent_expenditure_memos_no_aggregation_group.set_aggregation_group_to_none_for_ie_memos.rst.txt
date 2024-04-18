@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0006\_independent\_expenditure\_memos\_no\_aggregation\_group.set\_aggregation\_group\_to\_none\_for\_ie\_memos
+================================================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0006_independent_expenditure_memos_no_aggregation_group
+
+.. autofunction:: set_aggregation_group_to_none_for_ie_memos
