@@ -1,16 +1,18 @@
+import base64
+from io import BytesIO
 from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.web_services.tasks import (
     create_dot_fec,
+    get_dot_fec,
     submit_to_fec,
     submit_to_webprint,
 )
 from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
-from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
 import structlog
 
@@ -60,7 +62,10 @@ class WebServicesViewSet(viewsets.ViewSet):
             logger.error(not_found_msg)
             return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
-        file = get_file(file_name)
+        task = get_dot_fec.apply_async(args=[file_name], retry=False)
+        file_content_base64 = task.get()
+        file_content_bytes = base64.b64decode(file_content_base64)
+        file = BytesIO(file_content_bytes)
         logger.debug(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
 

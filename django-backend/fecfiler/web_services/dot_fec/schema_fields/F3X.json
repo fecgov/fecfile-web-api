@@ -1,7 +1,9 @@
 {
     "form_type": {},
     "filer_committee_id_number": {},
-    "committee_name": {},
+    "committee_name": {
+        "path": "form_3x.committee_name"
+    },
     "change_of_address": {
         "serializer": "BOOLEAN_X",
         "path": "form_3x.change_of_address"

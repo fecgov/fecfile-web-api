@@ -16,6 +16,7 @@ class Form3X(models.Model):
         unique=True,
     )
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
+    committee_name = models.TextField(null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
     street_2 = models.TextField(null=True, blank=True)
     city = models.TextField(null=True, blank=True)

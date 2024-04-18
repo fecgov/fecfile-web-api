@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 import math
 import time
@@ -12,12 +13,19 @@ from fecfiler.web_services.models import (
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
-from .web_service_storage import get_file_bytes, store_file
+from .web_service_storage import get_file, get_file_bytes, store_file
 from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
 
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+@shared_task
+def get_dot_fec(file_name):
+    file = get_file(file_name)
+    file_content = file.read()
+    return base64.b64encode(file_content).decode()
 
 
 @shared_task
