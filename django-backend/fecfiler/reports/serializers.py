@@ -19,7 +19,6 @@ from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
-from fecfiler.web_services.models import FECSubmissionState, FECStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -137,7 +136,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
-        representation["report_status"] = self.get_status_mapping(instance)
         representation["can_delete"] = self.can_delete(representation)
 
         return representation
@@ -176,19 +174,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 ).exists()
             )
         )
-
-    def get_status_mapping(self, instance):
-        if instance.upload_submission is None:
-            return "In progress"
-        if instance.upload_submission.fec_status == FECStatus.ACCEPTED:
-            return "Submission success"
-        if (
-            instance.upload_submission.fec_status == FECSubmissionState.FAILED
-            or instance.upload_submission.fec_status == FECStatus.REJECTED
-        ):
-            return "Submission failure"
-
-        return "Submission pending"
 
     def validate(self, data):
         self._context = self.context.copy()
