@@ -144,7 +144,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
         """can delete if there exist no transactions in this report
         where any transactions in a different report back reference to them"""
         no_check = ["F24", "F1M", "F99"]
-        return representation["report_status"] == "In progress" and (
+        return representation.get("report_status") == "In progress" and (
             representation["report_type"] in no_check
             or not (
                 ReportTransaction.objects.filter(
