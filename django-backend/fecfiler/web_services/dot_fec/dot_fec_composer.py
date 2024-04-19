@@ -48,20 +48,6 @@ def compose_transactions(report_id):
             transaction.filer_committee_id_number = (
                 FILE_AS_TEST_COMMITTEE or transaction.committee_account.committee_id
             )
-            # TODO: improve itemization inheritance.
-            # We should not have to determine it here
-            root_id = (
-                transaction.parent_transaction.parent_transaction.id
-                if transaction.parent_transaction
-                and transaction.parent_transaction.parent_transaction
-                else (
-                    transaction.parent_transaction.id
-                    if transaction.parent_transaction
-                    else transaction.id
-                )
-            )
-            root = transactions.filter(id=root_id).first()
-            transaction.itemized = root.itemized
 
             if transaction.schedule_a:
                 add_schedule_a_contact_fields(transaction)
