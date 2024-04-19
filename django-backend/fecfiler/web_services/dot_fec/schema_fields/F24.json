@@ -8,7 +8,9 @@
         "serializer": "DATE",
         "path": "form_24.original_amendment_date"
     },
-    "committee_name": {},
+    "committee_name": {
+        "path": "form_24.committee_name"
+    },
     "street_1": {
         "path": "form_24.street_1"
     },

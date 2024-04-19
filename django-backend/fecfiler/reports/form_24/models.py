@@ -16,6 +16,7 @@ class Form24(models.Model):
         unique=True,
     )
 
+    committee_name = models.TextField(null=True, blank=True)
     report_type_24_48 = models.TextField(null=True, blank=True)
     original_amendment_date = models.DateField(null=True, blank=True)
     street_1 = models.TextField(null=True, blank=True)
