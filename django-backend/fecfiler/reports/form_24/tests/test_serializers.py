@@ -13,6 +13,7 @@ class F24SerializerTestCase(TestCase):
 
     def setUp(self):
         self.valid_f24_report = {
+            "committee_name": "TEST",
             "form_type": "F24N",
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",

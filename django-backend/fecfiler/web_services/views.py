@@ -10,8 +10,8 @@ from fecfiler.web_services.tasks import (
 from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
-from .models import DotFEC, UploadSubmission, WebPrintSubmission
 from .web_service_storage import get_file
+from .models import DotFEC, UploadSubmission, WebPrintSubmission
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -61,6 +61,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
         file = get_file(file_name)
+        logger.debug(f"Retrieved .FEC: {file_name}")
         return Response(FileWrapper(file))
 
     @action(
