@@ -17,13 +17,13 @@ SESSION_ID = os.environ.get("OIDC_SESSION_ID")
 TIMEOUT = 30  # seconds
 
 # item counts
-WANTED_REPORTS = os.environ.get("LOCUST_WANTED_REPORTS", 10)
-WANTED_CONTACTS = os.environ.get("LOCUST_WANTED_CONTACTS", 100)
-WANTED_TRANSACTIONS = os.environ.get("LOCUST_WANTED_TRANSACTIONS", 500)
-SINGLE_TO_TRIPLE_RATIO = os.environ.get(
+WANTED_REPORTS = int(os.environ.get("LOCUST_WANTED_REPORTS", 10))
+WANTED_CONTACTS = int(os.environ.get("LOCUST_WANTED_CONTACTS", 100))
+WANTED_TRANSACTIONS = int(os.environ.get("LOCUST_WANTED_TRANSACTIONS", 500))
+SINGLE_TO_TRIPLE_RATIO = float(os.environ.get(
     "LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO",
     9 / 10
-)
+))
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 

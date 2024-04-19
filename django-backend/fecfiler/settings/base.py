@@ -85,6 +85,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -129,6 +130,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
+
 # OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -167,6 +170,7 @@ ALLOW_LOGOUT_GET_METHOD = True
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
+FFAPI_TIMEOUT_COOKIE_NAME = "ffapi_timeout"
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
