@@ -7,8 +7,7 @@ applications:
       - python_buildpack
     memory: 1G
     no-route: true
-    health-check-type: process
-    command: sleep infinity
+    command: bin/run-celery-worker.sh
     services:
       - fecfile-api-rds
       - fecfile-api-s3
