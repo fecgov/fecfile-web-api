@@ -250,7 +250,7 @@ workflows:
             - dependency-check
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|main/
+              only: /develop|release\/sprint-[\.\d]+|807-testing/
       - docs-build:
           requires:
             - test
