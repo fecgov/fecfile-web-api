@@ -76,15 +76,20 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     @action(detail=False)
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
+        if not candidate_id:
+            return HttpResponseBadRequest()
         try:
-            url = (
-                FEC_API_CANDIDATE_ENDPOINT
-                + validate_and_sanitize_candidate(candidate_id)
-                + "/"
+            headers = {"Content-Type": "application/json"}
+            params = {
+                "api_key": FEC_API_KEY,
+                "sort": "-two_year_period",
+            }
+            url = FEC_API_CANDIDATE_ENDPOINT.format(
+                validate_and_sanitize_candidate(candidate_id)
             )
-            return JsonResponse(
-                requests.get(url, params=urlencode({"api_key": FEC_API_KEY})).json()
-            )
+            response = requests.get(url, headers=headers, params=params).json()
+            results = response["results"]
+            return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
 
