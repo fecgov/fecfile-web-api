@@ -29,8 +29,8 @@ fecfiler.settings.base
    .. autosummary::
       :toctree:                                          
    
-      get_env_logging_processors
       get_logging_config
+      get_logging_processors
    
    
 
