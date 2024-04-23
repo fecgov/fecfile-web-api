@@ -228,15 +228,20 @@ def get_logging_config(log_format=LINE):
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(
-                    colors=True, exception_formatter=structlog.dev.rich_traceback
-                ),
+                "processors": [
+                    structlog.dev.ConsoleRenderer(
+                        colors=True, exception_formatter=structlog.dev.rich_traceback
+                    )
+                ],
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["level", "event", "logger"]
-                ),
+                "processors": [
+                    structlog.processors.ExceptionRenderer(),
+                    structlog.processors.KeyValueRenderer(
+                        key_order=["level", "event", "logger"]
+                    ),
+                ],
             },
         },
         "handlers": {
@@ -279,45 +284,27 @@ def get_logging_config(log_format=LINE):
     return logging_config
 
 
-def get_env_logging_processors(log_format=LINE):
+def get_logging_processors():
     """
     get structlog processors
-    depending on environment
-    env.space will None on local.
     We will need to set these explicitly for Celery too
     """
-
-    if log_format == LINE:
-        # Remove format_exc_info to pretty-print exceptions locally
-        return [
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ]
-    else:
-        # Key/Value in production
-        return [
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.format_exc_info,
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ]
+    return [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ]
 
 
 LOGGING = get_logging_config(LOG_FORMAT)
 
 structlog.configure(
-    processors=get_env_logging_processors(LOG_FORMAT),
+    processors=get_logging_processors(),
     logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,
 )

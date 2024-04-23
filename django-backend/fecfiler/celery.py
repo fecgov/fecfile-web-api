@@ -23,7 +23,7 @@ app = Celery("fecfiler")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # A step to initialize django-structlog
-app.steps['worker'].add(DjangoStructLogInitStep)
+app.steps["worker"].add(DjangoStructLogInitStep)
 
 env = cfenv.AppEnv()
 
@@ -34,12 +34,12 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     Celery and environment-specific logging
     See https://django-structlog.readthedocs.io/en/latest/celery.html
     """
-    log_format = env.get_credential('LOG_FORMAT')
+    log_format = env.get_credential("LOG_FORMAT")
 
     logging.config.dictConfig(settings.get_logging_config(log_format))
 
     structlog.configure(
-        processors=settings.get_env_logging_processors(log_format),
+        processors=settings.get_logging_processors(),
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
