@@ -8,7 +8,7 @@ applications:
     memory: 1G
     no-route: true
     health-check-type: process
-    command: bin/run-celery-worker.sh
+    command: sleep infinity
     services:
       - fecfile-api-rds
       - fecfile-api-s3
