@@ -11,13 +11,10 @@ def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
 
-    # somebody please bring back my exceptions
-    # if exc:
-    #     raise exc
+    logger.exception(exc)
     response = exception_handler(exc, context)
 
     if response is None:
-        logger.error(f"Error: {exc}")
         return HttpResponseServerError()
 
     # Delete user cookies on forbidden http response.
