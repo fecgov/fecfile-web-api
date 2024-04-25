@@ -371,7 +371,7 @@ class TransactionViewManager(Manager):
                     "_itemized",
                 ),
                 calendar_ytd_per_election_office=Coalesce(
-                    "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",
+                    "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",  # noqa
                     "view_parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),
