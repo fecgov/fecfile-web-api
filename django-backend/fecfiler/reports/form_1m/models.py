@@ -16,12 +16,6 @@ class Form1M(models.Model):
         unique=True,
     )
 
-    committee_name = models.TextField(null=True, blank=True)
-    street_1 = models.TextField(null=True, blank=True)
-    street_2 = models.TextField(null=True, blank=True)
-    city = models.TextField(null=True, blank=True)
-    state = models.TextField(null=True, blank=True)
-    zip = models.TextField(null=True, blank=True)
     committee_type = models.CharField(max_length=1, null=True, blank=True)
 
     contact_affiliated = models.ForeignKey(

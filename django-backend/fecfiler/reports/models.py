@@ -23,6 +23,13 @@ class Report(CommitteeOwnedModel):
         unique=True,
     )
 
+    committee_name = models.TextField(null=True, blank=True)
+    street_1 = models.TextField(null=True, blank=True)
+    street_2 = models.TextField(null=True, blank=True)
+    city = models.TextField(null=True, blank=True)
+    state = models.TextField(null=True, blank=True)
+    zip = models.TextField(null=True, blank=True)
+
     form_type = models.TextField(null=True, blank=True)
     report_version = models.TextField(
         null=True, blank=True

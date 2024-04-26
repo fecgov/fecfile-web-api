@@ -17,11 +17,6 @@ class Form24Serializer(ReportSerializer):
 
     report_type_24_48 = CharField(required=False, allow_null=True)
     original_amendment_date = DateField(required=False, allow_null=True)
-    street_1 = CharField(required=False, allow_null=True)
-    street_2 = CharField(required=False, allow_null=True)
-    city = CharField(required=False, allow_null=True)
-    state = CharField(required=False, allow_null=True)
-    zip = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
@@ -57,11 +52,7 @@ class Form24Serializer(ReportSerializer):
     class Meta(ReportSerializer.Meta):
         fields = (
             ReportSerializer.Meta.get_fields()
-            + [
-                f.name
-                for f in Form24._meta.get_fields()
-                if f.name not in ["committee_name", "report"]
-            ]
+            + [f.name for f in Form24._meta.get_fields() if f.name not in ["report"]]
             + ["fields_to_validate"]
         )
 

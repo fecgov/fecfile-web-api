@@ -72,12 +72,6 @@ CONTACT_KEYS = [
 class Form1MSerializer(ReportSerializer):
     schema_name = "F1M"
 
-    committee_name = CharField(required=False, allow_null=True)
-    street_1 = CharField(required=False, allow_null=True)
-    street_2 = CharField(required=False, allow_null=True)
-    city = CharField(required=False, allow_null=True)
-    state = CharField(required=False, allow_null=True)
-    zip = CharField(required=False, allow_null=True)
     committee_type = CharField(required=False, allow_null=True)
 
     contact_affiliated = ContactSerializer(required=False, allow_null=True)

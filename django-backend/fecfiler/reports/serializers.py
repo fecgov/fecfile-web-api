@@ -84,6 +84,13 @@ class Form1MSerializer(ModelSerializer):
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
 
+    committee_name = CharField(required=False, allow_null=True)
+    street_1 = CharField(required=False, allow_null=True)
+    street_2 = CharField(required=False, allow_null=True)
+    city = CharField(required=False, allow_null=True)
+    state = CharField(required=False, allow_null=True)
+    zip = CharField(required=False, allow_null=True)
+
     upload_submission = UploadSubmissionSerializer(
         read_only=True,
     )
@@ -193,7 +200,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 not in [
                     "uploadsubmission",
                     "webprintsubmission",
-                    "committee_name",
                     "memotext",
                     "transaction",
                     "dotfec",

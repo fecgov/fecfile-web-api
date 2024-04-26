@@ -18,21 +18,12 @@ class F99SerializerTestCase(TestCase):
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "AL",
-            "zip": "12345",
             "text_code": "MSM",
             "message_text": "A message to FEC",
             "fields_to_validate": [f.name for f in Form99._meta.get_fields()],
         }
 
         self.invalid_f99_report = {
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "TOO MANY CHARS",
             "text_code": "B",
             "fields_to_validate": [f.name for f in Form99._meta.get_fields()],
         }
@@ -61,5 +52,4 @@ class F99SerializerTestCase(TestCase):
             },
         )
         self.assertFalse(invalid_serializer.is_valid())
-        self.assertIsNotNone(invalid_serializer.errors["state"])
         self.assertIsNotNone(invalid_serializer.errors["text_code"])

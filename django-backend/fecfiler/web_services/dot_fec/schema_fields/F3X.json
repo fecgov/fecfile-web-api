@@ -6,21 +6,11 @@
         "serializer": "BOOLEAN_X",
         "path": "form_3x.change_of_address"
     },
-    "street_1": {
-        "path": "form_3x.street_1"
-    },
-    "street_2": {
-        "path": "form_3x.street_2"
-    },
-    "city": {
-        "path": "form_3x.city"
-    },
-    "state": {
-        "path": "form_3x.state"
-    },
-    "zip": {
-        "path": "form_3x.zip"
-    },
+    "street_1": {},
+    "street_2": {},
+    "city": {},
+    "state": {},
+    "zip": {},
     "report_code": {},
     "election_code": {
         "path": "form_3x.election_code"
