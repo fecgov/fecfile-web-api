@@ -4,11 +4,11 @@ from django.db import migrations, models
 
 
 def migrate_committee_data(apps, schema_editor):
-    Report = apps.get_model("reports", "Report")
-    Form24 = apps.get_model("reports", "Form24")
-    Form3x = apps.get_model("reports", "Form3X")
-    Form99 = apps.get_model("reports", "Form99")
-    Form1m = apps.get_model("reports", "Form1M")
+    Report = apps.get_model("reports", "Report")  # noqa
+    Form24 = apps.get_model("reports", "Form24")  # noqa
+    Form3x = apps.get_model("reports", "Form3X")  # noqa
+    Form99 = apps.get_model("reports", "Form99")  # noqa
+    Form1m = apps.get_model("reports", "Form1M")  # noqa
 
     for form in Form24.objects.all():
         report = Report.objects.get(form_24=form)
