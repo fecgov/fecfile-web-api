@@ -4,14 +4,14 @@ from django.db import migrations, models
 
 
 def migrate_committee_data(apps, schema_editor):
-    report = apps.get_model("reports", "Report")
-    form24 = apps.get_model("reports", "Form24")
-    form3x = apps.get_model("reports", "Form3X")
-    form99 = apps.get_model("reports", "Form99")
-    form1m = apps.get_model("reports", "Form1M")
+    Report = apps.get_model("reports", "Report")  # noqa
+    Form24 = apps.get_model("reports", "Form24")  # noqa
+    Form3x = apps.get_model("reports", "Form3X")  # noqa
+    Form99 = apps.get_model("reports", "Form99")  # noqa
+    Form1m = apps.get_model("reports", "Form1M")  # noqa
 
-    for form in form24.objects.all():
-        report = report.objects.get(form_24=form)
+    for form in Form24.objects.all():
+        report = Report.objects.get(form_24=form)
         report.street_1 = form.street_1
         report.street_2 = form.street_2
         report.city = form.city
@@ -19,8 +19,8 @@ def migrate_committee_data(apps, schema_editor):
         report.zip = form.zip
         report.save()
 
-    for form in form3x.objects.all():
-        report = report.objects.get(form_3x=form)
+    for form in Form3x.objects.all():
+        report = Report.objects.get(form_3x=form)
         report.street_1 = form.street_1
         report.street_2 = form.street_2
         report.city = form.city
@@ -28,8 +28,8 @@ def migrate_committee_data(apps, schema_editor):
         report.zip = form.zip
         report.save()
 
-    for form in form99.objects.all():
-        report = report.objects.get(form_99=form)
+    for form in Form99.objects.all():
+        report = Report.objects.get(form_99=form)
         report.committee_name = form.committee_name
         report.street_1 = form.street_1
         report.street_2 = form.street_2
@@ -38,8 +38,8 @@ def migrate_committee_data(apps, schema_editor):
         report.zip = form.zip
         report.save()
 
-    for form in form1m.objects.all():
-        report = report.objects.get(form_1m=form)
+    for form in Form1m.objects.all():
+        report = Report.objects.get(form_1m=form)
         report.committee_name = form.committee_name
         report.street_1 = form.street_1
         report.street_2 = form.street_2
