@@ -152,7 +152,6 @@ fecfiler.reports.form\_3x.models.Form3X
       ~Form3X.L9_debts_to_period
       ~Form3X.cash_on_hand_date
       ~Form3X.change_of_address
-      ~Form3X.city
       ~Form3X.date_of_election
       ~Form3X.election_code
       ~Form3X.id
@@ -160,10 +159,6 @@ fecfiler.reports.form\_3x.models.Form3X
       ~Form3X.pk
       ~Form3X.qualified_committee
       ~Form3X.report_set
-      ~Form3X.state
       ~Form3X.state_of_election
-      ~Form3X.street_1
-      ~Form3X.street_2
-      ~Form3X.zip
    
    

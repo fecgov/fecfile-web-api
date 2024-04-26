@@ -55,8 +55,6 @@ fecfiler.reports.form\_1m.models.Form1M
       ~Form1M.I_date_of_contribution
       ~Form1M.V_date_of_contribution
       ~Form1M.affiliated_date_form_f1_filed
-      ~Form1M.city
-      ~Form1M.committee_name
       ~Form1M.committee_type
       ~Form1M.contact_affiliated
       ~Form1M.contact_affiliated_id
@@ -77,9 +75,5 @@ fecfiler.reports.form\_1m.models.Form1M
       ~Form1M.objects
       ~Form1M.pk
       ~Form1M.report_set
-      ~Form1M.state
-      ~Form1M.street_1
-      ~Form1M.street_2
-      ~Form1M.zip
    
    

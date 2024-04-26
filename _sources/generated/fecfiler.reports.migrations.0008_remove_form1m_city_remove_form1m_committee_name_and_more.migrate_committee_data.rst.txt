@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0008\_remove\_form1m\_city\_remove\_form1m\_committee\_name\_and\_more.migrate\_committee\_data
+===========================================================================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more
+
+.. autofunction:: migrate_committee_data

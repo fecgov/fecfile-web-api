@@ -1,0 +1,41 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.migrations.0008\_remove\_form1m\_city\_remove\_form1m\_committee\_name\_and\_more
+==================================================================================================
+
+.. automodule:: fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      migrate_committee_data
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

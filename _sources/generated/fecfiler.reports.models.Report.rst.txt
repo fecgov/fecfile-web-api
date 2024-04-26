@@ -58,8 +58,10 @@ fecfiler.reports.models.Report
    
       ~Report.calculation_status
       ~Report.calculation_token
+      ~Report.city
       ~Report.committee_account
       ~Report.committee_account_id
+      ~Report.committee_name
       ~Report.confirmation_email_1
       ~Report.confirmation_email_2
       ~Report.coverage_from_date
@@ -85,6 +87,9 @@ fecfiler.reports.models.Report
       ~Report.report_id
       ~Report.report_version
       ~Report.reporttransaction_set
+      ~Report.state
+      ~Report.street_1
+      ~Report.street_2
       ~Report.transactions
       ~Report.treasurer_first_name
       ~Report.treasurer_last_name
@@ -96,5 +101,6 @@ fecfiler.reports.models.Report
       ~Report.upload_submission_id
       ~Report.webprint_submission
       ~Report.webprint_submission_id
+      ~Report.zip
    
    
