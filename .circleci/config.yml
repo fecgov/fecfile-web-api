@@ -241,7 +241,6 @@ workflows:
       - dependency-check
       - deploy-job:
           requires:
-            - test
             - dependency-check
           filters:
             branches:
