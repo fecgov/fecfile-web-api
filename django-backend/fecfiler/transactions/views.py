@@ -42,7 +42,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
-        "line_label_order_key",
+        "line_label",
         "created",
         "transaction_type_identifier",
         "memo_code",
@@ -81,9 +81,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
-            schedules_to_include = (
-                schedule_filters.split(",") if schedule_filters else []
-            )
+            schedules_to_include = schedule_filters.split(",") if schedule_filters else []
             queryset = queryset.filter(
                 schedule__in=[
                     Schedule[schedule].value for schedule in schedules_to_include
@@ -279,9 +277,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 child_transaction.parent_transaction_id = transaction_instance.id
                 child_transaction.save()
             else:
-                child_transaction_data["parent_transaction_id"] = (
-                    transaction_instance.id
-                )
+                child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
                     child_transaction_data["contact_1_id"] = (
