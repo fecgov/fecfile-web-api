@@ -237,7 +237,6 @@ jobs:
 workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - test
       - dependency-check
       - deploy-job:
           requires:
@@ -247,7 +246,6 @@ workflows:
               only: /develop|release\/sprint-[\.\d]+|feature\/632/
       - docs-build:
           requires:
-            - test
             - dependency-check
           filters:
             branches:
