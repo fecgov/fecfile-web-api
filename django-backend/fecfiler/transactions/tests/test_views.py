@@ -291,7 +291,7 @@ class TransactionViewsTestCase(TestCase):
         report_coverage_from_date = Report.objects.get(
             id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
         ).coverage_from_date
-        debt_id = response.data["id"]
+        debt_id = response.data
         self.assertEqual(response.status_code, 200)
         debt = Transaction.objects.get(id=debt_id)
         self.assertEqual(

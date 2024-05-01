@@ -81,9 +81,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
-            schedules_to_include = (
-                schedule_filters.split(",") if schedule_filters else []
-            )
+            schedules_to_include = schedule_filters.split(",") if schedule_filters else []
             queryset = queryset.filter(
                 schedule__in=[
                     Schedule[schedule].value for schedule in schedules_to_include
@@ -108,12 +106,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             saved_transaction = self.save_transaction(request.data, request)
             print(f"transaction ID: {saved_transaction.id}")
         # transaction_view = self.get_queryset().get(id=saved_transaction.id)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+        return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+        return Response(saved_transaction.id)
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
@@ -279,9 +277,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 child_transaction.parent_transaction_id = transaction_instance.id
                 child_transaction.save()
             else:
-                child_transaction_data["parent_transaction_id"] = (
-                    transaction_instance.id
-                )
+                child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
                     child_transaction_data["contact_1_id"] = (
