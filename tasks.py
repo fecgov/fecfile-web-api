@@ -98,6 +98,7 @@ def _do_deploy(ctx, space, app):
         f"cf {cmd} {app} -f {manifest_filename}",
         echo=True,
         warn=True,
+        pty=True,
     )
     print(f"cf push output:\n {new_deploy.stdout}")
     return new_deploy
