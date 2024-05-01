@@ -31,10 +31,10 @@ def delete_memberships_with_overlapping_emails(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('committee_accounts', '0003_membership_pending_email_alter_membership_id_and_more'),
-    ]
+    dependencies = [(
+        'committee_accounts',
+        '0003_membership_pending_email_alter_membership_id_and_more'
+    )]
 
     operations = [
         migrations.RunPython(
