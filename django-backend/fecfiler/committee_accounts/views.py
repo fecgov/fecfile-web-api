@@ -161,7 +161,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         # Check for pre-existing membership
         matching_memberships = self.get_queryset().filter(
-            Q(pending_email=email.lower()) | Q(user__email=email.lower())
+            Q(pending_email__iexact=email) | Q(user__email__iexact=email)
         )
         if matching_memberships.count() > 0:
             return Response(

@@ -14,15 +14,16 @@ def delete_memberships_with_overlapping_emails(apps, schema_editor):
         unique_pending_emails = set()
         emails_to_prune = set()
         for membership in committee_memberships:
-            if membership.pending_email not in unique_pending_emails:
-                unique_pending_emails.add(membership.pending_email)
+            pending_email = str(membership.pending_email).lower()
+            if pending_email not in unique_pending_emails:
+                unique_pending_emails.add(pending_email)
             else:
-                emails_to_prune.add(membership.pending_email)
+                emails_to_prune.add(pending_email)
 
-        for email in emails_to_prune:
+        for email in list(emails_to_prune):
             # ordering by user places any memberships with a user first
             overlapping_memberships = list(
-                committee_memberships.filter(pending_email=email).order_by('user')
+                committee_memberships.filter(pending_email__iexact=email).order_by('user')
             )
             for membership_to_delete in overlapping_memberships[1:]:
                 membership_to_delete.delete()
