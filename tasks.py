@@ -99,6 +99,7 @@ def _do_deploy(ctx, space, app):
         echo=True,
         warn=True,
     )
+    print(f"cf push output:\n {new_deploy.stdout}")
     return new_deploy
 
 
