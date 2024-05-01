@@ -32,9 +32,7 @@ class F3XReportTestCase(TestCase):
             summary_a["line_6d"],
             Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
         )
-        self.assertEqual(
-            summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"]
-        )
+        self.assertEqual(summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"])
         self.assertEqual(summary_a["line_9"], Decimal("215.00"))
         self.assertEqual(summary_a["line_10"], Decimal("250.00"))
         self.assertEqual(summary_a["line_11ai"], Decimal("10000.23"))
@@ -140,9 +138,7 @@ class F3XReportTestCase(TestCase):
             + Decimal("1201.50")  # line_29
             + Decimal("1102.25"),  # line_30c
         )
-        self.assertEqual(
-            summary_b["line_8"], summary_b["line_6d"] - summary_b["line_7"]
-        )
+        self.assertEqual(summary_b["line_8"], summary_b["line_6d"] - summary_b["line_7"])
         self.assertEqual(summary_b["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_b["line_11aii"], Decimal("103.77"))
         self.assertEqual(summary_b["line_11aiii"], Decimal("10104.00"))
@@ -208,3 +204,11 @@ class F3XReportTestCase(TestCase):
         summary_a, _ = summary_service.calculate_summary()
         self.assertEqual(summary_a["line_15"], Decimal("0"))
         self.assertEqual(summary_a["line_17"], Decimal("0"))
+
+    def test_report_with_zero_cash_on_hand(self):
+        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x.form_3x.L6a_cash_on_hand_jan_1_ytd = 0
+        f3x.form_3x.save()
+        summary_service = SummaryService(f3x)
+        summary_a, _ = summary_service.calculate_summary()
+        self.assertTrue("line_8" in summary_a)

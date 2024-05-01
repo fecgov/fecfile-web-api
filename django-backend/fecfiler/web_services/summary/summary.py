@@ -247,7 +247,8 @@ class SummaryService:
             # user defined cash on hand
             column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
-        if column_a["line_6b"] and column_b["line_6a"]:
+        # if we have cash on hand values
+        if "line_6b" in column_a and "line_6a" in column_b:
             column_a["line_6d"] = column_a["line_6b"] + column_a["line_6c"]
             column_a["line_8"] = column_a["line_6d"] - column_a["line_7"]
             column_b["line_6d"] = column_b["line_6a"] + column_b["line_6c"]
