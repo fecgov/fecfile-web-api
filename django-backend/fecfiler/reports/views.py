@@ -8,7 +8,8 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
-from django.db.models import Case, Value, When
+from django.db.models import Case, Value, When, CharField, F
+from django.db.models.functions import Concat, Trim
 import structlog
 
 
@@ -43,6 +44,18 @@ report_code_label_mapping = Case(
 )
 
 
+version_labels = {
+    "F3XN": "Original",
+    "F3XA": "Amendment",
+    "F3XT": "Termination",
+    "F24N": "Original",
+    "F24A": "Amendment",
+    "F1MN": "Original",
+    "F1MA": "Amendment",
+    "F99": "Original",
+}
+
+
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -53,9 +66,34 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
-    queryset = Report.objects.annotate(
-        report_code_label=report_code_label_mapping
-    ).all()
+    whens = [When(form_type=k, then=Value(v)) for k, v in version_labels.items()]
+
+    queryset = (
+        Report.objects.annotate(report_code_label=report_code_label_mapping)
+        .annotate(
+            form_type_label=Case(
+                *whens,
+                default=Value(""),
+                output_field=CharField(),
+            ),
+            report_version_label=Case(
+                When(report_version__isnull=True, then=Value("")),
+                default=F("report_version"),
+                output_field=CharField(),
+            ),
+        )
+        .annotate(
+            version_label=Trim(
+                Concat(
+                    F("form_type_label"),
+                    Value(" "),
+                    F("report_version_label"),
+                    output_field=CharField(),
+                )
+            )
+        )
+        .all()
+    )
 
     serializer_class = ReportSerializer
     filter_backends = [filters.OrderingFilter]
@@ -65,6 +103,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         "form_type",
         "upload_submission__created",
         "report_status",
+        "version_label",
     ]
     ordering = ["form_type"]
 
