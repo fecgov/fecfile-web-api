@@ -84,7 +84,8 @@ class ContactSerializer(
             ),
         )
 
-        representation["has_transaction_or_report"] = query.exists()
+        if self.context.get("request") and "contacts" in self.context["request"].path:
+            representation["has_transaction_or_report"] = query.exists()
 
         return representation
 
