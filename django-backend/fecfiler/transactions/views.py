@@ -325,9 +325,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
-        return Response(
-            [TransactionSerializer().to_representation(data) for data in saved_data]
-        )
+        ids = []
+        for data in saved_data:
+            ids.append(data.id)
+        return Response(ids)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
