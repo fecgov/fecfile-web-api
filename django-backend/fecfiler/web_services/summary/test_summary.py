@@ -212,3 +212,11 @@ class F3XReportTestCase(TestCase):
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
         self.assertTrue("line_8" in summary_a)
+
+    def test_report_with_none_cash_on_hand(self):
+        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x.form_3x.L6a_cash_on_hand_jan_1_ytd = None
+        f3x.form_3x.save()
+        summary_service = SummaryService(f3x)
+        summary_a, _ = summary_service.calculate_summary()
+        self.assertFalse("line_8" in summary_a)

@@ -1,5 +1,6 @@
 from django.test import TestCase
 import datetime
+from decimal import Decimal
 from .dot_fec_serializer import (
     serialize_field,
     serialize_instance,
@@ -61,8 +62,15 @@ class DotFECSerializerTestCase(TestCase):
             self.f3x, "L6b_cash_on_hand_beginning_period", f3x_field_mappings
         )
         self.assertEqual(serialized_numeric, "6.00")
-        serialized_numeric_undefined = serialize_field(
-            Report(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
+        self.f3x.form_3x.L6b_cash_on_hand_beginning_period = Decimal("0.00")
+        serialized_numeric_0 = serialize_field(  # 0.00 should be serialized as 0.00
+            self.f3x, "L6b_cash_on_hand_beginning_period", f3x_field_mappings
+        )
+        self.assertEqual(serialized_numeric_0, "0.00")
+        serialized_numeric_undefined = (
+            serialize_field(  # undefined should be serialized as ""
+                Report(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
+            )
         )
         self.assertEqual(serialized_numeric_undefined, "")
 
