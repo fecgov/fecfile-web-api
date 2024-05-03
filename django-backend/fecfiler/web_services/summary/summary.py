@@ -248,7 +248,7 @@ class SummaryService:
             column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
 
         # if we have cash on hand values
-        if column_a.get("line_6b") != None and column_b.get("line_6a") != None:
+        if column_a.get("line_6b") is not None and column_b.get("line_6a") is not None:
             column_a["line_6d"] = column_a["line_6b"] + column_a["line_6c"]
             column_a["line_8"] = column_a["line_6d"] - column_a["line_7"]
             column_b["line_6d"] = column_b["line_6a"] + column_b["line_6c"]
