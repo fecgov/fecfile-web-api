@@ -219,7 +219,7 @@ def register_committee(committee_id, user):
             f1_email = f1_line.split(FS_STR)[11]
 
     failure_reason = None
-    if f1_email != email:
+    if not f1_email or f1_email.lower() != email.lower():
         failure_reason = f"Email {email} does not match committee email"
 
     existing_account = CommitteeAccount.objects.filter(
