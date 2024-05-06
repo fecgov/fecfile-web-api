@@ -275,12 +275,19 @@ def calculate_summary(report_id):
             Report.objects.filter(
                 id=report.id, calculation_token=calculation_token
             ).update(
-                calculation_status=CalculationState.SUCCEEDED, calculation_token=None
+                calculation_status=CalculationState.SUCCEEDED,
+                calculation_token=None
             )
         )
 
         # If we failed to update, do not calculate any further reports
         if not updated:
+            logger.info(
+                f"Report: {report.id} (token: {calculation_token}) "
+                "recalculation cancelled"
+            )
             break
+
+        logger.info(f"Report: {report.id} recalculated")
 
     return primary_report.id
