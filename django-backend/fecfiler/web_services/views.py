@@ -158,6 +158,6 @@ class WebServicesViewSet(viewsets.ViewSet):
         report = Report.objects.filter(
             id=report_id, committee_account_id=committee_uuid
         ).first()
-        if report.calculation_status != CalculationState.SUCCEEDED:
+        if report.calculation_status != CalculationState.SUCCEEDED.value:
             return calculate_summary.s(report_id)
         return None
