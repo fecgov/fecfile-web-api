@@ -1,6 +1,7 @@
 from datetime import datetime
 import math
 from unittest.mock import patch
+from uuid import UUID
 from django.test import TestCase, RequestFactory
 from fecfiler.web_services.views import WebServicesViewSet
 from rest_framework.test import force_authenticate
@@ -81,6 +82,10 @@ class WebServicesViewSetTest(TestCase):
         id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
 
         request = self.factory.get(f"api/v1/web-services/dot-fec/{id}")
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
         force_authenticate(request, user=self.user)
         response = self.view.get_dot_fec(request, id)
 

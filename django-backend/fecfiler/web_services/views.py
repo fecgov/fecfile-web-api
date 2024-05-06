@@ -69,8 +69,10 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Download the most recent .FEC created for a report
         Currently only useful for testing purposes
         """
-
-        dot_fec_record = DotFEC.objects.filter(id=id)
+        committee_uuid = request.session["committee_uuid"]
+        dot_fec_record = DotFEC.objects.filter(
+            id=id, report__committee_account_id=committee_uuid
+        )
         if not dot_fec_record.exists():
             not_found_msg = f"No .FEC was found for id: {id}"
             logger.error(not_found_msg)
