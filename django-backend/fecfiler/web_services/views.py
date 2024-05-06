@@ -42,7 +42,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         task = self.get_calculation_task(request, report_id)
         if task:
-            task = task | create_dot_fec.s()
+            task = (task | create_dot_fec.s()).apply_async()
         else:
             task = create_dot_fec.apply_async((report_id, None, None), retry=False)
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
@@ -132,7 +132,6 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Start tracking submission"""
         submission_id = WebPrintSubmission.objects.initiate_submission(report_id).id
-        print(f"ahoy: {submission_id}")
 
         """Start Celery tasks in chain
         Notice that we don't send the upload submission id to `create_dot_fec`
@@ -147,8 +146,8 @@ class WebServicesViewSet(viewsets.ViewSet):
         else:
             task = create_dot_fec.s(report_id, webprint_submission_id=submission_id)
 
-        task = task | submit_to_webprint.s(
-            submission_id, FEC_FILING_API, False
+        task = (
+            task | submit_to_webprint.s(submission_id, FEC_FILING_API, False)
         ).apply_async(retry=False)
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
