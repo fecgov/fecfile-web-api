@@ -110,5 +110,6 @@ fecfiler.reports.form\_24.views.Form24ViewSet
       ~Form24ViewSet.throttle_classes
       ~Form24ViewSet.versioning_class
       ~Form24ViewSet.view_is_async
+      ~Form24ViewSet.whens
    
    

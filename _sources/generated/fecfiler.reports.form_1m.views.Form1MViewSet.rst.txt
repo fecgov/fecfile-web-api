@@ -110,5 +110,6 @@ fecfiler.reports.form\_1m.views.Form1MViewSet
       ~Form1MViewSet.throttle_classes
       ~Form1MViewSet.versioning_class
       ~Form1MViewSet.view_is_async
+      ~Form1MViewSet.whens
    
    
