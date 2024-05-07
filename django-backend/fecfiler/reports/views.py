@@ -70,7 +70,8 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     queryset = (
         Report.objects.annotate(report_code_label=report_code_label_mapping)
-        .annotate(
+        # alias fields used by the version_label annotation only. not part of payload
+        .alias(
             form_type_label=Case(
                 *whens,
                 default=Value(""),
