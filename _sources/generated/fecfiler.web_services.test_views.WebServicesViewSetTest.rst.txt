@@ -1,0 +1,137 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.test\_views.WebServicesViewSetTest
+=========================================================
+
+.. currentmodule:: fecfiler.web_services.test_views
+
+.. autoclass:: WebServicesViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WebServicesViewSetTest.__init__
+      ~WebServicesViewSetTest.addClassCleanup
+      ~WebServicesViewSetTest.addCleanup
+      ~WebServicesViewSetTest.addTypeEqualityFunc
+      ~WebServicesViewSetTest.assertAlmostEqual
+      ~WebServicesViewSetTest.assertAlmostEquals
+      ~WebServicesViewSetTest.assertContains
+      ~WebServicesViewSetTest.assertCountEqual
+      ~WebServicesViewSetTest.assertDictContainsSubset
+      ~WebServicesViewSetTest.assertDictEqual
+      ~WebServicesViewSetTest.assertEqual
+      ~WebServicesViewSetTest.assertEquals
+      ~WebServicesViewSetTest.assertFalse
+      ~WebServicesViewSetTest.assertFieldOutput
+      ~WebServicesViewSetTest.assertFormError
+      ~WebServicesViewSetTest.assertFormSetError
+      ~WebServicesViewSetTest.assertFormsetError
+      ~WebServicesViewSetTest.assertGreater
+      ~WebServicesViewSetTest.assertGreaterEqual
+      ~WebServicesViewSetTest.assertHTMLEqual
+      ~WebServicesViewSetTest.assertHTMLNotEqual
+      ~WebServicesViewSetTest.assertIn
+      ~WebServicesViewSetTest.assertInHTML
+      ~WebServicesViewSetTest.assertIs
+      ~WebServicesViewSetTest.assertIsInstance
+      ~WebServicesViewSetTest.assertIsNone
+      ~WebServicesViewSetTest.assertIsNot
+      ~WebServicesViewSetTest.assertIsNotNone
+      ~WebServicesViewSetTest.assertJSONEqual
+      ~WebServicesViewSetTest.assertJSONNotEqual
+      ~WebServicesViewSetTest.assertLess
+      ~WebServicesViewSetTest.assertLessEqual
+      ~WebServicesViewSetTest.assertListEqual
+      ~WebServicesViewSetTest.assertLogs
+      ~WebServicesViewSetTest.assertMultiLineEqual
+      ~WebServicesViewSetTest.assertNoLogs
+      ~WebServicesViewSetTest.assertNotAlmostEqual
+      ~WebServicesViewSetTest.assertNotAlmostEquals
+      ~WebServicesViewSetTest.assertNotContains
+      ~WebServicesViewSetTest.assertNotEqual
+      ~WebServicesViewSetTest.assertNotEquals
+      ~WebServicesViewSetTest.assertNotIn
+      ~WebServicesViewSetTest.assertNotIsInstance
+      ~WebServicesViewSetTest.assertNotRegex
+      ~WebServicesViewSetTest.assertNotRegexpMatches
+      ~WebServicesViewSetTest.assertNumQueries
+      ~WebServicesViewSetTest.assertQuerySetEqual
+      ~WebServicesViewSetTest.assertQuerysetEqual
+      ~WebServicesViewSetTest.assertRaises
+      ~WebServicesViewSetTest.assertRaisesMessage
+      ~WebServicesViewSetTest.assertRaisesRegex
+      ~WebServicesViewSetTest.assertRaisesRegexp
+      ~WebServicesViewSetTest.assertRedirects
+      ~WebServicesViewSetTest.assertRegex
+      ~WebServicesViewSetTest.assertRegexpMatches
+      ~WebServicesViewSetTest.assertSequenceEqual
+      ~WebServicesViewSetTest.assertSetEqual
+      ~WebServicesViewSetTest.assertTemplateNotUsed
+      ~WebServicesViewSetTest.assertTemplateUsed
+      ~WebServicesViewSetTest.assertTrue
+      ~WebServicesViewSetTest.assertTupleEqual
+      ~WebServicesViewSetTest.assertURLEqual
+      ~WebServicesViewSetTest.assertWarns
+      ~WebServicesViewSetTest.assertWarnsMessage
+      ~WebServicesViewSetTest.assertWarnsRegex
+      ~WebServicesViewSetTest.assertXMLEqual
+      ~WebServicesViewSetTest.assertXMLNotEqual
+      ~WebServicesViewSetTest.assert_
+      ~WebServicesViewSetTest.captureOnCommitCallbacks
+      ~WebServicesViewSetTest.countTestCases
+      ~WebServicesViewSetTest.debug
+      ~WebServicesViewSetTest.defaultTestResult
+      ~WebServicesViewSetTest.doClassCleanups
+      ~WebServicesViewSetTest.doCleanups
+      ~WebServicesViewSetTest.fail
+      ~WebServicesViewSetTest.failIf
+      ~WebServicesViewSetTest.failIfAlmostEqual
+      ~WebServicesViewSetTest.failIfEqual
+      ~WebServicesViewSetTest.failUnless
+      ~WebServicesViewSetTest.failUnlessAlmostEqual
+      ~WebServicesViewSetTest.failUnlessEqual
+      ~WebServicesViewSetTest.failUnlessRaises
+      ~WebServicesViewSetTest.id
+      ~WebServicesViewSetTest.modify_settings
+      ~WebServicesViewSetTest.run
+      ~WebServicesViewSetTest.setUp
+      ~WebServicesViewSetTest.setUpClass
+      ~WebServicesViewSetTest.setUpTestData
+      ~WebServicesViewSetTest.settings
+      ~WebServicesViewSetTest.shortDescription
+      ~WebServicesViewSetTest.skipTest
+      ~WebServicesViewSetTest.subTest
+      ~WebServicesViewSetTest.tearDown
+      ~WebServicesViewSetTest.tearDownClass
+      ~WebServicesViewSetTest.test_check_dot_fec_not_ready
+      ~WebServicesViewSetTest.test_check_dot_fec_ready
+      ~WebServicesViewSetTest.test_create_dot_fec
+      ~WebServicesViewSetTest.test_get_dot_fec_not_exists
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WebServicesViewSetTest.available_apps
+      ~WebServicesViewSetTest.databases
+      ~WebServicesViewSetTest.fixtures
+      ~WebServicesViewSetTest.longMessage
+      ~WebServicesViewSetTest.maxDiff
+      ~WebServicesViewSetTest.reset_sequences
+      ~WebServicesViewSetTest.serialized_rollback
+   
+   

@@ -40,6 +40,7 @@ fecfiler.web\_services
    fecfiler.web_services.tasks
    fecfiler.web_services.test_models
    fecfiler.web_services.test_tasks
+   fecfiler.web_services.test_views
    fecfiler.web_services.test_web_service_storage
    fecfiler.web_services.urls
    fecfiler.web_services.views

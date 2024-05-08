@@ -21,6 +21,7 @@ fecfiler.web\_services.views.WebServicesViewSet
    
       ~WebServicesViewSet.__init__
       ~WebServicesViewSet.as_view
+      ~WebServicesViewSet.check_dot_fec
       ~WebServicesViewSet.check_object_permissions
       ~WebServicesViewSet.check_permissions
       ~WebServicesViewSet.check_throttles
