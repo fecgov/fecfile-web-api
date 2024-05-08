@@ -39,7 +39,7 @@ def create_dot_fec(
         if file_name is None:
             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
-        if not file_content or not file_name:
+        if not file_content:
             raise Exception("No file created")
         store_file(file_content, file_name, force_write_to_disk)
         dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
