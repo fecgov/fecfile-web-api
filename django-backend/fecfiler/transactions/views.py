@@ -289,15 +289,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return self.queryset.get(id=transaction_instance.id)
 
-    @action(detail=False, methods=["put"], url_path=r"multisave")
-    def save_transactions(self, request):
-        with db_transaction.atomic():
-            saved_data = [self.save_transaction(data, request) for data in request.data]
-        ids = []
-        for data in saved_data:
-            ids.append(data.id)
-        return Response(ids)
-
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
@@ -321,7 +312,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 request.data[1]["reatt_redes"] = reatt_redes
                 request.data[1]["reatt_redes_id"] = reatt_redes.id
                 child = request.data[1].get("children", [])[0]
-                child["reatt_redes"] = reatt_redes
+                child[" "] = reatt_redes
                 child["reatt_redes_id"] = reatt_redes.id
                 request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)

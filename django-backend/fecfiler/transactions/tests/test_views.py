@@ -175,32 +175,6 @@ class TransactionViewsTestCase(TestCase):
         transaction = response.data
         self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "58.00")
 
-    def test_multisave_transactions(self):
-        txn1 = deepcopy(self.payloads["IN_KIND"])
-        txn1["contact_1"]["last_name"] = "one"
-        txn2 = deepcopy(self.payloads["IN_KIND"])
-        txn2["contact_1"]["last_name"] = "two"
-        txn3 = deepcopy(self.payloads["IN_KIND"])
-        txn3["contact_1"]["last_name"] = "three"
-
-        payload = [txn1, txn2, txn3]
-
-        view_set = TransactionViewSet()
-        view_set.format_kwarg = {}
-        request = self.factory.put(
-            "/api/v1/transactions/multisave/",
-            json.dumps(payload),
-            content_type=self.json_content_type,
-        )
-        request.user = self.user
-        request.data = deepcopy(payload)
-        view_set.request = request
-
-        view_set = TransactionViewSet()
-        response = view_set.save_transactions(self.request(payload))
-        transactions = response.data
-        self.assertEqual(len(transactions), 3)
-
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
         txn1["contributor_last_name"] = "one"
