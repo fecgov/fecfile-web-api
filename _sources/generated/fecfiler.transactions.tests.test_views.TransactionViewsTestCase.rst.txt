@@ -119,7 +119,6 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_get_previous_entity
       ~TransactionViewsTestCase.test_get_queryset
       ~TransactionViewsTestCase.test_inherited_election_aggregate
-      ~TransactionViewsTestCase.test_multisave_transactions
       ~TransactionViewsTestCase.test_reatt_redes_multisave_transactions
       ~TransactionViewsTestCase.test_remove_transaction_from_report
       ~TransactionViewsTestCase.test_save_debt
