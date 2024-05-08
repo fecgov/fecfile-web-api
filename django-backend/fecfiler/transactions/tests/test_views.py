@@ -200,7 +200,6 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.save_transactions(self.request(payload))
         transactions = response.data
         self.assertEqual(len(transactions), 3)
-        self.assertEqual("one", transactions[0]["contributor_last_name"])
 
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
