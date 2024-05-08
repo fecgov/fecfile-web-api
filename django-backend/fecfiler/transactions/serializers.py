@@ -257,10 +257,17 @@ class TransactionSerializer(
                 instance.reatt_redes
             )
 
+        representation["reports"] = []
         representation["report_ids"] = []
         for report in instance.reports.all():
             representation["report_ids"].append(report.id)
-        representation.pop("reports")
+            representation["reports"].append({
+                "id": report.id,
+                "coverage_from_date": report.coverage_from_date,
+                "coverage_through_date": report.coverage_through_date,
+                "report_code": report.report_code,
+                "report_type": report.report_type
+            })
 
         return representation
 
