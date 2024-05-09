@@ -11,8 +11,6 @@ from fecfiler.web_services.summary.tasks import CalculationState
 import math
 from unittest.mock import patch
 from uuid import UUID
-import datetime
-import structlog
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
@@ -28,6 +26,7 @@ class WebServicesViewSetTest(TestCase):
         create_committee_view(self.committee.id)
         self.committee.members.add(self.user)
         self.factory = RequestFactory()
+        self.view = WebServicesViewSet()
         self.task_id = "testTaskId"
 
     def test_create_dot_fec(self):
@@ -40,6 +39,7 @@ class WebServicesViewSetTest(TestCase):
         )
         force_authenticate(request, self.user)
         request.session = {"committee_uuid": self.committee.id}
+
         response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
@@ -131,37 +131,6 @@ class WebServicesViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {"done": False})
-
-    @patch("fecfiler.web_services.views.create_dot_fec.apply_async")
-    def test_create_dot_fec(self, mock_apply_async):
-        mock_instance = mock_apply_async.return_value
-        mock_instance.task_id = "testTaskId"
-
-        data = {
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
-        }
-        request = self.factory.post(
-            "api/v1/web-services/dot-fec/", data, "application/json"
-        )
-        request.data = data
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-        force_authenticate(request, user=self.user)
-        response = self.view.create_dot_fec(request)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            {
-                "file_name": (
-                    f"{data['report_id']}_{math.floor(datetime.now().timestamp())}.fec"
-                ),
-                "task_id": mock_instance.task_id,
-            },
-        )
 
     def test_get_dot_fec_not_exists(self):
         id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
