@@ -110,9 +110,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     Value(""),
                     output_field=TextField(),
                 ),
-                email=Coalesce(
-                    "user__email", "pending_email", output_field=TextField()
-                ),
+                email=Coalesce("user__email", "pending_email", output_field=TextField()),
                 is_active=~Q(user=None),
             )
         )
@@ -129,9 +127,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(
-        detail=False, methods=["post"], url_path="add-member", url_name="add_member"
-    )
+    @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
         committee_uuid = self.request.session["committee_uuid"]
         committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
@@ -161,7 +157,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         # Check for pre-existing membership
         matching_memberships = self.get_queryset().filter(
-            Q(pending_email=email) | Q(user__email=email)
+            Q(pending_email__iexact=email) | Q(user__email__iexact=email)
         )
         if matching_memberships.count() > 0:
             return Response(
@@ -219,12 +215,18 @@ def register_committee(committee_id, user):
             f1_email = f1_line.split(FS_STR)[11]
 
     failure_reason = None
-    if f1_email != email:
+
+    if ";" in f1_email:
+        f1_email = f1_email.split(";")
+    elif "," in f1_email:
+        f1_email = f1_email.split(",")
+    else:
+        f1_email = [f1_email]
+
+    if email not in f1_email:
         failure_reason = f"Email {email} does not match committee email"
 
-    existing_account = CommitteeAccount.objects.filter(
-        committee_id=committee_id
-    ).first()
+    existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
         failure_reason = f"Committee {committee_id} already registered"
 

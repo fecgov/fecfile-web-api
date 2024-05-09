@@ -1,3 +1,5 @@
+import math
+from datetime import datetime
 from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -14,6 +16,8 @@ from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.reports.models import Report
+from celery.result import AsyncResult
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -40,30 +44,44 @@ class WebServicesViewSet(viewsets.ViewSet):
         report_id = serializer.validated_data["report_id"]
         logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
 
+        file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
         task = self.get_calculation_task(request, report_id)
         if task:
-            task = (task | create_dot_fec.s()).apply_async()
+            task = (task | create_dot_fec.s(None, None, False, file_name)).apply_async()
         else:
-            task = create_dot_fec.apply_async((report_id, None, None), retry=False)
+            task = create_dot_fec.apply_async(
+                (report_id, None, None, False, file_name), retry=False
+            )
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
-        return Response({"status": ".FEC task created"})
+        return Response({"file_name": file_name, "task_id": task.task_id})
 
     @action(
         detail=False,
         methods=["get"],
-        url_path="dot-fec/(?P<report_id>[a-z0-9-]+)",
+        url_path="dot-fec/check/(?P<task_id>[a-z0-9-]+)",
+    )
+    def check_dot_fec(self, request, task_id):
+        res = AsyncResult(task_id)
+        if res.ready():
+            return Response({"done": True, "id": res.get()})
+        return Response({"done": False})
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="dot-fec/(?P<id>[a-z0-9-]+)",
         renderer_classes=(DotFECRenderer,),
     )
-    def get_dot_fec(self, request, report_id):
+    def get_dot_fec(self, request, id):
         """Download the most recent .FEC created for a report
         Currently only useful for testing purposes
         """
         committee_uuid = request.session["committee_uuid"]
         dot_fec_record = DotFEC.objects.filter(
-            report__id=report_id, report__committee_account_id=committee_uuid
-        ).order_by("-file_name")
+            id=id, report__committee_account_id=committee_uuid
+        )
         if not dot_fec_record.exists():
-            not_found_msg = f"No .FEC was found for report id: {report_id}"
+            not_found_msg = f"No .FEC was found for id: {id}"
             logger.error(not_found_msg)
             return Response(not_found_msg, status=status.HTTP_400_BAD_REQUEST)
         file_name = dot_fec_record.first().file_name
