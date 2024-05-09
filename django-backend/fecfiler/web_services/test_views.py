@@ -8,7 +8,6 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.web_services.summary.tasks import CalculationState
 
-import math
 from unittest.mock import patch
 from uuid import UUID
 
