@@ -7,11 +7,13 @@ from fecfiler.web_services.tasks import (
     submit_to_fec,
     submit_to_webprint,
 )
+from fecfiler.web_services.summary.tasks import CalculationState, calculate_summary
 from fecfiler.settings import FEC_FILING_API
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
+from fecfiler.reports.models import Report
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -37,7 +39,12 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
         logger.debug(f"Starting Celery Task create_dot_fec for report :{report_id}")
-        task = create_dot_fec.apply_async((report_id, None, None), retry=False)
+
+        task = self.get_calculation_task(request, report_id)
+        if task:
+            task = (task | create_dot_fec.s()).apply_async()
+        else:
+            task = create_dot_fec.apply_async((report_id, None, None), retry=False)
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"status": ".FEC task created"})
 
@@ -83,13 +90,22 @@ class WebServicesViewSet(viewsets.ViewSet):
         backdoor_code = serializer.validated_data.get("backdoor_code", None)
 
         """Start tracking submission"""
-        upload_submission = UploadSubmission.objects.initiate_submission(report_id)
+        submission_id = UploadSubmission.objects.initiate_submission(report_id).id
 
-        """Start Celery tasks in chain"""
+        """Start Celery tasks in chain
+        Check to see if calculating the summary is necessary. If not, just start
+        then chain with create_dot_fec
+        """
+        task = self.get_calculation_task(request, report_id)
+        if task:
+            task = task | create_dot_fec.s(upload_submission_id=submission_id)
+        else:
+            task = create_dot_fec.s(report_id, upload_submission_id=submission_id)
+
         task = (
-            create_dot_fec.s(report_id, upload_submission_id=upload_submission.id)
+            task
             | submit_to_fec.s(
-                upload_submission.id,
+                submission_id,
                 e_filing_password,
                 FEC_FILING_API,
                 False,
@@ -115,16 +131,33 @@ class WebServicesViewSet(viewsets.ViewSet):
         report_id = serializer.validated_data["report_id"]
 
         """Start tracking submission"""
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(report_id)
+        submission_id = WebPrintSubmission.objects.initiate_submission(report_id).id
 
         """Start Celery tasks in chain
-        Notice that we don't send the submission id to `create_dot_fec`
+        Notice that we don't send the upload submission id to `create_dot_fec`
         We don't want the .FEC to be signed for WebPrint
+
+        Check to see if calculating the summary is necessary. If not, just start
+        then chain with create_dot_fec
         """
+        task = self.get_calculation_task(request, report_id)
+        if task:
+            task = task | create_dot_fec.s(webprint_submission_id=submission_id)
+        else:
+            task = create_dot_fec.s(report_id, webprint_submission_id=submission_id)
+
         task = (
-            create_dot_fec.s(report_id, webprint_submission_id=webprint_submission.id)
-            | submit_to_webprint.s(webprint_submission.id, FEC_FILING_API, False)
+            task | submit_to_webprint.s(submission_id, FEC_FILING_API, False)
         ).apply_async(retry=False)
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
+
+    def get_calculation_task(self, request, report_id):
+        committee_uuid = request.session["committee_uuid"]
+        report = Report.objects.filter(
+            id=report_id, committee_account_id=committee_uuid
+        ).first()
+        if report.calculation_status != CalculationState.SUCCEEDED.value:
+            return calculate_summary.s(report_id)
+        return None

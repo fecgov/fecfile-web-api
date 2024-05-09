@@ -48,20 +48,6 @@ def compose_transactions(report_id):
             transaction.filer_committee_id_number = (
                 FILE_AS_TEST_COMMITTEE or transaction.committee_account.committee_id
             )
-            # TODO: improve itemization inheritance.
-            # We should not have to determine it here
-            root_id = (
-                transaction.parent_transaction.parent_transaction.id
-                if transaction.parent_transaction
-                and transaction.parent_transaction.parent_transaction
-                else (
-                    transaction.parent_transaction.id
-                    if transaction.parent_transaction
-                    else transaction.id
-                )
-            )
-            root = transactions.filter(id=root_id).first()
-            transaction.itemized = root.itemized
 
             if transaction.schedule_a:
                 add_schedule_a_contact_fields(transaction)
@@ -77,10 +63,6 @@ def compose_transactions(report_id):
                 add_schedule_d_contact_fields(transaction)
             if transaction.schedule_e:
                 add_schedule_e_contact_fields(transaction)
-                # Assign child IE's their parent's calendar ytd per election
-                transaction.calendar_ytd_per_election_office = (
-                    root.calendar_ytd_per_election_office
-                )
 
         return [t for t in transactions if (t.itemized or report.form_24 is not None)]
     else:

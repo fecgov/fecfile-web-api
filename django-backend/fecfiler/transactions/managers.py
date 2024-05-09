@@ -219,10 +219,12 @@ class TransactionManager(SoftDeleteManager):
         return Case(
             When(
                 schedule_c__isnull=False,
-                then=Coalesce(Window(
-                    expression=Sum("effective_amount"),
-                    **self.loan_payment_window
-                ), Value(Decimal(0)))
+                then=Coalesce(
+                    Window(
+                        expression=Sum("effective_amount"), **self.loan_payment_window
+                    ),
+                    Value(Decimal(0)),
+                ),
             )
         )
 
@@ -369,6 +371,7 @@ class TransactionViewManager(Manager):
                     "_itemized",
                 ),
                 calendar_ytd_per_election_office=Coalesce(
+                    "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",  # noqa
                     "view_parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),

@@ -17,21 +17,12 @@ class F24SerializerTestCase(TestCase):
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "AL",
-            "zip": "12345",
             "report_type_24_48": "48",
             "original_amendment_date": "2023-11-01",
             "fields_to_validate": [f.name for f in Form24._meta.get_fields()],
         }
 
         self.invalid_f24_report = {
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "AL",
             "report_type_24_48": "90c",
             "committee_type": "WAY TOO MANY CHARS",
         }
@@ -60,5 +51,4 @@ class F24SerializerTestCase(TestCase):
             },
         )
         self.assertFalse(invalid_serializer.is_valid())
-        self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["report_type_24_48"])

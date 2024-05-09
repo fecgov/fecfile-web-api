@@ -85,6 +85,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -121,13 +122,18 @@ CORS_ALLOW_CREDENTIALS = True
 DATABASES = {
     # Be sure to set the DATABASE_URL environment variable on your local
     # development machine so that the local database can be connected to.
-    "default": dj_database_url.config()
+    "default": dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Connection string for connecting directly
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
 
 # OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
@@ -167,6 +173,7 @@ ALLOW_LOGOUT_GET_METHOD = True
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
+FFAPI_TIMEOUT_COOKIE_NAME = "ffapi_timeout"
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
@@ -224,15 +231,20 @@ def get_logging_config(log_format=LINE):
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(
-                    colors=True, exception_formatter=structlog.dev.rich_traceback
-                ),
+                "processors": [
+                    structlog.dev.ConsoleRenderer(
+                        colors=True, exception_formatter=structlog.dev.rich_traceback
+                    )
+                ],
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["level", "event", "logger"]
-                ),
+                "processors": [
+                    structlog.processors.ExceptionRenderer(),
+                    structlog.processors.KeyValueRenderer(
+                        key_order=["level", "event", "logger"]
+                    ),
+                ],
             },
         },
         "handlers": {
@@ -275,45 +287,27 @@ def get_logging_config(log_format=LINE):
     return logging_config
 
 
-def get_env_logging_processors(log_format=LINE):
+def get_logging_processors():
     """
     get structlog processors
-    depending on environment
-    env.space will None on local.
     We will need to set these explicitly for Celery too
     """
-
-    if log_format == LINE:
-        # Remove format_exc_info to pretty-print exceptions locally
-        return [
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ]
-    else:
-        # Key/Value in production
-        return [
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.format_exc_info,
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ]
+    return [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ]
 
 
 LOGGING = get_logging_config(LOG_FORMAT)
 
 structlog.configure(
-    processors=get_env_logging_processors(LOG_FORMAT),
+    processors=get_logging_processors(),
     logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,
 )
@@ -359,7 +353,7 @@ FEC_API = env.get_credential("FEC_API")
 FEC_API_KEY = env.get_credential("FEC_API_KEY")
 FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
-FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/"
+FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
 
 """MOCK OPENFEC settings"""

@@ -164,6 +164,19 @@ Set up git secrets to protect oneself from committing sensitive information such
   NOTE: The pre-commit hook is installed GLOBALLY by default so commits to all cloned repositories on your computer will be scanned for sensitive data. See the comments at the top of the script for local install options.
 - See git-secrets README for more features: https://github.com/awslabs/git-secrets#readme
 
+### Code formatting
+[Black](https://github.com/psf/black) is the Python code formatter used on the project.
+
+- Install using `pip install black`.
+- If using vscode, add (or update) the following section of your settings.json to the following so that code is formatted on save:
+```
+"[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
+}
+```
+- To format a specific file or directory manually, use `black <file_or_directory>`
+
 ### Commit local code changes to origin daily
 
 As a best practice policy, please commit any feature code changes made during the day to origin each evening before signing off for the day.

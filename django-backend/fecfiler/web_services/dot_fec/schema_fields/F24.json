@@ -9,21 +9,11 @@
         "path": "form_24.original_amendment_date"
     },
     "committee_name": {},
-    "street_1": {
-        "path": "form_24.street_1"
-    },
-    "street_2": {
-        "path": "form_24.street_2"
-    },
-    "city": {
-        "path": "form_24.city"
-    },
-    "state": {
-        "path": "form_24.state"
-    },
-    "zip": {
-        "path": "form_24.zip"
-    },
+    "street_1": {},
+    "street_2": {},
+    "city": {},
+    "state": {},
+    "zip": {},
     "treasurer_last_name": {},
     "treasurer_first_name": {},
     "treasurer_middle_name": {},

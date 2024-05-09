@@ -112,6 +112,46 @@ class TransactionViewTestCase(TestCase):
             view[0].back_reference_tran_id_number, partnership_receipt.transaction_id
         )
 
+    def test_transaction_view_list_with_grandparent(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+        )
+        jf_transfer.save()
+
+        parnership_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="50.00",
+        )
+        parnership_jf_transfer_memo.parent_transaction = jf_transfer
+        parnership_jf_transfer_memo.save()
+
+        parnership_attribution_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="5.00",
+        )
+        parnership_attribution_jf_transfer_memo.parent_transaction = (
+            parnership_jf_transfer_memo
+        )
+        parnership_attribution_jf_transfer_memo.save()
+
+        view = get_read_model(self.committee.id).objects.all()
+        self.assertEqual(view[0].itemized, True)
+        self.assertEqual(view[0].calendar_ytd_per_election_office, 500)
+        self.assertEqual(view[1].itemized, True)
+        self.assertEqual(view[1].calendar_ytd_per_election_office, 500)
+        self.assertEqual(view[2].itemized, True)
+        self.assertEqual(view[2].calendar_ytd_per_election_office, 500)
+
     def test_refund_aggregate(self):
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",

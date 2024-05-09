@@ -25,11 +25,6 @@ class Form3XSerializer(ReportSerializer):
 
     is_first = BooleanField(read_only=True, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
-    street_1 = CharField(required=False, allow_null=True)
-    street_2 = CharField(required=False, allow_null=True)
-    city = CharField(required=False, allow_null=True)
-    state = CharField(required=False, allow_null=True)
-    zip = CharField(required=False, allow_null=True)
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
     state_of_election = CharField(required=False, allow_null=True)
@@ -390,11 +385,7 @@ class Form3XSerializer(ReportSerializer):
     class Meta(ReportSerializer.Meta):
         fields = (
             ReportSerializer.Meta.get_fields()
-            + [
-                f.name
-                for f in Form3X._meta.get_fields()
-                if f.name not in ["committee_name", "report"]
-            ]
+            + [f.name for f in Form3X._meta.get_fields() if f.name not in ["report"]]
             + ["fields_to_validate", "is_first"]
         )
 

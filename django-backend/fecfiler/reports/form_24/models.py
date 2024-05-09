@@ -18,11 +18,6 @@ class Form24(models.Model):
 
     report_type_24_48 = models.TextField(null=True, blank=True)
     original_amendment_date = models.DateField(null=True, blank=True)
-    street_1 = models.TextField(null=True, blank=True)
-    street_2 = models.TextField(null=True, blank=True)
-    city = models.TextField(null=True, blank=True)
-    state = models.TextField(null=True, blank=True)
-    zip = models.TextField(null=True, blank=True)
 
     class Meta:
         app_label = "reports"
