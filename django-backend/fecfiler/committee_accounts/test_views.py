@@ -53,7 +53,7 @@ class CommitteeMemberViewSetTest(TestCase):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")
         view = CommitteeMembershipViewSet()
         request = self.factory.get(
-            "/api/v1/committee-members/{membership_uuid}/remove-member"
+            f"/api/v1/committee-members/{membership_uuid}/remove-member"
         )
         request.user = self.user
         request.session = {
