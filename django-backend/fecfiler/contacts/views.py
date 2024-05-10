@@ -6,7 +6,7 @@ import requests
 from django.db.models import CharField, Q, Value
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
@@ -40,6 +40,11 @@ def validate_and_sanitize_candidate(candidate_id):
     return candidate_id
 
 
+class ContactListPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+
+
 class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -47,6 +52,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     """
 
     serializer_class = ContactSerializer
+    pagination_class = ContactListPagination
 
     """Note that this ViewSet inherits from CommitteeOwnedViewMixin
     The queryset will be further limmited by the user's committee
@@ -72,6 +78,17 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         "id",
     ]
     ordering = ["-created"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "page" in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False)
     def candidate(self, request):
@@ -182,9 +199,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
 
         fecfile_committees = list(
             self.get_queryset()
-            .filter(
-                Q(type="COM") & (Q(committee_id__icontains=q) | Q(name__icontains=q))
-            )
+            .filter(Q(type="COM") & (Q(committee_id__icontains=q) | Q(name__icontains=q)))
             .exclude(id__in=exclude_ids)
             .values()
             .order_by("-committee_id")
@@ -313,6 +328,7 @@ class DeletedContactsViewSet(
     GenericViewSet,
 ):
     serializer_class = ContactSerializer
+    pagination_class = ContactListPagination
 
     queryset = (
         Contact.all_objects.filter(deleted__isnull=False)
@@ -334,6 +350,17 @@ class DeletedContactsViewSet(
         "id",
     ]
     ordering = ["-created"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "page" in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
     def restore(self, request):
