@@ -1,4 +1,4 @@
-from rest_framework import filters, status
+from rest_framework import filters, status, pagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -11,7 +11,6 @@ from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, CharField, F
 from django.db.models.functions import Concat, Trim
 import structlog
-
 
 logger = structlog.get_logger(__name__)
 
@@ -56,6 +55,11 @@ version_labels = {
 }
 
 
+class ReportListPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+
+
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -97,6 +101,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     )
 
     serializer_class = ReportSerializer
+    pagination_class = ReportListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "report_code_label",
