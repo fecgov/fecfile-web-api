@@ -20,7 +20,6 @@ fecfiler.transactions.managers.TransactionViewManager
    .. autosummary::
    
       ~TransactionViewManager.LINE_LABEL_CLAUSE
-      ~TransactionViewManager.LINE_LABEL_ORDER_CLAUSE
       ~TransactionViewManager.ORDER_KEY_CLAUSE
       ~TransactionViewManager.__init__
       ~TransactionViewManager.aaggregate
