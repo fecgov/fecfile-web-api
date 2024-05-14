@@ -42,7 +42,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
-        "line_label_order_key",
+        "line_label",
         "created",
         "transaction_type_identifier",
         "memo_code",

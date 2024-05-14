@@ -376,7 +376,6 @@ class TransactionViewManager(Manager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
-                line_label_order_key=self.LINE_LABEL_ORDER_CLAUSE(),
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
@@ -428,12 +427,6 @@ class TransactionViewManager(Manager):
     C = ["SC/9", "SC/10"]
     D = ["SD9", "SD10"]
     E = ["SE"]
-
-    def LINE_LABEL_ORDER_CLAUSE(self):  # noqa: N802
-        order = self.C + self.D + self.A_11 + self.A + self.B + self.E
-        return Case(
-            *[When(form_type=line, then=Value(i)) for i, line in enumerate(order)]
-        )
 
     def LINE_LABEL_CLAUSE(self):  # noqa: N802
         label_map = {

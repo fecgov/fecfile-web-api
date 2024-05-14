@@ -48,7 +48,7 @@ def default_serializer(model_instance, field_name, mapping):
     "None", thus the falsy condition
     """
     value = get_value_from_path(model_instance, mapping.get("path", None) or field_name)
-    return str(value) if value else ""
+    return str(value) if value is not None else ""
 
 
 """A map of model field types to their serializers.
@@ -89,9 +89,11 @@ def serialize_instance(schema_name, instance):
     column_sequences, row_length = extract_row_config(schema_name)
     field_mappings = get_field_mappings(schema_name)
     row = [
-        serialize_field(instance, column_sequences[column_index + 1], field_mappings)
-        if (column_index + 1) in column_sequences
-        else ""
+        (
+            serialize_field(instance, column_sequences[column_index + 1], field_mappings)
+            if (column_index + 1) in column_sequences
+            else ""
+        )
         for column_index in range(0, row_length)
     ]
     return FS_STR.join(row)

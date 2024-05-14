@@ -63,7 +63,7 @@ class DotFECSubmitter:
                     "report_id": fec_report_id or str(uuid()),
                 }
             )
-        logger.debug("FEC upload response: {response}")
+        logger.debug(f"FEC upload response: {response}")
         return response
 
     def poll_status(self, submission_id):

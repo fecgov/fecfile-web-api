@@ -11,42 +11,54 @@ def migrate_committee_data(apps, schema_editor):
     Form1m = apps.get_model("reports", "Form1M")  # noqa
 
     for form in Form24.objects.all():
-        report = Report.objects.get(form_24=form)
-        report.street_1 = form.street_1
-        report.street_2 = form.street_2
-        report.city = form.city
-        report.state = form.state
-        report.zip = form.zip
-        report.save()
+        report = Report.objects.filter(form_24=form).first()
+        if report is not None:
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            print("Report not found for ", form)
 
     for form in Form3x.objects.all():
-        report = Report.objects.get(form_3x=form)
-        report.street_1 = form.street_1
-        report.street_2 = form.street_2
-        report.city = form.city
-        report.state = form.state
-        report.zip = form.zip
-        report.save()
+        report = Report.objects.filter(form_3x=form).first()
+        if report is not None:
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            print("Report not found for ", form)
 
     for form in Form99.objects.all():
-        report = Report.objects.get(form_99=form)
-        report.committee_name = form.committee_name
-        report.street_1 = form.street_1
-        report.street_2 = form.street_2
-        report.city = form.city
-        report.state = form.state
-        report.zip = form.zip
-        report.save()
+        report = Report.objects.filter(form_99=form).first()
+        if report is not None:
+            report.committee_name = form.committee_name
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            print("Report not found for ", form)
 
     for form in Form1m.objects.all():
-        report = Report.objects.get(form_1m=form)
-        report.committee_name = form.committee_name
-        report.street_1 = form.street_1
-        report.street_2 = form.street_2
-        report.city = form.city
-        report.state = form.state
-        report.zip = form.zip
-        report.save()
+        report = Report.objects.filter(form_1m=form).first()
+        if report is not None:
+            report.committee_name = form.committee_name
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            print("Report not found for ", form)
 
 
 class Migration(migrations.Migration):
