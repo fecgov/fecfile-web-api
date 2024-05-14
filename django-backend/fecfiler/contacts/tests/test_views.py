@@ -1,12 +1,12 @@
 from unittest import mock
-
 from django.test import RequestFactory, TestCase
 from rest_framework.test import force_authenticate
 import uuid
 
 from fecfiler.user.models import User
-from .models import Contact
-from .views import ContactViewSet, DeletedContactsViewSet
+from ..models import Contact
+from ..views import ContactViewSet, DeletedContactsViewSet
+from .utils import create_test_individual_contact
 
 mock_results = {
     "results": [
@@ -69,9 +69,7 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
-        request = self.factory.get(
-            "/api/v1/contacts/candidate?" "candidate_id=P60012143"
-        )
+        request = self.factory.get("/api/v1/contacts/candidate?" "candidate_id=P60012143")
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
 
@@ -282,9 +280,7 @@ class ContactViewSetTest(TestCase):
         response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data, uuid.UUID("a03a141a-d2df-402c-93c6-e705ec6007f3")
-        )
+        self.assertEqual(response.data, uuid.UUID("a03a141a-d2df-402c-93c6-e705ec6007f3"))
 
     def test_get_contact_id_no_match(self):
         request = self.factory.get(
@@ -363,3 +359,42 @@ class ContactViewSetTest(TestCase):
         response = ContactViewSet.as_view({"put": "update"})(request, pk=contact.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["first_name"], "Other")
+
+    def test_list_paginated(self):
+        view = ContactViewSet()
+        view.format_kwarg = "format"
+        request = self.factory.get("/api/v1/contacts")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": uuid.UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+
+        for i in range(10):
+            create_test_individual_contact(
+                f"last{i}", f"first{i}", "11111111-2222-3333-4444-555555555555"
+            )
+        request.method = "GET"
+        request.query_params = {"page": 1}
+        view.request = request
+        response = view.list(request)
+        self.assertEqual(len(response.data["results"]), 10)
+
+    def test_list_no_pagination(self):
+        view = ContactViewSet()
+        view.format_kwarg = "format"
+        request = self.factory.get("/api/v1/contacts")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": uuid.UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        request.method = "GET"
+        request.query_params = {}
+        view.request = request
+        response = view.list(request)
+        try:
+            response.data["results"]  # A non-paginated response will throw an error here
+            self.assertTrue(response is None)
+        except TypeError:
+            self.assertTrue(response is not None)
