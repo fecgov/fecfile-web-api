@@ -79,17 +79,6 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     ]
     ordering = ["-created"]
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
     @action(detail=False)
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
@@ -350,17 +339,6 @@ class DeletedContactsViewSet(
         "id",
     ]
     ordering = ["-created"]
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
     def restore(self, request):

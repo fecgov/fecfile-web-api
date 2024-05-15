@@ -91,6 +91,17 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
             raise SuspiciousSession("session has invalid committee_id")
         return committee_id
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "page" in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
@@ -120,17 +131,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 is_active=~Q(user=None),
             )
         )
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
