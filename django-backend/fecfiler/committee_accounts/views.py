@@ -1,6 +1,6 @@
 from uuid import UUID
 from fecfiler.user.models import User
-from rest_framework import filters, viewsets, mixins
+from rest_framework import filters, viewsets, mixins, pagination
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.transactions.models import (
     Transaction,
@@ -25,6 +25,11 @@ import structlog
 from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
+
+
+class CommitteeMemberListPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
 
 
 class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -86,9 +91,21 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
             raise SuspiciousSession("session has invalid committee_id")
         return committee_id
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "page" in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
+    pagination_class = CommitteeMemberListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["name", "email", "role", "is_active", "created"]
     ordering = ["-created"]
@@ -114,18 +131,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 is_active=~Q(user=None),
             )
         )
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
