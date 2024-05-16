@@ -29,6 +29,7 @@ fecfiler.contacts.views
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      ContactListPagination
       ContactViewSet
       DeletedContactsViewSet
    

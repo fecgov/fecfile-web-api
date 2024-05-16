@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.contacts.test\_views.ContactViewSetTest
-================================================
+fecfiler.contacts.tests.test\_views.ContactViewSetTest
+======================================================
 
-.. currentmodule:: fecfiler.contacts.test_views
+.. currentmodule:: fecfiler.contacts.tests.test_views
 
 .. autoclass:: ContactViewSetTest
    :members:                                    
@@ -126,6 +126,8 @@ fecfiler.contacts.test\_views.ContactViewSetTest
       ~ContactViewSetTest.test_get_contact_id_no_match
       ~ContactViewSetTest.test_individual_lookup_happy_path
       ~ContactViewSetTest.test_individual_lookup_no_q
+      ~ContactViewSetTest.test_list_no_pagination
+      ~ContactViewSetTest.test_list_paginated
       ~ContactViewSetTest.test_organization_lookup_happy_path
       ~ContactViewSetTest.test_organization_lookup_no_q
       ~ContactViewSetTest.test_restore

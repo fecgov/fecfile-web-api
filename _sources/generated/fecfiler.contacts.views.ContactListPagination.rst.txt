@@ -1,0 +1,55 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.contacts.views.ContactListPagination
+=============================================
+
+.. currentmodule:: fecfiler.contacts.views
+
+.. autoclass:: ContactListPagination
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ContactListPagination.__init__
+      ~ContactListPagination.get_html_context
+      ~ContactListPagination.get_next_link
+      ~ContactListPagination.get_page_number
+      ~ContactListPagination.get_page_size
+      ~ContactListPagination.get_paginated_response
+      ~ContactListPagination.get_paginated_response_schema
+      ~ContactListPagination.get_previous_link
+      ~ContactListPagination.get_results
+      ~ContactListPagination.get_schema_fields
+      ~ContactListPagination.get_schema_operation_parameters
+      ~ContactListPagination.paginate_queryset
+      ~ContactListPagination.to_html
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ContactListPagination.display_page_controls
+      ~ContactListPagination.invalid_page_message
+      ~ContactListPagination.last_page_strings
+      ~ContactListPagination.max_page_size
+      ~ContactListPagination.page_query_description
+      ~ContactListPagination.page_query_param
+      ~ContactListPagination.page_size
+      ~ContactListPagination.page_size_query_description
+      ~ContactListPagination.page_size_query_param
+      ~ContactListPagination.template
+   
+   

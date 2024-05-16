@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
 
-fecfiler.contacts.test\_serializers.ContactSerializerTestCase
-=============================================================
+fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
+===================================================================
 
-.. currentmodule:: fecfiler.contacts.test_serializers
+.. currentmodule:: fecfiler.contacts.tests.test_serializers
 
 .. autoclass:: ContactSerializerTestCase
    :members:                                    

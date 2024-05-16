@@ -30,6 +30,7 @@ fecfiler.committee\_accounts.views
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      CommitteeMemberListPagination
       CommitteeMembershipViewSet
       CommitteeOwnedViewMixin
       CommitteeViewSet

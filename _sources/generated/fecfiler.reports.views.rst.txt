@@ -29,6 +29,7 @@ fecfiler.reports.views
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      ReportListPagination
       ReportViewMixin
       ReportViewSet
    

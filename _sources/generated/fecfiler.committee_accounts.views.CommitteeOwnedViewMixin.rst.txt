@@ -56,6 +56,7 @@ fecfiler.committee\_accounts.views.CommitteeOwnedViewMixin
       ~CommitteeOwnedViewMixin.http_method_not_allowed
       ~CommitteeOwnedViewMixin.initial
       ~CommitteeOwnedViewMixin.initialize_request
+      ~CommitteeOwnedViewMixin.list
       ~CommitteeOwnedViewMixin.options
       ~CommitteeOwnedViewMixin.paginate_queryset
       ~CommitteeOwnedViewMixin.perform_authentication

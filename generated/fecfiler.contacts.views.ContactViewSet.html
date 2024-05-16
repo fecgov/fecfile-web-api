@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fecfiler.contacts.views.DeletedContactsViewSet" href="fecfiler.contacts.views.DeletedContactsViewSet.html" />
-    <link rel="prev" title="fecfiler.contacts.views.validate_and_sanitize_candidate" href="fecfiler.contacts.views.validate_and_sanitize_candidate.html" />
+    <link rel="prev" title="fecfiler.contacts.views.ContactListPagination" href="fecfiler.contacts.views.ContactListPagination.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -588,7 +588,10 @@ determine what kind of exception to raise.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.pagination_class">
 <span class="sig-name descname"><span class="pre">pagination_class</span></span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.pagination_class" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">PageNumberPagination</span></code></p>
+<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewMixin
+The queryset will be further limmited by the user’s committee
+in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
+<p>alias of <a class="reference internal" href="fecfiler.contacts.views.ContactListPagination.html#fecfiler.contacts.views.ContactListPagination" title="fecfiler.contacts.views.ContactListPagination"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContactListPagination</span></code></a></p>
 </dd></dl>
 
 <dl class="py property">
@@ -627,10 +630,7 @@ will instead be performed lazily, the first time either
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.contacts.views.ContactViewSet.serializer_class">
 <span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#fecfiler.contacts.views.ContactViewSet.serializer_class" title="Link to this definition">¶</a></dt>
-<dd><p>Note that this ViewSet inherits from CommitteeOwnedViewMixin
-The queryset will be further limmited by the user’s committee
-in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
-<p>alias of <a class="reference internal" href="fecfiler.contacts.serializers.ContactSerializer.html#fecfiler.contacts.serializers.ContactSerializer" title="fecfiler.contacts.serializers.ContactSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContactSerializer</span></code></a></p>
+<dd><p>alias of <a class="reference internal" href="fecfiler.contacts.serializers.ContactSerializer.html#fecfiler.contacts.serializers.ContactSerializer" title="fecfiler.contacts.serializers.ContactSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContactSerializer</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -678,12 +678,11 @@ in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.models.html">fecfiler.contacts.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.serializers.html">fecfiler.contacts.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.signals.html">fecfiler.contacts.signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.test_models.html">fecfiler.contacts.test_models</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.test_serializers.html">fecfiler.contacts.test_serializers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.test_views.html">fecfiler.contacts.test_views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.tests.html">fecfiler.contacts.tests</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.contacts.urls.html">fecfiler.contacts.urls</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.contacts.views.html">fecfiler.contacts.views</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.contacts.views.validate_and_sanitize_candidate.html">fecfiler.contacts.views.validate_and_sanitize_candidate</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.contacts.views.ContactListPagination.html">fecfiler.contacts.views.ContactListPagination</a></li>
 <li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.contacts.views.ContactViewSet</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet"><code class="docutils literal notranslate"><span class="pre">ContactViewSet</span></code></a><ul>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.contacts.views.ContactViewSet.__init__"><code class="docutils literal notranslate"><span class="pre">ContactViewSet.__init__()</span></code></a></li>
@@ -773,7 +772,7 @@ in CommitteeOwnedViewMixin’s implementation of get_queryset()</p>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.contacts.html">fecfiler.contacts</a><ul>
   <li><a href="fecfiler.contacts.views.html">fecfiler.contacts.views</a><ul>
-      <li>Previous: <a href="fecfiler.contacts.views.validate_and_sanitize_candidate.html" title="previous chapter">fecfiler.contacts.views.validate_and_sanitize_candidate</a></li>
+      <li>Previous: <a href="fecfiler.contacts.views.ContactListPagination.html" title="previous chapter">fecfiler.contacts.views.ContactListPagination</a></li>
       <li>Next: <a href="fecfiler.contacts.views.DeletedContactsViewSet.html" title="next chapter">fecfiler.contacts.views.DeletedContactsViewSet</a></li>
   </ul></li>
   </ul></li>

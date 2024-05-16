@@ -1,0 +1,55 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.views.ReportListPagination
+===========================================
+
+.. currentmodule:: fecfiler.reports.views
+
+.. autoclass:: ReportListPagination
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportListPagination.__init__
+      ~ReportListPagination.get_html_context
+      ~ReportListPagination.get_next_link
+      ~ReportListPagination.get_page_number
+      ~ReportListPagination.get_page_size
+      ~ReportListPagination.get_paginated_response
+      ~ReportListPagination.get_paginated_response_schema
+      ~ReportListPagination.get_previous_link
+      ~ReportListPagination.get_results
+      ~ReportListPagination.get_schema_fields
+      ~ReportListPagination.get_schema_operation_parameters
+      ~ReportListPagination.paginate_queryset
+      ~ReportListPagination.to_html
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportListPagination.display_page_controls
+      ~ReportListPagination.invalid_page_message
+      ~ReportListPagination.last_page_strings
+      ~ReportListPagination.max_page_size
+      ~ReportListPagination.page_query_description
+      ~ReportListPagination.page_query_param
+      ~ReportListPagination.page_size
+      ~ReportListPagination.page_size_query_description
+      ~ReportListPagination.page_size_query_param
+      ~ReportListPagination.template
+   
+   
