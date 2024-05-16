@@ -69,7 +69,7 @@ class ContactViewSetTest(TestCase):
 
     @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
-        request = self.factory.get("/api/v1/contacts/candidate?" "candidate_id=P60012143")
+        request = self.factory.get("/api/v1/contacts/candidate?candidate_id=P60012143")
         request.user = self.user
         response = ContactViewSet.as_view({"get": "candidate"})(request)
 
@@ -217,7 +217,7 @@ class ContactViewSetTest(TestCase):
 
     def test_individual_lookup_happy_path(self):
         request = self.factory.get(
-            "/api/v1/contacts/individual_lookup?" "q=Lastname&max_fecfile_results=5"
+            "/api/v1/contacts/individual_lookup?q=Lastname&max_fecfile_results=5"
         )
         request.user = self.user
         request.session = {
@@ -227,7 +227,7 @@ class ContactViewSetTest(TestCase):
 
         response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
 
-        expected_json_fragment = '"last_name": "Lastname", "first_name": ' '"Firstname"'
+        expected_json_fragment = '"last_name": "Lastname", "first_name": "Firstname"'
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
@@ -246,7 +246,7 @@ class ContactViewSetTest(TestCase):
 
     def test_organization_lookup_happy_path(self):
         request = self.factory.get(
-            "/api/v1/contacts/organization_lookup?" "q=test&max_fecfile_results=5"
+            "/api/v1/contacts/organization_lookup?q=test&max_fecfile_results=5"
         )
         request.user = self.user
         request.session = {
