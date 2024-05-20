@@ -222,7 +222,7 @@ def register_committee(committee_id, user):
     failure_reason = None
 
     if not f1_email:
-        failure_reason = f"No email provided in F1"
+        failure_reason = "No email provided in F1"
     else:
         f1_email_lowercase = f1_email.lower()
         f1_emails = []
