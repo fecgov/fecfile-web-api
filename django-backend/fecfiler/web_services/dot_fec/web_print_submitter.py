@@ -33,7 +33,7 @@ class WebPrintSubmitter:
                     "batch_id": 123,
                 }
             )
-        logger.debug("FEC upload response: {response}")
+        logger.debug(f"FEC upload response: {response}")
         return response
 
     def poll_status(self, batch_id, submission_id):
