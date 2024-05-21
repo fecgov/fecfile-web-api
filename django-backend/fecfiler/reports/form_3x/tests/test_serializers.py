@@ -103,7 +103,6 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        print(f"ahoy:{f3x_report.upload_submission.fec_status}")
         self.assertEquals(representation["report_status"], "Submission success")
 
         # an error occured at some point on our side after the user submitted

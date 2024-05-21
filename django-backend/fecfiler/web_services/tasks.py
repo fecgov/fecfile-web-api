@@ -26,6 +26,7 @@ def create_dot_fec(
     upload_submission_id=None,
     webprint_submission_id=None,
     force_write_to_disk=False,
+    file_name=None,
 ):
     if upload_submission_id:
         submission = UploadSubmission.objects.get(id=upload_submission_id)
@@ -35,9 +36,10 @@ def create_dot_fec(
         submission.save_state(FECSubmissionState.CREATING_FILE)
     try:
         file_content = compose_dot_fec(report_id, upload_submission_id)
-        file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
+        if file_name is None:
+            file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
-        if not file_content or not file_name:
+        if not file_content:
             raise Exception("No file created")
         store_file(file_content, file_name, force_write_to_disk)
         dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)

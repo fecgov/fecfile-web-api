@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Contact
+from ..models import Contact
 
 
 class ContactTestCase(TestCase):
@@ -34,6 +34,4 @@ class ContactTestCase(TestCase):
         self.assertEquals(soft_deleted_contact.first_name, "First")
         self.assertIsNotNone(soft_deleted_contact.deleted)
         soft_deleted_contact.hard_delete()
-        self.assertRaises(
-            Contact.DoesNotExist, Contact.all_objects.get, last_name="Last"
-        )
+        self.assertRaises(Contact.DoesNotExist, Contact.all_objects.get, last_name="Last")

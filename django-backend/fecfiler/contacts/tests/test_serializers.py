@@ -1,6 +1,6 @@
 from django.test import TestCase
-from .models import Contact
-from .serializers import ContactSerializer
+from ..models import Contact
+from ..serializers import ContactSerializer
 from rest_framework.request import HttpRequest, Request
 from fecfiler.user.models import User
 
