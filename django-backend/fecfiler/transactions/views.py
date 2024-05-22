@@ -275,9 +275,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
-                child_transaction = self.get_queryset().get(id=child_transaction_data)
-                child_transaction.parent_transaction_id = transaction_instance.id
-                child_transaction.save()
+                Transaction.objects.filter(id=child_transaction_data).update(
+                    parent_transaction_id=transaction_instance.id
+                )
             else:
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
