@@ -82,6 +82,11 @@ INSTALLED_APPS = [
     "fecfiler.mock_openfec",
 ]
 
+SPECTACULAR_SETTINGS = {
+    "SCHEMA_PATH_PREFIX": "/api/v[0-9]",  # restores nice tagging
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -324,9 +329,7 @@ CELERY_TASK_SERIALIZER = "json"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
-CELERY_WORKER_STORAGE = env.get_credential(
-    "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
-)
+CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
 
 """FEC Webload settings
 """
