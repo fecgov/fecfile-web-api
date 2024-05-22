@@ -114,6 +114,7 @@ fecfiler.committee\_accounts.test\_views.CommitteeAccountsViewsTest
       ~CommitteeAccountsViewsTest.tearDown
       ~CommitteeAccountsViewsTest.tearDownClass
       ~CommitteeAccountsViewsTest.test_register_committee
+      ~CommitteeAccountsViewsTest.test_register_committee_case_insensitive
       ~CommitteeAccountsViewsTest.test_register_committee_existing
       ~CommitteeAccountsViewsTest.test_register_committee_mismatch_email
    
