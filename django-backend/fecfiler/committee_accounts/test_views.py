@@ -41,6 +41,18 @@ class CommitteeAccountsViewsTest(TestCase):
             user=self.other_user,
         )
 
+    def test_register_committee_case_insensitive(self):
+        self.test_user.email = self.test_user.email.upper()
+        account = register_committee("C12345678", self.test_user)
+        self.assertEquals(account.committee_id, "C12345678")
+        self.assertRaisesMessage(
+            Exception,
+            self.register_error_message,
+            register_committee,
+            committee_id="C12345678",
+            user=self.test_user,
+        )
+
 
 class CommitteeMemberViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee", "unaffiliated_users"]

@@ -221,15 +221,20 @@ def register_committee(committee_id, user):
 
     failure_reason = None
 
-    if ";" in f1_email:
-        f1_email = f1_email.split(";")
-    elif "," in f1_email:
-        f1_email = f1_email.split(",")
+    if not f1_email:
+        failure_reason = "No email provided in F1"
     else:
-        f1_email = [f1_email]
+        f1_email_lowercase = f1_email.lower()
+        f1_emails = []
+        if ";" in f1_email_lowercase:
+            f1_emails = f1_email_lowercase.split(";")
+        elif "," in f1_email_lowercase:
+            f1_emails = f1_email_lowercase.split(",")
+        else:
+            f1_emails = [f1_email_lowercase]
 
-    if email not in f1_email:
-        failure_reason = f"Email {email} does not match committee email"
+        if email.lower() not in f1_emails:
+            failure_reason = f"Email {email} does not match committee email"
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
