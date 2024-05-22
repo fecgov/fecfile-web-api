@@ -7,6 +7,7 @@ applications:
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
+    health-check-type: port
     command: bin/run-api.sh
     memory: 2G
     services:
