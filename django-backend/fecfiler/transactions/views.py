@@ -70,7 +70,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             model = get_read_model(committee_uuid)
             queryset = model.objects
 
-        logger.debug(self.request.data)
         report_id = (
             (
                 self.request.query_params.get("report_id")
