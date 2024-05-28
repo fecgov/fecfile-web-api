@@ -8,10 +8,16 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.web_services.summary.tasks import CalculationState
 
+from unittest.mock import patch
+from uuid import UUID
+
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
 class WebServicesViewSetTest(TestCase):
-    fixtures = ["C01234567_user_and_committee"]
+    fixtures = [
+        "C01234567_user_and_committee",
+        "test_f3x_reports",
+    ]
 
     def setUp(self):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
@@ -19,6 +25,8 @@ class WebServicesViewSetTest(TestCase):
         create_committee_view(self.committee.id)
         self.committee.members.add(self.user)
         self.factory = RequestFactory()
+        self.view = WebServicesViewSet()
+        self.task_id = "testTaskId"
 
     def test_create_dot_fec(self):
         report = create_form3x(
@@ -30,6 +38,7 @@ class WebServicesViewSetTest(TestCase):
         )
         force_authenticate(request, self.user)
         request.session = {"committee_uuid": self.committee.id}
+
         response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
@@ -97,3 +106,41 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
         # assert that summary was caclulated
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
+
+    @patch("fecfiler.web_services.views.AsyncResult")
+    def test_check_dot_fec_ready(self, mock_async_result):
+        request = self.factory.get(f"api/v1/web-services/dot-fec/check/{self.task_id}")
+        mock_instance = mock_async_result.return_value
+        mock_instance.ready.return_value = True
+        mock_instance.get.return_value = "testId"
+        self.view.request = request
+        response = self.view.check_dot_fec(request, self.task_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"done": True, "id": "testId"})
+
+    @patch("fecfiler.web_services.views.AsyncResult")
+    def test_check_dot_fec_not_ready(self, mock_async_result):
+        request = self.factory.get(f"api/v1/web-services/dot-fec/check/{self.task_id}")
+        mock_instance = mock_async_result.return_value
+        mock_instance.ready.return_value = False
+        mock_instance.get.return_value = "testId"
+        self.view.request = request
+        response = self.view.check_dot_fec(request, self.task_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"done": False})
+
+    def test_get_dot_fec_not_exists(self):
+        id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+
+        request = self.factory.get(f"api/v1/web-services/dot-fec/{id}")
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        force_authenticate(request, user=self.user)
+        response = self.view.get_dot_fec(request, id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, f"No .FEC was found for id: {id}")

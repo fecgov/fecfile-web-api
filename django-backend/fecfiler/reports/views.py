@@ -1,4 +1,4 @@
-from rest_framework import filters, status
+from rest_framework import filters, status, pagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -8,9 +8,9 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
-from django.db.models import Case, Value, When
+from django.db.models import Case, Value, When, CharField, F
+from django.db.models.functions import Concat, Trim
 import structlog
-
 
 logger = structlog.get_logger(__name__)
 
@@ -43,6 +43,23 @@ report_code_label_mapping = Case(
 )
 
 
+version_labels = {
+    "F3XN": "Original",
+    "F3XA": "Amendment",
+    "F3XT": "Termination",
+    "F24N": "Original",
+    "F24A": "Amendment",
+    "F1MN": "Original",
+    "F1MA": "Amendment",
+    "F99": "Original",
+}
+
+
+class ReportListPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+
+
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -53,11 +70,38 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
-    queryset = Report.objects.annotate(
-        report_code_label=report_code_label_mapping
-    ).all()
+    whens = [When(form_type=k, then=Value(v)) for k, v in version_labels.items()]
+
+    queryset = (
+        Report.objects.annotate(report_code_label=report_code_label_mapping)
+        # alias fields used by the version_label annotation only. not part of payload
+        .alias(
+            form_type_label=Case(
+                *whens,
+                default=Value(""),
+                output_field=CharField(),
+            ),
+            report_version_label=Case(
+                When(report_version__isnull=True, then=Value("")),
+                default=F("report_version"),
+                output_field=CharField(),
+            ),
+        )
+        .annotate(
+            version_label=Trim(
+                Concat(
+                    F("form_type_label"),
+                    Value(" "),
+                    F("report_version_label"),
+                    output_field=CharField(),
+                )
+            )
+        )
+        .all()
+    )
 
     serializer_class = ReportSerializer
+    pagination_class = ReportListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
         "report_code_label",
@@ -65,6 +109,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         "form_type",
         "upload_submission__created",
         "report_status",
+        "version_label",
     ]
     ordering = ["form_type"]
 
@@ -145,17 +190,6 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class ReportViewMixin(GenericViewSet):

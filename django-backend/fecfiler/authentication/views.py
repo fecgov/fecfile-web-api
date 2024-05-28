@@ -44,7 +44,7 @@ def login_dot_gov_logout(request):
     }
     query = urlencode(params)
     op_logout_url = OIDC_OP_LOGOUT_ENDPOINT
-    redirect_url = "{url}?{query}".format(url=op_logout_url, query=query)
+    redirect_url = f"{op_logout_url}?{query}"
 
     return redirect_url
 
@@ -54,13 +54,13 @@ def generate_username(uuid):
 
 
 def handle_valid_login(user):
-    logger.debug("Successful login: {}".format(user))
+    logger.debug(f"Successful login: {user}")
     response = HttpResponse()
     return response
 
 
 def handle_invalid_login(username):
-    logger.debug("Unauthorized login attempt: {}".format(username))
+    logger.debug(f"Unauthorized login attempt: {username}")
     return HttpResponse('Unauthorized', status=401)
 
 
