@@ -1,0 +1,6 @@
+fecfiler.user.migrations.0006\_remove\_old\_login\_accounts.remove\_old\_login\_accounts
+========================================================================================
+
+.. currentmodule:: fecfiler.user.migrations.0006_remove_old_login_accounts
+
+.. autofunction:: remove_old_login_accounts
