@@ -37,14 +37,16 @@ def create_schedule_b(
     )
 
 
-def create_ie(committee, contact, date, amount, code):
+def create_ie(committee, contact, disbursement_date, dissemination_date, amount, code):
     return create_test_transaction(
         "INDEPENDENT_EXPENDITURE",
         ScheduleE,
         committee,
         contact_2=contact,
+        group="INDEPENDENT_EXPENDITURE",
         schedule_data={
-            "disbursement_date": date,
+            "disbursement_date": disbursement_date,
+            "dissemination_date": dissemination_date,
             "expenditure_amount": amount,
             "election_code": code,
         },

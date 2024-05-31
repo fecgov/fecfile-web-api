@@ -15,7 +15,6 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
-from fecfiler.transactions.calculations import update_calculated_fields
 
 import uuid
 import structlog
@@ -180,8 +179,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.memo_text.save()
 
         super(Transaction, self).save(*args, **kwargs)
-
-        update_calculated_fields(self)
 
         for report in self.reports.all():
             update_recalculation(report)
