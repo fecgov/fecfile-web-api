@@ -1,6 +1,6 @@
 from enum import Enum
 from celery import shared_task
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from django.db.models import Q
 from .summary import SummaryService
 import uuid
@@ -21,8 +21,7 @@ class CalculationState(Enum):
 
 
 def get_reports_to_calculate(primary_report):
-    coverage_from_date = primary_report.coverage_from_date
-    if coverage_from_date is None:
+    if not hasattr(primary_report, "coverage_from_date"):
         return primary_report
 
     report_year = primary_report.coverage_from_date.year
@@ -43,6 +42,9 @@ def calculate_summary(report_id):
         primary_report = Report.objects.get(id=report_id)
     except Exception:
         return None
+
+    if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
+        return primary_report.id
 
     reports_to_recalculate = get_reports_to_calculate(primary_report)
     calculation_token = uuid.uuid4()
