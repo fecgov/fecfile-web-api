@@ -13,8 +13,10 @@ def create_form3x(committee, coverage_from, coverage_through, data={}):
 def create_form24(committee, data={}):
     return create_test_report(Form24, committee, data=data)
 
+
 def create_form99(committee, data={}):
     return create_test_report(Form99, committee, data=data)
+
 
 def create_form1m(committee, data={}):
     return create_test_report(Form1M, committee, data=data)
