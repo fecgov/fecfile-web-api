@@ -21,6 +21,10 @@ class CalculationState(Enum):
 
 
 def get_reports_to_calculate(primary_report):
+    coverage_from_date = primary_report.coverage_from_date
+    if coverage_from_date is None:
+        return primary_report
+
     report_year = primary_report.coverage_from_date.year
     reports_to_recalculate = Report.objects.filter(
         ~Q(calculation_status=CalculationState.SUCCEEDED),
