@@ -177,7 +177,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             id=report_id, committee_account_id=committee_uuid
         ).first()
         if (
-            report.get_form_name() in FORMS_TO_CALCULATE 
+            report.get_form_name() in FORMS_TO_CALCULATE
             and report.calculation_status != CalculationState.SUCCEEDED.value
         ):
             return calculate_summary.s(report_id)
