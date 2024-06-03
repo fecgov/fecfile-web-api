@@ -5,7 +5,7 @@ from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
-from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.reports.tests.utils import create_form3x, create_form24
 from fecfiler.web_services.summary.tasks import CalculationState
 
 from unittest.mock import patch
@@ -54,6 +54,18 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
         # assert that summary was caclulated
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
+
+    def test_create_dot_fec_form_24(self):
+        report = create_form24(self.committee)
+        request = self.factory.post(
+            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
+        )
+        force_authenticate(request, self.user)
+        request.session = {"committee_uuid": self.committee.id}
+
+        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
+        self.assertEqual(response.status_code, 200)
+        report.refresh_from_db()
 
     def test_submit_to_webprint(self):
         report = create_form3x(
