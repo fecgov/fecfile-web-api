@@ -5,7 +5,9 @@ from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
-from fecfiler.reports.tests.utils import create_form3x, create_form24, create_form99, create_form1m
+from fecfiler.reports.tests.utils import (
+	create_form3x, create_form24, create_form99, create_form1m
+)
 from fecfiler.web_services.summary.tasks import CalculationState
 
 from unittest.mock import patch
