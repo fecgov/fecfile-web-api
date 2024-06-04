@@ -20,7 +20,7 @@ class CalculationState(Enum):
         return str(self.value)
 
 
-def get_reports_to_calculate(primary_report):
+def get_reports_to_calculate_by_coverage_date(primary_report):
     if not hasattr(primary_report, "coverage_from_date"):
         return primary_report
 
@@ -46,7 +46,9 @@ def calculate_summary(report_id):
     if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
         return primary_report.id
 
-    reports_to_recalculate = get_reports_to_calculate(primary_report)
+    reports_to_recalculate = get_reports_to_calculate_by_coverage_date(
+        primary_report
+    )
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
         calculation_token=calculation_token,
