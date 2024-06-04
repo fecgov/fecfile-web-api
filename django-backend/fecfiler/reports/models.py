@@ -160,6 +160,10 @@ TABLE_TO_FORM = {
     "form_1m": "F1M",
 }
 
+FORMS_TO_CALCULATE = [
+    "F3X",
+]
+
 
 def update_recalculation(report: Report):
     if report:
