@@ -102,3 +102,10 @@ the duration of the testing session.  There are (as of writing) four tasks:
 - Load Contacts
 - Load Reports
 - Load Transactions
+
+
+# Silk Profiling
+
+In addition to load testing, Silk query profiling can be installed to inspect queries and response times.
+
+Installation instructions for local development can be found [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
