@@ -1,0 +1,6 @@
+fecfiler.reports.tests.utils.create\_form1m
+===========================================
+
+.. currentmodule:: fecfiler.reports.tests.utils
+
+.. autofunction:: create_form1m

@@ -17,7 +17,7 @@ fecfiler.web\_services.summary.tasks
    .. autosummary::
       :toctree:                                          
    
-      get_reports_to_calculate
+      get_reports_to_calculate_by_coverage_date
    
    
 

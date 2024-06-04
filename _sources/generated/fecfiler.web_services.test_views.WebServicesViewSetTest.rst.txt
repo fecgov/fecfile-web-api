@@ -116,6 +116,9 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.test_check_dot_fec_not_ready
       ~WebServicesViewSetTest.test_check_dot_fec_ready
       ~WebServicesViewSetTest.test_create_dot_fec
+      ~WebServicesViewSetTest.test_create_dot_fec_form_1m
+      ~WebServicesViewSetTest.test_create_dot_fec_form_24
+      ~WebServicesViewSetTest.test_create_dot_fec_form_99
       ~WebServicesViewSetTest.test_get_dot_fec_not_exists
       ~WebServicesViewSetTest.test_submit_to_fec
       ~WebServicesViewSetTest.test_submit_to_webprint
