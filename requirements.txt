@@ -28,3 +28,4 @@ git+https://github.com/fecgov/mozilla-django-oidc.git@5a813c15fba5463a2907b2e22a
 zeep==4.2.1
 django-structlog[celery]==7.1.0
 rich==13.7.0
+django-silk

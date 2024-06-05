@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
+    "silk",
     "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
@@ -93,6 +94,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
+    'silk.middleware.SilkyMiddleware',
 ]
 
 TEMPLATES = [
@@ -362,3 +364,6 @@ if MOCK_OPENFEC == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 else:
     MOCK_OPENFEC_REDIS_URL = None
+
+"""SILKY PROFILING SETTINGS"""
+SILKY_PYTHON_PROFILER=True
