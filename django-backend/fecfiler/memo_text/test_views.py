@@ -2,23 +2,26 @@ from django.test import TestCase, RequestFactory
 from fecfiler.user.models import User
 from rest_framework.test import APIClient
 from .views import MemoTextViewSet
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class MemoTextViewSetTest(TestCase):
-    fixtures = ["test_f3x_reports", "test_memo_text", "C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        create_committee_view(self.committee.id)
+        self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.factory = RequestFactory()
 
     def test_get_memo_texts_for_report_id(self):
-        request = self.factory.get(
-            "/api/v1/memo-text/?report_id=b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        request = self.factory.get(f"/api/v1/memo-text/?report_id={self.q1_report.id}")
         request.user = self.user
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
         response = MemoTextViewSet.as_view({"get": "list"})(request)
         self.assertEqual(response.status_code, 200)
@@ -28,14 +31,14 @@ class MemoTextViewSetTest(TestCase):
         client.force_authenticate(user=self.user)
         session = client.session._get_session_from_db()
         session.session_data = client.session.encode(
-            {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+            {"committee_uuid": str(self.committee.id)}
         )
         session.save()
         data = {
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "report_id": self.q1_report.id,
             "rec_type": "TEXT",
             "text4000": "test_new_text",
-            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "committee_account": str(self.committee.id),
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
             "fields_to_validate": [
@@ -56,14 +59,14 @@ class MemoTextViewSetTest(TestCase):
         client.force_authenticate(user=self.user)
         session = client.session._get_session_from_db()
         session.session_data = client.session.encode(
-            {"committee_uuid": "11111111-2222-3333-4444-555555555555"}
+            {"committee_uuid": str(self.committee.id)}
         )
         session.save()
         data = {
-            "report_id": "a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965",
+            "report_id": str(self.q1_report.id),
             "rec_type": "TEXT",
             "text4000": "test_existing_text",
-            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "committee_account": str(self.committee.id),
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
         }

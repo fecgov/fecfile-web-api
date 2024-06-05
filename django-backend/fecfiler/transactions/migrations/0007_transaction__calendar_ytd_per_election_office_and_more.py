@@ -34,14 +34,14 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        
+
         CREATE OR REPLACE FUNCTION calculate_entity_aggregates()
         RETURNS TRIGGER AS $$
         DECLARE
             sql_committee_id TEXT;
             temp_table_name TEXT;
             schedule_date DATE;
-            
+
             v_election_code TEXT;
             v_candidate_office TEXT;
             v_candidate_state TEXT;
@@ -49,20 +49,26 @@ class Migration(migrations.Migration):
         BEGIN
             sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
             temp_table_name := 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
-            
+
             -- If schedule_c2_id or schedule_d_id is not null, stop processing
             IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL THEN
                 RETURN NEW;
             END IF;
 
-            -- Determine which schedule_id is not null and get the date from the corresponding table
+            -- Determine which schedule_id is not null
+            -- and get the date from the corresponding table
             IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL THEN
                 IF NEW.schedule_a_id IS NOT NULL THEN
-                    SELECT contribution_date INTO schedule_date FROM transactions_schedulea WHERE id = NEW.schedule_a_id;
+                    SELECT contribution_date
+                    INTO schedule_date
+                    FROM transactions_schedulea
+                    WHERE id = NEW.schedule_a_id;
                 ELSIF NEW.schedule_b_id IS NOT NULL THEN
-                    SELECT contribution_date INTO schedule_date FROM transactions_scheduleb WHERE id = NEW.schedule_b_id;
+                    SELECT expenditure_date
+                    INTO schedule_date
+                    FROM transactions_scheduleb
+                    WHERE id = NEW.schedule_b_id;
                 END IF;
-                
 
                 EXECUTE format('
                     CREATE TEMPORARY TABLE %I ON COMMIT DROP AS
@@ -80,7 +86,8 @@ class Migration(migrations.Migration):
                     SET aggregate = tt.new_sum
                     FROM ' || temp_table_name || ' AS tt
                      WHERE t.id = tt.id AND (t.aggregate IS DISTINCT FROM tt.new_sum);
-                ', temp_table_name) USING NEW.contact_1_id, EXTRACT(YEAR FROM schedule_date), NEW.aggregation_group;
+                ', temp_table_name) USING NEW.contact_1_id,
+                EXTRACT(YEAR FROM schedule_date), NEW.aggregation_group;
             ELSIF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL THEN
                 EXECUTE format('
                     CREATE TEMPORARY TABLE %I ON COMMIT DROP AS
@@ -92,25 +99,31 @@ class Migration(migrations.Migration):
                     WHERE loan_key LIKE (
                         SELECT transaction_id FROM transactions_transaction
                         WHERE id = $1
-                    ) || ''%'';
+                    ) || ''%%'';
 
                     UPDATE transactions_transaction AS t
                     SET loan_payment_to_date = tt.new_sum
                     FROM ' || temp_table_name || ' AS tt
-                    WHERE
-                        t.id = tt.id AND (t.loan_payment_to_date IS DISTINCT FROM tt.new_sum)
-                        AND tt.loan_key LIKE ''%LOAN'';
+                    WHERE t.id = tt.id
+                    AND (t.loan_payment_to_date IS DISTINCT FROM tt.new_sum)
+                    AND tt.loan_key LIKE ''%%LOAN'';
                 ', temp_table_name) USING NEW.id;
             ELSIF NEW.schedule_e_id IS NOT NULL THEN
-                SELECT COALESCE(disbursement_date, dissemination_date) INTO schedule_date FROM transactions_schedulee WHERE id = NEW.schedule_e_id;
-                SELECT election_code INTO v_election_code FROM transactions_schedulee WHERE id = NEW.schedule_e_id;
-                SELECT candidate_office, candidate_state, candidate_district INTO v_candidate_office, v_candidate_state, v_candidate_district FROM contacts WHERE id = NEW.contact_2_id;
-                
+                SELECT COALESCE(disbursement_date, dissemination_date)
+                    INTO schedule_date FROM transactions_schedulee
+                    WHERE id = NEW.schedule_e_id;
+                SELECT election_code INTO v_election_code FROM transactions_schedulee
+                    WHERE id = NEW.schedule_e_id;
+                SELECT candidate_office, candidate_state, candidate_district
+                    INTO v_candidate_office, v_candidate_state, v_candidate_district
+                    FROM contacts WHERE id = NEW.contact_2_id;
+
                 EXECUTE format('
                     CREATE TEMPORARY TABLE %I ON COMMIT DROP AS
                     SELECT
                         t.id,
-                        SUM(t.effective_amount) OVER (ORDER BY t.date, t.created) AS new_sum
+                        SUM(t.effective_amount) OVER
+                        (ORDER BY t.date, t.created) AS new_sum
                     FROM transactions_schedulee e
                         JOIN transaction_view__' || sql_committee_id || ' t
                             ON e.id = t.schedule_e_id
@@ -140,8 +153,11 @@ class Migration(migrations.Migration):
                     UPDATE transactions_transaction AS t
                     SET _calendar_ytd_per_election_office = tt.new_sum
                     FROM ' || temp_table_name || ' AS tt
-                    WHERE t.id = tt.id AND (t._calendar_ytd_per_election_office IS DISTINCT FROM tt.new_sum);
-                ', temp_table_name) USING v_election_code, v_candidate_office, COALESCE(v_candidate_state, ''), COALESCE(v_candidate_district, ''), EXTRACT(YEAR FROM schedule_date), NEW.aggregation_group;
+                    WHERE t.id = tt.id AND
+                    (t._calendar_ytd_per_election_office IS DISTINCT FROM tt.new_sum);
+                ', temp_table_name) USING v_election_code, v_candidate_office,
+                    COALESCE(v_candidate_state, ''), COALESCE(v_candidate_district, ''),
+                    EXTRACT(YEAR FROM schedule_date), NEW.aggregation_group;
             END IF;
 
             RETURN NEW;

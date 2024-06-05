@@ -47,15 +47,15 @@ class TransactionViewTestCase(TestCase):
         transactions = (
             view.filter(committee_account_id=self.committee.id).all().order_by("date")
         )
-        for transaction in transactions:
-            transaction.refresh_from_db()
+        for t in transactions:
+            t.refresh_from_db()
         self.assertEqual(transactions[0].aggregate, Decimal("123.45"))
         self.assertEqual(transactions[2].aggregate, Decimal("300"))
         self.assertEqual(transactions[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
 
-        unaggregated = create_test_transaction(  # noqa: F841
+        create_test_transaction(  # noqa: F841
             "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
@@ -85,8 +85,8 @@ class TransactionViewTestCase(TestCase):
         transactions = view.filter(committee_account_id=self.committee.id).order_by(
             "date"
         )
-        for transaction in transactions:
-            transaction.refresh_from_db()
+        for t in transactions:
+            t.refresh_from_db()
         self.assertEqual(transactions[0].aggregate, None)
         self.assertEqual(transactions[0].force_unaggregated, True)
         self.assertEqual(transactions[1].aggregate, Decimal("200"))
@@ -127,6 +127,7 @@ class TransactionViewTestCase(TestCase):
                 self.contact_1,
                 "2024-01-01",
                 amount="500.00",
+                itemized=True,
             )
             jf_transfer.save()
 
@@ -134,8 +135,9 @@ class TransactionViewTestCase(TestCase):
                 "PARTNERSHIP_JF_TRANSFER_MEMO",
                 self.committee,
                 self.contact_1,
-                "2024-01-01",
+                "2024-01-02",
                 amount="50.00",
+                itemized=True,
             )
             parnership_jf_transfer_memo.parent_transaction = jf_transfer
             parnership_jf_transfer_memo.save()
@@ -144,15 +146,16 @@ class TransactionViewTestCase(TestCase):
                 "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
                 self.committee,
                 self.contact_1,
-                "2024-01-01",
+                "2024-01-03",
                 amount="5.00",
+                itemized=True,
             )
             parnership_attribution_jf_transfer_memo.parent_transaction = (
                 parnership_jf_transfer_memo
             )
             parnership_attribution_jf_transfer_memo.save()
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = get_read_model(self.committee.id).objects.all().order_by("date")
 
         self.assertEqual(view[0].itemized, True)
         self.assertEqual(view[0].aggregate, 500)
@@ -255,6 +258,7 @@ class TransactionViewTestCase(TestCase):
                 ie["dissemination_date"],
                 ie["amount"],
                 ie["code"],
+                ie["contact"],
             )
 
         view = get_read_model(self.committee.id).objects.all()
@@ -300,17 +304,17 @@ class TransactionViewTestCase(TestCase):
         print("DEBT SUCCESS")
 
     def test_line_label(self):
-        first_schedule_a = create_schedule_a(
+        create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
             self.contact_1,
             "2024-01-01",
             "1.00",
             "GENERAL",
-            "SA11AII",
+            "SA11AI",
+            False,
+            True,
         )
-        first_schedule_a.force_itemized = True
-        first_schedule_a.save()
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
@@ -318,7 +322,7 @@ class TransactionViewTestCase(TestCase):
             "2024-01-02",
             "2.00",
             "GENERAl",
-            "SA11AII",
+            "SA11AI",
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -327,20 +331,20 @@ class TransactionViewTestCase(TestCase):
             "2024-01-03",
             "1000.00",
             "GENERAL",
-            "SA11AI",
+            "SA11AII",
         )
         create_schedule_b(
             "OPERATING_EXPENDITURE",
             self.committee,
             self.contact_1,
-            "2024-01-01",
+            "2024-01-04",
             "100.00",
             "GENERAL_DISBURSEMENT",
             "SB21B",
         )
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = get_read_model(self.committee.id).objects.all().order_by("date")
         self.assertEqual(view[0].line_label, "11(a)(i)")
-        self.assertEqual(view[1].line_label, "11(a)(i)")
+        self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")
         self.assertEqual(view[3].line_label, "21(b)")

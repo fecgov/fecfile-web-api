@@ -1,39 +1,66 @@
 from django.test import TestCase
-from fecfiler.reports.models import Report
 from fecfiler.memo_text.models import MemoText
-from fecfiler.transactions.models import Transaction
 from .dot_fec_composer import compose_dot_fec, add_row_to_content
 from fecfiler.committee_accounts.views import create_committee_view
 from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.reports.tests.utils import create_form3x, create_form99
+from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.contacts.tests.utils import create_test_individual_contact
+from datetime import datetime
 
 
 class DotFECSerializerTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-        "test_f99",
-        "test_individual_receipt",
-        "test_memo_text",
-    ]
 
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
-        self.f3x = Report.objects.filter(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).first()
-        self.transaction = Transaction.objects.filter(
-            id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
-        ).first()
-        self.report_level_memo_text = MemoText.objects.filter(
-            id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d"
-        ).first()
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
+        coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
+        self.f3x = create_form3x(
+            self.committee,
+            coverage_from,
+            coverage_through,
+            {"L38_net_operating_expenditures_ytd": format(381.00, ".2f")},
+        )
+        self.f99 = create_form99(
+            self.committee,
+            coverage_from,
+            coverage_through,
+            {
+                "text_code": "ABC",
+                "message_text": "\nBEHOLD! A large text string\nwith new lines",
+            },
+        )
+        self.contact_1 = create_test_individual_contact(
+            "last name", "First name", self.committee.id
+        )
+
+        self.transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            datetime.strptime("2024-01-03", "%Y-%m-%d"),
+            "1.00",
+            "GENERAL",
+            "SA11AI",
+        )
+        self.transaction.reports.add(self.f3x)
+        self.transaction.save()
+        self.report_level_memo_text = MemoText(
+            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
+            rec_type="TEXT",
+            text4000="dahtest2",
+            committee_account_id=self.committee.id,
+            report_id=self.f3x.id,
+        )
 
     def test_compose_dot_fec(self):
         with self.assertRaisesMessage(Exception, "header: 100000000 not found"):
             compose_dot_fec(100000000, None)
 
-        file_content = compose_dot_fec("b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None)
-        self.assertEqual(file_content.count(CRLF_STR), 5)
+        file_content = compose_dot_fec(self.f3x.id, None)
+        self.assertEqual(file_content.count(CRLF_STR), 2)
 
     def test_add_row_to_content(self):
         summary_row = serialize_instance("F3X", self.f3x)
@@ -51,7 +78,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_dot_fec_str[2].split(FS_STR)[-1], "dahtest2")
 
     def test_f99(self):
-        content = compose_dot_fec("11111111-1111-1111-1111-111111111111", None)
+        content = compose_dot_fec(self.f99.id, None)
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")

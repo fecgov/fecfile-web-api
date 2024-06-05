@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
@@ -8,15 +9,24 @@ from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.contacts.tests.utils import (
+    create_test_individual_contact,
+    create_test_candidate_contact,
+)
+from fecfiler.transactions.tests.utils import (
+    create_schedule_a,
+    create_schedule_b,
+    create_loan,
+    create_ie,
+)
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class TransactionViewsTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-        "test_transaction_views_transactions",
-        "test_election_aggregation_data",
-    ]
 
     json_content_type = "application/json"
 
@@ -26,11 +36,36 @@ class TransactionViewsTestCase(TestCase):
 
     def setUp(self):
         print("SETUP TEST_VEW")
-        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.factory = RequestFactory()
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        create_committee_view(self.committee.id)
+        self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        self.contact_1 = create_test_individual_contact(
+            "last name", "First name", self.committee.id
+        )
+        self.contact_2 = create_test_candidate_contact(
+            "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
+        )
+        self.transaction = create_ie(
+            self.committee,
+            self.contact_1,
+            "2023-01-12",
+            "2023-01-15",
+            "153.00",
+            "C2012",
+            self.contact_2,
+        )
         self.payloads = json.load(
             open("fecfiler/transactions/fixtures/view_payloads.json")
+        )
+        create_schedule_b(
+            "GENERAL_DISBURSEMENT",
+            self.committee,
+            self.contact_1,
+            "2023-09-02",
+            "3.00",
+            "GENERAL_DISBURSEMENT",
         )
 
     def request(self, payload, params={}):
@@ -43,8 +78,8 @@ class TransactionViewsTestCase(TestCase):
         request.data = deepcopy(payload)
         request.query_params = params
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
         return request
 
@@ -71,6 +106,21 @@ class TransactionViewsTestCase(TestCase):
         )
 
     def test_get_queryset(self):
+        for i in range(8):
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                "2023-01-01",
+                str((i + 1) * 10),
+                "GENERAL",
+            )
+
+        for i in range(2):
+            create_loan(
+                self.committee, self.contact_1, Decimal((i + 1) * 10), "2023-09-20", "2.0"
+            )
+
         view_set = TransactionViewSet()
         view_set.request = self.request({}, {"schedules": "A,B,C,C2,D,E"})
         self.assertEqual(view_set.get_queryset().count(), 12)
@@ -82,9 +132,7 @@ class TransactionViewsTestCase(TestCase):
     def test_get_previous_entity(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
-        view_set.request = self.request(
-            {}, {"contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073"}
-        )
+        view_set.request = self.request({}, {"contact_1_id": str(self.contact_1.id)})
         # leave out required params
         response = view_set.previous_transaction_by_entity(view_set.request)
         self.assertEqual(response.status_code, 400)
@@ -93,7 +141,7 @@ class TransactionViewsTestCase(TestCase):
             self.request(
                 {},
                 {
-                    "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
+                    "contact_1_id": str(self.contact_1.id),
                     "date": "2023-09-20",
                     "aggregation_group": "GENERAL_DISBURSEMENT",
                 },
@@ -105,7 +153,7 @@ class TransactionViewsTestCase(TestCase):
             self.request(
                 {},
                 {
-                    "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
+                    "contact_1_id": str(self.contact_1.id),
                     "date": "2024-09-20",
                     "aggregation_group": "GENERAL_DISBURSEMENT",
                 },
@@ -150,30 +198,31 @@ class TransactionViewsTestCase(TestCase):
                 "election_code": "C2012",
                 "candidate_office": "S",
                 "candidate_state": "AK",
+                "candidate_district": "01",
             },
         )
         response = view_set.previous_transaction_by_election(view_set.request)
-        self.assertEqual(response.data["date"], "2023-10-31")
+        transaction = response.data
+
+        self.assertEqual(transaction.get("date"), "2023-01-12")
 
     def test_inherited_election_aggregate(self):
-        request = self.factory.get(
-            "/api/v1/transactions/aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35/"
-        )
+        request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")
         request.user = self.user
         request.query_params = {}
         request.data = {}
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
 
         view = TransactionViewSet
         view.request = request
-        response = view.as_view({"get": "retrieve"})(
-            request, pk="aaaaaaaa-607f-4f5d-bfb4-0fa1776d4e35"
-        )
+
+        response = view.as_view({"get": "retrieve"})(request, pk=str(self.transaction.id))
         transaction = response.data
-        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "58.00")
+        logger.debug(transaction)
+        self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
 
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
@@ -191,8 +240,8 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(len(transactions), 2)
 
     def test_add_transaction_to_report(self):
-        report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        transaction_id = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        report_id = str(self.q1_report.id)
+        transaction_id = str(self.transaction.id)
 
         payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
@@ -218,15 +267,15 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
-        payload["transaction_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["transaction_id"] = str(self.transaction.id)
         payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
         response = view_set.add_transaction_to_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
     def test_remove_transaction_from_report(self):
-        report_id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        transaction_id = "0b0b9776-df8b-4f5f-b4c5-d751167417e7"
+        report_id = str(self.q1_report.id)
+        transaction_id = str(self.transaction.id)
 
         payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
@@ -251,7 +300,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
-        payload["transaction_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
+        payload["transaction_id"] = str(self.transaction.id)
         payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
         response = view_set.remove_transaction_from_report(self.request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -259,14 +308,14 @@ class TransactionViewsTestCase(TestCase):
 
     def test_save_debt(self):
         payload = self.payloads["DEBT"]
+        payload["report_ids"] = [str(self.q1_report.id)]
         view_set = TransactionViewSet()
         response = view_set.create(self.request(payload))
-        report_coverage_from_date = Report.objects.get(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).coverage_from_date
+        report_coverage_from_date = self.q1_report.coverage_from_date
         debt_id = response.data
         self.assertEqual(response.status_code, 200)
         debt = Transaction.objects.get(id=debt_id)
         self.assertEqual(
-            debt.schedule_d.report_coverage_from_date, report_coverage_from_date
+            debt.schedule_d.report_coverage_from_date.strftime("%Y-%m-%d"),
+            report_coverage_from_date,
         )

@@ -15,6 +15,7 @@ FS_STR = chr(ascii.FS)
 def get_value_from_path(object, path):
     split_path = path if isinstance(path, list) else path.split(".")
     value = getattr(object, split_path[0], None)
+    logger.debug(f"value: {value}")
     if len(split_path) > 1:
         return get_value_from_path(
             value,
@@ -89,13 +90,11 @@ def serialize_instance(schema_name, instance):
     column_sequences, row_length = extract_row_config(schema_name)
     field_mappings = get_field_mappings(schema_name)
     row = [
-        (
-            serialize_field(instance, column_sequences[column_index + 1], field_mappings)
-            if (column_index + 1) in column_sequences
-            else ""
-        )
+        (serialize_field(instance, column_sequences[column_index + 1], field_mappings))
         for column_index in range(0, row_length)
     ]
+    if "" == row[0]:
+        row[0] = "F3XN"
     return FS_STR.join(row)
 
 

@@ -6,22 +6,44 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 
 
-def create_form3x(committee, coverage_from, coverage_through, data):
-    return create_test_report(Form3X, committee, coverage_from, coverage_through, data)
+def create_form3x(
+    committee,
+    coverage_from,
+    coverage_through,
+    data,
+    report_code="Q1",
+):
+    return create_test_report(
+        Form3X, committee, report_code, coverage_from, coverage_through, data
+    )
 
 
 def create_form24(committee, coverage_from, coverage_through, data):
-    return create_test_report(Form24, committee, coverage_from, coverage_through, data)
+    return create_test_report(
+        Form24, committee, None, coverage_from, coverage_through, data
+    )
+
+
+def create_form99(committee, coverage_from, coverage_through, data):
+    return create_test_report(
+        Form99, committee, None, coverage_from, coverage_through, data
+    )
 
 
 def create_test_report(
-    form, committee, coverage_from=None, coverage_through=None, data=None
+    form,
+    committee,
+    report_code=None,
+    coverage_from=None,
+    coverage_through=None,
+    data=None,
 ):
     form_object = create_form(form, data)
     report = Report.objects.create(
         committee_account=committee,
         coverage_from_date=coverage_from,
         coverage_through_date=coverage_through,
+        report_code=report_code,
         **{FORM_CLASS_TO_FIELD[form]: form_object},
     )
     return report

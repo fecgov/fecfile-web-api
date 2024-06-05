@@ -7,10 +7,19 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+from fecfiler.contacts.models import Contact
 
 
 def create_schedule_a(
-    type, committee, contact, date, amount, group="GENERAL", form_type="SA11I"
+    type,
+    committee,
+    contact,
+    date,
+    amount,
+    group="GENERAL",
+    form_type="SA11I",
+    memo_code=False,
+    itemized=False,
 ):
     return create_test_transaction(
         type,
@@ -19,7 +28,11 @@ def create_schedule_a(
         contact_1=contact,
         group=group,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
-        transaction_data={"_form_type": form_type},
+        transaction_data={
+            "_form_type": form_type,
+            "memo_code": memo_code,
+            "force_itemized": itemized,
+        },
     )
 
 
@@ -28,21 +41,31 @@ def create_schedule_b(
 ):
     return create_test_transaction(
         type,
-        ScheduleA,
+        ScheduleB,
         committee,
         contact_1=contact,
         group=group,
-        schedule_data={"contribution_date": date, "contribution_amount": amount},
+        schedule_data={"expenditure_date": date, "expenditure_amount": amount},
         transaction_data={"_form_type": form_type},
     )
 
 
-def create_ie(committee, contact, disbursement_date, dissemination_date, amount, code):
+def create_ie(
+    committee,
+    contact: Contact,
+    disbursement_date,
+    dissemination_date,
+    amount,
+    code,
+    candidate: Contact,
+    memo_code=False,
+):
     return create_test_transaction(
         "INDEPENDENT_EXPENDITURE",
         ScheduleE,
         committee,
-        contact_2=contact,
+        contact_1=contact,
+        contact_2=candidate,
         group="INDEPENDENT_EXPENDITURE",
         schedule_data={
             "disbursement_date": disbursement_date,
@@ -50,16 +73,48 @@ def create_ie(committee, contact, disbursement_date, dissemination_date, amount,
             "expenditure_amount": amount,
             "election_code": code,
         },
+        transaction_data={
+            "_form_type": "SE",
+            "memo_code": memo_code,
+        },
     )
 
 
-def create_debt(committee, contact, incurred_amount):
+def create_debt(
+    committee, contact, incurred_amount, form_type="SD9", type="DEBT_OWED_BY_COMMITTEE"
+):
     return create_test_transaction(
-        "DEBT_OWED_BY_COMMITTEE",
+        type,
         ScheduleD,
         committee,
         contact_1=contact,
         schedule_data={"incurred_amount": incurred_amount},
+        transaction_data={"_form_type": form_type},
+    )
+
+
+def create_loan(
+    committee,
+    contact,
+    loan_amount,
+    loan_due_date,
+    loan_interest_rate,
+    secured=False,
+    type="LOAN_RECEIVED_FROM_INDIVIDUAL",
+    form_type="SC/9",
+):
+    return create_test_transaction(
+        type,
+        ScheduleC,
+        committee,
+        contact_1=contact,
+        schedule_data={
+            "loan_amount": loan_amount,
+            "loan_due_date": loan_due_date,
+            "loan_interest_rate": loan_interest_rate,
+            "secured": secured,
+        },
+        transaction_data={"_form_type": form_type},
     )
 
 

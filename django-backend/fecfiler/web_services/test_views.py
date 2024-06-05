@@ -9,19 +9,14 @@ from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.web_services.summary.tasks import CalculationState
 
 from unittest.mock import patch
-from uuid import UUID
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
 class WebServicesViewSetTest(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-    ]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
         create_committee_view(self.committee.id)
         self.committee.members.add(self.user)
         self.factory = RequestFactory()
@@ -132,12 +127,14 @@ class WebServicesViewSetTest(TestCase):
         self.assertEqual(response.data, {"done": False})
 
     def test_get_dot_fec_not_exists(self):
-        id = "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-
+        report = create_form3x(
+            self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
+        )
+        id = report.id
         request = self.factory.get(f"api/v1/web-services/dot-fec/{id}")
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
         force_authenticate(request, user=self.user)
         response = self.view.get_dot_fec(request, id)

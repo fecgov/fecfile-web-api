@@ -163,9 +163,7 @@ def submit_to_webprint(
     # TODO: add timeout?
     while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
         logger.info(f"Polling status for {submission.fec_submission_id}.")
-        logger.info(
-            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
-        )
+        logger.info(f"Status: {submission.fec_status}, Message: {submission.fec_message}")
         time.sleep(2)
         status_response_string = submitter.poll_status(
             submission.batch_id, submission.fec_submission_id

@@ -198,9 +198,7 @@ class ReportTransaction(models.Model):
         serialize=False,
         unique=True,
     )
-    transaction = models.ForeignKey(
-        "transactions.Transaction", on_delete=models.CASCADE
-    )
+    transaction = models.ForeignKey("transactions.Transaction", on_delete=models.CASCADE)
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
