@@ -17,4 +17,6 @@ applications:
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      FEC_AGENCY_ID: FEC
+      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       LOG_FORMAT: KEY_VALUE
