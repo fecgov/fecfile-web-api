@@ -34,38 +34,10 @@ from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
 from ..reports.models import Report
+from fecfiler.reports.report_code_label import report_code_label_case
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
-
-
-report_code_label_mapping = Case(
-    When(report_code="Q1", then=Value("APRIL 15 QUARTERLY REPORT (Q1)")),
-    When(report_code="Q2", then=Value("JULY 15 QUARTERLY REPORT (Q2)")),
-    When(report_code="Q3", then=Value("OCTOBER 15 QUARTERLY REPORT (Q3)")),
-    When(report_code="YE", then=Value("JANUARY 31 YEAR-END (YE)")),
-    When(report_code="TER", then=Value("TERMINATION REPORT (TER)")),
-    When(report_code="MY", then=Value("JULY 31 MID-YEAR REPORT (MY)")),
-    When(report_code="12G", then=Value("12-DAY PRE-GENERAL (12G)")),
-    When(report_code="12P", then=Value("12-DAY PRE-PRIMARY (12P)")),
-    When(report_code="12R", then=Value("12-DAY PRE-RUNOFF (12R)")),
-    When(report_code="12S", then=Value("12-DAY PRE-SPECIAL (12S)")),
-    When(report_code="12C", then=Value("12-DAY PRE-CONVENTION (12C)")),
-    When(report_code="30G", then=Value("30-DAY POST-GENERAL (30G)")),
-    When(report_code="30R", then=Value("30-DAY POST-RUNOFF (30R)")),
-    When(report_code="30S", then=Value("30-DAY POST-SPECIAL (30S)")),
-    When(report_code="M2", then=Value("FEBRUARY 20 MONTHLY REPORT (M2)")),
-    When(report_code="M3", then=Value("MARCH 20 MONTHLY REPORT (M3)")),
-    When(report_code="M4", then=Value("APRIL 20 MONTHLY REPORT (M4)")),
-    When(report_code="M5", then=Value("MAY 20 MONTHLY REPORT (M5)")),
-    When(report_code="M6", then=Value("JUNE 20 MONTHLY REPORT (M6)")),
-    When(report_code="M7", then=Value("JULY 20 MONTHLY REPORT (M7)")),
-    When(report_code="M8", then=Value("AUGUST 20 MONTHLY REPORT (M8)")),
-    When(report_code="M9", then=Value("SEPTEMBER 20 MONTHLY REPORT (M9)")),
-    When(report_code="M10", then=Value("OCTOBER 20 MONTHLY REPORT (M10)")),
-    When(report_code="M11", then=Value("NOVEMBER 20 MONTHLY REPORT (M11)")),
-    When(report_code="M12", then=Value("DECEMBER 20 MONTHLY REPORT (M12)")),
-)
 
 
 class TransactionManager(SoftDeleteManager):
@@ -333,11 +305,6 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def transaction_view(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
-            .annotate(report_code_label=report_code_label_mapping)
-            .values("report_code_label")[:1]
-        )
         return (
             super()
             .get_queryset()
@@ -359,7 +326,6 @@ class TransactionManager(SoftDeleteManager):
                 transaction_ptr_id=F("id"),
                 back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
                 back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                report_code_label=REPORT_CODE_LABEL_CLAUSE,
             )
         )
 
@@ -368,7 +334,7 @@ class TransactionViewManager(Manager):
     def get_queryset(self):
         REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
             Report.objects.filter(transactions=OuterRef("pk"))
-            .annotate(report_code_label=report_code_label_mapping)
+            .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
 

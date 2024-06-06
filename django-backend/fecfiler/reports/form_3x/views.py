@@ -7,6 +7,7 @@ from fecfiler.reports.views import ReportViewSet
 from .serializers import Form3XSerializer
 import structlog
 from rest_framework.response import Response
+from fecfiler.reports.report_code_label import report_code_label_mapping
 
 logger = structlog.get_logger(__name__)
 
@@ -36,9 +37,13 @@ class Form3XViewSet(ReportViewSet):
         )
         return JsonResponse(data, safe=False)
 
+    @action(detail=False)
+    def report_code_map(self, request):
+        return JsonResponse(report_code_label_mapping, safe=False)
+
     @action(detail=False, methods=["get"], url_path=r"future")
     def future_form3x_reports(self, request):
-        json_date_string = request.GET.get('after', '')
+        json_date_string = request.GET.get("after", "")
         data = list(
             self.get_queryset().filter(coverage_through_date__gt=json_date_string)
         )
