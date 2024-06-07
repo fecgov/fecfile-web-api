@@ -114,6 +114,7 @@ fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
       ~ScheduleEUtilsTestCase.tearDown
       ~ScheduleEUtilsTestCase.tearDownClass
       ~ScheduleEUtilsTestCase.test_contacts_to_representation
+      ~ScheduleEUtilsTestCase.test_contacts_to_representation_primary_presidential
    
    
 

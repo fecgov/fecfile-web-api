@@ -68,6 +68,7 @@ fecfiler.transactions.schedule\_e.models.ScheduleE
       ~ScheduleE.objects
       ~ScheduleE.payee_cmtte_fec_id_number
       ~ScheduleE.pk
+      ~ScheduleE.so_candidate_state
       ~ScheduleE.support_oppose_code
       ~ScheduleE.transaction_set
    
