@@ -74,6 +74,7 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.perform_update
       ~Form3XViewSet.permission_denied
       ~Form3XViewSet.raise_uncaught_exception
+      ~Form3XViewSet.report_code_map
       ~Form3XViewSet.retrieve
       ~Form3XViewSet.reverse_action
       ~Form3XViewSet.setup

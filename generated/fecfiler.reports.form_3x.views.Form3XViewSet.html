@@ -215,19 +215,22 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">report_code_map</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.reverse_action" title="fecfiler.reports.form_3x.views.Form3XViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve</span></code>(request, *args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.reverse_action" title="fecfiler.reports.form_3x.views.Form3XViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.setup" title="fecfiler.reports.form_3x.views.Form3XViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.setup" title="fecfiler.reports.form_3x.views.Form3XViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.throttled" title="fecfiler.reports.form_3x.views.Form3XViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.views.Form3XViewSet.throttled" title="fecfiler.reports.form_3x.views.Form3XViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request[, pk])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(request[, pk])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -737,6 +740,7 @@ will instead be performed lazily, the first time either
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.managers.html">fecfiler.reports.managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.migrations.html">fecfiler.reports.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.models.html">fecfiler.reports.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.report_code_label.html">fecfiler.reports.report_code_label</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.serializers.html">fecfiler.reports.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.signals.html">fecfiler.reports.signals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.test_views.html">fecfiler.reports.test_views</a></li>

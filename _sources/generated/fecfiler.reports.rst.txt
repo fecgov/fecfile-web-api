@@ -39,6 +39,7 @@ fecfiler.reports
    fecfiler.reports.managers
    fecfiler.reports.migrations
    fecfiler.reports.models
+   fecfiler.reports.report_code_label
    fecfiler.reports.serializers
    fecfiler.reports.signals
    fecfiler.reports.test_views
