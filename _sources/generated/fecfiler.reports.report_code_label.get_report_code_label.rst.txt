@@ -1,0 +1,6 @@
+fecfiler.reports.report\_code\_label.get\_report\_code\_label
+=============================================================
+
+.. currentmodule:: fecfiler.reports.report_code_label
+
+.. autofunction:: get_report_code_label

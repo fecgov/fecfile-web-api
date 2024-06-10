@@ -12,6 +12,13 @@ fecfiler.reports.report\_code\_label
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_report_code_label
+   
    
 
    
