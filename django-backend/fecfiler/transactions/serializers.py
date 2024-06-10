@@ -29,6 +29,8 @@ from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fiel
 from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
+
+from fecfiler.reports.report_code_label import get_report_code_label
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -266,6 +268,7 @@ class TransactionSerializer(
                     "coverage_through_date": report.coverage_through_date,
                     "report_code": report.report_code,
                     "report_type": report.report_type,
+                    "report_code_label": get_report_code_label(report),
                 }
             )
 

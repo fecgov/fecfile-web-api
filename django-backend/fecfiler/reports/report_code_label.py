@@ -1,4 +1,5 @@
 from django.db.models import Case, When, Value
+from fecfiler.reports.models import Report
 
 report_code_label_mapping = {
     "Q1": "APRIL 15 QUARTERLY REPORT (Q1)",
@@ -36,3 +37,11 @@ report_code_label_case = Case(
     When(form_99__isnull=False, then=Value("")),
     When(form_1m__isnull=False, then=Value("")),
 )
+
+
+def get_report_code_label(report: Report):
+    if report.form_3x:
+        return report_code_label_mapping[report.report_code]
+    if report.form_24:
+        return f"{report.form_24.report_type_24_48} HOUR"
+    return ""
