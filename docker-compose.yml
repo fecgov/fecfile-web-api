@@ -69,8 +69,6 @@ services:
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
-    ports:
-      - 8080:8080
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -108,6 +106,14 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+
+  nginx:
+    build: https://github.com/fecgov/fecfile-api-proxy.git#feature/816
+    container_name: fecfile-api-proxy
+    ports:
+      - 8080:8080
+    depends_on:
+      - api
 
   locust-leader:
     image: locustio/locust

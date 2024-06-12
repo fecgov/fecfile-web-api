@@ -188,6 +188,8 @@ OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 # OpenID Connect settings end
 
+USE_X_FORWARDED_HOST = True
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
 
@@ -324,9 +326,7 @@ CELERY_TASK_SERIALIZER = "json"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
-CELERY_WORKER_STORAGE = env.get_credential(
-    "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
-)
+CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
 
 """FEC Webload settings
 """
