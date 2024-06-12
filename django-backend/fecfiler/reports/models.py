@@ -23,6 +23,13 @@ class Report(CommitteeOwnedModel):
         unique=True,
     )
 
+    committee_name = models.TextField(null=True, blank=True)
+    street_1 = models.TextField(null=True, blank=True)
+    street_2 = models.TextField(null=True, blank=True)
+    city = models.TextField(null=True, blank=True)
+    state = models.TextField(null=True, blank=True)
+    zip = models.TextField(null=True, blank=True)
+
     form_type = models.TextField(null=True, blank=True)
     report_version = models.TextField(
         null=True, blank=True
@@ -152,6 +159,10 @@ TABLE_TO_FORM = {
     "form_99": "F99",
     "form_1m": "F1M",
 }
+
+FORMS_TO_CALCULATE = [
+    "F3X",
+]
 
 
 def update_recalculation(report: Report):

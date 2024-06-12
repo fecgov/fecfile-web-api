@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "storages",
+    "silk",
     "django_structlog",
     "fecfiler.authentication",
     "fecfiler.committee_accounts",
@@ -93,6 +94,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
+    'silk.middleware.SilkyMiddleware',
 ]
 
 TEMPLATES = [
@@ -122,7 +124,10 @@ CORS_ALLOW_CREDENTIALS = True
 DATABASES = {
     # Be sure to set the DATABASE_URL environment variable on your local
     # development machine so that the local database can be connected to.
-    "default": dj_database_url.config()
+    "default": dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Connection string for connecting directly
@@ -359,3 +364,6 @@ if MOCK_OPENFEC == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 else:
     MOCK_OPENFEC_REDIS_URL = None
+
+"""SILKY PROFILING SETTINGS"""
+SILKY_PYTHON_PROFILER=True

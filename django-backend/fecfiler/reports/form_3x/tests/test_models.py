@@ -8,11 +8,6 @@ class F3XTestCase(TestCase):
     def setUp(self):
         self.valid_f3x_summary = Form3X(
             change_of_address=False,
-            street_1="22 Testing Ln",
-            street_2="Unit B",
-            city="Testville",
-            state="AK",
-            zip="54321",
             election_code="P2020",
             date_of_election="2020-12-31",
             state_of_election="AK",
@@ -28,7 +23,6 @@ class F3XTestCase(TestCase):
         self.valid_f3x_summary.save()
         f3x_summary_from_db = Form3X.objects.get(election_code="P2020")
         self.assertIsInstance(f3x_summary_from_db, Form3X)
-        self.assertEquals(f3x_summary_from_db.zip, "54321")
         f3x_summary_from_db.delete()
         self.assertRaises(
             Form3X.DoesNotExist,

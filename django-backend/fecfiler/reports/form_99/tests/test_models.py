@@ -5,11 +5,6 @@ from ..models import Form99
 class F99TestCase(TestCase):
     def setUp(self):
         self.valid_form_99 = Form99(
-            street_1="22 Test Street",
-            street_2="Unit B",
-            city="Testopolis",
-            state="AL",
-            zip="12345",
             text_code="MSM",
         )
 

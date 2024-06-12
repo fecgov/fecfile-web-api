@@ -42,7 +42,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     pagination_class = TransactionListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = [
-        "line_label_order_key",
+        "line_label",
         "created",
         "transaction_type_identifier",
         "memo_code",
@@ -69,6 +69,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             committee_uuid = self.get_committee_uuid()
             model = get_read_model(committee_uuid)
             queryset = model.objects
+
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -81,9 +82,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         schedule_filters = self.request.query_params.get("schedules")
         if schedule_filters is not None:
-            schedules_to_include = (
-                schedule_filters.split(",") if schedule_filters else []
-            )
+            schedules_to_include = schedule_filters.split(",") if schedule_filters else []
             queryset = queryset.filter(
                 schedule__in=[
                     Schedule[schedule].value for schedule in schedules_to_include
@@ -108,12 +107,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             saved_transaction = self.save_transaction(request.data, request)
             print(f"transaction ID: {saved_transaction.id}")
         # transaction_view = self.get_queryset().get(id=saved_transaction.id)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+        return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-        return Response(TransactionSerializer().to_representation(saved_transaction))
+        return Response(saved_transaction.id)
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
@@ -275,13 +274,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
-                child_transaction = self.get_queryset().get(id=child_transaction_data)
-                child_transaction.parent_transaction_id = transaction_instance.id
-                child_transaction.save()
-            else:
-                child_transaction_data["parent_transaction_id"] = (
-                    transaction_instance.id
+                Transaction.objects.filter(id=child_transaction_data).update(
+                    parent_transaction_id=transaction_instance.id
                 )
+            else:
+                child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
                     child_transaction_data["contact_1_id"] = (
@@ -292,25 +289,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 self.save_transaction(child_transaction_data, request)
 
         return self.queryset.get(id=transaction_instance.id)
-
-    @action(detail=False, methods=["put"], url_path=r"multisave")
-    def save_transactions(self, request):
-        with db_transaction.atomic():
-            saved_data = [self.save_transaction(data, request) for data in request.data]
-        return Response(
-            [TransactionSerializer().to_representation(data) for data in saved_data]
-        )
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
     def save_reatt_redes_transactions(self, request):
@@ -324,14 +302,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 request.data[1]["reatt_redes"] = reatt_redes
                 request.data[1]["reatt_redes_id"] = reatt_redes.id
                 child = request.data[1].get("children", [])[0]
-                child["reatt_redes"] = reatt_redes
+                child[" "] = reatt_redes
                 child["reatt_redes_id"] = reatt_redes.id
                 request.data[1]["children"] = [child]
                 to = self.save_transaction(request.data[1], request)
                 saved_data = [reatt_redes, to]
-        return Response(
-            [TransactionSerializer().to_representation(data) for data in saved_data]
-        )
+        ids = []
+        for data in saved_data:
+            ids.append(data.id)
+        return Response(ids)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):

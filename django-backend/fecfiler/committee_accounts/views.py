@@ -1,6 +1,6 @@
 from uuid import UUID
 from fecfiler.user.models import User
-from rest_framework import filters, viewsets, mixins
+from rest_framework import filters, viewsets, mixins, pagination
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.transactions.models import (
     Transaction,
@@ -25,6 +25,11 @@ import structlog
 from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
+
+
+class CommitteeMemberListPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
 
 
 class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -86,9 +91,21 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
             raise SuspiciousSession("session has invalid committee_id")
         return committee_id
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "page" in request.query_params:
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
+    pagination_class = CommitteeMemberListPagination
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["name", "email", "role", "is_active", "created"]
     ordering = ["-created"]
@@ -110,28 +127,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     Value(""),
                     output_field=TextField(),
                 ),
-                email=Coalesce(
-                    "user__email", "pending_email", output_field=TextField()
-                ),
+                email=Coalesce("user__email", "pending_email", output_field=TextField()),
                 is_active=~Q(user=None),
             )
         )
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(
-        detail=False, methods=["post"], url_path="add-member", url_name="add_member"
-    )
+    @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
         committee_uuid = self.request.session["committee_uuid"]
         committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
@@ -161,7 +162,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         # Check for pre-existing membership
         matching_memberships = self.get_queryset().filter(
-            Q(pending_email=email) | Q(user__email=email)
+            Q(pending_email__iexact=email) | Q(user__email__iexact=email)
         )
         if matching_memberships.count() > 0:
             return Response(
@@ -219,12 +220,23 @@ def register_committee(committee_id, user):
             f1_email = f1_line.split(FS_STR)[11]
 
     failure_reason = None
-    if f1_email != email:
-        failure_reason = f"Email {email} does not match committee email"
 
-    existing_account = CommitteeAccount.objects.filter(
-        committee_id=committee_id
-    ).first()
+    if not f1_email:
+        failure_reason = "No email provided in F1"
+    else:
+        f1_email_lowercase = f1_email.lower()
+        f1_emails = []
+        if ";" in f1_email_lowercase:
+            f1_emails = f1_email_lowercase.split(";")
+        elif "," in f1_email_lowercase:
+            f1_emails = f1_email_lowercase.split(",")
+        else:
+            f1_emails = [f1_email_lowercase]
+
+        if email.lower() not in f1_emails:
+            failure_reason = f"Email {email} does not match committee email"
+
+    existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
         failure_reason = f"Committee {committee_id} already registered"
 

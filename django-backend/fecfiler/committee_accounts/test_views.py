@@ -41,6 +41,18 @@ class CommitteeAccountsViewsTest(TestCase):
             user=self.other_user,
         )
 
+    def test_register_committee_case_insensitive(self):
+        self.test_user.email = self.test_user.email.upper()
+        account = register_committee("C12345678", self.test_user)
+        self.assertEquals(account.committee_id, "C12345678")
+        self.assertRaisesMessage(
+            Exception,
+            self.register_error_message,
+            register_committee,
+            committee_id="C12345678",
+            user=self.test_user,
+        )
+
 
 class CommitteeMemberViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee", "unaffiliated_users"]
@@ -53,7 +65,7 @@ class CommitteeMemberViewSetTest(TestCase):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")
         view = CommitteeMembershipViewSet()
         request = self.factory.get(
-            "/api/v1/committee-members/{membership_uuid}/remove-member"
+            f"/api/v1/committee-members/{membership_uuid}/remove-member"
         )
         request.user = self.user
         request.session = {

@@ -1,24 +1,12 @@
 {
     "form_type": {},
     "filer_committee_id_number": {},
-    "committee_name": {
-        "path": "form_1m.committee_name"
-    },
-    "street_1": {
-        "path": "form_1m.street_1"
-    },
-    "street_2": {
-        "path": "form_1m.street_2"
-    },
-    "city": {
-        "path": "form_1m.city"
-    },
-    "state": {
-        "path": "form_1m.state"
-    },
-    "zip": {
-        "path": "form_1m.zip"
-    },
+    "committee_name": {},
+    "street_1": {},
+    "street_2": {},
+    "city": {},
+    "state": {},
+    "zip": {},
     "committee_type": {
         "path": "form_1m.committee_type"
     },

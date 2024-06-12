@@ -19,11 +19,6 @@ class F1MSerializerTestCase(TestCase):
             "treasurer_last_name": "Testerson",
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "AL",
-            "zip": "12345",
             "committee_type": "X",
             "affiliated_date_form_f1_filed": "2023-11-7",
             "affiliated_committee_fec_id": "C00277616",
@@ -32,10 +27,6 @@ class F1MSerializerTestCase(TestCase):
         }
 
         self.invalid_f1m_report = {
-            "street_1": "22 Test Street",
-            "street_2": "Unit B",
-            "city": "Testopolis",
-            "state": "AL",
             "committee_type": "WAY TOO MANY CHARS",
         }
 
@@ -63,7 +54,6 @@ class F1MSerializerTestCase(TestCase):
             },
         )
         self.assertFalse(invalid_serializer.is_valid())
-        self.assertIsNotNone(invalid_serializer.errors["zip"])
         self.assertIsNotNone(invalid_serializer.errors["committee_type"])
 
     def test_contacts_to_representation(self):

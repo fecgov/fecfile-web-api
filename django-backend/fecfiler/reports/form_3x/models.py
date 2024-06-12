@@ -16,11 +16,7 @@ class Form3X(models.Model):
         unique=True,
     )
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
-    street_1 = models.TextField(null=True, blank=True)
-    street_2 = models.TextField(null=True, blank=True)
-    city = models.TextField(null=True, blank=True)
-    state = models.TextField(null=True, blank=True)
-    zip = models.TextField(null=True, blank=True)
+
     election_code = models.TextField(null=True, blank=True)
     date_of_election = models.DateField(null=True, blank=True)
     state_of_election = models.TextField(null=True, blank=True)

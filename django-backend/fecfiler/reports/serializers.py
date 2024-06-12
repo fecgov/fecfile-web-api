@@ -51,9 +51,7 @@ class Form1MSerializer(ModelSerializer):
     contact_candidate_V_id = UUIDField(allow_null=True, required=False)  # noqa: N815
     contact_affiliated = ContactSerializer(allow_null=True, required=False)
 
-    contact_candidate_I = ContactSerializer(  # noqa: N815
-        allow_null=True, required=False
-    )
+    contact_candidate_I = ContactSerializer(allow_null=True, required=False)  # noqa: N815
     contact_candidate_II = ContactSerializer(  # noqa: N815
         allow_null=True, required=False
     )
@@ -63,9 +61,7 @@ class Form1MSerializer(ModelSerializer):
     contact_candidate_IV = ContactSerializer(  # noqa: N815
         allow_null=True, required=False
     )
-    contact_candidate_V = ContactSerializer(  # noqa: N815
-        allow_null=True, required=False
-    )
+    contact_candidate_V = ContactSerializer(allow_null=True, required=False)  # noqa: N815
 
     class Meta:
         fields = [
@@ -84,6 +80,13 @@ class Form1MSerializer(ModelSerializer):
 class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
     id = UUIDField(required=False)
 
+    committee_name = CharField(required=False, allow_null=True)
+    street_1 = CharField(required=False, allow_null=True)
+    street_2 = CharField(required=False, allow_null=True)
+    city = CharField(required=False, allow_null=True)
+    state = CharField(required=False, allow_null=True)
+    zip = CharField(required=False, allow_null=True)
+
     upload_submission = UploadSubmissionSerializer(
         read_only=True,
     )
@@ -93,9 +96,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     report_status = CharField(
         read_only=True,
     )
-    report_code_label = CharField(
-        read_only=True,
-    )
+    report_code_label = CharField(read_only=True)
+    version_label = CharField(read_only=True)
     is_first = BooleanField(read_only=True)
 
     form_3x = Form3XSerializer(required=False)
@@ -103,13 +105,12 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     form_99 = Form99Serializer(required=False)
     form_1m = Form1MSerializer(required=False)
 
-    def to_representation(self, instance, depth=0):
+    def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
         form_3x = representation.pop("form_3x") or []
         form_24 = representation.pop("form_24") or []
         form_99 = representation.pop("form_99") or []
         form_1m = representation.pop("form_1m") or []
-
         if form_3x:
             representation["report_type"] = "F3X"
             for property in form_3x:
@@ -193,14 +194,19 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 not in [
                     "uploadsubmission",
                     "webprintsubmission",
-                    "committee_name",
                     "memotext",
                     "transaction",
                     "dotfec",
                     "report",
                     "reporttransaction",
                 ]
-            ] + ["report_status", "fields_to_validate", "report_code_label", "is_first"]
+            ] + [
+                "report_status",
+                "fields_to_validate",
+                "report_code_label",
+                "version_label",
+                "is_first",
+            ]
 
         fields = get_fields()
         read_only_fields = ["id", "created", "updated", "is_first"]
