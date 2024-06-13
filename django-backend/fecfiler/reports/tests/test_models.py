@@ -18,7 +18,7 @@ class ReportModelTestCase(TestCase):
         self.missing_type_transaction = {}
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         create_committee_view(self.committee.id)
-        self.f24_report = create_form24(self.committee, "2024-01-01", "2024-02-01", {})
+        self.f24_report = create_form24(self.committee)
         self.f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
 
     def test_amending(self):
@@ -41,7 +41,7 @@ class ReportModelTestCase(TestCase):
         self.assertEquals(self.f24_report.form_type, "F24A")
 
     def test_delete(self):
-        f24_report = create_form24(self.committee, {})
+        f24_report = create_form24(self.committee)
         f24_report_id = f24_report.id
         f24_id = f24_report.form_24.id
         f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
@@ -66,13 +66,13 @@ class ReportModelTestCase(TestCase):
         ie.save()
         ie_id = ie.id
 
-        self.f24_report.delete()
+        f24_report.delete()
         ie = Transaction.all_objects.filter(id=ie_id).first()
         self.assertIsNone(ie.deleted)
         self.assertFalse(Report.objects.filter(id=f24_report_id).exists())
         self.assertFalse(Form24.objects.filter(id=f24_id).exists())
 
-        self.f3x_report.delete()
+        f3x_report.delete()
         self.assertFalse(Report.objects.filter(id=f3x_report_id).exists())
         self.assertFalse(Form3X.objects.filter(id=f3x_id).exists())
 

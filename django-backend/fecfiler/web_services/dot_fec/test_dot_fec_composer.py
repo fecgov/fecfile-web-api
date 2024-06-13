@@ -25,8 +25,6 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.f99 = create_form99(
             self.committee,
-            coverage_from,
-            coverage_through,
             {
                 "text_code": "ABC",
                 "message_text": "\nBEHOLD! A large text string\nwith new lines",
