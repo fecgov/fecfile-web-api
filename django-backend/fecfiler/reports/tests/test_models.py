@@ -41,10 +41,12 @@ class ReportModelTestCase(TestCase):
         self.assertEquals(self.f24_report.form_type, "F24A")
 
     def test_delete(self):
-        f24_report_id = self.f24_report.id
-        f24_id = self.f24_report.form_24.id
-        f3x_report_id = self.f3x_report.id
-        f3x_id = self.f3x_report.form_3x.id
+        f24_report = create_form24(self.committee, {})
+        f24_report_id = f24_report.id
+        f24_id = f24_report.form_24.id
+        f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        f3x_report_id = f3x_report.id
+        f3x_id = f3x_report.form_3x.id
         candidate_a = Contact.objects.create(
             committee_account_id=self.committee.id,
             candidate_office="H",

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("transactions", "0006_independent_expenditure_memos_no_aggregation_group"),
+        ("transactions", "0007_schedulee_so_candidate_state"),
     ]
 
     operations = [

@@ -31,6 +31,8 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
+from ..reports.models import Report
+from fecfiler.reports.report_code_label import report_code_label_case
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -270,6 +272,12 @@ class TransactionManager(SoftDeleteManager):
 
 class TransactionViewManager(Manager):
     def get_queryset(self):
+        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"))
+            .annotate(report_code_label=report_code_label_case)
+            .values("report_code_label")[:1]
+        )
+
         return (
             super()
             .get_queryset()
@@ -316,6 +324,7 @@ class TransactionViewManager(Manager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
+                report_code_label=REPORT_CODE_LABEL_CLAUSE,
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
@@ -344,9 +353,7 @@ class TransactionViewManager(Manager):
                     output_field=TextField(),
                 ),
             ),
-            default=Concat(
-                "schedule", "_form_type", "created", output_field=TextField()
-            ),
+            default=Concat("schedule", "_form_type", "created", output_field=TextField()),
             output_field=TextField(),
         )
 

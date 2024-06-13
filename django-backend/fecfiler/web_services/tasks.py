@@ -154,21 +154,27 @@ def submit_to_webprint(
     email = WEBPRINT_EMAIL
 
     """Submit to WebPrint"""
-    submitter = WebPrintSubmitter(api)
-    logger.info(f"Uploading {file_name} to FEC WebPrint")
-    submission_response_string = submitter.submit(email, dot_fec_bytes)
-    submission.save_fec_response(submission_response_string)
+    try:
+        submitter = WebPrintSubmitter(api)
+        logger.info(f"Uploading {file_name} to FEC WebPrint")
+        submission_response_string = submitter.submit(email, dot_fec_bytes)
+        submission.save_fec_response(submission_response_string)
 
-    """Poll FEC for status of submission"""
-    # TODO: add timeout?
-    while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-        logger.info(f"Polling status for {submission.fec_submission_id}.")
-        logger.info(f"Status: {submission.fec_status}, Message: {submission.fec_message}")
-        time.sleep(2)
-        status_response_string = submitter.poll_status(
-            submission.batch_id, submission.fec_submission_id
-        )
-        submission.save_fec_response(status_response_string)
+        """Poll FEC for status of submission"""
+        # TODO: add timeout?
+        while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+            logger.info(f"Polling status for {submission.fec_submission_id}.")
+            logger.info(
+                f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+            )
+            time.sleep(2)
+            status_response_string = submitter.poll_status(
+                submission.batch_id, submission.fec_submission_id
+            )
+            submission.save_fec_response(status_response_string)
+    except Exception:
+        submission.save_error("Failed submitting to WebPrint")
+        return
 
     new_state = (
         FECSubmissionState.SUCCEEDED

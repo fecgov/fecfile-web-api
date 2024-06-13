@@ -56,6 +56,18 @@ class ScheduleESerializer(ModelSerializer):
         model_data = get_model_data(validated_data, ScheduleE)
         return ScheduleE.objects.create(**model_data)
 
+    def to_internal_value(self, data):
+        # We only save the candidate state in the schedule e table for
+        # presidential candidates that are in a primary election.
+        # Otherwise, the candidate state is located in the contact_2 record.
+        validated_data = super().to_internal_value(data)
+        if not (
+            validated_data.get('election_code').startswith('P')
+            and validated_data.get('so_candidate_office') == 'P'
+        ):
+            validated_data['so_candidate_state'] = None
+        return validated_data
+
     class Meta:
         fields = [
             f.name
