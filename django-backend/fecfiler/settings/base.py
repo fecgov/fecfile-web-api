@@ -189,7 +189,7 @@ OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 # OpenID Connect settings end
 
 USE_X_FORWARDED_HOST = True
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
