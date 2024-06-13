@@ -108,7 +108,7 @@ services:
       FECFILE_GITHUB_TOKEN:
 
   nginx:
-    build: https://github.com/fecgov/fecfile-api-proxy.git#feature/816
+    build: https://github.com/fecgov/fecfile-api-proxy.git#develop
     container_name: fecfile-api-proxy
     ports:
       - 8080:8080
