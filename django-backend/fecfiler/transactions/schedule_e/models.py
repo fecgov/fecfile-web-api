@@ -28,6 +28,7 @@ class ScheduleE(models.Model):
     completing_suffix = models.TextField(null=True, blank=True)
     date_signed = models.DateField(null=True, blank=True)
     memo_text_description = models.TextField(null=True, blank=True)
+    so_candidate_state = models.TextField(null=True, blank=True)
 
     def get_transaction(self):
         return self.transaction_set.first()
