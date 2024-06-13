@@ -29,13 +29,13 @@ from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fiel
 from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
+
+from fecfiler.reports.report_code_label import get_report_code_label
 import structlog
 
 logger = structlog.get_logger(__name__)
 
-MISSING_SCHEMA_NAME_ERROR = ValidationError(
-    {"schema_name": ["No schema_name provided"]}
-)
+MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
 
 SCHEDULE_SERIALIZERS = dict(
     A=ScheduleASerializer,
@@ -76,9 +76,7 @@ class TransactionSerializer(
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
-    back_reference_sched_name = CharField(
-        required=False, allow_null=True, read_only=True
-    )
+    back_reference_sched_name = CharField(required=False, allow_null=True, read_only=True)
     form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
     name = CharField(read_only=True)
@@ -98,6 +96,7 @@ class TransactionSerializer(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
     line_label = CharField(read_only=True)
+    report_code_label = CharField(read_only=True)
 
     class Meta:
         model = Transaction
@@ -144,6 +143,7 @@ class TransactionSerializer(
                 "payment_amount",
                 "balance_at_close",
                 "line_label",
+                "report_code_label",
             ]
 
         fields = get_fields()
@@ -261,13 +261,16 @@ class TransactionSerializer(
         representation["report_ids"] = []
         for report in instance.reports.all():
             representation["report_ids"].append(report.id)
-            representation["reports"].append({
-                "id": report.id,
-                "coverage_from_date": report.coverage_from_date,
-                "coverage_through_date": report.coverage_through_date,
-                "report_code": report.report_code,
-                "report_type": report.report_type
-            })
+            representation["reports"].append(
+                {
+                    "id": report.id,
+                    "coverage_from_date": report.coverage_from_date,
+                    "coverage_through_date": report.coverage_through_date,
+                    "report_code": report.report_code,
+                    "report_type": report.report_type,
+                    "report_code_label": get_report_code_label(report),
+                }
+            )
 
         return representation
 
