@@ -175,11 +175,6 @@ def get_form_3x(form_3x_id):
         "fields": {
             "id": form_3x_id,
             "change_of_address": False,
-            "street_1": random_string(16, use_digits=True),
-            "street_2": random_string(6, use_digits=True),
-            "city": random_string(10),
-            "state": random_string(2),
-            "zip": random_string(2, use_letters=False, use_digits=True),
             "qualified_committee": False,
         }
     }
