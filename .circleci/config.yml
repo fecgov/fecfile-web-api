@@ -245,7 +245,7 @@ workflows:
             - dependency-check
           filters:
             branches:
-              only: /feature\/816|release\/sprint-[\.\d]+|main/
+              only: /develop|release\/sprint-[\.\d]+|main/
       - docs-build:
           requires:
             - test
