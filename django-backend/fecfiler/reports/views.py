@@ -61,7 +61,6 @@ class ReportListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-@silk_profile(name='report__viewset_class')
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
