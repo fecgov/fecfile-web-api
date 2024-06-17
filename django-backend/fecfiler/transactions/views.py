@@ -28,6 +28,7 @@ import structlog
 
 import os
 import psycopg2
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -58,6 +59,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ordering = ["-created"]
     queryset = Transaction.objects
 
+    @silk_profile(name='transaction__get_queryset')
     def get_queryset(self):
         # Use the table if writing
         if hasattr(self, "action") and self.action in [
@@ -125,6 +127,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return response
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
+    @silk_profile(name='transaction__previous_transaction_by_entity')
     def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
@@ -140,6 +143,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
+    @silk_profile('transaction__previous_transaction_by_election')
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
@@ -165,6 +169,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             id, date, aggregation_group, None, election_code, office, state, district
         )
 
+    @silk_profile(name='transaction__get_previous')
     def get_previous(
         self,
         transaction_id,
@@ -202,6 +207,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
+    @silk_profile(name='transaction__save_transaction')
     def save_transaction(self, transaction_data, request):
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
