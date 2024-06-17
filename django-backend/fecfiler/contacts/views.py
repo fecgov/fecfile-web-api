@@ -349,7 +349,5 @@ class DeletedContactsViewSet(
                 "Contact Ids are invalid",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        for contact in contacts:
-            contact.deleted = None
-            contact.save()
+        contacts.update(deleted=None)
         return Response(ids_to_restore)
