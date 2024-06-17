@@ -81,9 +81,7 @@ def _login_to_cf(ctx, space):
             "   cf create-service cloud-gov-service-account space-deployer"
             " [my-service-account-name]"
         )
-        print(
-            "   cf create-service-key  [my-server-account-name] [my-service-key-name]"
-        )
+        print("   cf create-service-key  [my-server-account-name] [my-service-key-name]")
         print("   cf service-key  [my-server-account-name] [my-service-key-name]")
 
         exit(1)
@@ -97,7 +95,9 @@ def _do_deploy(ctx, space, app):
 
     cmd = "push --strategy rolling" if existing_deploy.ok else "push"
     new_deploy = ctx.run(
-        f"cf {cmd} {app} -f {manifest_filename}", echo=True, warn=True,
+        f"cf {cmd} {app} -f {manifest_filename}",
+        echo=True,
+        warn=True,
     )
     return new_deploy
 
@@ -137,17 +137,13 @@ def _rollback(ctx, app):
         hide=True,
         warn=True,
     )
-    active_deployments = (
-        json.loads(status.stdout).get("pagination").get("total_results")
-    )
+    active_deployments = json.loads(status.stdout).get("pagination").get("total_results")
     # Try to roll back
     if active_deployments > 0:
         print("Attempting to roll back any deployment in progress...")
         # Show the in-between state
         ctx.run(f"cf app {app}", echo=True, warn=True)
-        cancel_deploy = ctx.run(
-            f"cf cancel-deployment {app}", echo=True, warn=True
-        )
+        cancel_deploy = ctx.run(f"cf cancel-deployment {app}", echo=True, warn=True)
         if cancel_deploy.ok:
             print("Successfully cancelled deploy. Check logs.")
         else:
@@ -196,6 +192,21 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         if not new_deploy.ok:
             _rollback(ctx, app)
             return sys.exit(1)
+
+    # Allow proxy to connect to api via internal route
+    add_network_policy = ctx.run(
+        "cf add-network-policy fecfile-api-proxy fecfile-web-api",
+        echo=True,
+        warn=True,
+    )
+    if not add_network_policy.ok:
+        print(
+            "Unable to add network policy. Make sure the proxy app is deployed.\n"
+            "For more information, check logs."
+        )
+
+        # Fail the build because the api will be down until the proxy can connect
+        return sys.exit(1)
 
     # Needed for CircleCI
     return sys.exit(0)
