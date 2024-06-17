@@ -33,6 +33,7 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
+from silk.profiling.profiler import silk_profile
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -302,6 +303,7 @@ class TransactionManager(SoftDeleteManager):
             default=None,
         )
 
+    @silk_profile(name='transaction__transaction_view')
     def transaction_view(self):
         return (
             super()
@@ -329,6 +331,7 @@ class TransactionManager(SoftDeleteManager):
 
 
 class TransactionViewManager(Manager):
+    @silk_profile(name='transaction_view_manager__get_queryset')
     def get_queryset(self):
         return (
             super()

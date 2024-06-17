@@ -11,6 +11,7 @@ from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, CharField, F
 from django.db.models.functions import Concat, Trim
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -60,6 +61,7 @@ class ReportListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+@silk_profile(name='report__viewset_class')
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -115,6 +117,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     # Allow requests to filter reports output based on report type by
     # passing a query parameter
+    @silk_profile(name='report__get_queryset')
     def get_queryset(self):
         queryset = super().get_queryset()
         report_type_filters = self.request.query_params.get("report_type")
@@ -197,6 +200,7 @@ class ReportViewMixin(GenericViewSet):
         return filter_by_report(super().get_queryset(), self)
 
 
+@silk_profile(name='report__filter_by_report')
 def filter_by_report(queryset, viewset):
     report_id = (
         (

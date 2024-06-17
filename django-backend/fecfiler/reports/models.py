@@ -8,6 +8,7 @@ from .form_24.models import Form24
 from .form_99.models import Form99
 from .form_1m.models import Form1M
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -80,6 +81,7 @@ class Report(CommitteeOwnedModel):
     objects = ReportManager()
 
     @property
+    @silk_profile(name='report__previous_report')
     def previous_report(self):
         return (
             Report.objects.get_queryset()
@@ -91,6 +93,7 @@ class Report(CommitteeOwnedModel):
             .last()
         )
 
+    @silk_profile(name='report__save')
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
         from fecfiler.transactions.schedule_d.utils import carry_forward_debts
@@ -108,6 +111,7 @@ class Report(CommitteeOwnedModel):
                 carry_forward_debts(self)
                 update_recalculation(self)
 
+    @silk_profile(name='report__get_future_in_progress_reports')
     def get_future_in_progress_reports(
         self,
     ):
@@ -165,6 +169,7 @@ FORMS_TO_CALCULATE = [
 ]
 
 
+@silk_profile(name='report__update_recalculation')
 def update_recalculation(report: Report):
     if report:
         committee = report.committee_account
