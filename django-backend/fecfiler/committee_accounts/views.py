@@ -32,8 +32,13 @@ class CommitteeMemberListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+class CommitteePagination(pagination.PageNumberPagination):
+    page_size = 100
+
+
 class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = CommitteeAccountSerializer
+    pagination_class = CommitteePagination
 
     def get_queryset(self):
         user = self.request.user
