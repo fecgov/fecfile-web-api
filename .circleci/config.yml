@@ -232,6 +232,25 @@ jobs:
           name: Deploy docs to gh-pages branch
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
 
+  trigger-e2e-test-pipeline:
+      docker: 
+        - image: cimg/base:2021.11
+      resource_class: small
+      steps:
+        - run:
+            name: Ping another pipeline
+            command: |
+              CREATED_PIPELINE=$(
+                curl -v https://circleci.com/api/v2/project/gh/fecgov/fecfile-web-app/pipeline \
+                --header "Content-Type: application/json" \
+                --header "Accept: application/json" \
+                --header "Circle-Token: $CIRCLE_TOKEN" \
+                --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
+                | jq -r '.id'
+              )
+              echo "created pipeline"
+              echo $CREATED_PIPELINE
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -239,6 +258,10 @@ workflows:
     jobs:
       - test
       - dependency-check
+      - trigger-e2e-test-pipeline:
+          filters:
+            branches:
+              only: /develop|release\/sprint-[\.\d]+|main/
       - deploy-job:
           requires:
             - test
