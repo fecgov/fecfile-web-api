@@ -181,7 +181,13 @@ def flag_reports_for_recalculation(report: Report):
         flagged_count = reports_to_flag.update(
             calculation_status=None
         )
-        logger.info(f"Report {report.id} marked for recalculation along with {flagged_count-1} subsequent reports")
+        logger.info(
+            f"""Report {
+                report.id
+            } marked for recalculation along with {
+                flagged_count-1
+            } subsequent reports"""
+        )
 
 
 class ReportMixin(models.Model):

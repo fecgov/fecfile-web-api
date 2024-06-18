@@ -277,7 +277,7 @@ def get_sched_transaction(sched_transaction_id, amount, date, schedule_format):
     date_prefix = schedule_format["date_prefix"]
 
     return {
-        "model": f"transactions.{schedule_format["schedule_name"]}",
+        "model": f"transactions.{schedule_format['schedule_name']}",
         "fields": {
             "id": f"{sched_transaction_id}",
             f"{amount_prefix}_amount": amount,
@@ -290,7 +290,7 @@ def get_transaction(transaction_id, sched_transaction_id, committee_uuid, contac
         "model": "transactions.transaction",
         "fields": {
             "id": f"{transaction_id}",
-            f"{schedule["schedule_id_field"]}": f"{sched_transaction_id}",
+            f"{schedule['schedule_id_field']}": f"{sched_transaction_id}",
             "committee_account_id": f"{committee_uuid}",
             "_form_type": "SA11AI",
             "memo_code": choices([True, False], [0.8, 0.2], k=1)[0],
