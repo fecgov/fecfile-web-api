@@ -169,6 +169,7 @@ FORMS_TO_CALCULATE = [
 ]
 
 
+@silk_profile(name='report__flag_reports_for_recalculation')
 def flag_reports_for_recalculation(report: Report):
     if report and report.get_form_name() in FORMS_TO_CALCULATE:
         committee = report.committee_account
