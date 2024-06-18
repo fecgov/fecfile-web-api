@@ -1,5 +1,5 @@
 from django.conf.urls import include
-from django.urls import re_path, path
+from django.urls import re_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -38,5 +38,3 @@ urlpatterns = [
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
 ]
-
-urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
