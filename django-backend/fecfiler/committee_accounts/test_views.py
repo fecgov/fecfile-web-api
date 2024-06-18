@@ -125,6 +125,29 @@ class CommitteeMemberViewSetTest(TestCase):
         self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
         self.assertEqual(response.data["is_active"], True)
 
+    def test_add_membership_for_preexisting_user_email_case_test(self):
+        # This test covers a bug found where the email entered is treated
+        # as case when determining membership when it should not be.
+
+        view = CommitteeMembershipViewSet()
+        request = self.factory.get("/api/v1/committee-members/add-member")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        request.method = "POST"
+        request.data = {
+            "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            "email": "TEST_USER_0001@fec.gov",
+        }
+        view.request = request
+        response = view.add_member(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
+        self.assertEqual(response.data["is_active"], True)
+
     def test_add_membership_requires_correct_parameters(self):
         view = CommitteeMembershipViewSet()
         request = self.factory.get("/api/v1/committee-members/add-member")
