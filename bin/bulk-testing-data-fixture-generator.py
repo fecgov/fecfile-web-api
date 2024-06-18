@@ -313,8 +313,8 @@ def get_transaction_report(transaction_id, report_id):
         "fields": {
             "transaction_id": f"{transaction_id}",
             "report_id": f"{report_id}",
-                "created": "2024-01-01T00:00:00.000Z",
-                "updated": "2024-01-01T00:00:00.000Z"
+            "created": "2024-01-01T00:00:00.000Z",
+            "updated": "2024-01-01T00:00:00.000Z"
         }
     }
 
@@ -323,12 +323,12 @@ def create_transaction(committee_uuid, contact_id, report):
     schedule = choice(list(SCHEDULE_FORMATS.values()))
     report_id = get_record_uuid(report)
     report_date = report["fields"]["coverage_from_date"]
-    
+
     sched_transaction_id = uuid4()
     transaction_id = uuid4()
     return [
         get_sched_transaction(
-            sched_transaction_id, randrange(100,500), report_date, schedule
+            sched_transaction_id, randrange(100, 500), report_date, schedule
         ),
         get_transaction(
             transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule
@@ -395,7 +395,7 @@ def prepare_records(records):
             + c["sched_transactions"]
             + c["transactions"]
             + c["transaction_reports"]
-		)
+        )
     return out_records
 
 
