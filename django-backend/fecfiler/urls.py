@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import re_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+# from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 BASE_V1_URL = r"^api/v1/"
 
