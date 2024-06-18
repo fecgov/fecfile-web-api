@@ -169,6 +169,25 @@ FORMS_TO_CALCULATE = [
 ]
 
 
+def flag_reports_for_recalculation(report: Report):
+    if report and report.get_form_name() in FORMS_TO_CALCULATE:
+        committee = report.committee_account
+        report_date = report.coverage_from_date
+        reports_to_flag = []
+        if report_date is None:
+            reports_to_flag = Report.objects.get(id=report.id)
+        else:
+            reports_to_flag = Report.objects.filter(
+                committee_account=committee,
+                coverage_from_date__gte=report_date
+            )
+
+        flagged_count = reports_to_flag.update(
+            calculation_status=None
+        )
+        logger.info(f"Report {report.id} marked for recalculation along with {flagged_count-1} subsequent reports")
+
+
 @silk_profile(name='report__update_recalculation')
 def update_recalculation(report: Report):
     if report:

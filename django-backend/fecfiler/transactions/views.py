@@ -53,6 +53,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         "aggregate",
         "balance",
         "back_reference_tran_id_number",
+        "form_type",
+        "report_code_label",
     ]
     ordering = ["-created"]
     queryset = Transaction.objects
