@@ -1,0 +1,55 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.views.CommitteePagination
+======================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autoclass:: CommitteePagination
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteePagination.__init__
+      ~CommitteePagination.get_html_context
+      ~CommitteePagination.get_next_link
+      ~CommitteePagination.get_page_number
+      ~CommitteePagination.get_page_size
+      ~CommitteePagination.get_paginated_response
+      ~CommitteePagination.get_paginated_response_schema
+      ~CommitteePagination.get_previous_link
+      ~CommitteePagination.get_results
+      ~CommitteePagination.get_schema_fields
+      ~CommitteePagination.get_schema_operation_parameters
+      ~CommitteePagination.paginate_queryset
+      ~CommitteePagination.to_html
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteePagination.display_page_controls
+      ~CommitteePagination.invalid_page_message
+      ~CommitteePagination.last_page_strings
+      ~CommitteePagination.max_page_size
+      ~CommitteePagination.page_query_description
+      ~CommitteePagination.page_query_param
+      ~CommitteePagination.page_size
+      ~CommitteePagination.page_size_query_description
+      ~CommitteePagination.page_size_query_param
+      ~CommitteePagination.template
+   
+   

@@ -33,6 +33,7 @@ fecfiler.committee\_accounts.views
       CommitteeMemberListPagination
       CommitteeMembershipViewSet
       CommitteeOwnedViewMixin
+      CommitteePagination
       CommitteeViewSet
    
    
