@@ -160,9 +160,9 @@ def get_form_3x_date_data():
     data = F3X_DATE_DATA.pop(0)
     out_data = {
         "report_code": data["report_code"],
-        "coverage_from_date": f"{data["year"]}-{data["from_date"]}",
-        "coverage_through_date": f"{data["year"]}-{data["through_date"]}",
-        "date_signed": f"{data["year"]}-{data["through_date"]}"
+        "coverage_from_date": f"{data['year']}-{data['from_date']}",
+        "coverage_through_date": f"{data['year']}-{data['through_date']}",
+        "date_signed": f"{data['year']}-{data['through_date']}"
     }
     data["year"] += 1
     F3X_DATE_DATA.append(data)
