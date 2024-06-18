@@ -148,7 +148,8 @@ class Migration(migrations.Migration):
                 FROM ' || temp_table_name || ' AS tt
                 WHERE t.id = tt.id;
             '
-            USING v_election_code,
+            USING
+                v_election_code,
                 v_candidate_office,
                 COALESCE(v_candidate_state, ''),
                 COALESCE(v_candidate_district, ''),
@@ -200,6 +201,8 @@ class Migration(migrations.Migration):
             sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
             temp_table_name := 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
 
+            -- RAISE EXCEPTION '%', NEW;
+
             -- If schedule_c2_id or schedule_d_id is not null, stop processing
             IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
             THEN
@@ -208,20 +211,20 @@ class Migration(migrations.Migration):
 
             IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
             THEN
-                calculate_entity_aggregates(NEW, sql_committee_id, temp_table_name);
+                SELECT calculate_entity_aggregates(NEW, sql_committee_id, temp_table_name);
                 IF OLD IS NOT NULL
                     AND NEW.contact_1_id <> OLD.contact_1_id
                 THEN
-		            calculate_entity_aggregates(OLD, sql_committee_id, temp_table_name)
-	            END IF;
+                    SELECT calculate_entity_aggregates(OLD, sql_committee_id, temp_table_name);
+                END IF;
 
             ELSIF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL
             THEN
-                calculate_loan_payment_to_date(NEW, sql_committee_id, temp_table_name)
+                SELECT calculate_loan_payment_to_date(NEW, sql_committee_id, temp_table_name);
 
             ELSIF NEW.schedule_e_id IS NOT NULL
             THEN
-                calculate_calendar_ytd_per_election_office(NEW, sql_committee_id, temp_table_name)
+                SELECT calculate_calendar_ytd_per_election_office(NEW, sql_committee_id, temp_table_name);
             END IF;
 
             RETURN NEW;
