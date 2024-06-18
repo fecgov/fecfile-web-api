@@ -115,6 +115,7 @@ fecfiler.reports.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.tearDownClass
       ~CommitteeMemberViewSetTest.test_list_no_pagination
       ~CommitteeMemberViewSetTest.test_list_paginated
+      ~CommitteeMemberViewSetTest.test_ordering
    
    
 
