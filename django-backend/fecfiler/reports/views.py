@@ -9,7 +9,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from .serializers import ReportSerializer
-from django.db.models import Case, Value, When, CharField, F
+from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 import structlog
 
@@ -25,6 +25,17 @@ version_labels = {
     "F1MN": "Original",
     "F1MA": "Amendment",
     "F99": "Original",
+}
+
+form_type_ordering = {
+    "F1MN": 10,
+    "F1MA": 10,
+    "F3XN": 20,
+    "F3XA": 20,
+    "F3XT": 20,
+    "F24N": 30,
+    "F24A": 30,
+    "F99": 40,
 }
 
 
@@ -79,17 +90,30 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ordering_fields = [
         "report_code_label",
         "coverage_through_date",
-        "form_type",
         "upload_submission__created",
         "report_status",
         "version_label",
+        "form_type_ordering",
     ]
-    ordering = ["form_type"]
+    ordering = ["form_type_ordering"]
 
     # Allow requests to filter reports output based on report type by
     # passing a query parameter
     def get_queryset(self):
-        queryset = super().get_queryset()
+        ordering_whens = [
+            When(form_type=k, then=Value(v)) for k, v in form_type_ordering.items()
+        ]
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(
+                form_type_ordering=Case(
+                    *ordering_whens,
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+            )
+        )
         report_type_filters = self.request.query_params.get("report_type")
         if report_type_filters is not None:
             report_type_list = report_type_filters.split(",")
@@ -103,6 +127,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 queryset = queryset.filter(form_99__isnull=True)
             if "f1m" not in report_type_list:
                 queryset = queryset.filter(form_1m__isnull=True)
+
         return queryset
 
     @action(detail=True, methods=["post"], url_name="amend")
@@ -163,6 +188,19 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def list(self, request, *args, **kwargs):
+        ordering = request.query_params.get("ordering")
+        if ordering in ["form_type", "-form_type"]:
+            new_ordering = (
+                "-form_type_ordering"
+                if ordering.startswith("-")
+                else "form_type_ordering"
+            )
+            request.query_params._mutable = True
+            request.query_params["ordering"] = new_ordering
+            request.query_params._mutable = False
+        return super().list(request, args, kwargs)
 
 
 class ReportViewMixin(GenericViewSet):
