@@ -59,9 +59,9 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering = self.get_ordering(request, queryset, view)
         if ordering:
             if '-memo_code' in ordering and not (
-                    queryset.filter(memo_code=True).exists() and 
-                    queryset.filter(memo_code__isnull=True).exists()
-                ):
+                queryset.filter(memo_code=True).exists() and 
+                queryset.filter(memo_code__isnull=True).exists()
+            ):
                 ordering = ['memo_code']
             return queryset.order_by(*ordering)
         return queryset
