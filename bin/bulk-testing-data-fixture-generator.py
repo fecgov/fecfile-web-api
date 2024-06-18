@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 
 PRIMARY_COMMITTEE_FEC_ID = os.environ.get("LOCAL_TEST_USER", "C00000000")
 PRIMARY_COMMITTEE_UUID = os.environ.get("LOCAL_TEST_COMMITTEE_UUID", uuid4())
-CONTACT_TYPES = ["IND","ORG","COM","CAN"]
+CONTACT_TYPES = ["IND", "ORG", "COM", "CAN"]
 SCHEDULE_FORMATS = {
     "A": {
         "schedule_name": "schedulea",
@@ -253,7 +253,9 @@ def get_contact(contact_id, committee_uuid, contact_type):
             candidate_office = choice(["H", "S", "P"])
             candidate_district = random_string(1, use_letters=False, use_digits=True)
             candidate_state = random_string(2)
-            candidate_id = f"{candidate_office}{candidate_district}{candidate_state}{random_string(5, use_letters=False, use_digits=True)}"
+            candidate_id = f"""{candidate_office}{candidate_district}{candidate_state}{
+                random_string(5, use_letters=False, use_digits=True)
+            }"""
             contact["fields"] |= {
                 "candidate_state": candidate_state,
                 "candidate_office": candidate_office,
@@ -285,7 +287,9 @@ def get_sched_transaction(sched_transaction_id, amount, date, schedule_format):
     }
 
 
-def get_transaction(transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule):
+def get_transaction(
+    transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule
+):
     return {
         "model": "transactions.transaction",
         "fields": {
@@ -307,10 +311,10 @@ def get_transaction_report(transaction_id, report_id):
     return {
         "model": "reports.reporttransaction",
         "fields": {
-          "transaction_id": f"{transaction_id}",
-          "report_id": f"{report_id}",
-            "created": "2024-01-01T00:00:00.000Z",
-            "updated": "2024-01-01T00:00:00.000Z"
+            "transaction_id": f"{transaction_id}",
+            "report_id": f"{report_id}",
+                "created": "2024-01-01T00:00:00.000Z",
+                "updated": "2024-01-01T00:00:00.000Z"
         }
     }
 
@@ -323,11 +327,15 @@ def create_transaction(committee_uuid, contact_id, report):
     sched_transaction_id = uuid4()
     transaction_id = uuid4()
     return [
-        get_sched_transaction(sched_transaction_id, randrange(100,500), report_date, schedule),
-        get_transaction(transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule),
+        get_sched_transaction(
+            sched_transaction_id, randrange(100,500), report_date, schedule
+        ),
+        get_transaction(
+            transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule
+        ),
         get_transaction_report(transaction_id, report_id)
     ]
-    
+
 
 def get_records():
     committees = [
@@ -378,9 +386,10 @@ def get_records():
 def prepare_records(records):
     out_records = []
     for c in records.values():
+        if c["committee_record"]["fields"]["committee_id"] != PRIMARY_COMMITTEE_FEC_ID:
+            out_records.append(c["committee_record"])
         out_records += (
-            ([c["committee_record"]] if c["committee_record"]["fields"]["committee_id"] != PRIMARY_COMMITTEE_FEC_ID else [])
-            + c["form_3xs"]
+            [c["form_3xs"]]
             + c["reports"]
             + c["contacts"]
             + c["sched_transactions"]
@@ -399,7 +408,7 @@ class UUIDEncoder(json.JSONEncoder):
 
 def save_records_to_fixture(records):
     directory = os.getcwd()
-    filename = f"bulk-testing-data.locust.json"
+    filename = "bulk-testing-data.locust.json"
     full_filename = os.path.join(directory, filename)
     file = open(full_filename, "w")
     file.write(json.dumps(records, cls=UUIDEncoder))
@@ -411,5 +420,8 @@ sorted_records = prepare_records(records)
 save_records_to_fixture(sorted_records)
 print(PRIMARY_COMMITTEE_FEC_ID, PRIMARY_COMMITTEE_UUID)
 for c in records.values():
-    print(c["committee_record"]["fields"]["id"], c["committee_record"]["fields"]["committee_id"])
+    print(
+        c["committee_record"]["fields"]["id"],
+        c["committee_record"]["fields"]["committee_id"]
+    )
 print(f"Generated fixture with {'{:,}'.format(len(sorted_records))} records")
