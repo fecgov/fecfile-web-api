@@ -19,7 +19,6 @@ from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
-from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -106,7 +105,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     form_99 = Form99Serializer(required=False)
     form_1m = Form1MSerializer(required=False)
 
-    @silk_profile(name='report__to_representation')
     def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
         form_3x = representation.pop("form_3x") or []
@@ -143,8 +141,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
 
         return representation
 
-
-    @silk_profile(name='report__can_delete')
     def can_delete(self, representation):
         """can delete if there exist no transactions in this report
         where any transactions in a different report back reference to them"""
@@ -180,7 +176,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             )
         )
 
-    @silk_profile(name='report__validate')
     def validate(self, data):
         self._context = self.context.copy()
         self._context["fields_to_ignore"] = self._context.get(

@@ -35,7 +35,6 @@ from enum import Enum
 from .schedule_b.managers import refunds as schedule_b_refunds
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
-from silk.profiling.profiler import silk_profile
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -305,7 +304,6 @@ class TransactionManager(SoftDeleteManager):
             default=None,
         )
 
-    @silk_profile(name='transaction__transaction_view')
     def transaction_view(self):
         return (
             super()
@@ -333,7 +331,6 @@ class TransactionManager(SoftDeleteManager):
 
 
 class TransactionViewManager(Manager):
-    @silk_profile(name='transaction_view_manager__get_queryset')
     def get_queryset(self):
         REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
             Report.objects.filter(transactions=OuterRef("pk"))
