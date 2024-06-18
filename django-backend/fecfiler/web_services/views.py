@@ -15,7 +15,7 @@ from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from celery.result import AsyncResult
 
 import structlog
@@ -176,6 +176,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         report = Report.objects.filter(
             id=report_id, committee_account_id=committee_uuid
         ).first()
-        if report.calculation_status != CalculationState.SUCCEEDED.value:
+        if (
+            report.get_form_name() in FORMS_TO_CALCULATE
+            and report.calculation_status != CalculationState.SUCCEEDED.value
+        ):
             return calculate_summary.s(report_id)
         return None
