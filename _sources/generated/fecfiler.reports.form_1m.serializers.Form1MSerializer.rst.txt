@@ -28,7 +28,6 @@ fecfiler.reports.form\_1m.serializers.Form1MSerializer
       ~Form1MSerializer.build_standard_field
       ~Form1MSerializer.build_unknown_field
       ~Form1MSerializer.build_url_field
-      ~Form1MSerializer.can_delete
       ~Form1MSerializer.create
       ~Form1MSerializer.fail
       ~Form1MSerializer.get_attribute

@@ -28,7 +28,6 @@ fecfiler.reports.form\_24.serializers.Form24Serializer
       ~Form24Serializer.build_standard_field
       ~Form24Serializer.build_unknown_field
       ~Form24Serializer.build_url_field
-      ~Form24Serializer.can_delete
       ~Form24Serializer.create
       ~Form24Serializer.fail
       ~Form24Serializer.get_attribute

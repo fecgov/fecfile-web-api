@@ -24,6 +24,7 @@ fecfiler.reports.models.Report
       ~Report.amend
       ~Report.arefresh_from_db
       ~Report.asave
+      ~Report.can_delete
       ~Report.check
       ~Report.clean
       ~Report.clean_fields
