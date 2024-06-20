@@ -1,6 +1,8 @@
 import uuid
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import Q
+from django.db.models import OuterRef, Subquery, Exists, Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -135,6 +137,8 @@ class Report(CommitteeOwnedModel):
         self.save()
 
     def delete(self):
+        if not self.can_delete():
+            raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
         if not self.form_24:
             """only delete transactions if the report is the source of the
             tranaction"""
@@ -151,6 +155,61 @@ class Report(CommitteeOwnedModel):
                 form.delete()
 
         super(CommitteeOwnedModel, self).delete()
+
+    def can_delete(self):
+        """
+        can't delete if submitted
+        can't delete if amended
+        can't delete form3x if there exists any transactions in this report or
+        where any transactions in a different report back reference to them
+        """
+        return (
+            not self.upload_submission
+            and (
+                self.report_version is None
+                or self.report_version == "0"
+                or self.report_version == 0
+            )
+            and (
+                not self.form_3x
+                or (
+                    not bool(self.form_24)
+                    and not ReportTransaction.objects.filter(
+                        Exists(
+                            Subquery(
+                                ReportTransaction.objects.filter(
+                                    ~Q(report_id=self.id),
+                                    Q(
+                                        Q(transaction__id=OuterRef("transaction_id"))
+                                        | Q(
+                                            transaction__reatt_redes_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__parent_transaction_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__debt_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__loan_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                    ),
+                                )
+                            )
+                        ),
+                        report_id=self.id,
+                    ).exists()
+                )
+            )
+        )
 
 
 TABLE_TO_FORM = {
@@ -202,9 +261,7 @@ class ReportTransaction(models.Model):
         serialize=False,
         unique=True,
     )
-    transaction = models.ForeignKey(
-        "transactions.Transaction", on_delete=models.CASCADE
-    )
+    transaction = models.ForeignKey("transactions.Transaction", on_delete=models.CASCADE)
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
