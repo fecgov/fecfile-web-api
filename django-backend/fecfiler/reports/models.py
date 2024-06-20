@@ -160,7 +160,7 @@ class Report(CommitteeOwnedModel):
         """
         can't delete if submitted
         can't delete if amended
-        can't delete if there exists any transactions in this report
+        can't delete form3x if there exists any transactions in this report or
         where any transactions in a different report back reference to them
         """
         return (
@@ -171,11 +171,10 @@ class Report(CommitteeOwnedModel):
                 or self.report_version == 0
             )
             and (
-                bool(self.form_24)
-                or bool(self.form_1m)
-                or bool(self.form_99)
-                or not (
-                    ReportTransaction.objects.filter(
+                not self.form_3x
+                or (
+                    not bool(self.form_24)
+                    and not ReportTransaction.objects.filter(
                         Exists(
                             Subquery(
                                 ReportTransaction.objects.filter(
