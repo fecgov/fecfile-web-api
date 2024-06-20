@@ -60,7 +60,7 @@ class TransactionOrderingFilter(OrderingFilter):
         if ordering:
             if '-memo_code' in ordering and not (
                 queryset.filter(memo_code=True).exists() and 
-                queryset.filter(memo_code__isnull=True).exists()
+                queryset.exclude(memo_code=True).exists()
             ):
                 ordering = ['memo_code']
             return queryset.order_by(*ordering)

@@ -84,5 +84,77 @@
             "created": "2023-10-17T18:35:07.353Z",
             "updated": "2023-10-17T18:35:07.354Z"
         }
+    },
+    {
+        "model": "transactions.schedulea",
+        "pk": "10000000-1000-1000-1000-100000000000",
+        "fields": {
+            "contribution_date": "2023-09-01",
+            "contribution_amount": "3.00",
+            "contribution_purpose_descrip": "sdfasdf"
+        }
+    },
+    {
+        "comment": "Link between a transaction and a report",
+        "model": "reports.reporttransaction",
+        "fields": {
+          "transaction_id": "10000000-1000-1000-1000-100000000000",
+          "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+          "created": "2022-02-09T00:00:00.000Z",
+          "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "10000000-1000-1000-1000-100000000000",
+        "fields": {
+            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "transaction_type_identifier": "OPERATING_EXPENDITURE",
+            "aggregation_group": "GENERAL_DISBURSEMENT",
+            "_form_type": "SB21B",
+            "transaction_id": "11111111111111111111",
+            "entity_type": "ORG",
+            "schedule_a": "10000000-1000-1000-1000-100000000000",
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
+            "created": "2023-10-17T18:35:07.353Z",
+            "updated": "2023-10-17T18:35:07.354Z",
+            "memo_code": true
+        }
+    },
+    {
+        "model": "transactions.schedulea",
+        "pk": "10000000-1000-1000-1000-100000000001",
+        "fields": {
+            "contribution_date": "2023-09-01",
+            "contribution_amount": "3.00",
+            "contribution_purpose_descrip": "sdfasdf"
+        }
+    },
+    {
+        "comment": "Link between a transaction and a report",
+        "model": "reports.reporttransaction",
+        "fields": {
+            "transaction_id": "10000000-1000-1000-1000-100000000001",
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "created": "2023-11-27T18:35:07.353Z",
+            "updated": "2023-11-27T18:35:07.354Z"
+        }
+    },
+    {
+        "model": "transactions.transaction",
+        "pk": "10000000-1000-1000-1000-100000000001",
+        "fields": {
+            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "transaction_type_identifier": "OPERATING_EXPENDITURE",
+            "aggregation_group": "GENERAL_DISBURSEMENT",
+            "_form_type": "SB21B",
+            "transaction_id": "11111111111111111111",
+            "entity_type": "ORG",
+            "schedule_a": "10000000-1000-1000-1000-100000000001",
+            "contact_1_id": "00000000-6486-4062-944f-aa0c4cbe4073",
+            "created": "2023-11-27T18:35:07.353Z",
+            "updated": "2023-11-27T18:35:07.354Z",
+            "memo_code": true
+        }
     }
 ]

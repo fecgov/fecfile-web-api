@@ -5,7 +5,7 @@ from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
-from fecfiler.transactions.views import TransactionViewSet
+from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.views import create_committee_view
 
@@ -73,9 +73,9 @@ class TransactionViewsTestCase(TestCase):
     def test_get_queryset(self):
         view_set = TransactionViewSet()
         view_set.request = self.request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 12)
+        self.assertEqual(view_set.get_queryset().count(), 14)
         view_set.request = self.request({}, {"schedules": "A,B,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 10)
+        self.assertEqual(view_set.get_queryset().count(), 12)
         view_set.request = self.request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
@@ -270,3 +270,92 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(
             debt.schedule_d.report_coverage_from_date, report_coverage_from_date
         )
+
+    def test_sorting_memo_code(self):
+        ordering_filter = TransactionOrderingFilter()
+        view = TransactionViewSet()
+        request = self.factory.get(
+            "/api/v1/transactions/",
+            content_type=self.json_content_type,
+        )
+        request.query_params = {
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "ordering": "memo_code"
+        }
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
+        view.request = request
+        queryset = view.get_queryset()
+        memos_sorted = queryset.order_by('memo_code')
+
+        ordered_queryset = ordering_filter.filter_queryset(
+            request,
+            queryset,
+            view
+        )
+        self.assertEqual(
+            ordered_queryset.first().id,
+            memos_sorted.first().id
+        )
+
+    def test_sorting_memo_code_inverted(self):
+        ordering_filter = TransactionOrderingFilter()
+        view = TransactionViewSet()
+        request = self.factory.get(
+            "/api/v1/transactions/",
+            content_type=self.json_content_type,
+        )
+        request.query_params = {
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "ordering": "-memo_code"
+        }
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
+        view.request = request
+        queryset = view.get_queryset()
+        memos_inverted = queryset.order_by('-memo_code')
+
+        ordered_queryset = ordering_filter.filter_queryset(
+            request,
+            queryset,
+            view
+        )
+        self.assertEqual(
+            ordered_queryset.first().id,
+            memos_inverted.first().id
+        )
+
+    def test_sorting_memos_only(self):
+        ordering_filter = TransactionOrderingFilter()
+        view = TransactionViewSet()
+        request = self.factory.get(
+            "/api/v1/transactions/",
+            content_type=self.json_content_type,
+        )
+        request.query_params = {
+            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
+            "ordering": "-memo_code"
+        }
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
+        view.request = request
+        queryset = view.get_queryset()
+        memos_only = queryset.filter(memo_code=True)
+        ordered_queryset = ordering_filter.filter_queryset(
+            request,
+            memos_only,
+            view
+        )
+        self.assertEqual(
+            ordered_queryset.first().id,
+            memos_only.first().id
+        )
+
+
+
