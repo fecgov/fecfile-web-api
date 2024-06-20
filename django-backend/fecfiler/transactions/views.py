@@ -62,7 +62,9 @@ class TransactionOrderingFilter(OrderingFilter):
                 queryset.filter(memo_code=True).exists() and 
                 queryset.exclude(memo_code=True).exists()
             ):
-                ordering = ['memo_code']
+                ordering = [
+                    'memo_code' if param == '-memo_code' else param for param in ordering
+                ]
             return queryset.order_by(*ordering)
         return queryset
 
