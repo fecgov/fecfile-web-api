@@ -8,8 +8,8 @@ from invoke import task
 
 env = cfenv.AppEnv()
 
-APP_NAME = "fecfile-web-api"
-WEB_SERVICES_NAME = "fecfile-web-services"
+APP_NAME = "fecfile-web-api-test"
+WEB_SERVICES_NAME = "fecfile-web-services-test"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 MANIFEST_LABEL = {
@@ -50,7 +50,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "feature/780-update-domain-settings"),
 )
 
 

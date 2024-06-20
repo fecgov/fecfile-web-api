@@ -1,9 +1,9 @@
 ---
 applications:
-  - name: fecfile-web-api
-    instances: 2
+  - name: fecfile-web-api-test
+    instances: 1
     routes:
-      - route: fecfile-web-api-dev.apps.internal
+      - route: fecfile-web-api-dev-test.apps.internal
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
@@ -21,7 +21,7 @@ applications:
       CSRF_TRUSTED_ORIGINS: https://fecfile-web-app-dev.app.cloud.gov
       FFAPI_COOKIE_DOMAIN: app.cloud.gov
       LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-dev.app.cloud.gov
-      LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/login-redirect
+      LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-dev-test.app.cloud.gov/api/v1/auth/login-redirect
       LOGOUT_REDIRECT_URL: https://fecfile-web-app-dev.app.cloud.gov/api/v1/auth/logout-redirect
       FEC_API: https://api.open.fec.gov/v1/
       SESSION_COOKIE_AGE: 64800
