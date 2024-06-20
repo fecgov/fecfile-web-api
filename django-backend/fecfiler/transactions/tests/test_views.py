@@ -356,6 +356,3 @@ class TransactionViewsTestCase(TestCase):
             ordered_queryset.first().id,
             memos_only.first().id
         )
-
-
-

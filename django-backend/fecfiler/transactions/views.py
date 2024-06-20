@@ -59,8 +59,8 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering = self.get_ordering(request, queryset, view)
         if ordering:
             if '-memo_code' in ordering and not (
-                queryset.filter(memo_code=True).exists() and 
-                queryset.exclude(memo_code=True).exists()
+                queryset.filter(memo_code=True).exists()
+                and queryset.exclude(memo_code=True).exists()
             ):
                 ordering = [
                     'memo_code' if param == '-memo_code' else param for param in ordering
