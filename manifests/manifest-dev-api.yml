@@ -22,7 +22,7 @@ applications:
       FFAPI_COOKIE_DOMAIN: app.cloud.gov
       LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-dev.app.cloud.gov
       LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/login-redirect
-      LOGOUT_REDIRECT_URL: https://fecfile-web-api-dev.app.cloud.gov/api/v1/auth/logout-redirect
+      LOGOUT_REDIRECT_URL: https://fecfile-web-app-dev.app.cloud.gov/api/v1/auth/logout-redirect
       FEC_API: https://api.open.fec.gov/v1/
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
