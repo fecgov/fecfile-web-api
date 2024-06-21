@@ -108,7 +108,7 @@ class Report(CommitteeOwnedModel):
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
                 carry_forward_debts(self)
-                update_recalculation(self)
+                flag_reports_for_recalculation(self)
 
     def get_future_in_progress_reports(
         self,
@@ -224,22 +224,29 @@ FORMS_TO_CALCULATE = [
 ]
 
 
-def update_recalculation(report: Report):
-    if report:
+def flag_reports_for_recalculation(report: Report):
+    if report and report.get_form_name() in FORMS_TO_CALCULATE:
         committee = report.committee_account
         report_date = report.coverage_from_date
-        if report_date is not None:
-            reports_to_flag_for_recalculation = Report.objects.filter(
-                committee_account=committee,
-                coverage_from_date__gte=report_date,
-            )
+        reports_to_flag = []
+        if report_date is None:
+            reports_to_flag = Report.objects.get(id=report.id)
         else:
-            reports_to_flag_for_recalculation = [report]
+            reports_to_flag = Report.objects.filter(
+                committee_account=committee,
+                coverage_from_date__gte=report_date
+            )
 
-        for report_to_recalc in reports_to_flag_for_recalculation:
-            report_to_recalc.calculation_status = None
-            report_to_recalc.save()
-            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+        flagged_count = reports_to_flag.update(
+            calculation_status=None
+        )
+        logger.info(
+            f"""Report {
+                report.id
+            } marked for recalculation along with {
+                flagged_count-1
+            } subsequent reports"""
+        )
 
 
 class ReportMixin(models.Model):
