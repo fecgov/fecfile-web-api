@@ -47,7 +47,7 @@ class MemoTextViewSetTest(TestCase):
                 "transaction_uuid",
             ],
         }
-        response = client.post("/api/v1/memo-text/", data, format="json")
+        response = client.post("/api/v1/memo-text/", data, format="json", secure=True)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_new_text")
 
@@ -67,6 +67,6 @@ class MemoTextViewSetTest(TestCase):
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
         }
-        response = client.post("/api/v1/memo-text/", data, format="json")
+        response = client.post("/api/v1/memo-text/", data, format="json", secure=True)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_existing_text")
