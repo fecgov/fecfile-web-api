@@ -168,6 +168,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(serialized_boolean_yn_undefined, "N")
 
     def test_serialize_f3x_summary_instance(self):
+        self.assertEqual(self.f3x.form_type, "F3XN")
         summary_row = serialize_instance("F3X", self.f3x)
         split_row = summary_row.split(FS_STR)
         self.assertEqual(split_row[0], "F3XN")

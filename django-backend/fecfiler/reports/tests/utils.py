@@ -14,28 +14,25 @@ def create_form3x(
     report_code="Q1",
 ):
     return create_test_report(
-        Form3X, committee, report_code, coverage_from, coverage_through, data
+        Form3X, "F3XN", committee, report_code, coverage_from, coverage_through, data
     )
 
 
 def create_form24(committee, data={}):
-    return create_test_report(
-        Form24, committee, data=data
-    )
+    return create_test_report(Form24, "F24N", committee, data=data)
 
 
 def create_form99(committee, data={}):
-    return create_test_report(
-        Form99, committee, data=data
-    )
+    return create_test_report(Form99, "F99", committee, data=data)
 
 
 def create_form1m(committee, data={}):
-    return create_test_report(Form1M, committee, data=data)
+    return create_test_report(Form1M, "F1MN", committee, data=data)
 
 
 def create_test_report(
     form,
+    form_type,
     committee,
     report_code=None,
     coverage_from=None,
@@ -44,6 +41,7 @@ def create_test_report(
 ):
     form_object = create_form(form, data)
     report = Report.objects.create(
+        form_type=form_type,
         committee_account=committee,
         coverage_from_date=coverage_from,
         coverage_through_date=coverage_through,
