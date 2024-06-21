@@ -188,6 +188,8 @@ OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 # OpenID Connect settings end
 
+USE_X_FORWARDED_HOST = True
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
 

@@ -3,7 +3,7 @@ applications:
   - name: fecfile-web-api
     instances: 2
     routes:
-      - route: fecfile-web-api-stage.app.cloud.gov
+      - route: fecfile-web-api-stage.apps.internal
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
