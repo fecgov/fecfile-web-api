@@ -27,6 +27,8 @@ SCHEDULE_FORMATS = {
         "date_prefix": "loan_incurred",
         "schedule_id_field": "schedule_c_id",
     },
+    # Including Schedule D transactions was blocking Django from
+    # importing the resulting fixture cleanly.
     # "D": {
     #     "schedule_name": "scheduled",
     #     "amount_prefix": "incurred",
