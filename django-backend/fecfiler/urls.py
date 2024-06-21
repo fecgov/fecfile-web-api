@@ -13,6 +13,7 @@ def test_celery(_request):
     debug_task.delay()
     return Response(status=200)
 
+
 @api_view(["GET"])
 @permission_classes([])
 def get_api_status(_request):
