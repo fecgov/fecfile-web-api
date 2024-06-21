@@ -5,7 +5,6 @@ from fecfiler.reports.models import Report, Form24, Form3X
 from fecfiler.reports.tests.utils import create_form, create_form3x, create_form24
 from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.transactions.tests.utils import create_ie, create_debt
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction

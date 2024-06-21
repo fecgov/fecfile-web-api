@@ -19,7 +19,7 @@ class CommitteeMemberViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     def test_list_paginated(self):
-        for i in range(10):
+        for _ in range(10):
             create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         view = ReportViewSet()
         view.format_kwarg = "format"

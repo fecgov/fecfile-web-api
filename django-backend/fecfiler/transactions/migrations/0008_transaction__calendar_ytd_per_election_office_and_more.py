@@ -31,12 +31,13 @@ class Migration(migrations.Migration):
                 blank=True, decimal_places=2, max_digits=11, null=True
             ),
         ),
-
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        """),
-
-        migrations.RunSQL("""
+        """
+        ),
+        migrations.RunSQL(
+            """
         CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
             txn RECORD,
             sql_committee_id TEXT,
@@ -83,9 +84,10 @@ class Migration(migrations.Migration):
                 txn.aggregation_group;
         END;
         $$ LANGUAGE plpgsql;
-        """),
-
-        migrations.RunSQL("""
+        """
+        ),
+        migrations.RunSQL(
+            """
         CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
             txn RECORD,
             sql_committee_id TEXT,
@@ -157,9 +159,10 @@ class Migration(migrations.Migration):
                 txn.aggregation_group;
         END;
         $$ LANGUAGE plpgsql;
-        """),
-
-        migrations.RunSQL("""
+        """
+        ),
+        migrations.RunSQL(
+            """
         CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
             txn RECORD,
             sql_committee_id TEXT,
@@ -189,9 +192,10 @@ class Migration(migrations.Migration):
             USING txn.id;
         END;
         $$ LANGUAGE plpgsql;
-        """),
-
-        migrations.RunSQL("""
+        """
+        ),
+        migrations.RunSQL(
+            """
         CREATE OR REPLACE FUNCTION calculate_aggregates()
         RETURNS TRIGGER AS $$
         DECLARE
@@ -200,8 +204,7 @@ class Migration(migrations.Migration):
         BEGIN
             sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
             temp_table_name := 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
-
-            -- RAISE EXCEPTION '%', NEW;
+            RAISE NOTICE 'TESTING TRIGGER';
 
             -- If schedule_c2_id or schedule_d_id is not null, stop processing
             IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
@@ -211,20 +214,36 @@ class Migration(migrations.Migration):
 
             IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
             THEN
-                SELECT calculate_entity_aggregates(NEW, sql_committee_id, temp_table_name);
-                IF OLD IS NOT NULL
+                PERFORM calculate_entity_aggregates(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+                IF TG_OP = 'UPDATE'
                     AND NEW.contact_1_id <> OLD.contact_1_id
                 THEN
-                    SELECT calculate_entity_aggregates(OLD, sql_committee_id, temp_table_name);
+                    PERFORM calculate_entity_aggregates(
+                        OLD, sql_committee_id, temp_table_name || 'OLD');
                 END IF;
 
             ELSIF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL
             THEN
-                SELECT calculate_loan_payment_to_date(NEW, sql_committee_id, temp_table_name);
+                PERFORM calculate_loan_payment_to_date(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+                IF TG_OP = 'UPDATE'
+                    AND NEW.contact_1_id <> OLD.contact_1_id
+                THEN
+                    PERFORM calculate_loan_payment_to_date(
+                        OLD, sql_committee_id, temp_table_name || 'OLD');
+                END IF;
 
             ELSIF NEW.schedule_e_id IS NOT NULL
             THEN
-                SELECT calculate_calendar_ytd_per_election_office(NEW, sql_committee_id, temp_table_name);
+                PERFORM calculate_calendar_ytd_per_election_office(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+                IF TG_OP = 'UPDATE'
+                    AND NEW.contact_1_id <> OLD.contact_1_id
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        OLD, sql_committee_id, temp_table_name || 'OLD');
+                END IF;
             END IF;
 
             RETURN NEW;
@@ -236,5 +255,6 @@ class Migration(migrations.Migration):
         FOR EACH ROW
         WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION calculate_aggregates();
-        """),
+        """
+        ),
     ]

@@ -6,7 +6,10 @@ from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import (
-    create_form3x, create_form24, create_form99, create_form1m
+    create_form3x,
+    create_form24,
+    create_form99,
+    create_form1m,
 )
 from fecfiler.web_services.summary.tasks import CalculationState
 
@@ -168,14 +171,14 @@ class WebServicesViewSetTest(TestCase):
         report = create_form3x(
             self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
         )
-        id = report.id
-        request = self.factory.get(f"api/v1/web-services/dot-fec/{id}")
+        test_id = report.id
+        request = self.factory.get(f"api/v1/web-services/dot-fec/{test_id}")
         request.session = {
             "committee_uuid": str(self.committee.id),
             "committee_id": str(self.committee.committee_id),
         }
         force_authenticate(request, user=self.user)
-        response = self.view.get_dot_fec(request, id)
+        response = self.view.get_dot_fec(request, test_id)
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, f"No .FEC was found for id: {id}")
+        self.assertEqual(response.data, f"No .FEC was found for id: {test_id}")
