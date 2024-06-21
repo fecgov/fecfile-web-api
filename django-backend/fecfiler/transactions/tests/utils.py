@@ -10,7 +10,14 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 
 
 def create_schedule_a(
-    type, committee, contact, date, amount, group="GENERAL", form_type="SA11I"
+    type,
+    committee,
+    contact,
+    date,
+    amount,
+    group="GENERAL",
+    form_type="SA11I",
+    memo_code=None,
 ):
     return create_test_transaction(
         type,
@@ -20,11 +27,19 @@ def create_schedule_a(
         group=group,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
         transaction_data={"_form_type": form_type},
+        memo_code=memo_code
     )
 
 
 def create_schedule_b(
-    type, committee, contact, date, amount, group="GENERAL", form_type="SB"
+    type,
+    committee,
+    contact,
+    date,
+    amount,
+    group="GENERAL",
+    form_type="SB",
+    memo_code=None
 ):
     return create_test_transaction(
         type,
@@ -34,6 +49,7 @@ def create_schedule_b(
         group=group,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
         transaction_data={"_form_type": form_type},
+        memo_code=memo_code
     )
 
 
@@ -70,6 +86,7 @@ def create_test_transaction(
     group=None,
     schedule_data=None,
     transaction_data=None,
+    memo_code=None,
 ):
     schedule_object = create_schedule(schedule, schedule_data)
     transaction = Transaction.objects.create(
@@ -78,6 +95,7 @@ def create_test_transaction(
         contact_1=contact_1,
         contact_2=contact_2,
         aggregation_group=group,
+        memo_code=memo_code,
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
         **(transaction_data or {})
     )

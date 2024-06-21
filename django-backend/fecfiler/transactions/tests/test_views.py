@@ -7,7 +7,11 @@ import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction
+from fecfiler.contacts.models import Contact
+from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class TransactionViewsTestCase(TestCase):
@@ -32,6 +36,11 @@ class TransactionViewsTestCase(TestCase):
         self.payloads = json.load(
             open("fecfiler/transactions/fixtures/view_payloads.json")
         )
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
+        self.report = create_form3x(self.committee, '2022-01-01', '2025-12-31')
+
 
     def request(self, payload, params={}):
         request = self.factory.post(
@@ -272,27 +281,49 @@ class TransactionViewsTestCase(TestCase):
         )
 
     def test_sorting_memo_code(self):
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": False},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": None},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                memo_code=receipt_data["memo_code"]
+            )
+
         ordering_filter = TransactionOrderingFilter()
         view = TransactionViewSet()
+        transactions = (
+            Transaction.objects.filter(committee_account_id=self.committee.id)
+        )
+
         request = self.factory.get(
             "/api/v1/transactions/",
             content_type=self.json_content_type,
         )
         request.query_params = {
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "ordering": "memo_code"
         }
+        request.data = {
+            "report_id": self.report.id,
+        }
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         view.request = request
-        queryset = view.get_queryset()
-        memos_sorted = queryset.order_by('memo_code')
+        memos_sorted = transactions.order_by('memo_code')
 
         ordered_queryset = ordering_filter.filter_queryset(
             request,
-            queryset,
+            transactions,
             view
         )
         self.assertEqual(
@@ -301,58 +332,159 @@ class TransactionViewsTestCase(TestCase):
         )
 
     def test_sorting_memo_code_inverted(self):
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": False},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": None},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                memo_code=receipt_data["memo_code"]
+            )
+
         ordering_filter = TransactionOrderingFilter()
         view = TransactionViewSet()
+
         request = self.factory.get(
             "/api/v1/transactions/",
             content_type=self.json_content_type,
         )
         request.query_params = {
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
-            "ordering": "-memo_code"
+            "ordering": "-memo_code",
+            "report_id": self.report.id,
         }
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         view.request = request
-        queryset = view.get_queryset()
-        memos_inverted = queryset.order_by('-memo_code')
+
+        transactions = (
+            view.get_queryset().filter(committee_account_id=self.committee.id)
+        )
+        memos_inverted = transactions.order_by('-memo_code')
 
         ordered_queryset = ordering_filter.filter_queryset(
             request,
-            queryset,
+            transactions,
             view
         )
+        print(f"Ordered Length: {transactions.count()}")
+        print(input())
         self.assertEqual(
             ordered_queryset.first().id,
             memos_inverted.first().id
         )
 
     def test_sorting_memos_only(self):
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                memo_code=receipt_data["memo_code"]
+            )
+
         ordering_filter = TransactionOrderingFilter()
         view = TransactionViewSet()
+        transactions = (
+            view.get_queryset().filter(committee_account_id=self.committee.id)
+        )
+
         request = self.factory.get(
             "/api/v1/transactions/",
             content_type=self.json_content_type,
         )
         request.query_params = {
-            "report_id": "1406535e-f99f-42c4-97a8-247904b7d297",
             "ordering": "-memo_code"
         }
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
+        }
+        request.data = {
+            "report_id": self.report.id
         }
         view.request = request
-        queryset = view.get_queryset()
-        memos_only = queryset.filter(memo_code=True)
+        memos_sorted = transactions.order_by('memo_code')
+
+        parsed_ordering = ordering_filter.get_ordering(
+            request,
+            transactions,
+            view
+        )
+        self.assertListEqual(parsed_ordering, ["memo_code"])
         ordered_queryset = ordering_filter.filter_queryset(
             request,
-            memos_only,
+            transactions,
             view
         )
         self.assertEqual(
             ordered_queryset.first().id,
-            memos_only.first().id
+            memos_sorted.first().id
         )
+
+    def test_multi_sorting(self):
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo_code": True},
+            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo_code": False},
+            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo_code": False},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                memo_code=receipt_data["memo_code"]
+            )
+
+        ordering_filter = TransactionOrderingFilter()
+        view = TransactionViewSet()
+        transactions = (
+            view.get_queryset().filter(committee_account_id=self.committee.id)
+        )
+
+        request = self.factory.get(
+            "/api/v1/transactions/",
+            content_type=self.json_content_type,
+        )
+        request.query_params = {
+            "ordering": "memo_code, amount"
+        }
+        request.session = {
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
+        }
+        view.request = request
+        memos_sorted = transactions.order_by('memo_code', 'amount')
+
+        ordered_queryset = ordering_filter.filter_queryset(
+            request,
+            transactions,
+            view
+        )
+        for i in range(ordered_queryset.count()):
+            self.assertEqual(
+                ordered_queryset[i].id,
+                memos_sorted[i].id
+            )

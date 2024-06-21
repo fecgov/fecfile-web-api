@@ -39,17 +39,21 @@ class TransactionListPagination(pagination.PageNumberPagination):
 
 
 class TransactionOrderingFilter(OrderingFilter):
-    def get_ordering(self, request, _queryset, view):
+    def get_ordering(self, request, queryset, view):
         ordering_query_param = request.query_params.get(self.ordering_param)
         ordering_fields = getattr(view, "ordering_fields", [])
 
         if ordering_query_param:
             fields = [param.strip() for param in ordering_query_param.split(',')]
-            ordering = [
-                f for f in fields if (
-                    f.strip('-') in ordering_fields
-                )
-            ]
+            ordering = []
+            for field in fields:
+                if field.strip('-') in ordering_fields:
+                    if field == '-memo_code' and not (
+                        queryset.filter(memo_code=True).exists()
+                        and queryset.exclude(memo_code=True).exists()
+                    ):
+                        field = 'memo_code'
+                    ordering.append(field)
             if ordering:
                 return ordering
 
@@ -58,13 +62,6 @@ class TransactionOrderingFilter(OrderingFilter):
     def filter_queryset(self, request, queryset, view):
         ordering = self.get_ordering(request, queryset, view)
         if ordering:
-            if '-memo_code' in ordering and not (
-                queryset.filter(memo_code=True).exists()
-                and queryset.exclude(memo_code=True).exists()
-            ):
-                ordering = [
-                    'memo_code' if param == '-memo_code' else param for param in ordering
-                ]
             return queryset.order_by(*ordering)
         return queryset
 
