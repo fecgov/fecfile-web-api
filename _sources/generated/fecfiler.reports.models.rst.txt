@@ -17,7 +17,7 @@ fecfiler.reports.models
    .. autosummary::
       :toctree:                                          
    
-      update_recalculation
+      flag_reports_for_recalculation
    
    
 

@@ -1,6 +1,0 @@
-fecfiler.reports.models.update\_recalculation
-=============================================
-
-.. currentmodule:: fecfiler.reports.models
-
-.. autofunction:: update_recalculation

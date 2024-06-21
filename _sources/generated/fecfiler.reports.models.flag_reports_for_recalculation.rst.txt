@@ -1,0 +1,6 @@
+fecfiler.reports.models.flag\_reports\_for\_recalculation
+=========================================================
+
+.. currentmodule:: fecfiler.reports.models
+
+.. autofunction:: flag_reports_for_recalculation
