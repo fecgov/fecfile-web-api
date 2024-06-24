@@ -32,6 +32,7 @@ fecfiler.transactions.views
       :template: custom-class-template.rst               
    
       TransactionListPagination
+      TransactionOrderingFilter
       TransactionViewSet
    
    

@@ -1,0 +1,48 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.views.TransactionOrderingFilter
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autoclass:: TransactionOrderingFilter
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionOrderingFilter.__init__
+      ~TransactionOrderingFilter.filter_queryset
+      ~TransactionOrderingFilter.get_default_ordering
+      ~TransactionOrderingFilter.get_default_valid_fields
+      ~TransactionOrderingFilter.get_ordering
+      ~TransactionOrderingFilter.get_schema_fields
+      ~TransactionOrderingFilter.get_schema_operation_parameters
+      ~TransactionOrderingFilter.get_template_context
+      ~TransactionOrderingFilter.get_valid_fields
+      ~TransactionOrderingFilter.remove_invalid_fields
+      ~TransactionOrderingFilter.to_html
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionOrderingFilter.ordering_description
+      ~TransactionOrderingFilter.ordering_fields
+      ~TransactionOrderingFilter.ordering_param
+      ~TransactionOrderingFilter.ordering_title
+      ~TransactionOrderingFilter.template
+   
+   

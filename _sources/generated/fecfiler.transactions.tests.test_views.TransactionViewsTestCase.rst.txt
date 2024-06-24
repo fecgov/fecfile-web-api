@@ -89,6 +89,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assert_
       ~TransactionViewsTestCase.captureOnCommitCallbacks
       ~TransactionViewsTestCase.countTestCases
+      ~TransactionViewsTestCase.create_trans_from_data
       ~TransactionViewsTestCase.debug
       ~TransactionViewsTestCase.defaultTestResult
       ~TransactionViewsTestCase.doClassCleanups
@@ -119,10 +120,14 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_get_previous_entity
       ~TransactionViewsTestCase.test_get_queryset
       ~TransactionViewsTestCase.test_inherited_election_aggregate
+      ~TransactionViewsTestCase.test_multi_sorting
       ~TransactionViewsTestCase.test_reatt_redes_multisave_transactions
       ~TransactionViewsTestCase.test_remove_transaction_from_report
       ~TransactionViewsTestCase.test_save_debt
       ~TransactionViewsTestCase.test_save_transaction_pair
+      ~TransactionViewsTestCase.test_sorting_memo_code
+      ~TransactionViewsTestCase.test_sorting_memo_code_inverted
+      ~TransactionViewsTestCase.test_sorting_memos_only_true
       ~TransactionViewsTestCase.test_update
    
    

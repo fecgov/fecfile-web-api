@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.utils.create\_report\_transaction
+=============================================================
+
+.. currentmodule:: fecfiler.transactions.tests.utils
+
+.. autofunction:: create_report_transaction
