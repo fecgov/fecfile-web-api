@@ -1,5 +1,6 @@
 from django.db import transaction as db_transaction
-from rest_framework import filters, pagination
+from rest_framework import pagination
+from rest_framework.filters import OrderingFilter
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -37,10 +38,38 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+class TransactionOrderingFilter(OrderingFilter):
+    def get_ordering(self, request, queryset, view):
+        ordering_query_param = request.query_params.get(self.ordering_param)
+        ordering_fields = getattr(view, "ordering_fields", [])
+
+        if ordering_query_param:
+            fields = [param.strip() for param in ordering_query_param.split(',')]
+            ordering = []
+            for field in fields:
+                if field.strip('-') in ordering_fields:
+                    if field == '-memo_code' and not (
+                        queryset.filter(memo_code=True).exists()
+                        and queryset.exclude(memo_code=True).exists()
+                    ):
+                        field = 'memo_code'
+                    ordering.append(field)
+            if ordering:
+                return ordering
+
+        return self.get_default_ordering(view)
+
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+        if ordering:
+            return queryset.order_by(*ordering)
+        return queryset
+
+
 class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [TransactionOrderingFilter]
     ordering_fields = [
         "line_label",
         "created",
