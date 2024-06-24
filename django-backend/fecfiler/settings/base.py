@@ -111,17 +111,16 @@ TEMPLATES = [
     },
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
-# ]
+# https://github.com/adamchainz/django-cors-headers?tab=readme-ov-file#cors_allowed_origin_regexes-sequencestr--patternstr
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://(.*?).fec\.gov$",
-    r"^https://(.*?).cloud\.gov$",
+    r"^https://(.*?).fecfile\.fec\.gov$",
+    r"^https://(.*?).cloud\.gov$",  # pull this out after we move
 ]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
 
+# https://docs.djangoproject.com/en/5.0/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = ["https://*.fec.gov", "https://*.cloud.gov"]
 
 # Database
