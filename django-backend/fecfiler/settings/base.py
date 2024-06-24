@@ -111,12 +111,18 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
+# CORS_ALLOWED_ORIGINS = [
+#     env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
+# ]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://(.*?).fec\.gov$",
+    r"^https://(.*?).cloud\.gov$",
 ]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ["https://*.fec.gov", "https://*.cloud.gov"]
 
 # Database
 DATABASES = {
