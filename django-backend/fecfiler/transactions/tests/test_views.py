@@ -41,7 +41,6 @@ class TransactionViewsTestCase(TestCase):
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
         self.report = create_form3x(self.committee, '2022-01-01', '2025-12-31')
 
-
     def request(self, payload, params={}):
         request = self.factory.post(
             "/api/v1/transactions",
@@ -282,10 +281,10 @@ class TransactionViewsTestCase(TestCase):
 
     def test_sorting_memo_code(self):
         indiviual_receipt_data = [
-            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": False},
-            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": None},
-            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
             create_schedule_a(
@@ -296,7 +295,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["amount"],
                 group=receipt_data["group"],
                 report=self.report,
-                memo_code=receipt_data["memo_code"]
+                memo_code=receipt_data["memo"]
             )
 
         ordering_filter = TransactionOrderingFilter()
@@ -334,10 +333,10 @@ class TransactionViewsTestCase(TestCase):
 
     def test_sorting_memo_code_inverted(self):
         indiviual_receipt_data = [
-            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": False},
-            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": None},
-            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
             create_schedule_a(
@@ -348,7 +347,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["amount"],
                 group=receipt_data["group"],
                 report=self.report,
-                memo_code=receipt_data["memo_code"]
+                memo_code=receipt_data["memo"]
             )
 
         ordering_filter = TransactionOrderingFilter()
@@ -385,10 +384,10 @@ class TransactionViewsTestCase(TestCase):
 
     def test_sorting_memos_only_true(self):
         indiviual_receipt_data = [
-            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo_code": True},
+            {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-02", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
             create_schedule_a(
@@ -399,7 +398,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["amount"],
                 group=receipt_data["group"],
                 report=self.report,
-                memo_code=receipt_data["memo_code"]
+                memo_code=receipt_data["memo"]
             )
 
         ordering_filter = TransactionOrderingFilter()
@@ -443,10 +442,10 @@ class TransactionViewsTestCase(TestCase):
 
     def test_multi_sorting(self):
         indiviual_receipt_data = [
-            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo_code": True},
-            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo_code": False},
-            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo_code": False},
+            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo": False},
         ]
         for receipt_data in indiviual_receipt_data:
             create_schedule_a(
@@ -457,7 +456,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["amount"],
                 group=receipt_data["group"],
                 report=self.report,
-                memo_code=receipt_data["memo_code"]
+                memo_code=receipt_data["memo"]
             )
 
         ordering_filter = TransactionOrderingFilter()

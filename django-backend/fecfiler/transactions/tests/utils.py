@@ -115,6 +115,7 @@ def create_test_transaction(
 def create_schedule(schedule: Model, data):
     return schedule.objects.create(**data)
 
+
 def create_report_transaction(report, transaction):
     if transaction and report:
         return ReportTransaction.objects.create(
