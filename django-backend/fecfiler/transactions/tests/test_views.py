@@ -295,6 +295,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
+                report=self.report,
                 memo_code=receipt_data["memo_code"]
             )
 
@@ -346,6 +347,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
+                report=self.report,
                 memo_code=receipt_data["memo_code"]
             )
 
@@ -376,14 +378,12 @@ class TransactionViewsTestCase(TestCase):
             transactions,
             view
         )
-        print(f"Ordered Length: {transactions.count()}")
-        print(input())
         self.assertEqual(
             ordered_queryset.first().id,
             memos_inverted.first().id
         )
 
-    def test_sorting_memos_only(self):
+    def test_sorting_memos_only_true(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo_code": True},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo_code": True},
@@ -398,30 +398,30 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
+                report=self.report,
                 memo_code=receipt_data["memo_code"]
             )
 
         ordering_filter = TransactionOrderingFilter()
         view = TransactionViewSet()
-        transactions = (
-            view.get_queryset().filter(committee_account_id=self.committee.id)
-        )
 
         request = self.factory.get(
             "/api/v1/transactions/",
             content_type=self.json_content_type,
         )
         request.query_params = {
-            "ordering": "-memo_code"
+            "ordering": "-memo_code",
+            "report_id": self.report.id,
         }
         request.session = {
             "committee_uuid": self.committee.id,
             "committee_id": self.committee.committee_id,
         }
-        request.data = {
-            "report_id": self.report.id
-        }
         view.request = request
+
+        transactions = (
+            view.get_queryset().filter(committee_account_id=self.committee.id)
+        )
         memos_sorted = transactions.order_by('memo_code')
 
         parsed_ordering = ordering_filter.get_ordering(
@@ -430,6 +430,7 @@ class TransactionViewsTestCase(TestCase):
             view
         )
         self.assertListEqual(parsed_ordering, ["memo_code"])
+
         ordered_queryset = ordering_filter.filter_queryset(
             request,
             transactions,
@@ -455,6 +456,7 @@ class TransactionViewsTestCase(TestCase):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
+                report=self.report,
                 memo_code=receipt_data["memo_code"]
             )
 
