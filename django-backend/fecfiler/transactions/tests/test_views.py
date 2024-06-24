@@ -82,9 +82,9 @@ class TransactionViewsTestCase(TestCase):
     def test_get_queryset(self):
         view_set = TransactionViewSet()
         view_set.request = self.request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 14)
-        view_set.request = self.request({}, {"schedules": "A,B,D,E"})
         self.assertEqual(view_set.get_queryset().count(), 12)
+        view_set.request = self.request({}, {"schedules": "A,B,D,E"})
+        self.assertEqual(view_set.get_queryset().count(), 10)
         view_set.request = self.request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
