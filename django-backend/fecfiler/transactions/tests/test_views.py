@@ -40,6 +40,20 @@ class TransactionViewsTestCase(TestCase):
         create_committee_view(self.committee.id)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
         self.report = create_form3x(self.committee, '2022-01-01', '2025-12-31')
+        self.ordering_filter = TransactionOrderingFilter()
+        self.view = TransactionViewSet()
+
+    def create_trans_from_data(self, receipt_data):
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            receipt_data["date"],
+            receipt_data["amount"],
+            group=receipt_data["group"],
+            report=self.report,
+            memo_code=receipt_data["memo"]
+        )
 
     def request(self, payload, params={}):
         request = self.factory.post(
@@ -287,19 +301,8 @@ class TransactionViewsTestCase(TestCase):
             {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
-            create_schedule_a(
-                "INDIVIDUAL_RECEIPT",
-                self.committee,
-                self.contact_1,
-                receipt_data["date"],
-                receipt_data["amount"],
-                group=receipt_data["group"],
-                report=self.report,
-                memo_code=receipt_data["memo"]
-            )
+            self.create_trans_from_data(receipt_data)
 
-        ordering_filter = TransactionOrderingFilter()
-        view = TransactionViewSet()
         transactions = (
             Transaction.objects.filter(committee_account_id=self.committee.id)
         )
@@ -309,22 +312,20 @@ class TransactionViewsTestCase(TestCase):
             content_type=self.json_content_type,
         )
         request.query_params = {
-            "ordering": "memo_code"
-        }
-        request.data = {
+            "ordering": "memo_code",
             "report_id": self.report.id,
         }
         request.session = {
             "committee_uuid": self.committee.id,
             "committee_id": self.committee.committee_id,
         }
-        view.request = request
+        self.view.request = request
         memos_sorted = transactions.order_by('memo_code')
 
-        ordered_queryset = ordering_filter.filter_queryset(
+        ordered_queryset = self.ordering_filter.filter_queryset(
             request,
             transactions,
-            view
+            self.view
         )
         self.assertEqual(
             ordered_queryset.first().id,
@@ -339,19 +340,7 @@ class TransactionViewsTestCase(TestCase):
             {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
-            create_schedule_a(
-                "INDIVIDUAL_RECEIPT",
-                self.committee,
-                self.contact_1,
-                receipt_data["date"],
-                receipt_data["amount"],
-                group=receipt_data["group"],
-                report=self.report,
-                memo_code=receipt_data["memo"]
-            )
-
-        ordering_filter = TransactionOrderingFilter()
-        view = TransactionViewSet()
+            self.create_trans_from_data(receipt_data)
 
         request = self.factory.get(
             "/api/v1/transactions/",
@@ -365,17 +354,17 @@ class TransactionViewsTestCase(TestCase):
             "committee_uuid": self.committee.id,
             "committee_id": self.committee.committee_id,
         }
-        view.request = request
+        self.view.request = request
 
         transactions = (
-            view.get_queryset().filter(committee_account_id=self.committee.id)
+            self.view.get_queryset().filter(committee_account_id=self.committee.id)
         )
         memos_inverted = transactions.order_by('-memo_code')
 
-        ordered_queryset = ordering_filter.filter_queryset(
+        ordered_queryset = self.ordering_filter.filter_queryset(
             request,
             transactions,
-            view
+            self.view
         )
         self.assertEqual(
             ordered_queryset.first().id,
@@ -390,19 +379,7 @@ class TransactionViewsTestCase(TestCase):
             {"date": "2024-01-03", "amount": "100.00", "group": "OTHER", "memo": True},
         ]
         for receipt_data in indiviual_receipt_data:
-            create_schedule_a(
-                "INDIVIDUAL_RECEIPT",
-                self.committee,
-                self.contact_1,
-                receipt_data["date"],
-                receipt_data["amount"],
-                group=receipt_data["group"],
-                report=self.report,
-                memo_code=receipt_data["memo"]
-            )
-
-        ordering_filter = TransactionOrderingFilter()
-        view = TransactionViewSet()
+            self.create_trans_from_data(receipt_data)
 
         request = self.factory.get(
             "/api/v1/transactions/",
@@ -416,24 +393,24 @@ class TransactionViewsTestCase(TestCase):
             "committee_uuid": self.committee.id,
             "committee_id": self.committee.committee_id,
         }
-        view.request = request
+        self.view.request = request
 
         transactions = (
-            view.get_queryset().filter(committee_account_id=self.committee.id)
+            self.view.get_queryset().filter(committee_account_id=self.committee.id)
         )
         memos_sorted = transactions.order_by('memo_code')
 
-        parsed_ordering = ordering_filter.get_ordering(
+        parsed_ordering = self.ordering_filter.get_ordering(
             request,
             transactions,
-            view
+            self.view
         )
         self.assertListEqual(parsed_ordering, ["memo_code"])
 
-        ordered_queryset = ordering_filter.filter_queryset(
+        ordered_queryset = self.ordering_filter.filter_queryset(
             request,
             transactions,
-            view
+            self.view
         )
         self.assertEqual(
             ordered_queryset.first().id,
@@ -448,21 +425,10 @@ class TransactionViewsTestCase(TestCase):
             {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo": False},
         ]
         for receipt_data in indiviual_receipt_data:
-            create_schedule_a(
-                "INDIVIDUAL_RECEIPT",
-                self.committee,
-                self.contact_1,
-                receipt_data["date"],
-                receipt_data["amount"],
-                group=receipt_data["group"],
-                report=self.report,
-                memo_code=receipt_data["memo"]
-            )
+            self.create_trans_from_data(receipt_data)
 
-        ordering_filter = TransactionOrderingFilter()
-        view = TransactionViewSet()
         transactions = (
-            view.get_queryset().filter(committee_account_id=self.committee.id)
+            self.view.get_queryset().filter(committee_account_id=self.committee.id)
         )
 
         request = self.factory.get(
@@ -476,13 +442,13 @@ class TransactionViewsTestCase(TestCase):
             "committee_uuid": self.committee.id,
             "committee_id": self.committee.committee_id,
         }
-        view.request = request
+        self.view.request = request
         memos_sorted = transactions.order_by('memo_code', 'amount')
 
-        ordered_queryset = ordering_filter.filter_queryset(
+        ordered_queryset = self.ordering_filter.filter_queryset(
             request,
             transactions,
-            view
+            self.view
         )
         for i in range(ordered_queryset.count()):
             self.assertEqual(
