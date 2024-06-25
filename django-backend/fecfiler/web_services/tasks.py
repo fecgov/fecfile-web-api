@@ -15,6 +15,7 @@ from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
 
+import traceback
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -116,6 +117,7 @@ def submit_to_fec(
             submission.save_fec_response(status_response_string)
     except Exception:
         submission.save_error("Failed submitting to FEC")
+        logger.error(traceback.format_exc())
         return
 
     new_state = (
