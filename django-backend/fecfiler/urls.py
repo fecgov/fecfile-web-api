@@ -1,5 +1,5 @@
 from django.conf.urls import include
-from django.urls import re_path
+from django.urls import re_path, path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -37,5 +37,5 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
-    re_path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
+    path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
 ]
