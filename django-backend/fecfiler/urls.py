@@ -3,6 +3,8 @@ from django.urls import re_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.views.generic.base import RedirectView
+from fecfiler.settings import LOGIN_REDIRECT_CLIENT_URL
 
 BASE_V1_URL = r"^api/v1/"
 
@@ -16,9 +18,7 @@ def test_celery(request):
 
 
 urlpatterns = [
-    re_path(
-        r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"
-    ),
+    re_path(r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
     re_path(
         r"^api/docs/",
         SpectacularSwaggerView.as_view(
@@ -37,4 +37,5 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
+    re_path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
 ]
