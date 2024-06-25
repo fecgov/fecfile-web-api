@@ -7,10 +7,19 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+from fecfiler.reports.models import ReportTransaction
 
 
 def create_schedule_a(
-    type, committee, contact, date, amount, group="GENERAL", form_type="SA11I"
+    type,
+    committee,
+    contact,
+    date,
+    amount,
+    group="GENERAL",
+    form_type="SA11I",
+    memo_code=None,
+    report=None,
 ):
     return create_test_transaction(
         type,
@@ -18,13 +27,23 @@ def create_schedule_a(
         committee,
         contact_1=contact,
         group=group,
+        report=report,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
         transaction_data={"_form_type": form_type},
+        memo_code=memo_code
     )
 
 
 def create_schedule_b(
-    type, committee, contact, date, amount, group="GENERAL", form_type="SB"
+    type,
+    committee,
+    contact,
+    date,
+    amount,
+    group="GENERAL",
+    form_type="SB",
+    memo_code=None,
+    report=None,
 ):
     return create_test_transaction(
         type,
@@ -32,17 +51,20 @@ def create_schedule_b(
         committee,
         contact_1=contact,
         group=group,
+        report=report,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
         transaction_data={"_form_type": form_type},
+        memo_code=memo_code
     )
 
 
-def create_ie(committee, contact, date, amount, code):
+def create_ie(committee, contact, date, amount, code, report=None):
     return create_test_transaction(
         "INDEPENDENT_EXPENDITURE",
         ScheduleE,
         committee,
         contact_2=contact,
+        report=report,
         schedule_data={
             "disbursement_date": date,
             "expenditure_amount": amount,
@@ -51,12 +73,13 @@ def create_ie(committee, contact, date, amount, code):
     )
 
 
-def create_debt(committee, contact, incurred_amount):
+def create_debt(committee, contact, incurred_amount, report=None):
     return create_test_transaction(
         "DEBT_OWED_BY_COMMITTEE",
         ScheduleD,
         committee,
         contact_1=contact,
+        report=report,
         schedule_data={"incurred_amount": incurred_amount},
     )
 
@@ -70,6 +93,8 @@ def create_test_transaction(
     group=None,
     schedule_data=None,
     transaction_data=None,
+    memo_code=None,
+    report=None,
 ):
     schedule_object = create_schedule(schedule, schedule_data)
     transaction = Transaction.objects.create(
@@ -78,14 +103,25 @@ def create_test_transaction(
         contact_1=contact_1,
         contact_2=contact_2,
         aggregation_group=group,
+        memo_code=memo_code,
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
         **(transaction_data or {})
     )
+    if report:
+        create_report_transaction(report, transaction)
     return transaction
 
 
 def create_schedule(schedule: Model, data):
     return schedule.objects.create(**data)
+
+
+def create_report_transaction(report, transaction):
+    if transaction and report:
+        return ReportTransaction.objects.create(
+            report_id=report.id,
+            transaction_id=transaction.id
+        )
 
 
 SCHEDULE_CLASS_TO_FIELD = {
