@@ -1,7 +1,9 @@
 from django.conf.urls import include
-from django.urls import re_path
+from django.urls import re_path, path
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.views.generic.base import RedirectView
+from fecfiler.settings import LOGIN_REDIRECT_CLIENT_URL
 
 BASE_V1_URL = r"^api/v1/"
 
@@ -33,5 +35,6 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
+    path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
     re_path(r"^status/", get_api_status)
 ]
