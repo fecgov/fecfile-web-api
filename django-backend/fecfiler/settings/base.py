@@ -185,6 +185,19 @@ OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
 OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 
 OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
+
+# keygen settings
+LOGIN_DOT_GOV_RSA_PK_SIZE = int(env.get_credential("LOGIN_DOT_GOV_RSA_PK_SIZE", "2048"))
+LOGIN_DOT_GOV_X509_DAYS_VALID = int(
+    env.get_credential("LOGIN_DOT_GOV_X509_DAYS_VALID", "365")
+)
+LOGIN_DOT_GOV_X509_COUNTRY = env.get_credential("LOGIN_DOT_GOV_X509_COUNTRY")
+LOGIN_DOT_GOV_X509_STATE = env.get_credential("LOGIN_DOT_GOV_X509_STATE")
+LOGIN_DOT_GOV_X509_LOCALITY = env.get_credential("LOGIN_DOT_GOV_X509_LOCALITY")
+LOGIN_DOT_GOV_X509_ORG = env.get_credential("LOGIN_DOT_GOV_X509_ORG")
+LOGIN_DOT_GOV_X509_ORG_UNIT = env.get_credential("LOGIN_DOT_GOV_X509_ORG_UNIT")
+LOGIN_DOT_GOV_X509_COMMON_NAME = env.get_credential("LOGIN_DOT_GOV_X509_COMMON_NAME")
+LOGIN_DOT_GOV_X509_EMAIL_ADDRESS = env.get_credential("LOGIN_DOT_GOV_X509_EMAIL_ADDRESS")
 # OpenID Connect settings end
 
 USE_X_FORWARDED_HOST = True
