@@ -33,7 +33,7 @@ class Command(BaseCommand):
             x509_cert = self.gen_x509_cert(rsa_pk)
             self.stdout.write(self.style.SUCCESS("Successfully generated pk/cert"))
         except Exception:
-            self.stdout.write(self.style.SUCCESS("Failed to generated pk/cert"))
+            self.stdout.write(self.style.ERROR("Failed to generated pk/cert"))
 
     def gen_rsa_pk(self):
         return rsa.generate_private_key(
