@@ -17,6 +17,7 @@ fecfiler.urls
    .. autosummary::
       :toctree:                                          
    
+      get_api_status
       test_celery
    
    
