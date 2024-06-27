@@ -1,5 +1,6 @@
 from django.db import transaction as db_transaction
-from rest_framework import filters, pagination
+from rest_framework import pagination
+from rest_framework.filters import OrderingFilter
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,7 +19,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report, update_recalculation
+from fecfiler.reports.models import Report, flag_reports_for_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -37,10 +38,38 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+class TransactionOrderingFilter(OrderingFilter):
+    def get_ordering(self, request, queryset, view):
+        ordering_query_param = request.query_params.get(self.ordering_param)
+        ordering_fields = getattr(view, "ordering_fields", [])
+
+        if ordering_query_param:
+            fields = [param.strip() for param in ordering_query_param.split(',')]
+            ordering = []
+            for field in fields:
+                if field.strip('-') in ordering_fields:
+                    if field == '-memo_code' and not (
+                        queryset.filter(memo_code=True).exists()
+                        and queryset.exclude(memo_code=True).exists()
+                    ):
+                        field = 'memo_code'
+                    ordering.append(field)
+            if ordering:
+                return ordering
+
+        return self.get_default_ordering(view)
+
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+        if ordering:
+            return queryset.order_by(*ordering)
+        return queryset
+
+
 class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [TransactionOrderingFilter]
     ordering_fields = [
         "line_label",
         "created",
@@ -263,7 +292,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
-            update_recalculation(report)
+            flag_reports_for_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -327,7 +356,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.add(report)
-        update_recalculation(report)
+        flag_reports_for_recalculation(report)
         return Response("Transaction added to report")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
@@ -343,7 +372,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.remove(report)
-        update_recalculation(report)
+        flag_reports_for_recalculation(report)
         return Response("Transaction removed from report")
 
 
