@@ -1,23 +1,30 @@
 import uuid
 from django.test import TestCase
 from .models import MemoText
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class MemoTextTestCase(TestCase):
-    fixtures = ["test_f3x_reports", "test_memo_text", "C01234567_user_and_committee"]
 
     def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+
         self.valid_memo_text = MemoText(
             id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
             rec_type="TEXT",
             text4000="tessst4",
-            committee_account_id="11111111-2222-3333-4444-555555555555",
-            report_id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            committee_account_id=self.committee.id,
+            report_id=q1_report.id,
         )
 
     def test_get_memo_text(self):
-        memo_text = MemoText.objects.get(id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d")
-        self.assertEquals(memo_text.text4000, "dahtest2")
+        self.valid_memo_text.save()
+        memo_text = MemoText.objects.get(id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
+        self.assertEquals(memo_text.text4000, "tessst4")
 
     def test_save_and_delete(self):
         self.valid_memo_text.save()
@@ -28,5 +35,5 @@ class MemoTextTestCase(TestCase):
         self.assertEquals(
             memo_text_from_db.id, uuid.UUID("94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
         )
-        self.assertEquals(memo_text_from_db.transaction_id_number, "REPORT_MEMO_TEXT2")
+        self.assertEquals(memo_text_from_db.transaction_id_number, "REPORT_MEMO_TEXT1")
         self.assertEquals(memo_text_from_db.text4000, "tessst4")

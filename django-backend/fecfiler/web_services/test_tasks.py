@@ -1,7 +1,5 @@
 from django.test import TestCase
 from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
-from fecfiler.reports.models import Report
-from fecfiler.transactions.models import Transaction
 from .models import (
     DotFEC,
     FECStatus,
@@ -12,34 +10,42 @@ from .models import (
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from pathlib import Path
 from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
+from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.contacts.tests.utils import create_test_individual_contact
+from fecfiler.transactions.tests.utils import create_schedule_a
 
 
 class TasksTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-        "test_individual_receipt",
-        "test_memo_text",
-    ]
 
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
-        self.f3x = Report.objects.filter(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).first()
-        self.transaction = Transaction.objects.filter(
-            id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
-        ).first()
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        self.contact_1 = create_test_individual_contact(
+            "Smith", "John", self.committee.id
+        )
+
+        self.transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2023-01-05",
+            "123.45",
+            "GENERAL",
+            "SA11AI",
+        )
+        self.transaction.reports.add(self.f3x)
+        self.transaction.force_itemized = True
+        self.transaction.save()
 
     """
     CREATE DOT FEC TESTS
     """
 
     def test_create_dot_fec(self):
-        dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae", None, None, True
-        )
+        dot_fec_id = create_dot_fec(str(self.f3x.id), None, None, True)
         dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
         result_dot_fec = Path(CELERY_LOCAL_STORAGE_DIRECTORY).joinpath(
             dot_fec_record.file_name
@@ -59,11 +65,9 @@ class TasksTestCase(TestCase):
     """
 
     def test_submit_to_fec(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            str(self.f3x.id),
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -89,11 +93,9 @@ class TasksTestCase(TestCase):
         self.assertEqual(len(upload_submission.fec_report_id), 36)
 
     def test_submit_no_password(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            str(self.f3x.id),
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -102,16 +104,12 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
         )
-        self.assertEqual(
-            upload_submission.fecfile_error, "No E-Filing Password provided"
-        )
+        self.assertEqual(upload_submission.fecfile_error, "No E-Filing Password provided")
 
     def test_submit_missing_file(self):
-        upload_submission = UploadSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            str(self.f3x.id),
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
@@ -123,9 +121,7 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
         )
-        self.assertEqual(
-            upload_submission.fecfile_error, "Could not retrieve .FEC bytes"
-        )
+        self.assertEqual(upload_submission.fecfile_error, "Could not retrieve .FEC bytes")
 
     """
     SUBMIT TO WEBPRINT TESTS
@@ -133,10 +129,10 @@ class TasksTestCase(TestCase):
 
     def test_submit_to_webprint(self):
         webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
+            str(self.f3x.id)
         )
         dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            str(self.f3x.id),
             webprint_submission_id=webprint_submission.id,
             force_write_to_disk=True,
         )
