@@ -16,7 +16,7 @@ before creating additional resources randomly as needed.  Inter-resource links (
 `contact_id` and `report_id` fields on a transaction) are not pre-generated and are instead
 determined randomly at run-time.
 
-You can generate these .json files by running `python locust-testing/locust_data_generator.py`
+You can generate these .json files by running `python performance-testing/locust_data_generator.py`
 Run the script with the `-h` flag for additional information.
 
 ## Setup - Environment variables
