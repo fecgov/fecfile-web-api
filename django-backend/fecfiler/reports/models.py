@@ -136,8 +136,8 @@ class Report(CommitteeOwnedModel):
         self.upload_submission = None
         self.save()
 
-    def delete(self, force_delete=False):
-        if not self.can_delete() and not force_delete:
+    def delete(self):
+        if not self.can_delete():
             raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
         if not self.form_24:
             """only delete transactions if the report is the source of the
