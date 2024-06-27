@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "fecfiler.openfec",
     "fecfiler.user",
     "fecfiler.mock_openfec",
+    "silk"
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 TEMPLATES = [
