@@ -16,7 +16,7 @@ def test_celery(_request):
     return Response(status=200)
 
 
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 @permission_classes([])
 def get_api_status(_request):
     return Response(status=200)
