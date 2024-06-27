@@ -240,7 +240,6 @@ class Migration(migrations.Migration):
                 PERFORM calculate_calendar_ytd_per_election_office(
                     NEW, sql_committee_id, temp_table_name || 'NEW');
                 IF TG_OP = 'UPDATE'
-                    AND NEW.contact_2_id <> OLD.contact_2_id
                 THEN
                     PERFORM calculate_calendar_ytd_per_election_office(
                         OLD, sql_committee_id, temp_table_name || 'OLD');
