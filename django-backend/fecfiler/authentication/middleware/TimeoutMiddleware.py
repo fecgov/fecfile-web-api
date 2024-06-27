@@ -13,6 +13,8 @@ class TimeoutMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        # TODO: Rename middleware, or create new class?
+        response['cache-control'] = "no-cache, no-store"
         session_cookie = response.cookies.get(settings.SESSION_COOKIE_NAME)
         if session_cookie:
             response.set_cookie(
