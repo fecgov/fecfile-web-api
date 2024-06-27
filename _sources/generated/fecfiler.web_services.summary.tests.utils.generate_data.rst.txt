@@ -1,0 +1,6 @@
+fecfiler.web\_services.summary.tests.utils.generate\_data
+=========================================================
+
+.. currentmodule:: fecfiler.web_services.summary.tests.utils
+
+.. autofunction:: generate_data

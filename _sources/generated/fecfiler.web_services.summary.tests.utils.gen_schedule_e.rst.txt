@@ -1,0 +1,6 @@
+fecfiler.web\_services.summary.tests.utils.gen\_schedule\_e
+===========================================================
+
+.. currentmodule:: fecfiler.web_services.summary.tests.utils
+
+.. autofunction:: gen_schedule_e

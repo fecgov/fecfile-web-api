@@ -35,5 +35,6 @@ fecfiler.web\_services.summary
    fecfiler.web_services.summary.tasks
    fecfiler.web_services.summary.test_summary
    fecfiler.web_services.summary.test_tasks
+   fecfiler.web_services.summary.tests
    fecfiler.web_services.summary.views
 

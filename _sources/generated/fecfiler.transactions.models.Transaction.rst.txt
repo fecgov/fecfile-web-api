@@ -56,6 +56,7 @@ fecfiler.transactions.models.Transaction
 
    .. autosummary::
    
+      ~Transaction.aggregate
       ~Transaction.aggregation_group
       ~Transaction.all_objects
       ~Transaction.children
@@ -80,6 +81,7 @@ fecfiler.transactions.models.Transaction
       ~Transaction.loan
       ~Transaction.loan_associations
       ~Transaction.loan_id
+      ~Transaction.loan_payment_to_date
       ~Transaction.memo_code
       ~Transaction.memo_text
       ~Transaction.memo_text_id

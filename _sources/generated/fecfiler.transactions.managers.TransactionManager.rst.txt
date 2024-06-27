@@ -19,12 +19,9 @@ fecfiler.transactions.managers.TransactionManager
 
    .. autosummary::
    
-      ~TransactionManager.ELECTION_AGGREGATE_CLAUSE
-      ~TransactionManager.ENTITY_AGGREGGATE_CLAUSE
       ~TransactionManager.INCURRED_PRIOR_CLAUSE
       ~TransactionManager.ITEMIZATION_CLAUSE
       ~TransactionManager.LOAN_KEY_CLAUSE
-      ~TransactionManager.LOAN_PAYMENT_CLAUSE
       ~TransactionManager.PAYMENT_AMOUNT_CLAUSE
       ~TransactionManager.PAYMENT_PRIOR_CLAUSE
       ~TransactionManager.SCHEDULE_CLAUSE
@@ -107,7 +104,6 @@ fecfiler.transactions.managers.TransactionManager
 
    .. autosummary::
    
-      ~TransactionManager.AGGREGATE
       ~TransactionManager.AMOUNT_CLAUSE
       ~TransactionManager.BACK_REFERENCE_CLAUSE
       ~TransactionManager.BACK_REFERENCE_NAME_CLAUSE
@@ -118,9 +114,6 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.auto_created
       ~TransactionManager.creation_counter
       ~TransactionManager.db
-      ~TransactionManager.election_aggregate_window
-      ~TransactionManager.entity_aggregate_window
-      ~TransactionManager.loan_payment_window
       ~TransactionManager.use_in_migrations
    
    

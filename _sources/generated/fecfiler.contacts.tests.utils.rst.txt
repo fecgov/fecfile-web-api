@@ -17,6 +17,7 @@ fecfiler.contacts.tests.utils
    .. autosummary::
       :toctree:                                          
    
+      create_test_candidate_contact
       create_test_individual_contact
    
    

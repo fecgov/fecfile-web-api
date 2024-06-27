@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.web\_services.summary.tests.utils
+==========================================
+
+.. automodule:: fecfiler.web_services.summary.tests.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      gen_schedule_a
+      gen_schedule_b
+      gen_schedule_c
+      gen_schedule_d
+      gen_schedule_e
+      generate_data
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
