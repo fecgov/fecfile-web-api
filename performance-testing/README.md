@@ -108,4 +108,10 @@ the duration of the testing session.  There are (as of writing) four tasks:
 
 In addition to load testing, Silk query profiling can be installed to inspect queries and response times.
 
-Installation instructions for local development can be found [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
+For a jump-start in setting up for Silk testing, consider merging in the `silk-profiling-base` branch.
+The branch contains the necessary configuration changes and marks a selection of functions for profiling.
+
+If setting up from scratch, you can find instructions for local development [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
+
+Once set up, silk profiling will run automatically as the API receives and processes requests.
+To view the results, visit the API's `/silk` endpoint (for local development: `localhost:8080/silk/`)
