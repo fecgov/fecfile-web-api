@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "drf_spectacular",
     "corsheaders",
     "storages",
     "django_structlog",
@@ -188,6 +187,8 @@ OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
 OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 # OpenID Connect settings end
 
+USE_X_FORWARDED_HOST = True
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/New_York"
 
@@ -213,7 +214,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
@@ -324,17 +325,13 @@ CELERY_TASK_SERIALIZER = "json"
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
-CELERY_WORKER_STORAGE = env.get_credential(
-    "CELERY_WORKER_STORAGE", CeleryStorageType.AWS
-)
+CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
 
 """FEC Webload settings
 """
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
-FILE_AS_TEST_COMMITTEE = env.get_credential("FILE_AS_TEST_COMMITTEE")
-TEST_COMMITTEE_PASSWORD = env.get_credential("TEST_COMMITTEE_PASSWORD")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes

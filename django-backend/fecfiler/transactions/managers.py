@@ -26,8 +26,6 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
-    RowRange,
-    Window,
     Manager,
 )
 from decimal import Decimal
@@ -41,38 +39,6 @@ but are called different names"""
 
 
 class TransactionManager(SoftDeleteManager):
-    entity_aggregate_window = {
-        "partition_by": [
-            F("contact_1_id"),
-            F("date__year"),
-            F("aggregation_group"),
-        ],
-        "order_by": ["date", "created"],
-        "frame": RowRange(None, 0),
-    }
-    election_aggregate_window = {
-        "partition_by": [
-            F("schedule_e__election_code"),
-            F("contact_2__candidate_office"),
-            F("contact_2__candidate_state"),
-            F("contact_2__candidate_district"),
-            F("date__year"),
-            F("aggregation_group"),
-        ],
-        "order_by": ["date", "created"],
-        "frame": RowRange(None, 0),
-    }
-    loan_payment_window = {
-        "partition_by": [
-            Case(
-                When(loan_id__isnull=False, then=F("loan_id")),
-                When(schedule_c__isnull=False, then=F("id")),
-                default=None,
-            )
-        ],
-        "order_by": ["loan_key"],
-        "frame": RowRange(None, 0),
-    }
 
     def get_queryset(self):
         return super().get_queryset()
@@ -132,16 +98,6 @@ class TransactionManager(SoftDeleteManager):
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
     )
-
-    AGGREGATE = Case(
-        When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
-    )
-
-    def ENTITY_AGGREGGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
-
-    def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
 
     BACK_REFERENCE_CLAUSE = Coalesce(
         F("reatt_redes__transaction_id"),
@@ -215,19 +171,6 @@ class TransactionManager(SoftDeleteManager):
             ),
             default=None,
             output_field=TextField(),
-        )
-
-    def LOAN_PAYMENT_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_c__isnull=False,
-                then=Coalesce(
-                    Window(
-                        expression=Sum("effective_amount"), **self.loan_payment_window
-                    ),
-                    Value(Decimal(0)),
-                ),
-            )
         )
 
     def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
@@ -313,13 +256,10 @@ class TransactionManager(SoftDeleteManager):
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
                 effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
-                aggregate=self.ENTITY_AGGREGGATE_CLAUSE(),
-                _calendar_ytd_per_election_office=self.ELECTION_AGGREGATE_CLAUSE(),
                 incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=self.LOAN_KEY_CLAUSE(),
-                loan_payment_to_date=self.LOAN_PAYMENT_CLAUSE(),
                 _itemized=self.ITEMIZATION_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,

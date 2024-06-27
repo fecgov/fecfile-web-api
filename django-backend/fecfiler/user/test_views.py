@@ -15,7 +15,7 @@ class UserViewSetTest(TestCase):
         client = APIClient()
         client.force_authenticate(user=self.user)
 
-        response = client.get("/api/v1/users/current/")
+        response = client.get("/api/v1/users/current/", secure=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["first_name"], "First")
@@ -33,7 +33,7 @@ class UserViewSetTest(TestCase):
             "security_consent_exp_date": "2025-03-12",
         }
 
-        response = client.put("/api/v1/users/current/", test_put_data)
+        response = client.put("/api/v1/users/current/", test_put_data, secure=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["first_name"], "test_first_name_updated")
