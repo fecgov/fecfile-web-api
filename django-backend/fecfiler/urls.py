@@ -16,7 +16,7 @@ def test_celery(_request):
     return Response(status=200)
 
 
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 @permission_classes([])
 def get_api_status(_request):
     return Response(status=200)
@@ -36,5 +36,5 @@ urlpatterns = [
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
     path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
-    re_path(r"^status/", get_api_status)
+    re_path(BASE_V1_URL + "status/", get_api_status)
 ]
