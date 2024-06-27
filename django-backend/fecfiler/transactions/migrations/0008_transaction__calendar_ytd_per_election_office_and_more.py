@@ -234,19 +234,13 @@ class Migration(migrations.Migration):
             THEN
                 PERFORM calculate_loan_payment_to_date(
                     NEW, sql_committee_id, temp_table_name || 'NEW');
-                IF TG_OP = 'UPDATE'
-                    AND NEW.contact_1_id <> OLD.contact_1_id
-                THEN
-                    PERFORM calculate_loan_payment_to_date(
-                        OLD, sql_committee_id, temp_table_name || 'OLD');
-                END IF;
 
             ELSIF NEW.schedule_e_id IS NOT NULL
             THEN
                 PERFORM calculate_calendar_ytd_per_election_office(
                     NEW, sql_committee_id, temp_table_name || 'NEW');
                 IF TG_OP = 'UPDATE'
-                    AND NEW.contact_1_id <> OLD.contact_1_id
+                    AND NEW.contact_2_id <> OLD.contact_2_id
                 THEN
                     PERFORM calculate_calendar_ytd_per_election_office(
                         OLD, sql_committee_id, temp_table_name || 'OLD');
