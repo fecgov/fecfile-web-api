@@ -110,8 +110,9 @@ In addition to load testing, Silk query profiling can be installed to inspect qu
 
 For a jump-start in setting up for Silk testing, consider merging in the `silk-profiling-base` branch.
 The branch contains the necessary configuration changes and marks a selection of functions for profiling.
+(Silk makes changes to the database, so be sure to run `python manage.py migrate` or spin up a fresh container)
 
-If setting up from scratch, you can find instructions for local development [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
+If setting up from scratch (or looking for more usage instructions), you can find documentation [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
 
 Once set up, silk profiling will run automatically as the API receives and processes requests.
 To view the results, visit the API's `/silk` endpoint (for local development: `localhost:8080/silk/`)
