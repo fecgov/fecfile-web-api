@@ -32,7 +32,6 @@ from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 
 from fecfiler.reports.report_code_label import get_report_code_label
 import structlog
-from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -150,7 +149,6 @@ class TransactionSerializer(
         fields = get_fields()
         read_only_fields = ["children"]
 
-    @silk_profile(name='transaction__to_representation')
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         schedule_a = representation.pop("schedule_a")
@@ -276,7 +274,6 @@ class TransactionSerializer(
 
         return representation
 
-    @silk_profile(name='transaction__validate')
     def validate(self, data):
         initial_data = getattr(self, "initial_data")
         schedule_serializer = SCHEDULE_SERIALIZERS[initial_data.get("schedule_id")]

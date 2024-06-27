@@ -1,4 +1,4 @@
-from .models import Report, ReportTransaction
+from .models import Report
 from rest_framework.serializers import (
     ModelSerializer,
     CharField,
@@ -17,9 +17,7 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
-from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
-from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -106,7 +104,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     form_99 = Form99Serializer(required=False)
     form_1m = Form1MSerializer(required=False)
 
-    @silk_profile(name='report__to_representation')
     def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
         form_3x = representation.pop("form_3x") or []
@@ -139,48 +136,10 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
-        representation["can_delete"] = self.can_delete(representation)
+        representation["can_delete"] = instance.can_delete()
 
         return representation
 
-
-    @silk_profile(name='report__can_delete')
-    def can_delete(self, representation):
-        """can delete if there exist no transactions in this report
-        where any transactions in a different report back reference to them"""
-        no_check = ["F24", "F1M", "F99"]
-        return representation.get("report_status") == "In progress" and (
-            representation["report_type"] in no_check
-            or not (
-                ReportTransaction.objects.filter(
-                    Exists(
-                        Subquery(
-                            ReportTransaction.objects.filter(
-                                ~Q(report_id=representation["id"]),
-                                Q(
-                                    Q(transaction__id=OuterRef("transaction_id"))
-                                    | Q(
-                                        transaction__reatt_redes_id=OuterRef(
-                                            "transaction_id"
-                                        )
-                                    )
-                                    | Q(
-                                        transaction__parent_transaction_id=OuterRef(
-                                            "transaction_id"
-                                        )
-                                    )
-                                    | Q(transaction__debt_id=OuterRef("transaction_id"))
-                                    | Q(transaction__loan_id=OuterRef("transaction_id"))
-                                ),
-                            )
-                        )
-                    ),
-                    report_id=representation["id"],
-                ).exists()
-            )
-        )
-
-    @silk_profile(name='report__validate')
     def validate(self, data):
         self._context = self.context.copy()
         self._context["fields_to_ignore"] = self._context.get(

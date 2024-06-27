@@ -1,6 +1,8 @@
 import uuid
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import Q
+from django.db.models import OuterRef, Subquery, Exists, Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -8,7 +10,6 @@ from .form_24.models import Form24
 from .form_99.models import Form99
 from .form_1m.models import Form1M
 import structlog
-from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -81,7 +82,6 @@ class Report(CommitteeOwnedModel):
     objects = ReportManager()
 
     @property
-    @silk_profile(name='report__previous_report')
     def previous_report(self):
         return (
             Report.objects.get_queryset()
@@ -93,7 +93,6 @@ class Report(CommitteeOwnedModel):
             .last()
         )
 
-    @silk_profile(name='report__save')
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
         from fecfiler.transactions.schedule_d.utils import carry_forward_debts
@@ -109,9 +108,8 @@ class Report(CommitteeOwnedModel):
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
                 carry_forward_debts(self)
-                update_recalculation(self)
+                flag_reports_for_recalculation(self)
 
-    @silk_profile(name='report__get_future_in_progress_reports')
     def get_future_in_progress_reports(
         self,
     ):
@@ -139,6 +137,8 @@ class Report(CommitteeOwnedModel):
         self.save()
 
     def delete(self):
+        if not self.can_delete():
+            raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
         if not self.form_24:
             """only delete transactions if the report is the source of the
             tranaction"""
@@ -155,6 +155,61 @@ class Report(CommitteeOwnedModel):
                 form.delete()
 
         super(CommitteeOwnedModel, self).delete()
+
+    def can_delete(self):
+        """
+        can't delete if submitted
+        can't delete if amended
+        can't delete form3x if there exists any transactions in this report or
+        where any transactions in a different report back reference to them
+        """
+        return (
+            not self.upload_submission
+            and (
+                self.report_version is None
+                or self.report_version == "0"
+                or self.report_version == 0
+            )
+            and (
+                not self.form_3x
+                or (
+                    not bool(self.form_24)
+                    and not ReportTransaction.objects.filter(
+                        Exists(
+                            Subquery(
+                                ReportTransaction.objects.filter(
+                                    ~Q(report_id=self.id),
+                                    Q(
+                                        Q(transaction__id=OuterRef("transaction_id"))
+                                        | Q(
+                                            transaction__reatt_redes_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__parent_transaction_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__debt_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                        | Q(
+                                            transaction__loan_id=OuterRef(
+                                                "transaction_id"
+                                            )
+                                        )
+                                    ),
+                                )
+                            )
+                        ),
+                        report_id=self.id,
+                    ).exists()
+                )
+            )
+        )
 
 
 TABLE_TO_FORM = {
@@ -186,26 +241,13 @@ def flag_reports_for_recalculation(report: Report):
         flagged_count = reports_to_flag.update(
             calculation_status=None
         )
-        logger.info(f"Report {report.id} marked for recalculation along with {flagged_count-1} subsequent reports")
-
-
-@silk_profile(name='report__update_recalculation')
-def update_recalculation(report: Report):
-    if report:
-        committee = report.committee_account
-        report_date = report.coverage_from_date
-        if report_date is not None:
-            reports_to_flag_for_recalculation = Report.objects.filter(
-                committee_account=committee,
-                coverage_from_date__gte=report_date,
-            )
-        else:
-            reports_to_flag_for_recalculation = [report]
-
-        for report_to_recalc in reports_to_flag_for_recalculation:
-            report_to_recalc.calculation_status = None
-            report_to_recalc.save()
-            logger.info(f"Report: {report_to_recalc.id} marked for recalcuation")
+        logger.info(
+            f"""Report {
+                report.id
+            } marked for recalculation along with {
+                flagged_count-1
+            } subsequent reports"""
+        )
 
 
 class ReportMixin(models.Model):
@@ -227,9 +269,7 @@ class ReportTransaction(models.Model):
         serialize=False,
         unique=True,
     )
-    transaction = models.ForeignKey(
-        "transactions.Transaction", on_delete=models.CASCADE
-    )
+    transaction = models.ForeignKey("transactions.Transaction", on_delete=models.CASCADE)
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

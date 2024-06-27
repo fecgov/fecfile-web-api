@@ -1,5 +1,6 @@
 from django.db import transaction as db_transaction
-from rest_framework import filters, pagination
+from rest_framework import pagination
+from rest_framework.filters import OrderingFilter
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,7 +19,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report, update_recalculation
+from fecfiler.reports.models import Report, flag_reports_for_recalculation
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -28,7 +29,6 @@ import structlog
 
 import os
 import psycopg2
-from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -38,10 +38,38 @@ class TransactionListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+class TransactionOrderingFilter(OrderingFilter):
+    def get_ordering(self, request, queryset, view):
+        ordering_query_param = request.query_params.get(self.ordering_param)
+        ordering_fields = getattr(view, "ordering_fields", [])
+
+        if ordering_query_param:
+            fields = [param.strip() for param in ordering_query_param.split(',')]
+            ordering = []
+            for field in fields:
+                if field.strip('-') in ordering_fields:
+                    if field == '-memo_code' and not (
+                        queryset.filter(memo_code=True).exists()
+                        and queryset.exclude(memo_code=True).exists()
+                    ):
+                        field = 'memo_code'
+                    ordering.append(field)
+            if ordering:
+                return ordering
+
+        return self.get_default_ordering(view)
+
+    def filter_queryset(self, request, queryset, view):
+        ordering = self.get_ordering(request, queryset, view)
+        if ordering:
+            return queryset.order_by(*ordering)
+        return queryset
+
+
 class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [TransactionOrderingFilter]
     ordering_fields = [
         "line_label",
         "created",
@@ -59,7 +87,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ordering = ["-created"]
     queryset = Transaction.objects
 
-    @silk_profile(name='transaction__get_queryset')
     def get_queryset(self):
         # Use the table if writing
         if hasattr(self, "action") and self.action in [
@@ -127,7 +154,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return response
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
-    @silk_profile(name='transaction__previous_transaction_by_entity')
     def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
@@ -143,7 +169,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
-    @silk_profile('transaction__previous_transaction_by_election')
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
@@ -169,7 +194,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             id, date, aggregation_group, None, election_code, office, state, district
         )
 
-    @silk_profile(name='transaction__get_previous')
     def get_previous(
         self,
         transaction_id,
@@ -207,7 +231,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-    @silk_profile(name='transaction__save_transaction')
     def save_transaction(self, transaction_data, request):
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
@@ -269,7 +292,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
-            update_recalculation(report)
+            flag_reports_for_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -333,7 +356,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.add(report)
-        update_recalculation(report)
+        flag_reports_for_recalculation(report)
         return Response("Transaction added to report")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
@@ -349,7 +372,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.remove(report)
-        update_recalculation(report)
+        flag_reports_for_recalculation(report)
         return Response("Transaction removed from report")
 
 

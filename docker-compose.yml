@@ -55,8 +55,6 @@ services:
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
-      FILE_AS_TEST_COMMITTEE:
-      TEST_COMMITTEE_PASSWORD:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
@@ -69,8 +67,6 @@ services:
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
-    ports:
-      - 8080:8080
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -99,8 +95,6 @@ services:
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
-      FILE_AS_TEST_COMMITTEE:
-      TEST_COMMITTEE_PASSWORD:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       FEC_API:
@@ -108,6 +102,14 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+
+  nginx:
+    build: https://github.com/fecgov/fecfile-api-proxy.git#develop
+    container_name: fecfile-api-proxy
+    ports:
+      - 8080:8080
+    depends_on:
+      - api
 
   locust-leader:
     image: locustio/locust
