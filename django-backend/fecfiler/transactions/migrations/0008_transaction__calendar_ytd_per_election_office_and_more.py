@@ -3,6 +3,13 @@
 from django.db import migrations, models
 
 
+def populate_existing_rows(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+    for row in transaction.objects.all():
+        row.aggregate = 0.0
+        row.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -257,4 +264,5 @@ class Migration(migrations.Migration):
         EXECUTE FUNCTION calculate_aggregates();
         """
         ),
+        migrations.RunPython(populate_existing_rows),
     ]
