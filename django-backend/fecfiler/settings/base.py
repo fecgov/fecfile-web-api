@@ -118,7 +118,7 @@ CORS_ALLOW_HEADERS = default_headers + ("enctype", "token", "cache-control")
 CORS_ALLOW_CREDENTIALS = True
 
 # https://docs.djangoproject.com/en/5.0/ref/settings/#csrf-trusted-origins
-CSRF_TRUSTED_ORIGINS = ["https://*.fec.gov", "https://*.cloud.gov"]
+CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
 # Database
 DATABASES = {
