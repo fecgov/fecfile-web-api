@@ -82,6 +82,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -111,7 +112,13 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://(.*?).fecfile\.fec\.gov$"
 ]
-CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
+
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "enctype",
+    "token",
+    "cache-control",
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
