@@ -27,9 +27,7 @@ KEY_VALUE = "KEY_VALUE"
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-CSRF_TRUSTED_ORIGINS = [
-    env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
-]
+CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
 """
 Enables alternative log in method.

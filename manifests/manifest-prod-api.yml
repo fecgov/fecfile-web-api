@@ -17,7 +17,6 @@ applications:
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-      CSRF_TRUSTED_ORIGINS: https://fecfile-web-app-prod.app.cloud.gov
       FFAPI_COOKIE_DOMAIN: app.cloud.gov
       LOGIN_REDIRECT_CLIENT_URL: https://fecfile-web-app-prod.app.cloud.gov
       LOGIN_REDIRECT_SERVER_URL: https://fecfile-web-api-prod.app.cloud.gov/api/v1/auth/login-redirect
