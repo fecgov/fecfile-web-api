@@ -116,7 +116,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://(.*?).fecfile\.fec\.gov$",
     r"^https://(.*?).cloud\.gov$",  # pull this out after we move
 ]
-CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
+CORS_ALLOW_HEADERS = default_headers + ("enctype", "token", "cache-control")
 
 CORS_ALLOW_CREDENTIALS = True
 
