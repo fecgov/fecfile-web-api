@@ -110,8 +110,8 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://(.*?).fecfile\.fec\.gov$"
 ]
 CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
 
