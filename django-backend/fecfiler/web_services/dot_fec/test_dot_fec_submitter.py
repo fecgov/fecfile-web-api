@@ -4,23 +4,19 @@ from django.test import TestCase
 from .dot_fec_submitter import DotFECSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
-from fecfiler.reports.models import Report
 from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class DotFECSubmitterTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-    ]
 
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
-        self.f3x = Report.objects.filter(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).first()
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.dot_fec_id = create_dot_fec(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            str(self.f3x.id),
             force_write_to_disk=True,
         )
         self.dot_fec_record = DotFEC.objects.get(id=self.dot_fec_id)

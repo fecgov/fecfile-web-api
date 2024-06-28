@@ -1,29 +1,34 @@
 from decimal import Decimal
 from django.test import TestCase
-from fecfiler.reports.models import Report
-from fecfiler.transactions.models import get_read_model
+from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
 from .summary import SummaryService
+from fecfiler.reports.tests.utils import create_form3x
+from datetime import datetime
+from fecfiler.contacts.tests.utils import create_test_individual_contact
+from .tests.utils import generate_data
 
 
 class F3XReportTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-        "test_schedulea_summary_transactions",
-        "test_scheduleb_summary_transactions",
-        "test_schedulec_summary_transactions",
-        "test_scheduled_summary_transactions",
-        "test_schedulee_summary_transactions",
-        "test_contacts",
-    ]
 
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.contact_1 = create_test_individual_contact(
+            "last name", "First name", self.committee.id
+        )
 
     def test_calculate_summary_column_a(self):
-        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
-
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
+            datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
+            {"L6a_cash_on_hand_jan_1_ytd": 61},
+            "12C",
+        )
+        self.debt = generate_data(
+            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
+        )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
 
@@ -33,7 +38,7 @@ class F3XReportTestCase(TestCase):
             Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
         )
         self.assertEqual(summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"])
-        self.assertEqual(summary_a["line_9"], Decimal("215.00"))
+        self.assertEqual(summary_a["line_9"], Decimal("250.00"))
         self.assertEqual(summary_a["line_10"], Decimal("250.00"))
         self.assertEqual(summary_a["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_a["line_11aii"], Decimal("3.77"))
@@ -111,14 +116,22 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_calculate_summary_column_b(self):
-        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
+            datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
+            {"L6a_cash_on_hand_jan_1_ytd": 61},
+            "12C",
+        )
+        self.debt = generate_data(
+            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
+        )
         summary_service = SummaryService(f3x)
         _, summary_b = summary_service.calculate_summary()
 
-        debt = get_read_model(f3x.committee_account.id).objects.get(
-            id="aaaaaaaa-4d75-46f0-bce2-111000000001"
-        )
-        self.assertEqual(debt.itemized, False)
+        self.assertIsNotNone(self.debt)
+        if self.debt is not None:
+            self.assertEqual(self.debt.force_itemized, False)
 
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(
@@ -199,24 +212,35 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_report_with_no_transactions(self):
-        f3x = Report.objects.get(id="a07c8c65-1b2d-4e6e-bcaa-fa8d39e50965")
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
+            {},
+        )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
         self.assertEqual(summary_a["line_15"], Decimal("0"))
         self.assertEqual(summary_a["line_17"], Decimal("0"))
 
     def test_report_with_zero_cash_on_hand(self):
-        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
-        f3x.form_3x.L6a_cash_on_hand_jan_1_ytd = 0
-        f3x.form_3x.save()
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
+            {"L6a_cash_on_hand_jan_1_ytd": 0},
+        )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
         self.assertTrue("line_8" in summary_a)
 
     def test_report_with_none_cash_on_hand(self):
-        f3x = Report.objects.get(id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae")
-        f3x.form_3x.L6a_cash_on_hand_jan_1_ytd = None
-        f3x.form_3x.save()
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
+            {"L6a_cash_on_hand_jan_1_ytd": None},
+        )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary()
         self.assertFalse("line_8" in summary_a)

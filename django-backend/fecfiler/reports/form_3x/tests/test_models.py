@@ -1,11 +1,21 @@
 from django.test import TestCase
 from ..models import Form3X
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class F3XTestCase(TestCase):
-    fixtures = ["C01234567_user_and_committee", "test_f3x_reports"]
 
     def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.q1_report = create_form3x(
+            self.committee,
+            "2024-01-01",
+            "2024-02-01",
+            {"election_code": "test_string_value"},
+        )
         self.valid_f3x_summary = Form3X(
             change_of_address=False,
             election_code="P2020",
@@ -16,8 +26,7 @@ class F3XTestCase(TestCase):
         )
 
     def test_get_f3x_summary(self):
-        f3x_summary = Form3X.objects.get(id="a6d60d2d-d926-4e89-ad4b-c47d152a66ae")
-        self.assertEquals(f3x_summary.election_code, "test_string_value")
+        self.assertEquals(self.q1_report.form_3x.election_code, "test_string_value")
 
     def test_save_and_delete(self):
         self.valid_f3x_summary.save()

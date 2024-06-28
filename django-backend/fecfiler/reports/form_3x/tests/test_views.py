@@ -3,15 +3,49 @@ from django.test import TestCase, RequestFactory
 from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
 from fecfiler.user.models import User
-
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
 from rest_framework.test import force_authenticate
 
 
 class Form3XViewSetTest(TestCase):
-    fixtures = ["test_f3x_reports", "C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        create_committee_view(self.committee.id)
+        self.q1_report = create_form3x(
+            self.committee,
+            "2004-01-01",
+            "2004-02-28",
+            {},
+            "Q1",
+        )
+
+        self.m4_report = create_form3x(
+            self.committee,
+            "2005-03-01",
+            "2005-03-31",
+            {},
+            "M4",
+        )
+
+        self.my_report = create_form3x(
+            self.committee,
+            "2006-01-30",
+            "2006-02-28",
+            {},
+            "MY",
+        )
+
+        self.twelve_c_report = create_form3x(
+            self.committee,
+            "2007-01-30",
+            "2007-02-28",
+            {},
+            "12C",
+        )
         self.factory = RequestFactory()
 
     def test_coverage_dates_happy_path(self):
@@ -19,16 +53,16 @@ class Form3XViewSetTest(TestCase):
         request = self.factory.get("/api/v1/reports/form-f3x/coverage_dates")
         request.user = self.user
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
 
         response = Form3XViewSet.as_view({"get": "coverage_dates"})(request)
 
         expected_json = [
             {
-                "coverage_from_date": "2005-01-30",
-                "coverage_through_date": "2005-02-28",
+                "coverage_from_date": "2004-01-01",
+                "coverage_through_date": "2004-02-28",
                 "report_code": "Q1",
             },
             {
@@ -52,21 +86,17 @@ class Form3XViewSetTest(TestCase):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_amend(self):
-        request = self.factory.post(
-            "/api/v1/reports/1406535e-f99f-42c4-97a8-247904b7d297/amend/"
-        )
+        request = self.factory.post(f"/api/v1/reports/{self.q1_report.id}/amend/")
         request.user = self.user
         request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
         force_authenticate(request, self.user)
         view = Form3XViewSet.as_view({"post": "amend"})
-        response = view(request, pk="1406535e-f99f-42c4-97a8-247904b7d297")
+        response = view(request, pk=self.q1_report.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            Report.objects.filter(id="1406535e-f99f-42c4-97a8-247904b7d297")
-            .first()
-            .form_type,
+            Report.objects.filter(id=self.q1_report.id).first().form_type,
             "F3XA",
         )

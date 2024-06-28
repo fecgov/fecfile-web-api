@@ -5,7 +5,7 @@ from fecfiler.transactions.models import get_read_model
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
-from fecfiler.settings import FILE_AS_TEST_COMMITTEE, OUTPUT_TEST_INFO_IN_DOT_FEC
+from fecfiler.settings import OUTPUT_TEST_INFO_IN_DOT_FEC
 from fecfiler.transactions.schedule_a.utils import add_schedule_a_contact_fields
 from fecfiler.transactions.schedule_b.utils import add_schedule_b_contact_fields
 from fecfiler.transactions.schedule_c.utils import add_schedule_c_contact_fields
@@ -27,9 +27,7 @@ def compose_report(report_id, upload_submission_record_id):
         logger.info(f"composing report: {report_id}")
         report = report_result.first()
         """Compose derived fields"""
-        report.filer_committee_id_number = (
-            FILE_AS_TEST_COMMITTEE or report.committee_account.committee_id
-        )
+        report.filer_committee_id_number = report.committee_account.committee_id
         if upload_submission_result.exists():
             report.date_signed = upload_submission_result.first().created
         return report
@@ -46,7 +44,7 @@ def compose_transactions(report_id):
         """Compose derived fields"""
         for transaction in transactions:
             transaction.filer_committee_id_number = (
-                FILE_AS_TEST_COMMITTEE or transaction.committee_account.committee_id
+                transaction.committee_account.committee_id
             )
 
             if transaction.schedule_a:
@@ -78,9 +76,7 @@ def compose_report_level_memos(report_id):
     if report_level_memos.exists():
         logger.info(f"composing report level memos: {report_id}")
         for memo in report_level_memos:
-            memo.filer_committee_id_number = (
-                FILE_AS_TEST_COMMITTEE or memo.committee_account.committee_id
-            )
+            memo.filer_committee_id_number = memo.committee_account.committee_id
         return report_level_memos
     else:
         logger.info(f"no report level memos found for report: {report_id}")
@@ -199,9 +195,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             )
             if transaction.memo_text:
                 memo = transaction.memo_text
-                memo.filer_committee_id_number = (
-                    FILE_AS_TEST_COMMITTEE or memo.committee_account.committee_id
-                )
+                memo.filer_committee_id_number = memo.committee_account.committee_id
                 memo.back_reference_tran_id_number = transaction.transaction_id
                 memo.back_reference_sched_form_name = transaction.form_type
                 serialized_memo = serialize_instance("Text", memo)

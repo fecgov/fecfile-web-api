@@ -14,6 +14,10 @@ from fecfiler.transactions.tests.utils import (
     create_debt,
 )
 from decimal import Decimal
+from django.db import transaction
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class TransactionViewTestCase(TestCase):
@@ -43,14 +47,15 @@ class TransactionViewTestCase(TestCase):
         transactions = (
             view.filter(committee_account_id=self.committee.id).all().order_by("date")
         )
-
+        for t in transactions:
+            t.refresh_from_db()
         self.assertEqual(transactions[0].aggregate, Decimal("123.45"))
         self.assertEqual(transactions[2].aggregate, Decimal("300"))
         self.assertEqual(transactions[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
 
-        unaggregated = create_test_transaction(  # noqa: F841
+        create_test_transaction(  # noqa: F841
             "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
@@ -80,7 +85,9 @@ class TransactionViewTestCase(TestCase):
         transactions = view.filter(committee_account_id=self.committee.id).order_by(
             "date"
         )
-        self.assertEqual(transactions[0].aggregate, Decimal("0"))
+        for t in transactions:
+            t.refresh_from_db()
+        self.assertEqual(transactions[0].aggregate, None)
         self.assertEqual(transactions[0].force_unaggregated, True)
         self.assertEqual(transactions[1].aggregate, Decimal("200"))
 
@@ -113,44 +120,49 @@ class TransactionViewTestCase(TestCase):
         )
 
     def test_transaction_view_list_with_grandparent(self):
-        jf_transfer = create_schedule_a(
-            "JOINT_FUNDRAISING_TRANSFER",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="500.00",
-        )
-        jf_transfer.save()
+        with transaction.atomic():
+            jf_transfer = create_schedule_a(
+                "JOINT_FUNDRAISING_TRANSFER",
+                self.committee,
+                self.contact_1,
+                "2024-01-01",
+                amount="500.00",
+                itemized=True,
+            )
+            jf_transfer.save()
 
-        parnership_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="50.00",
-        )
-        parnership_jf_transfer_memo.parent_transaction = jf_transfer
-        parnership_jf_transfer_memo.save()
+            parnership_jf_transfer_memo = create_schedule_a(
+                "PARTNERSHIP_JF_TRANSFER_MEMO",
+                self.committee,
+                self.contact_1,
+                "2024-01-02",
+                amount="50.00",
+                itemized=True,
+            )
+            parnership_jf_transfer_memo.parent_transaction = jf_transfer
+            parnership_jf_transfer_memo.save()
 
-        parnership_attribution_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="5.00",
-        )
-        parnership_attribution_jf_transfer_memo.parent_transaction = (
-            parnership_jf_transfer_memo
-        )
-        parnership_attribution_jf_transfer_memo.save()
+            parnership_attribution_jf_transfer_memo = create_schedule_a(
+                "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+                self.committee,
+                self.contact_1,
+                "2024-01-03",
+                amount="5.00",
+                itemized=True,
+            )
+            parnership_attribution_jf_transfer_memo.parent_transaction = (
+                parnership_jf_transfer_memo
+            )
+            parnership_attribution_jf_transfer_memo.save()
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = get_read_model(self.committee.id).objects.all().order_by("date")
+
         self.assertEqual(view[0].itemized, True)
-        self.assertEqual(view[0].calendar_ytd_per_election_office, 500)
+        self.assertEqual(view[0].aggregate, 500)
         self.assertEqual(view[1].itemized, True)
-        self.assertEqual(view[1].calendar_ytd_per_election_office, 500)
+        self.assertEqual(view[1].aggregate, 550)
         self.assertEqual(view[2].itemized, True)
-        self.assertEqual(view[2].calendar_ytd_per_election_office, 500)
+        self.assertEqual(view[2].aggregate, 555)
 
     def test_refund_aggregate(self):
         create_schedule_a(
@@ -195,37 +207,43 @@ class TransactionViewTestCase(TestCase):
         )
         ies = [
             {  # same election previous year
-                "date": "2023-01-01",
+                "disbursement_date": "2023-01-01",
+                "dissemination_date": "2023-01-01",
                 "amount": "123.45",
                 "contact": candidate_a,
                 "code": "H2024",
             },
             {  # same election same year
-                "date": "2024-01-01",
+                "disbursement_date": "2024-01-01",
+                "dissemination_date": "2024-01-01",
                 "amount": "1.00",
                 "contact": candidate_a,
                 "code": "H2024",
             },
             {  # same election same year
-                "date": "2024-01-02",
+                "disbursement_date": "2024-01-02",
+                "dissemination_date": "2024-01-02",
                 "amount": "1.00",
                 "contact": candidate_a,
                 "code": "H2024",
             },
             {  # same election same year
-                "date": "2024-01-03",
+                "disbursement_date": "2024-01-03",
+                "dissemination_date": "2024-01-03",
                 "amount": "2.00",
                 "contact": candidate_b,
                 "code": "H2024",
             },
             {  # different election same year
-                "date": "2024-01-04",
+                "disbursement_date": "2024-01-04",
+                "dissemination_date": "2024-01-04",
                 "amount": "3.00",
                 "contact": candidate_c,
                 "code": "H2024",
             },
             {  # different election same year
-                "date": "2024-01-05",
+                "disbursement_date": "2024-01-05",
+                "dissemination_date": "2024-01-05",
                 "amount": "4.00",
                 "contact": candidate_a,
                 "code": "Z2024",
@@ -234,31 +252,23 @@ class TransactionViewTestCase(TestCase):
 
         for ie in ies:
             create_ie(
-                self.committee, ie["contact"], ie["date"], ie["amount"], ie["code"]
+                self.committee,
+                ie["contact"],
+                ie["disbursement_date"],
+                ie["dissemination_date"],
+                ie["amount"],
+                ie["code"],
+                ie["contact"],
             )
 
-        view: QuerySet = Transaction.objects.transaction_view()
-        transactions = view.filter(committee_account_id=self.committee.id).order_by(
-            "date"
-        )
-        self.assertEqual(
-            transactions[0]._calendar_ytd_per_election_office, Decimal("123.45")
-        )
-        self.assertEqual(
-            transactions[1]._calendar_ytd_per_election_office, Decimal("1.00")
-        )
-        self.assertEqual(
-            transactions[2]._calendar_ytd_per_election_office, Decimal("2.00")
-        )
-        self.assertEqual(
-            transactions[3]._calendar_ytd_per_election_office, Decimal("4.00")
-        )
-        self.assertEqual(
-            transactions[4]._calendar_ytd_per_election_office, Decimal("3.00")
-        )
-        self.assertEqual(
-            transactions[5]._calendar_ytd_per_election_office, Decimal("4.00")
-        )
+        view = get_read_model(self.committee.id).objects.all()
+
+        self.assertEqual(view[0]._calendar_ytd_per_election_office, Decimal("123.45"))
+        self.assertEqual(view[1]._calendar_ytd_per_election_office, Decimal("1.00"))
+        self.assertEqual(view[2]._calendar_ytd_per_election_office, Decimal("2.00"))
+        self.assertEqual(view[3]._calendar_ytd_per_election_office, Decimal("4.00"))
+        self.assertEqual(view[4]._calendar_ytd_per_election_office, Decimal("3.00"))
+        self.assertEqual(view[5]._calendar_ytd_per_election_office, Decimal("4.00"))
 
     def test_debts(self):
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
@@ -294,17 +304,17 @@ class TransactionViewTestCase(TestCase):
         print("DEBT SUCCESS")
 
     def test_line_label(self):
-        first_schedule_a = create_schedule_a(
+        create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
             self.contact_1,
             "2024-01-01",
             "1.00",
             "GENERAL",
-            "SA11AII",
+            "SA11AI",
+            False,
+            True,
         )
-        first_schedule_a.force_itemized = True
-        first_schedule_a.save()
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
@@ -312,7 +322,7 @@ class TransactionViewTestCase(TestCase):
             "2024-01-02",
             "2.00",
             "GENERAl",
-            "SA11AII",
+            "SA11AI",
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -321,20 +331,20 @@ class TransactionViewTestCase(TestCase):
             "2024-01-03",
             "1000.00",
             "GENERAL",
-            "SA11AI",
+            "SA11AII",
         )
         create_schedule_b(
             "OPERATING_EXPENDITURE",
             self.committee,
             self.contact_1,
-            "2024-01-01",
+            "2024-01-04",
             "100.00",
             "GENERAL_DISBURSEMENT",
             "SB21B",
         )
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = get_read_model(self.committee.id).objects.all().order_by("date")
         self.assertEqual(view[0].line_label, "11(a)(i)")
-        self.assertEqual(view[1].line_label, "11(a)(i)")
+        self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")
         self.assertEqual(view[3].line_label, "21(b)")

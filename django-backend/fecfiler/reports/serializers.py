@@ -1,4 +1,4 @@
-from .models import Report, ReportTransaction
+from .models import Report
 from rest_framework.serializers import (
     ModelSerializer,
     CharField,
@@ -17,7 +17,6 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
-from django.db.models import OuterRef, Subquery, Exists, Q
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -137,44 +136,9 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
-        representation["can_delete"] = self.can_delete(representation)
+        representation["can_delete"] = instance.can_delete()
 
         return representation
-
-    def can_delete(self, representation):
-        """can delete if there exist no transactions in this report
-        where any transactions in a different report back reference to them"""
-        no_check = ["F24", "F1M", "F99"]
-        return representation.get("report_status") == "In progress" and (
-            representation["report_type"] in no_check
-            or not (
-                ReportTransaction.objects.filter(
-                    Exists(
-                        Subquery(
-                            ReportTransaction.objects.filter(
-                                ~Q(report_id=representation["id"]),
-                                Q(
-                                    Q(transaction__id=OuterRef("transaction_id"))
-                                    | Q(
-                                        transaction__reatt_redes_id=OuterRef(
-                                            "transaction_id"
-                                        )
-                                    )
-                                    | Q(
-                                        transaction__parent_transaction_id=OuterRef(
-                                            "transaction_id"
-                                        )
-                                    )
-                                    | Q(transaction__debt_id=OuterRef("transaction_id"))
-                                    | Q(transaction__loan_id=OuterRef("transaction_id"))
-                                ),
-                            )
-                        )
-                    ),
-                    report_id=representation["id"],
-                ).exists()
-            )
-        )
 
     def validate(self, data):
         self._context = self.context.copy()

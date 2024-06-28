@@ -1,24 +1,24 @@
 import json
 from django.test import TestCase
-from fecfiler.reports.models import Report
 from fecfiler.web_services.models import (
     FECStatus,
     UploadSubmission,
     FECSubmissionState,
     WebPrintSubmission,
 )
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.user.models import User
 
 
 class UploadSubmissionTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-    ]
 
     def setUp(self):
-        self.f3x = Report.objects.filter(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).first()
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        create_committee_view(self.committee.id)
+        self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.upload_submission = UploadSubmission()
         self.webprint_submission = WebPrintSubmission()
 
@@ -28,9 +28,7 @@ class UploadSubmissionTestCase(TestCase):
 
     def test_initiate_submission(self):
         self.assertIsNone(self.f3x.upload_submission_id)
-        submission = UploadSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         self.assertEqual(
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,
@@ -69,9 +67,7 @@ class UploadSubmissionTestCase(TestCase):
 
     def test_webprint_initiate_submission(self):
         self.assertIsNone(self.f3x.webprint_submission_id)
-        submission = WebPrintSubmission.objects.initiate_submission(
-            "b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        )
+        submission = WebPrintSubmission.objects.initiate_submission(str(self.f3x.id))
         self.assertEqual(
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,

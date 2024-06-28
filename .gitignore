@@ -63,7 +63,7 @@ django-backend/.local/
 *.bower-tmp
 
 # Locust Testing Data
-locust-testing/locust-data/*.locust.json
+performance-testing/locust-data/*.locust.json
 
 
 # System Files

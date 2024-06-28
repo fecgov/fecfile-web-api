@@ -32,7 +32,7 @@ class UserViewSetTest(TestCase):
         }
 
         response = client.post(
-            "/api/v1/feedback/submit/", data=test_post_data, **test_headers
+            "/api/v1/feedback/submit/", data=test_post_data, secure=True, **test_headers
         )
 
         mock_github3_login.assert_called_once()
