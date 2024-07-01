@@ -18,7 +18,7 @@ applications:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
       FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
-      LOGIN_REDIRECT_CLIENT_URL: https://stage-api.fecfile.fec.gov
+      LOGIN_REDIRECT_CLIENT_URL: https://stage.fecfile.fec.gov
       LOGIN_REDIRECT_SERVER_URL: https://stage-api.fecfile.fec.gov/api/v1/auth/login-redirect
       LOGOUT_REDIRECT_URL: https://stage-api.fecfile.fec.gov/api/v1/auth/logout-redirect
       FEC_API: https://api.open.fec.gov/v1/
