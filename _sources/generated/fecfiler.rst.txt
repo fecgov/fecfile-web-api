@@ -38,6 +38,7 @@ fecfiler
    fecfiler.dcf_importer
    fecfiler.feedback
    fecfiler.memo_text
+   fecfiler.middleware
    fecfiler.mock_openfec
    fecfiler.openfec
    fecfiler.reports
