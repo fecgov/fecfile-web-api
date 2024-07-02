@@ -29,6 +29,7 @@ fecfiler.reports.views.ReportViewSet
       ~ReportViewSet.destroy
       ~ReportViewSet.determine_version
       ~ReportViewSet.dispatch
+      ~ReportViewSet.e2e_delete_all_reports
       ~ReportViewSet.filter_queryset
       ~ReportViewSet.finalize_response
       ~ReportViewSet.get_authenticate_header
@@ -57,7 +58,6 @@ fecfiler.reports.views.ReportViewSet
       ~ReportViewSet.get_view_description
       ~ReportViewSet.get_view_name
       ~ReportViewSet.handle_exception
-      ~ReportViewSet.hard_delete_reports
       ~ReportViewSet.http_method_not_allowed
       ~ReportViewSet.initial
       ~ReportViewSet.initialize_request

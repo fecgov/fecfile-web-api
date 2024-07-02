@@ -80,92 +80,92 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.dispatch" title="fecfiler.reports.form_24.views.Form24ViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.filter_queryset" title="fecfiler.reports.form_24.views.Form24ViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">e2e_delete_all_reports</span></code>(request)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.filter_queryset" title="fecfiler.reports.form_24.views.Form24ViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.finalize_response" title="fecfiler.reports.form_24.views.Form24ViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.finalize_response" title="fecfiler.reports.form_24.views.Form24ViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_authenticate_header" title="fecfiler.reports.form_24.views.Form24ViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_authenticate_header" title="fecfiler.reports.form_24.views.Form24ViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_authenticators" title="fecfiler.reports.form_24.views.Form24ViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_authenticators" title="fecfiler.reports.form_24.views.Form24ViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_content_negotiator" title="fecfiler.reports.form_24.views.Form24ViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_content_negotiator" title="fecfiler.reports.form_24.views.Form24ViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler" title="fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler" title="fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
 <td><p>Returns the exception handler that this view uses.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler_context</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_exception_handler_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler_context</span></code></a>()</p></td>
 <td><p>Returns a dict that is passed through to EXCEPTION_HANDLER, as the <cite>context</cite> argument.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_extra_action_url_map" title="fecfiler.reports.form_24.views.Form24ViewSet.get_extra_action_url_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_action_url_map</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_extra_action_url_map" title="fecfiler.reports.form_24.views.Form24ViewSet.get_extra_action_url_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_action_url_map</span></code></a>()</p></td>
 <td><p>Build a map of {names: urls} for the extra actions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_extra_actions" title="fecfiler.reports.form_24.views.Form24ViewSet.get_extra_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_actions</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_extra_actions" title="fecfiler.reports.form_24.views.Form24ViewSet.get_extra_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_actions</span></code></a>()</p></td>
 <td><p>Get the methods that are marked as an extra ViewSet <cite>&#64;action</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_format_suffix" title="fecfiler.reports.form_24.views.Form24ViewSet.get_format_suffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_format_suffix</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_format_suffix" title="fecfiler.reports.form_24.views.Form24ViewSet.get_format_suffix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_format_suffix</span></code></a>(**kwargs)</p></td>
 <td><p>Determine if the request includes a '.json' style format suffix</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_object" title="fecfiler.reports.form_24.views.Form24ViewSet.get_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_object</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_object" title="fecfiler.reports.form_24.views.Form24ViewSet.get_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_object</span></code></a>()</p></td>
 <td><p>Returns the object the view is displaying.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_paginated_response" title="fecfiler.reports.form_24.views.Form24ViewSet.get_paginated_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_paginated_response</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_paginated_response" title="fecfiler.reports.form_24.views.Form24ViewSet.get_paginated_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_paginated_response</span></code></a>(data)</p></td>
 <td><p>Return a paginated style <cite>Response</cite> object for the given output data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_parser_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_parser_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser_context</span></code></a>(http_request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_parser_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_parser_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parser_context</span></code></a>(http_request)</p></td>
 <td><p>Returns a dict that is passed through to Parser.parse(), as the <cite>parser_context</cite> keyword argument.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_parsers" title="fecfiler.reports.form_24.views.Form24ViewSet.get_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parsers</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_parsers" title="fecfiler.reports.form_24.views.Form24ViewSet.get_parsers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_parsers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of parsers that this view can use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_permissions" title="fecfiler.reports.form_24.views.Form24ViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_permissions" title="fecfiler.reports.form_24.views.Form24ViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of permissions that this view requires.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_queryset" title="fecfiler.reports.form_24.views.Form24ViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_queryset" title="fecfiler.reports.form_24.views.Form24ViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
 <td><p>Get the list of items for this view.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_renderer_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_renderer_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
 <td><p>Returns a dict that is passed through to Renderer.render(), as the <cite>renderer_context</cite> keyword argument.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_renderers" title="fecfiler.reports.form_24.views.Form24ViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_renderers" title="fecfiler.reports.form_24.views.Form24ViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of renderers that this view can use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Return the serializer instance that should be used for validating and deserializing input, and for serializing output.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_class" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_class" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
 <td><p>Return the class to use for the serializer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_context" title="fecfiler.reports.form_24.views.Form24ViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
 <td><p>Extra context provided to the serializer class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_throttles" title="fecfiler.reports.form_24.views.Form24ViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_throttles" title="fecfiler.reports.form_24.views.Form24ViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_view_description" title="fecfiler.reports.form_24.views.Form24ViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_view_description" title="fecfiler.reports.form_24.views.Form24ViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
 <td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_view_name" title="fecfiler.reports.form_24.views.Form24ViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.get_view_name" title="fecfiler.reports.form_24.views.Form24ViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
 <td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.handle_exception" title="fecfiler.reports.form_24.views.Form24ViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.handle_exception" title="fecfiler.reports.form_24.views.Form24ViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
 <td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete_reports</span></code>(request)</p></td>
-<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_24.views.Form24ViewSet.http_method_not_allowed" title="fecfiler.reports.form_24.views.Form24ViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>

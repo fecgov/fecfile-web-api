@@ -30,6 +30,7 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.destroy
       ~Form3XViewSet.determine_version
       ~Form3XViewSet.dispatch
+      ~Form3XViewSet.e2e_delete_all_reports
       ~Form3XViewSet.filter_queryset
       ~Form3XViewSet.finalize_response
       ~Form3XViewSet.future_form3x_reports
@@ -59,7 +60,6 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.get_view_description
       ~Form3XViewSet.get_view_name
       ~Form3XViewSet.handle_exception
-      ~Form3XViewSet.hard_delete_reports
       ~Form3XViewSet.http_method_not_allowed
       ~Form3XViewSet.initial
       ~Form3XViewSet.initialize_request

@@ -29,6 +29,7 @@ fecfiler.reports.form\_99.views.Form99ViewSet
       ~Form99ViewSet.destroy
       ~Form99ViewSet.determine_version
       ~Form99ViewSet.dispatch
+      ~Form99ViewSet.e2e_delete_all_reports
       ~Form99ViewSet.filter_queryset
       ~Form99ViewSet.finalize_response
       ~Form99ViewSet.get_authenticate_header
@@ -57,7 +58,6 @@ fecfiler.reports.form\_99.views.Form99ViewSet
       ~Form99ViewSet.get_view_description
       ~Form99ViewSet.get_view_name
       ~Form99ViewSet.handle_exception
-      ~Form99ViewSet.hard_delete_reports
       ~Form99ViewSet.http_method_not_allowed
       ~Form99ViewSet.initial
       ~Form99ViewSet.initialize_request

@@ -29,6 +29,7 @@ fecfiler.reports.form\_24.views.Form24ViewSet
       ~Form24ViewSet.destroy
       ~Form24ViewSet.determine_version
       ~Form24ViewSet.dispatch
+      ~Form24ViewSet.e2e_delete_all_reports
       ~Form24ViewSet.filter_queryset
       ~Form24ViewSet.finalize_response
       ~Form24ViewSet.get_authenticate_header
@@ -57,7 +58,6 @@ fecfiler.reports.form\_24.views.Form24ViewSet
       ~Form24ViewSet.get_view_description
       ~Form24ViewSet.get_view_name
       ~Form24ViewSet.handle_exception
-      ~Form24ViewSet.hard_delete_reports
       ~Form24ViewSet.http_method_not_allowed
       ~Form24ViewSet.initial
       ~Form24ViewSet.initialize_request

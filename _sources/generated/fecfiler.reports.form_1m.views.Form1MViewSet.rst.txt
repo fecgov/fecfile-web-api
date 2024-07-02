@@ -29,6 +29,7 @@ fecfiler.reports.form\_1m.views.Form1MViewSet
       ~Form1MViewSet.destroy
       ~Form1MViewSet.determine_version
       ~Form1MViewSet.dispatch
+      ~Form1MViewSet.e2e_delete_all_reports
       ~Form1MViewSet.filter_queryset
       ~Form1MViewSet.finalize_response
       ~Form1MViewSet.get_authenticate_header
@@ -57,7 +58,6 @@ fecfiler.reports.form\_1m.views.Form1MViewSet
       ~Form1MViewSet.get_view_description
       ~Form1MViewSet.get_view_name
       ~Form1MViewSet.handle_exception
-      ~Form1MViewSet.hard_delete_reports
       ~Form1MViewSet.http_method_not_allowed
       ~Form1MViewSet.initial
       ~Form1MViewSet.initialize_request
