@@ -147,7 +147,9 @@ OIDC_MAX_STATES = 3
 
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_RP_CLIENT_ID = env.get_credential("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET_STAGING = env.get_credential("OIDC_RP_CLIENT_SECRET_STAGING")
 OIDC_RP_CLIENT_SECRET = env.get_credential("OIDC_RP_CLIENT_SECRET")
+OIDC_RP_CLIENT_SECRET_BACKUP = env.get_credential("OIDC_RP_CLIENT_SECRET_BACKUP")
 
 # The Django field used to identify users - default is email
 OIDC_RP_UNIQUE_IDENTIFIER = "username"
@@ -188,7 +190,7 @@ OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
 
 # keygen settings
 LOGIN_DOT_GOV_RSA_PK_SIZE = int(env.get_credential("LOGIN_DOT_GOV_RSA_PK_SIZE", "2048"))
-LOGIN_DOT_GOV_X509_DAYS_VALID = int(
+LOGIN_DOT_GOV_X509_DAYS_VALID = float(
     env.get_credential("LOGIN_DOT_GOV_X509_DAYS_VALID", "365")
 )
 LOGIN_DOT_GOV_X509_COUNTRY = env.get_credential("LOGIN_DOT_GOV_X509_COUNTRY")
