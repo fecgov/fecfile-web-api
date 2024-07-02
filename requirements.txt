@@ -13,7 +13,7 @@ djangorestframework==3.14.0
 git+https://github.com/fecgov/fecfile-validate@0f8b966b623fbca644aebb2054fe4829eb0e0a93#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.42
 github3.py==4.0.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 invoke==1.7.3
 itypes==1.2.0
 MarkupSafe==2.1.1
