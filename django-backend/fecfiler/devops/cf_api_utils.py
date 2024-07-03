@@ -6,7 +6,7 @@ logger = structlog.get_logger(__name__)
 base_uri = "https://api.fr.cloud.gov/v3"
 
 
-def update_credentials(token, space_name, service_instance_name, credentials_dict):
+def retrieve_credentials(token, space_name, service_instance_name):
     try:
         logger.info(f"Retrieving guid for space_name {space_name}")
         space_guid = get_space_guid(token, space_name)
@@ -17,7 +17,18 @@ def update_credentials(token, space_name, service_instance_name, credentials_dic
         )
 
         logger.info(f"Retrieving creds for service_instance_guid {service_instance_guid}")
-        creds = get_credentials_by_guid(token, service_instance_guid)
+        return get_credentials_by_guid(token, service_instance_guid)
+    except Exception:
+        logger.error(
+            "FAILED to retrieve credentials for space_name "
+            f"{space_name} service_instance_name {service_instance_name}"
+        )
+        raise
+
+
+def update_credentials(token, space_name, service_instance_name, credentials_dict):
+    try:
+        creds = retrieve_credentials(token, space_name, service_instance_name)
 
         logger.info(f"Merging creds")
         merged_creds = merge_credentials(creds, credentials_dict)

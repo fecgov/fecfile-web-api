@@ -9,7 +9,6 @@ class Command(BaseCommand):
         parser.add_argument("cf_token", type=str)
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
-        parser.add_argument("credentials_dict", type=dict)
 
     def handle(self, *args, **options):
         try:

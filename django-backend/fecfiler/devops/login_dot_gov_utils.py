@@ -10,7 +10,7 @@ from fecfiler.settings import (
     LOGIN_DOT_GOV_X509_DAYS_VALID,
 )
 from fecfiler.s3 import S3_SESSION
-from fecfiler.devops.cf_api_utils import update_credentials
+from fecfiler.devops.cf_api_utils import retrieve_credentials, update_credentials
 from fecfiler.devops.crypt_utils import (
     gen_rsa_pk,
     rsa_pk_to_bytes,
@@ -23,6 +23,42 @@ import datetime
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+def backout_login_dot_gov_cert(
+    cf_token: str,
+    cf_space_name: str,
+    cf_service_instance_name: str,
+):
+    logger.info("Retrieving current creds")
+    current_creds = retrieve_credentials(
+        cf_token, cf_space_name, cf_service_instance_name
+    )
+
+    logger.info("Backing out creds")
+    updated_keys = {
+        "OIDC_RP_CLIENT_SECRET_STAGING": current_creds["OIDC_RP_CLIENT_SECRET"],
+        "OIDC_RP_CLIENT_SECRET": current_creds["OIDC_RP_CLIENT_SECRET_BACKUP"],
+    }
+    update_credentials(cf_token, cf_space_name, cf_service_instance_name, updated_keys)
+
+
+def install_login_dot_gov_cert(
+    cf_token: str,
+    cf_space_name: str,
+    cf_service_instance_name: str,
+):
+    logger.info("Retrieving current creds")
+    current_creds = retrieve_credentials(
+        cf_token, cf_space_name, cf_service_instance_name
+    )
+
+    logger.info("Updating creds")
+    updated_keys = {
+        "OIDC_RP_CLIENT_SECRET_BACKUP": current_creds["OIDC_RP_CLIENT_SECRET"],
+        "OIDC_RP_CLIENT_SECRET": current_creds["OIDC_RP_CLIENT_SECRET_STAGING"],
+    }
+    update_credentials(cf_token, cf_space_name, cf_service_instance_name, updated_keys)
 
 
 def gen_and_stage_login_dot_gov_cert(
