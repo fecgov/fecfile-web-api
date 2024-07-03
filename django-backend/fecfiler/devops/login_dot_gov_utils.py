@@ -108,5 +108,5 @@ def stage_login_dot_gov_cert(x509_cert: Certificate):
     x509_cert_bytes = x509_cert_to_bytes(x509_cert)
     filename = f"public_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.crt"
     s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
-    s3_object.put(x509_cert_bytes)
+    s3_object.put(Body=x509_cert_bytes)
     logger.info(f"Cert saved as {filename}")
