@@ -19,7 +19,7 @@ def gen_rsa_pk(size: int):
 def rsa_pk_to_bytes(rsa_pk: rsa.RSAPrivateKey):
     return rsa_pk.private_bytes(
         encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption(),
     )
 

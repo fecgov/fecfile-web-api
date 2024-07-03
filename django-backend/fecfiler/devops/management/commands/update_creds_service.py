@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from fecfiler.devops.cf_api_utils import update_credentials
+import json
 
 
 class Command(BaseCommand):
@@ -9,7 +10,7 @@ class Command(BaseCommand):
         parser.add_argument("cf_token", type=str)
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
-        parser.add_argument("credentials_dict", type=dict)
+        parser.add_argument("credentials_dict", type=json.loads)
 
     def handle(self, *args, **options):
         try:
