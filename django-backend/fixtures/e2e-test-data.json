@@ -6,7 +6,7 @@
             "password": "pbkdf2_sha256$260000$8lcKqWHCEOwOMqtzTV6oDr$/fvcNuEmdyOaEpKjISOJuwngn5enhl3uSaEDI7N+RNk=",
             "is_superuser": false,
             "email": "test@test.com",
-            "username": "C00601211test@test.com",
+            "username": "C99999999test@test.com",
             "first_name": "Test",
             "last_name": "Testson",
             "last_login": "2022-05-02T13:44:07.324Z",
@@ -19,7 +19,7 @@
         "model": "committee_accounts.CommitteeAccount",
         "pk": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
         "fields": {
-            "committee_id": "C00601211",
+            "committee_id": "C99999999",
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }

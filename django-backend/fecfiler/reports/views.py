@@ -139,15 +139,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     @action(
         detail=False,
         methods=["post"],
-        url_path="hard-delete-reports",
+        url_path="e2e-delete-all-reports",
     )
-    def hard_delete_reports(self, request):
-        committee_id = request.data.get("committee_id")
-        if not committee_id:
-            return Response(
-                "No committee_id provided", status=status.HTTP_400_BAD_REQUEST
-            )
-
+    def e2e_delete_all_reports(self, request):
+        committee_id = "C99999999"
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
         report_count = reports.count()
         transactions = Transaction.objects.filter(
