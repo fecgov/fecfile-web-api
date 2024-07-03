@@ -2,7 +2,7 @@ import uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import OuterRef, Subquery, Exists, Q
+from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -80,6 +80,7 @@ class Report(CommitteeOwnedModel):
     form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
+    can_delete = models.BooleanField(default=True)
 
     @property
     def previous_report(self):
@@ -99,7 +100,6 @@ class Report(CommitteeOwnedModel):
 
         # Record if the is a create or update operation
         create_action = self.created is None
-
         with db_transaction.atomic():
             super(Report, self).save(*args, **kwargs)
 
@@ -137,7 +137,7 @@ class Report(CommitteeOwnedModel):
         self.save()
 
     def delete(self):
-        if not self.can_delete():
+        if not self.can_delete:
             raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
         if not self.form_24:
             """only delete transactions if the report is the source of the
@@ -155,61 +155,6 @@ class Report(CommitteeOwnedModel):
                 form.delete()
 
         super(CommitteeOwnedModel, self).delete()
-
-    def can_delete(self):
-        """
-        can't delete if submitted
-        can't delete if amended
-        can't delete form3x if there exists any transactions in this report or
-        where any transactions in a different report back reference to them
-        """
-        return (
-            not self.upload_submission
-            and (
-                self.report_version is None
-                or self.report_version == "0"
-                or self.report_version == 0
-            )
-            and (
-                not self.form_3x
-                or (
-                    not bool(self.form_24)
-                    and not ReportTransaction.objects.filter(
-                        Exists(
-                            Subquery(
-                                ReportTransaction.objects.filter(
-                                    ~Q(report_id=self.id),
-                                    Q(
-                                        Q(transaction__id=OuterRef("transaction_id"))
-                                        | Q(
-                                            transaction__reatt_redes_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__parent_transaction_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__debt_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__loan_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                    ),
-                                )
-                            )
-                        ),
-                        report_id=self.id,
-                    ).exists()
-                )
-            )
-        )
 
 
 TABLE_TO_FORM = {
@@ -233,13 +178,10 @@ def flag_reports_for_recalculation(report: Report):
             reports_to_flag = Report.objects.get(id=report.id)
         else:
             reports_to_flag = Report.objects.filter(
-                committee_account=committee,
-                coverage_from_date__gte=report_date
+                committee_account=committee, coverage_from_date__gte=report_date
             )
 
-        flagged_count = reports_to_flag.update(
-            calculation_status=None
-        )
+        flagged_count = reports_to_flag.update(calculation_status=None)
         logger.info(
             f"""Report {
                 report.id

@@ -136,7 +136,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             this_report = Report.objects.get(id=representation["id"])
             representation["is_first"] = this_report.is_first if this_report else True
 
-        representation["can_delete"] = instance.can_delete()
+        representation["can_delete"] = instance.can_delete
 
         return representation
 
