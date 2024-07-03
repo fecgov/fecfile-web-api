@@ -45,9 +45,7 @@ class TransactionManager(SoftDeleteManager):
 
     def ITEMIZATION_CLAUSE(self):  # noqa: N802
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types
-            + schedule_b_over_two_hundred_types
-            + schedule_e_over_two_hundred_types
+            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
             When(force_itemized__isnull=False, then=F("force_itemized")),
@@ -55,6 +53,10 @@ class TransactionManager(SoftDeleteManager):
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
                 then=Q(aggregate__gt=Value(Decimal(200))),
+            ),
+            When(
+                transaction_type_identifier__in=schedule_e_over_two_hundred_types,
+                then=Q(_calendar_ytd_per_election_office__gt=Value(Decimal(200))),
             ),
             default=Value(True),
             output_field=BooleanField(),
