@@ -100,7 +100,7 @@ def stage_login_dot_gov_pk(
     rsa_pk: rsa.RSAPrivateKey,
 ):
     rsa_pk_creds_bytes = rsa_pk_to_bytes(rsa_pk)
-    creds_to_update = {"OIDC_RP_CLIENT_SECRET_STAGING": rsa_pk_creds_bytes}
+    creds_to_update = {"OIDC_RP_CLIENT_SECRET_STAGING": rsa_pk_creds_bytes.decode()}
     update_credentials(cf_token, cf_space_name, cf_service_instance_name, creds_to_update)
 
 
