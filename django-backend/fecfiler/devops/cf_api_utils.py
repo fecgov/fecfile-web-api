@@ -18,12 +18,11 @@ def retrieve_credentials(token, space_name, service_instance_name):
 
         logger.info(f"Retrieving creds for service_instance_guid {service_instance_guid}")
         return get_credentials_by_guid(token, service_instance_guid)
-    except Exception:
-        logger.error(
+    except Exception as e:
+        raise Exception(
             "FAILED to retrieve credentials for space_name "
             f"{space_name} service_instance_name {service_instance_name}"
-        )
-        raise
+        ) from e
 
 
 def update_credentials(token, space_name, service_instance_name, credentials_dict):
@@ -44,12 +43,11 @@ def update_credentials(token, space_name, service_instance_name, credentials_dic
 
         logger.info(f"Updating creds for service_instance_guid {service_instance_guid}")
         update_credentials_for_service(token, service_instance_guid, merged_creds)
-    except Exception:
-        logger.error(
+    except Exception as e:
+        raise Exception(
             "FAILED to update credentials for space_name "
             f"{space_name} service_instance_name {service_instance_name}"
-        )
-        raise
+        ) from e
 
 
 def get_auth_header(token):
@@ -76,8 +74,7 @@ def get_space_guid(token, space_name):
             raise Exception("Space guid not found in response")
         return space_guid
     except Exception:
-        logger.error(f"Failed to retrieve guid for space_name {space_name}")
-        raise
+        raise Exception(f"Failed to retrieve guid for space_name {space_name}")
 
 
 def get_service_instance_guid(token, space_guid, service_instance_name):
@@ -101,11 +98,10 @@ def get_service_instance_guid(token, space_guid, service_instance_name):
             raise Exception("Service instance guid not found in response")
         return service_instance_guid
     except Exception:
-        logger.error(
+        raise Exception(
             "Failed to retrieve guid for service_instance_name "
             f"{service_instance_name} space_guid {space_guid}"
         )
-        raise
 
 
 def get_credentials_by_guid(token, service_instance_guid):
@@ -116,11 +112,10 @@ def get_credentials_by_guid(token, service_instance_guid):
         creds = response.json()
         return creds
     except Exception:
-        logger.error(
+        raise Exception(
             "Failed to retrieve creds for service_instance_guid "
             f"{service_instance_guid}"
         )
-        raise
 
 
 def merge_credentials(creds, update_data):
@@ -135,7 +130,6 @@ def update_credentials_for_service(token, service_instance_guid, creds):
         response = requests.patch(url, json=creds, headers=headers)
         response.raise_for_status()
     except Exception:
-        logger.error(
+        raise Exception(
             "Failed to patch creds for service_instance_guid " f"{service_instance_guid}"
         )
-        raise
