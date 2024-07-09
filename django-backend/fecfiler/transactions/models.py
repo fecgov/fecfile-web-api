@@ -15,6 +15,7 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+
 import uuid
 import structlog
 from silk.profiling.profiler import silk_profile
@@ -137,6 +138,17 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         ScheduleE, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    # Calculated fields
+    aggregate = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    _calendar_ytd_per_election_office = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    loan_payment_to_date = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+
     objects = TransactionManager()
 
     def get_schedule_name(self):
@@ -195,11 +207,8 @@ def get_read_model(committee_uuid):
         date = models.DateField()
         form_type = models.TextField()
         effective_amount = models.DecimalField()
-        aggregate = models.DecimalField()
-        _calendar_ytd_per_election_office = models.DecimalField()
         back_reference_tran_id_number = models.TextField()
         loan_key = models.TextField()
-        loan_payment_to_date = models.DecimalField()
         incurred_prior = models.DecimalField()
         payment_prior = models.DecimalField()
         payment_amount = models.DecimalField()

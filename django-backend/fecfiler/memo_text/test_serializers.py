@@ -2,35 +2,40 @@ from django.test import TestCase
 from .serializers import MemoTextSerializer
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class MemoTextSerializerTestCase(TestCase):
-    fixtures = ["test_memo_text", "C01234567_user_and_committee", "test_f3x_reports"]
 
     def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        create_committee_view(self.committee.id)
+        q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+
         self.valid_memo_text = {
             "rec_type": "TEXT",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": q1_report.id,
             "text4000": "tessst4",
             "transaction_id_number": "REPORT_MEMO_TEXT_3",
-            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "committee_account": self.committee.id,
         }
 
         self.invalid_memo_text = {
             "rec_type": "Invalid_rec_type",
-            "report_id": "b6d60d2d-d926-4e89-ad4b-c47d152a66ae",
+            "report_id": q1_report.id,
             "text4000": "tessst4",
             "transaction_id_number": "REPORT_MEMO_TEXT_3",
-            "committee_account": "11111111-2222-3333-4444-555555555555",
+            "committee_account": self.committee.id,
         }
 
         self.mock_request = Request(HttpRequest())
-        self.mock_request.user = User.objects.get(
-            id="12345678-aaaa-bbbb-cccc-111122223333"
-        )
+        self.mock_request.user = self.user
         self.mock_request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
         }
 
     def test_serializer_validate(self):
