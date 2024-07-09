@@ -36,6 +36,6 @@ urlpatterns = [
     re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
     re_path(r"^celery-test/", test_celery),
     path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
+    re_path(BASE_V1_URL + "status/", get_api_status),
     re_path(r"^silk/", include('silk.urls', namespace='silk'))
-    re_path(BASE_V1_URL + "status/", get_api_status)
 ]
