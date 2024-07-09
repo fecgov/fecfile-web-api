@@ -65,11 +65,32 @@ class CfApiUtilsTestCase(TestCase):
     # update_credentials
 
     @patch("fecfiler.devops.cf_api_utils.get_space_guid")
+    def test_update_credentials_throws_exception(
+        self,
+        get_space_guid_mock,
+    ):
+        test_token = "test_token"
+        test_space_name = "test_space_name"
+        test_service_instance_name = "test_service_instance_name"
+        mock_credentials = {"testkey1": "testval1"}
+
+        get_space_guid_mock.side_effect = Exception("FAIL")
+
+        with self.assertRaisesMessage(
+            Exception,
+            "FAILED to update credentials for space_name "
+            f"{test_space_name} service_instance_name {test_service_instance_name}",
+        ):
+            update_credentials(
+                test_token, test_space_name, test_service_instance_name, mock_credentials
+            )
+
+    @patch("fecfiler.devops.cf_api_utils.get_space_guid")
     @patch("fecfiler.devops.cf_api_utils.get_service_instance_guid")
     @patch("fecfiler.devops.cf_api_utils.retrieve_credentials")
     @patch("fecfiler.devops.cf_api_utils.merge_credentials")
     @patch("fecfiler.devops.cf_api_utils.update_credentials_for_service")
-    def test_retrieve_credentials_happy_path(
+    def test_update_credentials_happy_path(
         self,
         update_credentials_for_service_mock,
         merge_credentials_mock,
