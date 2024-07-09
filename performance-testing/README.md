@@ -46,7 +46,7 @@ Run the script with the `-h` flag for additional information.
 
 2. Set the target API service for testing in [docker-compose.yml](https://github.com/fecgov/fecfile-web-api/blob/develop/docker-compose.yml#L118):
 - As an example, this is what you would set in order to target DEV:
-  - `-f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov`
+  - `-f /mnt/locust/locust_run.py --master -H https://dev-api.fecfile.fec.gov`
 
 ## Running Tests
 

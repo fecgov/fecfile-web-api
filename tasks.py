@@ -10,6 +10,7 @@ env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
 WEB_SERVICES_NAME = "fecfile-web-services"
+PROXY_NAME = "fecfile-api-proxy"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 MANIFEST_LABEL = {
@@ -195,7 +196,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Allow proxy to connect to api via internal route
     add_network_policy = ctx.run(
-        "cf add-network-policy fecfile-api-proxy fecfile-web-api",
+        f"cf add-network-policy {PROXY_NAME} {APP_NAME}",
         echo=True,
         warn=True,
     )
