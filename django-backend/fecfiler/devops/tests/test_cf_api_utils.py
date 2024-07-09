@@ -1,6 +1,5 @@
 from django.test import TestCase, RequestFactory
 from unittest.mock import Mock, patch
-from unittest import mock
 from fecfiler.devops.cf_api_utils import (
     get_space_guid,
     get_service_instance_guid,
@@ -10,7 +9,6 @@ from fecfiler.devops.cf_api_utils import (
     retrieve_credentials,
     update_credentials,
 )
-import uuid
 
 
 class CfApiUtilsTestCase(TestCase):
