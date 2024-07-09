@@ -1,6 +1,5 @@
 from django.test import TestCase, RequestFactory
-from unittest.mock import Mock, patch
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from unittest.mock import patch
 from fecfiler.devops.crypt_utils import (
     gen_rsa_pk,
     rsa_pk_to_bytes,

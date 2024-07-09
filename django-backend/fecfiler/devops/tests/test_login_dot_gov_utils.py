@@ -1,5 +1,5 @@
 from django.test import TestCase, RequestFactory
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from fecfiler.devops.login_dot_gov_utils import (
     stage_login_dot_gov_cert,
     stage_login_dot_gov_pk,
