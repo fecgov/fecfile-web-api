@@ -56,17 +56,25 @@ class TransactionManager(SoftDeleteManager):
             ),
             When(
                 transaction_type_identifier__in=schedule_e_over_two_hundred_types,
-                then=Coalesce(
-                    Q(parent_transaction__parent_transaction___calendar_ytd_per_election_office__gt=Value(  # noqa
-                        Decimal(200)
-                    )),
-                    Q(parent_transaction___calendar_ytd_per_election_office__gt=Value(
-                        Decimal(200)
-                    )),
-                    Q(_calendar_ytd_per_election_office__gt=Value(
-                        Decimal(200)
-                    )),
-                    Value(False)
+                then=Case(
+                    When(
+                        parent_transaction__parent_transaction___calendar_ytd_per_election_office__gt=Value(  # noqa
+                            Decimal(200)
+                        ),
+                        then=True,
+                    ),
+                    When(
+                        parent_transaction___calendar_ytd_per_election_office__gt=Value(
+                            Decimal(200)
+                        ),
+                        then=True,
+                    ),
+                    When(
+                        _calendar_ytd_per_election_office__gt=Value(Decimal(200)),
+                        then=True,
+                    ),
+                    default=False,
+                    output_field=BooleanField(),
                 ),
             ),
             default=Value(True),
