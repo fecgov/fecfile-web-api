@@ -4,9 +4,9 @@ from django.db import migrations
 def update_existing_rows(apps, schema_editor):
     transaction = apps.get_model("transactions", "Transaction")
     types = [
-        'LOAN_RECEIVED_FROM_INDIVIDUAL',
-        'LOAN_RECEIVED_FROM BANK',
-        'LOAN_BY_COMMITTEE',
+        "LOAN_RECEIVED_FROM_INDIVIDUAL",
+        "LOAN_RECEIVED_FROM BANK",
+        "LOAN_BY_COMMITTEE",
     ]
     for row in transaction.objects.filter(transaction_type_identifier__in=types):
         row.save()
@@ -15,10 +15,7 @@ def update_existing_rows(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        (
-            "transactions",
-            "0008_transaction__calendar_ytd_per_election_office_and_more"
-        ),
+        ("transactions", "0008_transaction__calendar_ytd_per_election_office_and_more"),
     ]
 
     operations = [
@@ -60,6 +57,58 @@ class Migration(migrations.Migration):
                 AND tt.loan_key LIKE ''%%LOAN'';
             '
             USING txn.id;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+        ),
+        migrations.RunSQL(
+            """
+        CREATE OR REPLACE FUNCTION calculate_aggregates()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            sql_committee_id TEXT;
+            temp_table_name TEXT;
+        BEGIN
+            sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+            temp_table_name := 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
+            RAISE NOTICE 'TESTING TRIGGER';
+
+            -- If schedule_c2_id or schedule_d_id is not null, stop processing
+            IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+            THEN
+                RETURN NEW;
+            END IF;
+
+            IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+            THEN
+                PERFORM calculate_entity_aggregates(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+                IF TG_OP = 'UPDATE'
+                    AND NEW.contact_1_id <> OLD.contact_1_id
+                THEN
+                    PERFORM calculate_entity_aggregates(
+                        OLD, sql_committee_id, temp_table_name || 'OLD');
+                END IF;
+            END IF;
+
+            IF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
+            THEN
+                PERFORM calculate_loan_payment_to_date(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+            END IF;
+
+            IF NEW.schedule_e_id IS NOT NULL
+            THEN
+                PERFORM calculate_calendar_ytd_per_election_office(
+                    NEW, sql_committee_id, temp_table_name || 'NEW');
+                IF TG_OP = 'UPDATE'
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        OLD, sql_committee_id, temp_table_name || 'OLD');
+                END IF;
+            END IF;
+
+            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
         """
