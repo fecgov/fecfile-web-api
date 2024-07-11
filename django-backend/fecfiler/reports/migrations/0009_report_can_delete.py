@@ -17,45 +17,22 @@ def create_trigger(apps, schema_editor):
             """
         CREATE OR REPLACE FUNCTION check_can_delete() RETURNS TRIGGER AS $$
         DECLARE
+        BEGIN
+            PERFORM update_report_can_delete(NEW);
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+
+        CREATE OR REPLACE FUNCTION check_transaction_can_delete() RETURNS TRIGGER AS $$
+        DECLARE
             associated_report reports_report%ROWTYPE;
         BEGIN
-
-            IF (TG_TABLE_NAME = 'transactions_transaction') THEN
-                SELECT * INTO associated_report FROM reports_report WHERE id IN (
+            SELECT * INTO associated_report FROM reports_report WHERE id IN (
                     SELECT report_id FROM reports_reporttransaction
                     WHERE transaction_id = NEW.id LIMIT 1
                 );
-            ELSE
-                associated_report := NEW;
-            END IF;
-
-            associated_report.can_delete = associated_report.upload_submission_id IS NULL
-                AND (associated_report.report_version IS NULL
-                OR associated_report.report_version = '0')
-                AND (associated_report.form_3x_id IS NULL OR (
-                    associated_report.form_24_id IS NULL
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM reports_reporttransaction AS rt1
-                        JOIN transactions_transaction AS t1 ON rt1.transaction_id = t1.id
-                        WHERE rt1.report_id = associated_report.id
-                        AND EXISTS (
-                            SELECT 1
-                            FROM reports_reporttransaction AS rt2
-                            WHERE rt2.report_id != associated_report.id
-                            AND (
-                                t1.id = rt2.transaction_id
-                                OR t1.reatt_redes_id = rt2.transaction_id
-                                OR t1.parent_transaction_id = rt2.transaction_id
-                                OR t1.debt_id = rt2.transaction_id
-                                OR t1.loan_id = rt2.transaction_id
-                            )
-                        )
-                    )
-                ));
-
-            UPDATE reports_report SET can_delete = associated_report.can_delete
-            WHERE id = associated_report.id;
+                PERFORM update_report_can_delete(associated_report);
 
             RETURN NEW;
         END;
@@ -71,7 +48,7 @@ def create_trigger(apps, schema_editor):
         AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
         WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
-        EXECUTE FUNCTION check_can_delete();
+        EXECUTE FUNCTION check_transaction_can_delete();
         """
         )
 
@@ -109,6 +86,52 @@ class Migration(migrations.Migration):
             model_name="report",
             name="can_delete",
             field=models.BooleanField(default=True),
+        ),
+        migrations.RunSQL(
+            """
+        CREATE OR REPLACE FUNCTION update_report_can_delete(report RECORD)
+        RETURNS VOID AS $$
+        BEGIN
+            report.can_delete = report.upload_submission_id IS NULL
+                AND (report.report_version IS NULL OR report.report_version = '0')
+                AND (
+                    report.form_3x_id IS NULL OR
+                    (
+                        report.form_24_id IS NULL
+                        AND NOT EXISTS(
+                            SELECT "reports_reporttransaction"."id"
+                            FROM "reports_reporttransaction" WHERE (
+                                EXISTS(
+                                    SELECT 1 AS "a" FROM "reports_reporttransaction" U0
+                                    INNER JOIN "transactions_transaction" U2
+                                    ON (U0."transaction_id" = U2."id")
+                                    WHERE (
+                                    NOT (U0."report_id" = report.id)
+                                    AND (
+                                        U0."transaction_id" =
+                                        ("reports_reporttransaction"."transaction_id")
+                                        OR U2."reatt_redes_id" =
+                                        ("reports_reporttransaction"."transaction_id")
+                                        OR U2."parent_transaction_id" =
+                                        ("reports_reporttransaction"."transaction_id")
+                                        OR U2."debt_id" =
+                                        ("reports_reporttransaction"."transaction_id")
+                                        OR U2."loan_id" =
+                                        ("reports_reporttransaction"."transaction_id")
+                                    )
+                                    ) LIMIT 1
+                                )
+                                AND "reports_reporttransaction"."report_id" = report.id
+                            )
+                        )
+                    )
+                );
+
+            UPDATE reports_report SET can_delete = report.can_delete
+            WHERE id = report.id;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
         ),
         migrations.RunPython(create_trigger, reverse_code),
         migrations.RunPython(populate_existing_rows),

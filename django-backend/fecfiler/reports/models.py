@@ -154,6 +154,10 @@ class Report(CommitteeOwnedModel):
             if form:
                 form.delete()
 
+        reports_to_flag = Report.objects.filter(
+            committee_account=self.committee_account
+        ).exclude(id=self.id)
+        reports_to_flag.update(calculation_status=None)
         super(CommitteeOwnedModel, self).delete()
 
 
@@ -178,7 +182,7 @@ def flag_reports_for_recalculation(report: Report):
             reports_to_flag = Report.objects.get(id=report.id)
         else:
             reports_to_flag = Report.objects.filter(
-                committee_account=committee, coverage_from_date__gte=report_date
+                committee_account=committee,
             )
 
         flagged_count = reports_to_flag.update(calculation_status=None)
