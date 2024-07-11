@@ -1,5 +1,4 @@
 from django.test import TestCase
-import datetime
 from decimal import Decimal
 from .dot_fec_serializer import (
     serialize_field,
@@ -13,34 +12,78 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
+from fecfiler.contacts.tests.utils import create_test_individual_contact
+from datetime import datetime, date
 
 
 class DotFECSerializerTestCase(TestCase):
-    fixtures = [
-        "C01234567_user_and_committee",
-        "test_f3x_reports",
-        "test_individual_receipt",
-        "test_memo_text",
-        "test_fake_schedule_c",
-    ]
-
     def setUp(self):
-        self.f3x = Report.objects.filter(
-            id="b6d60d2d-d926-4e89-ad4b-c47d152a66ae"
-        ).first()
-        self.transaction = Transaction.objects.filter(
-            id="e7880981-9ee7-486f-b288-7a607e4cd0dd"
-        ).first()
-        self.schc_transaction1 = Transaction.objects.filter(
-            id="57b95c3a-f7bc-4c36-a3fd-66bb52976eec"
-        ).first()
-        self.schc_transaction2 = Transaction.objects.filter(
-            id="3fce473a-7939-4733-a0a8-298d16a058cd"
-        ).first()
-        self.report_level_memo_text = MemoText.objects.filter(
-            id="1dee28f8-4cfa-4f70-8658-7a9e7f02ab1d"
-        ).first()
-        self.report_level_memo_text.filer_committee_id_number = "C00601211"
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
+        coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
+        self.f3x = create_form3x(
+            self.committee,
+            coverage_from,
+            coverage_through,
+            {
+                "L38_net_operating_expenditures_ytd": format(381.00, ".2f"),
+                "L6b_cash_on_hand_beginning_period": format(6.00, ".2f"),
+                "change_of_address": True,
+            },
+        )
+        self.f3x.treasurer_last_name = "Lastname"
+        self.f3x.date_signed = datetime.strptime("2004-07-29", "%Y-%m-%d")
+
+        self.f3x.save()
+
+        self.contact_1 = create_test_individual_contact(
+            "last name", "First name", self.committee.id
+        )
+
+        self.transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            datetime.strptime("2020-04-19", "%Y-%m-%d"),
+            "1234.56",
+            "GENERAL",
+            "SA11AI",
+        )
+        self.transaction.reports.add(self.f3x)
+        self.transaction.save()
+
+        self.schc_transaction1 = create_loan(
+            self.committee,
+            self.contact_1,
+            10,
+            datetime.strptime("2023-09-20", "%Y-%m-%d"),
+            "2.0",
+            True,
+        )
+
+        self.schc_transaction2 = create_loan(
+            self.committee,
+            self.contact_1,
+            10,
+            datetime.strptime("2023-09-20", "%Y-%m-%d"),
+            "2.0",
+        )
+
+        self.report_level_memo_text = MemoText(
+            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
+            rec_type="TEXT",
+            text4000="dahtest2",
+            committee_account_id=self.committee.id,
+            report_id=self.f3x.id,
+            transaction_id_number="REPORT_MEMO_TEXT_1",
+        )
+
+        self.report_level_memo_text.filer_committee_id_number = "C00000000"
         self.report_level_memo_text.back_reference_sched_form_name = "F3XN"
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
@@ -125,6 +168,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(serialized_boolean_yn_undefined, "N")
 
     def test_serialize_f3x_summary_instance(self):
+        self.assertEqual(self.f3x.form_type, "F3XN")
         summary_row = serialize_instance("F3X", self.f3x)
         split_row = summary_row.split(FS_STR)
         self.assertEqual(split_row[0], "F3XN")
@@ -141,7 +185,7 @@ class DotFECSerializerTestCase(TestCase):
         report_level_memo_row = serialize_instance("Text", self.report_level_memo_text)
         split_row = report_level_memo_row.split(FS_STR)
         self.assertEqual(split_row[0], "TEXT")
-        self.assertEqual(split_row[1], "C00601211")
+        self.assertEqual(split_row[1], "C00000000")
         self.assertEqual(split_row[2], "REPORT_MEMO_TEXT_1")
         self.assertEqual(split_row[4], "F3XN")
         self.assertEqual(split_row[5], "dahtest2")
@@ -161,6 +205,6 @@ class DotFECSerializerTestCase(TestCase):
         contribution_date = get_value_from_path(
             self.transaction, "schedule_a.contribution_date"
         )
-        self.assertEqual(contribution_date, datetime.date(2020, 4, 19))
+        self.assertEqual(contribution_date.date(), date(2020, 4, 19))
         bogus_value = get_value_from_path(self.transaction, "not.real.path")
         self.assertIsNone(bogus_value)
