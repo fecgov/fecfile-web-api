@@ -415,4 +415,3 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(transactions[4].amount, Decimal("5000.00"))
         self.assertEqual(transactions[4].loan_payment_to_date, Decimal("2100.00"))
         self.assertEqual(transactions[5].amount, Decimal("600.00"))
-        
