@@ -109,9 +109,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://(.*?).fecfile\.fec\.gov$"
-]
+CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://(.*?).fecfile\.fec\.gov$"]
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
@@ -364,3 +362,6 @@ if MOCK_OPENFEC == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 else:
     MOCK_OPENFEC_REDIS_URL = None
+
+
+TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
