@@ -4,7 +4,11 @@ from django.test.runner import DiscoverRunner
 class CustomTestRunner(DiscoverRunner):
     def __init__(self, *args, **kwargs):
         # Automatically exclude "performance" tagged tickets unless specifically invoked
-        if "tags" not in kwargs.keys():
+        if (
+            "tags" not in kwargs.keys()
+            or kwargs["tags"] is None
+            or "performance" not in kwargs["tags"]
+        ):
             exclude = kwargs["exclude_tags"]
             if exclude is None:
                 exclude = []

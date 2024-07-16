@@ -1,4 +1,3 @@
-import datetime
 import timeit
 from django.test import TestCase, tag
 from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
@@ -17,9 +16,6 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.transactions.schedule_a.models import ScheduleA
-from fecfiler.transactions.models import Transaction
-from fecfiler.reports.models import ReportTransaction
 
 import structlog
 
@@ -187,21 +183,3 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             webprint_submission.fec_image_url, "https://www.fec.gov/static/img/seal.svg"
         )
-
-
-from django.db import connection
-
-
-def bulk_insert(values):
-    base_sql = "INSERT INTO transactions_transaction (transaction_type_identifier, aggregration_group, _form_type) VALUES"
-    values_sql = []
-    values_data = []
-
-    for value_list in values:
-        placeholders = ["%s" for _ in range(len(value_list))]
-        values_sql.append(f"({', '.join(placeholders)})")
-        values_data.extend(value_list)
-
-    sql = f"{base_sql} {', '.join(values_sql)}"
-    with connection.cursor() as cursor:
-        cursor.executemany(sql, [values_data])
