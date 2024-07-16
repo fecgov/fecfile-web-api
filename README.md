@@ -66,14 +66,12 @@ _Special Note:_ If the fecfile-validate repo was updated, the commit of the upda
 ### Create a feature branch
 
 Using git-flow extensions:
-` git flow feature start feature_branch
-`
+`git flow feature start feature_branch`
 
 Without the git-flow extensions:
-` git checkout develop
+`git checkout develop
     git pull
-    git checkout -b feature/feature_branch develop
-`
+    git checkout -b feature/feature_branch develop`
 
 - Developer creates a GitHub PR when ready to merge to `develop` branch
 - Reviewer reviews and merges feature branch into `develop` via GitHub
@@ -165,16 +163,19 @@ Set up git secrets to protect oneself from committing sensitive information such
 - See git-secrets README for more features: https://github.com/awslabs/git-secrets#readme
 
 ### Code formatting
+
 [Black](https://github.com/psf/black) is the Python code formatter used on the project.
 
 - Install using `pip install black`.
 - If using vscode, add (or update) the following section of your settings.json to the following so that code is formatted on save:
+
 ```
 "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true
 }
 ```
+
 - To format a specific file or directory manually, use `black <file_or_directory>`
 
 ### Commit local code changes to origin daily
@@ -187,11 +188,12 @@ The project is using the Google Python Style Guide as the baseline to keep code 
 See here for comment style rules: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 
 ### Snyk security scanning
+
 A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer who will log into the [Snyk Dashboard](https://app.snyk.io/invite/link/accept?invite=93042de6-4eca-4bb5-bf76-9c2e9f895e24&utm_source=link_invite&utm_medium=referral&utm_campaign=product-link-invite&from=link_invite) and perform the following tasks:
 
 1. Review the vulnerability reports for each of the FECFile Online GitHub repository.
-2. Write up a ticket (1 for each reported vulnerability) to remediate the vulnerability.
+2. Write up a ticket (1 for each reported "Critical" or "High" severity vulnerability) to remediate the vulnerability.
 3. Point and mark each ticket with the following tags: "security", "high priority".
 4. Move each new ticket into the current sprint and sprint backlog.
 
-The weekly assignment log can be found in the Google drive 🔒  [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
+The weekly assignment log can be found in the Google drive 🔒 [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
