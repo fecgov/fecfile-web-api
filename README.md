@@ -195,5 +195,6 @@ A Snyk online account has been set up for FEC to monitor the FECFile Online GitH
 2. Write up a ticket (1 for each reported "Critical" or "High" severity vulnerability) to remediate the vulnerability.
 3. Point and mark each ticket with the following tags: "security", "high priority".
 4. Move each new ticket into the current sprint and sprint backlog.
+5. Update weekly assignment log with tickets created or "None".
 
 The weekly assignment log can be found in the Google drive 🔒 [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
