@@ -430,7 +430,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="""This script generates json test data for use in performance testing."""
+        description="""This script generates json test data for
+            use in performance testing."""
     )
     """
         Creating committees with a fixture leads to a transaction_view related error when
@@ -462,7 +463,8 @@ if __name__ == "__main__":
         default=1000,
         type=int,
         help="""The number of transactions to be created in each committee.
-            Transactions are comprised of three records each. Defaults to one thousand (1,000)."""
+            Transactions are comprised of three records each.
+            Defaults to one thousand (1,000)."""
     )
     args = parser.parse_args()
 
@@ -470,7 +472,6 @@ if __name__ == "__main__":
         args.transactions,
         args.reports,
         args.contacts,
-        committees=0 # args.committees
+        committees=0  # args.committees
     )
     print(f"Generated fixture with {'{:,}'.format(len(sorted_records))} records")
-

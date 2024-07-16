@@ -132,7 +132,8 @@ Running the script with the `-h` or `--help` flags will provide additional infor
 
 Once you have a fixture, you can load it into the database by performing the following steps:
 
-1a. (For Local) Use `docker exec -it fecfile-api /bin/bash` to enter the docker container.
-1b. (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
+1. Enter a fecfile-api docker container
+- (For Local) Use `docker exec -it fecfile-api /bin/bash`
+- (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
 2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
 3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.
