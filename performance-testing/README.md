@@ -117,3 +117,22 @@ Once set up, silk profiling will run automatically as the API receives and proce
 To view the results, visit the API's `/silk` endpoint (for local development: `localhost:8080/silk/`)
 
 If setting up from scratch or looking for usage instructions, you can find documentation [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
+
+
+# Creating and loading bulk data with fixtures
+
+Fixtures are .json files that can be used to load data into the database.  Loading data with fixtures is far faster than
+creating records with individual requests, making it especially useful for preparing a database for ad-hoc performance testing.
+
+A script has been provided for generating fixtures with specific numbers of records.  You can run the script with
+```
+  python bulk-testing-data-fixture-generator.py
+```
+Running the script with the `-h` or `--help` flags will provide additional information.
+
+Once you have a fixture, you can load it into the database by performing the following steps:
+
+1a. (For Local) Use `docker exec -it fecfile-api /bin/bash` to enter the docker container.
+1b. (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
+2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
+3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.
