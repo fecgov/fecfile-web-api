@@ -39,4 +39,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0006_independent_expenditure_memos_no_aggregation_group
    fecfiler.transactions.migrations.0007_schedulee_so_candidate_state
    fecfiler.transactions.migrations.0008_transaction__calendar_ytd_per_election_office_and_more
+   fecfiler.transactions.migrations.0009_update_calculate_loan_payment_to_date
 
