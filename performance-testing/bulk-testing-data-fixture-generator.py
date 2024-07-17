@@ -1,20 +1,23 @@
 """Creating and loading bulk data with fixtures
 
-Fixtures are .json files that can be used to load data into the database.
-Loading data with fixtures is far faster than creating records with individual
-requests, making it especially useful for preparing a database for ad-hoc
-performance testing.
+Fixtures are .json files that can be used to load data into the database.  Loading data
+with fixtures is far faster than creating records with individual requests, making it
+especially useful for preparing a database for ad-hoc performance testing.
 
-A script has been provided for generating fixtures with specific numbers of
-records.  You can run the script with:
+A script has been provided for generating fixtures with specific numbers of records.
+You can run the script with:
+```
+  python bulk-testing-data-fixture-generator.py
+```
+The script requires an environment variable to function:
+- `LOCAL_TEST_COMMITTEE_UUID`: Used to ensure that created records are viewable within
+the test committee.  For most cases, the value in the `e2e-test-data.json` fixture is
+what you're looking for.  This can be overriden by using the `--committee-uuid` optional
+parameter when running the script.
 
-    python bulk-testing-data-fixture-generator.py
+Running the script with the `-h` or `--help` flags will provide additional information.
 
-Running the script with the `-h` or `--help` flags will provide additional
-information.
-
-Once you have a fixture, you can load it into the database by performing the
-following steps:
+Once you have a fixture, you can load it into the database by following these steps:
 
 1. Enter a fecfile-api docker container
 - (For Local) Use `docker exec -it fecfile-api /bin/bash`
@@ -30,8 +33,7 @@ import os
 from uuid import UUID, uuid4
 
 
-PRIMARY_COMMITTEE_FEC_ID = os.environ.get("LOCAL_TEST_USER", "C00000000")
-PRIMARY_COMMITTEE_UUID = os.environ.get("LOCAL_TEST_COMMITTEE_UUID", uuid4())
+PRIMARY_COMMITTEE_UUID = os.environ.get("LOCAL_TEST_COMMITTEE_UUID", None)
 CONTACT_TYPES = ["IND", "ORG", "COM", "CAN"]
 SCHEDULE_FORMATS = {
     "A": {
@@ -368,7 +370,7 @@ def create_transaction(committee_uuid, contact_id, report):
 
 
 def create_records(transaction_count, report_count, contact_count, committee_count):
-    committees = [create_committee(PRIMARY_COMMITTEE_FEC_ID, PRIMARY_COMMITTEE_UUID)]
+    committees = [create_committee("N/A", PRIMARY_COMMITTEE_UUID)]
     for _ in range(max(committee_count, 0)):
         committees.append(create_committee())
 
@@ -412,7 +414,7 @@ def create_records(transaction_count, report_count, contact_count, committee_cou
 def prepare_records(records):
     out_records = []
     for c in records.values():
-        if c["committee_record"]["fields"]["committee_id"] != PRIMARY_COMMITTEE_FEC_ID:
+        if c["committee_record"]["fields"]["committee_id"] != "N/A":
             out_records.append(c["committee_record"])
 
     for c in records.values():
@@ -491,7 +493,25 @@ if __name__ == "__main__":
             Transactions are comprised of three records each.
             Defaults to one thousand (1,000)."""
     )
+    parser.add_argument(
+        '--committee-uuid',
+        default=None,
+        help="""Manually specify the Committee Account UUID used in created records.
+            This overrides the UUID found in the `LOCAL_TEST_COMMITTEE_UUID`
+            environment variable."""
+    )
     args = parser.parse_args()
+
+    if args.committee_uuid is not None:
+        PRIMARY_COMMITTEE_UUID = args.committee_uuid
+
+    if PRIMARY_COMMITTEE_UUID is None:
+        print(
+            "\nPlease provide a Committee Account UUID either with the " +
+            "`LOCAL_TEST_COMMITTEE_UUID` environment variable or the --committee-uuid " +
+            "optional parameter.\n"
+        )
+        exit()
 
     sorted_records = create_fixture(
         args.transactions,

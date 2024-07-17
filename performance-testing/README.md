@@ -128,9 +128,14 @@ A script has been provided for generating fixtures with specific numbers of reco
 ```
   python bulk-testing-data-fixture-generator.py
 ```
+The script requires an environment variable to function:
+- `LOCAL_TEST_COMMITTEE_UUID`: Used to ensure that created records are viewable within the test committee.
+For most cases, the value in the `e2e-test-data.json` fixture is what you're looking for.  This can be overriden
+by using the `--committee-uuid` optional parameter when running the script.
+
 Running the script with the `-h` or `--help` flags will provide additional information.
 
-Once you have a fixture, you can load it into the database by performing the following steps:
+Once you have a fixture, you can load it into the database by following these steps:
 
 1. Enter a fecfile-api docker container
 - (For Local) Use `docker exec -it fecfile-api /bin/bash`
