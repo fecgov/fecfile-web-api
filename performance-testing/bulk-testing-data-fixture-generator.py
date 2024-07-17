@@ -1,3 +1,28 @@
+"""Creating and loading bulk data with fixtures
+
+Fixtures are .json files that can be used to load data into the database.
+Loading data with fixtures is far faster than creating records with individual
+requests, making it especially useful for preparing a database for ad-hoc
+performance testing.
+
+A script has been provided for generating fixtures with specific numbers of
+records.  You can run the script with:
+
+    python bulk-testing-data-fixture-generator.py
+
+Running the script with the `-h` or `--help` flags will provide additional
+information.
+
+Once you have a fixture, you can load it into the database by performing the
+following steps:
+
+1. Enter a fecfile-api docker container
+- (For Local) Use `docker exec -it fecfile-api /bin/bash`
+- (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
+2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
+3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.
+"""
+
 import json
 from random import choice, choices, randrange
 import string
