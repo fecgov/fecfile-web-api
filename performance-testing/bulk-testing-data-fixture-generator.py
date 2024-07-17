@@ -507,9 +507,9 @@ if __name__ == "__main__":
 
     if PRIMARY_COMMITTEE_UUID is None:
         print(
-            "\nPlease provide a Committee Account UUID either with the " +
-            "`LOCAL_TEST_COMMITTEE_UUID` environment variable or the --committee-uuid " +
-            "optional parameter.\n"
+            "\nPlease provide a Committee Account UUID either with the "
+            + "`LOCAL_TEST_COMMITTEE_UUID` environment variable or the --committee-uuid "
+            + "optional parameter.\n"
         )
         exit()
 
