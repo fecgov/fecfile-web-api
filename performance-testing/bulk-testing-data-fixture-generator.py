@@ -1,3 +1,31 @@
+"""Creating and loading bulk data with fixtures
+
+Fixtures are .json files that can be used to load data into the database.  Loading data
+with fixtures is far faster than creating records with individual requests, making it
+especially useful for preparing a database for ad-hoc performance testing.
+
+A script has been provided for generating fixtures with specific numbers of records.
+You can run the script with:
+```
+  python bulk-testing-data-fixture-generator.py
+```
+The script requires an environment variable to function:
+- `LOCAL_TEST_COMMITTEE_UUID`: Used to ensure that created records are viewable within
+the test committee.  For most cases, the value in the `e2e-test-data.json` fixture is
+what you're looking for.  This can be overriden by using the `--committee-uuid` optional
+parameter when running the script.
+
+Running the script with the `-h` or `--help` flags will provide additional information.
+
+Once you have a fixture, you can load it into the database by following these steps:
+
+1. Enter a fecfile-api docker container
+- (For Local) Use `docker exec -it fecfile-api /bin/bash`
+- (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
+2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
+3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.
+"""
+
 import json
 from random import choice, choices, randrange
 import string
@@ -5,8 +33,7 @@ import os
 from uuid import UUID, uuid4
 
 
-PRIMARY_COMMITTEE_FEC_ID = os.environ.get("LOCAL_TEST_USER", "C00000000")
-PRIMARY_COMMITTEE_UUID = os.environ.get("LOCAL_TEST_COMMITTEE_UUID", uuid4())
+PRIMARY_COMMITTEE_UUID = os.environ.get("LOCAL_TEST_COMMITTEE_UUID", None)
 CONTACT_TYPES = ["IND", "ORG", "COM", "CAN"]
 SCHEDULE_FORMATS = {
     "A": {
@@ -125,7 +152,7 @@ def random_string(length, use_letters=True, use_digits=False, use_punctuation=Fa
     if use_digits:
         character_pool += string.digits
     if use_punctuation:
-        character_pool += string.punctuation
+        character_pool += "!.?$@,#+=%&"
 
     if len(character_pool) == 0:
         return ""
@@ -303,6 +330,9 @@ def get_transaction(
             "contact_1_id": f"{contact_id}",
             "aggregation_group": "GENERAL",
             "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+            "aggregate": 0,
+            "_calendar_ytd_per_election_office": None,
+            "loan_payment_to_date": None,
             "created": "2024-01-01T00:00:00.000Z",
             "updated": "2024-01-01T00:00:00.000Z"
         }
@@ -339,14 +369,15 @@ def create_transaction(committee_uuid, contact_id, report):
     ]
 
 
-def get_records():
-    committees = [
-        create_committee() for _ in range(4)
-    ]
-    committees.append(create_committee(PRIMARY_COMMITTEE_FEC_ID, PRIMARY_COMMITTEE_UUID))
+def create_records(transaction_count, report_count, contact_count, committee_count):
+    committees = [create_committee("N/A", PRIMARY_COMMITTEE_UUID)]
+    for _ in range(max(committee_count, 0)):
+        committees.append(create_committee())
+
     committee_records = {}
     for comm in committees:
-        committee_records[get_record_uuid(comm)] = {
+        committee_uuid = get_record_uuid(comm)
+        committee_records[committee_uuid] = {
             "committee_record": comm,
             "form_3xs": [],
             "reports": [],
@@ -355,32 +386,27 @@ def get_records():
             "transactions": [],
             "transaction_reports": []
         }
+        committee_record = committee_records[committee_uuid]
 
-    for _ in range(50):
-        committee = choice(committees)
-        committee_uuid = get_record_uuid(committee)
-        form_3x, report = create_report(committee_uuid)
-        committee_records[committee_uuid]["form_3xs"].append(form_3x)
-        committee_records[committee_uuid]["reports"].append(report)
+        for _ in range(max(report_count, 1)):
+            form_3x, report = create_report(committee_uuid)
+            committee_record["form_3xs"].append(form_3x)
+            committee_record["reports"].append(report)
 
-    for _ in range(2395):
-        committee = choice(committees)
-        committee_uuid = get_record_uuid(committee)
-        contact = create_contact(committee_uuid)
-        committee_records[committee_uuid]["contacts"].append(contact)
+        for _ in range(max(contact_count, 1)):
+            contact = create_contact(committee_uuid)
+            committee_record["contacts"].append(contact)
 
-    for _ in range(32500):
-        committee = choice(committees)
-        committee_uuid = get_record_uuid(committee)
-        report = choice(committee_records[committee_uuid]["reports"])
-        contact = choice(committee_records[committee_uuid]["contacts"])
-        contact_id = get_record_uuid(contact)
-        sched, trans, trans_rep = create_transaction(
-            committee_uuid, contact_id, report
-        )
-        committee_records[committee_uuid]["sched_transactions"].append(sched)
-        committee_records[committee_uuid]["transactions"].append(trans)
-        committee_records[committee_uuid]["transaction_reports"].append(trans_rep)
+        for _ in range(max(transaction_count, 1)):
+            report = choice(committee_record["reports"])
+            contact = choice(committee_record["contacts"])
+            contact_id = get_record_uuid(contact)
+            sched, trans, trans_rep = create_transaction(
+                committee_uuid, contact_id, report
+            )
+            committee_record["sched_transactions"].append(sched)
+            committee_record["transactions"].append(trans)
+            committee_record["transaction_reports"].append(trans_rep)
 
     return committee_records
 
@@ -388,10 +414,12 @@ def get_records():
 def prepare_records(records):
     out_records = []
     for c in records.values():
-        if c["committee_record"]["fields"]["committee_id"] != PRIMARY_COMMITTEE_FEC_ID:
+        if c["committee_record"]["fields"]["committee_id"] != "N/A":
             out_records.append(c["committee_record"])
+
+    for c in records.values():
         out_records += (
-            [c["form_3xs"]]
+            c["form_3xs"]
             + c["reports"]
             + c["contacts"]
             + c["sched_transactions"]
@@ -417,13 +445,78 @@ def save_records_to_fixture(records):
     file.close()
 
 
-records = get_records()
-sorted_records = prepare_records(records)
-save_records_to_fixture(sorted_records)
-print(PRIMARY_COMMITTEE_FEC_ID, PRIMARY_COMMITTEE_UUID)
-for c in records.values():
-    print(
-        c["committee_record"]["fields"]["id"],
-        c["committee_record"]["fields"]["committee_id"]
+def create_fixture(transactions=1000, reports=5, contacts=100, committees=1):
+    records = create_records(transactions, reports, contacts, committees)
+    sorted_records = prepare_records(records)
+    save_records_to_fixture(sorted_records)
+
+    return sorted_records
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="""This script generates json test data for
+            use in performance testing."""
     )
-print(f"Generated fixture with {'{:,}'.format(len(sorted_records))} records")
+    """
+        Creating committees with a fixture leads to a transaction_view related error when
+        loading the fixture into the database.
+    """
+    # parser.add_argument(
+    #     "--committees",
+    #     default=0,
+    #     type=int,
+    #     help="""The number of committees in addition to the testing committee
+    #         to be created. Defaults to zero (0)."""
+    # )
+    parser.add_argument(
+        "--reports",
+        default=5,
+        type=int,
+        help="""The number of form-3x reports to be created in each committee.
+            Reports are comprised of two records each. Defaults to five (5).""",
+    )
+    parser.add_argument(
+        "--contacts",
+        default=100,
+        type=int,
+        help="""The number of contacts to be created in each committee.
+            Defaults to one hundred (100)."""
+    )
+    parser.add_argument(
+        "--transactions",
+        default=1000,
+        type=int,
+        help="""The number of transactions to be created in each committee.
+            Transactions are comprised of three records each.
+            Defaults to one thousand (1,000)."""
+    )
+    parser.add_argument(
+        '--committee-uuid',
+        default=None,
+        help="""Manually specify the Committee Account UUID used in created records.
+            This overrides the UUID found in the `LOCAL_TEST_COMMITTEE_UUID`
+            environment variable."""
+    )
+    args = parser.parse_args()
+
+    if args.committee_uuid is not None:
+        PRIMARY_COMMITTEE_UUID = args.committee_uuid
+
+    if PRIMARY_COMMITTEE_UUID is None:
+        print(
+            "\nPlease provide a Committee Account UUID either with the "
+            + "`LOCAL_TEST_COMMITTEE_UUID` environment variable or the --committee-uuid "
+            + "optional parameter.\n"
+        )
+        exit()
+
+    sorted_records = create_fixture(
+        args.transactions,
+        args.reports,
+        args.contacts,
+        committees=0  # args.committees
+    )
+    print(f"Generated fixture with {'{:,}'.format(len(sorted_records))} records")
