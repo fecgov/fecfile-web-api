@@ -46,7 +46,7 @@ Run the script with the `-h` flag for additional information.
 
 2. Set the target API service for testing in [docker-compose.yml](https://github.com/fecgov/fecfile-web-api/blob/develop/docker-compose.yml#L118):
 - As an example, this is what you would set in order to target DEV:
-  - `-f /mnt/locust/locust_run.py --master -H https://fecfile-web-api-dev.app.cloud.gov`
+  - `-f /mnt/locust/locust_run.py --master -H https://dev-api.fecfile.fec.gov`
 
 ## Running Tests
 
@@ -117,3 +117,28 @@ Once set up, silk profiling will run automatically as the API receives and proce
 To view the results, visit the API's `/silk` endpoint (for local development: `localhost:8080/silk/`)
 
 If setting up from scratch or looking for usage instructions, you can find documentation [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
+
+
+# Creating and loading bulk data with fixtures
+
+Fixtures are .json files that can be used to load data into the database.  Loading data with fixtures is far faster than
+creating records with individual requests, making it especially useful for preparing a database for ad-hoc performance testing.
+
+A script has been provided for generating fixtures with specific numbers of records.  You can run the script with
+```
+  python bulk-testing-data-fixture-generator.py
+```
+The script requires an environment variable to function:
+- `LOCAL_TEST_COMMITTEE_UUID`: Used to ensure that created records are viewable within the test committee.
+For most cases, the value in the `e2e-test-data.json` fixture is what you're looking for.  This can be overriden
+by using the `--committee-uuid` optional parameter when running the script.
+
+Running the script with the `-h` or `--help` flags will provide additional information.
+
+Once you have a fixture, you can load it into the database by following these steps:
+
+1. Enter a fecfile-api docker container
+- (For Local) Use `docker exec -it fecfile-api /bin/bash`
+- (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
+2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
+3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.

@@ -7,13 +7,13 @@ decorator==5.1.1
 dj-database-url==1.3.0
 dj-static==0.0.6
 Django==4.2.11  # when updating this, also update requirements/tox versions in fecgov/mozilla_django_oidc
-django-cors-headers==3.13.0
+django-cors-headers==4.3.1
 django-storages==1.13.1
 djangorestframework==3.14.0
 git+https://github.com/fecgov/fecfile-validate@0f8b966b623fbca644aebb2054fe4829eb0e0a93#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.42
 github3.py==4.0.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 invoke==1.7.3
 itypes==1.2.0
 MarkupSafe==2.1.1
@@ -27,3 +27,8 @@ git+https://github.com/fecgov/mozilla-django-oidc.git@5a813c15fba5463a2907b2e22a
 zeep==4.2.1
 django-structlog[celery]==7.1.0
 rich==13.7.0
+
+# Pinning sqlparse to 0.5.0 as it is a sub-dependency that needs to be upgraded for security
+sqlparse==0.5.0
+authlib==1.3.1
+setuptools==70.3.0

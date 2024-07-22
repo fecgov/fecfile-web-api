@@ -1,4 +1,5 @@
-from django.test import TestCase
+import timeit
+from django.test import TestCase, tag
 from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
 from .models import (
     DotFEC,
@@ -15,6 +16,10 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
+
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class TasksTestCase(TestCase):
@@ -35,10 +40,9 @@ class TasksTestCase(TestCase):
             "123.45",
             "GENERAL",
             "SA11AI",
+            itemized=True,
+            report=self.f3x,
         )
-        self.transaction.reports.add(self.f3x)
-        self.transaction.force_itemized = True
-        self.transaction.save()
 
     """
     CREATE DOT FEC TESTS
@@ -59,6 +63,33 @@ class TasksTestCase(TestCase):
         finally:
             if result_dot_fec.exists():
                 result_dot_fec.unlink()
+
+    @tag("performance")
+    def test_load(self):
+        num_a = 2000
+        transactions = []
+
+        for _ in range(num_a):
+            t = create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                "2023-01-05",
+                "123.45",
+                "GENERAL",
+                "SA11AI",
+                itemized=True,
+                report=self.f3x,
+            )
+            transactions.append(t)
+
+        self.assertEqual(len(transactions), num_a)
+        start_time = timeit.default_timer()
+        dot_fec_id = create_dot_fec(str(self.f3x.id), None, None, True)
+        end_time = timeit.default_timer()
+        execution_time = end_time - start_time
+        logger.info(f"Execution time: {execution_time:.4f} seconds")
+        self.assertIsNotNone(dot_fec_id)
 
     """
     SUBMIT TO FEC TESTS

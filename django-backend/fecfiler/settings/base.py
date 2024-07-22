@@ -27,9 +27,7 @@ KEY_VALUE = "KEY_VALUE"
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-CSRF_TRUSTED_ORIGINS = [
-    env.get_credential("CSRF_TRUSTED_ORIGINS", "http://localhost:4200")
-]
+CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
 """
 Enables alternative log in method.
@@ -84,6 +82,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -110,10 +109,14 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    env.get_credential("CORS_ALLOWED_ORIGINS", "http://localhost:4200")
-]
-CORS_ALLOW_HEADERS = default_headers + ("enctype", "token")
+CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://(.*?).fecfile\.fec\.gov$"]
+
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "enctype",
+    "token",
+    "cache-control",
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -359,3 +362,6 @@ if MOCK_OPENFEC == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 else:
     MOCK_OPENFEC_REDIS_URL = None
+
+
+TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
