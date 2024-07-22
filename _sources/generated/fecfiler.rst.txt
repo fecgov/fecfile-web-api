@@ -45,6 +45,7 @@ fecfiler
    fecfiler.s3
    fecfiler.settings
    fecfiler.shared
+   fecfiler.test_runner
    fecfiler.transactions
    fecfiler.urls
    fecfiler.user

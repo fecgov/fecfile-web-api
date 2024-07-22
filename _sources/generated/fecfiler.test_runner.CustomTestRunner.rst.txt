@@ -1,0 +1,53 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.test\_runner.CustomTestRunner
+======================================
+
+.. currentmodule:: fecfiler.test_runner
+
+.. autoclass:: CustomTestRunner
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CustomTestRunner.__init__
+      ~CustomTestRunner.add_arguments
+      ~CustomTestRunner.build_suite
+      ~CustomTestRunner.get_databases
+      ~CustomTestRunner.get_resultclass
+      ~CustomTestRunner.get_test_runner_kwargs
+      ~CustomTestRunner.load_tests_for_label
+      ~CustomTestRunner.load_with_patterns
+      ~CustomTestRunner.log
+      ~CustomTestRunner.run_checks
+      ~CustomTestRunner.run_suite
+      ~CustomTestRunner.run_tests
+      ~CustomTestRunner.setup_databases
+      ~CustomTestRunner.setup_shuffler
+      ~CustomTestRunner.setup_test_environment
+      ~CustomTestRunner.suite_result
+      ~CustomTestRunner.teardown_databases
+      ~CustomTestRunner.teardown_test_environment
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CustomTestRunner.reorder_by
+      ~CustomTestRunner.shuffle_seed
+      ~CustomTestRunner.test_loader
+   
+   

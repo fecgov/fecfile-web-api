@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>fecfiler.test_runner.CustomTestRunner &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.transactions" href="fecfiler.transactions.html" />
+    <link rel="prev" title="fecfiler.test_runner" href="fecfiler.test_runner.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-test-runner-customtestrunner">
+<h1>fecfiler.test_runner.CustomTestRunner<a class="headerlink" href="#fecfiler-test-runner-customtestrunner" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.test_runner.</span></span><span class="sig-name descname"><span class="pre">CustomTestRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DiscoverRunner</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.__init__" title="fecfiler.test_runner.CustomTestRunner.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_arguments</span></code>(parser)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_suite</span></code>([test_labels, extra_tests])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_databases</span></code>(suite)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_resultclass</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_test_runner_kwargs</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_tests_for_label</span></code>(label, discover_kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_with_patterns</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.log" title="fecfiler.test_runner.CustomTestRunner.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a>(msg[, level])</p></td>
+<td><p>Log the message at the given logging level (the default is INFO).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_checks</span></code>(databases)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_suite</span></code>(suite, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="fecfiler.test_runner.CustomTestRunner.run_tests"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_tests</span></code></a>(test_labels[, extra_tests])</p></td>
+<td><p>Run the unit tests for all the test labels in the provided list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_databases</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_shuffler</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_test_environment</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">suite_result</span></code>(suite, result, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.teardown_databases" title="fecfiler.test_runner.CustomTestRunner.teardown_databases"><code class="xref py py-obj docutils literal notranslate"><span class="pre">teardown_databases</span></code></a>(old_config, **kwargs)</p></td>
+<td><p>Destroy all the non-mirror databases.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">teardown_test_environment</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder_by</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shuffle_seed</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_loader</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.log" title="Link to this definition">¶</a></dt>
+<dd><p>Log the message at the given logging level (the default is INFO).</p>
+<p>If a logger isn’t set, the message is instead printed to the console,
+respecting the configured verbosity. A verbosity of 0 prints no output,
+a verbosity of 1 prints INFO and above, and a verbosity of 2 or higher
+prints all levels.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.parallel_test_suite">
+<span class="sig-name descname"><span class="pre">parallel_test_suite</span></span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.parallel_test_suite" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">ParallelTestSuite</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.run_tests">
+<span class="sig-name descname"><span class="pre">run_tests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_tests</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="Link to this definition">¶</a></dt>
+<dd><p>Run the unit tests for all the test labels in the provided list.</p>
+<p>Test labels should be dotted Python paths to test modules, test
+classes, or test methods.</p>
+<p>Return the number of tests that failed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.teardown_databases">
+<span class="sig-name descname"><span class="pre">teardown_databases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.teardown_databases" title="Link to this definition">¶</a></dt>
+<dd><p>Destroy all the non-mirror databases.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.test_runner">
+<span class="sig-name descname"><span class="pre">test_runner</span></span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.test_runner" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">TextTestRunner</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.test_suite">
+<span class="sig-name descname"><span class="pre">test_suite</span></span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.test_suite" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">TestSuite</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.test_runner.html">fecfiler.test_runner</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.test_runner.CustomTestRunner</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.__init__"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.__init__()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.log"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.log()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.parallel_test_suite"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.parallel_test_suite</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.run_tests"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.run_tests()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.teardown_databases"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.teardown_databases()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.test_runner"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.test_runner</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.test_suite"><code class="docutils literal notranslate"><span class="pre">CustomTestRunner.test_suite</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.user.html">fecfiler.user</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.utils.html">fecfiler.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.test_runner.html">fecfiler.test_runner</a><ul>
+      <li>Previous: <a href="fecfiler.test_runner.html" title="previous chapter">fecfiler.test_runner</a></li>
+      <li>Next: <a href="fecfiler.transactions.html" title="next chapter">fecfiler.transactions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.test_runner.CustomTestRunner.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
