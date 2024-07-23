@@ -19,7 +19,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report, flag_reports_for_recalculation
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -44,15 +44,15 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering_fields = getattr(view, "ordering_fields", [])
 
         if ordering_query_param:
-            fields = [param.strip() for param in ordering_query_param.split(',')]
+            fields = [param.strip() for param in ordering_query_param.split(",")]
             ordering = []
             for field in fields:
-                if field.strip('-') in ordering_fields:
-                    if field == '-memo_code' and not (
+                if field.strip("-") in ordering_fields:
+                    if field == "-memo_code" and not (
                         queryset.filter(memo_code=True).exists()
                         and queryset.exclude(memo_code=True).exists()
                     ):
-                        field = 'memo_code'
+                        field = "memo_code"
                     ordering.append(field)
             if ordering:
                 return ordering
@@ -292,7 +292,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
-            flag_reports_for_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -356,7 +355,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.add(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction added to report")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
@@ -372,7 +370,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.remove(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction removed from report")
 
 

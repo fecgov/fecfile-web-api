@@ -108,7 +108,6 @@ class Report(CommitteeOwnedModel):
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
                 carry_forward_debts(self)
-                flag_reports_for_recalculation(self)
 
     def get_future_in_progress_reports(
         self,
@@ -154,10 +153,6 @@ class Report(CommitteeOwnedModel):
             if form:
                 form.delete()
 
-        reports_to_flag = Report.objects.filter(
-            committee_account=self.committee_account
-        ).exclude(id=self.id)
-        reports_to_flag.update(calculation_status=None)
         super(CommitteeOwnedModel, self).delete()
 
 
@@ -171,28 +166,6 @@ TABLE_TO_FORM = {
 FORMS_TO_CALCULATE = [
     "F3X",
 ]
-
-
-def flag_reports_for_recalculation(report: Report):
-    if report and report.get_form_name() in FORMS_TO_CALCULATE:
-        committee = report.committee_account
-        report_date = report.coverage_from_date
-        reports_to_flag = []
-        if report_date is None:
-            reports_to_flag = Report.objects.get(id=report.id)
-        else:
-            reports_to_flag = Report.objects.filter(
-                committee_account=committee,
-            )
-
-        flagged_count = reports_to_flag.update(calculation_status=None)
-        logger.info(
-            f"""Report {
-                report.id
-            } marked for recalculation along with {
-                flagged_count-1
-            } subsequent reports"""
-        )
 
 
 class ReportMixin(models.Model):
