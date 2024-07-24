@@ -213,11 +213,12 @@ def check_email_match(email, f1_emails):
 
     Args:
         email (str): The email to be checked.
-        f1_emails (str): A string containing a list of committee emails separated by commas or semicolons.
+        f1_emails (str): A string containing a list of committee emails separated
+        by commas or semicolons.
 
     Returns:
-        str or None: If the provided email does not match any of the committee emails, returns a string
-        indicating the mismatch. Otherwise, returns None.
+        str or None: If the provided email does not match any of the committee emails,
+        returns a string indicating the mismatch. Otherwise, returns None.
     """
     if not f1_emails:
         return "No email provided in F1"
