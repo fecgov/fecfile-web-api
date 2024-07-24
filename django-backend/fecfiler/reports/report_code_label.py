@@ -35,7 +35,7 @@ report_code_label_case = Case(
     When(form_24__report_type_24_48=24, then=Value("24 HOUR")),
     When(form_24__report_type_24_48=48, then=Value("48 HOUR")),
     When(form_99__isnull=False, then=Value("")),
-    When(form_1m__isnull=False, then=Value("")),
+    When(form_1m__isnull=False, then=Value("NOTIFICATION OF MULTICANDIDATE STATUS")),
 )
 
 
