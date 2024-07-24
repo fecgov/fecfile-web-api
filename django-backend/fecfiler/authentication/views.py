@@ -19,7 +19,6 @@ from fecfiler.settings import (
     FFAPI_COOKIE_DOMAIN,
     FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
     FFAPI_TIMEOUT_COOKIE_NAME,
-    OIDC_RP_CLIENT_ID,
     OIDC_ACR_VALUES,
     OIDC_OP_AUTHORIZATION_ENDPOINT,
     OIDC_MAX_STATES,
@@ -84,9 +83,8 @@ def add_nonce_to_session(request, state, nonce):
         request.session["oidc_states"] = {}
 
     # Make sure that the State/Nonce dictionary in the session does not get too big.
-    # If the number of State/Nonce combinations reaches a certain threshold, remove the oldest
-    # state by finding out
-    # which element has the oldest "add_on" time.
+    # If the number of State/Nonce combinations reaches a certain threshold,
+    # remove the oldest state by finding out which element has the oldest "add_on" time.
     if len(request.session["oidc_states"]) >= OIDC_MAX_STATES:
         logger.info(
             'User has more than {} "oidc_states" in their session, '
@@ -213,11 +211,6 @@ def oidc_callback(request):
 
         # Authenticating is slow, so save the updated oidc_states.
         request.session.save()
-        # Reset the session. This forces the session to get reloaded from the database after
-        # fetching the token from the OpenID connect provider.
-        # Without this step we would overwrite items that are being added/removed from the
-        # session in parallel browser tabs.
-        request.session = request.session.__class__(request.session.session_key)
 
         kwargs = {
             "request": request,
@@ -229,12 +222,10 @@ def oidc_callback(request):
             login(request, user)
             return HttpResponseRedirect(LOGIN_REDIRECT_URL)
 
-        return handle_oidc_callback_error(request)
+    return handle_oidc_callback_error(request)
 
 
 @api_view(["GET"])
-@authentication_classes([])
-@permission_classes([])
 @require_http_methods(["GET"])
 def oidc_logout(request):
     logout_url = LOGOUT_REDIRECT_URL

@@ -189,7 +189,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         )
         token_payload = {
             "client_assertion": encoded_jwt,
-            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",  # noqa
             "code": payload.get("code"),
             "grant_type": "authorization_code",
         }
