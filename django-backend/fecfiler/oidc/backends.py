@@ -28,16 +28,7 @@ from josepy.jwk import JWK
 from josepy.jws import JWS, Header
 from requests.exceptions import HTTPError
 
-from fecfiler.settings import (
-    OIDC_OP_UNIQUE_IDENTIFIER,
-    OIDC_RP_UNIQUE_IDENTIFIER,
-    OIDC_RP_SIGN_ALGO,
-    OIDC_OP_JWKS_ENDPOINT,
-    OIDC_RP_CLIENT_ID,
-    OIDC_OP_TOKEN_ENDPOINT,
-    OIDC_RP_CLIENT_SECRET,
-    OIDC_OP_USER_ENDPOINT,
-)
+from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,7 +41,7 @@ class OIDCAuthenticationBackend(ModelBackend):
 
     def get_idp_unique_id_value(self, claims):
         """Helper method to clarify whether we're using OP or RP unique ID"""
-        return claims.get(OIDC_OP_UNIQUE_IDENTIFIER)
+        return claims.get(settings.OIDC_OP_UNIQUE_IDENTIFIER)
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified unique identifier."""
@@ -59,7 +50,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         if not unique_identifier_value:
             return self.UserModel.objects.none()
         # Use the app label to filter
-        filter_label = OIDC_RP_UNIQUE_IDENTIFIER + "__iexact"
+        filter_label = settings.OIDC_RP_UNIQUE_IDENTIFIER + "__iexact"
         kwargs = {filter_label: unique_identifier_value}
         filtered_users = self.UserModel.objects.filter(**kwargs)
 
@@ -92,11 +83,11 @@ class OIDCAuthenticationBackend(ModelBackend):
 
         try:
             alg = jws.signature.combined.alg.name
-        except KeyError:
+        except AttributeError:
             msg = "No alg value found in header"
             raise SuspiciousOperation(msg)
 
-        if alg != OIDC_RP_SIGN_ALGO:
+        if alg != settings.OIDC_RP_SIGN_ALGO:
             msg = (
                 "The provider algorithm {!r} does not match the client's "
                 "OIDC_RP_SIGN_ALGO.".format(alg)
@@ -119,7 +110,7 @@ class OIDCAuthenticationBackend(ModelBackend):
     def retrieve_matching_jwk(self, token):
         """Get the signing key by exploring the JWKS endpoint of the OP."""
         response_jwks = requests.get(
-            OIDC_OP_JWKS_ENDPOINT,
+            settings.OIDC_OP_JWKS_ENDPOINT,
             verify=True,
             timeout=None,
             proxies=None,
@@ -176,15 +167,15 @@ class OIDCAuthenticationBackend(ModelBackend):
         https://github.com/trussworks/logindotgov-oidc-py
         """
         jwt_args = {
-            "iss": OIDC_RP_CLIENT_ID,
-            "sub": OIDC_RP_CLIENT_ID,
-            "aud": OIDC_OP_TOKEN_ENDPOINT,
+            "iss": settings.OIDC_RP_CLIENT_ID,
+            "sub": settings.OIDC_RP_CLIENT_ID,
+            "aud": settings.OIDC_OP_TOKEN_ENDPOINT,
             "jti": secrets.token_hex(16),
             "exp": int(time.time()) + 300,  # 5 minutes from now
         }
         # Client secret needs to be pem-encoded string
         encoded_jwt = jwt.encode(
-            jwt_args, OIDC_RP_CLIENT_SECRET, algorithm=OIDC_RP_SIGN_ALGO
+            jwt_args, settings.OIDC_RP_CLIENT_SECRET, algorithm=settings.OIDC_RP_SIGN_ALGO
         )
         token_payload = {
             "client_assertion": encoded_jwt,
@@ -192,7 +183,7 @@ class OIDCAuthenticationBackend(ModelBackend):
             "code": payload.get("code"),
             "grant_type": "authorization_code",
         }
-        response = requests.post(OIDC_OP_TOKEN_ENDPOINT, data=token_payload)
+        response = requests.post(settings.OIDC_OP_TOKEN_ENDPOINT, data=token_payload)
         self.raise_token_response_error(response)
         return response.json()
 
@@ -216,7 +207,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         the default implementation, but may be used when overriding this method"""
 
         user_response = requests.get(
-            OIDC_OP_USER_ENDPOINT,
+            settings.OIDC_OP_USER_ENDPOINT,
             headers={"Authorization": "Bearer {0}".format(access_token)},
             verify=True,
             timeout=None,
@@ -240,8 +231,8 @@ class OIDCAuthenticationBackend(ModelBackend):
             return None
 
         token_payload = {
-            "client_id": OIDC_RP_CLIENT_ID,
-            "client_secret": OIDC_RP_CLIENT_SECRET,
+            "client_id": settings.OIDC_RP_CLIENT_ID,
+            "client_secret": settings.OIDC_RP_CLIENT_SECRET,
             "grant_type": "authorization_code",
             "code": code,
             "redirect_uri": self.request.build_absolute_uri(reverse("oidc_callback")),

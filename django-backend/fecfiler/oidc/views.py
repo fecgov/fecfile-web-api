@@ -86,7 +86,7 @@ def oidc_authenticate(request):
     query = urlencode(params)
     redirect_url = "{url}?{query}".format(url=OIDC_OP_AUTHORIZATION_ENDPOINT, query=query)
     response = HttpResponseRedirect(redirect_url)
-    response.set_signed_cookie("oidc_state", state)
+    response.set_signed_cookie("oidc_state", state, secure=True, httponly=True)
     return response
 
 
