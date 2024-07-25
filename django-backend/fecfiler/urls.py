@@ -33,6 +33,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.openfec.urls")),
     re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(r"^celery-test/", test_celery),
     path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
     re_path(BASE_V1_URL + "status/", get_api_status),

@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "fecfiler.openfec",
     "fecfiler.user",
     "fecfiler.mock_openfec",
+    "fecfiler.oidc",
 ]
 
 MIDDLEWARE = [
@@ -139,7 +140,7 @@ FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
 # OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "fecfiler.authentication.backends.OIDCAuthenticationBackend",
+    "fecfiler.oidc.backends.OIDCAuthenticationBackend",
 ]
 
 # Maximum number of concurrent sessions

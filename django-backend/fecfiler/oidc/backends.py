@@ -1,5 +1,5 @@
 """
-This source code has been lifted from the mozilla-django-oidc
+This source code has been copied from the mozilla-django-oidc
 project:
 https://mozilla-django-oidc.readthedocs.io/en/stable/index.html#
 https://github.com/mozilla/mozilla-django-oidc/tree/main
@@ -7,7 +7,6 @@ https://github.com/mozilla/mozilla-django-oidc/tree/main
 It has been modified in places to meet the needs of the project and
 the original version can be found on Github:
 https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/auth.py
-
 """
 
 import json
