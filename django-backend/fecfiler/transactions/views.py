@@ -319,6 +319,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
                 self.save_transaction(child_transaction_data, request)
 
+        update_child_purpose_descriptions(transaction_instance)
+
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -405,3 +407,90 @@ def stringify_queryset(qs):
         s = cursor.mogrify(sql, params)
     conn.close()
     return s
+
+
+def update_child_purpose_descriptions(transaction: Transaction):
+
+    child_transaction_type_ids = {
+        'JOINT_FUNDRAISING_TRANSFER': [
+            'INDIVIDUAL_JF_TRANSFER_MEMO',
+            'PAC_JF_TRANSFER_MEMO',
+            # 'PARTNERSHIP_JF_TRANSFER_MEMO',
+            'PARTY_JF_TRANSFER_MEMO',
+            'TRIBAL_JF_TRANSFER_MEMO',
+        ],
+        'JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT': [
+            'INDIVIDUAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO',
+            'PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO',
+            'PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO',
+            'TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO',
+        ],
+        'JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT': [
+            'INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO',
+            'PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO',
+            'PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO',
+            'TRIBAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO',
+        ],
+        'JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT': [
+            'INDIVIDUAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO',
+            'PAC_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO',
+            'PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO',
+            'TRIBAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO',
+        ],
+        'PARTNERSHIP_JF_TRANSFER_MEMO': [
+            'PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO',
+        ],
+        'PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO': [
+            'PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO',
+        ],
+        'PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO': [
+            'PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO',
+        ],
+        'PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO': [
+            'PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO',
+        ],
+    }
+
+    if transaction.transaction_type_identifier in child_transaction_type_ids:
+
+        # Fetch all child transactions for the given parent_transaction_id
+        children = Transaction.objects.filter(
+            parent_transaction_id=transaction.id,
+            transaction_type_identifier__in=child_transaction_type_ids[
+                transaction.transaction_type_identifier
+            ] 
+        )
+
+        # Update the amount for each child transaction
+        for child in children:
+            child.transactions_schedulea.contribution_purpose_descrip = update_description_text(
+                transaction,
+                child_transaction_type_ids[transaction.transaction_type_identifier],
+            )
+            child.save()
+        
+        # Perform a bulk update
+        # Transaction.objects.bulk_update(children, ['transactions_schedulea__contribution_purpose_descrip'])
+
+
+def update_description_text(transaction: Transaction, child_transaction_type_identifier: str) -> str:
+    if child_transaction_type_identifier == 'INDIVIDUAL_JF_TRANSFER_MEMO':
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    elif child_transaction_type_identifier == 'PAC_JF_TRANSFER_MEMO':
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    # elif child_transaction_type_identifier == 'PARTNERSHIP_JF_TRANSFER_MEMO':
+        
+    #     committee_clause = f">>> JF Memo: {transaction.contributor_organization_name}"
+    #     const hasChildren = transaction.children && transaction.children.length > 0;
+    #     const parenthetical = hasChildren
+    #     ? ' (See Partnership Attribution(s) below)'
+    #     : ' (Partnership attributions do not meet itemization threshold)'
+    #     if ((committee_clause + parenthetical).length > 100) {
+    #     committee_clause = committee_clause.slice(0, 97 - parenthetical.length) + '...'
+    #     }
+    #     return committeeClause + parenthetical
+
+    elif child_transaction_type_identifier == 'PARTY_JF_TRANSFER_MEMO':
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    elif child_transaction_type_identifier == 'TRIBAL_JF_TRANSFER_MEMO':
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
