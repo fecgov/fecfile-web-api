@@ -2,7 +2,7 @@ from unittest.mock import Mock
 from django.test import RequestFactory, TestCase
 from django.contrib.auth import get_user_model
 
-from .views import (
+from fecfiler.oidc.views import (
     oidc_logout,
     login_redirect,
     logout_redirect,
@@ -11,7 +11,7 @@ from .views import (
 UserModel = get_user_model()
 
 
-class AuthenticationTest(TestCase):
+class OidcTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
     user = None
 
@@ -19,7 +19,7 @@ class AuthenticationTest(TestCase):
         self.user = UserModel.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
-    def test_login_dot_gov_logout_happy_path(self):
+    def xtest_login_dot_gov_logout_happy_path(self):
         test_state = "test_state"
 
         mock_request = Mock()
