@@ -32,8 +32,14 @@ report_code_label_mapping = {
 # Generate the Case object
 report_code_label_case = Case(
     *[When(report_code=k, then=Value(v)) for k, v in report_code_label_mapping.items()],
-    When(form_24__report_type_24_48=24, then=Value("24 HOUR")),
-    When(form_24__report_type_24_48=48, then=Value("48 HOUR")),
+    When(
+        form_24__report_type_24_48=24,
+        then=Value("24 HOUR REPORT OF INDEPENDENT EXPENDITURES"),
+    ),
+    When(
+        form_24__report_type_24_48=48,
+        then=Value("48 HOUR REPORT OF INDEPENDENT EXPENDITURES"),
+    ),
     When(form_99__isnull=False, then=Value("")),
     When(form_1m__isnull=False, then=Value("")),
 )
