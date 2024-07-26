@@ -41,7 +41,7 @@ report_code_label_case = Case(
         then=Value("48 HOUR REPORT OF INDEPENDENT EXPENDITURES"),
     ),
     When(form_99__isnull=False, then=Value("")),
-    When(form_1m__isnull=False, then=Value("")),
+    When(form_1m__isnull=False, then=Value("NOTIFICATION OF MULTICANDIDATE STATUS")),
 )
 
 
