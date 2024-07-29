@@ -9,7 +9,7 @@ the original version can be found on Github:
 https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/views.py
 """
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth import logout
 from django.utils.crypto import get_random_string
 from django.urls import reverse
@@ -28,6 +28,7 @@ from fecfiler.settings import (
     FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
     OIDC_ACR_VALUES,
     OIDC_OP_AUTHORIZATION_ENDPOINT,
+    LOGIN_REDIRECT_URL,
 )
 from fecfiler.authentication.utils import delete_user_logged_in_cookies
 
@@ -95,13 +96,19 @@ def oidc_authenticate(request):
 @permission_classes([])
 @require_http_methods(["GET"])
 def oidc_callback(request):
-    if (
-        "error" not in request.query_params
-        and "code" in request.query_params
-        and "state" in request.query_params
-    ):
-        return handle_oidc_callback_request(request)
-    return handle_oidc_callback_error(request)
+    try:
+        if (
+            "error" not in request.query_params
+            and "code" in request.query_params
+            and "state" in request.query_params
+        ):
+            handle_oidc_callback_request(request)
+            return HttpResponseRedirect(LOGIN_REDIRECT_URL)
+        handle_oidc_callback_error(request)
+        return HttpResponseRedirect("/")
+    except Exception as error:
+        logger.error(f"Failed to process oidc_callback request {str(error)}")
+        return HttpResponseServerError()
 
 
 @api_view(["GET"])

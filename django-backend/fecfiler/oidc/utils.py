@@ -16,11 +16,10 @@ import time
 
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import logout, authenticate, login
-from django.http import HttpResponseRedirect
+
 
 from fecfiler.settings import (
     OIDC_MAX_STATES,
-    LOGIN_REDIRECT_URL,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -50,7 +49,6 @@ def handle_oidc_callback_request(request):
     user = authenticate(**kwargs)
     if user and user.is_active:
         login(request, user)
-        return HttpResponseRedirect(LOGIN_REDIRECT_URL)
 
 
 def handle_oidc_callback_error(request):
@@ -68,7 +66,6 @@ def handle_oidc_callback_error(request):
     if request.user.is_authenticated:
         logout(request)
     assert not request.user.is_authenticated
-    return HttpResponseRedirect("/")
 
 
 def add_oidc_nonce_to_session(request, state, nonce):
