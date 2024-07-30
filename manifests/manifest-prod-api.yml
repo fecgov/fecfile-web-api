@@ -26,3 +26,5 @@ applications:
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       MOCK_OPENFEC: REDIS
+      # ---- FEATURE FLAGS ----
+      FLAG__FORM1_LOOKUP: TEST # Values are TEST and PROD, defaults to TEST

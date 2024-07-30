@@ -364,4 +364,8 @@ else:
     MOCK_OPENFEC_REDIS_URL = None
 
 
+"""FEATURE FLAGS"""
+FLAG__FORM1_LOOKUP = env.get_credential("FLAG__FORM1_LOOKUP")
+
+
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

@@ -57,10 +57,14 @@ def retrieve_recent_f1(committee_id):
         "api_key": settings.FEC_API_KEY,
         "committee_id": committee_id,
     }
-    endpoints = [
-        f"{settings.FEC_API}efile/form1/",
-        f"{settings.FEC_API}committee/{committee_id}/"
-    ]
+
+    if settings.FLAG__FORM1_LOOKUP == "PROD":
+        endpoints = [
+            f"{settings.FEC_API}efile/form1/",
+            f"{settings.FEC_API}committee/{committee_id}/"
+        ]
+    else:
+        endpoints = [f"{settings.FEC_API}/efile/test-form1/"]
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
         results = response["results"]
