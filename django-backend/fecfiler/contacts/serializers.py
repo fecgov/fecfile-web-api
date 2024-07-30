@@ -13,10 +13,12 @@ from rest_framework.serializers import (
 from rest_framework.exceptions import ValidationError
 
 from .models import Contact
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
 
+@silk_profile(name='contact__create_or_update_contact')
 def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
 
     if not user_committee_id:
@@ -55,6 +57,7 @@ class ContactSerializer(
     # Contains the number of transactions linked to the contact
     has_transaction_or_report = BooleanField(required=False)
 
+    @silk_profile(name='contact__to_representation')
     def to_representation(self, instance, depth=0):
         representation = super().to_representation(instance)
         query = Contact.objects.filter(
@@ -89,9 +92,11 @@ class ContactSerializer(
 
         return representation
 
+    @silk_profile(name='contact__get_schema_name')
     def get_schema_name(self, data):
         return f"Contact_{self.contact_value[data.get('type', None)]}"
 
+    @silk_profile(name='contact__validate')
     def validate(self, data):
         matches = (
             Contact.objects.exclude(id=data.get("id"))

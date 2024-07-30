@@ -18,6 +18,7 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 
 import uuid
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -173,6 +174,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
+    @silk_profile(name='transaction__save')
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id

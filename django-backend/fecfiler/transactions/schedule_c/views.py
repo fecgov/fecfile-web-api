@@ -5,6 +5,7 @@ from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 import copy
+from silk.profiling.profiler import silk_profile
 
 
 def save_hook(transaction: Transaction, is_existing):
@@ -15,6 +16,7 @@ def save_hook(transaction: Transaction, is_existing):
             update_in_future_reports(transaction)
 
 
+@silk_profile(name='transaction__sched_c__create_in_future_reports')
 def create_in_future_reports(transaction: Transaction):
     current_report = transaction.reports.filter(form_3x__isnull=False).first()
     future_reports = current_report.get_future_in_progress_reports()
@@ -23,6 +25,7 @@ def create_in_future_reports(transaction: Transaction):
         carry_forward_loan(transaction_copy, report)
 
 
+@silk_profile(name='transaction__sched_c__update_in_future_reports')
 def update_in_future_reports(transaction: Transaction):
     current_report = transaction.reports.filter(form_3x__isnull=False).first()
     future_reports = current_report.get_future_in_progress_reports()

@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -34,6 +35,7 @@ NAME_REVERSED_CLAUSE = Concat(
 )
 
 
+@silk_profile(name='contact__validate_and_sanitize_candidate')
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
@@ -80,6 +82,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     ordering = ["-created"]
 
     @action(detail=False)
+    @silk_profile(name='contact__candidate')
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
         if not candidate_id:
@@ -100,6 +103,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return HttpResponseBadRequest()
 
     @action(detail=False)
+    @silk_profile(name='contact__candidate_lookup')
     def candidate_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -164,6 +168,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    @silk_profile(name='contact__committee_lookup')
     def committee_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -210,6 +215,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    @silk_profile(name='contact__individual_lookup')
     def individual_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -246,6 +252,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    @silk_profile(name='contact__organization_lookup')
     def organization_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -270,6 +277,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    @silk_profile(name='contact__get_contact_id')
     def get_contact_id(self, request):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:
@@ -281,10 +289,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return Response(match.id if match else "")
 
+    @silk_profile(name='contact__update')
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             return super().update(request, *args, **kwargs)
 
+    @silk_profile(name='contact__get_int_param_value')
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
@@ -297,6 +307,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
                 return max_param_value
         return default_param_value
 
+    @silk_profile(name='contact__get_max_results')
     def get_max_results(self, request):
         max_fecfile_results = self.get_int_param_value(
             request,
@@ -341,6 +352,7 @@ class DeletedContactsViewSet(
     ordering = ["-created"]
 
     @action(detail=False, methods=["post"])
+    @silk_profile(name='contact__restore')
     def restore(self, request):
         ids_to_restore = request.data
         contacts = self.queryset.filter(id__in=ids_to_restore)

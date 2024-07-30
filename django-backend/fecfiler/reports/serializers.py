@@ -18,6 +18,7 @@ from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -104,6 +105,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     form_99 = Form99Serializer(required=False)
     form_1m = Form1MSerializer(required=False)
 
+    @silk_profile(name='report__to_representation')
     def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
         form_3x = representation.pop("form_3x") or []

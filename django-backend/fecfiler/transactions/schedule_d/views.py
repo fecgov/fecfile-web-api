@@ -5,6 +5,7 @@ from fecfiler.transactions.schedule_d.utils import carry_forward_debt
 import copy
 from fecfiler.transactions.models import Transaction
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -16,6 +17,7 @@ def save_hook(transaction: Transaction, is_existing):
         update_in_future_reports(transaction)
 
 
+@silk_profile(name='transaction__sched_d__create_in_future_reports')
 def create_in_future_reports(transaction):
     current_report = transaction.reports.filter(form_3x__isnull=False).first()
     future_reports = current_report.get_future_in_progress_reports()
@@ -28,6 +30,7 @@ def create_in_future_reports(transaction):
         carry_forward_debt(transaction_copy, report)
 
 
+@silk_profile(name='transaction__sched_d__update_in_future_reports')
 def update_in_future_reports(transaction):
     future_reports = transaction.reports.filter(
         form_3x__isnull=False).first().get_future_in_progress_reports()

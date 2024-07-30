@@ -10,6 +10,7 @@ from .form_24.models import Form24
 from .form_99.models import Form99
 from .form_1m.models import Form1M
 import structlog
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -93,6 +94,8 @@ class Report(CommitteeOwnedModel):
             .last()
         )
 
+
+    @silk_profile(name='report__save')
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
         from fecfiler.transactions.schedule_d.utils import carry_forward_debts
@@ -156,6 +159,7 @@ class Report(CommitteeOwnedModel):
 
         super(CommitteeOwnedModel, self).delete()
 
+    @silk_profile(name='report__can_delete')
     def can_delete(self):
         """
         can't delete if submitted
@@ -224,6 +228,7 @@ FORMS_TO_CALCULATE = [
 ]
 
 
+@silk_profile(name='report__flag_reports_for_recalculation')
 def flag_reports_for_recalculation(report: Report):
     if report and report.get_form_name() in FORMS_TO_CALCULATE:
         committee = report.committee_account
