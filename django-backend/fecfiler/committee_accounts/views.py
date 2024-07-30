@@ -13,7 +13,6 @@ from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
