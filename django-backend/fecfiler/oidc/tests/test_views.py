@@ -5,7 +5,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from unittest.mock import MagicMock
 
 from fecfiler.oidc.views import (
-    oidc_logout,
     login_redirect,
     logout_redirect,
     oidc_authenticate,

@@ -9,19 +9,11 @@ the original version can be found on Github:
 https://github.com/mozilla/mozilla-django-oidc/blob/main/tests/test_auth.py
 """
 
-import json
-from jwcrypto import jwk
-from jwcrypto.common import json_decode
 from unittest.mock import Mock, patch
 from requests.exceptions import HTTPError
 from django.core.exceptions import SuspiciousOperation
-
-
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase, override_settings
-from django.utils.encoding import force_bytes, smart_str
-from josepy.b64 import b64encode
-
 from fecfiler.oidc.backends import OIDCAuthenticationBackend
 
 User = get_user_model()
@@ -186,3 +178,210 @@ class OIDCAuthenticationBackendTestCase(TestCase):
             "JWS token verification failed",
         ):
             self.backend.authenticate(request=auth_request)
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.JWS")
+    def test_authenticate_nonce_verification_failed(
+        self,
+        jws_mock,
+        jwt_mock,
+        requests_mock,
+    ):
+        test_jws_json_header = '{"kid":"test_kid","alg":"RS256"}'
+        test_jwks = {
+            "keys": [
+                {
+                    "alg": "RS256",
+                    "use": "sig",
+                    "kty": "RSA",
+                    "n": "test_n",
+                    "e": "test_e",
+                    "kid": "test_kid",
+                }
+            ]
+        }
+        test_alg = "RS256"
+        test_jws_payload = b'{"nonce": "test_nonce_value"}'
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": "access_granted",
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.return_value = test_jwks
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.from_compact.return_value.signature.protected = test_jws_json_header
+        jws_mock.from_compact.return_value.signature.combined.alg.name = test_alg
+        jws_mock.from_compact.return_value.verify.return_value = True
+        jws_mock.from_compact.return_value.payload = test_jws_payload
+
+        auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
+        with self.assertRaisesMessage(
+            SuspiciousOperation,
+            "JWT Nonce verification failed.",
+        ):
+            self.backend.authenticate(
+                request=auth_request, nonce="test_nonce_value_mismatched"
+            )
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.JWS")
+    def test_authenticate_payload_claims_verification_failed(
+        self,
+        jws_mock,
+        jwt_mock,
+        requests_mock,
+    ):
+        test_jws_json_header = '{"kid":"test_kid","alg":"RS256"}'
+        test_jwks = {
+            "keys": [
+                {
+                    "alg": "RS256",
+                    "use": "sig",
+                    "kty": "RSA",
+                    "n": "test_n",
+                    "e": "test_e",
+                    "kid": "test_kid",
+                }
+            ]
+        }
+        test_alg = "RS256"
+        test_jws_payload = b'{"nonce": "test_nonce_value"}'
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": "access_granted",
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.return_value = test_jwks
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.from_compact.return_value.signature.protected = test_jws_json_header
+        jws_mock.from_compact.return_value.signature.combined.alg.name = test_alg
+        jws_mock.from_compact.return_value.verify.return_value = True
+        jws_mock.from_compact.return_value.payload = test_jws_payload
+
+        auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
+        with self.assertRaisesMessage(
+            SuspiciousOperation,
+            "Claims verification failed",
+        ):
+            self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.JWS")
+    @patch("fecfiler.oidc.backends.len")
+    def test_authenticate_payload_multiple_users_returned(
+        self,
+        len_mock,
+        jws_mock,
+        jwt_mock,
+        requests_mock,
+    ):
+        test_jws_json_header = '{"kid":"test_kid","alg":"RS256"}'
+        test_jwks = {
+            "keys": [
+                {
+                    "alg": "RS256",
+                    "use": "sig",
+                    "kty": "RSA",
+                    "n": "test_n",
+                    "e": "test_e",
+                    "kid": "test_kid",
+                }
+            ]
+        }
+        test_alg = "RS256"
+        test_jws_payload = b'{"nonce": "test_nonce_value"}'
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": "access_granted",
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.side_effect = [
+            test_jwks,
+            {"email": "test_email", "username": "test_username"},
+        ]
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.from_compact.return_value.signature.protected = test_jws_json_header
+        jws_mock.from_compact.return_value.signature.combined.alg.name = test_alg
+        jws_mock.from_compact.return_value.verify.return_value = True
+        jws_mock.from_compact.return_value.payload = test_jws_payload
+        len_mock.return_value = 2
+
+        auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
+        with self.assertRaisesMessage(
+            SuspiciousOperation,
+            "Multiple users returned",
+        ):
+
+            self.backend.UserModel.objects = Mock()
+            self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.JWS")
+    @patch("fecfiler.oidc.backends.len")
+    def test_authenticate_payload_create_new_user_happy_path(
+        self,
+        len_mock,
+        jws_mock,
+        jwt_mock,
+        requests_mock,
+    ):
+        test_jws_json_header = '{"kid":"test_kid","alg":"RS256"}'
+        test_jwks = {
+            "keys": [
+                {
+                    "alg": "RS256",
+                    "use": "sig",
+                    "kty": "RSA",
+                    "n": "test_n",
+                    "e": "test_e",
+                    "kid": "test_kid",
+                }
+            ]
+        }
+        test_alg = "RS256"
+        test_jws_payload = b'{"nonce": "test_nonce_value"}'
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": "access_granted",
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.side_effect = [
+            test_jwks,
+            {"email": "test_email", "username": "test_username"},
+        ]
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.from_compact.return_value.signature.protected = test_jws_json_header
+        jws_mock.from_compact.return_value.signature.combined.alg.name = test_alg
+        jws_mock.from_compact.return_value.verify.return_value = True
+        jws_mock.from_compact.return_value.payload = test_jws_payload
+        len_mock.return_value = 0
+
+        auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
+
+        self.backend.UserModel.objects = Mock()
+        retval = self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
+        self.assertIsNotNone(retval)

@@ -157,9 +157,8 @@ class OIDCAuthenticationBackend(ModelBackend):
         token_nonce = payload.get("nonce")
 
         if nonce != token_nonce:
-            msg = "JWT Nonce verification failed."
+            msg = "JWT Nonce verification failed. "
             raise SuspiciousOperation(msg)
-        return payload
 
     def get_token(self, payload):
         """Return token object as a dictionary.
@@ -202,7 +201,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         )
         raise HTTPError(http_error_msg, response=response)
 
-    def get_userinfo(self, access_token, id_token, payload):
+    def get_userinfo(self, access_token):
         """Return user details dictionary. The id_token and payload are not used in
         the default implementation, but may be used when overriding this method"""
 
@@ -244,22 +243,15 @@ class OIDCAuthenticationBackend(ModelBackend):
         access_token = token_info.get("access_token")
 
         # Validate the token
-        payload = self.verify_token(id_token, nonce=nonce)
+        self.verify_token(id_token, nonce=nonce)
 
-        if payload:
-            try:
-                return self.get_or_create_user(access_token, id_token, payload)
-            except SuspiciousOperation as exc:
-                LOGGER.warning("failed to get or create user: %s", exc)
-                return None
+        return self.get_or_create_user(access_token)
 
-        return None
-
-    def get_or_create_user(self, access_token, id_token, payload):
+    def get_or_create_user(self, access_token):
         """Returns a User instance if 1 user is found. Creates a user if not found
         and configured to do so. Returns nothing if multiple users are matched."""
 
-        user_info = self.get_userinfo(access_token, id_token, payload)
+        user_info = self.get_userinfo(access_token)
 
         claims_verified = self.verify_claims(user_info)
         if not claims_verified:
