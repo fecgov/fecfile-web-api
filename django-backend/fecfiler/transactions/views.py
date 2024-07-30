@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
     Transaction,
@@ -44,15 +45,15 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering_fields = getattr(view, "ordering_fields", [])
 
         if ordering_query_param:
-            fields = [param.strip() for param in ordering_query_param.split(',')]
+            fields = [param.strip() for param in ordering_query_param.split(",")]
             ordering = []
             for field in fields:
-                if field.strip('-') in ordering_fields:
-                    if field == '-memo_code' and not (
+                if field.strip("-") in ordering_fields:
+                    if field == "-memo_code" and not (
                         queryset.filter(memo_code=True).exists()
                         and queryset.exclude(memo_code=True).exists()
                     ):
-                        field = 'memo_code'
+                        field = "memo_code"
                     ordering.append(field)
             if ordering:
                 return ordering
@@ -319,6 +320,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
                 self.save_transaction(child_transaction_data, request)
 
+        update_dependent_descriptions(transaction_instance)
+
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -405,3 +408,156 @@ def stringify_queryset(qs):
         s = cursor.mogrify(sql, params)
     conn.close()
     return s
+
+
+def update_dependent_descriptions(transaction: Transaction):
+
+    dependencies = {
+        "JOINT_FUNDRAISING_TRANSFER": {
+            "method": get_jf_transfer_child_description_clause,
+            "children": [
+                "INDIVIDUAL_JF_TRANSFER_MEMO",
+                "PAC_JF_TRANSFER_MEMO",
+                "PARTNERSHIP_JF_TRANSFER_MEMO",
+                "PARTY_JF_TRANSFER_MEMO",
+                "TRIBAL_JF_TRANSFER_MEMO",
+            ],
+        },
+        "JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT": {
+            "method": get_jf_transfer_national_party_convention_account_child_description_clause,
+            "children": [
+                "INDIVIDUAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+                "PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+                "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+                "TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+            ],
+        },
+        "JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT": {
+            "method": get_jf_transfer_national_party_headquarters_account_child_description_clause,
+            "children": [
+                "INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+                "PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+                "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+                "TRIBAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+            ],
+        },
+        "JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT": {
+            "method": get_jf_transfer_national_party_recount_account_child_description_clause,
+            "children": [
+                "INDIVIDUAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+                "PAC_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+                "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+                "TRIBAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            ],
+        },
+    }
+    child_transaction_type_ids = {
+        "JOINT_FUNDRAISING_TRANSFER": [
+            "INDIVIDUAL_JF_TRANSFER_MEMO",
+            "PAC_JF_TRANSFER_MEMO",
+            # 'PARTNERSHIP_JF_TRANSFER_MEMO',
+            "PARTY_JF_TRANSFER_MEMO",
+            "TRIBAL_JF_TRANSFER_MEMO",
+        ],
+        "JF_TRANSFER_NATIONAL_PARTY_CONVENTION_ACCOUNT": [
+            "INDIVIDUAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+            "PAC_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+            "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+            "TRIBAL_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+        ],
+        "JF_TRANSFER_NATIONAL_PARTY_HEADQUARTERS_ACCOUNT": [
+            "INDIVIDUAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+            "PAC_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+            "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+            "TRIBAL_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+        ],
+        "JF_TRANSFER_NATIONAL_PARTY_RECOUNT_ACCOUNT": [
+            "INDIVIDUAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            "PAC_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+            "TRIBAL_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+        ],
+        "PARTNERSHIP_JF_TRANSFER_MEMO": [
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+        ],
+        "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO": [
+            "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+        ],
+        "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO": [
+            "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+        ],
+        "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO": [
+            "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+        ],
+    }
+
+    if transaction.transaction_type_identifier in dependencies:
+
+        if dependencies[transaction.transaction_type_identifier]["children"]:
+            # Fetch all child transactions for the given parent_transaction_id
+            children = Transaction.objects.filter(
+                parent_transaction_id=transaction.id,
+                transaction_type_identifier__in=dependencies[
+                    transaction.transaction_type_identifier
+                ]["children"],
+            )
+            description_clause = dependencies[transaction.transaction_type_identifier][
+                "method"
+            ](transaction)
+            children.update(contribution_purpose_descrip=description_clause)
+
+
+def get_jf_transfer_child_description_clause(transaction: Transaction) -> str:
+    return Concat(Value(">>> JF Memo: "), transaction.contributor_organization_name)
+
+
+def get_jf_transfer_national_party_convention_account_child_description_clause(
+    transaction: Transaction,
+) -> str:
+    return Concat(
+        Value(">>> Pres. Nominating Convention Account JF Memo: "),
+        transaction.contributor_organization_name,
+    )
+
+
+def get_jf_transfer_national_party_headquarters_account_child_description_clause(
+    transaction: Transaction,
+) -> str:
+    return Concat(
+        Value(">>> Headquarters Buildings Account JF Memo: "),
+        transaction.contributor_organization_name,
+    )
+
+
+def get_jf_transfer_national_party_recount_account_child_description_clause(
+    transaction: Transaction,
+) -> str:
+    return Concat(
+        Value(">>> Recount/Legal Proceedings Account JF Memo: "),
+        transaction.contributor_organization_name,
+    )
+
+
+def update_description_text(
+    transaction: Transaction, child_transaction_type_identifier: str
+) -> str:
+    if child_transaction_type_identifier == "INDIVIDUAL_JF_TRANSFER_MEMO":
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    elif child_transaction_type_identifier == "PAC_JF_TRANSFER_MEMO":
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    # elif child_transaction_type_identifier == 'PARTNERSHIP_JF_TRANSFER_MEMO':
+
+    #     committee_clause = f">>> JF Memo: {transaction.contributor_organization_name}"
+    #     const hasChildren = transaction.children && transaction.children.length > 0;
+    #     const parenthetical = hasChildren
+    #     ? ' (See Partnership Attribution(s) below)'
+    #     : ' (Partnership attributions do not meet itemization threshold)'
+    #     if ((committee_clause + parenthetical).length > 100) {
+    #     committee_clause = committee_clause.slice(0, 97 - parenthetical.length) + '...'
+    #     }
+    #     return committeeClause + parenthetical
+
+    elif child_transaction_type_identifier == "PARTY_JF_TRANSFER_MEMO":
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
+    elif child_transaction_type_identifier == "TRIBAL_JF_TRANSFER_MEMO":
+        return f">>> JF Memo: {transaction.contributor_organization_name}"
