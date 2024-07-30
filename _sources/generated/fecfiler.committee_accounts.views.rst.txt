@@ -17,6 +17,7 @@ fecfiler.committee\_accounts.views
    .. autosummary::
       :toctree:                                          
    
+      check_email_match
       create_committee_view
       register_committee
    

@@ -1,0 +1,138 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.test\_views.CheckEmailMatchTestCase
+================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.test_views
+
+.. autoclass:: CheckEmailMatchTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CheckEmailMatchTestCase.__init__
+      ~CheckEmailMatchTestCase.addClassCleanup
+      ~CheckEmailMatchTestCase.addCleanup
+      ~CheckEmailMatchTestCase.addTypeEqualityFunc
+      ~CheckEmailMatchTestCase.assertAlmostEqual
+      ~CheckEmailMatchTestCase.assertAlmostEquals
+      ~CheckEmailMatchTestCase.assertContains
+      ~CheckEmailMatchTestCase.assertCountEqual
+      ~CheckEmailMatchTestCase.assertDictContainsSubset
+      ~CheckEmailMatchTestCase.assertDictEqual
+      ~CheckEmailMatchTestCase.assertEqual
+      ~CheckEmailMatchTestCase.assertEquals
+      ~CheckEmailMatchTestCase.assertFalse
+      ~CheckEmailMatchTestCase.assertFieldOutput
+      ~CheckEmailMatchTestCase.assertFormError
+      ~CheckEmailMatchTestCase.assertFormSetError
+      ~CheckEmailMatchTestCase.assertFormsetError
+      ~CheckEmailMatchTestCase.assertGreater
+      ~CheckEmailMatchTestCase.assertGreaterEqual
+      ~CheckEmailMatchTestCase.assertHTMLEqual
+      ~CheckEmailMatchTestCase.assertHTMLNotEqual
+      ~CheckEmailMatchTestCase.assertIn
+      ~CheckEmailMatchTestCase.assertInHTML
+      ~CheckEmailMatchTestCase.assertIs
+      ~CheckEmailMatchTestCase.assertIsInstance
+      ~CheckEmailMatchTestCase.assertIsNone
+      ~CheckEmailMatchTestCase.assertIsNot
+      ~CheckEmailMatchTestCase.assertIsNotNone
+      ~CheckEmailMatchTestCase.assertJSONEqual
+      ~CheckEmailMatchTestCase.assertJSONNotEqual
+      ~CheckEmailMatchTestCase.assertLess
+      ~CheckEmailMatchTestCase.assertLessEqual
+      ~CheckEmailMatchTestCase.assertListEqual
+      ~CheckEmailMatchTestCase.assertLogs
+      ~CheckEmailMatchTestCase.assertMultiLineEqual
+      ~CheckEmailMatchTestCase.assertNoLogs
+      ~CheckEmailMatchTestCase.assertNotAlmostEqual
+      ~CheckEmailMatchTestCase.assertNotAlmostEquals
+      ~CheckEmailMatchTestCase.assertNotContains
+      ~CheckEmailMatchTestCase.assertNotEqual
+      ~CheckEmailMatchTestCase.assertNotEquals
+      ~CheckEmailMatchTestCase.assertNotIn
+      ~CheckEmailMatchTestCase.assertNotIsInstance
+      ~CheckEmailMatchTestCase.assertNotRegex
+      ~CheckEmailMatchTestCase.assertNotRegexpMatches
+      ~CheckEmailMatchTestCase.assertNumQueries
+      ~CheckEmailMatchTestCase.assertQuerySetEqual
+      ~CheckEmailMatchTestCase.assertQuerysetEqual
+      ~CheckEmailMatchTestCase.assertRaises
+      ~CheckEmailMatchTestCase.assertRaisesMessage
+      ~CheckEmailMatchTestCase.assertRaisesRegex
+      ~CheckEmailMatchTestCase.assertRaisesRegexp
+      ~CheckEmailMatchTestCase.assertRedirects
+      ~CheckEmailMatchTestCase.assertRegex
+      ~CheckEmailMatchTestCase.assertRegexpMatches
+      ~CheckEmailMatchTestCase.assertSequenceEqual
+      ~CheckEmailMatchTestCase.assertSetEqual
+      ~CheckEmailMatchTestCase.assertTemplateNotUsed
+      ~CheckEmailMatchTestCase.assertTemplateUsed
+      ~CheckEmailMatchTestCase.assertTrue
+      ~CheckEmailMatchTestCase.assertTupleEqual
+      ~CheckEmailMatchTestCase.assertURLEqual
+      ~CheckEmailMatchTestCase.assertWarns
+      ~CheckEmailMatchTestCase.assertWarnsMessage
+      ~CheckEmailMatchTestCase.assertWarnsRegex
+      ~CheckEmailMatchTestCase.assertXMLEqual
+      ~CheckEmailMatchTestCase.assertXMLNotEqual
+      ~CheckEmailMatchTestCase.assert_
+      ~CheckEmailMatchTestCase.captureOnCommitCallbacks
+      ~CheckEmailMatchTestCase.countTestCases
+      ~CheckEmailMatchTestCase.debug
+      ~CheckEmailMatchTestCase.defaultTestResult
+      ~CheckEmailMatchTestCase.doClassCleanups
+      ~CheckEmailMatchTestCase.doCleanups
+      ~CheckEmailMatchTestCase.fail
+      ~CheckEmailMatchTestCase.failIf
+      ~CheckEmailMatchTestCase.failIfAlmostEqual
+      ~CheckEmailMatchTestCase.failIfEqual
+      ~CheckEmailMatchTestCase.failUnless
+      ~CheckEmailMatchTestCase.failUnlessAlmostEqual
+      ~CheckEmailMatchTestCase.failUnlessEqual
+      ~CheckEmailMatchTestCase.failUnlessRaises
+      ~CheckEmailMatchTestCase.id
+      ~CheckEmailMatchTestCase.modify_settings
+      ~CheckEmailMatchTestCase.run
+      ~CheckEmailMatchTestCase.setUp
+      ~CheckEmailMatchTestCase.setUpClass
+      ~CheckEmailMatchTestCase.setUpTestData
+      ~CheckEmailMatchTestCase.settings
+      ~CheckEmailMatchTestCase.shortDescription
+      ~CheckEmailMatchTestCase.skipTest
+      ~CheckEmailMatchTestCase.subTest
+      ~CheckEmailMatchTestCase.tearDown
+      ~CheckEmailMatchTestCase.tearDownClass
+      ~CheckEmailMatchTestCase.test_email_matching_case_insensitive
+      ~CheckEmailMatchTestCase.test_match_comma
+      ~CheckEmailMatchTestCase.test_match_semicolon
+      ~CheckEmailMatchTestCase.test_no_f1_email
+      ~CheckEmailMatchTestCase.test_no_match
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CheckEmailMatchTestCase.available_apps
+      ~CheckEmailMatchTestCase.databases
+      ~CheckEmailMatchTestCase.fixtures
+      ~CheckEmailMatchTestCase.longMessage
+      ~CheckEmailMatchTestCase.maxDiff
+      ~CheckEmailMatchTestCase.reset_sequences
+      ~CheckEmailMatchTestCase.serialized_rollback
+   
+   
