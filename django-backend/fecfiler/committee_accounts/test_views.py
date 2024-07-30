@@ -4,6 +4,7 @@ from fecfiler.committee_accounts.models import Membership
 from fecfiler.committee_accounts.views import (
     register_committee,
     CommitteeMembershipViewSet,
+    check_email_match,
 )
 from fecfiler.user.models import User
 from django.core.management import call_command
@@ -189,3 +190,33 @@ class CommitteeMemberViewSetTest(TestCase):
             response.data,
             "This email is taken by an existing membership to this committee",
         )
+
+
+class CheckEmailMatchTestCase(TestCase):
+    def test_no_f1_email(self):
+        result = check_email_match("email3@example.com", None)
+        self.assertEqual(result, "No email provided in F1")
+
+    def test_no_match(self):
+        f1_emails = "email1@example.com;email2@example.com"
+        result = check_email_match("email3@example.com", f1_emails)
+        self.assertEqual(
+            result, "Email email3@example.com does not match committee email"
+        )
+
+    def test_match_semicolon(self):
+        f1_emails = "email1@example.com;email2@example.com"
+        result = check_email_match("email1@example.com", f1_emails)
+        self.assertIsNone(result)
+        result = check_email_match("email2@example.com", f1_emails)
+        self.assertIsNone(result)
+
+    def test_match_comma(self):
+        f1_emails = "email1@example.com,email2@example.com"
+        result = check_email_match("email2@example.com", f1_emails)
+        self.assertIsNone(result)
+
+    def test_email_matching_case_insensitive(self):
+        f1_emails = "email1@example.com;email2@example.com"
+        result = check_email_match("EMAIL1@example.com", f1_emails)
+        self.assertIsNone(result)
