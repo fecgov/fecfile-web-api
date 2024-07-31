@@ -48,6 +48,7 @@ class OIDCAuthenticationBackend(ModelBackend):
                 f"{settings.OIDC_OP_UNIQUE_IDENTIFIER} from claims"
             )
             raise SuspiciousOperation(msg)
+        return retval
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified unique identifier."""
