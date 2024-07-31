@@ -1,0 +1,143 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_login\_dot\_gov\_utils.LoginDotGovUtilsTestCase
+===========================================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_login_dot_gov_utils
+
+.. autoclass:: LoginDotGovUtilsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LoginDotGovUtilsTestCase.__init__
+      ~LoginDotGovUtilsTestCase.addClassCleanup
+      ~LoginDotGovUtilsTestCase.addCleanup
+      ~LoginDotGovUtilsTestCase.addTypeEqualityFunc
+      ~LoginDotGovUtilsTestCase.assertAlmostEqual
+      ~LoginDotGovUtilsTestCase.assertAlmostEquals
+      ~LoginDotGovUtilsTestCase.assertContains
+      ~LoginDotGovUtilsTestCase.assertCountEqual
+      ~LoginDotGovUtilsTestCase.assertDictContainsSubset
+      ~LoginDotGovUtilsTestCase.assertDictEqual
+      ~LoginDotGovUtilsTestCase.assertEqual
+      ~LoginDotGovUtilsTestCase.assertEquals
+      ~LoginDotGovUtilsTestCase.assertFalse
+      ~LoginDotGovUtilsTestCase.assertFieldOutput
+      ~LoginDotGovUtilsTestCase.assertFormError
+      ~LoginDotGovUtilsTestCase.assertFormSetError
+      ~LoginDotGovUtilsTestCase.assertFormsetError
+      ~LoginDotGovUtilsTestCase.assertGreater
+      ~LoginDotGovUtilsTestCase.assertGreaterEqual
+      ~LoginDotGovUtilsTestCase.assertHTMLEqual
+      ~LoginDotGovUtilsTestCase.assertHTMLNotEqual
+      ~LoginDotGovUtilsTestCase.assertIn
+      ~LoginDotGovUtilsTestCase.assertInHTML
+      ~LoginDotGovUtilsTestCase.assertIs
+      ~LoginDotGovUtilsTestCase.assertIsInstance
+      ~LoginDotGovUtilsTestCase.assertIsNone
+      ~LoginDotGovUtilsTestCase.assertIsNot
+      ~LoginDotGovUtilsTestCase.assertIsNotNone
+      ~LoginDotGovUtilsTestCase.assertJSONEqual
+      ~LoginDotGovUtilsTestCase.assertJSONNotEqual
+      ~LoginDotGovUtilsTestCase.assertLess
+      ~LoginDotGovUtilsTestCase.assertLessEqual
+      ~LoginDotGovUtilsTestCase.assertListEqual
+      ~LoginDotGovUtilsTestCase.assertLogs
+      ~LoginDotGovUtilsTestCase.assertMultiLineEqual
+      ~LoginDotGovUtilsTestCase.assertNoLogs
+      ~LoginDotGovUtilsTestCase.assertNotAlmostEqual
+      ~LoginDotGovUtilsTestCase.assertNotAlmostEquals
+      ~LoginDotGovUtilsTestCase.assertNotContains
+      ~LoginDotGovUtilsTestCase.assertNotEqual
+      ~LoginDotGovUtilsTestCase.assertNotEquals
+      ~LoginDotGovUtilsTestCase.assertNotIn
+      ~LoginDotGovUtilsTestCase.assertNotIsInstance
+      ~LoginDotGovUtilsTestCase.assertNotRegex
+      ~LoginDotGovUtilsTestCase.assertNotRegexpMatches
+      ~LoginDotGovUtilsTestCase.assertNumQueries
+      ~LoginDotGovUtilsTestCase.assertQuerySetEqual
+      ~LoginDotGovUtilsTestCase.assertQuerysetEqual
+      ~LoginDotGovUtilsTestCase.assertRaises
+      ~LoginDotGovUtilsTestCase.assertRaisesMessage
+      ~LoginDotGovUtilsTestCase.assertRaisesRegex
+      ~LoginDotGovUtilsTestCase.assertRaisesRegexp
+      ~LoginDotGovUtilsTestCase.assertRedirects
+      ~LoginDotGovUtilsTestCase.assertRegex
+      ~LoginDotGovUtilsTestCase.assertRegexpMatches
+      ~LoginDotGovUtilsTestCase.assertSequenceEqual
+      ~LoginDotGovUtilsTestCase.assertSetEqual
+      ~LoginDotGovUtilsTestCase.assertTemplateNotUsed
+      ~LoginDotGovUtilsTestCase.assertTemplateUsed
+      ~LoginDotGovUtilsTestCase.assertTrue
+      ~LoginDotGovUtilsTestCase.assertTupleEqual
+      ~LoginDotGovUtilsTestCase.assertURLEqual
+      ~LoginDotGovUtilsTestCase.assertWarns
+      ~LoginDotGovUtilsTestCase.assertWarnsMessage
+      ~LoginDotGovUtilsTestCase.assertWarnsRegex
+      ~LoginDotGovUtilsTestCase.assertXMLEqual
+      ~LoginDotGovUtilsTestCase.assertXMLNotEqual
+      ~LoginDotGovUtilsTestCase.assert_
+      ~LoginDotGovUtilsTestCase.captureOnCommitCallbacks
+      ~LoginDotGovUtilsTestCase.countTestCases
+      ~LoginDotGovUtilsTestCase.debug
+      ~LoginDotGovUtilsTestCase.defaultTestResult
+      ~LoginDotGovUtilsTestCase.doClassCleanups
+      ~LoginDotGovUtilsTestCase.doCleanups
+      ~LoginDotGovUtilsTestCase.fail
+      ~LoginDotGovUtilsTestCase.failIf
+      ~LoginDotGovUtilsTestCase.failIfAlmostEqual
+      ~LoginDotGovUtilsTestCase.failIfEqual
+      ~LoginDotGovUtilsTestCase.failUnless
+      ~LoginDotGovUtilsTestCase.failUnlessAlmostEqual
+      ~LoginDotGovUtilsTestCase.failUnlessEqual
+      ~LoginDotGovUtilsTestCase.failUnlessRaises
+      ~LoginDotGovUtilsTestCase.id
+      ~LoginDotGovUtilsTestCase.modify_settings
+      ~LoginDotGovUtilsTestCase.run
+      ~LoginDotGovUtilsTestCase.setUp
+      ~LoginDotGovUtilsTestCase.setUpClass
+      ~LoginDotGovUtilsTestCase.setUpTestData
+      ~LoginDotGovUtilsTestCase.settings
+      ~LoginDotGovUtilsTestCase.shortDescription
+      ~LoginDotGovUtilsTestCase.skipTest
+      ~LoginDotGovUtilsTestCase.subTest
+      ~LoginDotGovUtilsTestCase.tearDown
+      ~LoginDotGovUtilsTestCase.tearDownClass
+      ~LoginDotGovUtilsTestCase.test_backout_login_dot_gov_cert_happy_path
+      ~LoginDotGovUtilsTestCase.test_backout_login_dot_gov_cert_throws_exception
+      ~LoginDotGovUtilsTestCase.test_gen_and_stage_login_dot_gov_cert_happy_path
+      ~LoginDotGovUtilsTestCase.test_gen_and_stage_login_dot_gov_cert_throws_exception
+      ~LoginDotGovUtilsTestCase.test_install_login_dot_gov_cert_happy_path
+      ~LoginDotGovUtilsTestCase.test_install_login_dot_gov_cert_throws_exception
+      ~LoginDotGovUtilsTestCase.test_stage_login_dot_gov_cert_happy_path
+      ~LoginDotGovUtilsTestCase.test_stage_login_dot_gov_cert_throws_exception
+      ~LoginDotGovUtilsTestCase.test_stage_login_dot_gov_pk_happy_path
+      ~LoginDotGovUtilsTestCase.test_stage_login_dot_gov_pk_throws_exception
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LoginDotGovUtilsTestCase.available_apps
+      ~LoginDotGovUtilsTestCase.databases
+      ~LoginDotGovUtilsTestCase.fixtures
+      ~LoginDotGovUtilsTestCase.longMessage
+      ~LoginDotGovUtilsTestCase.maxDiff
+      ~LoginDotGovUtilsTestCase.reset_sequences
+      ~LoginDotGovUtilsTestCase.serialized_rollback
+   
+   

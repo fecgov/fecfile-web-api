@@ -1,0 +1,141 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_crypt\_utils.CfApiUtilsTestCase
+===========================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_crypt_utils
+
+.. autoclass:: CfApiUtilsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CfApiUtilsTestCase.__init__
+      ~CfApiUtilsTestCase.addClassCleanup
+      ~CfApiUtilsTestCase.addCleanup
+      ~CfApiUtilsTestCase.addTypeEqualityFunc
+      ~CfApiUtilsTestCase.assertAlmostEqual
+      ~CfApiUtilsTestCase.assertAlmostEquals
+      ~CfApiUtilsTestCase.assertContains
+      ~CfApiUtilsTestCase.assertCountEqual
+      ~CfApiUtilsTestCase.assertDictContainsSubset
+      ~CfApiUtilsTestCase.assertDictEqual
+      ~CfApiUtilsTestCase.assertEqual
+      ~CfApiUtilsTestCase.assertEquals
+      ~CfApiUtilsTestCase.assertFalse
+      ~CfApiUtilsTestCase.assertFieldOutput
+      ~CfApiUtilsTestCase.assertFormError
+      ~CfApiUtilsTestCase.assertFormSetError
+      ~CfApiUtilsTestCase.assertFormsetError
+      ~CfApiUtilsTestCase.assertGreater
+      ~CfApiUtilsTestCase.assertGreaterEqual
+      ~CfApiUtilsTestCase.assertHTMLEqual
+      ~CfApiUtilsTestCase.assertHTMLNotEqual
+      ~CfApiUtilsTestCase.assertIn
+      ~CfApiUtilsTestCase.assertInHTML
+      ~CfApiUtilsTestCase.assertIs
+      ~CfApiUtilsTestCase.assertIsInstance
+      ~CfApiUtilsTestCase.assertIsNone
+      ~CfApiUtilsTestCase.assertIsNot
+      ~CfApiUtilsTestCase.assertIsNotNone
+      ~CfApiUtilsTestCase.assertJSONEqual
+      ~CfApiUtilsTestCase.assertJSONNotEqual
+      ~CfApiUtilsTestCase.assertLess
+      ~CfApiUtilsTestCase.assertLessEqual
+      ~CfApiUtilsTestCase.assertListEqual
+      ~CfApiUtilsTestCase.assertLogs
+      ~CfApiUtilsTestCase.assertMultiLineEqual
+      ~CfApiUtilsTestCase.assertNoLogs
+      ~CfApiUtilsTestCase.assertNotAlmostEqual
+      ~CfApiUtilsTestCase.assertNotAlmostEquals
+      ~CfApiUtilsTestCase.assertNotContains
+      ~CfApiUtilsTestCase.assertNotEqual
+      ~CfApiUtilsTestCase.assertNotEquals
+      ~CfApiUtilsTestCase.assertNotIn
+      ~CfApiUtilsTestCase.assertNotIsInstance
+      ~CfApiUtilsTestCase.assertNotRegex
+      ~CfApiUtilsTestCase.assertNotRegexpMatches
+      ~CfApiUtilsTestCase.assertNumQueries
+      ~CfApiUtilsTestCase.assertQuerySetEqual
+      ~CfApiUtilsTestCase.assertQuerysetEqual
+      ~CfApiUtilsTestCase.assertRaises
+      ~CfApiUtilsTestCase.assertRaisesMessage
+      ~CfApiUtilsTestCase.assertRaisesRegex
+      ~CfApiUtilsTestCase.assertRaisesRegexp
+      ~CfApiUtilsTestCase.assertRedirects
+      ~CfApiUtilsTestCase.assertRegex
+      ~CfApiUtilsTestCase.assertRegexpMatches
+      ~CfApiUtilsTestCase.assertSequenceEqual
+      ~CfApiUtilsTestCase.assertSetEqual
+      ~CfApiUtilsTestCase.assertTemplateNotUsed
+      ~CfApiUtilsTestCase.assertTemplateUsed
+      ~CfApiUtilsTestCase.assertTrue
+      ~CfApiUtilsTestCase.assertTupleEqual
+      ~CfApiUtilsTestCase.assertURLEqual
+      ~CfApiUtilsTestCase.assertWarns
+      ~CfApiUtilsTestCase.assertWarnsMessage
+      ~CfApiUtilsTestCase.assertWarnsRegex
+      ~CfApiUtilsTestCase.assertXMLEqual
+      ~CfApiUtilsTestCase.assertXMLNotEqual
+      ~CfApiUtilsTestCase.assert_
+      ~CfApiUtilsTestCase.captureOnCommitCallbacks
+      ~CfApiUtilsTestCase.countTestCases
+      ~CfApiUtilsTestCase.debug
+      ~CfApiUtilsTestCase.defaultTestResult
+      ~CfApiUtilsTestCase.doClassCleanups
+      ~CfApiUtilsTestCase.doCleanups
+      ~CfApiUtilsTestCase.fail
+      ~CfApiUtilsTestCase.failIf
+      ~CfApiUtilsTestCase.failIfAlmostEqual
+      ~CfApiUtilsTestCase.failIfEqual
+      ~CfApiUtilsTestCase.failUnless
+      ~CfApiUtilsTestCase.failUnlessAlmostEqual
+      ~CfApiUtilsTestCase.failUnlessEqual
+      ~CfApiUtilsTestCase.failUnlessRaises
+      ~CfApiUtilsTestCase.id
+      ~CfApiUtilsTestCase.modify_settings
+      ~CfApiUtilsTestCase.run
+      ~CfApiUtilsTestCase.setUp
+      ~CfApiUtilsTestCase.setUpClass
+      ~CfApiUtilsTestCase.setUpTestData
+      ~CfApiUtilsTestCase.settings
+      ~CfApiUtilsTestCase.shortDescription
+      ~CfApiUtilsTestCase.skipTest
+      ~CfApiUtilsTestCase.subTest
+      ~CfApiUtilsTestCase.tearDown
+      ~CfApiUtilsTestCase.tearDownClass
+      ~CfApiUtilsTestCase.test_gen_rsa_pk_happy_path
+      ~CfApiUtilsTestCase.test_gen_rsa_pk_throws_exception
+      ~CfApiUtilsTestCase.test_gen_x509_cert_happy_path
+      ~CfApiUtilsTestCase.test_gen_x509_cert_throws_exception
+      ~CfApiUtilsTestCase.test_rsa_pk_to_bytes_happy_path
+      ~CfApiUtilsTestCase.test_rsa_pk_to_bytes_throws_exception
+      ~CfApiUtilsTestCase.test_x509_cert_to_bytes_happy_path
+      ~CfApiUtilsTestCase.test_x509_cert_to_bytes_throws_exception
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CfApiUtilsTestCase.available_apps
+      ~CfApiUtilsTestCase.databases
+      ~CfApiUtilsTestCase.fixtures
+      ~CfApiUtilsTestCase.longMessage
+      ~CfApiUtilsTestCase.maxDiff
+      ~CfApiUtilsTestCase.reset_sequences
+      ~CfApiUtilsTestCase.serialized_rollback
+   
+   

@@ -36,6 +36,7 @@ fecfiler
    fecfiler.committee_accounts
    fecfiler.contacts
    fecfiler.dcf_importer
+   fecfiler.devops
    fecfiler.feedback
    fecfiler.memo_text
    fecfiler.middleware

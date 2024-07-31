@@ -1,0 +1,37 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.devops.login\_dot\_gov\_utils
+======================================
+
+.. automodule:: fecfiler.devops.login_dot_gov_utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      backout_login_dot_gov_cert
+      gen_and_stage_login_dot_gov_cert
+      install_login_dot_gov_cert
+      stage_login_dot_gov_cert
+      stage_login_dot_gov_pk
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
