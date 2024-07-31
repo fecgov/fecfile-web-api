@@ -1,0 +1,143 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
+====================================================================
+
+.. currentmodule:: fecfiler.oidc.tests.test_backends
+
+.. autoclass:: OIDCAuthenticationBackendTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OIDCAuthenticationBackendTestCase.__init__
+      ~OIDCAuthenticationBackendTestCase.addClassCleanup
+      ~OIDCAuthenticationBackendTestCase.addCleanup
+      ~OIDCAuthenticationBackendTestCase.addTypeEqualityFunc
+      ~OIDCAuthenticationBackendTestCase.assertAlmostEqual
+      ~OIDCAuthenticationBackendTestCase.assertAlmostEquals
+      ~OIDCAuthenticationBackendTestCase.assertContains
+      ~OIDCAuthenticationBackendTestCase.assertCountEqual
+      ~OIDCAuthenticationBackendTestCase.assertDictContainsSubset
+      ~OIDCAuthenticationBackendTestCase.assertDictEqual
+      ~OIDCAuthenticationBackendTestCase.assertEqual
+      ~OIDCAuthenticationBackendTestCase.assertEquals
+      ~OIDCAuthenticationBackendTestCase.assertFalse
+      ~OIDCAuthenticationBackendTestCase.assertFieldOutput
+      ~OIDCAuthenticationBackendTestCase.assertFormError
+      ~OIDCAuthenticationBackendTestCase.assertFormSetError
+      ~OIDCAuthenticationBackendTestCase.assertFormsetError
+      ~OIDCAuthenticationBackendTestCase.assertGreater
+      ~OIDCAuthenticationBackendTestCase.assertGreaterEqual
+      ~OIDCAuthenticationBackendTestCase.assertHTMLEqual
+      ~OIDCAuthenticationBackendTestCase.assertHTMLNotEqual
+      ~OIDCAuthenticationBackendTestCase.assertIn
+      ~OIDCAuthenticationBackendTestCase.assertInHTML
+      ~OIDCAuthenticationBackendTestCase.assertIs
+      ~OIDCAuthenticationBackendTestCase.assertIsInstance
+      ~OIDCAuthenticationBackendTestCase.assertIsNone
+      ~OIDCAuthenticationBackendTestCase.assertIsNot
+      ~OIDCAuthenticationBackendTestCase.assertIsNotNone
+      ~OIDCAuthenticationBackendTestCase.assertJSONEqual
+      ~OIDCAuthenticationBackendTestCase.assertJSONNotEqual
+      ~OIDCAuthenticationBackendTestCase.assertLess
+      ~OIDCAuthenticationBackendTestCase.assertLessEqual
+      ~OIDCAuthenticationBackendTestCase.assertListEqual
+      ~OIDCAuthenticationBackendTestCase.assertLogs
+      ~OIDCAuthenticationBackendTestCase.assertMultiLineEqual
+      ~OIDCAuthenticationBackendTestCase.assertNoLogs
+      ~OIDCAuthenticationBackendTestCase.assertNotAlmostEqual
+      ~OIDCAuthenticationBackendTestCase.assertNotAlmostEquals
+      ~OIDCAuthenticationBackendTestCase.assertNotContains
+      ~OIDCAuthenticationBackendTestCase.assertNotEqual
+      ~OIDCAuthenticationBackendTestCase.assertNotEquals
+      ~OIDCAuthenticationBackendTestCase.assertNotIn
+      ~OIDCAuthenticationBackendTestCase.assertNotIsInstance
+      ~OIDCAuthenticationBackendTestCase.assertNotRegex
+      ~OIDCAuthenticationBackendTestCase.assertNotRegexpMatches
+      ~OIDCAuthenticationBackendTestCase.assertNumQueries
+      ~OIDCAuthenticationBackendTestCase.assertQuerySetEqual
+      ~OIDCAuthenticationBackendTestCase.assertQuerysetEqual
+      ~OIDCAuthenticationBackendTestCase.assertRaises
+      ~OIDCAuthenticationBackendTestCase.assertRaisesMessage
+      ~OIDCAuthenticationBackendTestCase.assertRaisesRegex
+      ~OIDCAuthenticationBackendTestCase.assertRaisesRegexp
+      ~OIDCAuthenticationBackendTestCase.assertRedirects
+      ~OIDCAuthenticationBackendTestCase.assertRegex
+      ~OIDCAuthenticationBackendTestCase.assertRegexpMatches
+      ~OIDCAuthenticationBackendTestCase.assertSequenceEqual
+      ~OIDCAuthenticationBackendTestCase.assertSetEqual
+      ~OIDCAuthenticationBackendTestCase.assertTemplateNotUsed
+      ~OIDCAuthenticationBackendTestCase.assertTemplateUsed
+      ~OIDCAuthenticationBackendTestCase.assertTrue
+      ~OIDCAuthenticationBackendTestCase.assertTupleEqual
+      ~OIDCAuthenticationBackendTestCase.assertURLEqual
+      ~OIDCAuthenticationBackendTestCase.assertWarns
+      ~OIDCAuthenticationBackendTestCase.assertWarnsMessage
+      ~OIDCAuthenticationBackendTestCase.assertWarnsRegex
+      ~OIDCAuthenticationBackendTestCase.assertXMLEqual
+      ~OIDCAuthenticationBackendTestCase.assertXMLNotEqual
+      ~OIDCAuthenticationBackendTestCase.assert_
+      ~OIDCAuthenticationBackendTestCase.captureOnCommitCallbacks
+      ~OIDCAuthenticationBackendTestCase.countTestCases
+      ~OIDCAuthenticationBackendTestCase.debug
+      ~OIDCAuthenticationBackendTestCase.defaultTestResult
+      ~OIDCAuthenticationBackendTestCase.doClassCleanups
+      ~OIDCAuthenticationBackendTestCase.doCleanups
+      ~OIDCAuthenticationBackendTestCase.fail
+      ~OIDCAuthenticationBackendTestCase.failIf
+      ~OIDCAuthenticationBackendTestCase.failIfAlmostEqual
+      ~OIDCAuthenticationBackendTestCase.failIfEqual
+      ~OIDCAuthenticationBackendTestCase.failUnless
+      ~OIDCAuthenticationBackendTestCase.failUnlessAlmostEqual
+      ~OIDCAuthenticationBackendTestCase.failUnlessEqual
+      ~OIDCAuthenticationBackendTestCase.failUnlessRaises
+      ~OIDCAuthenticationBackendTestCase.id
+      ~OIDCAuthenticationBackendTestCase.modify_settings
+      ~OIDCAuthenticationBackendTestCase.run
+      ~OIDCAuthenticationBackendTestCase.setUp
+      ~OIDCAuthenticationBackendTestCase.setUpClass
+      ~OIDCAuthenticationBackendTestCase.setUpTestData
+      ~OIDCAuthenticationBackendTestCase.settings
+      ~OIDCAuthenticationBackendTestCase.shortDescription
+      ~OIDCAuthenticationBackendTestCase.skipTest
+      ~OIDCAuthenticationBackendTestCase.subTest
+      ~OIDCAuthenticationBackendTestCase.tearDown
+      ~OIDCAuthenticationBackendTestCase.tearDownClass
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_bad_token_response
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_invalid_jwks
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_nonce_verification_failed
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_oidc_op_unique_identifier_not_found
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_claims_verification_failed
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_create_new_user_happy_path
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_multiple_users_returned
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_failed_alg_does_not_match
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_failed_no_alg
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_lib_call_failed
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OIDCAuthenticationBackendTestCase.available_apps
+      ~OIDCAuthenticationBackendTestCase.databases
+      ~OIDCAuthenticationBackendTestCase.fixtures
+      ~OIDCAuthenticationBackendTestCase.longMessage
+      ~OIDCAuthenticationBackendTestCase.maxDiff
+      ~OIDCAuthenticationBackendTestCase.reset_sequences
+      ~OIDCAuthenticationBackendTestCase.serialized_rollback
+   
+   

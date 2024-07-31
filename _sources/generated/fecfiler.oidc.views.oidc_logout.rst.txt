@@ -1,0 +1,6 @@
+fecfiler.oidc.views.oidc\_logout
+================================
+
+.. currentmodule:: fecfiler.oidc.views
+
+.. autofunction:: oidc_logout

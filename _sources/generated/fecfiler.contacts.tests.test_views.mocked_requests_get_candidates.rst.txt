@@ -1,6 +1,0 @@
-fecfiler.contacts.tests.test\_views.mocked\_requests\_get\_candidates
-=====================================================================
-
-.. currentmodule:: fecfiler.contacts.tests.test_views
-
-.. autofunction:: mocked_requests_get_candidates

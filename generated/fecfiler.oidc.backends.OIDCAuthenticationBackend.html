@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>fecfiler.oidc.backends.OIDCAuthenticationBackend &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.oidc.tests" href="fecfiler.oidc.tests.html" />
+    <link rel="prev" title="fecfiler.oidc.backends" href="fecfiler.oidc.backends.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-oidc-backends-oidcauthenticationbackend">
+<h1>fecfiler.oidc.backends.OIDCAuthenticationBackend<a class="headerlink" href="#fecfiler-oidc-backends-oidcauthenticationbackend" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.oidc.backends.</span></span><span class="sig-name descname"><span class="pre">OIDCAuthenticationBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBackend</span></code></p>
+<p>Override Django’s authentication.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.__init__" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.authenticate" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.authenticate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">authenticate</span></code></a>(request, **kwargs)</p></td>
+<td><p>Authenticates a user based on the OIDC code flow.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.create_user" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.create_user"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_user</span></code></a>(claims)</p></td>
+<td><p>Return object for a newly created user account.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_users_by_claims</span></code></a>(claims)</p></td>
+<td><p>Return all users matching the specified unique identifier.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_permissions</span></code>(user_obj[, obj])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_group_permissions" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_group_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_group_permissions</span></code></a>(user_obj[, obj])</p></td>
+<td><p>Return a set of permission strings the user <cite>user_obj</cite> has from the groups they belong.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_idp_unique_id_value" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_idp_unique_id_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_idp_unique_id_value</span></code></a>(claims)</p></td>
+<td><p>Helper method to clarify whether we're using OP or RP unique ID</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_or_create_user</span></code></a>(access_token)</p></td>
+<td><p>Returns a User instance if 1 user is found.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_payload_data" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_payload_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_payload_data</span></code></a>(token, key)</p></td>
+<td><p>Helper method to get the payload of the JWT token.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_token" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_token</span></code></a>(payload)</p></td>
+<td><p>Return token object as a dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_user</span></code></a>(user_id)</p></td>
+<td><p>Return a user based on the id.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user_permissions" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_user_permissions</span></code></a>(user_obj[, obj])</p></td>
+<td><p>Return a set of permission strings the user <cite>user_obj</cite> has from their <cite>user_permissions</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_userinfo" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_userinfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_userinfo</span></code></a>(access_token)</p></td>
+<td><p>Return user details dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_username" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_username</span></code></a>(claims)</p></td>
+<td><p>Generate username based on claims.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_module_perms</span></code></a>(user_obj, app_label)</p></td>
+<td><p>Return True if user_obj has any permissions in the given app_label.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_perm</span></code>(user_obj, perm[, obj])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.raise_token_response_error" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.raise_token_response_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_token_response_error</span></code></a>(response)</p></td>
+<td><p>Raises <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPError</span></code>, if one occurred.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.retrieve_matching_jwk" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.retrieve_matching_jwk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_matching_jwk</span></code></a>(token)</p></td>
+<td><p>Get the signing key by exploring the JWKS endpoint of the OP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_user</span></code></a>(user, claims)</p></td>
+<td><p>Update existing user with new email, if necessary save, and return user</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_can_authenticate</span></code></a>(user)</p></td>
+<td><p>Reject users with is_active=False.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_claims</span></code></a>(claims)</p></td>
+<td><p>Verify the provided claims to decide if authentication should be allowed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_token</span></code></a>(token, **kwargs)</p></td>
+<td><p>Validate the token signature.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with_perm</span></code></a>(perm[, is_active, ...])</p></td>
+<td><p>Return users that have permission &quot;perm&quot;.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.authenticate" title="Link to this definition">¶</a></dt>
+<dd><p>Authenticates a user based on the OIDC code flow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.create_user">
+<span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.create_user" title="Link to this definition">¶</a></dt>
+<dd><p>Return object for a newly created user account.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims">
+<span class="sig-name descname"><span class="pre">filter_users_by_claims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims" title="Link to this definition">¶</a></dt>
+<dd><p>Return all users matching the specified unique identifier.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_group_permissions">
+<span class="sig-name descname"><span class="pre">get_group_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_group_permissions" title="Link to this definition">¶</a></dt>
+<dd><p>Return a set of permission strings the user <cite>user_obj</cite> has from the
+groups they belong.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_idp_unique_id_value">
+<span class="sig-name descname"><span class="pre">get_idp_unique_id_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_idp_unique_id_value" title="Link to this definition">¶</a></dt>
+<dd><p>Helper method to clarify whether we’re using OP or RP unique ID</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user">
+<span class="sig-name descname"><span class="pre">get_or_create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">access_token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a User instance if 1 user is found. Creates a user if not found
+and configured to do so. Returns nothing if multiple users are matched.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_payload_data">
+<span class="sig-name descname"><span class="pre">get_payload_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_payload_data" title="Link to this definition">¶</a></dt>
+<dd><p>Helper method to get the payload of the JWT token.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_token">
+<span class="sig-name descname"><span class="pre">get_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_token" title="Link to this definition">¶</a></dt>
+<dd><p>Return token object as a dictionary.
+Borrowed from logindotgov-oidc, modified
+<a class="reference external" href="https://github.com/trussworks/logindotgov-oidc-py">https://github.com/trussworks/logindotgov-oidc-py</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user">
+<span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user" title="Link to this definition">¶</a></dt>
+<dd><p>Return a user based on the id.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user_permissions">
+<span class="sig-name descname"><span class="pre">get_user_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user_permissions" title="Link to this definition">¶</a></dt>
+<dd><p>Return a set of permission strings the user <cite>user_obj</cite> has from their
+<cite>user_permissions</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_userinfo">
+<span class="sig-name descname"><span class="pre">get_userinfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">access_token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_userinfo" title="Link to this definition">¶</a></dt>
+<dd><p>Return user details dictionary. The id_token and payload are not used in
+the default implementation, but may be used when overriding this method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.get_username">
+<span class="sig-name descname"><span class="pre">get_username</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_username" title="Link to this definition">¶</a></dt>
+<dd><p>Generate username based on claims.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms">
+<span class="sig-name descname"><span class="pre">has_module_perms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if user_obj has any permissions in the given app_label.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.raise_token_response_error">
+<span class="sig-name descname"><span class="pre">raise_token_response_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.raise_token_response_error" title="Link to this definition">¶</a></dt>
+<dd><p>Raises <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPError</span></code>, if one occurred.
+as per: <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6749#section-5.2">https://datatracker.ietf.org/doc/html/rfc6749#section-5.2</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.retrieve_matching_jwk">
+<span class="sig-name descname"><span class="pre">retrieve_matching_jwk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.retrieve_matching_jwk" title="Link to this definition">¶</a></dt>
+<dd><p>Get the signing key by exploring the JWKS endpoint of the OP.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user">
+<span class="sig-name descname"><span class="pre">update_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user" title="Link to this definition">¶</a></dt>
+<dd><p>Update existing user with new email, if necessary save, and return user</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate">
+<span class="sig-name descname"><span class="pre">user_can_authenticate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate" title="Link to this definition">¶</a></dt>
+<dd><p>Reject users with is_active=False. Custom user models that don’t have
+that attribute are allowed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims">
+<span class="sig-name descname"><span class="pre">verify_claims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">claims</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims" title="Link to this definition">¶</a></dt>
+<dd><p>Verify the provided claims to decide if authentication should be allowed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token">
+<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the token signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm">
+<span class="sig-name descname"><span class="pre">with_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_superusers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm" title="Link to this definition">¶</a></dt>
+<dd><p>Return users that have permission “perm”. By default, filter out
+inactive users and include superusers.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.authentication.html">fecfiler.authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.oidc.html">fecfiler.oidc</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.oidc.backends.html">fecfiler.oidc.backends</a><ul class="current">
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.oidc.backends.OIDCAuthenticationBackend</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.__init__"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.__init__()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.authenticate"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.authenticate()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.create_user"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.create_user()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.filter_users_by_claims()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_group_permissions"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_group_permissions()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_idp_unique_id_value"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_idp_unique_id_value()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_or_create_user()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_payload_data"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_payload_data()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_token"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_token()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_user()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_user_permissions"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_user_permissions()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_userinfo"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_userinfo()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_username"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.get_username()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.has_module_perms()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.raise_token_response_error"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.raise_token_response_error()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.retrieve_matching_jwk"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.retrieve_matching_jwk()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.update_user()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.user_can_authenticate()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.verify_claims()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.verify_token()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.with_perm()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.oidc.tests.html">fecfiler.oidc.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.oidc.urls.html">fecfiler.oidc.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.oidc.utils.html">fecfiler.oidc.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.oidc.views.html">fecfiler.oidc.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.test_runner.html">fecfiler.test_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.user.html">fecfiler.user</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.utils.html">fecfiler.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.oidc.html">fecfiler.oidc</a><ul>
+  <li><a href="fecfiler.oidc.backends.html">fecfiler.oidc.backends</a><ul>
+      <li>Previous: <a href="fecfiler.oidc.backends.html" title="previous chapter">fecfiler.oidc.backends</a></li>
+      <li>Next: <a href="fecfiler.oidc.tests.html" title="next chapter">fecfiler.oidc.tests</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.oidc.backends.OIDCAuthenticationBackend.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

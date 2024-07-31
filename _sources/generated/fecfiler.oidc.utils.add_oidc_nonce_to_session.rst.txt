@@ -1,0 +1,6 @@
+fecfiler.oidc.utils.add\_oidc\_nonce\_to\_session
+=================================================
+
+.. currentmodule:: fecfiler.oidc.utils
+
+.. autofunction:: add_oidc_nonce_to_session

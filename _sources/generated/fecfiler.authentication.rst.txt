@@ -35,5 +35,6 @@ fecfiler.authentication
    fecfiler.authentication.models
    fecfiler.authentication.test_views
    fecfiler.authentication.urls
+   fecfiler.authentication.utils
    fecfiler.authentication.views
 

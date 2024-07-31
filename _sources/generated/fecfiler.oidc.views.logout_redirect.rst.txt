@@ -1,0 +1,6 @@
+fecfiler.oidc.views.logout\_redirect
+====================================
+
+.. currentmodule:: fecfiler.oidc.views
+
+.. autofunction:: logout_redirect

@@ -1,0 +1,6 @@
+fecfiler.oidc.views.oidc\_authenticate
+======================================
+
+.. currentmodule:: fecfiler.oidc.views
+
+.. autofunction:: oidc_authenticate

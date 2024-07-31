@@ -1,0 +1,6 @@
+fecfiler.oidc.utils.handle\_oidc\_callback\_request
+===================================================
+
+.. currentmodule:: fecfiler.oidc.utils
+
+.. autofunction:: handle_oidc_callback_request

@@ -1,0 +1,6 @@
+fecfiler.oidc.views.oidc\_callback
+==================================
+
+.. currentmodule:: fecfiler.oidc.views
+
+.. autofunction:: oidc_callback

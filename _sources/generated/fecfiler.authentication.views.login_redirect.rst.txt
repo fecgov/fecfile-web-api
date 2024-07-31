@@ -1,6 +1,0 @@
-fecfiler.authentication.views.login\_redirect
-=============================================
-
-.. currentmodule:: fecfiler.authentication.views
-
-.. autofunction:: login_redirect

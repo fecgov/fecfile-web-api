@@ -1,0 +1,143 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.oidc.tests.test\_views.OidcTest
+========================================
+
+.. currentmodule:: fecfiler.oidc.tests.test_views
+
+.. autoclass:: OidcTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OidcTest.__init__
+      ~OidcTest.addClassCleanup
+      ~OidcTest.addCleanup
+      ~OidcTest.addTypeEqualityFunc
+      ~OidcTest.assertAlmostEqual
+      ~OidcTest.assertAlmostEquals
+      ~OidcTest.assertContains
+      ~OidcTest.assertCountEqual
+      ~OidcTest.assertDictContainsSubset
+      ~OidcTest.assertDictEqual
+      ~OidcTest.assertEqual
+      ~OidcTest.assertEquals
+      ~OidcTest.assertFalse
+      ~OidcTest.assertFieldOutput
+      ~OidcTest.assertFormError
+      ~OidcTest.assertFormSetError
+      ~OidcTest.assertFormsetError
+      ~OidcTest.assertGreater
+      ~OidcTest.assertGreaterEqual
+      ~OidcTest.assertHTMLEqual
+      ~OidcTest.assertHTMLNotEqual
+      ~OidcTest.assertIn
+      ~OidcTest.assertInHTML
+      ~OidcTest.assertIs
+      ~OidcTest.assertIsInstance
+      ~OidcTest.assertIsNone
+      ~OidcTest.assertIsNot
+      ~OidcTest.assertIsNotNone
+      ~OidcTest.assertJSONEqual
+      ~OidcTest.assertJSONNotEqual
+      ~OidcTest.assertLess
+      ~OidcTest.assertLessEqual
+      ~OidcTest.assertListEqual
+      ~OidcTest.assertLogs
+      ~OidcTest.assertMultiLineEqual
+      ~OidcTest.assertNoLogs
+      ~OidcTest.assertNotAlmostEqual
+      ~OidcTest.assertNotAlmostEquals
+      ~OidcTest.assertNotContains
+      ~OidcTest.assertNotEqual
+      ~OidcTest.assertNotEquals
+      ~OidcTest.assertNotIn
+      ~OidcTest.assertNotIsInstance
+      ~OidcTest.assertNotRegex
+      ~OidcTest.assertNotRegexpMatches
+      ~OidcTest.assertNumQueries
+      ~OidcTest.assertQuerySetEqual
+      ~OidcTest.assertQuerysetEqual
+      ~OidcTest.assertRaises
+      ~OidcTest.assertRaisesMessage
+      ~OidcTest.assertRaisesRegex
+      ~OidcTest.assertRaisesRegexp
+      ~OidcTest.assertRedirects
+      ~OidcTest.assertRegex
+      ~OidcTest.assertRegexpMatches
+      ~OidcTest.assertSequenceEqual
+      ~OidcTest.assertSetEqual
+      ~OidcTest.assertTemplateNotUsed
+      ~OidcTest.assertTemplateUsed
+      ~OidcTest.assertTrue
+      ~OidcTest.assertTupleEqual
+      ~OidcTest.assertURLEqual
+      ~OidcTest.assertWarns
+      ~OidcTest.assertWarnsMessage
+      ~OidcTest.assertWarnsRegex
+      ~OidcTest.assertXMLEqual
+      ~OidcTest.assertXMLNotEqual
+      ~OidcTest.assert_
+      ~OidcTest.captureOnCommitCallbacks
+      ~OidcTest.countTestCases
+      ~OidcTest.debug
+      ~OidcTest.defaultTestResult
+      ~OidcTest.doClassCleanups
+      ~OidcTest.doCleanups
+      ~OidcTest.fail
+      ~OidcTest.failIf
+      ~OidcTest.failIfAlmostEqual
+      ~OidcTest.failIfEqual
+      ~OidcTest.failUnless
+      ~OidcTest.failUnlessAlmostEqual
+      ~OidcTest.failUnlessEqual
+      ~OidcTest.failUnlessRaises
+      ~OidcTest.get_request
+      ~OidcTest.id
+      ~OidcTest.modify_settings
+      ~OidcTest.run
+      ~OidcTest.setUp
+      ~OidcTest.setUpClass
+      ~OidcTest.setUpTestData
+      ~OidcTest.settings
+      ~OidcTest.shortDescription
+      ~OidcTest.skipTest
+      ~OidcTest.subTest
+      ~OidcTest.tearDown
+      ~OidcTest.tearDownClass
+      ~OidcTest.test_login_redirect
+      ~OidcTest.test_logout_redirect
+      ~OidcTest.test_oidc_authenticate
+      ~OidcTest.test_oidc_callback_error
+      ~OidcTest.test_oidc_callback_happy_path
+      ~OidcTest.test_oidc_callback_session_states_not_found
+      ~OidcTest.test_oidc_logout_happy_path
+      ~OidcTest.xtest_login_dot_gov_logout_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OidcTest.available_apps
+      ~OidcTest.databases
+      ~OidcTest.fixtures
+      ~OidcTest.longMessage
+      ~OidcTest.maxDiff
+      ~OidcTest.reset_sequences
+      ~OidcTest.serialized_rollback
+      ~OidcTest.user
+   
+   
