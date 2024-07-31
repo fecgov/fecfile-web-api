@@ -38,6 +38,7 @@ fecfiler.reports.serializers.Form99Serializer
       ~Form99Serializer.get_fields
       ~Form99Serializer.get_initial
       ~Form99Serializer.get_unique_for_date_validators
+      ~Form99Serializer.get_unique_together_constraints
       ~Form99Serializer.get_unique_together_validators
       ~Form99Serializer.get_uniqueness_extra_kwargs
       ~Form99Serializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.reports.serializers.Form99Serializer
       ~Form99Serializer.run_validation
       ~Form99Serializer.run_validators
       ~Form99Serializer.save
+      ~Form99Serializer.set_value
       ~Form99Serializer.to_internal_value
       ~Form99Serializer.to_representation
       ~Form99Serializer.update

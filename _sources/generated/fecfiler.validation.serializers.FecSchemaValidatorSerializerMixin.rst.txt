@@ -38,6 +38,7 @@ fecfiler.validation.serializers.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.run_validation
       ~FecSchemaValidatorSerializerMixin.run_validators
       ~FecSchemaValidatorSerializerMixin.save
+      ~FecSchemaValidatorSerializerMixin.set_value
       ~FecSchemaValidatorSerializerMixin.to_internal_value
       ~FecSchemaValidatorSerializerMixin.to_representation
       ~FecSchemaValidatorSerializerMixin.update

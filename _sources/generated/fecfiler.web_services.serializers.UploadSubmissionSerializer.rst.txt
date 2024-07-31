@@ -38,6 +38,7 @@ fecfiler.web\_services.serializers.UploadSubmissionSerializer
       ~UploadSubmissionSerializer.get_fields
       ~UploadSubmissionSerializer.get_initial
       ~UploadSubmissionSerializer.get_unique_for_date_validators
+      ~UploadSubmissionSerializer.get_unique_together_constraints
       ~UploadSubmissionSerializer.get_unique_together_validators
       ~UploadSubmissionSerializer.get_uniqueness_extra_kwargs
       ~UploadSubmissionSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.web\_services.serializers.UploadSubmissionSerializer
       ~UploadSubmissionSerializer.run_validation
       ~UploadSubmissionSerializer.run_validators
       ~UploadSubmissionSerializer.save
+      ~UploadSubmissionSerializer.set_value
       ~UploadSubmissionSerializer.to_internal_value
       ~UploadSubmissionSerializer.to_representation
       ~UploadSubmissionSerializer.update

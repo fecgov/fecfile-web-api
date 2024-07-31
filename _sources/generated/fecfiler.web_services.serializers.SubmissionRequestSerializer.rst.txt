@@ -34,6 +34,7 @@ fecfiler.web\_services.serializers.SubmissionRequestSerializer
       ~SubmissionRequestSerializer.run_validation
       ~SubmissionRequestSerializer.run_validators
       ~SubmissionRequestSerializer.save
+      ~SubmissionRequestSerializer.set_value
       ~SubmissionRequestSerializer.to_internal_value
       ~SubmissionRequestSerializer.to_representation
       ~SubmissionRequestSerializer.update

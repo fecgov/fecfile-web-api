@@ -34,6 +34,7 @@ fecfiler.web\_services.serializers.ReportIdSerializer
       ~ReportIdSerializer.run_validation
       ~ReportIdSerializer.run_validators
       ~ReportIdSerializer.save
+      ~ReportIdSerializer.set_value
       ~ReportIdSerializer.to_internal_value
       ~ReportIdSerializer.to_representation
       ~ReportIdSerializer.update

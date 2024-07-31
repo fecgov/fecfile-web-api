@@ -34,6 +34,7 @@ fecfiler.feedback.serializers.FeedbackSerializer
       ~FeedbackSerializer.run_validation
       ~FeedbackSerializer.run_validators
       ~FeedbackSerializer.save
+      ~FeedbackSerializer.set_value
       ~FeedbackSerializer.to_internal_value
       ~FeedbackSerializer.to_representation
       ~FeedbackSerializer.update

@@ -38,6 +38,7 @@ fecfiler.committee\_accounts.serializers.CommitteeAccountSerializer
       ~CommitteeAccountSerializer.get_fields
       ~CommitteeAccountSerializer.get_initial
       ~CommitteeAccountSerializer.get_unique_for_date_validators
+      ~CommitteeAccountSerializer.get_unique_together_constraints
       ~CommitteeAccountSerializer.get_unique_together_validators
       ~CommitteeAccountSerializer.get_uniqueness_extra_kwargs
       ~CommitteeAccountSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.committee\_accounts.serializers.CommitteeAccountSerializer
       ~CommitteeAccountSerializer.run_validation
       ~CommitteeAccountSerializer.run_validators
       ~CommitteeAccountSerializer.save
+      ~CommitteeAccountSerializer.set_value
       ~CommitteeAccountSerializer.to_internal_value
       ~CommitteeAccountSerializer.to_representation
       ~CommitteeAccountSerializer.update

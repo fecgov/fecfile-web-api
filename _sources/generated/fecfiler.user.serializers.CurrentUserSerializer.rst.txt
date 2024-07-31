@@ -38,6 +38,7 @@ fecfiler.user.serializers.CurrentUserSerializer
       ~CurrentUserSerializer.get_fields
       ~CurrentUserSerializer.get_initial
       ~CurrentUserSerializer.get_unique_for_date_validators
+      ~CurrentUserSerializer.get_unique_together_constraints
       ~CurrentUserSerializer.get_unique_together_validators
       ~CurrentUserSerializer.get_uniqueness_extra_kwargs
       ~CurrentUserSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.user.serializers.CurrentUserSerializer
       ~CurrentUserSerializer.run_validation
       ~CurrentUserSerializer.run_validators
       ~CurrentUserSerializer.save
+      ~CurrentUserSerializer.set_value
       ~CurrentUserSerializer.to_internal_value
       ~CurrentUserSerializer.to_representation
       ~CurrentUserSerializer.update

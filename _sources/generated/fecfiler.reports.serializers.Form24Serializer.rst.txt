@@ -38,6 +38,7 @@ fecfiler.reports.serializers.Form24Serializer
       ~Form24Serializer.get_fields
       ~Form24Serializer.get_initial
       ~Form24Serializer.get_unique_for_date_validators
+      ~Form24Serializer.get_unique_together_constraints
       ~Form24Serializer.get_unique_together_validators
       ~Form24Serializer.get_uniqueness_extra_kwargs
       ~Form24Serializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.reports.serializers.Form24Serializer
       ~Form24Serializer.run_validation
       ~Form24Serializer.run_validators
       ~Form24Serializer.save
+      ~Form24Serializer.set_value
       ~Form24Serializer.to_internal_value
       ~Form24Serializer.to_representation
       ~Form24Serializer.update

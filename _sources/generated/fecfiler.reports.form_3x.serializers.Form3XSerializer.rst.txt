@@ -41,6 +41,7 @@ fecfiler.reports.form\_3x.serializers.Form3XSerializer
       ~Form3XSerializer.get_initial
       ~Form3XSerializer.get_schema_name
       ~Form3XSerializer.get_unique_for_date_validators
+      ~Form3XSerializer.get_unique_together_constraints
       ~Form3XSerializer.get_unique_together_validators
       ~Form3XSerializer.get_uniqueness_extra_kwargs
       ~Form3XSerializer.get_validation_candidate
@@ -53,6 +54,7 @@ fecfiler.reports.form\_3x.serializers.Form3XSerializer
       ~Form3XSerializer.run_validation
       ~Form3XSerializer.run_validators
       ~Form3XSerializer.save
+      ~Form3XSerializer.set_value
       ~Form3XSerializer.to_internal_value
       ~Form3XSerializer.to_representation
       ~Form3XSerializer.update

@@ -38,6 +38,7 @@ fecfiler.web\_services.serializers.WebPrintSubmissionSerializer
       ~WebPrintSubmissionSerializer.get_fields
       ~WebPrintSubmissionSerializer.get_initial
       ~WebPrintSubmissionSerializer.get_unique_for_date_validators
+      ~WebPrintSubmissionSerializer.get_unique_together_constraints
       ~WebPrintSubmissionSerializer.get_unique_together_validators
       ~WebPrintSubmissionSerializer.get_uniqueness_extra_kwargs
       ~WebPrintSubmissionSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.web\_services.serializers.WebPrintSubmissionSerializer
       ~WebPrintSubmissionSerializer.run_validation
       ~WebPrintSubmissionSerializer.run_validators
       ~WebPrintSubmissionSerializer.save
+      ~WebPrintSubmissionSerializer.set_value
       ~WebPrintSubmissionSerializer.to_internal_value
       ~WebPrintSubmissionSerializer.to_representation
       ~WebPrintSubmissionSerializer.update

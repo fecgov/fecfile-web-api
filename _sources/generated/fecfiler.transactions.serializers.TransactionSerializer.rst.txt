@@ -42,6 +42,7 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.get_initial
       ~TransactionSerializer.get_schema_name
       ~TransactionSerializer.get_unique_for_date_validators
+      ~TransactionSerializer.get_unique_together_constraints
       ~TransactionSerializer.get_unique_together_validators
       ~TransactionSerializer.get_uniqueness_extra_kwargs
       ~TransactionSerializer.get_validation_candidate
@@ -54,6 +55,7 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.run_validation
       ~TransactionSerializer.run_validators
       ~TransactionSerializer.save
+      ~TransactionSerializer.set_value
       ~TransactionSerializer.to_internal_value
       ~TransactionSerializer.to_representation
       ~TransactionSerializer.update

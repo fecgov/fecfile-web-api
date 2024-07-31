@@ -38,6 +38,7 @@ fecfiler.transactions.schedule\_b.serializers.ScheduleBSerializer
       ~ScheduleBSerializer.get_fields
       ~ScheduleBSerializer.get_initial
       ~ScheduleBSerializer.get_unique_for_date_validators
+      ~ScheduleBSerializer.get_unique_together_constraints
       ~ScheduleBSerializer.get_unique_together_validators
       ~ScheduleBSerializer.get_uniqueness_extra_kwargs
       ~ScheduleBSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.transactions.schedule\_b.serializers.ScheduleBSerializer
       ~ScheduleBSerializer.run_validation
       ~ScheduleBSerializer.run_validators
       ~ScheduleBSerializer.save
+      ~ScheduleBSerializer.set_value
       ~ScheduleBSerializer.to_internal_value
       ~ScheduleBSerializer.to_representation
       ~ScheduleBSerializer.update

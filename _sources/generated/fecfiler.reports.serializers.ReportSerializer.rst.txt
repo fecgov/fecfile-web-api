@@ -41,6 +41,7 @@ fecfiler.reports.serializers.ReportSerializer
       ~ReportSerializer.get_initial
       ~ReportSerializer.get_schema_name
       ~ReportSerializer.get_unique_for_date_validators
+      ~ReportSerializer.get_unique_together_constraints
       ~ReportSerializer.get_unique_together_validators
       ~ReportSerializer.get_uniqueness_extra_kwargs
       ~ReportSerializer.get_validation_candidate
@@ -53,6 +54,7 @@ fecfiler.reports.serializers.ReportSerializer
       ~ReportSerializer.run_validation
       ~ReportSerializer.run_validators
       ~ReportSerializer.save
+      ~ReportSerializer.set_value
       ~ReportSerializer.to_internal_value
       ~ReportSerializer.to_representation
       ~ReportSerializer.update

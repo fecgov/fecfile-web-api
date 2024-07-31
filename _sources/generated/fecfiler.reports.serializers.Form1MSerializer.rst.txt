@@ -38,6 +38,7 @@ fecfiler.reports.serializers.Form1MSerializer
       ~Form1MSerializer.get_fields
       ~Form1MSerializer.get_initial
       ~Form1MSerializer.get_unique_for_date_validators
+      ~Form1MSerializer.get_unique_together_constraints
       ~Form1MSerializer.get_unique_together_validators
       ~Form1MSerializer.get_uniqueness_extra_kwargs
       ~Form1MSerializer.get_validators
@@ -48,6 +49,7 @@ fecfiler.reports.serializers.Form1MSerializer
       ~Form1MSerializer.run_validation
       ~Form1MSerializer.run_validators
       ~Form1MSerializer.save
+      ~Form1MSerializer.set_value
       ~Form1MSerializer.to_internal_value
       ~Form1MSerializer.to_representation
       ~Form1MSerializer.update

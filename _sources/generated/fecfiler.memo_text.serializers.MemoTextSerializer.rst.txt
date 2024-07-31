@@ -41,6 +41,7 @@ fecfiler.memo\_text.serializers.MemoTextSerializer
       ~MemoTextSerializer.get_initial
       ~MemoTextSerializer.get_schema_name
       ~MemoTextSerializer.get_unique_for_date_validators
+      ~MemoTextSerializer.get_unique_together_constraints
       ~MemoTextSerializer.get_unique_together_validators
       ~MemoTextSerializer.get_uniqueness_extra_kwargs
       ~MemoTextSerializer.get_validation_candidate
@@ -53,6 +54,7 @@ fecfiler.memo\_text.serializers.MemoTextSerializer
       ~MemoTextSerializer.run_validation
       ~MemoTextSerializer.run_validators
       ~MemoTextSerializer.save
+      ~MemoTextSerializer.set_value
       ~MemoTextSerializer.to_internal_value
       ~MemoTextSerializer.to_representation
       ~MemoTextSerializer.update

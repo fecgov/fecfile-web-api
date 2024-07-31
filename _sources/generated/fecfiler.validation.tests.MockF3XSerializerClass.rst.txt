@@ -38,6 +38,7 @@ fecfiler.validation.tests.MockF3XSerializerClass
       ~MockF3XSerializerClass.run_validation
       ~MockF3XSerializerClass.run_validators
       ~MockF3XSerializerClass.save
+      ~MockF3XSerializerClass.set_value
       ~MockF3XSerializerClass.to_internal_value
       ~MockF3XSerializerClass.to_representation
       ~MockF3XSerializerClass.update

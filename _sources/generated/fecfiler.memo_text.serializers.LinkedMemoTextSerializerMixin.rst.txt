@@ -39,6 +39,7 @@ fecfiler.memo\_text.serializers.LinkedMemoTextSerializerMixin
       ~LinkedMemoTextSerializerMixin.get_fields
       ~LinkedMemoTextSerializerMixin.get_initial
       ~LinkedMemoTextSerializerMixin.get_unique_for_date_validators
+      ~LinkedMemoTextSerializerMixin.get_unique_together_constraints
       ~LinkedMemoTextSerializerMixin.get_unique_together_validators
       ~LinkedMemoTextSerializerMixin.get_uniqueness_extra_kwargs
       ~LinkedMemoTextSerializerMixin.get_validators
@@ -49,6 +50,7 @@ fecfiler.memo\_text.serializers.LinkedMemoTextSerializerMixin
       ~LinkedMemoTextSerializerMixin.run_validation
       ~LinkedMemoTextSerializerMixin.run_validators
       ~LinkedMemoTextSerializerMixin.save
+      ~LinkedMemoTextSerializerMixin.set_value
       ~LinkedMemoTextSerializerMixin.to_internal_value
       ~LinkedMemoTextSerializerMixin.to_representation
       ~LinkedMemoTextSerializerMixin.update

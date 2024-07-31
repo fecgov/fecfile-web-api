@@ -91,19 +91,22 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value" title="fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.set_value" title="fecfiler.feedback.serializers.FeedbackSerializer.set_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_value</span></code></a>(dictionary, keys, value)</p></td>
+<td><p>Similar to Python's built in <cite>dictionary[key] = value</cite>, but takes a list of nested keys instead of a single key.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value" title="fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
 <td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_representation" title="fecfiler.feedback.serializers.FeedbackSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_representation" title="fecfiler.feedback.serializers.FeedbackSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(instance, validated_data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>(attrs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>(attrs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.validate_empty_values" title="fecfiler.feedback.serializers.FeedbackSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.validate_empty_values" title="fecfiler.feedback.serializers.FeedbackSerializer.validate_empty_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_empty_values</span></code></a>(data)</p></td>
 <td><p>Validate empty values, and either:</p></td>
 </tr>
 </tbody>
@@ -261,6 +264,16 @@ be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.feedback.serializers.FeedbackSerializer.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.feedback.serializers.FeedbackSerializer.set_value" title="Link to this definition">¶</a></dt>
+<dd><p>Similar to Python’s built in <cite>dictionary[key] = value</cite>,
+but takes a list of nested keys instead of a single key.</p>
+<p>set_value({‘a’: 1}, [], {‘b’: 2}) -&gt; {‘a’: 1, ‘b’: 2}
+set_value({‘a’: 1}, [‘x’], 2) -&gt; {‘a’: 1, ‘x’: 2}
+set_value({‘a’: 1}, [‘x’, ‘y’], 2) -&gt; {‘a’: 1, ‘x’: {‘y’: 2}}</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value">
 <span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value" title="Link to this definition">¶</a></dt>
 <dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
@@ -336,6 +349,7 @@ have validation applied as normal.</p></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.root"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.root</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.run_validation"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.run_validation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.run_validators"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.run_validators()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.set_value"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.set_value()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_internal_value"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.to_internal_value()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.to_representation"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.to_representation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.feedback.serializers.FeedbackSerializer.validate_empty_values"><code class="docutils literal notranslate"><span class="pre">FeedbackSerializer.validate_empty_values()</span></code></a></li>

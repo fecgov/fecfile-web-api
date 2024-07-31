@@ -41,6 +41,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.get_initial
       ~ContactSerializer.get_schema_name
       ~ContactSerializer.get_unique_for_date_validators
+      ~ContactSerializer.get_unique_together_constraints
       ~ContactSerializer.get_unique_together_validators
       ~ContactSerializer.get_uniqueness_extra_kwargs
       ~ContactSerializer.get_validation_candidate
@@ -53,6 +54,7 @@ fecfiler.contacts.serializers.ContactSerializer
       ~ContactSerializer.run_validation
       ~ContactSerializer.run_validators
       ~ContactSerializer.save
+      ~ContactSerializer.set_value
       ~ContactSerializer.to_internal_value
       ~ContactSerializer.to_representation
       ~ContactSerializer.update

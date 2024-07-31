@@ -39,6 +39,7 @@ fecfiler.transactions.serializers.TransactionReportSerializer
       ~TransactionReportSerializer.get_fields
       ~TransactionReportSerializer.get_initial
       ~TransactionReportSerializer.get_unique_for_date_validators
+      ~TransactionReportSerializer.get_unique_together_constraints
       ~TransactionReportSerializer.get_unique_together_validators
       ~TransactionReportSerializer.get_uniqueness_extra_kwargs
       ~TransactionReportSerializer.get_validators
@@ -49,6 +50,7 @@ fecfiler.transactions.serializers.TransactionReportSerializer
       ~TransactionReportSerializer.run_validation
       ~TransactionReportSerializer.run_validators
       ~TransactionReportSerializer.save
+      ~TransactionReportSerializer.set_value
       ~TransactionReportSerializer.to_internal_value
       ~TransactionReportSerializer.to_representation
       ~TransactionReportSerializer.update
