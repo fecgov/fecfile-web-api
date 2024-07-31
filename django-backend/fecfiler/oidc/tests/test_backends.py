@@ -12,11 +12,8 @@ https://github.com/mozilla/mozilla-django-oidc/blob/main/tests/test_auth.py
 from unittest.mock import Mock, patch
 from requests.exceptions import HTTPError
 from django.core.exceptions import SuspiciousOperation
-from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase, override_settings
 from fecfiler.oidc.backends import OIDCAuthenticationBackend
-
-User = get_user_model()
 
 
 @override_settings(OIDC_OP_TOKEN_ENDPOINT="https://server.example.com/token")
@@ -329,8 +326,6 @@ class OIDCAuthenticationBackendTestCase(TestCase):
             SuspiciousOperation,
             "Multiple users returned",
         ):
-
-            self.backend.UserModel.objects = Mock()
             self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
 
     @patch("fecfiler.oidc.backends.requests")
@@ -382,6 +377,6 @@ class OIDCAuthenticationBackendTestCase(TestCase):
 
         auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
 
-        self.backend.UserModel.objects = Mock()
+        self.backend.UserModel.objects.create_user = Mock()
         retval = self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
         self.assertIsNotNone(retval)
