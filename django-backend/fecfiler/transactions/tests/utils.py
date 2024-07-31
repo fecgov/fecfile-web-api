@@ -49,6 +49,7 @@ def create_schedule_b(
     form_type="SB",
     memo_code=False,
     report=None,
+    loan_id=None
 ):
     return create_test_transaction(
         type,
@@ -58,7 +59,11 @@ def create_schedule_b(
         group=group,
         report=report,
         schedule_data={"expenditure_date": date, "expenditure_amount": amount},
-        transaction_data={"_form_type": form_type, "memo_code": memo_code},
+        transaction_data={
+            "_form_type": form_type,
+            "memo_code": memo_code,
+            "loan_id": loan_id
+        },
     )
 
 
@@ -122,7 +127,10 @@ def create_loan(
     secured=False,
     type="LOAN_RECEIVED_FROM_INDIVIDUAL",
     form_type="SC/9",
+    loan_incurred_date=None,
+    report=None,
 ):
+    report_coverage_through_date = report.coverage_through_date if report else None
     return create_test_transaction(
         type,
         ScheduleC,
@@ -133,8 +141,11 @@ def create_loan(
             "loan_due_date": loan_due_date,
             "loan_interest_rate": loan_interest_rate,
             "secured": secured,
+            "loan_incurred_date": loan_incurred_date,
+            "report_coverage_through_date": report_coverage_through_date,
         },
         transaction_data={"_form_type": form_type},
+        report=report,
     )
 
 
