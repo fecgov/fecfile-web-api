@@ -278,7 +278,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
     @patch("fecfiler.oidc.backends.jwt")
     @patch("fecfiler.oidc.backends.JWS")
     @patch("fecfiler.oidc.backends.len")
-    def test_authenticate_payload_multiple_users_returned(
+    def test_authenticate_oidc_op_unique_identifier_not_found(
         self,
         len_mock,
         jws_mock,
@@ -311,6 +311,60 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         get_json_mock.json.side_effect = [
             test_jwks,
             {"email": "test_email", "username": "test_username"},
+        ]
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.from_compact.return_value.signature.protected = test_jws_json_header
+        jws_mock.from_compact.return_value.signature.combined.alg.name = test_alg
+        jws_mock.from_compact.return_value.verify.return_value = True
+        jws_mock.from_compact.return_value.payload = test_jws_payload
+        len_mock.return_value = 2
+
+        auth_request = RequestFactory().get("/foo", {"code": "foo", "state": "bar"})
+        with self.assertRaisesMessage(
+            SuspiciousOperation,
+            "Failed to retrieve OIDC_OP_UNIQUE_IDENTIFIER sub from claims",
+        ):
+            self.backend.authenticate(request=auth_request, nonce="test_nonce_value")
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.JWS")
+    @patch("fecfiler.oidc.backends.len")
+    def test_authenticate_payload_multiple_users_returned(
+        self,
+        len_mock,
+        jws_mock,
+        jwt_mock,
+        requests_mock,
+    ):
+        test_jws_json_header = '{"kid":"test_kid","alg":"RS256"}'
+        test_jwks = {
+            "keys": [
+                {
+                    "alg": "RS256",
+                    "use": "sig",
+                    "kty": "RSA",
+                    "n": "test_n",
+                    "e": "test_e",
+                    "kid": "test_kid",
+                }
+            ]
+        }
+        test_alg = "RS256"
+        test_jws_payload = b'{"nonce": "test_nonce_value"}'
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": "access_granted",
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.side_effect = [
+            test_jwks,
+            {"sub": "test_sub", "email": "test_email", "username": "test_username"},
         ]
 
         requests_mock.post.return_value = post_json_mock
@@ -364,7 +418,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         get_json_mock = Mock(status_code=200)
         get_json_mock.json.side_effect = [
             test_jwks,
-            {"email": "test_email", "username": "test_username"},
+            {"sub": "test_sub", "email": "test_email", "username": "test_username"},
         ]
 
         requests_mock.post.return_value = post_json_mock

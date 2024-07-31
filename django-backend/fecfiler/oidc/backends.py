@@ -41,7 +41,13 @@ class OIDCAuthenticationBackend(ModelBackend):
 
     def get_idp_unique_id_value(self, claims):
         """Helper method to clarify whether we're using OP or RP unique ID"""
-        return claims.get(settings.OIDC_OP_UNIQUE_IDENTIFIER)
+        retval = claims.get(settings.OIDC_OP_UNIQUE_IDENTIFIER)
+        if not retval:
+            msg = (
+                "Failed to retrieve OIDC_OP_UNIQUE_IDENTIFIER "
+                f"{settings.OIDC_OP_UNIQUE_IDENTIFIER} from claims"
+            )
+            raise SuspiciousOperation(msg)
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified unique identifier."""
