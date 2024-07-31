@@ -365,7 +365,7 @@ else:
 
 
 """FEATURE FLAGS"""
-FLAG__FORM1_LOOKUP = env.get_credential("FLAG__FORM1_LOOKUP")
+FLAG__EFO_TARGET = env.get_credential("FLAG__EFO_TARGET")
 
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

@@ -27,4 +27,4 @@ applications:
       LOG_FORMAT: KEY_VALUE
       MOCK_OPENFEC: REDIS
       # ---- FEATURE FLAGS ----
-      FLAG__FORM1_LOOKUP: TEST # Values are TEST and PROD, defaults to TEST
+      FLAG__EFO_TARGET: TEST # Values are TEST and PROD, defaults to TEST

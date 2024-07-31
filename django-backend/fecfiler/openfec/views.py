@@ -58,7 +58,7 @@ def retrieve_recent_f1(committee_id):
         "committee_id": committee_id,
     }
 
-    if settings.FLAG__FORM1_LOOKUP == "PROD":
+    if settings.FLAG__EFO_TARGET == "PROD":
         endpoints = [
             f"{settings.FEC_API}efile/form1/",
             f"{settings.FEC_API}committee/{committee_id}/"
