@@ -141,3 +141,4 @@ services:
 
 networks:
   my-net:
+    driver: bridge
