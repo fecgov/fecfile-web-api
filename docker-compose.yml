@@ -65,6 +65,8 @@ services:
       dockerfile: "${API_DOCKERFILE:-Dockerfile}"
     image: fecfile-api
     container_name: fecfile-api
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
@@ -106,6 +108,8 @@ services:
   nginx:
     build: https://github.com/fecgov/fecfile-api-proxy.git#develop
     container_name: fecfile-api-proxy
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
     ports:
       - 8080:8080
     depends_on:
