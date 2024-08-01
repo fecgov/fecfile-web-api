@@ -102,8 +102,6 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
-    networks:
-      - my-net
 
   nginx:
     build: https://github.com/fecgov/fecfile-api-proxy.git#develop
@@ -112,8 +110,6 @@ services:
       - 8080:8080
     depends_on:
       - api
-    networks:
-      - my-net
 
   locust-leader:
     image: locustio/locust
@@ -138,7 +134,3 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
-
-networks:
-  my-net:
-    driver: bridge
