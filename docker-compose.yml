@@ -134,3 +134,6 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+
+networks:
+  my-net:
