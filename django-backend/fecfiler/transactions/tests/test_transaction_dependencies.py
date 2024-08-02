@@ -38,8 +38,14 @@ class TransactionDependenciesTestCase(TestCase):
 
         memo_prefix = "Pres. Nominating Convention Account JF Memo:"
         is_attribution = True
-        committee_name = "Committee Name That Is reeeeeeeeeeeeeeeeeeeeeeaaaaaaaaaaaaaaaaaaaaaaally Long"
-        expected = "Pres. Nominating Convention Account JF Memo: Committee Name That Is ree... (Partnership Attribution)"
+        committee_name = (
+            "Committee Name That Is "
+            + "reeeeeeeeeeeeeeeeeeeeeeaaaaaaaaaaaaaaaaaaaaaaally Long"
+        )
+        expected = (
+            "Pres. Nominating Convention Account JF Memo:"
+            + " Committee Name That Is ree... (Partnership Attribution)"
+        )
         self.assertEqual(
             get_jf_transfer_description(memo_prefix, committee_name, is_attribution),
             expected,

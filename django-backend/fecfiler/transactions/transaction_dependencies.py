@@ -1,14 +1,14 @@
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
-from django.db.models import Value, Case, When, F, Q, Subquery, OuterRef
+from django.db.models import Value, Case, When, Q, Subquery, OuterRef
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 def update_dependent_descriptions(transaction: Transaction):
-    """Joint Fundraising Transfer committee names must be updated in the contribution_purpose_descrip field of
-    dependent transactions."""
+    """Joint Fundraising Transfer committee names must be updated
+    in the contribution_purpose_descrip field of dependent transactions."""
     if transaction.transaction_type_identifier in JF_TRANSFER_DEPENDENCIES:
         dependencies = JF_TRANSFER_DEPENDENCIES[transaction.transaction_type_identifier]
 
@@ -17,7 +17,7 @@ def update_dependent_descriptions(transaction: Transaction):
         grandchildren = dependencies["grandchildren"]
 
         """The description for all children will be the same,
-            and the description for all grandchildren will be the same."""
+        and the description for all grandchildren will be the same."""
         child_update = get_jf_transfer_description(
             dependencies["prefix"], transaction.contact_1.name, False
         )
@@ -38,9 +38,11 @@ def update_dependent_descriptions(transaction: Transaction):
         )
 
         """Update the contribution_purpose_descrip field for all dependent transactions.
-            Django does not support Case(When()) where the condition using joined tables (transaction__).
-            So we use a Subquery to define the new description
-            Ref: https://code.djangoproject.com/ticket/14104"""
+        Django does not support Case(When()) where the condition using
+        joined tables (transaction__). So we use a Subquery to define
+        the new description
+
+        Ref: https://code.djangoproject.com/ticket/14104"""
         count = dependents.update(
             contribution_purpose_descrip=Subquery(
                 ScheduleA.objects.filter(id=OuterRef("id"))
@@ -62,9 +64,9 @@ def update_dependent_descriptions(transaction: Transaction):
 def get_jf_transfer_description(
     memo_prefix: str, committee_name: str, is_attribution: bool
 ):
-    """Generate a description for the dependent transaction of a joint fundraising transfer.
-    If it's an attribution, the description will include a parenthetical indicating that it's a partnership attribution.
-    """
+    """Generate a description for the dependent transaction of a joint
+    fundraising transfer. If it's an attribution, the description will
+    include a parenthetical indicating that it's a partnership attribution."""
     committee_clause = f"{memo_prefix} {committee_name}"
     if is_attribution:
         parenthetical = "(Partnership Attribution)"
