@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenciesTestCase
+===========================================================================================
+
+.. currentmodule:: fecfiler.transactions.tests.test_transaction_dependencies
+
+.. autoclass:: TransactionDependenciesTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionDependenciesTestCase.__init__
+      ~TransactionDependenciesTestCase.addClassCleanup
+      ~TransactionDependenciesTestCase.addCleanup
+      ~TransactionDependenciesTestCase.addTypeEqualityFunc
+      ~TransactionDependenciesTestCase.assertAlmostEqual
+      ~TransactionDependenciesTestCase.assertAlmostEquals
+      ~TransactionDependenciesTestCase.assertContains
+      ~TransactionDependenciesTestCase.assertCountEqual
+      ~TransactionDependenciesTestCase.assertDictContainsSubset
+      ~TransactionDependenciesTestCase.assertDictEqual
+      ~TransactionDependenciesTestCase.assertEqual
+      ~TransactionDependenciesTestCase.assertEquals
+      ~TransactionDependenciesTestCase.assertFalse
+      ~TransactionDependenciesTestCase.assertFieldOutput
+      ~TransactionDependenciesTestCase.assertFormError
+      ~TransactionDependenciesTestCase.assertFormSetError
+      ~TransactionDependenciesTestCase.assertFormsetError
+      ~TransactionDependenciesTestCase.assertGreater
+      ~TransactionDependenciesTestCase.assertGreaterEqual
+      ~TransactionDependenciesTestCase.assertHTMLEqual
+      ~TransactionDependenciesTestCase.assertHTMLNotEqual
+      ~TransactionDependenciesTestCase.assertIn
+      ~TransactionDependenciesTestCase.assertInHTML
+      ~TransactionDependenciesTestCase.assertIs
+      ~TransactionDependenciesTestCase.assertIsInstance
+      ~TransactionDependenciesTestCase.assertIsNone
+      ~TransactionDependenciesTestCase.assertIsNot
+      ~TransactionDependenciesTestCase.assertIsNotNone
+      ~TransactionDependenciesTestCase.assertJSONEqual
+      ~TransactionDependenciesTestCase.assertJSONNotEqual
+      ~TransactionDependenciesTestCase.assertLess
+      ~TransactionDependenciesTestCase.assertLessEqual
+      ~TransactionDependenciesTestCase.assertListEqual
+      ~TransactionDependenciesTestCase.assertLogs
+      ~TransactionDependenciesTestCase.assertMultiLineEqual
+      ~TransactionDependenciesTestCase.assertNoLogs
+      ~TransactionDependenciesTestCase.assertNotAlmostEqual
+      ~TransactionDependenciesTestCase.assertNotAlmostEquals
+      ~TransactionDependenciesTestCase.assertNotContains
+      ~TransactionDependenciesTestCase.assertNotEqual
+      ~TransactionDependenciesTestCase.assertNotEquals
+      ~TransactionDependenciesTestCase.assertNotIn
+      ~TransactionDependenciesTestCase.assertNotIsInstance
+      ~TransactionDependenciesTestCase.assertNotRegex
+      ~TransactionDependenciesTestCase.assertNotRegexpMatches
+      ~TransactionDependenciesTestCase.assertNumQueries
+      ~TransactionDependenciesTestCase.assertQuerySetEqual
+      ~TransactionDependenciesTestCase.assertQuerysetEqual
+      ~TransactionDependenciesTestCase.assertRaises
+      ~TransactionDependenciesTestCase.assertRaisesMessage
+      ~TransactionDependenciesTestCase.assertRaisesRegex
+      ~TransactionDependenciesTestCase.assertRaisesRegexp
+      ~TransactionDependenciesTestCase.assertRedirects
+      ~TransactionDependenciesTestCase.assertRegex
+      ~TransactionDependenciesTestCase.assertRegexpMatches
+      ~TransactionDependenciesTestCase.assertSequenceEqual
+      ~TransactionDependenciesTestCase.assertSetEqual
+      ~TransactionDependenciesTestCase.assertTemplateNotUsed
+      ~TransactionDependenciesTestCase.assertTemplateUsed
+      ~TransactionDependenciesTestCase.assertTrue
+      ~TransactionDependenciesTestCase.assertTupleEqual
+      ~TransactionDependenciesTestCase.assertURLEqual
+      ~TransactionDependenciesTestCase.assertWarns
+      ~TransactionDependenciesTestCase.assertWarnsMessage
+      ~TransactionDependenciesTestCase.assertWarnsRegex
+      ~TransactionDependenciesTestCase.assertXMLEqual
+      ~TransactionDependenciesTestCase.assertXMLNotEqual
+      ~TransactionDependenciesTestCase.assert_
+      ~TransactionDependenciesTestCase.captureOnCommitCallbacks
+      ~TransactionDependenciesTestCase.countTestCases
+      ~TransactionDependenciesTestCase.debug
+      ~TransactionDependenciesTestCase.defaultTestResult
+      ~TransactionDependenciesTestCase.doClassCleanups
+      ~TransactionDependenciesTestCase.doCleanups
+      ~TransactionDependenciesTestCase.fail
+      ~TransactionDependenciesTestCase.failIf
+      ~TransactionDependenciesTestCase.failIfAlmostEqual
+      ~TransactionDependenciesTestCase.failIfEqual
+      ~TransactionDependenciesTestCase.failUnless
+      ~TransactionDependenciesTestCase.failUnlessAlmostEqual
+      ~TransactionDependenciesTestCase.failUnlessEqual
+      ~TransactionDependenciesTestCase.failUnlessRaises
+      ~TransactionDependenciesTestCase.id
+      ~TransactionDependenciesTestCase.modify_settings
+      ~TransactionDependenciesTestCase.run
+      ~TransactionDependenciesTestCase.setUp
+      ~TransactionDependenciesTestCase.setUpClass
+      ~TransactionDependenciesTestCase.setUpTestData
+      ~TransactionDependenciesTestCase.settings
+      ~TransactionDependenciesTestCase.shortDescription
+      ~TransactionDependenciesTestCase.skipTest
+      ~TransactionDependenciesTestCase.subTest
+      ~TransactionDependenciesTestCase.tearDown
+      ~TransactionDependenciesTestCase.tearDownClass
+      ~TransactionDependenciesTestCase.test_get_jf_transfer_description
+      ~TransactionDependenciesTestCase.test_update_dependent_descriptions
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionDependenciesTestCase.available_apps
+      ~TransactionDependenciesTestCase.databases
+      ~TransactionDependenciesTestCase.fixtures
+      ~TransactionDependenciesTestCase.longMessage
+      ~TransactionDependenciesTestCase.maxDiff
+      ~TransactionDependenciesTestCase.reset_sequences
+      ~TransactionDependenciesTestCase.serialized_rollback
+   
+   
