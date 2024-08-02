@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
-from fecfiler.transactions.transaction_dependencies import TransactionDependenciesUtils
+from fecfiler.transactions.transaction_dependencies import update_dependent_descriptions
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
     Transaction,
@@ -324,7 +324,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         EXAMPLE: if this transaction is a JF transfer, update the descriptions of its
         children and grandchildren transactions with any changes to the committee name
         """
-        TransactionDependenciesUtils().update_dependent_descriptions(transaction_instance)
+        update_dependent_descriptions(transaction_instance)
 
         return self.queryset.get(id=transaction_instance.id)
 
