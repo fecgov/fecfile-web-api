@@ -1,6 +1,9 @@
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
-from django.db.models import Value, Case, When, F, Q
+from django.db.models import Value, Case, When, F, Q, Subquery, OuterRef
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def update_dependent_descriptions(transaction: Transaction):
@@ -8,20 +11,51 @@ def update_dependent_descriptions(transaction: Transaction):
     dependent transactions."""
     if transaction.transaction_type_identifier in JF_TRANSFER_DEPENDENCIES:
         dependencies = JF_TRANSFER_DEPENDENCIES[transaction.transaction_type_identifier]
+
+        """Identify the transaction types to update"""
+        children = dependencies["children"]
+        grandchildren = dependencies["grandchildren"]
+
+        """The description for all children will be the same,
+            and the description for all grandchildren will be the same."""
+        child_update = get_jf_transfer_description(
+            dependencies["prefix"], transaction.contact_1.name, False
+        )
+        grandchild_update = get_jf_transfer_description(
+            dependencies["prefix"], transaction.contact_1.name, True
+        )
+
+        """Establish the queryset with all dependent transactions"""
         dependents = ScheduleA.objects.filter(
             Q(
                 transaction__parent_transaction_id=transaction.id,
-                transaction__transaction_type_identifier__in=dependencies["children"],
+                transaction__transaction_type_identifier__in=children,
             )
             | Q(
                 transaction__parent_transaction__parent_transaction_id=transaction.id,
-                transaction__transaction_type_identifier__in=dependencies[
-                    "grandchildren"
-                ],
+                transaction__transaction_type_identifier__in=grandchildren,
             )
         )
-        update_expression = get_update_expression(transaction)
-        dependents.update(contribution_purpose_descrip=Value(update_expression))
+
+        """Update the contribution_purpose_descrip field for all dependent transactions.
+            Django does not support Case(When()) where the condition using other tables (transaction__).
+            So we use a Subquery to define the new description"""
+        count = dependents.update(
+            contribution_purpose_descrip=Subquery(
+                ScheduleA.objects.filter(id=OuterRef("id"))
+                .annotate(
+                    new_description=Case(
+                        When(
+                            transaction__parent_transaction_id=transaction.id,
+                            then=Value(child_update),
+                        ),
+                        default=Value(grandchild_update),
+                    )
+                )
+                .values("new_description")[:1]
+            ),
+        )
+        logger.debug(f"Updated {count} dependent transactions for {transaction}")
 
 
 def get_jf_transfer_description(
@@ -34,35 +68,9 @@ def get_jf_transfer_description(
     if is_attribution:
         parenthetical = "(Partnership Attribution)"
         if len(committee_clause + parenthetical) > 100:
-            committee_clause = committee_clause[: 97 - len(parenthetical)] + "..."
+            committee_clause = committee_clause[: 96 - len(parenthetical)] + "..."
         return f"{committee_clause} {parenthetical}"
     return committee_clause
-
-
-def get_update_expression(transaction: Transaction):
-    """Get the update expression for the dependent transaction descriptions.
-    The children will have different descriptions than the grandchildren.
-    """
-    dependencies = JF_TRANSFER_DEPENDENCIES[transaction.transaction_type_identifier]
-    children = dependencies["children"]
-    child_update = get_jf_transfer_description(
-        dependencies["prefix"], transaction.committee_name, False
-    )
-    grandchildren = dependencies["grandchildren"]
-    grandchild_update = get_jf_transfer_description(
-        dependencies["prefix"], transaction.committee_name, True
-    )
-    return Case(
-        When(
-            transaction__transaction_type_identifier__in=children,
-            then=Value(child_update),
-        ),
-        When(
-            transaction__transaction_type_identifier__in=grandchildren,
-            then=Value(grandchild_update),
-        ),
-        default=F("contribution_purpose_descrip"),
-    )
 
 
 # Dictionary of joint fundraising transfer dependencies.
