@@ -12,13 +12,6 @@ fecfiler.reports.models
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      flag_reports_for_recalculation
-   
    
 
    

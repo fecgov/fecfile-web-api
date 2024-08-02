@@ -115,7 +115,6 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.tearDownClass
       ~ReportModelTestCase.test_amending
       ~ReportModelTestCase.test_amending_f24
-      ~ReportModelTestCase.test_can_delete
       ~ReportModelTestCase.test_delete
    
    

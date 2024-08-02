@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0009\_report\_can\_delete.populate\_existing\_rows
+==============================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0009_report_can_delete
+
+.. autofunction:: populate_existing_rows

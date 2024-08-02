@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0009\_report\_can\_delete.reverse\_code
+===================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0009_report_can_delete
+
+.. autofunction:: reverse_code
