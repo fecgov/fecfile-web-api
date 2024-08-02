@@ -38,8 +38,9 @@ def update_dependent_descriptions(transaction: Transaction):
         )
 
         """Update the contribution_purpose_descrip field for all dependent transactions.
-            Django does not support Case(When()) where the condition using other tables (transaction__).
-            So we use a Subquery to define the new description"""
+            Django does not support Case(When()) where the condition using joined tables (transaction__).
+            So we use a Subquery to define the new description
+            Ref: https://code.djangoproject.com/ticket/14104"""
         count = dependents.update(
             contribution_purpose_descrip=Subquery(
                 ScheduleA.objects.filter(id=OuterRef("id"))
