@@ -58,6 +58,10 @@ services:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   api:
     build:
@@ -102,6 +106,10 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
 
   nginx:
     build: https://github.com/fecgov/fecfile-api-proxy.git#develop
@@ -110,6 +118,10 @@ services:
       - 8080:8080
     depends_on:
       - api
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   locust-leader:
     image: locustio/locust
