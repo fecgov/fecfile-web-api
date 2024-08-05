@@ -347,9 +347,17 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
+
+"""FEATURE FLAGS"""
+FLAG__EFO_TARGET = env.get_credential("FLAG__EFO_TARGET")
+
+
 """FEC API settings
 """
-FEC_API = env.get_credential("FEC_API")
+if FLAG__EFO_TARGET == "PRODUCTION":
+    FEC_API = env.get_credential("FEC_API_PROD")
+else:
+    FEC_API = env.get_credential("FEC_API_TEST")
 FEC_API_KEY = env.get_credential("FEC_API_KEY")
 FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
@@ -362,10 +370,6 @@ if MOCK_OPENFEC == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 else:
     MOCK_OPENFEC_REDIS_URL = None
-
-
-"""FEATURE FLAGS"""
-FLAG__EFO_TARGET = env.get_credential("FLAG__EFO_TARGET")
 
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
