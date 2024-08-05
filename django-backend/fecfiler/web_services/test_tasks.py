@@ -65,11 +65,11 @@ class TasksTestCase(TestCase):
                 result_dot_fec.unlink()
 
     @tag("performance")
-    def test_load(self):
-        num_a = 2000
+    def test_large_number_of_transactions_on_single_report(self):
+        num_transactions = 2000
         transactions = []
 
-        for _ in range(num_a):
+        for _ in range(num_transactions):
             t = create_schedule_a(
                 "INDIVIDUAL_RECEIPT",
                 self.committee,
@@ -83,13 +83,48 @@ class TasksTestCase(TestCase):
             )
             transactions.append(t)
 
-        self.assertEqual(len(transactions), num_a)
+        self.assertEqual(len(transactions), num_transactions)
         start_time = timeit.default_timer()
         dot_fec_id = create_dot_fec(str(self.f3x.id), None, None, True)
         end_time = timeit.default_timer()
         execution_time = end_time - start_time
         logger.info(f"Execution time: {execution_time:.4f} seconds")
         self.assertIsNotNone(dot_fec_id)
+
+    @tag("performance")
+    def test_creation_of_many_filings(self):
+        num_reports = 400
+        num_transactions = 0
+        transactions = []
+        reports = []
+
+        year = 2000
+
+        for _ in range(num_reports):
+            r = create_form3x(self.committee, f"{year}-01-01", f"{year}-02-01", {})
+            reports.append(r)
+            for _ in range(num_transactions):
+                t = create_schedule_a(
+                    "INDIVIDUAL_RECEIPT",
+                    self.committee,
+                    self.contact_1,
+                    f"{year}-01-05",
+                    "123.45",
+                    "GENERAL",
+                    "SA11AI",
+                    itemized=True,
+                    report=r,
+                )
+                transactions.append(t)
+            year += 1
+
+        self.assertEqual(len(transactions), num_transactions * num_reports)
+        start_time = timeit.default_timer()
+        for r in reports:
+            create_dot_fec(str(r.id), None, None, True)
+        end_time = timeit.default_timer()
+        execution_time = end_time - start_time
+        logger.info(f"Execution time: {execution_time:.4f} seconds")
 
     """
     SUBMIT TO FEC TESTS
