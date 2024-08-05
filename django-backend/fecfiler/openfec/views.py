@@ -17,10 +17,51 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         response = committee(pk)
         if response:
             return Response(response)
-        response = requests.get(
-            f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
-        )
-        return HttpResponse(response)
+
+        logger.debug(f"\n\nHi, I'm here! {pk}\n\n")
+        if settings.FLAG__EFO_TARGET == "PRODUCTION":
+            response = requests.get(
+                f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
+            )
+            return HttpResponse(response)
+        else:
+            return HttpResponse(self.get_committee_from_test_efo(pk))
+
+
+    def get_committee_from_test_efo(self, pk=None):
+        headers = {"Content-Type": "application/json"}
+        params = {
+            "api_key": settings.FEC_API_KEY,
+            "per_page": 100,
+        }
+        endpoint = f"{settings.FEC_API}/efile/test-form1/"
+        results = []
+        page = 1
+        last_good_response = None
+        while True:
+            params["page"] = page
+            response = requests.get(endpoint, headers=headers, params=params).json()
+
+            if not response.get('results'):
+                break
+
+            last_good_response = response
+            results.append(response['results'])
+            page += 1
+
+            if page >= response['pagination']['pages']:
+                break
+
+        matching_results = []
+        for result in results:
+            if pk in result['committee_name'] or pk in result['committee_id']:
+                matching_results.append(result)
+
+        if last_good_response is not None:
+            last_good_response['results'] = matching_results
+        return last_good_response
+
+
 
     @action(detail=True)
     def f1_filing(self, request, pk=None):
@@ -65,8 +106,11 @@ def retrieve_recent_f1(committee_id):
         ]
     else:
         endpoints = [f"{settings.FEC_API}/efile/test-form1/"]
+
+    logger.debug(f"\n\nF1 Retrieval Endpoints: {endpoints}\n\n")
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
+        logger.debug(f"\n\nResults:\n\n{response}\n\n")
         results = response["results"]
         if len(results) > 0:
             return results[0]

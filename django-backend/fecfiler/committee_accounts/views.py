@@ -237,6 +237,7 @@ def register_committee(committee_id, user):
         f1 = retrieve_recent_f1(committee_id)
 
     f1_emails = (f1 or {}).get("email")
+    logger.debug(f"\n\nF1 Emails: {f1_emails}\n\n")
     failure_reason = check_email_match(email, f1_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
