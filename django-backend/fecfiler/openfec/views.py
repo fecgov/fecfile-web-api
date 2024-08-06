@@ -50,15 +50,17 @@ def retrieve_recent_f1(committee_id):
     First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
     a request is made to a different endpoint that is updated nightly.
     The realtime endpoint will have more recent filings, but does not provide
-    filings older than 6 months. The nightly endpoint keeps a longer history"""
+    filings older than 6 months. The other endpoint returns a committee's current data
+    informed by their most recent F1 and F2 filings."""
     headers = {"Content-Type": "application/json"}
     params = {
         "api_key": settings.FEC_API_KEY,
         "committee_id": committee_id,
-        "sort": "-receipt_date",
-        "form_type": "F1",
     }
-    endpoints = [f"{settings.FEC_API}efile/filings/", f"{settings.FEC_API}filings/"]
+    endpoints = [
+        f"{settings.FEC_API}efile/form1/",
+        f"{settings.FEC_API}committee/{committee_id}/",
+    ]
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
         results = response["results"]
