@@ -147,7 +147,6 @@ class TransactionSerializer(
             ]
 
         fields = get_fields()
-        read_only_fields = ["children"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -158,10 +157,6 @@ class TransactionSerializer(
         schedule_c2 = representation.pop("schedule_c2")
         schedule_d = representation.pop("schedule_d")
         schedule_e = representation.pop("schedule_e")
-        if instance.transaction_set.count() > 0:
-            representation["children"] = [
-                child.id for child in instance.transaction_set.all()
-            ]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
