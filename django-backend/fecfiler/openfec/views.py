@@ -28,7 +28,6 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         else:
             return Response(self.get_committee_from_test_efo(pk))
 
-
     def get_committee_from_test_efo(self, pk=None):
         headers = {"Content-Type": "application/json"}
         params = {
@@ -82,7 +81,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 'per_page': 20,
                 'count': len(matching_results),
                 'page': 1,
-                'pages': ceil(len(matching_results)/20)
+                'pages': ceil(len(matching_results) / 20)
             }
         }
 
