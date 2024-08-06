@@ -101,7 +101,6 @@ services:
       FEC_API_TEST: https://api-stage.open.fec.gov/v1/
       FEC_API_KEY:
       LOG_FORMAT:
-      MOCK_OPENFEC:
       FECFILE_GITHUB_TOKEN:
 
   nginx:

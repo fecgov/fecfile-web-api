@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.settings import MOCK_OPENFEC_REDIS_URL, BASE_DIR, AWS_STORAGE_BUCKET_NAME
+from fecfiler.settings import FLAG__COMMITTEE_DATA_SOURCE, MOCK_OPENFEC_REDIS_URL, BASE_DIR, AWS_STORAGE_BUCKET_NAME
 import redis
 import os
 from fecfiler.s3 import S3_SESSION
@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument("--s3", action="store_true")
 
     def handle(self, *args, **options):
-        if MOCK_OPENFEC_REDIS_URL:
+        if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
             redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
             if not options.get("s3"):
                 path = os.path.join(

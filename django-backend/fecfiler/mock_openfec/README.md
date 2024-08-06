@@ -23,12 +23,11 @@ def query_filings(self, request):
 
 ## Setup
 
-If `MOCK_OPENFEC` is not set, everything will hit openfec normally
+If `FLAG__COMMITTEE_DATA_SOURCE` is not set to `REDIS`, everything will hit openfec normally
 
 Currently, the only backing is redis. Setting this to `REDIS` will automatically
 configure `MOCK_OPENFEC_REDIS_URL` to the `REDIS_URL`
-`MOCK_OPENFEC = "REDIS"
-`
+`FLAG__COMMITTEE_DATA_SOURCE = "REDIS"`
 
 # Local Development
 

@@ -351,12 +351,14 @@ AWS_REGION = env.get_credential("AWS_REGION")
 
 
 """FEATURE FLAGS"""
-FLAG__EFO_TARGET = env.get_credential("FLAG__EFO_TARGET")
+FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
+if FLAG__COMMITTEE_DATA_SOURCE not in ["PRODUCTION", "TEST", "REDIS"]:
+    FLAG__COMMITTEE_DATA_SOURCE = "TEST"
 
 
 """FEC API settings
 """
-if FLAG__EFO_TARGET == "PRODUCTION":
+if FLAG__COMMITTEE_DATA_SOURCE == "PRODUCTION":
     FEC_API = env.get_credential("FEC_API_PROD")
 else:
     FEC_API = env.get_credential("FEC_API_TEST")
@@ -368,11 +370,9 @@ FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
 
 """MOCK OPENFEC settings"""
-MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
-if MOCK_OPENFEC == "REDIS":
+MOCK_OPENFEC_REDIS_URL = None
+if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
-else:
-    MOCK_OPENFEC_REDIS_URL = None
 
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

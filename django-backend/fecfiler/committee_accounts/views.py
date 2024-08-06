@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
+from fecfiler.settings import FLAG__COMMITTEE_DATA_SOURCE
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
@@ -231,7 +231,7 @@ def check_email_match(email, f1_emails):
 def register_committee(committee_id, user):
     email = user.email
 
-    if MOCK_OPENFEC_REDIS_URL:
+    if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
         f1 = recent_f1(committee_id)
     else:
         f1 = retrieve_recent_f1(committee_id)

@@ -13,7 +13,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_no_override(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
@@ -27,7 +27,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_no_override_from_test_efo(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "TEST"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
@@ -41,7 +41,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_override_data_not_found(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C87654321/committee/")
             request.user = self.user
@@ -52,7 +52,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_override_happy_path(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             settings.BASE_DIR = "fecfiler/"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
@@ -68,7 +68,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_filings_invalid_resp(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
@@ -82,7 +82,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_filings_happy_path(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
@@ -99,7 +99,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_filings_from_test_efo_happy_path(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "TEST"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
@@ -116,7 +116,7 @@ class OpenfecViewSetTest(TestCase):
 
     def test_query_filings_from_test_efo(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            settings.FLAG__EFO_TARGET = "TEST"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             request = self.factory.get("/api/v1/openfec/query_filings/?query=C00")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:

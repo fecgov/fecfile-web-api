@@ -26,6 +26,5 @@ applications:
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
-      MOCK_OPENFEC:
       # ---- FEATURE FLAGS ----
-      FLAG__EFO_TARGET: TEST # Values are TEST and PRODUCTION, defaults to TEST
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and REDIS, defaults to TEST

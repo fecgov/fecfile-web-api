@@ -15,20 +15,21 @@ logger = structlog.get_logger(__name__)
 class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=True)
     def committee(self, request, pk=None):
-        response = committee(pk)
-        if response:
-            return Response(response)
-
-        if (
-            settings.FLAG__EFO_TARGET == "PRODUCTION"
-            or request.GET.get('force_efo_target') == "PRODUCTION"
-        ):
-            response = requests.get(
-                f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
-            )
-            return HttpResponse(response)
-        else:
-            return Response(self.get_committee_from_test_efo(pk))
+        match settings.FLAG__COMMITTEE_DATA_SOURCE:
+            case "PRODUCTION":
+                response = requests.get(
+                    f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
+                )
+                return HttpResponse(response)
+            case "TEST":
+                return Response(self.get_committee_from_test_efo(pk))
+            case "REDIS":
+                response = committee(pk)
+                return Response(response)
+            case _:
+                raise Exception(f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+                    settings.FLAG__COMMITTEE_DATA_SOURCE
+                }""")
 
     def get_committee_from_test_efo(self, pk=None):
         headers = {"Content-Type": "application/json"}
@@ -97,11 +98,9 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=False)
     def query_filings(self, request):
         query = request.query_params.get("query")
-        if settings.FLAG__EFO_TARGET == "PRODUCTION":
-            form_type = request.query_params.get("form_type")
-            if settings.MOCK_OPENFEC_REDIS_URL:
-                response = query_filings(query, form_type)
-            else:
+        form_type = request.query_params.get("form_type")
+        match settings.FLAG__COMMITTEE_DATA_SOURCE:
+            case "PRODUCTION":
                 params = {
                     "api_key": settings.FEC_API_KEY,
                     "q_filer": query,
@@ -111,9 +110,15 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 }
                 fec_response = requests.get(f"{settings.FEC_API}filings/", params)
                 response = fec_response.json()
-            return Response(response)
-        else:
-            return Response(self.query_filings_from_test_efo(query))
+                return Response(response)
+            case "TEST":
+                return Response(self.query_filings_from_test_efo(query))
+            case "REDIS":
+                return Response(query_filings(query, form_type))
+            case _:
+                raise Exception(f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+                    settings.FLAG__COMMITTEE_DATA_SOURCE
+                }""")
 
 
 def retrieve_recent_f1(committee_id):
@@ -129,13 +134,19 @@ def retrieve_recent_f1(committee_id):
         "committee_id": committee_id,
     }
 
-    if settings.FLAG__EFO_TARGET == "PRODUCTION":
-        endpoints = [
-            f"{settings.FEC_API}efile/form1/",
-            f"{settings.FEC_API}committee/{committee_id}/"
-        ]
-    else:
-        endpoints = [f"{settings.FEC_API_STAGE}/efile/test-form1/"]
+    endpoints = []
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            endpoints = [
+                f"{settings.FEC_API}efile/form1/",
+                f"{settings.FEC_API}committee/{committee_id}/"
+            ]
+        case "TEST":
+            endpoints = [f"{settings.FEC_API_STAGE}/efile/test-form1/"]
+        case _:
+            raise Exception(f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+                settings.FLAG__COMMITTEE_DATA_SOURCE
+            }""")
 
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
