@@ -360,6 +360,7 @@ if FLAG__EFO_TARGET == "PRODUCTION":
     FEC_API = env.get_credential("FEC_API_PROD")
 else:
     FEC_API = env.get_credential("FEC_API_TEST")
+FEC_API_STAGE = env.get_credential("FEC_API_TEST")
 FEC_API_KEY = env.get_credential("FEC_API_KEY")
 FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"

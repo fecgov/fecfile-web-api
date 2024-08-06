@@ -36,7 +36,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             "api_key": settings.FEC_API_KEY,
             "committee_id": pk,
         }
-        endpoint = f"{settings.FEC_API}/efile/test-form1/"
+        endpoint = f"{settings.FEC_API_STAGE}/efile/test-form1/"
         response = requests.get(endpoint, headers=headers, params=params).json()
         results = response.get('results', [])
         if results:
@@ -53,7 +53,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             "api_key": settings.FEC_API_KEY,
             "per_page": 100,
         }
-        endpoint = f"{settings.FEC_API}/efile/test-form1/"
+        endpoint = f"{settings.FEC_API_STAGE}/efile/test-form1/"
         results = []
         page = 1
         last_good_response = {}
@@ -135,7 +135,7 @@ def retrieve_recent_f1(committee_id):
             f"{settings.FEC_API}committee/{committee_id}/"
         ]
     else:
-        endpoints = [f"{settings.FEC_API}/efile/test-form1/"]
+        endpoints = [f"{settings.FEC_API_STAGE}/efile/test-form1/"]
 
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
