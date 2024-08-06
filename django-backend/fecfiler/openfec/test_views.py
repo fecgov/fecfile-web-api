@@ -12,16 +12,32 @@ class OpenfecViewSetTest(TestCase):
         self.factory = RequestFactory()
 
     def test_get_committee_no_override(self):
-        request = self.factory.get("/api/v1/openfec/C12345678/committee/")
-        request.user = self.user
-        with patch("fecfiler.openfec.views.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = None
-            response = OpenfecViewSet.as_view({"get": "committee"})(
-                request, pk="C12345678"
-            )
-            self.assertEqual(response.status_code, 200)
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__EFO_TARGET = "PRODUCTION"
+            request = self.factory.get("/api/v1/openfec/C12345678/committee/")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                mock_requests.get.return_value = mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = None
+                response = OpenfecViewSet.as_view({"get": "committee"})(
+                    request, pk="C12345678"
+                )
+                self.assertEqual(response.status_code, 200)
+
+    def test_get_committee_from_test_efo(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__EFO_TARGET = "TEST"
+            request = self.factory.get("/api/v1/openfec/C12345678/committee/")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                mock_requests.get.return_value = mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = None
+                response = OpenfecViewSet.as_view({"get": "committee"})(
+                    request, pk="C12345678"
+                )
+                self.assertEqual(response.status_code, 200)
 
     def test_get_committee_override_data_not_found(self):
         with patch("fecfiler.openfec.views.settings") as settings:

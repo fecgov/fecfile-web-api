@@ -19,7 +19,6 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         if response:
             return Response(response)
 
-        logger.debug(f"\n\nHi, I'm here! {pk}\n\n")
         if settings.FLAG__EFO_TARGET == "PRODUCTION":
             response = requests.get(
                 f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
