@@ -97,7 +97,8 @@ services:
       FEC_AGENCY_ID:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
-      FEC_API:
+      FEC_API_PROD: https://api.open.fec.gov/v1/
+      FEC_API_TEST: https://api-stage.open.fec.gov/v1/
       FEC_API_KEY:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS

@@ -1,3 +1,4 @@
+from math import ceil
 from rest_framework import viewsets
 from django.http.response import HttpResponse
 from rest_framework.response import Response
@@ -25,10 +26,27 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             )
             return HttpResponse(response)
         else:
-            return HttpResponse(self.get_committee_from_test_efo(pk))
+            return Response(self.get_committee_from_test_efo(pk))
 
 
     def get_committee_from_test_efo(self, pk=None):
+        headers = {"Content-Type": "application/json"}
+        params = {
+            "api_key": settings.FEC_API_KEY,
+            "committee_id": pk,
+        }
+        endpoint = f"{settings.FEC_API}/efile/test-form1/"
+        response = requests.get(endpoint, headers=headers, params=params).json()
+        results = response.get('results', [])
+        if results:
+            results[0]['name'] = results[0].get('committee_name', None)
+
+        return {
+            'api_version': response.get('api_version', None),
+            'results': response.get('results', [])[:1],
+        }
+
+    def query_filings_from_test_efo(self, query):
         headers = {"Content-Type": "application/json"}
         params = {
             "api_key": settings.FEC_API_KEY,
@@ -37,7 +55,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         endpoint = f"{settings.FEC_API}/efile/test-form1/"
         results = []
         page = 1
-        last_good_response = None
+        last_good_response = {}
         while True:
             params["page"] = page
             response = requests.get(endpoint, headers=headers, params=params).json()
@@ -46,7 +64,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 break
 
             last_good_response = response
-            results.append(response['results'])
+            results += response['results']
             page += 1
 
             if page >= response['pagination']['pages']:
@@ -54,14 +72,19 @@ class OpenfecViewSet(viewsets.GenericViewSet):
 
         matching_results = []
         for result in results:
-            if pk in result['committee_name'] or pk in result['committee_id']:
+            if query in result['committee_name'] or query in result['committee_id']:
                 matching_results.append(result)
 
-        if last_good_response is not None:
-            last_good_response['results'] = matching_results
-        return last_good_response
-
-
+        return {
+            'api_version': last_good_response.get('api_version', None),
+            'results': matching_results[:20],
+            'pagination': {
+                'per_page': 20,
+                'count': len(matching_results),
+                'page': 1,
+                'pages': ceil(len(matching_results)/20)
+            }
+        }
 
     @action(detail=True)
     def f1_filing(self, request, pk=None):
@@ -70,20 +93,23 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     @action(detail=False)
     def query_filings(self, request):
         query = request.query_params.get("query")
-        form_type = request.query_params.get("form_type")
-        if settings.MOCK_OPENFEC_REDIS_URL:
-            response = query_filings(query, form_type)
+        if settings.FLAG__EFO_TARGET == "PRODUCTION":
+            form_type = request.query_params.get("form_type")
+            if settings.MOCK_OPENFEC_REDIS_URL:
+                response = query_filings(query, form_type)
+            else:
+                params = {
+                    "api_key": settings.FEC_API_KEY,
+                    "q_filer": query,
+                    "sort": "-receipt_date",
+                    "form_type": form_type,
+                    "most_recent": True,
+                }
+                fec_response = requests.get(f"{settings.FEC_API}filings/", params)
+                response = fec_response.json()
+            return Response(response)
         else:
-            params = {
-                "api_key": settings.FEC_API_KEY,
-                "q_filer": query,
-                "sort": "-receipt_date",
-                "form_type": form_type,
-                "most_recent": True,
-            }
-            fec_response = requests.get(f"{settings.FEC_API}filings/", params)
-            response = fec_response.json()
-        return Response(response)
+            return Response(self.query_filings_from_test_efo(query))
 
 
 def retrieve_recent_f1(committee_id):
@@ -107,10 +133,8 @@ def retrieve_recent_f1(committee_id):
     else:
         endpoints = [f"{settings.FEC_API}/efile/test-form1/"]
 
-    logger.debug(f"\n\nF1 Retrieval Endpoints: {endpoints}\n\n")
     for endpoint in endpoints:
         response = requests.get(endpoint, headers=headers, params=params).json()
-        logger.debug(f"\n\nResults:\n\n{response}\n\n")
         results = response["results"]
         if len(results) > 0:
             return results[0]
