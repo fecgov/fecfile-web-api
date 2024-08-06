@@ -19,7 +19,10 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         if response:
             return Response(response)
 
-        if settings.FLAG__EFO_TARGET == "PRODUCTION":
+        if (
+            settings.FLAG__EFO_TARGET == "PRODUCTION"
+            or request.GET.get('force_efo_target') == "PRODUCTION"
+        ):
             response = requests.get(
                 f"{settings.FEC_API}committee/{pk}/?api_key={settings.FEC_API_KEY}"
             )
@@ -69,9 +72,12 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 break
 
         matching_results = []
+        found_committees = {}
         for result in results:
             if query in result['committee_name'] or query in result['committee_id']:
-                matching_results.append(result)
+                if not found_committees.get(result['committee_id']):
+                    found_committees[result['committee_id']] = result['committee_name']
+                    matching_results.append(result)
 
         return {
             'api_version': last_good_response.get('api_version', None),
