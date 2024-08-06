@@ -19,8 +19,8 @@ applications:
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
       FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
       LOGIN_REDIRECT_CLIENT_URL: https://fecfile.fec.gov
-      LOGIN_REDIRECT_SERVER_URL: https://api.fecfile.fec.gov/api/v1/auth/login-redirect
-      LOGOUT_REDIRECT_URL: https://api.fecfile.fec.gov/api/v1/auth/logout-redirect
+      LOGIN_REDIRECT_SERVER_URL: https://api.fecfile.fec.gov/api/v1/oidc/login-redirect
+      LOGOUT_REDIRECT_URL: https://api.fecfile.fec.gov/api/v1/oidc/logout-redirect
       FEC_API_PROD: https://api.open.fec.gov/v1/
       FEC_API_TEST: https://api-stage.open.fec.gov/v1/
       SESSION_COOKIE_AGE: 64800

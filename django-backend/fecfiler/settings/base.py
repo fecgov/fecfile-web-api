@@ -56,7 +56,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
-    "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -77,6 +76,8 @@ INSTALLED_APPS = [
     "fecfiler.openfec",
     "fecfiler.user",
     "fecfiler.mock_openfec",
+    "fecfiler.oidc",
+    "fecfiler.devops",
 ]
 
 MIDDLEWARE = [
@@ -137,29 +138,25 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
 
-# OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
+    "fecfiler.oidc.backends.OIDCAuthenticationBackend",
 ]
 
-OIDC_CREATE_USER = True
-OIDC_STORE_ID_TOKEN = True
 # Maximum number of concurrent sessions
 OIDC_MAX_STATES = 3
 
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_RP_CLIENT_ID = env.get_credential("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET_STAGING = env.get_credential("OIDC_RP_CLIENT_SECRET_STAGING")
 OIDC_RP_CLIENT_SECRET = env.get_credential("OIDC_RP_CLIENT_SECRET")
+OIDC_RP_CLIENT_SECRET_BACKUP = env.get_credential("OIDC_RP_CLIENT_SECRET_BACKUP")
 
 # The Django field used to identify users - default is email
 OIDC_RP_UNIQUE_IDENTIFIER = "username"
 
 # Sometimes the OP (IDP - login.gov)has a different label for the unique ID
 OIDC_OP_UNIQUE_IDENTIFIER = "sub"
-
-# Default implicit_flow is considered vulnerable
-OIDC_OP_CLIENT_AUTH_METHOD = "private_key_jwt"
 
 OIDC_OP_AUTODISCOVER_ENDPOINT = (
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
@@ -171,7 +168,8 @@ OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
 OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
 OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
 OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
-ALLOW_LOGOUT_GET_METHOD = True
+
+OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
@@ -181,14 +179,18 @@ LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
 LOGOUT_REDIRECT_URL = env.get_credential("LOGOUT_REDIRECT_URL")
 
-OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
-    "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
-}
-
-OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
-
-OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
-# OpenID Connect settings end
+# keygen settings
+LOGIN_DOT_GOV_RSA_PK_SIZE = int(env.get_credential("LOGIN_DOT_GOV_RSA_PK_SIZE", "2048"))
+LOGIN_DOT_GOV_X509_DAYS_VALID = float(
+    env.get_credential("LOGIN_DOT_GOV_X509_DAYS_VALID", "365")
+)
+LOGIN_DOT_GOV_X509_COUNTRY = env.get_credential("LOGIN_DOT_GOV_X509_COUNTRY")
+LOGIN_DOT_GOV_X509_STATE = env.get_credential("LOGIN_DOT_GOV_X509_STATE")
+LOGIN_DOT_GOV_X509_LOCALITY = env.get_credential("LOGIN_DOT_GOV_X509_LOCALITY")
+LOGIN_DOT_GOV_X509_ORG = env.get_credential("LOGIN_DOT_GOV_X509_ORG")
+LOGIN_DOT_GOV_X509_ORG_UNIT = env.get_credential("LOGIN_DOT_GOV_X509_ORG_UNIT")
+LOGIN_DOT_GOV_X509_COMMON_NAME = env.get_credential("LOGIN_DOT_GOV_X509_COMMON_NAME")
+LOGIN_DOT_GOV_X509_EMAIL_ADDRESS = env.get_credential("LOGIN_DOT_GOV_X509_EMAIL_ADDRESS")
 
 USE_X_FORWARDED_HOST = True
 

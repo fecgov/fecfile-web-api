@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
+from fecfiler.transactions.transaction_dependencies import update_dependent_descriptions
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
     Transaction,
@@ -19,7 +20,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report, flag_reports_for_recalculation
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -44,15 +45,15 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering_fields = getattr(view, "ordering_fields", [])
 
         if ordering_query_param:
-            fields = [param.strip() for param in ordering_query_param.split(',')]
+            fields = [param.strip() for param in ordering_query_param.split(",")]
             ordering = []
             for field in fields:
-                if field.strip('-') in ordering_fields:
-                    if field == '-memo_code' and not (
+                if field.strip("-") in ordering_fields:
+                    if field == "-memo_code" and not (
                         queryset.filter(memo_code=True).exists()
                         and queryset.exclude(memo_code=True).exists()
                     ):
-                        field = 'memo_code'
+                        field = "memo_code"
                     ordering.append(field)
             if ordering:
                 return ordering
@@ -292,7 +293,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
-            flag_reports_for_recalculation(report)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -318,6 +318,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     del child_transaction_data["contact_1"]
 
                 self.save_transaction(child_transaction_data, request)
+
+        """ trigger updates to transactions with fields that depend on this one
+        EXAMPLE: if this transaction is a JF transfer, update the descriptions of its
+        children and grandchildren transactions with any changes to the committee name
+        """
+        update_dependent_descriptions(transaction_instance)
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -356,7 +362,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.add(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction added to report")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
@@ -372,7 +377,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.remove(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction removed from report")
 
 
