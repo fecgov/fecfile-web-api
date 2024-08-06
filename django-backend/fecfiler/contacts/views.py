@@ -19,9 +19,12 @@ from fecfiler.settings import (
 from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
+from django.http.response import HttpResponse
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
+from fecfiler.mock_openfec.mock_endpoints import committee
+import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
 
@@ -98,6 +101,19 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
+
+    @action(detail=False)
+    def committee(self, request):
+        committee_id = request.query_params.get("committee_id")
+        if not committee_id:
+            return HttpResponseBadRequest()
+        response = committee(committee_id)
+        if response:
+            return Response(response)
+        response = requests.get(
+            f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}"
+        )
+        return HttpResponse(response)
 
     @action(detail=False)
     def candidate_lookup(self, request):
