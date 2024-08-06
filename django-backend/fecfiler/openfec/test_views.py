@@ -25,7 +25,7 @@ class OpenfecViewSetTest(TestCase):
                 )
                 self.assertEqual(response.status_code, 200)
 
-    def test_get_committee_from_test_efo(self):
+    def test_get_committee_no_override_from_test_efo(self):
         with patch("fecfiler.openfec.views.settings") as settings:
             settings.FLAG__EFO_TARGET = "TEST"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
@@ -84,6 +84,40 @@ class OpenfecViewSetTest(TestCase):
         with patch("fecfiler.openfec.views.settings") as settings:
             settings.FLAG__EFO_TARGET = "PRODUCTION"
             request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                mock_requests.get.return_value = mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response_object = {}
+                mock_response_object["results"] = [{}]
+                mock_response_object["results"][0]["form_type"] = "F1"
+                mock_response.json.return_value = mock_response_object
+                response = OpenfecViewSet.as_view({"get": "f1_filing"})(
+                    request, pk="C00100230"
+                )
+                self.assertEqual(response.status_code, 200)
+
+    def test_get_filings_from_test_efo_happy_path(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__EFO_TARGET = "TEST"
+            request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                mock_requests.get.return_value = mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response_object = {}
+                mock_response_object["results"] = [{}]
+                mock_response_object["results"][0]["form_type"] = "F1"
+                mock_response.json.return_value = mock_response_object
+                response = OpenfecViewSet.as_view({"get": "f1_filing"})(
+                    request, pk="C00100230"
+                )
+                self.assertEqual(response.status_code, 200)
+
+    def test_query_filings_from_test_efo(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__EFO_TARGET = "TEST"
+            request = self.factory.get("/api/v1/openfec/query_filings/?query=C00")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
                 mock_requests.get.return_value = mock_response = Mock()
