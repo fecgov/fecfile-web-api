@@ -160,6 +160,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "webprintsubmission",
                     "memotext",
                     "transaction",
+                    "transactions",
                     "dotfec",
                     "report",
                     "reporttransaction",
