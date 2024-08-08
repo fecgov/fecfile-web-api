@@ -91,9 +91,13 @@ def get_jf_transfer_descriptions(memo_prefix: str, commmittee_name: str):
     """Generate descriptions for the dependent transactions of a joint
     fundraising transfer. There are 4 descriptions:
     1. The description for most children transactions (ex: "JF Memo: Committee Name")
-    2. The description for grandchildren transactions (ex: "JF Memo: Committee Name (Partnership Attribution)")
-    3. The description for partnership memos with no grandchildren (ex: "JF Memo: Committee Name (Partnership attributions do not meet itemization threshold)")
-    4. The description for partnership memos with grandchildren (ex: "JF Memo: Committee Name (See Partnership Attribution(s) below)")
+    2. The description for grandchildren transactions
+        (ex: "JF Memo: Committee Name (Partnership Attribution)")
+    3. The description for partnership memos with no grandchildren
+        (ex: "JF Memo: Committee Name (Partnership attributions do not meet
+          itemization threshold)")
+    4. The description for partnership memos with grandchildren
+        (ex: "JF Memo: Committee Name (See Partnership Attribution(s) below)")
     """
     committee_clause = f"{memo_prefix} {commmittee_name}"
     attribution_description = get_truncated_description(

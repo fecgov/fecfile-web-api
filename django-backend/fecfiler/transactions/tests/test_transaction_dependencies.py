@@ -25,7 +25,8 @@ class TransactionDependenciesTestCase(TestCase):
         expected = (
             "JF Memo: Committee Name",
             "JF Memo: Committee Name (Partnership Attribution)",
-            "JF Memo: Committee Name (Partnership attributions do not meet itemization threshold)",
+            "JF Memo: Committee Name (Partnership attributions do"
+            + " not meet itemization threshold)",
             "JF Memo: Committee Name (See Partnership Attribution(s) below)",
         )
         self.assertEqual(
@@ -39,7 +40,8 @@ class TransactionDependenciesTestCase(TestCase):
         )
         expected = (
             "Pres. Nominating Convention Account JF Memo:"
-            + " Committee Name That Is reeeeeeeeeeeeeeeeeeeeeeaaaaaaaaaaaaaaaaaaaaaaally Long",
+            + " Committee Name That Is"
+            + " reeeeeeeeeeeeeeeeeeeeeeaaaaaaaaaaaaaaaaaaaaaaally Long",
             "Pres. Nominating Convention Account JF Memo:"
             + " Committee Name That Is ree... (Partnership Attribution)",
             "Pres. Nominating Convention Account"
@@ -100,11 +102,13 @@ class TransactionDependenciesTestCase(TestCase):
         partnership_memo.refresh_from_db()
         self.assertEquals(
             partnership_memo.schedule_a.contribution_purpose_descrip,
-            "JF Memo: Parent Contact (Partnership attributions do not meet itemization threshold)",
+            "JF Memo: Parent Contact"
+            + " (Partnership attributions do not meet itemization threshold)",
         )
 
     def test_jf_partnership_memo_with_attribution(self):
-        """Test the full process of updating the description for a JF partnership memo with an attribution"""
+        """Test the full process of updating the description
+        for a JF partnership memo with an attribution"""
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
