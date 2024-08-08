@@ -112,7 +112,7 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aupdate</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aupdate_or_create</span></code>([defaults])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aupdate_or_create</span></code>([defaults, create_defaults])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.bulk_create" title="fecfiler.authentication.models.AccountManager.bulk_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bulk_create</span></code></a>(objs[, batch_size, ...])</p></td>
@@ -148,7 +148,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.dates" title="fecfiler.authentication.models.AccountManager.dates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dates</span></code></a>(field_name, kind[, order])</p></td>
 <td><p>Return a list of date objects representing all available dates for the given field_name, scoped to 'kind'.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.datetimes" title="fecfiler.authentication.models.AccountManager.datetimes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetimes</span></code></a>(field_name, kind[, order, tzinfo, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.datetimes" title="fecfiler.authentication.models.AccountManager.datetimes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetimes</span></code></a>(field_name, kind[, order, tzinfo])</p></td>
 <td><p>Return a list of datetime objects representing all available datetimes for the given field_name, scoped to 'kind'.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">db_manager</span></code>([using, hints])</p></td>
@@ -253,7 +253,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.update" title="fecfiler.authentication.models.AccountManager.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(**kwargs)</p></td>
 <td><p>Update all elements in the current QuerySet, setting all the given fields to the appropriate values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.update_or_create" title="fecfiler.authentication.models.AccountManager.update_or_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_or_create</span></code></a>([defaults])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.update_or_create" title="fecfiler.authentication.models.AccountManager.update_or_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_or_create</span></code></a>([defaults, create_defaults])</p></td>
 <td><p>Look up an object with the given kwargs, updating one with defaults if it exists, otherwise create a new one.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.authentication.models.AccountManager.using" title="fecfiler.authentication.models.AccountManager.using"><code class="xref py py-obj docutils literal notranslate"><span class="pre">using</span></code></a>(alias)</p></td>
@@ -371,7 +371,7 @@ the given field_name, scoped to ‘kind’.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.authentication.models.AccountManager.datetimes">
-<span class="sig-name descname"><span class="pre">datetimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order='ASC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tzinfo=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_dst=&lt;object</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.AccountManager.datetimes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">datetimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ASC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tzinfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.AccountManager.datetimes" title="Link to this definition">¶</a></dt>
 <dd><p>Return a list of datetime objects representing all available
 datetimes for the given field_name, scoped to ‘kind’.</p>
 </dd></dl>
@@ -563,9 +563,11 @@ fields to the appropriate values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.authentication.models.AccountManager.update_or_create">
-<span class="sig-name descname"><span class="pre">update_or_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.AccountManager.update_or_create" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_or_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.authentication.models.AccountManager.update_or_create" title="Link to this definition">¶</a></dt>
 <dd><p>Look up an object with the given kwargs, updating one with defaults
-if it exists, otherwise create a new one.
+if it exists, otherwise create a new one. Optionally, an object can
+be created with different values than defaults by using
+create_defaults.
 Return a tuple (object, created), where created is a boolean
 specifying whether an object was created.</p>
 </dd></dl>

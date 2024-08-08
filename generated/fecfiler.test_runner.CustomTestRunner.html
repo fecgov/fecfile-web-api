@@ -52,7 +52,7 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_arguments</span></code>(parser)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_suite</span></code>([test_labels, extra_tests])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_suite</span></code>([test_labels])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_databases</span></code>(suite)</p></td>
@@ -79,7 +79,7 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_suite</span></code>(suite, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="fecfiler.test_runner.CustomTestRunner.run_tests"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_tests</span></code></a>(test_labels[, extra_tests])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="fecfiler.test_runner.CustomTestRunner.run_tests"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_tests</span></code></a>(test_labels, **kwargs)</p></td>
 <td><p>Run the unit tests for all the test labels in the provided list.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_databases</span></code>(**kwargs)</p></td>
@@ -134,7 +134,7 @@ prints all levels.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.test_runner.CustomTestRunner.run_tests">
-<span class="sig-name descname"><span class="pre">run_tests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_tests</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_tests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_labels</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.test_runner.CustomTestRunner.run_tests" title="Link to this definition">¶</a></dt>
 <dd><p>Run the unit tests for all the test labels in the provided list.</p>
 <p>Test labels should be dotted Python paths to test modules, test
 classes, or test methods.</p>

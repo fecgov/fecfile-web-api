@@ -20,6 +20,7 @@ fecfiler.user.models.User
    .. autosummary::
    
       ~User.__init__
+      ~User.acheck_password
       ~User.adelete
       ~User.arefresh_from_db
       ~User.asave

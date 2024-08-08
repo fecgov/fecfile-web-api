@@ -20,6 +20,7 @@ fecfiler.authentication.models.Account
    .. autosummary::
    
       ~Account.__init__
+      ~Account.acheck_password
       ~Account.adelete
       ~Account.arefresh_from_db
       ~Account.asave
