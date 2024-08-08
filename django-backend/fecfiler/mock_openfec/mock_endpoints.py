@@ -5,6 +5,8 @@ import redis
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
 if MOCK_OPENFEC_REDIS_URL:
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
+else:
+    redis_instance = None
 
 
 def committee(committee_id):

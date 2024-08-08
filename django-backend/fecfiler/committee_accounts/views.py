@@ -13,9 +13,7 @@ from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
-import requests
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
@@ -235,19 +233,10 @@ def register_committee(committee_id, user):
 
     if MOCK_OPENFEC_REDIS_URL:
         f1 = recent_f1(committee_id)
-        f1_emails = (f1 or {}).get("email")
     else:
         f1 = retrieve_recent_f1(committee_id)
-        dot_fec_url = (f1 or {}).get("fec_url")
-        if dot_fec_url:
-            response = requests.get(
-                dot_fec_url,
-                headers={"User-Agent": "fecfile-api"},
-            )
-            dot_fec_content = response.content.decode("utf-8")
-            f1_line = dot_fec_content.split("\n")[1]
-            f1_emails = f1_line.split(FS_STR)[11]
 
+    f1_emails = (f1 or {}).get("email")
     failure_reason = check_email_match(email, f1_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
