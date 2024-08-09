@@ -17,7 +17,9 @@ fecfiler.transactions.transaction\_dependencies
    .. autosummary::
       :toctree:                                          
    
-      get_jf_transfer_description
+      get_jf_transfer_descriptions
+      get_new_description_clause
+      get_truncated_description
       update_dependent_descriptions
    
    

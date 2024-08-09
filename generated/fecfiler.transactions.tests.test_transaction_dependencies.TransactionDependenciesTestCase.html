@@ -331,11 +331,17 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.tearDownClass" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_description" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_jf_transfer_description</span></code></a>()</p></td>
-<td><p>Test just the logic of generating the description</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_jf_transfer_descriptions</span></code></a>()</p></td>
+<td><p>Test just the logic of generating all the descriptions</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_update_dependent_descriptions" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_update_dependent_descriptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_update_dependent_descriptions</span></code></a>()</p></td>
-<td><p>Test the full process of updating dependent transaction descriptions</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_jf_memo</span></code></a>()</p></td>
+<td><p>Test the full process of updating the description for a JF memo</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_jf_partnership_memo</span></code></a>()</p></td>
+<td><p>Test the full process of updating the description for a JF partnership memo</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution" title="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_jf_partnership_memo_with_attribution</span></code></a>()</p></td>
+<td><p>Test the full process of updating the description for a JF partnership memo with an attribution</p></td>
 </tr>
 </tbody>
 </table>
@@ -1052,15 +1058,28 @@ block, allowing further test code to be executed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_description">
-<span class="sig-name descname"><span class="pre">test_get_jf_transfer_description</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_description" title="Link to this definition">¶</a></dt>
-<dd><p>Test just the logic of generating the description</p>
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions">
+<span class="sig-name descname"><span class="pre">test_get_jf_transfer_descriptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions" title="Link to this definition">¶</a></dt>
+<dd><p>Test just the logic of generating all the descriptions</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_update_dependent_descriptions">
-<span class="sig-name descname"><span class="pre">test_update_dependent_descriptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_update_dependent_descriptions" title="Link to this definition">¶</a></dt>
-<dd><p>Test the full process of updating dependent transaction descriptions</p>
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo">
+<span class="sig-name descname"><span class="pre">test_jf_memo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo" title="Link to this definition">¶</a></dt>
+<dd><p>Test the full process of updating the description for a JF memo</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo">
+<span class="sig-name descname"><span class="pre">test_jf_partnership_memo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo" title="Link to this definition">¶</a></dt>
+<dd><p>Test the full process of updating the description for a JF partnership memo</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution">
+<span class="sig-name descname"><span class="pre">test_jf_partnership_memo_with_attribution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution" title="Link to this definition">¶</a></dt>
+<dd><p>Test the full process of updating the description
+for a JF partnership memo with an attribution</p>
 </dd></dl>
 
 </dd></dl>
@@ -1197,8 +1216,10 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.subTest"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.subTest()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.tearDown"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.tearDown()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.tearDownClass()</span></code></a></li>
-<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_description"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_get_jf_transfer_description()</span></code></a></li>
-<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_update_dependent_descriptions"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_update_dependent_descriptions()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_get_jf_transfer_descriptions()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_jf_memo()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_jf_partnership_memo()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution"><code class="docutils literal notranslate"><span class="pre">TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution()</span></code></a></li>
 </ul>
 </li>
 </ul>

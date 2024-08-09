@@ -1,0 +1,6 @@
+fecfiler.transactions.transaction\_dependencies.get\_truncated\_description
+===========================================================================
+
+.. currentmodule:: fecfiler.transactions.transaction_dependencies
+
+.. autofunction:: get_truncated_description

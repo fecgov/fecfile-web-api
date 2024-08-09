@@ -1,0 +1,6 @@
+fecfiler.transactions.transaction\_dependencies.get\_new\_description\_clause
+=============================================================================
+
+.. currentmodule:: fecfiler.transactions.transaction_dependencies
+
+.. autofunction:: get_new_description_clause

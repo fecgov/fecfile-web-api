@@ -1,0 +1,6 @@
+fecfiler.transactions.transaction\_dependencies.get\_jf\_transfer\_descriptions
+===============================================================================
+
+.. currentmodule:: fecfiler.transactions.transaction_dependencies
+
+.. autofunction:: get_jf_transfer_descriptions

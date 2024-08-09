@@ -113,8 +113,10 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.subTest
       ~TransactionDependenciesTestCase.tearDown
       ~TransactionDependenciesTestCase.tearDownClass
-      ~TransactionDependenciesTestCase.test_get_jf_transfer_description
-      ~TransactionDependenciesTestCase.test_update_dependent_descriptions
+      ~TransactionDependenciesTestCase.test_get_jf_transfer_descriptions
+      ~TransactionDependenciesTestCase.test_jf_memo
+      ~TransactionDependenciesTestCase.test_jf_partnership_memo
+      ~TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution
    
    
 

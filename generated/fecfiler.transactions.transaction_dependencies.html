@@ -13,7 +13,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description.html" />
+    <link rel="next" title="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions.html" />
     <link rel="prev" title="fecfiler.transactions.tests.utils.create_test_transaction" href="fecfiler.transactions.tests.utils.create_test_transaction.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -37,8 +37,14 @@
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description.html#fecfiler.transactions.transaction_dependencies.get_jf_transfer_description" title="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jf_transfer_description</span></code></a>(memo_prefix, ...)</p></td>
-<td><p>Generate a description for the dependent transaction of a joint fundraising transfer.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions.html#fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions" title="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jf_transfer_descriptions</span></code></a>(memo_prefix, ...)</p></td>
+<td><p>Generate descriptions for the dependent transactions of a joint fundraising transfer. There are 4 descriptions: 1. The description for most children transactions (ex: &quot;JF Memo: Committee Name&quot;) 2. The description for grandchildren transactions     (ex: &quot;JF Memo: Committee Name (Partnership Attribution)&quot;) 3. The description for partnership memos with no grandchildren     (ex: &quot;JF Memo: Committee Name (Partnership attributions do not meet       itemization threshold)&quot;) 4. The description for partnership memos with grandchildren     (ex: &quot;JF Memo: Committee Name (See Partnership Attribution(s) below)&quot;).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_new_description_clause.html#fecfiler.transactions.transaction_dependencies.get_new_description_clause" title="fecfiler.transactions.transaction_dependencies.get_new_description_clause"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_new_description_clause</span></code></a>(memo_prefix, ...)</p></td>
+<td><p>Generate Django Expression to update the contribution_purpose_descrip field</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_truncated_description.html#fecfiler.transactions.transaction_dependencies.get_truncated_description" title="fecfiler.transactions.transaction_dependencies.get_truncated_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_truncated_description</span></code></a>(description, ...)</p></td>
+<td><p>Truncate the description to fit within the 100 character limit and append a parenthetical.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.update_dependent_descriptions.html#fecfiler.transactions.transaction_dependencies.update_dependent_descriptions" title="fecfiler.transactions.transaction_dependencies.update_dependent_descriptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_dependent_descriptions</span></code></a>(transaction)</p></td>
 <td><p>Joint Fundraising Transfer committee names must be updated in the contribution_purpose_descrip field of dependent transactions.</p></td>
@@ -101,7 +107,9 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.signals.html">fecfiler.transactions.signals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.transactions.transaction_dependencies</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description.html">fecfiler.transactions.transaction_dependencies.get_jf_transfer_description</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions.html">fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_new_description_clause.html">fecfiler.transactions.transaction_dependencies.get_new_description_clause</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.get_truncated_description.html">fecfiler.transactions.transaction_dependencies.get_truncated_description</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.update_dependent_descriptions.html">fecfiler.transactions.transaction_dependencies.update_dependent_descriptions</a></li>
 </ul>
 </li>
@@ -129,7 +137,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.transactions.html">fecfiler.transactions</a><ul>
       <li>Previous: <a href="fecfiler.transactions.tests.utils.create_test_transaction.html" title="previous chapter">fecfiler.transactions.tests.utils.create_test_transaction</a></li>
-      <li>Next: <a href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_description.html" title="next chapter">fecfiler.transactions.transaction_dependencies.get_jf_transfer_description</a></li>
+      <li>Next: <a href="fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions.html" title="next chapter">fecfiler.transactions.transaction_dependencies.get_jf_transfer_descriptions</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
