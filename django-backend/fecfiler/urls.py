@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.views.generic.base import RedirectView
 from fecfiler.settings import LOGIN_REDIRECT_CLIENT_URL
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 BASE_V1_URL = r"^api/v1/"
 
@@ -23,6 +24,13 @@ def get_api_status(_request):
 
 
 urlpatterns = [
+    re_path(r"^api/schema/", SpectacularAPIView.as_view(api_version="v1"), name="schema"),
+    re_path(
+        r"^api/docs/",
+        SpectacularSwaggerView.as_view(
+            template_name="swagger-ui.html", url_name="schema"
+        ),
+    ),
     re_path(BASE_V1_URL, include("fecfiler.committee_accounts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.reports.urls")),
