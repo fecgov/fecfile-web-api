@@ -10,7 +10,7 @@ Django==5.0.8
 django-cors-headers==4.4.0
 django-storages==1.14.3
 djangorestframework==3.15.2
-git+https://github.com/fecgov/fecfile-validate@0f8b966b623fbca644aebb2054fe4829eb0e0a93#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@c1f8d5489361ca8194b4057e31e52dbc9abc58ae#egg=fecfile_validate&subdirectory=fecfile_validate_python
 GitPython==3.1.42
 github3.py==4.0.1
 gunicorn==22.0.0
