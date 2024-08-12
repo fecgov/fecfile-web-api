@@ -3,6 +3,8 @@ ENV PYTHONUNBUFFERED=1
 
 RUN mkdir /opt/nxg_fec_e2e
 WORKDIR /opt/nxg_fec_e2e
+RUN mkdir -p /opt/nxg_fec_e2e/media
+RUN chmod -R 755 /opt/nxg_fec_e2e/media
 ADD requirements.txt /opt
 ADD django-backend /opt/nxg_fec_e2e/
 RUN pip3 install -r /opt/requirements.txt

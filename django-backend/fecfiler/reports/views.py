@@ -1,17 +1,21 @@
+import os
+from django.http import FileResponse, Http404
 from rest_framework import filters, status, pagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
-from .models import Report
+from .models import PDF, Report
 from .report_code_label import report_code_label_case
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
-from .serializers import ReportSerializer
+from .serializers import PDFSerializer, ReportSerializer
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 import structlog
+from rest_framework.generics import ListAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 
 logger = structlog.get_logger(__name__)
 
@@ -231,3 +235,51 @@ def delete_all_reports(committee_id="C99999999", log_method=logger.warn):
 
     reports.delete()
     transactions.hard_delete()
+
+
+class PDFViewSet(ModelViewSet):
+    queryset = PDF.objects.all()
+    serializer_class = PDFSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def create(self, request, *args, **kwargs):
+        file = request.data.get("file")
+        report_id = request.data.get("report")
+        title = request.data.get("title", os.path.splitext(file.name)[0])
+
+        # Retrieve the report instance
+        try:
+            report = Report.objects.get(id=report_id)
+        except Report.DoesNotExist:
+            return Response(
+                {"error": "Report not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Create a new PDF instance
+        pdf = PDF(report=report, title=title, file=file)
+        pdf.save()
+
+        # Serialize the new PDF instance
+        serializer = PDFSerializer(pdf)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["get"])
+    def download_pdf(self, request):
+        try:
+            pk = request.query_params.get("id")
+            pdf = PDF.objects.get(pk=pk)
+            logger.debug(f"{pdf.title}")
+            return FileResponse(
+                pdf.file.open(), as_attachment=True, filename=pdf.file.name
+            )
+        except PDF.DoesNotExist:
+            raise Http404("PDF not found")
+
+
+class ReportPDFList(ListAPIView):
+    serializer_class = PDFSerializer
+
+    def get_queryset(self):
+        report_id = self.kwargs["report_id"]
+        return PDF.objects.filter(report_id=report_id)

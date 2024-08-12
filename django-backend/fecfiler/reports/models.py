@@ -207,3 +207,17 @@ class ReportTransaction(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+
+class PDF(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    report = models.ForeignKey(Report, related_name="pdfs", on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="pdfs/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)

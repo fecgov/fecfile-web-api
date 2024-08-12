@@ -394,3 +394,7 @@ CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
 )
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

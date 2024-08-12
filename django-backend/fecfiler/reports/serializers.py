@@ -1,4 +1,4 @@
-from .models import Report
+from .models import PDF, Report
 from rest_framework.serializers import (
     ModelSerializer,
     CharField,
@@ -176,3 +176,9 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
 
         fields = get_fields()
         read_only_fields = ["id", "created", "updated", "is_first"]
+
+
+class PDFSerializer(ModelSerializer):
+    class Meta:
+        model = PDF
+        fields = "__all__"
