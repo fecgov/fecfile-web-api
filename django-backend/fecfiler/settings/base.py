@@ -227,6 +227,10 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
 }
 
+SPECTACULAR_SETTINGS = {
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
 
 def get_logging_config(log_format=LINE):
     logging_config = {
