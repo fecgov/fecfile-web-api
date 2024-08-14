@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("reports", "0009_report_can_delete"),
+        ("reports", "0010_report_can_unammend"),
     ]
 
     operations = [

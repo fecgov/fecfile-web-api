@@ -395,6 +395,5 @@ CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
 
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# For storing with S3, all we should need to do is enable this flag.
+# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"

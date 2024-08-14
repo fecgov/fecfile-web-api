@@ -9,6 +9,7 @@ from fecfiler.settings import (
     FEC_FILING_API_KEY,
     FEC_AGENCY_ID,
 )
+from fecfiler.reports.models import PDF
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -59,7 +60,32 @@ class EFODotFECSubmitter(DotFECSubmitter):
         self.fec_soap_client = Client(f"{FEC_FILING_API}/webload/services/upload?wsdl")
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
-        response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
+        response = ""
+        if self.fec_soap_client:
+            # Get PDF to be uploaded.
+            # We might need to add some logic to determine which PDF gets used
+            pdf = PDF.objects.first(report=fec_report_id)
+            pdf_bytes = None
+            with open(pdf.file.path, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+            # I've changed our payload being sent over the SOAP client allow sending the pdf_file
+            # This is dependent upon the FEC SOAP client
+            payload = {
+                "json_payload": json_payload,
+                "pdf_file": pdf_bytes,
+                "dot_fec_bytes": dot_fec_bytes,
+            }
+            response = self.fec_soap_client.service.upload(payload)
+        else:
+            """return an accepted message without reaching out to api"""
+            response = json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "We didn't really send anything to FEC",
+                    "report_id": fec_report_id or str(uuid()),
+                }
+            )
         logger.debug(f"FEC upload response: {response}")
         return response
 
