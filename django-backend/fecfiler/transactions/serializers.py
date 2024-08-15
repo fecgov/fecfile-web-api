@@ -187,8 +187,8 @@ class TransactionSerializer(
             representation["aggregate_amount"] = representation.get("aggregate")
             add_schedule_b_contact_fields(instance, representation)
 
-            # # For REDESIGNATED transactions, calculate the amount that has
-            # # been redesignated for the transaction
+            # For REDESIGNATED transactions, calculate the amount that has
+            # been redesignated for the transaction
             if instance.schedule_b.reattribution_redesignation_tag == "REDESIGNATED":
                 total = (
                     instance.reatt_redes_associations.filter(
