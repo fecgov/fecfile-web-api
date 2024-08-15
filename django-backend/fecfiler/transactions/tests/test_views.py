@@ -435,3 +435,65 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(ordered_queryset.count(), len(indiviual_receipt_data))
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
+
+    def test_retrieve_schedulea_no_reatt_redes_total_field(self):
+        schedule_a_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2023-01-01",
+            "300.00",
+            group="GENERAL",
+            report=self.q1_report,
+            memo_code=False,
+        )
+
+        request = self.factory.get(f"/api/v1/transactions/{schedule_a_transaction.id}/")
+        request.user = self.user
+        request.query_params = {}
+        request.data = {}
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+
+        view = TransactionViewSet
+        view.request = request
+
+        response = view.as_view({"get": "retrieve"})(
+            request, pk=str(schedule_a_transaction.id)
+        )
+        transaction = response.data
+        logger.debug(transaction)
+        self.assertEqual(transaction.get("amount"), "300.00")
+        self.assertEqual(transaction.get("reatt_redes_total"), None)
+
+    def test_retrieve_scheduleb_no_reatt_redes_total_field(self):
+        schedule_a_transaction = create_schedule_b(
+            "GENERAL_DISBURSEMENT",
+            self.committee,
+            self.contact_1,
+            "2023-01-01",
+            "200.00",
+            "GENERAL_DISBURSEMENT",
+        )
+
+        request = self.factory.get(f"/api/v1/transactions/{schedule_a_transaction.id}/")
+        request.user = self.user
+        request.query_params = {}
+        request.data = {}
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+
+        view = TransactionViewSet
+        view.request = request
+
+        response = view.as_view({"get": "retrieve"})(
+            request, pk=str(schedule_a_transaction.id)
+        )
+        transaction = response.data
+        logger.debug(transaction)
+        self.assertEqual(transaction.get("amount"), "200.00")
+        self.assertEqual(transaction.get("reatt_redes_total"), None)
