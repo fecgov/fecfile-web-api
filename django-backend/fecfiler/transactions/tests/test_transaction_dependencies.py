@@ -4,6 +4,7 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.transaction_dependencies import (
     get_jf_transfer_descriptions,
     update_dependent_children,
+    update_dependent_parent,
 )
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.committee_accounts.views import create_committee_view
@@ -146,4 +147,47 @@ class TransactionDependenciesTestCase(TestCase):
         self.assertEquals(
             attribution_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact (Partnership Attribution)",
+        )
+
+    def test_update_dependent_parents(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            100,
+        )
+        partnership_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            100,
+        )
+        partnership_memo.parent_transaction = jf_transfer
+        partnership_memo.save()
+        attribution_memo = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            100,
+        )
+        attribution_memo.parent_transaction = partnership_memo
+        attribution_memo.save()
+        self.assertIsNone(partnership_memo.schedule_a.contribution_purpose_descrip)
+        self.assertIsNone(attribution_memo.schedule_a.contribution_purpose_descrip)
+        update_dependent_parent(attribution_memo)
+        partnership_memo.refresh_from_db()
+        self.assertEquals(
+            partnership_memo.schedule_a.contribution_purpose_descrip,
+            "JF Memo: Parent Contact (See Partnership Attribution(s) below)",
+        )
+        attribution_memo.delete()
+        update_dependent_parent(attribution_memo)
+        partnership_memo.refresh_from_db()
+        self.assertEquals(
+            partnership_memo.schedule_a.contribution_purpose_descrip,
+            "JF Memo: Parent Contact"
+            + " (Partnership attributions do not meet itemization threshold)",
         )
