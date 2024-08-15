@@ -12,6 +12,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
+from fecfiler.settings.parsers import JSONSizeLimitParser
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -192,6 +193,10 @@ LOGIN_DOT_GOV_X509_ORG_UNIT = env.get_credential("LOGIN_DOT_GOV_X509_ORG_UNIT")
 LOGIN_DOT_GOV_X509_COMMON_NAME = env.get_credential("LOGIN_DOT_GOV_X509_COMMON_NAME")
 LOGIN_DOT_GOV_X509_EMAIL_ADDRESS = env.get_credential("LOGIN_DOT_GOV_X509_EMAIL_ADDRESS")
 
+# Max size of POST or PUT requests (in bytes)
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 307200
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2
+
 USE_X_FORWARDED_HOST = True
 
 LANGUAGE_CODE = "en-us"
@@ -223,6 +228,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
+    "DEFAULT_PARSER_CLASSES": [
+        # 'rest_framework.parsers.FormParser',
+        # 'rest_framework.parsers.MultiPartParser',
+        'fecfiler.settings.parsers.JSONSizeLimitParser',
+    ]
 }
 
 
