@@ -3,7 +3,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.transaction_dependencies import (
     get_jf_transfer_descriptions,
-    update_dependent_descriptions,
+    update_dependent_children,
 )
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.committee_accounts.views import create_committee_view
@@ -72,7 +72,7 @@ class TransactionDependenciesTestCase(TestCase):
         jf_memo.parent_transaction = jf_transfer
         jf_memo.save()
         self.assertIsNone(jf_memo.schedule_a.contribution_purpose_descrip)
-        update_dependent_descriptions(jf_transfer)
+        update_dependent_children(jf_transfer)
         jf_memo.refresh_from_db()
         self.assertEquals(
             jf_memo.schedule_a.contribution_purpose_descrip,
@@ -98,7 +98,7 @@ class TransactionDependenciesTestCase(TestCase):
         partnership_memo.parent_transaction = jf_transfer
         partnership_memo.save()
         self.assertIsNone(partnership_memo.schedule_a.contribution_purpose_descrip)
-        update_dependent_descriptions(jf_transfer)
+        update_dependent_children(jf_transfer)
         partnership_memo.refresh_from_db()
         self.assertEquals(
             partnership_memo.schedule_a.contribution_purpose_descrip,
@@ -136,7 +136,7 @@ class TransactionDependenciesTestCase(TestCase):
         attribution_memo.save()
         self.assertIsNone(partnership_memo.schedule_a.contribution_purpose_descrip)
         self.assertIsNone(attribution_memo.schedule_a.contribution_purpose_descrip)
-        update_dependent_descriptions(jf_transfer)
+        update_dependent_children(jf_transfer)
         partnership_memo.refresh_from_db()
         attribution_memo.refresh_from_db()
         self.assertEquals(
