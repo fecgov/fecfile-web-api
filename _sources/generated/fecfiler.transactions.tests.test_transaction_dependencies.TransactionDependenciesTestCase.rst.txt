@@ -117,6 +117,7 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.test_jf_memo
       ~TransactionDependenciesTestCase.test_jf_partnership_memo
       ~TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution
+      ~TransactionDependenciesTestCase.test_update_dependent_parents
    
    
 

@@ -1,6 +1,0 @@
-fecfiler.transactions.transaction\_dependencies.update\_dependent\_descriptions
-===============================================================================
-
-.. currentmodule:: fecfiler.transactions.transaction_dependencies
-
-.. autofunction:: update_dependent_descriptions
