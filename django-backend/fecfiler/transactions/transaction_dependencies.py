@@ -6,7 +6,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def update_dependent_descriptions(transaction: Transaction):
+def update_dependent_children(transaction: Transaction):
     """Joint Fundraising Transfer committee names must be updated
     in the contribution_purpose_descrip field of dependent transactions."""
     if transaction.transaction_type_identifier in JF_TRANSFER_DEPENDENCIES:
@@ -48,6 +48,33 @@ def update_dependent_descriptions(transaction: Transaction):
         logger.debug(f"Updated {count} dependent transactions for {transaction}")
 
 
+def update_dependent_parent(transaction: Transaction):
+    """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
+    when thier children are created or deleted."""
+    if transaction.transaction_type_identifier in PARTNERSHIP_ATTRIBUTIONS:
+        parent = transaction.parent_transaction
+        grandparent = parent.parent_transaction
+        dependencies = JF_TRANSFER_DEPENDENCIES[grandparent.transaction_type_identifier]
+        _, _, partnership_no_children_update, partnership_with_children_update = (
+            get_jf_transfer_descriptions(
+                dependencies["prefix"], grandparent.contact_1.name
+            )
+        )
+
+        ScheduleA.objects.filter(transaction__id=parent.id).update(
+            contribution_purpose_descrip=Subquery(
+                ScheduleA.objects.filter(id=OuterRef("id"))
+                .annotate(
+                    new_description=Case(
+                        When(HAS_CHILDREN, then=Value(partnership_with_children_update)),
+                        default=Value(partnership_no_children_update),
+                    )
+                )
+                .values("new_description")[:1]
+            )
+        )
+
+
 def get_new_description_clause(
     memo_prefix: str, commmittee_name: str, transaction_id: str
 ):
@@ -61,14 +88,8 @@ def get_new_description_clause(
         partnership_with_children_update,
     ) = get_jf_transfer_descriptions(memo_prefix, commmittee_name)
 
-    has_children = Exists(
-        Transaction.objects.filter(
-            parent_transaction_id=OuterRef("transaction__id")
-        ).values("id")[:1]
-    )
-
     partnership_case = Case(
-        When(has_children, then=Value(partnership_with_children_update)),
+        When(HAS_CHILDREN, then=Value(partnership_with_children_update)),
         default=Value(partnership_no_children_update),
     )
     child_case = Case(
@@ -187,3 +208,18 @@ PARTNERSHIP_MEMOS = [
     "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
     "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
 ]
+
+# List of transaction types that are partnership attributions.
+PARTNERSHIP_ATTRIBUTIONS = [
+    "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+]
+
+# Subquery to check if a transaction has children.
+HAS_CHILDREN = Exists(
+    Transaction.objects.filter(parent_transaction_id=OuterRef("transaction__id")).values(
+        "id"
+    )[:1]
+)
