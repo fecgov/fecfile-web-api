@@ -47,6 +47,11 @@ SCHEDULE_SERIALIZERS = dict(
     E=ScheduleESerializer,
 )
 
+REATTRIBUTED = "REATTRIBUTED"
+REDESIGNATED = "REDESIGNATED"
+REATTRIBUTION_TO = "REATTRIBUTION_TO"
+REDESIGNATION_TO = "REDESIGNATION_TO"
+
 
 class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
@@ -169,10 +174,10 @@ class TransactionSerializer(
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            if instance.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED":
+            if instance.schedule_a.reattribution_redesignation_tag == REATTRIBUTED:
                 total = (
                     instance.reatt_redes_associations.filter(
-                        schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
+                        schedule_a__reattribution_redesignation_tag=REATTRIBUTION_TO
                     ).aggregate(Sum("schedule_a__contribution_amount"))[
                         "schedule_a__contribution_amount__sum"
                     ]
@@ -189,10 +194,10 @@ class TransactionSerializer(
 
             # For REDESIGNATED transactions, calculate the amount that has
             # been redesignated for the transaction
-            if instance.schedule_b.reattribution_redesignation_tag == "REDESIGNATED":
+            if instance.schedule_b.reattribution_redesignation_tag == REDESIGNATED:
                 total = (
                     instance.reatt_redes_associations.filter(
-                        schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
+                        schedule_b__reattribution_redesignation_tag=REDESIGNATION_TO
                     ).aggregate(Sum("schedule_b__expenditure_amount"))[
                         "schedule_b__expenditure_amount__sum"
                     ]
