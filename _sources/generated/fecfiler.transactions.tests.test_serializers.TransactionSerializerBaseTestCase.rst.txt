@@ -113,6 +113,9 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.subTest
       ~TransactionSerializerBaseTestCase.tearDown
       ~TransactionSerializerBaseTestCase.tearDownClass
+      ~TransactionSerializerBaseTestCase.test_has_reattribution
+      ~TransactionSerializerBaseTestCase.test_has_redesignation
+      ~TransactionSerializerBaseTestCase.test_no_reattribution
       ~TransactionSerializerBaseTestCase.test_no_transaction_type_identifier
    
    
