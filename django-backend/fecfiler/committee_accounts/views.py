@@ -23,6 +23,7 @@ from django.db.models import Q, Value
 from django.db import connection
 import structlog
 from django.http import HttpResponse
+import re
 
 logger = structlog.get_logger(__name__)
 
@@ -206,12 +207,35 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         return HttpResponse("Member removed")
 
 
+def check_email_match(email, f1_emails):
+    """
+    Check if the provided email matches any of the committee emails.
+
+    Args:
+        email (str): The email to be checked.
+        f1_emails (str): A string containing a list of committee emails separated
+        by commas or semicolons.
+
+    Returns:
+        str or None: If the provided email does not match any of the committee emails,
+        returns a string indicating the mismatch. Otherwise, returns None.
+    """
+    if not f1_emails:
+        return "No email provided in F1"
+    else:
+        f1_email_lowercase = f1_emails.lower()
+        f1_emails = re.split(r"[;,]", f1_email_lowercase)
+        if email.lower() not in f1_emails:
+            return f"Email {email} does not match committee email"
+    return None
+
+
 def register_committee(committee_id, user):
     email = user.email
 
     if MOCK_OPENFEC_REDIS_URL:
         f1 = recent_f1(committee_id)
-        f1_email = (f1 or {}).get("email")
+        f1_emails = (f1 or {}).get("email")
     else:
         f1 = retrieve_recent_f1(committee_id)
         dot_fec_url = (f1 or {}).get("fec_url")
@@ -222,24 +246,9 @@ def register_committee(committee_id, user):
             )
             dot_fec_content = response.content.decode("utf-8")
             f1_line = dot_fec_content.split("\n")[1]
-            f1_email = f1_line.split(FS_STR)[11]
+            f1_emails = f1_line.split(FS_STR)[11]
 
-    failure_reason = None
-
-    if not f1_email:
-        failure_reason = "No email provided in F1"
-    else:
-        f1_email_lowercase = f1_email.lower()
-        f1_emails = []
-        if ";" in f1_email_lowercase:
-            f1_emails = f1_email_lowercase.split(";")
-        elif "," in f1_email_lowercase:
-            f1_emails = f1_email_lowercase.split(",")
-        else:
-            f1_emails = [f1_email_lowercase]
-
-        if email.lower() not in f1_emails:
-            failure_reason = f"Email {email} does not match committee email"
+    failure_reason = check_email_match(email, f1_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
@@ -270,6 +279,5 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(
-            f"DROP VIEW IF EXISTS {view_name};"
-            f"CREATE  VIEW {view_name} as {definition}"
+            f"CREATE OR REPLACE VIEW {view_name} as {definition}"
         )

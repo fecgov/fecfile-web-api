@@ -8,3 +8,4 @@
 # Example:
 # 40104 2022-01-15
 #
+71600 2024-09-01 # gunicorn <23.0.0 vulnerability
