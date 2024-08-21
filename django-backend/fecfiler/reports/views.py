@@ -136,6 +136,17 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report.amend()
         return Response(f"amended {report}")
 
+    @action(detail=True, methods=["post"], url_name="unamend")
+    def unamend(self, request, pk):
+        report: Report = self.get_object()
+        latest_submission = (
+            UploadSubmission.objects.filter(fec_report_id=report.report_id)
+            .order_by("-created")
+            .first()
+        )
+        report.unamend(latest_submission)
+        return Response(f"unamended {report}")
+
     @action(
         detail=False,
         methods=["post"],
