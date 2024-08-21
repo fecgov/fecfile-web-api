@@ -318,7 +318,11 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-DJANGO_STRUCTLOG_CELERY_ENABLED = True
+"""System status settings
+"""
+SYSTEM_STATUS_CACHE_BACKEND = env.get_credential("REDIS_URL")
+SYSTEM_STATUS_CACHE_AGE = env.get_credential("SYSTEM_STATUS_CACHE_AGE", 60)
+
 
 """Celery configurations
 """
@@ -327,6 +331,7 @@ CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")

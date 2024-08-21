@@ -91,6 +91,7 @@ services:
       LOGIN_REDIRECT_SERVER_URL:
       LOGIN_REDIRECT_CLIENT_URL:
       LOGOUT_REDIRECT_URL:
+      SYSTEM_STATUS_CACHE_AGE:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
       AWS_STORAGE_BUCKET_NAME:
@@ -130,18 +131,19 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
-    profiles: [locust]
+    profiles: [ locust ]
     environment:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+
 
   locust-follower:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [locust]
+    profiles: [ locust ]
     environment:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
