@@ -7,7 +7,6 @@ from fecfiler.celery import debug_task
 from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
 import json
 import redis
-from datetime import datetime
 
 if SYSTEM_STATUS_CACHE_BACKEND:
     redis_instance = redis.Redis.from_url(SYSTEM_STATUS_CACHE_BACKEND)
@@ -30,14 +29,14 @@ class SystemStatusViewSet(viewsets.ViewSet):
     When the status has been determined, we update the cache with the result.
     Whether the status comes from the cache or is determined on the fly, we return it.
 
-    The `{}` protects us from someone maliciously calling the endpoint to bog down the system.
-    The side effect of that is that if you call the endpoint again before the original request
-    completes, you'll get the 503 response.  Calling the endpoint multiple times rapidly is
-    not a valid use case, so this is acceptable.
+    The `{}` protects us from someone maliciously calling the endpoint to bog down the
+    system.  The side effect of that is that if you call the endpoint again before the
+    original request completes, you'll get the 503 response.  Calling the endpoint
+    multiple times rapidly is not a valid use case, so this is acceptable.
 
-    TODO: It would be ideal to have a scheduled task updating the cache rather than the api request
-    If we integrate something like Celery Beat, we could drastically reduce the complexity of these
-    endpoints to simply return the cache value.
+    TODO: It would be ideal to have a scheduled task updating the cache rather than
+    the api request If we integrate something like Celery Beat, we could drastically
+    reduce the complexity of these endpoints to simply return the cache value.
     """
 
     @action(
@@ -112,9 +111,10 @@ def get_celery_status():
 
 def update_status_cache(key, method):
     """
-    First set the cache value to an empty dictionary to indicate that the status is being checked.
-    Then run the method to get the status and update the cache with the result.
-    The empty dictionary value keeps us from checking the status multiple times if the cache expires.
+    First set the cache value to an empty dictionary to indicate that the status is
+    being checked.  Then run the method to get the status and update the cache with
+    the result. The empty dictionary value keeps us from checking the status multiple
+    times if the cache expires.
     """
     redis_instance.set(key, json.dumps({}), ex=SYSTEM_STATUS_CACHE_AGE)
     status = method()
