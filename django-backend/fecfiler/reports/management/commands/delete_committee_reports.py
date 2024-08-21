@@ -53,11 +53,17 @@ class Command(BaseCommand):
         ).count()
 
         self.stdout.write(self.style.SUCCESS(f"Deleting Reports: {report_count}"))
-        self.stdout.write(self.style.SUCCESS(f"Deleting Transactions: {transaction_count}"))
+        self.stdout.write(self.style.SUCCESS(
+            f"Deleting Transactions: {transaction_count}"
+        ))
         self.stdout.write(self.style.SUCCESS(f"Memos: {memo_count}"))
         self.stdout.write(self.style.SUCCESS(f"Dot Fecs: {dot_fec_count}"))
-        self.stdout.write(self.style.SUCCESS(f"Upload Submissions: {upload_submission_count}"))
-        self.stdout.write(self.style.SUCCESS(f"WebPrint Submissions: {web_print_submission_count}"))
+        self.stdout.write(self.style.SUCCESS(
+            f"Upload Submissions: {upload_submission_count}"
+        ))
+        self.stdout.write(self.style.SUCCESS(
+            f"WebPrint Submissions: {web_print_submission_count}"
+        ))
 
         reports.delete()
         transactions.hard_delete()
