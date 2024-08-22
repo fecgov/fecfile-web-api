@@ -147,7 +147,10 @@ class BaseSubmission(models.Model):
 
     def mark_task_completed(self):
         self.task_completed = datetime.now(timezone.utc)
-        logger.info(f"task completed in {self.task_completed - self.created}")
+        if self.created is not None:
+            logger.info(f"task completed in {self.task_completed - self.created}")
+        else:
+            logger.warning("task completed but no created timestamp")
 
     class Meta:
         abstract = True
