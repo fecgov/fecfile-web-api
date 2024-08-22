@@ -1,7 +1,7 @@
 from enum import Enum
 import json
 import uuid
-import datetime
+from datetime import datetime, timezone
 from django.db import models
 from fecfiler.reports.models import Report, ReportMixin
 import structlog
@@ -145,8 +145,8 @@ class BaseSubmission(models.Model):
         self.save()
 
     def mark_task_completed(self):
-        self.task_completed = datetime.datetime.now()
-        logger.info(f"task completed at {self.task_completed}")
+        self.task_completed = datetime.now(timezone.utc)
+        logger.info(f"task completed in {self.task_completed - self.created}")
 
     class Meta:
         abstract = True
