@@ -145,8 +145,8 @@ class BaseSubmission(models.Model):
         self.save()
 
     def mark_task_completed(self):
-        self.task_completed = datetime.now()
-        logger.info(f"Submission attempt completed at {self.task_completed}")
+        self.task_completed = datetime.datetime.now()
+        logger.info(f"task completed at {self.task_completed}")
 
     class Meta:
         abstract = True
