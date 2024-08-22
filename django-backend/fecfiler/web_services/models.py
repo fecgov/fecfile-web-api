@@ -128,7 +128,6 @@ class BaseSubmission(models.Model):
         self.fec_submission_id = fec_response_json.get("submission_id")
         self.fec_status = fec_response_json.get("status")
         self.fec_message = fec_response_json.get("message")
-        self.mark_task_completed()
         self.save()
 
     def save_error(self, error):
@@ -141,7 +140,9 @@ class BaseSubmission(models.Model):
     def save_state(self, new_state):
         self.fecfile_task_state = new_state
         logger.info(f"Submission {self.id} is {self.fecfile_task_state}")
-        self.mark_task_completed()
+        if new_state == FECSubmissionState.SUCCEEDED:
+            self.mark_task_completed()
+
         self.save()
 
     def mark_task_completed(self):
