@@ -44,12 +44,10 @@ class DotFECSubmitter:
             copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
         logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
-    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
+    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None, mock=False):
         response = ""
-        if self.fec_soap_client:
-            response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
-        else:
-            """return an accepted message without reaching out to api"""
+        if mock:
+            logger.debug("Mock Submission")
             response = json.dumps(
                 {
                     "submission_id": "fake_submission_id",
@@ -58,6 +56,21 @@ class DotFECSubmitter:
                     "report_id": fec_report_id or str(uuid()),
                 }
             )
+        else:
+            if self.fec_soap_client:
+                response = self.fec_soap_client.service.upload(
+                    json_payload, dot_fec_bytes
+                )
+            else:
+                """return an accepted message without reaching out to api"""
+                response = json.dumps(
+                    {
+                        "submission_id": "fake_submission_id",
+                        "status": FECStatus.ACCEPTED.value,
+                        "message": "We didn't really send anything to FEC",
+                        "report_id": fec_report_id or str(uuid()),
+                    }
+                )
         logger.debug(f"FEC upload response: {response}")
         return response
 

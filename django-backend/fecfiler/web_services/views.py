@@ -103,6 +103,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         """Retrieve parameters"""
+        mock = request.query_params.get("mock", "false").lower() == "true"
         report_id = serializer.validated_data["report_id"]
         e_filing_password = serializer.validated_data["password"]
         backdoor_code = serializer.validated_data.get("backdoor_code", None)
@@ -128,6 +129,7 @@ class WebServicesViewSet(viewsets.ViewSet):
                 FEC_FILING_API,
                 False,
                 backdoor_code,
+                mock,
             )
         ).apply_async(retry=False)
 
