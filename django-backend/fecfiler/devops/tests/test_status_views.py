@@ -3,6 +3,7 @@ from fecfiler.devops.views import (
     get_celery_status,
     get_database_status,
     get_redis_value,
+    update_status_cache,
     redis_instance,
 )
 
@@ -20,6 +21,14 @@ class SystemStatusViewTest(TestCase):
     def get_redis_value(self):
         key, value = "test_key", "test_value"
         redis_instance.set(key, value)
+        self.assertEqual(get_redis_value(key), value)
+        redis_instance.delete(key)
+        self.assertIsNone(get_redis_value(key))
+
+    def test_update_status_cache(self):
+        key, value = "test_key", "test_value"
+        self.assertIsNone(get_redis_value(key))
+        update_status_cache(key, lambda: value)
         self.assertEqual(get_redis_value(key), value)
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
