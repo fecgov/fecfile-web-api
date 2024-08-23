@@ -1,0 +1,6 @@
+fecfiler.web\_services.migrations.0002\_uploadsubmission\_task\_completed\_and\_more.set\_default\_task\_completed\_times
+=========================================================================================================================
+
+.. currentmodule:: fecfiler.web_services.migrations.0002_uploadsubmission_task_completed_and_more
+
+.. autofunction:: set_default_task_completed_times
