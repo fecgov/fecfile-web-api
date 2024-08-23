@@ -76,6 +76,7 @@ fecfiler.reports.form\_24.views.Form24ViewSet
       ~Form24ViewSet.reverse_action
       ~Form24ViewSet.setup
       ~Form24ViewSet.throttled
+      ~Form24ViewSet.unamend
       ~Form24ViewSet.update
    
    

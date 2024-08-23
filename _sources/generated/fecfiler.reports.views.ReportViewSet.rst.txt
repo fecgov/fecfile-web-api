@@ -76,6 +76,7 @@ fecfiler.reports.views.ReportViewSet
       ~ReportViewSet.reverse_action
       ~ReportViewSet.setup
       ~ReportViewSet.throttled
+      ~ReportViewSet.unamend
       ~ReportViewSet.update
    
    

@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0010\_report\_can\_unammend.create\_trigger
+=======================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0010_report_can_unammend
+
+.. autofunction:: create_trigger

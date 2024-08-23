@@ -79,6 +79,7 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.reverse_action
       ~Form3XViewSet.setup
       ~Form3XViewSet.throttled
+      ~Form3XViewSet.unamend
       ~Form3XViewSet.update
    
    

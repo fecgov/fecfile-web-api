@@ -76,6 +76,7 @@ fecfiler.reports.form\_99.views.Form99ViewSet
       ~Form99ViewSet.reverse_action
       ~Form99ViewSet.setup
       ~Form99ViewSet.throttled
+      ~Form99ViewSet.unamend
       ~Form99ViewSet.update
    
    

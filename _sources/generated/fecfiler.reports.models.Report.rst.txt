@@ -44,6 +44,7 @@ fecfiler.reports.models.Report
       ~Report.save
       ~Report.save_base
       ~Report.serializable_value
+      ~Report.unamend
       ~Report.unique_error_message
       ~Report.validate_constraints
       ~Report.validate_unique
@@ -59,6 +60,7 @@ fecfiler.reports.models.Report
       ~Report.calculation_status
       ~Report.calculation_token
       ~Report.can_delete
+      ~Report.can_unamend
       ~Report.city
       ~Report.committee_account
       ~Report.committee_account_id

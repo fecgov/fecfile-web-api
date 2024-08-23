@@ -116,6 +116,7 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.test_amending
       ~ReportModelTestCase.test_amending_f24
       ~ReportModelTestCase.test_delete
+      ~ReportModelTestCase.test_unamending
    
    
 
