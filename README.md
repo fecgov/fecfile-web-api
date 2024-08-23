@@ -42,7 +42,14 @@ export FEC_API="https://api.open.fec.gov/v1/"
 # Note - this API key has a very low rate limit -
 # For a better key, reach out to a team member or get one at https://api.open.fec.gov/developers/
 export FEC_API_KEY="DEMO_KEY"
+```
+
+By default EFO services will be mocked
+To integrate with EFO, set the following environment variables:
+
+```
 # Test EFO Services (for test filings):
+export MOCK_EFO=False
 export FEC_FILING_API="EFO_get_this_from_team_member"
 export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 ```

@@ -10,10 +10,16 @@ from fecfiler.web_services.models import (
     FECStatus,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
-from fecfiler.web_services.dot_fec.dot_fec_submitter import DotFECSubmitter
-from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
+from fecfiler.web_services.dot_fec.dot_fec_submitter import (
+    EFODotFECSubmitter,
+    MockDotFECSubmitter,
+)
+from fecfiler.web_services.dot_fec.web_print_submitter import (
+    EFOWebPrintSubmitter,
+    MockWebPrintSubmitter,
+)
 from .web_service_storage import get_file_bytes, store_file
-from fecfiler.settings import WEBPRINT_EMAIL, FEC_FILING_API
+from fecfiler.settings import WEBPRINT_EMAIL
 
 import structlog
 
@@ -66,12 +72,10 @@ def submit_to_fec(
     dot_fec_id,
     submission_record_id,
     e_filing_password,
-    api=None,
     force_read_from_disk=False,
     backdoor_code=None,
+    mock=False,
 ):
-    logger.info(f"FEC API: {FEC_FILING_API}")
-    logger.info(f"api submitter: {api}")
 
     submission = UploadSubmission.objects.get(id=submission_record_id)
     if submission.fecfile_task_state == FECSubmissionState.FAILED:
@@ -94,7 +98,7 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submitter = DotFECSubmitter(api)
+        submitter = EFODotFECSubmitter() if not mock else MockDotFECSubmitter()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
             dot_fec_record, e_filing_password, backdoor_code
@@ -129,13 +133,8 @@ def submit_to_fec(
 
 @shared_task
 def submit_to_webprint(
-    dot_fec_id,
-    submission_record_id,
-    api=None,
-    force_read_from_disk=False,
+    dot_fec_id, submission_record_id, force_read_from_disk=False, mock=False
 ):
-    logger.info(f"FEC API: {FEC_FILING_API}")
-    logger.info(f"api submitter: {api}")
     submission = WebPrintSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
@@ -155,7 +154,7 @@ def submit_to_webprint(
 
     """Submit to WebPrint"""
     try:
-        submitter = WebPrintSubmitter(api)
+        submitter = EFOWebPrintSubmitter() if not mock else MockWebPrintSubmitter()
         logger.info(f"Uploading {file_name} to FEC WebPrint")
         submission_response_string = submitter.submit(email, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)

@@ -52,6 +52,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
+      MOCK_EFO: True
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
@@ -96,6 +97,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
+      MOCK_EFO: True
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
@@ -130,18 +132,19 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
-    profiles: [locust]
+    profiles: [ locust ]
     environment:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+
 
   locust-follower:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [locust]
+    profiles: [ locust ]
     environment:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
