@@ -22,6 +22,8 @@ fecfiler.web\_services.dot\_fec.web\_print\_submitter
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      EFOWebPrintSubmitter
+      MockWebPrintSubmitter
       WebPrintSubmitter
    
    

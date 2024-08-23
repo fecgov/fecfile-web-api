@@ -23,6 +23,8 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_submitter
       :template: custom-class-template.rst               
    
       DotFECSubmitter
+      EFODotFECSubmitter
+      MockDotFECSubmitter
    
    
 

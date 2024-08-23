@@ -14,7 +14,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fecfiler.web_services.migrations" href="fecfiler.web_services.migrations.html" />
-    <link rel="prev" title="fecfiler.web_services.dot_fec.web_print_submitter" href="fecfiler.web_services.dot_fec.web_print_submitter.html" />
+    <link rel="prev" title="fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter" href="fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -36,31 +36,24 @@
 <h1>fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter<a class="headerlink" href="#fecfiler-web-services-dot-fec-web-print-submitter-webprintsubmitter" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.web_print_submitter.</span></span><span class="sig-name descname"><span class="pre">WebPrintSubmitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.web_print_submitter.</span></span><span class="sig-name descname"><span class="pre">WebPrintSubmitter</span></span><a class="headerlink" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract submitter class for submitnig .FEC files to a web print service</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__" title="fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(api)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__" title="fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">poll_status</span></code>(batch_id, submission_id)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit</span></code>(email, dot_fec_bytes)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fec_soap_client</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -122,6 +115,8 @@
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.test_dot_fec_serializer.html">fecfiler.web_services.dot_fec.test_dot_fec_serializer</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.test_dot_fec_submitter.html">fecfiler.web_services.dot_fec.test_dot_fec_submitter</a></li>
 <li class="toctree-l5 current"><a class="reference internal" href="fecfiler.web_services.dot_fec.web_print_submitter.html">fecfiler.web_services.dot_fec.web_print_submitter</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.web_print_submitter.EFOWebPrintSubmitter.html">fecfiler.web_services.dot_fec.web_print_submitter.EFOWebPrintSubmitter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter.html">fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter</a></li>
 <li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter</a><ul>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter"><code class="docutils literal notranslate"><span class="pre">WebPrintSubmitter</span></code></a><ul>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.dot_fec.web_print_submitter.WebPrintSubmitter.__init__"><code class="docutils literal notranslate"><span class="pre">WebPrintSubmitter.__init__()</span></code></a></li>
@@ -164,7 +159,7 @@
   <li><a href="fecfiler.web_services.html">fecfiler.web_services</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.web_print_submitter.html">fecfiler.web_services.dot_fec.web_print_submitter</a><ul>
-      <li>Previous: <a href="fecfiler.web_services.dot_fec.web_print_submitter.html" title="previous chapter">fecfiler.web_services.dot_fec.web_print_submitter</a></li>
+      <li>Previous: <a href="fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter.html" title="previous chapter">fecfiler.web_services.dot_fec.web_print_submitter.MockWebPrintSubmitter</a></li>
       <li>Next: <a href="fecfiler.web_services.migrations.html" title="next chapter">fecfiler.web_services.migrations</a></li>
   </ul></li>
   </ul></li>
