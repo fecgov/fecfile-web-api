@@ -5,25 +5,12 @@ import random
 import json
 import math
 
-from locust import between, task, TaskSet, user
+from locust import between, task, TaskSet, user, events
 import locust_data_generator
-
-
-TEST_USER = os.environ.get("LOCAL_TEST_USER")
-TEST_PWD = os.environ.get("LOCAL_TEST_PWD")
-SESSION_ID = os.environ.get("OIDC_SESSION_ID")
 
 # seconds
 TIMEOUT = 30  # seconds
 
-# item counts
-WANTED_REPORTS = int(os.environ.get("LOCUST_WANTED_REPORTS", 10))
-WANTED_CONTACTS = int(os.environ.get("LOCUST_WANTED_CONTACTS", 100))
-WANTED_TRANSACTIONS = int(os.environ.get("LOCUST_WANTED_TRANSACTIONS", 500))
-SINGLE_TO_TRIPLE_RATIO = float(os.environ.get(
-    "LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO",
-    9 / 10
-))
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
@@ -48,27 +35,79 @@ def get_json_data(name):
     return []
 
 
+@events.init_command_line_parser.add_listener
+def _(parser):
+    parser.add_argument(
+        "--username",
+        type=str,
+        env_var="LOCAL_TEST_USER",
+        default="test@test.com",
+        help="username for local testing",
+    )
+    parser.add_argument(
+        "--password",
+        type=str,
+        env_var="LOCAL_TEST_PWD",
+        help="password for local testing",
+    )
+    parser.add_argument(
+        "--session-id",
+        type=str,
+        env_var="OIDC_SESSION_ID",
+        help="session id for cloud.gov testing",
+    )
+    parser.add_argument(
+        "--wanted-reports",
+        type=int,
+        env_var="LOCUST_WANTED_REPORTS",
+        default=10,
+        help="number of reports to create",
+    )
+    parser.add_argument(
+        "--wanted-contacts",
+        type=int,
+        env_var="LOCUST_WANTED_CONTACTS",
+        default=100,
+        help="number of contacts to create",
+    )
+    parser.add_argument(
+        "--wanted-transactions",
+        type=int,
+        env_var="LOCUST_WANTED_TRANSACTIONS",
+        default=500,
+        help="number of transactions to create",
+    )
+    parser.add_argument(
+        "--transactions-single-to-triple-ratio",
+        type=float,
+        env_var="LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO",
+        default=9 / 10,
+        help="ratio of single to triple transactions",
+    )
+
+
 class Tasks(TaskSet):
     report_ids = []
     contacts = []
 
     def on_start(self):
+        parsed_options = self.environment.parsed_options
         if "cloud.gov" in self.client.base_url:
             self.client.headers = {
-                "cookie": f"sessionid={SESSION_ID};",
+                "cookie": f"sessionid={parsed_options.session_id};",
                 "user-agent": "Locust testing",
             }
             self.report_ids = self.fetch_values("reports", "id")
             self.contacts = self.scrape_endpoint("contacts")
         else:
+            username = parsed_options.username
+            password = parsed_options.password
             login_response = self.client.post(
                 "/api/v1/user/login/authenticate",
-                json={"username": TEST_USER, "password": TEST_PWD}
+                json={"username": username, "password": password},
             )
-            csrftoken = login_response.cookies.get('csrftoken')
-            self.client.headers = {
-                "X-CSRFToken": csrftoken
-            }
+            csrftoken = login_response.cookies.get("csrftoken")
+            self.client.headers = {"X-CSRFToken": csrftoken}
             committees = self.fetch_values("committees", "id")
             committee_uuid = committees[0]
             print("committee_uuid", committee_uuid)
@@ -79,21 +118,25 @@ class Tasks(TaskSet):
             report_count = self.fetch_count("reports")
             contact_count = self.fetch_count("contacts")
             transaction_count = self.fetch_count("transactions")
-            if report_count < WANTED_REPORTS:
+            wanted_reports = parsed_options.wanted_reports
+            if report_count < wanted_reports:
                 logging.info("Not enough reports, creating some")
-                self.create_reports(WANTED_REPORTS - report_count)
-            if contact_count < WANTED_CONTACTS:
+                self.create_reports(wanted_reports - report_count)
+            wanted_contacts = parsed_options.wanted_contacts
+            if contact_count < wanted_contacts:
                 logging.info("Not enough contacts, creating some")
-                self.create_contacts(WANTED_CONTACTS - contact_count)
+                self.create_contacts(wanted_contacts - contact_count)
 
             self.report_ids = self.fetch_values("reports", "id")
             logging.info(f"Report ids {self.report_ids}")
             self.contacts = self.scrape_endpoint("contacts")
-            if transaction_count < WANTED_TRANSACTIONS:
+            wanted_transactions = parsed_options.wanted_transactions
+            single_to_triple_ratio = parsed_options.transactions_single_to_triple_ratio
+            if transaction_count < wanted_transactions:
                 logging.info("Not enough transactions, creating some")
-                difference = WANTED_TRANSACTIONS - transaction_count
-                singles_needed = math.ceil(difference * SINGLE_TO_TRIPLE_RATIO)
-                triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
+                difference = wanted_transactions - transaction_count
+                singles_needed = math.ceil(difference * single_to_triple_ratio)
+                triples_needed = math.ceil(difference * (1 - single_to_triple_ratio))
                 self.create_single_transactions(singles_needed)
                 self.create_triple_transactions(triples_needed)
 
@@ -106,11 +149,9 @@ class Tasks(TaskSet):
             "coverage_through_date",
             "date_of_election",
             "state_of_election",
-            "form_type"
+            "form_type",
         ]
-        params = {
-            "fields_to_validate": fields_to_validate
-        }
+        params = {"fields_to_validate": fields_to_validate}
 
         reports = get_json_data("form-3x")
         if len(reports) < count:
@@ -122,7 +163,7 @@ class Tasks(TaskSet):
                 name="create_report",
                 # TODO: does it make sense to pass both the params and json here?
                 params=params,
-                json=report
+                json=report,
             )
 
     def create_contacts(self, count=1):
@@ -137,7 +178,7 @@ class Tasks(TaskSet):
                 # TODO: does it make sense to pass both the params and json here?
                 # Same with create_reports
                 json=contact,
-                timeout=TIMEOUT
+                timeout=TIMEOUT,
             )
 
     def create_single_transactions(self, count=1):
@@ -146,9 +187,7 @@ class Tasks(TaskSet):
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_single_transactions(
-                difference,
-                self.contacts,
-                self.report_ids
+                difference, self.contacts, self.report_ids
             )
 
         for transaction in transactions[:count]:
@@ -160,9 +199,7 @@ class Tasks(TaskSet):
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_triple_transactions(
-                difference,
-                self.contacts,
-                self.report_ids
+                difference, self.contacts, self.report_ids
             )
 
         for transaction in transactions[:count]:
@@ -206,17 +243,15 @@ class Tasks(TaskSet):
             "contributor_occupation",
             "memo_code",
             "memo_text_description",
-            "reattribution_redesignation_tag"
+            "reattribution_redesignation_tag",
         ]
-        params = {
-            "fields_to_validate": fields_to_validate
-        }
+        params = {"fields_to_validate": fields_to_validate}
         self.client.post(
             "/api/v1/transactions/",
             name="create_transactions",
             params=params,
             json=transaction,
-            timeout=TIMEOUT
+            timeout=TIMEOUT,
         )
 
     def fetch_count(self, endpoint):
@@ -252,18 +287,12 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         return self.client.get(
-            f"/api/v1/{endpoint}",
-            params=params,
-            name=f"preload_{endpoint}_ids"
+            f"/api/v1/{endpoint}", params=params, name=f"preload_{endpoint}_ids"
         )
 
     @task
     def celery_test(self):
-        self.client.get(
-            "/celery-test/",
-            name="celery-test",
-            timeout=TIMEOUT
-        )
+        self.client.get("/celery-test/", name="celery-test", timeout=TIMEOUT)
 
     @task
     def load_contacts(self):
@@ -272,10 +301,7 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         self.client.get(
-            "/api/v1/contacts/",
-            name="load_contacts",
-            timeout=TIMEOUT,
-            params=params
+            "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
         )
 
     @task
@@ -285,10 +311,7 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         self.client.get(
-            "/api/v1/reports/",
-            name="load_reports",
-            timeout=TIMEOUT,
-            params=params
+            "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
         )
 
     @task
@@ -305,7 +328,7 @@ class Tasks(TaskSet):
             "/api/v1/transactions/",
             name="load_transactions",
             timeout=TIMEOUT,
-            params=params
+            params=params,
         )
 
 
