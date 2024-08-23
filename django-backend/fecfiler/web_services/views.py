@@ -10,7 +10,7 @@ from fecfiler.web_services.tasks import (
     submit_to_webprint,
 )
 from fecfiler.web_services.summary.tasks import CalculationState, calculate_summary
-from fecfiler.settings import FEC_FILING_API
+from fecfiler.settings import MOCK_EFO
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
@@ -104,6 +104,9 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
+        if MOCK_EFO:
+            """If the server is set to mock, all submissions will be mocked"""
+            mock = True
         report_id = serializer.validated_data["report_id"]
         e_filing_password = serializer.validated_data["password"]
         backdoor_code = serializer.validated_data.get("backdoor_code", None)
@@ -126,7 +129,6 @@ class WebServicesViewSet(viewsets.ViewSet):
             | submit_to_fec.s(
                 submission_id,
                 e_filing_password,
-                FEC_FILING_API,
                 False,
                 backdoor_code,
                 mock,
@@ -148,6 +150,10 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         """Retrieve parameters"""
+        mock = request.query_params.get("mock", "false").lower() == "true"
+        if MOCK_EFO:
+            """If the server is set to mock, all submissions will be mocked"""
+            mock = True
         report_id = serializer.validated_data["report_id"]
 
         """Start tracking submission"""
@@ -166,9 +172,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         else:
             task = create_dot_fec.s(report_id, webprint_submission_id=submission_id)
 
-        task = (
-            task | submit_to_webprint.s(submission_id, FEC_FILING_API, False)
-        ).apply_async(retry=False)
+        task = (task | submit_to_webprint.s(submission_id, False, mock)).apply_async(
+            retry=False
+        )
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
