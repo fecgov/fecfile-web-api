@@ -104,7 +104,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
-        if MOCK_EFO:
+        if MOCK_EFO == "True":
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]
@@ -151,7 +151,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
-        if MOCK_EFO:
+        if MOCK_EFO == "True":
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]
