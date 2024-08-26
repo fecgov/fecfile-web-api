@@ -6,6 +6,7 @@ from fecfiler.devops.views import (
     update_status_cache,
     redis_instance,
 )
+import json
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
@@ -18,9 +19,9 @@ class SystemStatusViewTest(TestCase):
         status = get_database_status()
         self.assertTrue(status.get("database_is_running"))
 
-    def get_redis_value(self):
-        key, value = "test_key", "test_value"
-        redis_instance.set(key, value)
+    def test_get_redis_value(self):
+        key, value = "test_key", {"test": "value"}
+        redis_instance.set(key, json.dumps(value))
         self.assertEqual(get_redis_value(key), value)
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
