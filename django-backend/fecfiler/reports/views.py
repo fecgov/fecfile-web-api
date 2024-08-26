@@ -144,10 +144,11 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def e2e_delete_all_reports(self, request):
         committee_id = "C99999999"
         reports = Report.objects.filter(committee_account__committee_id=committee_id)
-        report_count = reports.count()
         transactions = Transaction.objects.filter(
             committee_account__committee_id=committee_id
         )
+
+        report_count = reports.count()
         transaction_count = transactions.count()
         memo_count = MemoText.objects.filter(
             report__committee_account__committee_id=committee_id
@@ -161,6 +162,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         web_print_submission_count = WebPrintSubmission.objects.filter(
             dot_fec__report__committee_account__committee_id=committee_id
         ).count()
+
         logger.warn(f"Deleting Reports: {report_count}")
         logger.warn(f"Deleting Transactions: {transaction_count}")
         logger.warn(f"Memos: {memo_count}")
@@ -168,8 +170,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         logger.warn(f"Upload Submissions: {upload_submission_count}")
         logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
-        reports.delete()
-        transactions.hard_delete()
+        delete_all_reports()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -213,3 +214,12 @@ def filter_by_report(queryset, viewset):
         else None
     )
     return queryset.filter(report_id=report_id) if report_id else queryset
+
+def delete_all_reports(committee_id="C99999999"):
+    reports = Report.objects.filter(committee_account__committee_id=committee_id)
+    transactions = Transaction.objects.filter(
+        committee_account__committee_id=committee_id
+    )
+
+    reports.delete()
+    transactions.hard_delete()

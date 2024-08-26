@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from fecfiler.reports.models import Report
+from fecfiler.reports.views import delete_all_reports
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -65,5 +66,4 @@ class Command(BaseCommand):
             f"WebPrint Submissions: {web_print_submission_count}"
         ))
 
-        reports.delete()
-        transactions.hard_delete()
+        delete_all_reports(committee_id)
