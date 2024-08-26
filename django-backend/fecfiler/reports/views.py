@@ -142,6 +142,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         url_path="e2e-delete-all-reports",
     )
     def e2e_delete_all_reports(self, request):
+        reports = Report.objects.filter(committee_account__committee_id=committee_id)
+        report_count = reports.count()
+
         delete_all_reports()
         return Response(f"Deleted {report_count} Reports")
 
