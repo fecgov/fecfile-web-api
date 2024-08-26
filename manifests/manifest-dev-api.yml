@@ -26,4 +26,4 @@ applications:
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       MOCK_OPENFEC: REDIS
-      MOCK_EFO: true
+      MOCK_EFO: True
