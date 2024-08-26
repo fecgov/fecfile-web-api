@@ -34,7 +34,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
 
         committee_id_regex = re.compile('^C[0-9]{1,8}$')
         if not committee_id_regex.match(query):
-            return Response(f"{query} is not part of a valid committee id")
+            return Response(f"{query} is not part of a valid committee id", status=400)
 
         if settings.MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
