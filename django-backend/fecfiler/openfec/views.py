@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.mock_openfec.mock_endpoints import query_filings, committee
 import requests
+import re
 import fecfiler.settings as settings
 
 import structlog
@@ -30,6 +31,11 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     def query_filings(self, request):
         query = request.query_params.get("query")
         form_type = request.query_params.get("form_type")
+
+        committee_id_regex = re.compile('^C[0-9]{1,8}$')
+        if not committee_id_regex.match(query):
+            return Response(f"{query} is not part of a valid committee id")
+
         if settings.MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
         else:
