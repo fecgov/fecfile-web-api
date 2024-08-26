@@ -34,36 +34,4 @@ class Command(BaseCommand):
         self.delete_committee_reports(committee_id)
 
     def delete_committee_reports(self, committee_id):
-        reports = Report.objects.filter(committee_account__committee_id=committee_id)
-        report_count = reports.count()
-        transactions = Transaction.objects.filter(
-            committee_account__committee_id=committee_id
-        )
-        transaction_count = transactions.count()
-        memo_count = MemoText.objects.filter(
-            report__committee_account__committee_id=committee_id
-        ).count()
-        dot_fec_count = DotFEC.objects.filter(
-            report__committee_account__committee_id=committee_id
-        ).count()
-        upload_submission_count = UploadSubmission.objects.filter(
-            dot_fec__report__committee_account__committee_id=committee_id
-        ).count()
-        web_print_submission_count = WebPrintSubmission.objects.filter(
-            dot_fec__report__committee_account__committee_id=committee_id
-        ).count()
-
-        self.stdout.write(self.style.SUCCESS(f"Deleting Reports: {report_count}"))
-        self.stdout.write(self.style.SUCCESS(
-            f"Deleting Transactions: {transaction_count}"
-        ))
-        self.stdout.write(self.style.SUCCESS(f"Memos: {memo_count}"))
-        self.stdout.write(self.style.SUCCESS(f"Dot Fecs: {dot_fec_count}"))
-        self.stdout.write(self.style.SUCCESS(
-            f"Upload Submissions: {upload_submission_count}"
-        ))
-        self.stdout.write(self.style.SUCCESS(
-            f"WebPrint Submissions: {web_print_submission_count}"
-        ))
-
-        delete_all_reports(committee_id)
+        delete_all_reports(committee_id, log_method=self.stdout.write)
