@@ -187,6 +187,7 @@ def filter_by_report(queryset, viewset):
     )
     return queryset.filter(report_id=report_id) if report_id else queryset
 
+
 def delete_all_reports(committee_id="C99999999", log_method=logger.warn):
     reports = Report.objects.filter(committee_account__committee_id=committee_id)
     transactions = Transaction.objects.filter(
