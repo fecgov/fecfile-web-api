@@ -137,6 +137,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             representation["is_first"] = this_report.is_first if this_report else True
 
         representation["can_delete"] = instance.can_delete
+        representation["can_unamend"] = instance.can_unamend
 
         return representation
 
@@ -160,6 +161,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "webprintsubmission",
                     "memotext",
                     "transaction",
+                    "transactions",
                     "dotfec",
                     "report",
                     "reporttransaction",
