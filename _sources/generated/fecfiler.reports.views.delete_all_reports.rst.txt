@@ -1,0 +1,6 @@
+fecfiler.reports.views.delete\_all\_reports
+===========================================
+
+.. currentmodule:: fecfiler.reports.views
+
+.. autofunction:: delete_all_reports

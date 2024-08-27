@@ -36,6 +36,7 @@ fecfiler.reports
    fecfiler.reports.form_24
    fecfiler.reports.form_3x
    fecfiler.reports.form_99
+   fecfiler.reports.management
    fecfiler.reports.managers
    fecfiler.reports.migrations
    fecfiler.reports.models

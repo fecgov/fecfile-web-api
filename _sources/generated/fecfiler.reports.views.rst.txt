@@ -17,6 +17,7 @@ fecfiler.reports.views
    .. autosummary::
       :toctree:                                          
    
+      delete_all_reports
       filter_by_report
    
    
