@@ -9,14 +9,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 BASE_V1_URL = r"^api/v1/"
 
 
-@api_view(["GET"])
-def test_celery(_request):
-    from fecfiler.celery import debug_task
-
-    debug_task.delay()
-    return Response(status=200)
-
-
 @api_view(["GET", "HEAD"])
 @permission_classes([])
 def get_api_status(_request):
@@ -42,7 +34,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
-    re_path(r"^celery-test/", test_celery),
+    re_path(r"", include("fecfiler.devops.urls")),
     path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
     re_path(BASE_V1_URL + "status/", get_api_status),
 ]

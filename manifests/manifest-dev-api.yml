@@ -26,4 +26,5 @@ applications:
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       MOCK_OPENFEC: REDIS
+      SYSTEM_STATUS_CACHE_AGE: 60
       MOCK_EFO: True
