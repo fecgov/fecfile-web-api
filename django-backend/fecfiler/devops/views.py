@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import connection
-from fecfiler.celery import debug_task
+
 from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
 import json
 import redis
