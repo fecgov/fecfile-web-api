@@ -47,6 +47,11 @@ SCHEDULE_SERIALIZERS = dict(
     E=ScheduleESerializer,
 )
 
+REATTRIBUTED = "REATTRIBUTED"
+REDESIGNATED = "REDESIGNATED"
+REATTRIBUTION_TO = "REATTRIBUTION_TO"
+REDESIGNATION_TO = "REDESIGNATION_TO"
+
 
 class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
@@ -147,7 +152,6 @@ class TransactionSerializer(
             ]
 
         fields = get_fields()
-        read_only_fields = ["children"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -158,10 +162,6 @@ class TransactionSerializer(
         schedule_c2 = representation.pop("schedule_c2")
         schedule_d = representation.pop("schedule_d")
         schedule_e = representation.pop("schedule_e")
-        if instance.transaction_set.count() > 0:
-            representation["children"] = [
-                child.id for child in instance.transaction_set.all()
-            ]
 
         if schedule_a:
             representation["contribution_aggregate"] = representation.get("aggregate")
@@ -169,15 +169,16 @@ class TransactionSerializer(
 
             # For REATTRIBUTED transactions, calculate the amount that has
             # been reattributed for the transaction
-            total = (
-                instance.reatt_redes_associations.filter(
-                    schedule_a__reattribution_redesignation_tag="REATTRIBUTION_TO"
-                ).aggregate(Sum("schedule_a__contribution_amount"))[
-                    "schedule_a__contribution_amount__sum"
-                ]
-                or 0.0
-            )
-            representation["reatt_redes_total"] = str(total)
+            if instance.schedule_a.reattribution_redesignation_tag == REATTRIBUTED:
+                total = (
+                    instance.reatt_redes_associations.filter(
+                        schedule_a__reattribution_redesignation_tag=REATTRIBUTION_TO
+                    ).aggregate(Sum("schedule_a__contribution_amount"))[
+                        "schedule_a__contribution_amount__sum"
+                    ]
+                    or 0.0
+                )
+                representation["reatt_redes_total"] = str(total)
 
             for property in schedule_a:
                 if not representation.get(property):
@@ -186,17 +187,18 @@ class TransactionSerializer(
             representation["aggregate_amount"] = representation.get("aggregate")
             add_schedule_b_contact_fields(instance, representation)
 
-            # # For REDESIGNATED transactions, calculate the amount that has
-            # # been redesignated for the transaction
-            total = (
-                instance.reatt_redes_associations.filter(
-                    schedule_b__reattribution_redesignation_tag="REDESIGNATION_TO"
-                ).aggregate(Sum("schedule_b__expenditure_amount"))[
-                    "schedule_b__expenditure_amount__sum"
-                ]
-                or 0.0
-            )
-            representation["reatt_redes_total"] = str(total)
+            # For REDESIGNATED transactions, calculate the amount that has
+            # been redesignated for the transaction
+            if instance.schedule_b.reattribution_redesignation_tag == REDESIGNATED:
+                total = (
+                    instance.reatt_redes_associations.filter(
+                        schedule_b__reattribution_redesignation_tag=REDESIGNATION_TO
+                    ).aggregate(Sum("schedule_b__expenditure_amount"))[
+                        "schedule_b__expenditure_amount__sum"
+                    ]
+                    or 0.0
+                )
+                representation["reatt_redes_total"] = str(total)
 
             for property in schedule_b:
                 if not representation.get(property):

@@ -81,6 +81,7 @@ class Report(CommitteeOwnedModel):
 
     objects = ReportManager()
     can_delete = models.BooleanField(default=True)
+    can_unamend = models.BooleanField(default=False)
 
     @property
     def previous_report(self):
@@ -133,6 +134,21 @@ class Report(CommitteeOwnedModel):
             self.form_24.save()
 
         self.upload_submission = None
+        self.can_unamend = True
+        self.save()
+
+    def unamend(self, latest_submission):
+        self.report_version = int(self.report_version or "1") - 1
+        if self.report_version == 0:
+            self.report_version = None
+            self.form_type = self.get_form_name() + "N"
+
+        if self.form_type == "F24":
+            self.form_24.original_amendment_date = None
+            self.form_24.save()
+
+        self.upload_submission = latest_submission
+        self.can_unamend = False
         self.save()
 
     def delete(self):
