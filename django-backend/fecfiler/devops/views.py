@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import connection
-
+from fecfiler.celery import debug_task
 from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
 import json
 import redis
@@ -109,8 +109,8 @@ def get_celery_status():
     # rigging this to be true because we can't turn off the pingdom check.
     # it seems like this celery task is locking the queue somehow.  will
     # need to investigate further.
-    return {"celery_is_running": True}
-    # return {"celery_is_running": debug_task.delay().wait(timeout=30, interval=1)}
+    # return {"celery_is_running": True}
+    return {"celery_is_running": debug_task.delay().wait(timeout=30, interval=1)}
 
 
 def update_status_cache(key, method):
