@@ -1,0 +1,6 @@
+fecfiler.settings.base.SYSTEM\_STATUS\_CACHE\_AGE
+=================================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: SYSTEM_STATUS_CACHE_AGE

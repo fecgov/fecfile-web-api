@@ -36,4 +36,6 @@ fecfiler.devops
    fecfiler.devops.login_dot_gov_utils
    fecfiler.devops.management
    fecfiler.devops.tests
+   fecfiler.devops.urls
+   fecfiler.devops.views
 

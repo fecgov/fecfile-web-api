@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.feedback &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.devops.views.get_redis_value &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.feedback.serializers" href="fecfiler.feedback.serializers.html" />
-    <link rel="prev" title="fecfiler.devops.views.SystemStatusViewSet" href="fecfiler.devops.views.SystemStatusViewSet.html" />
+    <link rel="next" title="fecfiler.devops.views.update_status_cache" href="fecfiler.devops.views.update_status_cache.html" />
+    <link rel="prev" title="fecfiler.devops.views.get_database_status" href="fecfiler.devops.views.get_database_status.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,25 +32,15 @@
 
           <div class="body" role="main">
             
-  <section id="module-fecfiler.feedback">
-<span id="fecfiler-feedback"></span><h1>fecfiler.feedback<a class="headerlink" href="#module-fecfiler.feedback" title="Link to this heading">¶</a></h1>
-<p class="rubric">Modules</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.feedback.serializers.html#module-fecfiler.feedback.serializers" title="fecfiler.feedback.serializers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.feedback.serializers</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.feedback.test_views.html#module-fecfiler.feedback.test_views" title="fecfiler.feedback.test_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.feedback.test_views</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.feedback.urls.html#module-fecfiler.feedback.urls" title="fecfiler.feedback.urls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.feedback.urls</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.feedback.views.html#module-fecfiler.feedback.views" title="fecfiler.feedback.views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.feedback.views</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+  <section id="fecfiler-devops-views-get-redis-value">
+<h1>fecfiler.devops.views.get_redis_value<a class="headerlink" href="#fecfiler-devops-views-get-redis-value" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="fecfiler.devops.views.get_redis_value">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.devops.views.</span></span><span class="sig-name descname"><span class="pre">get_redis_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.get_redis_value" title="Link to this definition">¶</a></dt>
+<dd><p>Get value from redis and parse the json.
+If they value is falsy (“”, None), return None</p>
+</dd></dl>
+
 </section>
 
 
@@ -78,14 +68,27 @@
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">fecfiler.feedback</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.feedback.serializers.html">fecfiler.feedback.serializers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.feedback.test_views.html">fecfiler.feedback.test_views</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.feedback.urls.html">fecfiler.feedback.urls</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.feedback.views.html">fecfiler.feedback.views</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.cf_api_utils.html">fecfiler.devops.cf_api_utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.crypt_utils.html">fecfiler.devops.crypt_utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.login_dot_gov_utils.html">fecfiler.devops.login_dot_gov_utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.management.html">fecfiler.devops.management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tests.html">fecfiler.devops.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.urls.html">fecfiler.devops.urls</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.devops.views.html">fecfiler.devops.views</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.get_celery_status.html">fecfiler.devops.views.get_celery_status</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.get_database_status.html">fecfiler.devops.views.get_database_status</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.devops.views.get_redis_value</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.devops.views.get_redis_value"><code class="docutils literal notranslate"><span class="pre">get_redis_value()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.update_status_cache.html">fecfiler.devops.views.update_status_cache</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.SystemStatusViewSet.html">fecfiler.devops.views.SystemStatusViewSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
@@ -115,8 +118,12 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
-      <li>Previous: <a href="fecfiler.devops.views.SystemStatusViewSet.html" title="previous chapter">fecfiler.devops.views.SystemStatusViewSet</a></li>
-      <li>Next: <a href="fecfiler.feedback.serializers.html" title="next chapter">fecfiler.feedback.serializers</a></li>
+  <li><a href="fecfiler.devops.html">fecfiler.devops</a><ul>
+  <li><a href="fecfiler.devops.views.html">fecfiler.devops.views</a><ul>
+      <li>Previous: <a href="fecfiler.devops.views.get_database_status.html" title="previous chapter">fecfiler.devops.views.get_database_status</a></li>
+      <li>Next: <a href="fecfiler.devops.views.update_status_cache.html" title="next chapter">fecfiler.devops.views.update_status_cache</a></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -152,7 +159,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.feedback.rst.txt"
+      <a href="../_sources/generated/fecfiler.devops.views.get_redis_value.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

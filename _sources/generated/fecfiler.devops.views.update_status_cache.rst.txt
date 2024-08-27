@@ -1,0 +1,6 @@
+fecfiler.devops.views.update\_status\_cache
+===========================================
+
+.. currentmodule:: fecfiler.devops.views
+
+.. autofunction:: update_status_cache

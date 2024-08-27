@@ -34,4 +34,5 @@ fecfiler.devops.tests
    fecfiler.devops.tests.test_cf_api_utils
    fecfiler.devops.tests.test_crypt_utils
    fecfiler.devops.tests.test_login_dot_gov_utils
+   fecfiler.devops.tests.test_status_views
 

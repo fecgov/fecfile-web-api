@@ -1,0 +1,6 @@
+fecfiler.devops.views.get\_database\_status
+===========================================
+
+.. currentmodule:: fecfiler.devops.views
+
+.. autofunction:: get_database_status

@@ -1,0 +1,137 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
+==============================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_status_views
+
+.. autoclass:: SystemStatusViewTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SystemStatusViewTest.__init__
+      ~SystemStatusViewTest.addClassCleanup
+      ~SystemStatusViewTest.addCleanup
+      ~SystemStatusViewTest.addTypeEqualityFunc
+      ~SystemStatusViewTest.assertAlmostEqual
+      ~SystemStatusViewTest.assertAlmostEquals
+      ~SystemStatusViewTest.assertContains
+      ~SystemStatusViewTest.assertCountEqual
+      ~SystemStatusViewTest.assertDictContainsSubset
+      ~SystemStatusViewTest.assertDictEqual
+      ~SystemStatusViewTest.assertEqual
+      ~SystemStatusViewTest.assertEquals
+      ~SystemStatusViewTest.assertFalse
+      ~SystemStatusViewTest.assertFieldOutput
+      ~SystemStatusViewTest.assertFormError
+      ~SystemStatusViewTest.assertFormSetError
+      ~SystemStatusViewTest.assertFormsetError
+      ~SystemStatusViewTest.assertGreater
+      ~SystemStatusViewTest.assertGreaterEqual
+      ~SystemStatusViewTest.assertHTMLEqual
+      ~SystemStatusViewTest.assertHTMLNotEqual
+      ~SystemStatusViewTest.assertIn
+      ~SystemStatusViewTest.assertInHTML
+      ~SystemStatusViewTest.assertIs
+      ~SystemStatusViewTest.assertIsInstance
+      ~SystemStatusViewTest.assertIsNone
+      ~SystemStatusViewTest.assertIsNot
+      ~SystemStatusViewTest.assertIsNotNone
+      ~SystemStatusViewTest.assertJSONEqual
+      ~SystemStatusViewTest.assertJSONNotEqual
+      ~SystemStatusViewTest.assertLess
+      ~SystemStatusViewTest.assertLessEqual
+      ~SystemStatusViewTest.assertListEqual
+      ~SystemStatusViewTest.assertLogs
+      ~SystemStatusViewTest.assertMultiLineEqual
+      ~SystemStatusViewTest.assertNoLogs
+      ~SystemStatusViewTest.assertNotAlmostEqual
+      ~SystemStatusViewTest.assertNotAlmostEquals
+      ~SystemStatusViewTest.assertNotContains
+      ~SystemStatusViewTest.assertNotEqual
+      ~SystemStatusViewTest.assertNotEquals
+      ~SystemStatusViewTest.assertNotIn
+      ~SystemStatusViewTest.assertNotIsInstance
+      ~SystemStatusViewTest.assertNotRegex
+      ~SystemStatusViewTest.assertNotRegexpMatches
+      ~SystemStatusViewTest.assertNumQueries
+      ~SystemStatusViewTest.assertQuerySetEqual
+      ~SystemStatusViewTest.assertQuerysetEqual
+      ~SystemStatusViewTest.assertRaises
+      ~SystemStatusViewTest.assertRaisesMessage
+      ~SystemStatusViewTest.assertRaisesRegex
+      ~SystemStatusViewTest.assertRaisesRegexp
+      ~SystemStatusViewTest.assertRedirects
+      ~SystemStatusViewTest.assertRegex
+      ~SystemStatusViewTest.assertRegexpMatches
+      ~SystemStatusViewTest.assertSequenceEqual
+      ~SystemStatusViewTest.assertSetEqual
+      ~SystemStatusViewTest.assertTemplateNotUsed
+      ~SystemStatusViewTest.assertTemplateUsed
+      ~SystemStatusViewTest.assertTrue
+      ~SystemStatusViewTest.assertTupleEqual
+      ~SystemStatusViewTest.assertURLEqual
+      ~SystemStatusViewTest.assertWarns
+      ~SystemStatusViewTest.assertWarnsMessage
+      ~SystemStatusViewTest.assertWarnsRegex
+      ~SystemStatusViewTest.assertXMLEqual
+      ~SystemStatusViewTest.assertXMLNotEqual
+      ~SystemStatusViewTest.assert_
+      ~SystemStatusViewTest.captureOnCommitCallbacks
+      ~SystemStatusViewTest.countTestCases
+      ~SystemStatusViewTest.debug
+      ~SystemStatusViewTest.defaultTestResult
+      ~SystemStatusViewTest.doClassCleanups
+      ~SystemStatusViewTest.doCleanups
+      ~SystemStatusViewTest.fail
+      ~SystemStatusViewTest.failIf
+      ~SystemStatusViewTest.failIfAlmostEqual
+      ~SystemStatusViewTest.failIfEqual
+      ~SystemStatusViewTest.failUnless
+      ~SystemStatusViewTest.failUnlessAlmostEqual
+      ~SystemStatusViewTest.failUnlessEqual
+      ~SystemStatusViewTest.failUnlessRaises
+      ~SystemStatusViewTest.id
+      ~SystemStatusViewTest.modify_settings
+      ~SystemStatusViewTest.run
+      ~SystemStatusViewTest.setUp
+      ~SystemStatusViewTest.setUpClass
+      ~SystemStatusViewTest.setUpTestData
+      ~SystemStatusViewTest.settings
+      ~SystemStatusViewTest.shortDescription
+      ~SystemStatusViewTest.skipTest
+      ~SystemStatusViewTest.subTest
+      ~SystemStatusViewTest.tearDown
+      ~SystemStatusViewTest.tearDownClass
+      ~SystemStatusViewTest.test_get_celery_status
+      ~SystemStatusViewTest.test_get_database_satus
+      ~SystemStatusViewTest.test_get_redis_value
+      ~SystemStatusViewTest.test_update_status_cache
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SystemStatusViewTest.available_apps
+      ~SystemStatusViewTest.databases
+      ~SystemStatusViewTest.fixtures
+      ~SystemStatusViewTest.longMessage
+      ~SystemStatusViewTest.maxDiff
+      ~SystemStatusViewTest.reset_sequences
+      ~SystemStatusViewTest.serialized_rollback
+   
+   

@@ -1,0 +1,6 @@
+fecfiler.devops.views.get\_celery\_status
+=========================================
+
+.. currentmodule:: fecfiler.devops.views
+
+.. autofunction:: get_celery_status
