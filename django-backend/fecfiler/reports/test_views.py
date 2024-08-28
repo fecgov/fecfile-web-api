@@ -107,8 +107,12 @@ class CommitteeMemberViewSetTest(TestCase):
         new_transaction = Transaction(committee_account=e2e_committee)
         new_transaction.save()
 
-        report_count = Report.objects.filter(committee_account__committee_id="C99999999").count()
-        transaction_count = Report.objects.filter(committee_account__committee_id="C99999999").count()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
         self.assertGreater(report_count, 0)
         self.assertGreater(transaction_count, 0)
 
@@ -124,8 +128,12 @@ class CommitteeMemberViewSetTest(TestCase):
         view.request = request
         view.e2e_delete_all_reports(request)
 
-        report_count = Report.objects.filter(committee_account__committee_id="C99999999").count()
-        transaction_count = Report.objects.filter(committee_account__committee_id="C99999999").count()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
 
@@ -140,14 +148,22 @@ class CommitteeMemberViewSetTest(TestCase):
         new_transaction = Transaction(committee_account=committee)
         new_transaction.save()
 
-        report_count = Report.objects.filter(committee_account__committee_id="C00000000").count()
-        transaction_count = Report.objects.filter(committee_account__committee_id="C00000000").count()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
         self.assertGreater(report_count, 0)
         self.assertGreater(transaction_count, 0)
 
         delete_all_reports(committee_id="C00000000")
 
-        report_count = Report.objects.filter(committee_account__committee_id="C00000000").count()
-        transaction_count = Report.objects.filter(committee_account__committee_id="C00000000").count()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
