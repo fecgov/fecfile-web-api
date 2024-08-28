@@ -13,7 +13,7 @@ def gen_and_install_django_key(
 ):
     try:
         logger.info("Generating key")
-        key = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+        key = get_random_secret_key()
 
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
@@ -22,9 +22,10 @@ def gen_and_install_django_key(
 
         logger.info("Installing key")
         updated_keys = {
-            "DJANGO_SECRET_KEY_FALLBACKS": current_creds.get(
-                "DJANGO_SECRET_KEY_FALLBACKS", []
-            ).append(current_creds["DJANGO_SECRET_KEY"]),
+            "DJANGO_SECRET_KEY_FALLBACKS": [
+                *(current_creds.get("DJANGO_SECRET_KEY_FALLBACKS", [])),
+                current_creds["DJANGO_SECRET_KEY"],
+            ],
             "DJANGO_SECRET_KEY": key,
         }
         update_credentials(
