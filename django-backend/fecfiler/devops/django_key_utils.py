@@ -1,5 +1,4 @@
 from fecfiler.devops.cf_api_utils import retrieve_credentials, update_credentials
-from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management.utils import get_random_secret_key
 import structlog
 
