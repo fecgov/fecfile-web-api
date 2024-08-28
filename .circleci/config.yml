@@ -239,7 +239,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|main/
+              only: /feature\/1552|release\/sprint-[\.\d]+|main/
       - docs-build:
           requires:
             - test
