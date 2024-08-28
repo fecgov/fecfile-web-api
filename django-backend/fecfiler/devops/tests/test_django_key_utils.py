@@ -87,5 +87,5 @@ class DjangoKeyUtilsTestCase(TestCase):
             test_token,
             test_space_name,
             test_service_instance_name,
-            {"SECRET_KEY_FALLBACKS": []},
+            {"DJANGO_SECRET_KEY_FALLBACKS": []},
         )

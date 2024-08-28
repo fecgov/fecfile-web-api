@@ -22,10 +22,10 @@ def gen_and_install_django_key(
 
         logger.info("Installing key")
         updated_keys = {
-            "SECRET_KEY_FALLBACKS": current_creds.get("SECRET_KEY_FALLBACKS", []).append(
-                current_creds["SECRET_KEY"]
-            ),
-            "SECRET_KEY": key,
+            "DJANGO_SECRET_KEY_FALLBACKS": current_creds.get(
+                "DJANGO_SECRET_KEY_FALLBACKS", []
+            ).append(current_creds["DJANGO_SECRET_KEY"]),
+            "DJANGO_SECRET_KEY": key,
         }
         update_credentials(
             cf_token, cf_space_name, cf_service_instance_name, updated_keys
@@ -40,7 +40,7 @@ def clear_fallback_django_keys(
     cf_service_instance_name: str,
 ):
     try:
-        creds_to_update = {"SECRET_KEY_FALLBACKS": []}
+        creds_to_update = {"DJANGO_SECRET_KEY_FALLBACKS": []}
         update_credentials(
             cf_token, cf_space_name, cf_service_instance_name, creds_to_update
         )
