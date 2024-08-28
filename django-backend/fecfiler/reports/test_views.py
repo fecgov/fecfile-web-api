@@ -167,3 +167,34 @@ class CommitteeMemberViewSetTest(TestCase):
         ).count()
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
+
+    def test_delete_all_reports_for_a_different_committee(self):
+        committee = CommitteeAccount.objects.get(committee_id="C00000000")
+
+        new_report = Report(
+            committee_account=committee
+        )
+        new_report.save()
+
+        new_transaction = Transaction(committee_account=committee)
+        new_transaction.save()
+
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        self.assertGreater(report_count, 0)
+        self.assertGreater(transaction_count, 0)
+
+        delete_all_reports(committee_id="C01234567")
+
+        new_report_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        new_transaction_count = Report.objects.filter(
+            committee_account__committee_id="C00000000"
+        ).count()
+        self.assertEqual(report_count, new_report_count)
+        self.assertEqual(transaction_count, new_transaction_count)
