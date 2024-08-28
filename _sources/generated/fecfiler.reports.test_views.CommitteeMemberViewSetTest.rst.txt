@@ -113,6 +113,9 @@ fecfiler.reports.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.subTest
       ~CommitteeMemberViewSetTest.tearDown
       ~CommitteeMemberViewSetTest.tearDownClass
+      ~CommitteeMemberViewSetTest.test_delete_all_reports_for_a_committee
+      ~CommitteeMemberViewSetTest.test_delete_all_reports_for_a_different_committee
+      ~CommitteeMemberViewSetTest.test_e2e_delete_all_reports
       ~CommitteeMemberViewSetTest.test_list_no_pagination
       ~CommitteeMemberViewSetTest.test_list_paginated
       ~CommitteeMemberViewSetTest.test_ordering
