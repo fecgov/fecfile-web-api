@@ -72,7 +72,7 @@ class OpenfecViewSetTest(TestCase):
             response = OpenfecViewSet.as_view({"get": "query_filings"})(request)
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
-                response.data, "NOTVALID is not part of a valid committee id"
+                response.data, "NOTVALID is not a valid committee id"
             )
 
     def test_get_filings_invalid_resp(self):
