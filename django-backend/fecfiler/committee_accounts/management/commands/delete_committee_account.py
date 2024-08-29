@@ -1,7 +1,5 @@
 from django.core.management.base import BaseCommand
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.views import delete_all_reports
-from fecfiler.contacts.views import delete_all_contacts
 import structlog
 
 logger = structlog.get_logger(__name__)
