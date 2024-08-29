@@ -1,8 +1,7 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import register_committee
 from fecfiler.contacts.models import Contact
-from fecfiler.reports.models import Report, ReportTransaction
+from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.user.models import User
 from django.core.management import call_command
