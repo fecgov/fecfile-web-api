@@ -65,7 +65,8 @@ class OidcTest(TestCase):
         retval = login_redirect(request)
         self.assertEqual(retval.status_code, 302)
 
-    def test_logout_redirect(self):
+    @patch("fecfiler.oidc.views.logout")
+    def test_logout_redirect(self, logout_mock):
         retval = logout_redirect(self.factory.get("/"))
         self.assertEqual(retval.status_code, 302)
 
