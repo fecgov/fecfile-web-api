@@ -116,7 +116,8 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submitter = EFODotFECSubmitter() if not mock else MockDotFECSubmitter()
+        submission_type_key = DOT_FEC_KEY if not mock else MOCK_DOT_FEC_KEY
+        submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
             dot_fec_record, e_filing_password, backdoor_code
@@ -127,34 +128,25 @@ def submit_to_fec(
         submission.save_fec_response(submission_response_string)
 
         """Poll FEC for status of submission"""
-        while (
-            submission.fec_status not in FECStatus.get_terminal_statuses_strings() and
-            submission.fecfile_polling_attempts < EFO_POLLING_MAX_ATTEMPTS
-        ):
-            submission.fecfile_polling_attempts += 1
-            logger.info(f"Polling status for {submission.fec_submission_id}.")
-            logger.info(
-                f"Status: {submission.fec_status}, Message: {submission.fec_message}"
-            )
-            logger.info(
-                f"""Attempt #{
-                    submission.fecfile_polling_attempts
-                } / {EFO_POLLING_MAX_ATTEMPTS}"""
-            )
-            time.sleep(EFO_POLLING_INTERVAL)
-            status_response_string = submitter.poll_status(submission.fec_submission_id)
-            submission.save_fec_response(status_response_string)
-    except Exception:
-        submission.save_error("Failed submitting to FEC")
-        return
 
-    new_state = (
-        FECSubmissionState.SUCCEEDED
-        if submission.fec_status == FECStatus.ACCEPTED.value
-        else FECSubmissionState.FAILED
-    )
-    submission.save_state(new_state)
-    return submission.id
+        if not submission.fec_status in FECStatus.get_terminal_statuses_strings():
+            logger.info(f"""Submission queued for processing.  Polling every {
+                EFO_POLLING_INTERVAL} seconds for {EFO_POLLING_MAX_ATTEMPTS} attempts"""
+            )
+            """ apply_async()
+            The apply_async() method can only take json serializable values as arguments.
+            This means we can't pass objects with methods.  To get around that, we pass the
+            submission id and a key that we can use to determine the type of the submission.
+            This lets us instantiate objects of the correct classes as we need them."""
+            return poll_for_fec_response.apply_async(
+                [submission.id, submission_type_key, "Dot FEC"], countdown=EFO_POLLING_INTERVAL
+            )
+        else:
+            return resolve_final_submission_state(submission)
+    except Exception as e:
+        logger.error(f"Error before polling: {str(e)}")
+        submission.save_error("Failed submitting to FEC")
+        return resolve_final_submission_state(submission)
 
 
 @shared_task
@@ -180,7 +172,6 @@ def submit_to_webprint(
 
     """Submit to WebPrint"""
     try:
-        mock=False
         submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC WebPrint")
@@ -207,7 +198,7 @@ def submit_to_webprint(
         return resolve_final_submission_state(submission)
 
 @shared_task
-def poll_for_fec_response(submission_id, submission_type_key, submission_type):
+def poll_for_fec_response(submission_id, submission_type_key, submission_name):
     try:
         submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
@@ -235,11 +226,11 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_type):
             return resolve_final_submission_state(submission)
         else:
             return poll_for_fec_response.apply_async(
-                [submission_id, submission_type_key, submission_type], countdown=EFO_POLLING_INTERVAL
+                [submission_id, submission_type_key, submission_name], countdown=EFO_POLLING_INTERVAL
             )
     except Exception as e:
         logger.error(f"Error in polling: {str(e)}")
-        submission.save_error(f"Failed submitting to {submission_type}")
+        submission.save_error(f"Failed submitting to {submission_name}")
         return resolve_final_submission_state(submission)
     
 def resolve_final_submission_state(submission):
