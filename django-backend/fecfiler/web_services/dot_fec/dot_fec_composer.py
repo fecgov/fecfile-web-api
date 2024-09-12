@@ -14,6 +14,7 @@ from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fiel
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 import structlog
+from sys import getsizeof
 
 logger = structlog.get_logger(__name__)
 
@@ -38,14 +39,18 @@ def compose_report(report_id, upload_submission_record_id):
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
     transaction_view_model = get_read_model(report.committee_account_id)
-    transactions = transaction_view_model.objects.filter(reports__id=report_id)
+    transactions = transaction_view_model.objects.filter(reports__id=report_id).prefetch_related()
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
+
+        transactions_composed = 0
+        transaction_count = transactions.count()
+        committee_id_number = transactions.first().committee_account.committee_id
         for transaction in transactions:
-            transaction.filer_committee_id_number = (
-                transaction.committee_account.committee_id
-            )
+            transactions_composed += 1
+            logger.debug(f"Composing transaction {transactions_composed} / {transaction_count}")
+            transaction.filer_committee_id_number = committee_id_number
 
             if transaction.schedule_a:
                 add_schedule_a_contact_fields(transaction)
@@ -182,13 +187,15 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(report_row)
         file_content = add_row_to_content(file_content, report_row)
 
-        transactions = compose_transactions(report_id)
-        for transaction in transactions:
+        composed_transactions = compose_transactions(report_id)
+        transaction_count = len(composed_transactions)
+        transactions_serialized = 0
+        for transaction in composed_transactions:
+            transactions_serialized += 1
+            logger.debug(f"Serializing transaction {transactions_serialized} / {transaction_count}")
             serialized_transaction = serialize_instance(
                 get_schema_name(transaction.schedule), transaction
             )
-            logger.debug("Serialized Transaction:")
-            logger.debug(serialized_transaction)
             test_info_prefix = get_test_info_prefix(transaction)
             file_content = add_row_to_content(
                 file_content, test_info_prefix + serialized_transaction
@@ -199,8 +206,6 @@ def compose_dot_fec(report_id, upload_submission_record_id):
                 memo.back_reference_tran_id_number = transaction.transaction_id
                 memo.back_reference_sched_form_name = transaction.form_type
                 serialized_memo = serialize_instance("Text", memo)
-                logger.debug("Serialized Memo:")
-                logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
         report_level_memos = compose_report_level_memos(report_id)
