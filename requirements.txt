@@ -27,6 +27,7 @@ zeep==4.2.1
 django-structlog[celery]==8.1.0
 rich==13.7.1
 josepy==1.14.0
+jwcrypto==1.5.6
 
 # Pinning sqlparse to 0.5.0 as it is a sub-dependency that needs to be upgraded for security
 sqlparse==0.5.0

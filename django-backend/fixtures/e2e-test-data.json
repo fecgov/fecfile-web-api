@@ -16,6 +16,22 @@
         }
     },
     {
+        "model": "user.user",
+        "pk": "e100e1da-cbfc-4189-aece-d139048a8e0a",
+        "fields": {
+            "password": "",
+            "is_superuser": false,
+            "email": "test@test.com",
+            "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d",
+            "first_name": "Test",
+            "last_name": "Testson",
+            "last_login": "2022-05-02T13:44:07.324Z",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-09-28T15:22:56.477Z"
+        }
+    },
+    {
         "model": "committee_accounts.CommitteeAccount",
         "pk": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
         "fields": {

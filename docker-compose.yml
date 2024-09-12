@@ -109,6 +109,7 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+      OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
     deploy:
       resources:
         limits:
