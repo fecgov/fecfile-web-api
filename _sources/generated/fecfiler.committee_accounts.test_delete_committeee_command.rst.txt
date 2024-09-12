@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.test\_delete\_committeee\_command
+==============================================================
+
+.. automodule:: fecfiler.committee_accounts.test_delete_committeee_command
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      CommitteeAccountsViewsTest
+   
+   
+
+   
+   
+   
+
+
+
