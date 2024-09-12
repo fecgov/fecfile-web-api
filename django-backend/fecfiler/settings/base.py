@@ -352,6 +352,12 @@ if not MOCK_EFO and FEC_FILING_API is None:
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
+
+"""EFO POLLING SETTINGS
+"""
+EFO_POLLING_MAX_ATTEMPTS = 100  # Max requests made
+EFO_POLLING_INTERVAL = 30  # Time between requests in seconds
+
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
 WARNING: This will BREAK submitting to fec because it will no longer conform to spec
