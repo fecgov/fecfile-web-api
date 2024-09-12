@@ -274,6 +274,7 @@ class TransactionSerializer(
                 }
             )
 
+        representation["can_delete"] = instance.can_delete
         return representation
 
     def validate(self, data):

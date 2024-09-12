@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -147,6 +148,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
 
+    can_delete = models.BooleanField(default=True)
+
     objects = TransactionManager()
 
     def get_schedule_name(self):
@@ -178,6 +181,99 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.memo_text.save()
 
         super(Transaction, self).save(*args, **kwargs)
+
+    def delete(self):
+        if self.can_delete and not self.deleted:
+            self.deleted = datetime.now()
+            self.save()
+
+            if not self.reatt_redes:
+                # If deleted parent transaction to a reattribution/redesignation
+                # delete the two child transactions
+                reatt_redes_transactions = Transaction.objects.filter(reatt_redes=self)
+                for child in reatt_redes_transactions:
+                    if not child.deleted:
+                        child.deleted = datetime.now()
+                        child.save()
+
+                # If earmark delete corresponding earmark
+                if self.transaction_type_identifier == "EARMARK_RECEIPT":
+                    earmark_memo = Transaction.objects.filter(
+                        parent_transaction=self
+                    ).first()
+                    earmark_memo.deleted = datetime.now()
+                    earmark_memo.save()
+                elif self.transaction_type_identifier == "EARMARK_MEMO":
+                    earmark_receipt = Transaction.objects.get(
+                        id=self.parent_transaction.id
+                    )
+                    earmark_receipt.deleted = datetime.now()
+                    earmark_receipt.save()
+                    reatt_redes_transactions = Transaction.objects.filter(
+                        reatt_redes=earmark_receipt
+                    )
+                    for child in reatt_redes_transactions:
+                        if not child.deleted:
+                            child.deleted = datetime.now()
+                            child.save()
+
+                # Handle debts
+                debts = Transaction.objects.filter(debt=self)
+                for debt in debts:
+                    if not debt.deleted:
+                        debt.deleted = datetime.now()
+                        debt.save()
+
+                # Handle Loans
+                if (
+                    "LOAN" in self.transaction_type_identifier
+                    and "LOAN_REPAYMENT_MADE" != self.transaction_type_identifier
+                ):
+                    # If deleting the receipt, also delete the whole loan
+                    if (
+                        "LOAN_MADE" == self.transaction_type_identifier
+                        or "RECEIPT" in self.transaction_type_identifier
+                    ):
+                        self.parent_transaction.deleted = datetime.now()
+                        self.parent_transaction.save()
+                        loan = self.parent_transaction
+                    else:
+                        loan = self
+                    self.delete_loans(loan)
+
+                child_transactions = Transaction.objects.filter(parent_transaction=self)
+                for child in child_transactions:
+                    if not child.deleted:
+                        child.deleted = datetime.now()
+                        child.save()
+            # If deleting a reattribution/redesignation transaction,
+            # delete the paired reattribution/redesignation but don't delete the parent
+            else:
+                reatt_redes_transactions = Transaction.objects.filter(
+                    reatt_redes=self.reatt_redes
+                )
+                for child in reatt_redes_transactions:
+                    if not child.deleted:
+                        child.deleted = datetime.now()
+                        child.save()
+
+    def delete_loans(self, loan):
+        loan_transactions = Transaction.objects.filter(loan_id=loan.id)
+        for child in loan_transactions:
+            if not child.deleted:
+                child.deleted = datetime.now()
+                child.save()
+                self.delete_loans(child)
+        loan_transactions = Transaction.objects.filter(parent_transaction_id=loan.id)
+        for child in loan_transactions:
+            if not child.deleted:
+                child.deleted = datetime.now()
+                child.save()
+                self.delete_loans(child)
+        if loan.loan:
+            loan.loan.deleted = datetime.now()
+            loan.loan.save()
+            self.delete_loans(loan.loan)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]

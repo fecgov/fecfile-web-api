@@ -435,3 +435,10 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(ordered_queryset.count(), len(indiviual_receipt_data))
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
+
+    def test_destroy(self):
+        view_set = TransactionViewSet()
+        request = self.factory.delete(f"/api/v1/transactions/{self.transaction.pk}/")
+        response = view_set.destroy(request, pk=self.transaction.pk)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())

@@ -149,10 +149,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             saved_transaction = self.save_transaction(request.data, request)
         return Response(saved_transaction.id)
 
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        update_dependent_parent(self.get_object())
-        return response
+    def destroy(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
+        with db_transaction.atomic():
+            instance = Transaction.objects.get(pk=pk)
+            instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}

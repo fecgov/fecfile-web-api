@@ -22,7 +22,15 @@ def create_schedule_a(
     memo_code=False,
     itemized=False,
     report=None,
+    parent_id=None,
 ):
+    transaction_data = {
+        "_form_type": form_type,
+        "memo_code": memo_code,
+        "force_itemized": itemized,
+    }
+    if parent_id is not None:
+        transaction_data["parent_transaction_id"] = parent_id
     return create_test_transaction(
         type,
         ScheduleA,
@@ -31,11 +39,7 @@ def create_schedule_a(
         group=group,
         report=report,
         schedule_data={"contribution_date": date, "contribution_amount": amount},
-        transaction_data={
-            "_form_type": form_type,
-            "memo_code": memo_code,
-            "force_itemized": itemized,
-        },
+        transaction_data=transaction_data,
     )
 
 
@@ -49,7 +53,7 @@ def create_schedule_b(
     form_type="SB",
     memo_code=False,
     report=None,
-    loan_id=None
+    loan_id=None,
 ):
     return create_test_transaction(
         type,
@@ -62,7 +66,7 @@ def create_schedule_b(
         transaction_data={
             "_form_type": form_type,
             "memo_code": memo_code,
-            "loan_id": loan_id
+            "loan_id": loan_id,
         },
     )
 
