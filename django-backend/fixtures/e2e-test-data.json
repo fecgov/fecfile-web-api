@@ -51,5 +51,17 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "beb9d2a2-9102-4b7d-92a4-02cbfe134d10",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
     }
 ]
