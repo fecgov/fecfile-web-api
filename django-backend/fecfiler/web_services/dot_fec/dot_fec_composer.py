@@ -14,7 +14,6 @@ from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fiel
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 import structlog
-from sys import getsizeof
 
 logger = structlog.get_logger(__name__)
 
