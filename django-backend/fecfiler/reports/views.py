@@ -136,40 +136,27 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report.amend()
         return Response(f"amended {report}")
 
+    @action(detail=True, methods=["post"], url_name="unamend")
+    def unamend(self, request, pk):
+        report: Report = self.get_object()
+        latest_submission = (
+            UploadSubmission.objects.filter(fec_report_id=report.report_id)
+            .order_by("-created")
+            .first()
+        )
+        report.unamend(latest_submission)
+        return Response(f"unamended {report}")
+
     @action(
         detail=False,
         methods=["post"],
         url_path="e2e-delete-all-reports",
     )
     def e2e_delete_all_reports(self, request):
-        committee_id = "C99999999"
-        reports = Report.objects.filter(committee_account__committee_id=committee_id)
+        reports = Report.objects.filter(committee_account__committee_id="C99999999")
         report_count = reports.count()
-        transactions = Transaction.objects.filter(
-            committee_account__committee_id=committee_id
-        )
-        transaction_count = transactions.count()
-        memo_count = MemoText.objects.filter(
-            report__committee_account__committee_id=committee_id
-        ).count()
-        dot_fec_count = DotFEC.objects.filter(
-            report__committee_account__committee_id=committee_id
-        ).count()
-        upload_submission_count = UploadSubmission.objects.filter(
-            dot_fec__report__committee_account__committee_id=committee_id
-        ).count()
-        web_print_submission_count = WebPrintSubmission.objects.filter(
-            dot_fec__report__committee_account__committee_id=committee_id
-        ).count()
-        logger.warn(f"Deleting Reports: {report_count}")
-        logger.warn(f"Deleting Transactions: {transaction_count}")
-        logger.warn(f"Memos: {memo_count}")
-        logger.warn(f"Dot Fecs: {dot_fec_count}")
-        logger.warn(f"Upload Submissions: {upload_submission_count}")
-        logger.warn(f"WebPrint Submissions: {web_print_submission_count}")
 
-        reports.delete()
-        transactions.hard_delete()
+        delete_all_reports()
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
@@ -213,3 +200,36 @@ def filter_by_report(queryset, viewset):
         else None
     )
     return queryset.filter(report_id=report_id) if report_id else queryset
+
+
+def delete_all_reports(committee_id="C99999999", log_method=logger.warn):
+    reports = Report.objects.filter(committee_account__committee_id=committee_id)
+    transactions = Transaction.objects.filter(
+        committee_account__committee_id=committee_id
+    )
+
+    report_count = reports.count()
+    transaction_count = transactions.count()
+    memo_count = MemoText.objects.filter(
+        report__committee_account__committee_id=committee_id
+    ).count()
+    dot_fec_count = DotFEC.objects.filter(
+        report__committee_account__committee_id=committee_id
+    ).count()
+    upload_submission_count = UploadSubmission.objects.filter(
+        dot_fec__report__committee_account__committee_id=committee_id
+    ).count()
+    web_print_submission_count = WebPrintSubmission.objects.filter(
+        dot_fec__report__committee_account__committee_id=committee_id
+    ).count()
+
+    log_method(f"Deleting Reports and Transactions for {committee_id}")
+    log_method(f"Deleting Reports: {report_count}")
+    log_method(f"Deleting Transactions: {transaction_count}")
+    log_method(f"Memos: {memo_count}")
+    log_method(f"Dot Fecs: {dot_fec_count}")
+    log_method(f"Upload Submissions: {upload_submission_count}")
+    log_method(f"WebPrint Submissions: {web_print_submission_count}")
+
+    reports.delete()
+    transactions.hard_delete()

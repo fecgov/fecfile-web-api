@@ -41,6 +41,28 @@ class ReportModelTestCase(TestCase):
         )
         self.assertEquals(self.f24_report.form_type, "F24A")
 
+    def test_unamending(self):
+        upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
+        upload_submission.save()
+        self.f3x_report.upload_submission = upload_submission
+        self.f3x_report.save()
+
+        self.f3x_report.amend()
+        self.f3x_report.unamend(upload_submission)
+        self.assertEqual(self.f3x_report.form_type, "F3XN")
+        self.assertEqual(self.f3x_report.report_version, None)
+        self.assertEqual(self.f3x_report.upload_submission, upload_submission)
+
+        self.f3x_report.amend()
+        new_upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
+        new_upload_submission.save()
+        self.f3x_report.upload_submission = new_upload_submission
+        self.f3x_report.amend()
+        self.f3x_report.unamend(new_upload_submission)
+        self.assertEqual(self.f3x_report.form_type, "F3XA")
+        self.assertEqual(self.f3x_report.report_version, 1)
+        self.assertEqual(self.f3x_report.upload_submission, new_upload_submission)
+
     def test_delete(self):
         f24_report = create_form24(self.committee)
         f24_report_id = f24_report.id
