@@ -19,11 +19,29 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     MockWebPrintSubmitter,
 )
 from .web_service_storage import get_file_bytes, store_file
-from fecfiler.settings import WEBPRINT_EMAIL
+from fecfiler.settings import WEBPRINT_EMAIL, EFO_POLLING_MAX_ATTEMPTS, EFO_POLLING_INTERVAL
 
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+WEB_PRINT_KEY = "WebPrint"
+MOCK_WEB_PRINT_KEY = "MockWebPrint"
+DOT_FEC_KEY = "DotFEC"
+MOCK_DOT_FEC_KEY = "MockDotFEC"
+SUBMISSION_MANAGERS = {
+    WEB_PRINT_KEY: EFOWebPrintSubmitter,
+    MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
+    DOT_FEC_KEY: EFODotFECSubmitter,
+    MOCK_DOT_FEC_KEY: MockDotFECSubmitter,
+}
+SUBMISSION_CLASSES = {
+    WEB_PRINT_KEY: WebPrintSubmission,
+    MOCK_WEB_PRINT_KEY: WebPrintSubmission,
+    DOT_FEC_KEY: UploadSubmission,
+    MOCK_DOT_FEC_KEY: UploadSubmission,
+}
 
 
 @shared_task
@@ -109,13 +127,21 @@ def submit_to_fec(
         submission.save_fec_response(submission_response_string)
 
         """Poll FEC for status of submission"""
-        # TODO: add timeout?
-        while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+        while (
+            submission.fec_status not in FECStatus.get_terminal_statuses_strings() and
+            submission.fecfile_polling_attempts < EFO_POLLING_MAX_ATTEMPTS
+        ):
+            submission.fecfile_polling_attempts += 1
             logger.info(f"Polling status for {submission.fec_submission_id}.")
             logger.info(
                 f"Status: {submission.fec_status}, Message: {submission.fec_message}"
             )
-            time.sleep(2)
+            logger.info(
+                f"""Attempt #{
+                    submission.fecfile_polling_attempts
+                } / {EFO_POLLING_MAX_ATTEMPTS}"""
+            )
+            time.sleep(EFO_POLLING_INTERVAL)
             status_response_string = submitter.poll_status(submission.fec_submission_id)
             submission.save_fec_response(status_response_string)
     except Exception:
@@ -154,27 +180,69 @@ def submit_to_webprint(
 
     """Submit to WebPrint"""
     try:
-        submitter = EFOWebPrintSubmitter() if not mock else MockWebPrintSubmitter()
+        mock=False
+        submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
+        submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC WebPrint")
         submission_response_string = submitter.submit(email, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)
 
-        """Poll FEC for status of submission"""
-        # TODO: add timeout?
-        while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            logger.info(f"Polling status for {submission.fec_submission_id}.")
-            logger.info(
-                f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+        if not submission.fec_status in FECStatus.get_terminal_statuses_strings():
+            logger.info(f"""Submission queued for processing.  Polling every {
+                EFO_POLLING_INTERVAL} seconds for {EFO_POLLING_MAX_ATTEMPTS} attempts"""
             )
-            time.sleep(2)
-            status_response_string = submitter.poll_status(
-                submission.batch_id, submission.fec_submission_id
+            """ apply_async()
+            The apply_async() method can only take json serializable values as arguments.
+            This means we can't pass objects with methods.  To get around that, we pass the
+            submission id and a key that we can use to determine the type of the submission.
+            This lets us instantiate objects of the correct classes as we need them."""
+            return poll_for_fec_response.apply_async(
+                [submission.id, submission_type_key, "WebPrint"], countdown=EFO_POLLING_INTERVAL
             )
-            submission.save_fec_response(status_response_string)
-    except Exception:
+        else:
+            return resolve_final_submission_state(submission)
+    except Exception as e:
+        logger.error(f"Error before polling: {str(e)}")
         submission.save_error("Failed submitting to WebPrint")
-        return
+        return resolve_final_submission_state(submission)
 
+@shared_task
+def poll_for_fec_response(submission_id, submission_type_key, submission_type):
+    try:
+        submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
+        submitter = SUBMISSION_MANAGERS[submission_type_key]()
+
+        submission.fecfile_polling_attempts += 1
+        logger.info(f"Polling status for {submission.fec_submission_id}.")
+        logger.info(
+            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
+        )
+        logger.info(
+            f"""Submission Polling - Attempt {
+                submission.fecfile_polling_attempts
+            } / {EFO_POLLING_MAX_ATTEMPTS}"""
+        )
+        status_response_string = submitter.poll_status(
+            submission.fec_batch_id, submission.fec_submission_id
+        )
+        submission.save_fec_response(status_response_string)
+        if (
+            submission.fec_status in FECStatus.get_terminal_statuses_strings() or
+            submission.fecfile_polling_attempts >= EFO_POLLING_MAX_ATTEMPTS
+        ):
+            if submission.fecfile_polling_attempts >= EFO_POLLING_MAX_ATTEMPTS:
+                logger.warning("POLLING ATTEMPTS EXCEEDED")
+            return resolve_final_submission_state(submission)
+        else:
+            return poll_for_fec_response.apply_async(
+                [submission_id, submission_type_key, submission_type], countdown=EFO_POLLING_INTERVAL
+            )
+    except Exception as e:
+        logger.error(f"Error in polling: {str(e)}")
+        submission.save_error(f"Failed submitting to {submission_type}")
+        return resolve_final_submission_state(submission)
+    
+def resolve_final_submission_state(submission):
     new_state = (
         FECSubmissionState.SUCCEEDED
         if submission.fec_status == FECStatus.COMPLETED.value
