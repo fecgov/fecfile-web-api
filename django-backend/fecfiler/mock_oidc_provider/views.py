@@ -29,16 +29,12 @@ else:
     raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 MOCK_OIDC_PROVIDER_DATA = "MOCK_OIDC_PROVIDER_DATA"
+MOCK_OIDC_PROVIDER_KDAT = "MOCK_OIDC_PROVIDER_KDAT"
 
 logger = structlog.get_logger(__name__)
 
 test_username = "c34867d9-3a41-43ff-ae25-ca498f64b52d"
 test_email = "test@test.com"
-
-test_kid = str(uuid4())
-rsapair = jwk.JWK.generate(kty="RSA", size=2048, kid=test_kid, use="sig", alg="RS256")
-pubkey = rsapair.export_public(True)
-pvtkey_pem = rsapair.export_to_pem(True, None).decode()
 
 
 @api_view(["GET"])
@@ -62,7 +58,19 @@ def discovery(request):
 @permission_classes([])
 @require_http_methods(["GET"])
 def certs(request):
-    retval = {"keys": [{**pubkey}]}
+    kdat = redis_instance.get(MOCK_OIDC_PROVIDER_KDAT)
+    if not kdat:
+        test_kid = str(uuid4())
+        rsapair = jwk.JWK.generate(
+            kty="RSA", size=2048, kid=test_kid, use="sig", alg="RS256"
+        )
+        pubkey = rsapair.export_public()
+        pvtkey_pem = rsapair.export_to_pem(True, None).decode()
+        kdat = json.dumps({"kid": test_kid, "pubkey": pubkey, "pvtkey": pvtkey_pem})
+        redis_instance.set(MOCK_OIDC_PROVIDER_KDAT, kdat, ex=3600)
+
+    pubkey_str = json.loads(kdat).get("pubkey")
+    retval = {"keys": [{**(json.loads(pubkey_str))}]}
     return JsonResponse(retval)
 
 
@@ -124,11 +132,12 @@ def token(request):
         "nbf": time.time(),
         "nonce": nonce,
     }
+    kdat = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_KDAT))
     id_token = jwt.encode(
         args,
-        pvtkey_pem,
+        kdat.get("pvtkey"),
         algorithm="RS256",
-        headers={"kid": test_kid},
+        headers={"kid": kdat.get("kid")},
     )
 
     retval = {
