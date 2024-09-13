@@ -89,9 +89,9 @@ services:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
       OIDC_RP_CLIENT_ID:
       OIDC_RP_CLIENT_SECRET:
-      LOGIN_REDIRECT_SERVER_URL:
-      LOGIN_REDIRECT_CLIENT_URL:
-      LOGOUT_REDIRECT_URL:
+      LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
+      LOGIN_REDIRECT_CLIENT_URL: http://localhost:4200
+      LOGOUT_REDIRECT_URL: http://localhost:8080/api/v1/oidc/logout-redirect
       SYSTEM_STATUS_CACHE_AGE:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
