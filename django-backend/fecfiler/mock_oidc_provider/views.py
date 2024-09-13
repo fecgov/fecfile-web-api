@@ -102,7 +102,7 @@ def authorize(request):
 def token(request):
     auth_data = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_DATA))
     if not auth_data.get("code"):
-        return HttpResponseBadRequest("call to authorize endpoint is first required")
+        return HttpResponseBadRequest("call to authorize endpoint is required first")
     request_code = request.data.get("code")
     if request_code != auth_data.get("code"):
         return HttpResponseBadRequest("authorize code is invalid")
@@ -149,7 +149,7 @@ def userinfo(request):
     if "Authorization" not in request.headers:
         return HttpResponseBadRequest("Authorization header is required")
     if not auth_data.get("access_token"):
-        return HttpResponseBadRequest("call to authorize endpoint is first required")
+        return HttpResponseBadRequest("call to authorize endpoint is required first")
     auth_header = request.headers.get("Authorization")
     match = re.search("Bearer (.+)", auth_header)
     if not match:
@@ -169,13 +169,8 @@ def userinfo(request):
 @permission_classes([])
 @require_http_methods(["GET"])
 def logout(request):
-    if (
-        "client_id" not in request.query_params
-        or "post_logout_redirect_uri" not in request.query_params
-    ):
-        return HttpResponseBadRequest(
-            "client_id, post_logout_redirect_uri params are required"
-        )
+    if "post_logout_redirect_uri" not in request.query_params:
+        return HttpResponseBadRequest("post_logout_redirect_uri param is required")
     post_logout_redirect_uri = request.query_params.get("post_logout_redirect_uri")
     state = request.query_params.get("state", None)
     redis_instance.delete(MOCK_OIDC_PROVIDER_DATA)
