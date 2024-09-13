@@ -9,7 +9,6 @@ from fecfiler.mock_oidc_provider.views import (
     token,
     userinfo,
     logout,
-    test_kid,
     test_username,
     test_email,
 )
@@ -45,8 +44,13 @@ class OidcTest(TestCase):
 
     # certs
 
-    def test_certs_happy_path(self):
+    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
+    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.set")
+    def test_certs_happy_path(self, mock_redis_set, mock_redis_get):
         request = self.factory.get("/")
+
+        mock_redis_get.side_effect = lambda _: None
+
         retval = certs(request)
         actual_json_content = json.loads(retval.content)
         key_dict = actual_json_content.get("keys")[0]
@@ -58,7 +62,7 @@ class OidcTest(TestCase):
         self.assertEqual(key_dict.get("kty"), "RSA")
         self.assertTrue("n" in key_dict)
         self.assertEqual(key_dict.get("e"), "AQAB")
-        self.assertEqual(key_dict.get("kid"), test_kid)
+        self.assertIsNotNone(key_dict.get("kid"))
 
     # authorize
 
@@ -160,7 +164,8 @@ class OidcTest(TestCase):
         self.assertEqual(expected_content, retval.content.decode())
 
     @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
-    def test_token_happy_path(self, mock_redis_get):
+    @patch("fecfiler.mock_oidc_provider.views.jwt.encode")
+    def test_token_happy_path(self, mock_jwt_encode, mock_redis_get):
         test_code = "test_code"
         test_nonce = "test_nonce"
         test_access_token = "test_access_token"
@@ -172,6 +177,7 @@ class OidcTest(TestCase):
         test_payload = {"code": test_code}
 
         mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
+        mock_jwt_encode.side_effect = lambda *args, **kwargs: "test_jwt_encoded"
 
         request = self.factory.post("/", test_payload)
         retval = token(request)
