@@ -58,18 +58,8 @@ def discovery(request):
 @permission_classes([])
 @require_http_methods(["GET"])
 def certs(request):
-    kdat = redis_instance.get(MOCK_OIDC_PROVIDER_KDAT)
-    if not kdat:
-        test_kid = str(uuid4())
-        rsapair = jwk.JWK.generate(
-            kty="RSA", size=2048, kid=test_kid, use="sig", alg="RS256"
-        )
-        pubkey = rsapair.export_public()
-        pvtkey_pem = rsapair.export_to_pem(True, None).decode()
-        kdat = json.dumps({"kid": test_kid, "pubkey": pubkey, "pvtkey": pvtkey_pem})
-        redis_instance.set(MOCK_OIDC_PROVIDER_KDAT, kdat, ex=3600)
-
-    pubkey_str = json.loads(kdat).get("pubkey")
+    kdat_dict = get_or_create_kdat_dict()
+    pubkey_str = kdat_dict.get("pubkey")
     retval = {"keys": [{**(json.loads(pubkey_str))}]}
     return JsonResponse(retval)
 
@@ -132,12 +122,12 @@ def token(request):
         "nbf": time.time(),
         "nonce": nonce,
     }
-    kdat = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_KDAT))
+    kdat_dict = get_or_create_kdat_dict()
     id_token = jwt.encode(
         args,
-        kdat.get("pvtkey"),
+        kdat_dict.get("pvtkey"),
         algorithm="RS256",
-        headers={"kid": kdat.get("kid")},
+        headers={"kid": kdat_dict.get("kid")},
     )
 
     retval = {
@@ -188,3 +178,17 @@ def logout(request):
     if state:
         retval += f"?state={state}"
     return HttpResponseRedirect(retval)
+
+
+def get_or_create_kdat_dict():
+    kdat = redis_instance.get(MOCK_OIDC_PROVIDER_KDAT)
+    if not kdat:
+        test_kid = str(uuid4())
+        rsapair = jwk.JWK.generate(
+            kty="RSA", size=2048, kid=test_kid, use="sig", alg="RS256"
+        )
+        pubkey = rsapair.export_public()
+        pvtkey_pem = rsapair.export_to_pem(True, None).decode()
+        kdat = json.dumps({"kid": test_kid, "pubkey": pubkey, "pvtkey": pvtkey_pem})
+        redis_instance.set(MOCK_OIDC_PROVIDER_KDAT, kdat, ex=3600)
+    return json.loads(kdat)
