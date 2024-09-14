@@ -182,8 +182,14 @@ class OIDCAuthenticationBackend(ModelBackend):
             "exp": int(time.time()) + 300,  # 5 minutes from now
         }
         # Client secret needs to be pem-encoded string
-        encoded_jwt = jwt.encode(
-            jwt_args, settings.OIDC_RP_CLIENT_SECRET, algorithm=settings.OIDC_RP_SIGN_ALGO
+        encoded_jwt = (
+            jwt.encode(
+                jwt_args,
+                settings.OIDC_RP_CLIENT_SECRET,
+                algorithm=settings.OIDC_RP_SIGN_ALGO,
+            )
+            if settings.OIDC_RP_CLIENT_SECRET and settings.OIDC_RP_SIGN_ALGO
+            else None
         )
         token_payload = {
             "client_assertion": encoded_jwt,
