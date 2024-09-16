@@ -59,6 +59,8 @@ services:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
     deploy:
       resources:
         limits:
@@ -109,6 +111,8 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
     deploy:
       resources:
         limits:

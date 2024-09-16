@@ -12,6 +12,8 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
+from fecfiler.shared.utilities import get_float_from_string
+from math import floor
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -355,8 +357,18 @@ WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 """EFO POLLING SETTINGS
 """
-EFO_POLLING_MAX_ATTEMPTS = 100  # Max requests made
-EFO_POLLING_INTERVAL = 30  # Time between requests in seconds
+EFO_POLLING_MAX_DURATION_DEFAULT = 300  # Max duration of polling in seconds
+EFO_POLLING_INTERVAL_DEFAULT = 30  # Time between requests in seconds
+
+EFO_POLLING_MAX_DURATION = get_float_from_string(
+    env.get_credential("EFO_POLLING_MAX_DURATION"),
+    EFO_POLLING_MAX_DURATION_DEFAULT
+)
+EFO_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("EFO_POLLING_INTERVAL"),
+    EFO_POLLING_INTERVAL_DEFAULT
+)
+EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION/EFO_POLLING_INTERVAL)
 
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
