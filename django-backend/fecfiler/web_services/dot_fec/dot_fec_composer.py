@@ -38,17 +38,15 @@ def compose_report(report_id, upload_submission_record_id):
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
     transaction_view_model = get_read_model(report.committee_account_id)
-    transactions = transaction_view_model.objects.filter(reports__id=report_id).prefetch_related()
+    transactions = transaction_view_model.objects.filter(
+        reports__id=report_id
+    ).prefetch_related()
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
 
-        transactions_composed = 0
-        transaction_count = transactions.count()
         committee_id_number = transactions.first().committee_account.committee_id
         for transaction in transactions:
-            transactions_composed += 1
-            logger.debug(f"Composing transaction {transactions_composed} / {transaction_count}")
             transaction.filer_committee_id_number = committee_id_number
 
             if transaction.schedule_a:
@@ -187,11 +185,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         file_content = add_row_to_content(file_content, report_row)
 
         composed_transactions = compose_transactions(report_id)
-        transaction_count = len(composed_transactions)
-        transactions_serialized = 0
         for transaction in composed_transactions:
-            transactions_serialized += 1
-            logger.debug(f"Serializing transaction {transactions_serialized} / {transaction_count}")
             serialized_transaction = serialize_instance(
                 get_schema_name(transaction.schedule), transaction
             )

@@ -3,7 +3,12 @@ import timeit
 from uuid import uuid4
 from django.test import TestCase, tag, override_settings
 from unittest.mock import patch
-from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint, poll_for_fec_response
+from .tasks import (
+	create_dot_fec,
+    submit_to_fec,
+    submit_to_webprint,
+    poll_for_fec_response
+)
 from .models import (
     DotFEC,
     FECStatus,
@@ -19,7 +24,10 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.web_services.dot_fec.web_print_submitter import EFOWebPrintSubmitter, WebPrintSubmitter, MockWebPrintSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import (
+	WebPrintSubmitter,
+    MockWebPrintSubmitter
+)
 
 import structlog
 
@@ -259,32 +267,48 @@ class PollingTasksTestCase(TestCase):
             str(self.f3x.id)
         )
         self.assertNotEqual(webprint_submission.fec_status, FECStatus.COMPLETED)
-        poll_for_fec_response(webprint_submission.id, self.mock_web_print_key, "Unit Testing Web Print")
+        poll_for_fec_response(
+            webprint_submission.id, self.mock_web_print_key, "Unit Testing Web Print"
+        )
         resolved_submission = WebPrintSubmission.objects.get(id=webprint_submission.id)
         self.assertEqual(resolved_submission.fec_status, FECStatus.COMPLETED)
 
     def test_submission_ongoing_polling(self):
-        with patch.multiple('fecfiler.web_services.tasks', SUBMISSION_MANAGERS=self.submission_managers, SUBMISSION_CLASSES=self.submission_classes):
+        with patch.multiple(
+            'fecfiler.web_services.tasks',
+            SUBMISSION_MANAGERS=self.submission_managers,
+            SUBMISSION_CLASSES=self.submission_classes
+        ):
             webprint_submission = WebPrintSubmission.objects.initiate_submission(
                 str(self.f3x.id)
             )
             webprint_submission.fec_submission_id = webprint_submission.id
             webprint_submission.save()
             self.assertEqual(webprint_submission.fecfile_polling_attempts, 0)
-            poll_for_fec_response(webprint_submission.id, self.test_print_key, "Unit Testing Web Print")
+            poll_for_fec_response(
+                webprint_submission.id, self.test_print_key, "Unit Testing Web Print"
+            )
             ongoing_submission = WebPrintSubmission.objects.get(id=webprint_submission.id)
             self.assertEqual(ongoing_submission.fec_status, FECStatus.COMPLETED.value)
             self.assertEqual(ongoing_submission.fecfile_polling_attempts, 5)
 
     def test_submission_polling_limit(self):
-        with patch.multiple('fecfiler.web_services.tasks', SUBMISSION_MANAGERS=self.submission_managers, SUBMISSION_CLASSES=self.submission_classes):
+        with patch.multiple(
+            'fecfiler.web_services.tasks',
+            SUBMISSION_MANAGERS=self.submission_managers,
+            SUBMISSION_CLASSES=self.submission_classes
+        ):
             webprint_submission = WebPrintSubmission.objects.initiate_submission(
                 str(self.f3x.id)
             )
             webprint_submission.fec_submission_id = webprint_submission.id
             webprint_submission.fecfile_polling_attempts = 6
             webprint_submission.save()
-            poll_for_fec_response(webprint_submission.id, self.test_print_key, "Unit Testing Web Print")
-            resolved_submission = WebPrintSubmission.objects.get(id=webprint_submission.id)
+            poll_for_fec_response(
+                webprint_submission.id, self.test_print_key, "Unit Testing Web Print"
+            )
+            resolved_submission = WebPrintSubmission.objects.get(
+                id=webprint_submission.id
+            )
             self.assertEqual(resolved_submission.fec_status, FECStatus.FAILED.value)
             self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)

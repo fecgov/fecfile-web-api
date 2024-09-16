@@ -368,7 +368,7 @@ EFO_POLLING_INTERVAL = get_float_from_string(
     env.get_credential("EFO_POLLING_INTERVAL"),
     EFO_POLLING_INTERVAL_DEFAULT
 )
-EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION/EFO_POLLING_INTERVAL)
+EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
 
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
