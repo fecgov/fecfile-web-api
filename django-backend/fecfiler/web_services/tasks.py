@@ -161,7 +161,8 @@ def submit_to_fec(
             submission.  This lets us instantiate objects of the correct classes as we
             need them."""
             return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "Dot FEC"], countdown=EFO_POLLING_INTERVAL
+                [submission.id, submission_type_key, "Dot FEC"],
+                countdown=EFO_POLLING_INTERVAL
             )
         else:
             return resolve_final_submission_state(submission)
