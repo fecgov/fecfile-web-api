@@ -19,10 +19,10 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
 )
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
-	WEBPRINT_EMAIL,
-	EFO_POLLING_MAX_DURATION,
-	EFO_POLLING_INTERVAL,
-	EFO_POLLING_MAX_ATTEMPTS
+    WEBPRINT_EMAIL,
+    EFO_POLLING_MAX_DURATION,
+    EFO_POLLING_INTERVAL,
+    EFO_POLLING_MAX_ATTEMPTS
 )
 
 import structlog

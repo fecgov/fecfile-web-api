@@ -4,7 +4,7 @@ from uuid import uuid4
 from django.test import TestCase, tag, override_settings
 from unittest.mock import patch
 from .tasks import (
-	create_dot_fec,
+    create_dot_fec,
     submit_to_fec,
     submit_to_webprint,
     poll_for_fec_response
@@ -25,7 +25,7 @@ from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.web_services.dot_fec.web_print_submitter import (
-	WebPrintSubmitter,
+    WebPrintSubmitter,
     MockWebPrintSubmitter
 )
 

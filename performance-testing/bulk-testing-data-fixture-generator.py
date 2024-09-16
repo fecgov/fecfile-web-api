@@ -402,8 +402,8 @@ def create_transaction(committee_uuid, contact_id, report, big_memos):
 
 
 def create_records(
-        transaction_count, report_count, contact_count, committee_count, big_memos
-    ):
+    transaction_count, report_count, contact_count, committee_count, big_memos
+):
     committees = [create_committee("N/A", PRIMARY_COMMITTEE_UUID)]
     for _ in range(max(committee_count, 0)):
         committees.append(create_committee())
@@ -483,8 +483,8 @@ def save_records_to_fixture(records):
 
 
 def create_fixture(
-        transactions=1000, reports=5, contacts=100, committees=1, big_memos=False
-    ):
+    transactions=1000, reports=5, contacts=100, committees=1, big_memos=False
+):
     records = create_records(transactions, reports, contacts, committees, big_memos)
     sorted_records = prepare_records(records)
     save_records_to_fixture(sorted_records)
