@@ -54,36 +54,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     in CommitteeOwnedViewMixin's implementation of get_queryset()
     """
 
-    whens = [When(form_type=k, then=Value(v)) for k, v in version_labels.items()]
-
-    queryset = (
-        Report.objects.annotate(report_code_label=report_code_label_case)
-        # alias fields used by the version_label annotation only. not part of payload
-        .alias(
-            form_type_label=Case(
-                *whens,
-                default=Value(""),
-                output_field=CharField(),
-            ),
-            report_version_label=Case(
-                When(report_version__isnull=True, then=Value("")),
-                default=F("report_version"),
-                output_field=CharField(),
-            ),
-        )
-        .annotate(
-            version_label=Trim(
-                Concat(
-                    F("form_type_label"),
-                    Value(" "),
-                    F("report_version_label"),
-                    output_field=CharField(),
-                )
-            )
-        )
-        .all()
-    )
-
+    queryset = Report.objects
     serializer_class = ReportSerializer
     pagination_class = ReportListPagination
     filter_backends = [filters.OrderingFilter]
@@ -103,7 +74,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         ordering_whens = [
             When(form_type=k, then=Value(v)) for k, v in form_type_ordering.items()
         ]
-        whens = [When(form_type=k, then=Value(v)) for k, v in version_labels.items()]
+        form_type_label_whens = [
+            When(form_type=k, then=Value(v)) for k, v in version_labels.items()
+        ]
         queryset = (
             super()
             .get_queryset()
@@ -111,7 +84,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             # alias fields used by the version_label annotation only. not part of payload
             .alias(
                 form_type_label=Case(
-                    *whens,
+                    *form_type_label_whens,
                     default=Value(""),
                     output_field=CharField(),
                 ),
