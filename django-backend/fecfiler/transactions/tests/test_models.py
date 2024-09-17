@@ -262,6 +262,93 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reatt_1.deleted)
         self.assertIsNotNone(reatt_2.deleted)
 
+    def test_delete_reattribution_jf_transfer(self):
+        # Setup JF Transfer
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        jf_transfer.save()
+
+        parnership_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        parnership_jf_transfer_memo.parent_transaction = jf_transfer
+        parnership_jf_transfer_memo.save()
+
+        parnership_attribution_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-03",
+            amount="5.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        parnership_attribution_jf_transfer_memo.parent_transaction = (
+            parnership_jf_transfer_memo
+        )
+        parnership_attribution_jf_transfer_memo.save()
+
+        # Reattribute to future report
+        reatt_pull_forward = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+            report=self.m2_report,
+        )
+        reatt_pull_forward.reatt_redes = jf_transfer
+        reatt_pull_forward.save()
+
+        reatt_1 = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="-10.00",
+            report=self.m2_report,
+        )
+        reatt_1.reatt_redes = reatt_pull_forward
+        reatt_1.save()
+
+        reatt_2 = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-01",
+            amount="10.00",
+            report=self.m2_report,
+        )
+        reatt_2.reatt_redes = reatt_pull_forward
+        reatt_2.save()
+
+        jf_transfer.delete()
+        jf_transfer.refresh_from_db()
+        parnership_jf_transfer_memo.refresh_from_db()
+        parnership_attribution_jf_transfer_memo.refresh_from_db()
+        reatt_pull_forward.refresh_from_db()
+        reatt_1.refresh_from_db()
+        reatt_2.refresh_from_db()
+        self.assertIsNotNone(jf_transfer.deleted)
+        self.assertIsNotNone(parnership_jf_transfer_memo.deleted)
+        self.assertIsNotNone(parnership_attribution_jf_transfer_memo.deleted)
+        self.assertIsNotNone(reatt_pull_forward.deleted)
+        self.assertIsNotNone(reatt_1.deleted)
+        self.assertIsNotNone(reatt_2.deleted)
+
     def test_can_delete_submitted_report(self):
         self.loan.refresh_from_db()
         self.loan_made.refresh_from_db()

@@ -190,11 +190,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if not self.reatt_redes:
                 # If deleted parent transaction to a reattribution/redesignation
                 # delete the two child transactions
-                reatt_redes_transactions = Transaction.objects.filter(reatt_redes=self)
-                for child in reatt_redes_transactions:
-                    if not child.deleted:
-                        child.deleted = datetime.now()
-                        child.save()
+                self.delete_reattributions(self)
 
                 # If earmark delete corresponding earmark
                 if self.transaction_type_identifier == "EARMARK_RECEIPT":
@@ -244,18 +240,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 child_transactions = Transaction.objects.filter(parent_transaction=self)
                 for child in child_transactions:
                     if not child.deleted:
-                        child.deleted = datetime.now()
-                        child.save()
+                        child.delete()
             # If deleting a reattribution/redesignation transaction,
             # delete the paired reattribution/redesignation but don't delete the parent
             else:
-                reatt_redes_transactions = Transaction.objects.filter(
-                    reatt_redes=self.reatt_redes
-                )
-                for child in reatt_redes_transactions:
-                    if not child.deleted:
-                        child.deleted = datetime.now()
-                        child.save()
+                self.delete_reattributions(self.reatt_redes)
 
     def delete_loans(self, loan):
         loan_transactions = Transaction.objects.filter(loan_id=loan.id)
@@ -274,6 +263,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             loan.loan.deleted = datetime.now()
             loan.loan.save()
             self.delete_loans(loan.loan)
+
+    def delete_reattributions(self, transaction):
+        reatt_redes_transactions = Transaction.objects.filter(reatt_redes=transaction)
+        for child in reatt_redes_transactions:
+            if not child.deleted:
+                child.deleted = datetime.now()
+                child.save()
+                self.delete_reattributions(child)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
