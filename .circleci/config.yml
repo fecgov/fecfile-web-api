@@ -200,7 +200,7 @@ jobs:
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
 
   # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
-  # It is used to run the e2e tests when the api is deployed to dev/stage/prod.
+  # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
   # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
   # circleci config file to differentiate it from the nightly runs.
   trigger-e2e-test-pipeline:
@@ -228,7 +228,7 @@ workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
       - test
-      # This job is triggered whenever a commit is made to the dev/stage/prod branches.
+      # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
       - trigger-e2e-test-pipeline:
           filters:
