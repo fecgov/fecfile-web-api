@@ -111,6 +111,5 @@ fecfiler.reports.views.ReportViewSet
       ~ReportViewSet.throttle_classes
       ~ReportViewSet.versioning_class
       ~ReportViewSet.view_is_async
-      ~ReportViewSet.whens
    
    

@@ -114,6 +114,5 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.throttle_classes
       ~Form3XViewSet.versioning_class
       ~Form3XViewSet.view_is_async
-      ~Form3XViewSet.whens
    
    
