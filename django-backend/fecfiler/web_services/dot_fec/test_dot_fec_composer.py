@@ -75,6 +75,37 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_dot_fec_str[1].split(FS_STR)[0], "SA11AI")
         self.assertEqual(split_dot_fec_str[2].split(FS_STR)[-1], "dahtest2")
 
+    def test_row_contains_aggregate(self):
+        new_contact = create_test_individual_contact(
+            "test last name", "test first name", self.committee.id
+        )
+        earlier_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            new_contact,
+            datetime.strptime("2024-01-03", "%Y-%m-%d"),
+            "50.00",
+            "GENERAL",
+            "SA11AI",
+        )
+        later_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            new_contact,
+            datetime.strptime("2024-01-04", "%Y-%m-%d"),
+            "25.00",
+            "GENERAL",
+            "SA11AI",
+        )
+        for transaction in [earlier_transaction, later_transaction]:
+            transaction.reports.add(self.f3x)
+            transaction.save()
+
+        later_transaction.refresh_from_db()
+        transaction_row = serialize_instance("SchA", later_transaction)
+        row_str = add_row_to_content("", transaction_row)
+        self.assertIn("75.00", row_str)
+
     def test_f99(self):
         content = compose_dot_fec(self.f99.id, None)
         split_content = content.split("\n")
