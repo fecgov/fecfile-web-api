@@ -94,7 +94,6 @@ class Header:
         rpt_id=None,
         rpt_number=None,
         hdrcomment=None,
-        qualified=True,
     ):
         self.record_type = record_type
         self.ef_type = ef_type
@@ -104,7 +103,6 @@ class Header:
         self.rpt_id = rpt_id
         self.rpt_number = rpt_number
         self.hdrcomment = hdrcomment
-        self.qualified = qualified
 
 
 def compose_header(report_id):
