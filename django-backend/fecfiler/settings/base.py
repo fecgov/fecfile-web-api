@@ -162,7 +162,8 @@ OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 OIDC_OP_AUTODISCOVER_ENDPOINT = (
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
 )
-OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
+# OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
+OIDC_OP_CONFIG = {}
 
 OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
 OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
