@@ -239,7 +239,8 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|main/
+              only: feature\/1572-test-environment-b
+              # only: /develop|release\/sprint-[\.\d]+|main/
       - docs-build:
           requires:
             - test
