@@ -4,7 +4,7 @@ Django settings for the FECFile project.
 
 import os
 import dj_database_url
-import requests
+# import requests
 import structlog
 import sys
 
