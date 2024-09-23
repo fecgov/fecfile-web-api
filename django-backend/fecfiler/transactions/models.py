@@ -183,94 +183,77 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         super(Transaction, self).save(*args, **kwargs)
 
     def delete(self):
-        if self.can_delete and not self.deleted:
-            self.deleted = datetime.now()
-            self.save()
+        if not self.can_delete:
+            raise Exception("Transaction cannot be deleted")
+        if not self.deleted:
+            super(Transaction, self).delete()
 
-            if not self.reatt_redes:
-                # If deleted parent transaction to a reattribution/redesignation
-                # delete the two child transactions
-                self.delete_reattributions(self)
+            # child transactions
+            child_transactions = Transaction.objects.filter(parent_transaction=self)
+            for child in child_transactions:
+                child.delete()
 
-                # If earmark delete corresponding earmark
-                if self.transaction_type_identifier == "EARMARK_RECEIPT":
-                    earmark_memo = Transaction.objects.filter(
-                        parent_transaction=self
-                    ).first()
-                    earmark_memo.deleted = datetime.now()
-                    earmark_memo.save()
-                elif self.transaction_type_identifier == "EARMARK_MEMO":
-                    earmark_receipt = Transaction.objects.get(
-                        id=self.parent_transaction.id
-                    )
-                    earmark_receipt.deleted = datetime.now()
-                    earmark_receipt.save()
-                    reatt_redes_transactions = Transaction.objects.filter(
-                        reatt_redes=earmark_receipt
-                    )
-                    for child in reatt_redes_transactions:
-                        if not child.deleted:
-                            child.deleted = datetime.now()
-                            child.save()
+            # transactions related to this debt
+            if self.debt and self.schedule_d:
+                """ASK BA IF THIS IS DESIRED BEHAVIOR"""
+                # If this is a carry forward debt, delete the original debt
+                self.debt.delete()
+            # delete any carry forwards or repayments related to this debt
+            debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
+            for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
+                carry_forward_or_repayment.delete()
 
-                # Handle debts
-                debts = Transaction.objects.filter(debt=self)
-                for debt in debts:
-                    if not debt.deleted:
-                        debt.deleted = datetime.now()
-                        debt.save()
+            # transactions related to a loan
+            if self.loan and self.schedule_c:
+                """ASK BA IF THIS IS DESIRED BEHAVIOR"""
+                # If this is a carry forward loan, delete the original loan
+                self.loan.delete()
+            # delete any carry forwards or repayments related to this loan
+            loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
+            for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
+                carry_forward_or_repayment.delete()
 
-                # Handle Loans
-                if (
-                    "LOAN" in self.transaction_type_identifier
-                    and "LOAN_REPAYMENT_MADE" != self.transaction_type_identifier
-                ):
-                    # If deleting the receipt, also delete the whole loan
-                    if (
-                        "LOAN_MADE" == self.transaction_type_identifier
-                        or "RECEIPT" in self.transaction_type_identifier
-                    ):
-                        self.parent_transaction.deleted = datetime.now()
-                        self.parent_transaction.save()
-                        loan = self.parent_transaction
-                    else:
-                        loan = self
-                    self.delete_loans(loan)
+            """
+            REATTRIBUTION/REDESIGNATION
+            """
+            # If this is a reattribution/redesignation 'from' transaction, delete the 'to' transaction
+            if (
+                self.schedule_a
+                and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
+            ) or (
+                self.schedule_b
+                and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
+            ):
+                self.parent_transaction.delete()
 
-                child_transactions = Transaction.objects.filter(parent_transaction=self)
-                for child in child_transactions:
-                    if not child.deleted:
-                        child.delete()
-            # If deleting a reattribution/redesignation transaction,
-            # delete the paired reattribution/redesignation but don't delete the parent
-            else:
-                self.delete_reattributions(self.reatt_redes)
+            # If this reattribution/redesignation is tied to a copy of the original transaction, delete the copy
+            if self.reatt_redes and (
+                (
+                    self.reatt_redes.schedule_a
+                    and self.reatt_redes.schedule_a.reattribution_redesignation_tag
+                    == "REATTRIBUTED"
+                )
+                or (
+                    self.reatt_redes.schedule_b
+                    and self.reatt_redes.schedule_b.reattribution_redesignation_tag
+                    == "REDESIGNATED"
+                )
+            ):
+                self.reatt_redes.delete()
 
-    def delete_loans(self, loan):
-        loan_transactions = Transaction.objects.filter(loan_id=loan.id)
-        for child in loan_transactions:
-            if not child.deleted:
-                child.deleted = datetime.now()
-                child.save()
-                self.delete_loans(child)
-        loan_transactions = Transaction.objects.filter(parent_transaction_id=loan.id)
-        for child in loan_transactions:
-            if not child.deleted:
-                child.deleted = datetime.now()
-                child.save()
-                self.delete_loans(child)
-        if loan.loan:
-            loan.loan.deleted = datetime.now()
-            loan.loan.save()
-            self.delete_loans(loan.loan)
+            # Delete any reattribution/redesignation transactions related to this transaction (copy/from/to)"
+            reatributions_and_redesignations = Transaction.objects.filter(
+                reatt_redes=self
+            )
+            for reatribuiton_or_redesignation in reatributions_and_redesignations:
+                reatribuiton_or_redesignation.delete()
 
-    def delete_reattributions(self, transaction):
-        reatt_redes_transactions = Transaction.objects.filter(reatt_redes=transaction)
-        for child in reatt_redes_transactions:
-            if not child.deleted:
-                child.deleted = datetime.now()
-                child.save()
-                self.delete_reattributions(child)
+            # coupled transactions
+            if (
+                self.parent_transaction
+                and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
+            ):
+                self.parent_transaction.delete()
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
@@ -333,3 +316,26 @@ SCHEDULE_TO_TABLE = {
     Schedule.D: "schedule_d",
     Schedule.E: "schedule_e",
 }
+
+COUPLED_TRANSACTION_TYPES = [
+    # EARMARK MEMOS
+    "EARMARK_MEMO",
+    "EARMARK_MEMO_CONVENTION_ACCOUNT",
+    "EARMARK_MEMO_HEADQUARTERS_ACCOUNT",
+    "EARMARK_MEMO_RECOUNT_ACCOUNT",
+    "PAC_EARMARK_MEMO",
+    # CONDUIT EARMARK OUTS
+    "CONDUIT_EARMARK_OUT_DEPOSITED",
+    "CONDUIT_EARMARK_OUT_UNDEPOSITED",
+    "PAC_CONDUIT_EARMARK_OUT_DEPOSITED",
+    "PAC_CONDUIT_EARMARK_OUT_UNDEPOSITED",
+    # IN KIND OUTS
+    "IN_KIND_OUT",
+    "PAC_IN_KIND_OUT",
+    "PARTY_IN_KIND_OUT",
+    # LOAN
+    "LOAN_MADE",
+    "LOAN_RECEIVED_FROM_BANK_RECEIPT",
+    "LOAN_RECEIVED_FROM_INDIVIDUAL_RECEIPT",
+    "C1_LOAN_AGREEMENT",
+]

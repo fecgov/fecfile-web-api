@@ -59,7 +59,7 @@ def carry_forward_debt(debt, report):
         # even if the loan is pulled forward multiple times.
         "debt_id": debt.loan_id or debt.id,
     }
-    save_copy(
+    return save_copy(
         Transaction(
             **model_to_dict(
                 debt,
