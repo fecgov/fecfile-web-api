@@ -129,90 +129,59 @@ class TransactionModelTestCase(TestCase):
         deleting the parent deletes all 3
         deleting the tier 2 deletes the tier 2 and 3
         deleting the tier 3 deletes only the tier 3"""
-
-        jf_transfer = create_schedule_a(
-            "JOINT_FUNDRAISING_TRANSFER",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="500.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        jf_transfer.save()
-        parnership_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-02",
-            amount="50.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        parnership_jf_transfer_memo.parent_transaction = jf_transfer
-        parnership_jf_transfer_memo.save()
-
-        parnership_attribution_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-03",
-            amount="5.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        parnership_attribution_jf_transfer_memo.parent_transaction = (
-            parnership_jf_transfer_memo
-        )
-        parnership_attribution_jf_transfer_memo.save()
+        (
+            jf_transfer,
+            partnership_jf_transfer_memo,
+            partnership_attribution_jf_transfer_memo,
+        ) = self.set_up_jf_transfer()
 
         """Delete the parent transaction"""
         jf_transfer.delete()
         # assert that parent and children transactions are deleted
         self.assertIsNone(Transaction.objects.filter(id=jf_transfer.id).first())
         self.assertIsNone(
-            Transaction.objects.filter(id=parnership_jf_transfer_memo.id).first()
+            Transaction.objects.filter(id=partnership_jf_transfer_memo.id).first()
         )
         self.assertIsNone(
             Transaction.objects.filter(
-                id=parnership_attribution_jf_transfer_memo.id
+                id=partnership_attribution_jf_transfer_memo.id
             ).first()
         )
 
-        #'un-delete' the transactions
+        # 'un-delete' the transactions
         undelete(jf_transfer)
-        undelete(parnership_jf_transfer_memo)
-        undelete(parnership_attribution_jf_transfer_memo)
+        undelete(partnership_jf_transfer_memo)
+        undelete(partnership_attribution_jf_transfer_memo)
 
         """Delete the tier 2"""
-        parnership_jf_transfer_memo.delete()
+        partnership_jf_transfer_memo.delete()
         # assert the jf_transfer is not deleted
         self.assertIsNotNone(Transaction.objects.filter(id=jf_transfer.id).first())
         # assert that the children transactions are deleted
         self.assertIsNone(
-            Transaction.objects.filter(id=parnership_jf_transfer_memo.id).first()
+            Transaction.objects.filter(id=partnership_jf_transfer_memo.id).first()
         )
         self.assertIsNone(
             Transaction.objects.filter(
-                id=parnership_attribution_jf_transfer_memo.id
+                id=partnership_attribution_jf_transfer_memo.id
             ).first()
         )
 
-        #'un-delete' the transactions
-        undelete(parnership_jf_transfer_memo)
-        undelete(parnership_attribution_jf_transfer_memo)
+        # 'un-delete' the transactions
+        undelete(partnership_jf_transfer_memo)
+        undelete(partnership_attribution_jf_transfer_memo)
 
         """Delete the tier 3"""
-        parnership_attribution_jf_transfer_memo.delete()
+        partnership_attribution_jf_transfer_memo.delete()
         # assert the jf_transfer and partnership_jf_transfer_memo are not deleted
         self.assertIsNotNone(Transaction.objects.filter(id=jf_transfer.id).first())
         self.assertIsNotNone(
-            Transaction.objects.filter(id=parnership_jf_transfer_memo.id).first()
+            Transaction.objects.filter(id=partnership_jf_transfer_memo.id).first()
         )
-        # assert that the parnership_attribution_jf_transfer_memo is deleted
+        # assert that the partnership_attribution_jf_transfer_memo is deleted
         self.assertIsNone(
             Transaction.objects.filter(
-                id=parnership_attribution_jf_transfer_memo.id
+                id=partnership_attribution_jf_transfer_memo.id
             ).first()
         )
 
@@ -594,43 +563,11 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_from.deleted)
 
     def test_delete_reattribution_jf_transfer(self):
-        # Setup JF Transfer
-        jf_transfer = create_schedule_a(
-            "JOINT_FUNDRAISING_TRANSFER",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="500.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        jf_transfer.save()
-
-        parnership_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-02",
-            amount="50.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        parnership_jf_transfer_memo.parent_transaction = jf_transfer
-        parnership_jf_transfer_memo.save()
-
-        parnership_attribution_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-03",
-            amount="5.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        parnership_attribution_jf_transfer_memo.parent_transaction = (
-            parnership_jf_transfer_memo
-        )
-        parnership_attribution_jf_transfer_memo.save()
+        (
+            jf_transfer,
+            partnership_jf_transfer_memo,
+            partnership_attribution_jf_transfer_memo,
+        ) = self.set_up_jf_transfer()
 
         # Reattribute to future report
         reatt_pull_forward = create_schedule_a(
@@ -678,21 +615,21 @@ class TransactionModelTestCase(TestCase):
         # Deleting the original deletes all transactions
         jf_transfer.delete()
         jf_transfer.refresh_from_db()
-        parnership_jf_transfer_memo.refresh_from_db()
-        parnership_attribution_jf_transfer_memo.refresh_from_db()
+        partnership_jf_transfer_memo.refresh_from_db()
+        partnership_attribution_jf_transfer_memo.refresh_from_db()
         reatt_pull_forward.refresh_from_db()
         reattribution_to.refresh_from_db()
         reattribution_from.refresh_from_db()
         self.assertIsNotNone(jf_transfer.deleted)
-        self.assertIsNotNone(parnership_jf_transfer_memo.deleted)
-        self.assertIsNotNone(parnership_attribution_jf_transfer_memo.deleted)
+        self.assertIsNotNone(partnership_jf_transfer_memo.deleted)
+        self.assertIsNotNone(partnership_attribution_jf_transfer_memo.deleted)
         self.assertIsNotNone(reatt_pull_forward.deleted)
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
         undelete(jf_transfer)
-        undelete(parnership_jf_transfer_memo)
-        undelete(parnership_attribution_jf_transfer_memo)
+        undelete(partnership_jf_transfer_memo)
+        undelete(partnership_attribution_jf_transfer_memo)
         undelete(reatt_pull_forward)
         undelete(reattribution_to)
         undelete(reattribution_from)
@@ -700,8 +637,8 @@ class TransactionModelTestCase(TestCase):
         # Deleting the copy deletes the reattributions
         reatt_pull_forward.delete()
         jf_transfer.refresh_from_db()
-        parnership_jf_transfer_memo.refresh_from_db()
-        parnership_attribution_jf_transfer_memo.refresh_from_db()
+        partnership_jf_transfer_memo.refresh_from_db()
+        partnership_attribution_jf_transfer_memo.refresh_from_db()
         reatt_pull_forward.refresh_from_db()
         reattribution_to.refresh_from_db()
         reattribution_from.refresh_from_db()
@@ -717,8 +654,8 @@ class TransactionModelTestCase(TestCase):
         # Deleting either reattribution deletes the copy
         reattribution_from.delete()
         jf_transfer.refresh_from_db()
-        parnership_jf_transfer_memo.refresh_from_db()
-        parnership_attribution_jf_transfer_memo.refresh_from_db()
+        partnership_jf_transfer_memo.refresh_from_db()
+        partnership_attribution_jf_transfer_memo.refresh_from_db()
         reatt_pull_forward.refresh_from_db()
         reattribution_to.refresh_from_db()
         reattribution_from.refresh_from_db()
@@ -771,6 +708,50 @@ class TransactionModelTestCase(TestCase):
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
+
+    def set_up_jf_transfer(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        jf_transfer.save()
+
+        partnership_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        partnership_jf_transfer_memo.parent_transaction = jf_transfer
+        partnership_jf_transfer_memo.save()
+
+        partnership_attribution_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-03",
+            amount="5.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        partnership_attribution_jf_transfer_memo.parent_transaction = (
+            partnership_jf_transfer_memo
+        )
+        partnership_attribution_jf_transfer_memo.save()
+
+        return (
+            jf_transfer,
+            partnership_jf_transfer_memo,
+            partnership_attribution_jf_transfer_memo,
+        )
 
 
 def undelete(transaction):

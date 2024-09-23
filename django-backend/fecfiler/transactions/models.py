@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -216,7 +215,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             """
             REATTRIBUTION/REDESIGNATION
             """
-            # If this is a reattribution/redesignation 'from' transaction, delete the 'to' transaction
+            # If this is a reattribution/redesignation 'from' transaction,
+            # delete the 'to' transaction
             if (
                 self.schedule_a
                 and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
@@ -226,7 +226,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             ):
                 self.parent_transaction.delete()
 
-            # If this reattribution/redesignation is tied to a copy of the original transaction, delete the copy
+            # If this reattribution/redesignation is tied to a copy of the original transaction,
+            # delete the copy
             if self.reatt_redes and (
                 (
                     self.reatt_redes.schedule_a
@@ -241,7 +242,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             ):
                 self.reatt_redes.delete()
 
-            # Delete any reattribution/redesignation transactions related to this transaction (copy/from/to)"
+            # Delete any reattribution/redesignation transactions
+            # related to this transaction (copy/from/to)"
             reatributions_and_redesignations = Transaction.objects.filter(
                 reatt_redes=self
             )
