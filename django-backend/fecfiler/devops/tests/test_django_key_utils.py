@@ -4,6 +4,7 @@ from fecfiler.devops.django_key_utils import (
     gen_and_install_django_key,
     clear_fallback_django_keys,
 )
+from django.core import management
 
 
 class DjangoKeyUtilsTestCase(TestCase):
@@ -43,8 +44,11 @@ class DjangoKeyUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        gen_and_install_django_key(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "gen_and_install_django_key",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once()
@@ -79,8 +83,11 @@ class DjangoKeyUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        clear_fallback_django_keys(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "clear_fallback_django_keys",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once_with(

@@ -7,6 +7,7 @@ from fecfiler.devops.login_dot_gov_cert_utils import (
     install_login_dot_gov_cert,
     backout_login_dot_gov_cert,
 )
+from django.core import management
 
 
 class LoginDotGovUtilsTestCase(TestCase):
@@ -46,8 +47,11 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        backout_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "backout_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once()
@@ -84,8 +88,11 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        install_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "install_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once()
@@ -126,8 +133,11 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        gen_and_stage_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "gen_and_stage_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         stage_login_dot_gov_pk_mock.assert_called_once()
