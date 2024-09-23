@@ -672,7 +672,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -776,6 +776,68 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(copy_of_transaction_for_reattribution.can_delete)
         self.assertFalse(reattribution_to.can_delete)
         self.assertFalse(reattribution_from.can_delete)
+
+    def test_can_delete_debt(self):
+
+        m1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        m2_report = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
+        original_debt = create_debt(
+            self.committee, self.contact_1, Decimal("123.00"), report=m1_report
+        )
+        m1_repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            Decimal("1.23"),
+            "GENERAL_DISBURSEMENT",
+            report=m1_report,
+        )
+        m1_repayment.debt = original_debt
+        m1_repayment.save()
+        carried_forward_debt = carry_forward_debt(original_debt, m2_report)
+        m2_repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-02-02",
+            Decimal("1.23"),
+            "GENERAL_DISBURSEMENT",
+            report=m2_report,
+        )
+        m2_repayment.debt = carried_forward_debt
+        m2_repayment.save()
+
+        self.assertTrue(original_debt.can_delete)
+        self.assertTrue(m1_repayment.can_delete)
+        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertTrue(m2_repayment.can_delete)
+
+        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            m2_report.id
+        )
+        original_debt.refresh_from_db()
+        m1_repayment.refresh_from_db()
+        carried_forward_debt.refresh_from_db()
+        m2_repayment.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        self.assertFalse(m1_repayment.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
+        self.assertFalse(m2_repayment.can_delete)
+
+        m2_report.upload_submission = None
+        m2_report.save()
+        m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            m1_report.id
+        )
+        original_debt.refresh_from_db()
+        m1_repayment.refresh_from_db()
+        carried_forward_debt.refresh_from_db()
+        m2_repayment.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        self.assertFalse(m1_repayment.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
+        self.assertTrue(m2_repayment.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(
