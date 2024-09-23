@@ -58,7 +58,6 @@ def carry_forward_debt(debt, report):
         # The debt_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
         "debt_id": debt.loan_id or debt.id,
-        "can_delete": False,
     }
     return save_copy(
         Transaction(

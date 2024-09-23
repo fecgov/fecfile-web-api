@@ -30,10 +30,6 @@ def create_trigger_function(apps, schema_editor):
             ELSE
                 UPDATE transactions_transaction tt
                 SET can_delete = CASE
-                    WHEN (
-                        (tt.schedule_c_id IS NOT NULL OR tt.schedule_d_id IS NOT NULL)
-                        AND (tt.loan_id IS NOT NULL OR tt.debt_id IS NOT NULL)
-                    ) THEN False
                     WHEN EXISTS (
                         SELECT 1
                         FROM reports_reporttransaction rr1
