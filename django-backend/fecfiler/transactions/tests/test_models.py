@@ -664,7 +664,7 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
-    def test_can_delete_submitted_report(self):
+    def test_can_delete_loan(self):
         self.loan.refresh_from_db()
         self.loan_made.refresh_from_db()
         self.carried_forward_loan.refresh_from_db()
@@ -708,6 +708,74 @@ class TransactionModelTestCase(TestCase):
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
+
+    def test_can_delete_reattributed_transaction(self):
+        # Can delete a reattribution on a future report (copy/to/from)
+        # Can NOT delete original or reattributions if future report is submitted
+        m1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        m2_report = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "100.00",
+            report=m1_report,
+        )
+        copy_of_transaction_for_reattribution = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "100.00",
+            report=m2_report,
+        )
+        copy_of_transaction_for_reattribution.reatt_redes = transaction
+        copy_of_transaction_for_reattribution.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED"
+        )
+        copy_of_transaction_for_reattribution.schedule_a.save()
+        copy_of_transaction_for_reattribution.save()
+        reattribution_to = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-02-01",
+            "10.00",
+            report=m2_report,
+        )
+        reattribution_to.reatt_redes = copy_of_transaction_for_reattribution
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.save()
+        reattribution_to.save()
+        reattribution_from = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-02-01",
+            "-10.00",
+            report=m2_report,
+            parent_id=reattribution_to.id,
+        )
+        reattribution_from.reatt_redes = copy_of_transaction_for_reattribution
+        reattribution_from.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED_FROM"
+        )
+        reattribution_from.schedule_a.save()
+        reattribution_from.save()
+
+        self.assertTrue(transaction.can_delete)
+        self.assertTrue(copy_of_transaction_for_reattribution.can_delete)
+        self.assertTrue(reattribution_to.can_delete)
+        self.assertTrue(reattribution_from.can_delete)
+
+        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            self.m2_report.id
+        )
+        self.assertFalse(transaction.can_delete)
+        self.assertFalse(copy_of_transaction_for_reattribution.can_delete)
+        self.assertFalse(reattribution_to.can_delete)
+        self.assertFalse(reattribution_from.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(
