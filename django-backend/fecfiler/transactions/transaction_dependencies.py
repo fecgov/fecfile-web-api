@@ -1,12 +1,12 @@
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.models import Transaction
-from django.db.models import Value, Case, When, Q, Subquery, OuterRef
+from django.db.models import Value, Case, When, Q, Subquery, OuterRef, Exists
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-def update_dependent_descriptions(transaction: Transaction):
+def update_dependent_children(transaction: Transaction):
     """Joint Fundraising Transfer committee names must be updated
     in the contribution_purpose_descrip field of dependent transactions."""
     if transaction.transaction_type_identifier in JF_TRANSFER_DEPENDENCIES:
@@ -15,15 +15,6 @@ def update_dependent_descriptions(transaction: Transaction):
         """Identify the transaction types to update"""
         children = dependencies["children"]
         grandchildren = dependencies["grandchildren"]
-
-        """The description for all children will be the same,
-        and the description for all grandchildren will be the same."""
-        child_update = get_jf_transfer_description(
-            dependencies["prefix"], transaction.contact_1.name, False
-        )
-        grandchild_update = get_jf_transfer_description(
-            dependencies["prefix"], transaction.contact_1.name, True
-        )
 
         """Establish the queryset with all dependent transactions"""
         dependents = ScheduleA.objects.filter(
@@ -47,12 +38,8 @@ def update_dependent_descriptions(transaction: Transaction):
             contribution_purpose_descrip=Subquery(
                 ScheduleA.objects.filter(id=OuterRef("id"))
                 .annotate(
-                    new_description=Case(
-                        When(
-                            transaction__parent_transaction_id=transaction.id,
-                            then=Value(child_update),
-                        ),
-                        default=Value(grandchild_update),
+                    new_description=get_new_description_clause(
+                        dependencies["prefix"], transaction.contact_1.name, transaction.id
                     )
                 )
                 .values("new_description")[:1]
@@ -61,19 +48,103 @@ def update_dependent_descriptions(transaction: Transaction):
         logger.debug(f"Updated {count} dependent transactions for {transaction}")
 
 
-def get_jf_transfer_description(
-    memo_prefix: str, committee_name: str, is_attribution: bool
+def update_dependent_parent(transaction: Transaction):
+    """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
+    when thier children are created or deleted."""
+    if transaction.transaction_type_identifier in PARTNERSHIP_ATTRIBUTIONS:
+        parent = transaction.parent_transaction
+        grandparent = parent.parent_transaction
+        dependencies = JF_TRANSFER_DEPENDENCIES[grandparent.transaction_type_identifier]
+        _, _, partnership_no_children_update, partnership_with_children_update = (
+            get_jf_transfer_descriptions(
+                dependencies["prefix"], grandparent.contact_1.name
+            )
+        )
+
+        ScheduleA.objects.filter(transaction__id=parent.id).update(
+            contribution_purpose_descrip=Subquery(
+                ScheduleA.objects.filter(id=OuterRef("id"))
+                .annotate(
+                    new_description=Case(
+                        When(HAS_CHILDREN, then=Value(partnership_with_children_update)),
+                        default=Value(partnership_no_children_update),
+                    )
+                )
+                .values("new_description")[:1]
+            )
+        )
+
+
+def get_new_description_clause(
+    memo_prefix: str, commmittee_name: str, transaction_id: str
 ):
-    """Generate a description for the dependent transaction of a joint
-    fundraising transfer. If it's an attribution, the description will
-    include a parenthetical indicating that it's a partnership attribution."""
-    committee_clause = f"{memo_prefix} {committee_name}"
-    if is_attribution:
-        parenthetical = "(Partnership Attribution)"
-        if len(committee_clause + parenthetical) > 100:
-            committee_clause = committee_clause[: 96 - len(parenthetical)] + "..."
-        return f"{committee_clause} {parenthetical}"
-    return committee_clause
+    """Generate Django Expression to update the contribution_purpose_descrip field"""
+
+    """Create descriptions to be used by different dependents."""
+    (
+        child_update,
+        attribution_update,
+        partnership_no_children_update,
+        partnership_with_children_update,
+    ) = get_jf_transfer_descriptions(memo_prefix, commmittee_name)
+
+    partnership_case = Case(
+        When(HAS_CHILDREN, then=Value(partnership_with_children_update)),
+        default=Value(partnership_no_children_update),
+    )
+    child_case = Case(
+        When(
+            transaction__transaction_type_identifier__in=PARTNERSHIP_MEMOS,
+            then=partnership_case,
+        ),
+        default=Value(child_update),
+    )
+    return Case(
+        When(
+            transaction__parent_transaction_id=transaction_id,
+            then=child_case,
+        ),
+        default=Value(attribution_update),
+    )
+
+
+def get_jf_transfer_descriptions(memo_prefix: str, commmittee_name: str):
+    """Generate descriptions for the dependent transactions of a joint
+    fundraising transfer. There are 4 descriptions:
+    1. The description for most children transactions (ex: "JF Memo: Committee Name")
+    2. The description for grandchildren transactions
+        (ex: "JF Memo: Committee Name (Partnership Attribution)")
+    3. The description for partnership memos with no grandchildren
+        (ex: "JF Memo: Committee Name (Partnership attributions do not meet
+          itemization threshold)")
+    4. The description for partnership memos with grandchildren
+        (ex: "JF Memo: Committee Name (See Partnership Attribution(s) below)")
+    """
+    committee_clause = f"{memo_prefix} {commmittee_name}"
+    attribution_description = get_truncated_description(
+        committee_clause, "(Partnership Attribution)"
+    )
+    partnership_description_no_children = get_truncated_description(
+        committee_clause, "(Partnership attributions do not meet itemization threshold)"
+    )
+    partnership_description_with_children = get_truncated_description(
+        committee_clause, "(See Partnership Attribution(s) below)"
+    )
+
+    return (
+        committee_clause,
+        attribution_description,
+        partnership_description_no_children,
+        partnership_description_with_children,
+    )
+
+
+def get_truncated_description(description: str, parenthetical: str):
+    """Truncate the description to fit within the 100 character limit
+    and append a parenthetical."""
+    if len(description + parenthetical) > 100:
+        description = description[: 96 - len(parenthetical)] + "..."
+    return f"{description} {parenthetical}"
 
 
 # Dictionary of joint fundraising transfer dependencies.
@@ -129,3 +200,26 @@ JF_TRANSFER_DEPENDENCIES = {
         ],
     },
 }
+
+# List of transaction types that are partnership memos.
+PARTNERSHIP_MEMOS = [
+    "PARTNERSHIP_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+]
+
+# List of transaction types that are partnership attributions.
+PARTNERSHIP_ATTRIBUTIONS = [
+    "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
+    "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
+]
+
+# Subquery to check if a transaction has children.
+HAS_CHILDREN = Exists(
+    Transaction.objects.filter(parent_transaction_id=OuterRef("transaction__id")).values(
+        "id"
+    )[:1]
+)

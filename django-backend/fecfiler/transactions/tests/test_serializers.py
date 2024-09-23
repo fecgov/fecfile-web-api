@@ -1,9 +1,16 @@
 from django.test import TestCase
 from fecfiler.user.models import User
 from rest_framework.request import HttpRequest, Request
-from fecfiler.transactions.serializers import TransactionSerializer
+from fecfiler.transactions.serializers import (
+    TransactionSerializer,
+    REDESIGNATION_TO,
+    REATTRIBUTION_TO,
+    REATTRIBUTED,
+    REDESIGNATED,
+)
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -30,3 +37,55 @@ class TransactionSerializerBaseTestCase(TestCase):
             serializer.get_schema_name({"schema_name": "INDIVIDUAL_RECEIPT"}),
             "INDIVIDUAL_RECEIPT",
         )
+
+    def test_no_reattribution(self):
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT", self.committee, None, None, 1
+        )
+
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(transaction)
+        self.assertIsNone(representation.get("reatt_redes_total"))
+
+        transaction.schedule_a.reattribution_redesignation_tag = REATTRIBUTED
+
+        representation = serializer.to_representation(transaction)
+        self.assertEqual(representation.get("reatt_redes_total"), "0.0")
+
+    def test_has_reattribution(self):
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT", self.committee, None, None, 1
+        )
+        transaction.schedule_a.reattribution_redesignation_tag = REATTRIBUTED
+        reatttribution = create_schedule_a(
+            "INDIVIDUAL_RECEIPT", self.committee, None, None, 1
+        )
+        reatttribution.reatt_redes = transaction
+        reatttribution.schedule_a.reattribution_redesignation_tag = REATTRIBUTION_TO
+        reatttribution.schedule_a.save()
+        reatttribution.save()
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(transaction)
+        self.assertEqual(representation.get("reatt_redes_total"), "1.00")
+
+    def test_has_redesignation(self):
+        transaction = create_schedule_b(
+            "OPERATING_EXPENDITURE", self.committee, None, None, 1
+        )
+        transaction.schedule_b.reattribution_redesignation_tag = REDESIGNATED
+        redesignation = create_schedule_b(
+            "OPERATING_EXPENDITURE", self.committee, None, None, 1
+        )
+        redesignation.reatt_redes = transaction
+        redesignation.schedule_b.reattribution_redesignation_tag = REDESIGNATION_TO
+        redesignation.schedule_b.save()
+        redesignation.save()
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(transaction)
+        self.assertEqual(representation.get("reatt_redes_total"), "1.00")

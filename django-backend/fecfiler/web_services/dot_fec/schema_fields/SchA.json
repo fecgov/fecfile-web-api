@@ -52,7 +52,7 @@
         "path": "schedule_a.contribution_amount"
     },
     "contribution_aggregate": {
-        "path": "schedule_a.contribution_aggregate"
+        "path": "aggregate"
     },
     "contribution_purpose_descrip": {
         "path": "schedule_a.contribution_purpose_descrip"

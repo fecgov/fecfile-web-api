@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "corsheaders",
     "storages",
     "django_structlog",
@@ -220,9 +221,14 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
+}
+
+SPECTACULAR_SETTINGS = {
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
@@ -318,7 +324,11 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-DJANGO_STRUCTLOG_CELERY_ENABLED = True
+"""System status settings
+"""
+SYSTEM_STATUS_CACHE_BACKEND = env.get_credential("REDIS_URL")
+SYSTEM_STATUS_CACHE_AGE = env.get_credential("SYSTEM_STATUS_CACHE_AGE", 60)
+
 
 """Celery configurations
 """
@@ -327,6 +337,7 @@ CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
@@ -334,7 +345,10 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
+MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
+if not MOCK_EFO and FEC_FILING_API is None:
+    raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
