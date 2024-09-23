@@ -61,6 +61,7 @@ def login_redirect(request):
 @require_http_methods(["GET"])
 @permission_classes([])
 def logout_redirect(request):
+    logout(request)
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
     delete_user_logged_in_cookies(response)
     return response
@@ -123,5 +124,4 @@ def oidc_logout(request):
         query = urlencode(params)
         op_logout_url = OIDC_OP_LOGOUT_ENDPOINT
         logout_url = f"{op_logout_url}?{query}"
-        logout(request)
     return HttpResponseRedirect(logout_url or LOGOUT_REDIRECT_URL)
