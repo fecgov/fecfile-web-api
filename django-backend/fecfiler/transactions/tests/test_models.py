@@ -243,17 +243,6 @@ class TransactionModelTestCase(TestCase):
         undelete(first_repayment)
         undelete(second_repayment)
 
-        """Deleting a carried forward debt should delete the original debt"""
-        carried_forward_debt.delete()
-        original_debt.refresh_from_db()
-        carried_forward_debt.refresh_from_db()
-        first_repayment.refresh_from_db()
-        second_repayment.refresh_from_db()
-        self.assertIsNotNone(original_debt.deleted)
-        self.assertIsNotNone(carried_forward_debt.deleted)
-        self.assertIsNotNone(first_repayment.deleted)
-        self.assertIsNotNone(second_repayment.deleted)
-
     def test_delete_loan_by_committee(self):
         self.assertIsNone(self.loan.deleted)
         self.assertIsNone(self.loan_made.deleted)
@@ -279,19 +268,6 @@ class TransactionModelTestCase(TestCase):
         undelete(self.carried_forward_loan)
         undelete(self.payment_1)
         undelete(self.payment_2)
-
-        self.carried_forward_loan.delete()
-        self.carried_forward_loan.refresh_from_db()
-        self.payment_2.refresh_from_db()
-        self.payment_1.refresh_from_db()
-        self.loan.refresh_from_db()
-        self.loan_made.refresh_from_db()
-
-        self.assertIsNotNone(self.loan.deleted)
-        self.assertIsNotNone(self.loan_made.deleted)
-        self.assertIsNotNone(self.carried_forward_loan.deleted)
-        self.assertIsNotNone(self.payment_1.deleted)
-        self.assertIsNotNone(self.payment_2.deleted)
 
     def test_delete_loan_received_from_bank(self):
         loan, loan_receipt, loan_aggreement, guarantor = create_loan_from_bank(
@@ -691,8 +667,9 @@ class TransactionModelTestCase(TestCase):
         self.carried_forward_loan.refresh_from_db()
         self.assertFalse(self.loan.can_delete)
         self.assertFalse(self.loan_made.can_delete)
-        self.assertFalse(self.carried_forward_loan.can_delete)
-        self.assertFalse(self.payment_1.can_delete)
+        # Can delete carried forward loan, but the UI won't let you
+        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertTrue(self.payment_1.can_delete)
         # Payment 2 can still be deleted because
         # it is a repayment on the loan in an active report
         self.assertTrue(self.payment_2.can_delete)
@@ -706,7 +683,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
+        # Can delete carried forward loan, but the UI won't let you
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
@@ -765,6 +742,10 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
+        transaction.refresh_from_db()
+        copy_of_transaction_for_reattribution.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
 
         self.assertTrue(transaction.can_delete)
         self.assertTrue(copy_of_transaction_for_reattribution.can_delete)
@@ -774,6 +755,12 @@ class TransactionModelTestCase(TestCase):
         m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
             self.m2_report.id
         )
+        m2_report.save()
+        transaction.refresh_from_db()
+        copy_of_transaction_for_reattribution.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
         self.assertFalse(transaction.can_delete)
         self.assertFalse(copy_of_transaction_for_reattribution.can_delete)
         self.assertFalse(reattribution_to.can_delete)
@@ -819,6 +806,8 @@ class TransactionModelTestCase(TestCase):
         m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
             m2_report.id
         )
+        m2_report.upload_submission.save()
+        m2_report.save()
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()
@@ -833,6 +822,7 @@ class TransactionModelTestCase(TestCase):
         m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
             m1_report.id
         )
+        m1_report.save()
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()

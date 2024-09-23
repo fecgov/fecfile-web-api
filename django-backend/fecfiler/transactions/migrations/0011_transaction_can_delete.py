@@ -17,14 +17,22 @@ def create_trigger_function(apps, schema_editor):
                     FROM reports_reporttransaction
                     WHERE report_id = NEW.id
                 )
-                OR loan_id IN (
-                    SELECT transaction_id
+                OR id IN (
+                    SELECT reatt_redes_id
                     FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
                     WHERE report_id = NEW.id
                 )
-                OR debt_id IN (
-                    SELECT transaction_id
+                OR id IN (
+                    SELECT loan_id
                     FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                    WHERE report_id = NEW.id
+                )
+                OR id IN (
+                    SELECT debt_id
+                    FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
                     WHERE report_id = NEW.id
                 );
             ELSE
@@ -43,16 +51,24 @@ def create_trigger_function(apps, schema_editor):
                     SELECT rr.transaction_id
                     FROM reports_reporttransaction rr
                     WHERE rr.report_id = NEW.id
+                ) 
+                OR id IN (
+                    SELECT reatt_redes_id
+                    FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                    WHERE report_id = NEW.id
                 )
-                OR tt.loan_id IN (
-                    SELECT rr.transaction_id
-                    FROM reports_reporttransaction rr
-                    WHERE rr.report_id = NEW.id
+                OR id IN (
+                    SELECT loan_id
+                    FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                    WHERE report_id = NEW.id
                 )
-                OR tt.debt_id IN (
-                    SELECT rr.transaction_id
-                    FROM reports_reporttransaction rr
-                    WHERE rr.report_id = NEW.id
+                OR id IN (
+                    SELECT debt_id
+                    FROM reports_reporttransaction
+                    JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                    WHERE report_id = NEW.id
                 );
             END IF;
             RETURN NEW;
