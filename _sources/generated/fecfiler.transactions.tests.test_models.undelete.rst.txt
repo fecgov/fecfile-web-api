@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.test\_models.undelete
+=================================================
+
+.. currentmodule:: fecfiler.transactions.tests.test_models
+
+.. autofunction:: undelete

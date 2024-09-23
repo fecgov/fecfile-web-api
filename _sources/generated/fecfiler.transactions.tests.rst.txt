@@ -32,6 +32,7 @@ fecfiler.transactions.tests
    :recursive:
 
    fecfiler.transactions.tests.test_manager
+   fecfiler.transactions.tests.test_models
    fecfiler.transactions.tests.test_serializers
    fecfiler.transactions.tests.test_transaction_dependencies
    fecfiler.transactions.tests.test_utils

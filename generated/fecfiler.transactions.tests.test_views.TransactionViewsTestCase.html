@@ -268,34 +268,40 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultTestResult</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doClassCleanups" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doClassCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doClassCleanups</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete_request</span></code>([path, params])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doClassCleanups" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doClassCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doClassCleanups</span></code></a>()</p></td>
 <td><p>Execute all class cleanup functions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doCleanups" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doCleanups</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doCleanups" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.doCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doCleanups</span></code></a>()</p></td>
 <td><p>Execute all cleanup functions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.fail" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>([msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.fail" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>([msg])</p></td>
 <td><p>Fail immediately, with the given message.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIf</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIf</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfAlmostEqual</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfAlmostEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfEqual</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnless</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnless</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessAlmostEqual</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessAlmostEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessEqual</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessEqual</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessRaises</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessRaises</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_request</span></code>([path, params])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
@@ -304,7 +310,7 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily applies changes a list setting and reverts back to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">request</span></code>(payload[, params])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_request</span></code>(payload[, params])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
@@ -338,6 +344,12 @@ not have a method with the specified name.</p>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_to_report</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy_with_dependent_parent</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_election</span></code>()</p></td>
@@ -1154,6 +1166,7 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.signals.html">fecfiler.transactions.signals</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.transactions.tests.html">fecfiler.transactions.tests</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.tests.test_manager.html">fecfiler.transactions.tests.test_manager</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.tests.test_models.html">fecfiler.transactions.tests.test_models</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.tests.test_serializers.html">fecfiler.transactions.tests.test_serializers</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.tests.test_transaction_dependencies.html">fecfiler.transactions.tests.test_transaction_dependencies</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.transactions.tests.test_utils.html">fecfiler.transactions.tests.test_utils</a></li>

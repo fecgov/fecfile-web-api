@@ -92,6 +92,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.create_trans_from_data
       ~TransactionViewsTestCase.debug
       ~TransactionViewsTestCase.defaultTestResult
+      ~TransactionViewsTestCase.delete_request
       ~TransactionViewsTestCase.doClassCleanups
       ~TransactionViewsTestCase.doCleanups
       ~TransactionViewsTestCase.fail
@@ -102,9 +103,10 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.failUnlessAlmostEqual
       ~TransactionViewsTestCase.failUnlessEqual
       ~TransactionViewsTestCase.failUnlessRaises
+      ~TransactionViewsTestCase.get_request
       ~TransactionViewsTestCase.id
       ~TransactionViewsTestCase.modify_settings
-      ~TransactionViewsTestCase.request
+      ~TransactionViewsTestCase.post_request
       ~TransactionViewsTestCase.run
       ~TransactionViewsTestCase.setUp
       ~TransactionViewsTestCase.setUpClass
@@ -116,6 +118,8 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.tearDown
       ~TransactionViewsTestCase.tearDownClass
       ~TransactionViewsTestCase.test_add_transaction_to_report
+      ~TransactionViewsTestCase.test_destroy
+      ~TransactionViewsTestCase.test_destroy_with_dependent_parent
       ~TransactionViewsTestCase.test_get_previous_election
       ~TransactionViewsTestCase.test_get_previous_entity
       ~TransactionViewsTestCase.test_get_queryset

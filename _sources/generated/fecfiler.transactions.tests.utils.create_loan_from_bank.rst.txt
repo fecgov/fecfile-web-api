@@ -1,0 +1,6 @@
+fecfiler.transactions.tests.utils.create\_loan\_from\_bank
+==========================================================
+
+.. currentmodule:: fecfiler.transactions.tests.utils
+
+.. autofunction:: create_loan_from_bank

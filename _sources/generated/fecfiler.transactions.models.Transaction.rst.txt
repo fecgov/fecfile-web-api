@@ -59,6 +59,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.aggregate
       ~Transaction.aggregation_group
       ~Transaction.all_objects
+      ~Transaction.blocking_reports
+      ~Transaction.can_delete
       ~Transaction.children
       ~Transaction.committee_account
       ~Transaction.committee_account_id

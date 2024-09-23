@@ -20,6 +20,7 @@ fecfiler.transactions.tests.utils
       create_debt
       create_ie
       create_loan
+      create_loan_from_bank
       create_report_transaction
       create_schedule
       create_schedule_a

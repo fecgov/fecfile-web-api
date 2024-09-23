@@ -26,7 +26,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.check_permissions
       ~TransactionViewSet.check_throttles
       ~TransactionViewSet.create
-      ~TransactionViewSet.delete
       ~TransactionViewSet.destroy
       ~TransactionViewSet.determine_version
       ~TransactionViewSet.dispatch

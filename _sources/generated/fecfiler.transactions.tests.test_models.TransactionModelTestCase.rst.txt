@@ -1,0 +1,147 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.tests.test\_models.TransactionModelTestCase
+=================================================================
+
+.. currentmodule:: fecfiler.transactions.tests.test_models
+
+.. autoclass:: TransactionModelTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionModelTestCase.__init__
+      ~TransactionModelTestCase.addClassCleanup
+      ~TransactionModelTestCase.addCleanup
+      ~TransactionModelTestCase.addTypeEqualityFunc
+      ~TransactionModelTestCase.assertAlmostEqual
+      ~TransactionModelTestCase.assertAlmostEquals
+      ~TransactionModelTestCase.assertContains
+      ~TransactionModelTestCase.assertCountEqual
+      ~TransactionModelTestCase.assertDictContainsSubset
+      ~TransactionModelTestCase.assertDictEqual
+      ~TransactionModelTestCase.assertEqual
+      ~TransactionModelTestCase.assertEquals
+      ~TransactionModelTestCase.assertFalse
+      ~TransactionModelTestCase.assertFieldOutput
+      ~TransactionModelTestCase.assertFormError
+      ~TransactionModelTestCase.assertFormSetError
+      ~TransactionModelTestCase.assertFormsetError
+      ~TransactionModelTestCase.assertGreater
+      ~TransactionModelTestCase.assertGreaterEqual
+      ~TransactionModelTestCase.assertHTMLEqual
+      ~TransactionModelTestCase.assertHTMLNotEqual
+      ~TransactionModelTestCase.assertIn
+      ~TransactionModelTestCase.assertInHTML
+      ~TransactionModelTestCase.assertIs
+      ~TransactionModelTestCase.assertIsInstance
+      ~TransactionModelTestCase.assertIsNone
+      ~TransactionModelTestCase.assertIsNot
+      ~TransactionModelTestCase.assertIsNotNone
+      ~TransactionModelTestCase.assertJSONEqual
+      ~TransactionModelTestCase.assertJSONNotEqual
+      ~TransactionModelTestCase.assertLess
+      ~TransactionModelTestCase.assertLessEqual
+      ~TransactionModelTestCase.assertListEqual
+      ~TransactionModelTestCase.assertLogs
+      ~TransactionModelTestCase.assertMultiLineEqual
+      ~TransactionModelTestCase.assertNoLogs
+      ~TransactionModelTestCase.assertNotAlmostEqual
+      ~TransactionModelTestCase.assertNotAlmostEquals
+      ~TransactionModelTestCase.assertNotContains
+      ~TransactionModelTestCase.assertNotEqual
+      ~TransactionModelTestCase.assertNotEquals
+      ~TransactionModelTestCase.assertNotIn
+      ~TransactionModelTestCase.assertNotIsInstance
+      ~TransactionModelTestCase.assertNotRegex
+      ~TransactionModelTestCase.assertNotRegexpMatches
+      ~TransactionModelTestCase.assertNumQueries
+      ~TransactionModelTestCase.assertQuerySetEqual
+      ~TransactionModelTestCase.assertQuerysetEqual
+      ~TransactionModelTestCase.assertRaises
+      ~TransactionModelTestCase.assertRaisesMessage
+      ~TransactionModelTestCase.assertRaisesRegex
+      ~TransactionModelTestCase.assertRaisesRegexp
+      ~TransactionModelTestCase.assertRedirects
+      ~TransactionModelTestCase.assertRegex
+      ~TransactionModelTestCase.assertRegexpMatches
+      ~TransactionModelTestCase.assertSequenceEqual
+      ~TransactionModelTestCase.assertSetEqual
+      ~TransactionModelTestCase.assertTemplateNotUsed
+      ~TransactionModelTestCase.assertTemplateUsed
+      ~TransactionModelTestCase.assertTrue
+      ~TransactionModelTestCase.assertTupleEqual
+      ~TransactionModelTestCase.assertURLEqual
+      ~TransactionModelTestCase.assertWarns
+      ~TransactionModelTestCase.assertWarnsMessage
+      ~TransactionModelTestCase.assertWarnsRegex
+      ~TransactionModelTestCase.assertXMLEqual
+      ~TransactionModelTestCase.assertXMLNotEqual
+      ~TransactionModelTestCase.assert_
+      ~TransactionModelTestCase.captureOnCommitCallbacks
+      ~TransactionModelTestCase.countTestCases
+      ~TransactionModelTestCase.debug
+      ~TransactionModelTestCase.defaultTestResult
+      ~TransactionModelTestCase.doClassCleanups
+      ~TransactionModelTestCase.doCleanups
+      ~TransactionModelTestCase.fail
+      ~TransactionModelTestCase.failIf
+      ~TransactionModelTestCase.failIfAlmostEqual
+      ~TransactionModelTestCase.failIfEqual
+      ~TransactionModelTestCase.failUnless
+      ~TransactionModelTestCase.failUnlessAlmostEqual
+      ~TransactionModelTestCase.failUnlessEqual
+      ~TransactionModelTestCase.failUnlessRaises
+      ~TransactionModelTestCase.id
+      ~TransactionModelTestCase.modify_settings
+      ~TransactionModelTestCase.run
+      ~TransactionModelTestCase.setUp
+      ~TransactionModelTestCase.setUpClass
+      ~TransactionModelTestCase.setUpTestData
+      ~TransactionModelTestCase.set_up_jf_transfer
+      ~TransactionModelTestCase.settings
+      ~TransactionModelTestCase.shortDescription
+      ~TransactionModelTestCase.skipTest
+      ~TransactionModelTestCase.subTest
+      ~TransactionModelTestCase.tearDown
+      ~TransactionModelTestCase.tearDownClass
+      ~TransactionModelTestCase.test_can_delete_debt
+      ~TransactionModelTestCase.test_can_delete_loan
+      ~TransactionModelTestCase.test_can_delete_reattributed_transaction
+      ~TransactionModelTestCase.test_delete_coupled_transactions
+      ~TransactionModelTestCase.test_delete_debt_transactions
+      ~TransactionModelTestCase.test_delete_loan_by_committee
+      ~TransactionModelTestCase.test_delete_loan_received_from_bank
+      ~TransactionModelTestCase.test_delete_reattribution
+      ~TransactionModelTestCase.test_delete_reattribution_earmark
+      ~TransactionModelTestCase.test_delete_reattribution_jf_transfer
+      ~TransactionModelTestCase.test_delete_reattribution_with_copy
+      ~TransactionModelTestCase.test_delete_transaction
+      ~TransactionModelTestCase.test_delete_transaction_with_children
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionModelTestCase.available_apps
+      ~TransactionModelTestCase.databases
+      ~TransactionModelTestCase.fixtures
+      ~TransactionModelTestCase.longMessage
+      ~TransactionModelTestCase.maxDiff
+      ~TransactionModelTestCase.reset_sequences
+      ~TransactionModelTestCase.serialized_rollback
+   
+   

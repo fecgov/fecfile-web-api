@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0011\_transaction\_can\_delete.drop\_trigger\_function
+=======================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0011_transaction_can_delete
+
+.. autofunction:: drop_trigger_function
