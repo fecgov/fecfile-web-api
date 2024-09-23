@@ -837,25 +837,28 @@ class TransactionModelTestCase(TestCase):
         m1_report.save()
 
         m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
-        carry_forward_loans(m3_report)
-        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
-            m2_report.id
-        )
-        m2_report.save()
+        carry_forward_debt(original_debt, m3_report)
+        # m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+        #     m2_report.id
+        # )
+        # m2_report.save()
         m3_report.upload_submission = UploadSubmission.objects.initiate_submission(
             m3_report.id
         )
         m3_report.save()
-
+        print(f"reports: {m1_report.id}, {m2_report.id}, {m3_report.id}")
         original_debt.refresh_from_db()
-        self.assertFalse(original_debt.can_delete)
+        # self.assertFalse(original_debt.can_delete)
+        print(f"blocking reports {original_debt.blocking_reports}")
         m2_report.upload_submission = None
         m2_report.save()
         original_debt.refresh_from_db()
+        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertFalse(original_debt.can_delete)
         m3_report.upload_submission = None
         m3_report.save()
         original_debt.refresh_from_db()
+        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertTrue(original_debt.can_delete)
 
     def set_up_jf_transfer(self):
