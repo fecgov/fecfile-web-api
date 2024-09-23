@@ -226,8 +226,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             ):
                 self.parent_transaction.delete()
 
-            # If this reattribution/redesignation is tied to a copy of the original transaction,
-            # delete the copy
+            # If this reattribution/redesignation is tied to a copy of
+            # the original transaction, delete the copy
             if self.reatt_redes and (
                 (
                     self.reatt_redes.schedule_a
