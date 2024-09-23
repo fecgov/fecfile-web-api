@@ -119,6 +119,7 @@ class TransactionSerializer(
                     "reatt_redes_associations",  # reattribution/redesignation
                     "reporttransaction",
                     "_form_type",
+                    "blocking_reports",
                 ]
             ] + [
                 "parent_transaction_id",
