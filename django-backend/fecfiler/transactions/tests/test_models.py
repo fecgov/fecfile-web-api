@@ -710,7 +710,7 @@ class TransactionModelTestCase(TestCase):
             report=m2_report,
         )
         copy_of_transaction_for_reattribution.reatt_redes = transaction
-        copy_of_transaction_for_reattribution.schedule_a.reattribution_redesignation_tag = (
+        copy_of_transaction_for_reattribution.schedule_a.reattribution_redesignation_tag = (  # noqa: E501
             "REATTRIBUTED"
         )
         copy_of_transaction_for_reattribution.schedule_a.save()

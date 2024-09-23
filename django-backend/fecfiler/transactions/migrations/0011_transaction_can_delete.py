@@ -12,7 +12,8 @@ def create_trigger_function(apps, schema_editor):
         BEGIN
             UPDATE transactions_transaction
             SET blocking_reports = CASE
-                WHEN NEW.upload_submission_id IS NOT NULL THEN array_append(blocking_reports, NEW.id)
+                WHEN NEW.upload_submission_id IS NOT NULL
+                THEN array_append(blocking_reports, NEW.id)
                 ELSE array_remove(blocking_reports, NEW.id)
             END
             -- all transactions in the submitted report
@@ -25,35 +26,40 @@ def create_trigger_function(apps, schema_editor):
             OR id IN (
                 SELECT reatt_redes_id
                 FROM reports_reporttransaction
-                JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
                 WHERE report_id = NEW.id
             )
             -- all loans that are carried forward in the submitted report
             OR id IN (
                 SELECT loan_id
                 FROM reports_reporttransaction
-                JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
                 WHERE report_id = NEW.id
             )
             -- all repayments to loans that are carried forward in the submitted report
             OR loan_id IN (
                 SELECT loan_id
                 FROM reports_reporttransaction
-                JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
                 WHERE report_id = NEW.id AND tt.schedule_c_id IS NOT NULL
             )
             -- all debts that are carried forward in the submitted report
             OR id IN (
                 SELECT debt_id
                 FROM reports_reporttransaction
-                JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
                 WHERE report_id = NEW.id
             )
             -- all repayments to debts that are carried forward in the submitted report
             OR debt_id IN (
                 SELECT debt_id
                 FROM reports_reporttransaction
-                JOIN transactions_transaction tt ON reports_reporttransaction.transaction_id = tt.id
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
                 WHERE report_id = NEW.id AND tt.schedule_d_id IS NOT NULL
             );
             RETURN NEW;
