@@ -71,6 +71,7 @@ def carry_forward_loan(loan, report):
         # The loan_id should point to the original loan transaction
         # even if the loan is pulled forward multiple times.
         "loan_id": loan.loan_id or loan.id,
+        "can_delete": False,
     }
     new_loan = save_copy(
         Transaction(
