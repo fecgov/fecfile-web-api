@@ -667,9 +667,9 @@ class TransactionModelTestCase(TestCase):
         self.carried_forward_loan.refresh_from_db()
         self.assertFalse(self.loan.can_delete)
         self.assertFalse(self.loan_made.can_delete)
+        self.assertFalse(self.payment_1.can_delete)
         # Can delete carried forward loan, but the UI won't let you
         self.assertTrue(self.carried_forward_loan.can_delete)
-        self.assertTrue(self.payment_1.can_delete)
         # Payment 2 can still be deleted because
         # it is a repayment on the loan in an active report
         self.assertTrue(self.payment_2.can_delete)
@@ -832,6 +832,31 @@ class TransactionModelTestCase(TestCase):
         # Can delete carried forward debt, but the UI won't let you
         self.assertTrue(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
+
+        m1_report.upload_submission = None
+        m1_report.save()
+
+        m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
+        carry_forward_loans(m3_report)
+        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            m2_report.id
+        )
+        m2_report.save()
+        m3_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            m3_report.id
+        )
+        m3_report.save()
+
+        original_debt.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        m2_report.upload_submission = None
+        m2_report.save()
+        original_debt.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        m3_report.upload_submission = None
+        m3_report.save()
+        original_debt.refresh_from_db()
+        self.assertTrue(original_debt.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(

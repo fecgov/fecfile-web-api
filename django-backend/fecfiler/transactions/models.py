@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.shared.utilities import generate_fec_uid
@@ -146,8 +147,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     loan_payment_to_date = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-
-    can_delete = models.BooleanField(default=True)
+    # report ids of reports that have been submitted
+    # and in doing so have blocked this transaction from being deleted
+    blocking_reports = ArrayField(models.UUIDField(), blank=False, default=list())
 
     objects = TransactionManager()
 
@@ -160,6 +162,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     @property
     def children(self):
         return self.transaction_set.all()
+
+    @property
+    def can_delete(self):
+        return len(self.blocking_reports) == 0
 
     def get_schedule(self):
         for schedule_key in [
