@@ -193,20 +193,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 child.delete()
 
             # transactions related to this debt
-            if self.debt and self.schedule_d:
-                """ASK BA IF THIS IS DESIRED BEHAVIOR"""
-                # If this is a carry forward debt, delete the original debt
-                self.debt.delete()
             # delete any carry forwards or repayments related to this debt
             debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
             for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
                 carry_forward_or_repayment.delete()
 
             # transactions related to a loan
-            if self.loan and self.schedule_c:
-                """ASK BA IF THIS IS DESIRED BEHAVIOR"""
-                # If this is a carry forward loan, delete the original loan
-                self.loan.delete()
             # delete any carry forwards or repayments related to this loan
             loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
             for carry_forward_or_repayment in loan_carry_forwards_and_repayments:

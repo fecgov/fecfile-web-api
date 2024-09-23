@@ -672,7 +672,8 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        self.assertFalse(self.carried_forward_loan.can_delete)
+        # Can delete carried forward debt, but the UI won't let you
+        self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -705,6 +706,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
+        # Can delete carried forward debt, but the UI won't let you
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
@@ -810,6 +812,7 @@ class TransactionModelTestCase(TestCase):
 
         self.assertTrue(original_debt.can_delete)
         self.assertTrue(m1_repayment.can_delete)
+        # Can delete carried forward debt, but the UI won't let you
         self.assertTrue(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
@@ -836,7 +839,8 @@ class TransactionModelTestCase(TestCase):
         m2_repayment.refresh_from_db()
         self.assertFalse(original_debt.can_delete)
         self.assertFalse(m1_repayment.can_delete)
-        self.assertFalse(carried_forward_debt.can_delete)
+        # Can delete carried forward debt, but the UI won't let you
+        self.assertTrue(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
     def set_up_jf_transfer(self):
