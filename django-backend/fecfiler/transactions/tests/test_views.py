@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
+from rest_framework.test import force_authenticate
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
@@ -96,7 +97,7 @@ class TransactionViewsTestCase(TestCase):
             memo_code=receipt_data["memo"],
         )
 
-    def request(self, payload, params={}):
+    def post_request(self, payload, params={}):
         request = self.factory.post(
             "/api/v1/transactions",
             json.dumps(payload),
@@ -111,21 +112,43 @@ class TransactionViewsTestCase(TestCase):
         }
         return request
 
+    def delete_request(self, path="api/v1/transactions", params={}):
+        request = self.factory.delete(path)
+        request.user = self.user
+        request.query_params = params
+        request.data = {}
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        return request
+
+    def get_request(self, path="api/v1/transactions", params={}):
+        request = self.factory.get(path)
+        request.user = self.user
+        request.query_params = params
+        request.data = {}
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        return request
+
     def test_save_transaction_pair(self):
-        request = self.request(self.payloads["IN_KIND"])
+        request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         self.assertEqual("John", transaction.contact_1.first_name)
         self.assertEqual("Smith", transaction.contact_1.last_name)
 
     def test_update(self):
-        request = self.request(self.payloads["IN_KIND"])
+        request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_payload = deepcopy(self.payloads["IN_KIND"])
         updated_payload["id"] = str(transaction.id)
         updated_payload["contribution_amount"] = 999
         updated_payload["children"][0]["id"] = str(transaction.children[0].id)
         updated_payload["children"][0]["expenditure_amount"] = 999
-        request = self.request(updated_payload)
+        request = self.post_request(updated_payload)
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_transaction = Transaction.objects.get(id=transaction.id)
         self.assertEqual(updated_transaction.schedule_a.contribution_amount, 999)
@@ -150,23 +173,23 @@ class TransactionViewsTestCase(TestCase):
             )
 
         view_set = TransactionViewSet()
-        view_set.request = self.request({}, {"schedules": "A,B,C,C2,D,E"})
+        view_set.request = self.post_request({}, {"schedules": "A,B,C,C2,D,E"})
         self.assertEqual(view_set.get_queryset().count(), 12)
-        view_set.request = self.request({}, {"schedules": "A,B,D,E"})
+        view_set.request = self.post_request({}, {"schedules": "A,B,D,E"})
         self.assertEqual(view_set.get_queryset().count(), 10)
-        view_set.request = self.request({}, {"schedules": ""})
+        view_set.request = self.post_request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
     def test_get_previous_entity(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
-        view_set.request = self.request({}, {"contact_1_id": str(self.contact_1.id)})
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
         # leave out required params
         response = view_set.previous_transaction_by_entity(view_set.request)
         self.assertEqual(response.status_code, 400)
 
         response = view_set.previous_transaction_by_entity(
-            self.request(
+            self.post_request(
                 {},
                 {
                     "contact_1_id": str(self.contact_1.id),
@@ -178,7 +201,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.data["date"], "2023-09-02")
 
         response = view_set.previous_transaction_by_entity(
-            self.request(
+            self.post_request(
                 {},
                 {
                     "contact_1_id": str(self.contact_1.id),
@@ -192,7 +215,7 @@ class TransactionViewsTestCase(TestCase):
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
-        view_set.request = self.request(
+        view_set.request = self.post_request(
             {},
             {
                 "date": "2023-09-20",
@@ -204,7 +227,7 @@ class TransactionViewsTestCase(TestCase):
         # leave out required params
         response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
-        view_set.request = self.request(
+        view_set.request = self.post_request(
             {},
             {
                 "date": "2023-09-20",
@@ -218,7 +241,7 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
 
-        view_set.request = self.request(
+        view_set.request = self.post_request(
             {},
             {
                 "date": "2023-10-31",
@@ -263,7 +286,7 @@ class TransactionViewsTestCase(TestCase):
         payload = [txn1, txn2]
 
         view_set = TransactionViewSet()
-        response = view_set.save_reatt_redes_transactions(self.request(payload))
+        response = view_set.save_reatt_redes_transactions(self.post_request(payload))
         transactions = response.data
         self.assertEqual(len(transactions), 2)
 
@@ -273,7 +296,7 @@ class TransactionViewsTestCase(TestCase):
 
         payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
-        response = view_set.add_transaction_to_report(self.request(payload))
+        response = view_set.add_transaction_to_report(self.post_request(payload))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "Transaction added to report")
@@ -290,14 +313,14 @@ class TransactionViewsTestCase(TestCase):
 
         # Verify response when no transaction id provided
         payload["transaction_id"] = None
-        response = view_set.add_transaction_to_report(self.request(payload))
+        response = view_set.add_transaction_to_report(self.post_request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
         payload["transaction_id"] = str(self.transaction.id)
         payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
-        response = view_set.add_transaction_to_report(self.request(payload))
+        response = view_set.add_transaction_to_report(self.post_request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
@@ -307,7 +330,7 @@ class TransactionViewsTestCase(TestCase):
 
         payload = {"transaction_id": transaction_id, "report_id": report_id}
         view_set = TransactionViewSet()
-        response = view_set.remove_transaction_from_report(self.request(payload))
+        response = view_set.remove_transaction_from_report(self.post_request(payload))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, "Transaction removed from report")
@@ -323,14 +346,14 @@ class TransactionViewsTestCase(TestCase):
 
         # Verify response when no transaction id provided
         payload["transaction_id"] = None
-        response = view_set.remove_transaction_from_report(self.request(payload))
+        response = view_set.remove_transaction_from_report(self.post_request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No transaction matching id provided")
 
         # Verify response when non existing report id provided
         payload["transaction_id"] = str(self.transaction.id)
         payload["report_id"] = "474a1a10-da68-4d71-9a11-cccccccccccc"
-        response = view_set.remove_transaction_from_report(self.request(payload))
+        response = view_set.remove_transaction_from_report(self.post_request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
@@ -338,7 +361,7 @@ class TransactionViewsTestCase(TestCase):
         payload = self.payloads["DEBT"]
         payload["report_ids"] = [str(self.q1_report.id)]
         view_set = TransactionViewSet()
-        response = view_set.create(self.request(payload))
+        response = view_set.create(self.post_request(payload))
         report_coverage_from_date = self.q1_report.coverage_from_date
         debt_id = response.data
         self.assertEqual(response.status_code, 200)
@@ -435,3 +458,68 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(ordered_queryset.count(), len(indiviual_receipt_data))
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
+
+    def test_destroy(self):
+        request = self.delete_request(f"api/v1/transactions/{self.transaction.id}/")
+        force_authenticate(request, self.user)
+        response = TransactionViewSet.as_view({"delete": "destroy"})(
+            request, pk=self.transaction.id
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())
+
+    def test_destroy_with_dependent_parent(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2020-01-01",
+            "100",
+        )
+        partnership_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2023-01-01",
+            "100",
+            parent_id=jf_transfer.id,
+        )
+        partnership_memo.schedule_a.contribution_purpose_descrip = (
+            "JF Memo: None (See Partnership Attribution(s) below)"
+        )
+        partnership_memo.schedule_a.save()
+        partnership_attribution_memo = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2023-01-01",
+            "100",
+            parent_id=partnership_memo.id,
+        )
+        get_request = self.get_request(f"api/v1/transactions/{partnership_memo.id}/")
+        force_authenticate(get_request, self.user)
+        response = TransactionViewSet.as_view({"get": "retrieve"})(
+            get_request, pk=partnership_memo.id
+        )
+        self.assertEqual(
+            response.data["contribution_purpose_descrip"],
+            "JF Memo: None (See Partnership Attribution(s) below)",
+        )
+
+        # If we delete the attribution memo, the parent memo should be updated
+        delete_request = self.delete_request(
+            f"api/v1/transactions/{partnership_attribution_memo.id}/"
+        )
+        force_authenticate(delete_request, self.user)
+        response = TransactionViewSet.as_view({"delete": "destroy"})(
+            delete_request, pk=partnership_attribution_memo.id
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = TransactionViewSet.as_view({"get": "retrieve"})(
+            get_request, pk=partnership_memo.id
+        )
+        self.assertEqual(
+            response.data["contribution_purpose_descrip"],
+            "JF Memo: None (Partnership attributions do not meet itemization threshold)",
+        )
