@@ -26,6 +26,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    CharField,
     Manager,
 )
 from decimal import Decimal
@@ -180,7 +181,7 @@ class TransactionManager(SoftDeleteManager):
                         "LOAN_REPAYMENT_MADE",
                     ]
                 ),
-                then=Concat(F("loan__transaction_id"), F("date")),
+                then=Concat(F("loan__transaction_id"), F("date"), output_field=CharField()),
             ),
             When(
                 schedule_c__isnull=False,
@@ -188,6 +189,7 @@ class TransactionManager(SoftDeleteManager):
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
                     Value("LOAN"),
+                    output_field=CharField()
                 ),
             ),
             default=None,
