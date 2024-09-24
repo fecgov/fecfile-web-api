@@ -181,7 +181,10 @@ class TransactionManager(SoftDeleteManager):
                         "LOAN_REPAYMENT_MADE",
                     ]
                 ),
-                then=Concat(F("loan__transaction_id"), F("date"), output_field=CharField()),
+                then=Concat(
+                    F("loan__transaction_id"),
+                    F("date"), output_field=CharField()
+                )
             ),
             When(
                 schedule_c__isnull=False,
