@@ -15,4 +15,4 @@ class MockEndpointsTest(TestCase):
         response = query_filings("NOT FINDABLE", "F1")
         self.assertEqual(len(response["results"]), 0)
         response = query_filings("st Com", "F1")
-        self.assertEqual(len(response["results"]), 2)
+        self.assertEqual(len(response["results"]), 3)
