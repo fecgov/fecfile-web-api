@@ -273,6 +273,7 @@ def get_read_model(committee_uuid):
         )
         schedule = models.TextField()
         _itemized = models.BooleanField()
+        _has_mismatched_itemized_child = models.BooleanField()
         amount = models.DecimalField()
         date = models.DateField()
         form_type = models.TextField()

@@ -84,6 +84,7 @@ class TransactionSerializer(
     back_reference_sched_name = CharField(required=False, allow_null=True, read_only=True)
     form_type = CharField(required=False, allow_null=True)
     itemized = BooleanField(read_only=True)
+    has_mismatched_itemized_child = BooleanField(read_only=True)
     name = CharField(read_only=True)
     date = DateField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -134,6 +135,7 @@ class TransactionSerializer(
                 "back_reference_sched_name",
                 "form_type",
                 "itemized",
+                "has_mismatched_itemized_child",
                 "fields_to_validate",
                 "schema_name",
                 "name",

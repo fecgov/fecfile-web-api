@@ -17,6 +17,7 @@ from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
     Subquery,
+    Exists,
     Sum,
     Q,
     F,
@@ -78,6 +79,23 @@ class TransactionManager(SoftDeleteManager):
                 ),
             ),
             default=Value(True),
+            output_field=BooleanField(),
+        )
+
+    def HAS_MISMATCHED_ITEMIZED_CHILD_CLAUSE(self):
+        return Case(
+            When(
+                _itemized=False,
+                then=Exists(
+                    super()
+                    .get_queryset()
+                    .annotate(
+                        _itemized=self.ITEMIZATION_CLAUSE(),
+                    )
+                    .filter(parent_transaction_id=OuterRef("id"), _itemized=True)
+                ),
+            ),
+            default=False,
             output_field=BooleanField(),
         )
 
@@ -282,6 +300,7 @@ class TransactionManager(SoftDeleteManager):
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=self.LOAN_KEY_CLAUSE(),
                 _itemized=self.ITEMIZATION_CLAUSE(),
+                _has_mismatched_itemized_child=self.HAS_MISMATCHED_ITEMIZED_CHILD_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
@@ -335,10 +354,12 @@ class TransactionViewManager(Manager):
                     ),
                 ),
                 itemized=Coalesce(
-                    "view_parent_transaction__view_parent_transaction___itemized",
-                    "view_parent_transaction___itemized",
+                    # "view_parent_transaction__view_parent_transaction___itemized",
+                    # "view_parent_transaction___itemized",
                     "_itemized",
+                    True,
                 ),
+                has_mismatched_itemized_child=F("_has_mismatched_itemized_child"),
                 calendar_ytd_per_election_office=Coalesce(
                     "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",  # noqa
                     "view_parent_transaction___calendar_ytd_per_election_office",
