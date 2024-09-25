@@ -1,7 +1,14 @@
 from django.test import TestCase
-from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec, add_row_to_content
+from fecfiler.web_services.dot_fec.dot_fec_composer import (
+	compose_dot_fec,
+	add_row_to_content
+)
 from fecfiler.committee_accounts.views import create_committee_view
-from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
+from fecfiler.web_services.dot_fec.dot_fec_serializer import (
+	serialize_instance,
+    CRLF_STR,
+    FS_STR
+)
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a

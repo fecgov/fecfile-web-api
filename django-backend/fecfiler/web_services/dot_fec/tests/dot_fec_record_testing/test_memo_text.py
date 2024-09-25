@@ -63,7 +63,10 @@ class DotFECTextRecordsTestCase(TestCase):
 
         self.f3x_row = serialize_instance("Text", self.f3x_memo).split(FS_STR)
         self.f99_row = serialize_instance("Text", self.f99_memo).split(FS_STR)
-        self.transaction_row = serialize_instance("Text", self.transaction_memo).split(FS_STR)
+        self.transaction_row = serialize_instance(
+            "Text",
+            self.transaction_memo
+        ).split(FS_STR)
 
     def test_record_name(self):
         self.assertEqual(self.f3x_row[0], "TEXT")
