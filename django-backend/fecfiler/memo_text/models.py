@@ -1,6 +1,7 @@
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.reports.models import ReportMixin
+from fecfiler.transactions.models import Transaction
 from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid
@@ -24,6 +25,26 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     text4000 = models.TextField(null=True, blank=True)
     text_prefix = models.TextField(null=True, blank=True)
 
+    @property
+    def filer_committee_id_number(self):
+        return self.commmittee.committee_id
+
+    @property
+    def back_reference_tran_id_number(self):
+        transaction = self.get_transaction()
+        if not transaction:
+            return None
+
+        return transaction.id
+
+    @property
+    def back_reference_sched_form_type(self):
+        transaction = self.get_transaction()
+        if transaction:
+            return transaction.form_type
+        if self.report:
+            return self.report.form_type
+
     class Meta:
         db_table = "memo_text"
 
@@ -34,6 +55,12 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
             len(MemoText.objects.filter(transaction_id_number=uid, report_id=report_id))
             > 0
         )
+
+    def get_transaction(self):
+        if self.transaction_uuid is None:
+            return None
+
+        return Transaction.objects.filter(id=self.transaction_uuid).first()
 
     def generate_report_id(self):
         report_memos = MemoText.objects.filter(

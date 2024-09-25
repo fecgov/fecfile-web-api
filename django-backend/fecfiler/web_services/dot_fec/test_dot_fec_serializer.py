@@ -83,8 +83,6 @@ class DotFECSerializerTestCase(TestCase):
             transaction_id_number="REPORT_MEMO_TEXT_1",
         )
 
-        self.report_level_memo_text.filer_committee_id_number = "C00000000"
-        self.report_level_memo_text.back_reference_sched_form_name = "F3XN"
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
     def test_serialize_field(self):
