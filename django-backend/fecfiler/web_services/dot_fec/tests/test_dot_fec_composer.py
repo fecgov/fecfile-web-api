@@ -1,8 +1,7 @@
 from django.test import TestCase
-from fecfiler.memo_text.models import MemoText
-from .dot_fec_composer import compose_dot_fec, add_row_to_content
+from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec, add_row_to_content
 from fecfiler.committee_accounts.views import create_committee_view
-from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
+from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a
@@ -56,7 +55,7 @@ class DotFECSerializerTestCase(TestCase):
             compose_dot_fec(100000000, None)
 
         file_content = compose_dot_fec(self.f3x.id, None)
-        self.assertEqual(file_content.count(CRLF_STR), 2)
+        self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):
         summary_row = serialize_instance("F3X", self.f3x)
