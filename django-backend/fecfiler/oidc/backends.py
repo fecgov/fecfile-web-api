@@ -28,6 +28,8 @@ from josepy.jwk import JWK
 from josepy.jws import JWS, Header
 from requests.exceptions import HTTPError
 
+from . import oidc_op_config
+
 from django.conf import settings
 
 LOGGER = logging.getLogger(__name__)
@@ -117,7 +119,7 @@ class OIDCAuthenticationBackend(ModelBackend):
     def retrieve_matching_jwk(self, token):
         """Get the signing key by exploring the JWKS endpoint of the OP."""
         response_jwks = requests.get(
-            settings.OIDC_OP_JWKS_ENDPOINT,
+            oidc_op_config.get_jwks_endpoint(),
             verify=True,
             timeout=None,
             proxies=None,
@@ -175,13 +177,19 @@ class OIDCAuthenticationBackend(ModelBackend):
         jwt_args = {
             "iss": settings.OIDC_RP_CLIENT_ID,
             "sub": settings.OIDC_RP_CLIENT_ID,
-            "aud": settings.OIDC_OP_TOKEN_ENDPOINT,
+            "aud": oidc_op_config.get_token_endpoint(),
             "jti": secrets.token_hex(16),
             "exp": int(time.time()) + 300,  # 5 minutes from now
         }
         # Client secret needs to be pem-encoded string
-        encoded_jwt = jwt.encode(
-            jwt_args, settings.OIDC_RP_CLIENT_SECRET, algorithm=settings.OIDC_RP_SIGN_ALGO
+        encoded_jwt = (
+            jwt.encode(
+                jwt_args,
+                settings.OIDC_RP_CLIENT_SECRET,
+                algorithm=settings.OIDC_RP_SIGN_ALGO,
+            )
+            if settings.OIDC_RP_CLIENT_SECRET and settings.OIDC_RP_SIGN_ALGO
+            else None
         )
         token_payload = {
             "client_assertion": encoded_jwt,
@@ -189,7 +197,7 @@ class OIDCAuthenticationBackend(ModelBackend):
             "code": payload.get("code"),
             "grant_type": "authorization_code",
         }
-        response = requests.post(settings.OIDC_OP_TOKEN_ENDPOINT, data=token_payload)
+        response = requests.post(oidc_op_config.get_token_endpoint(), data=token_payload)
         self.raise_token_response_error(response)
         return response.json()
 
@@ -213,7 +221,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         the default implementation, but may be used when overriding this method"""
 
         user_response = requests.get(
-            settings.OIDC_OP_USER_ENDPOINT,
+            oidc_op_config.get_user_endpoint(),
             headers={"Authorization": "Bearer {0}".format(access_token)},
             verify=True,
             timeout=None,
