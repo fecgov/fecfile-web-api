@@ -27,7 +27,7 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
 
     @property
     def filer_committee_id_number(self):
-        return self.commmittee.committee_id
+        return self.committee_account.committee_id
 
     @property
     def back_reference_tran_id_number(self):
@@ -35,10 +35,10 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         if not transaction:
             return None
 
-        return transaction.id
+        return transaction.transaction_id
 
     @property
-    def back_reference_sched_form_type(self):
+    def back_reference_sched_form_name(self):
         transaction = self.get_transaction()
         if transaction:
             return transaction.form_type
