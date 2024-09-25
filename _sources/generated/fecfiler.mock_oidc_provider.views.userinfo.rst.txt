@@ -1,0 +1,6 @@
+fecfiler.mock\_oidc\_provider.views.userinfo
+============================================
+
+.. currentmodule:: fecfiler.mock_oidc_provider.views
+
+.. autofunction:: userinfo

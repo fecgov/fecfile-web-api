@@ -1,0 +1,6 @@
+fecfiler.mock\_oidc\_provider.views.discovery
+=============================================
+
+.. currentmodule:: fecfiler.mock_oidc_provider.views
+
+.. autofunction:: discovery

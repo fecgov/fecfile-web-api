@@ -1,0 +1,6 @@
+fecfiler.mock\_oidc\_provider.views.get\_or\_create\_kdat\_dict
+===============================================================
+
+.. currentmodule:: fecfiler.mock_oidc_provider.views
+
+.. autofunction:: get_or_create_kdat_dict

@@ -1,0 +1,6 @@
+fecfiler.oidc.oidc\_op\_config.get\_oidc\_op\_config
+====================================================
+
+.. currentmodule:: fecfiler.oidc.oidc_op_config
+
+.. autofunction:: get_oidc_op_config

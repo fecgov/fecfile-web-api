@@ -40,6 +40,7 @@ fecfiler
    fecfiler.feedback
    fecfiler.memo_text
    fecfiler.middleware
+   fecfiler.mock_oidc_provider
    fecfiler.mock_openfec
    fecfiler.oidc
    fecfiler.openfec

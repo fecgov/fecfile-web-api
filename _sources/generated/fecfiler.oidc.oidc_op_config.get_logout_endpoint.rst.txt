@@ -1,0 +1,6 @@
+fecfiler.oidc.oidc\_op\_config.get\_logout\_endpoint
+====================================================
+
+.. currentmodule:: fecfiler.oidc.oidc_op_config
+
+.. autofunction:: get_logout_endpoint

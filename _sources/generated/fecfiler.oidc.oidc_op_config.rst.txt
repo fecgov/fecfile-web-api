@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.oidc.oidc\_op\_config
+==============================
+
+.. automodule:: fecfiler.oidc.oidc_op_config
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_authorization_endpoint
+      get_jwks_endpoint
+      get_logout_endpoint
+      get_oidc_op_config
+      get_token_endpoint
+      get_user_endpoint
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
