@@ -1,11 +1,11 @@
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import (
-	compose_dot_fec,
-	add_row_to_content
+    compose_dot_fec,
+    add_row_to_content
 )
 from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.web_services.dot_fec.dot_fec_serializer import (
-	serialize_instance,
+    serialize_instance,
     CRLF_STR,
     FS_STR
 )
