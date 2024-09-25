@@ -68,21 +68,6 @@ def compose_transactions(report_id):
         return []
 
 
-def compose_report_level_memos(report_id):
-    report_level_memos = MemoText.objects.filter(
-        report_id=report_id,
-        transaction_uuid=None,
-    )
-    if report_level_memos.exists():
-        logger.info(f"composing report level memos: {report_id}")
-        # for memo in report_level_memos:
-        #     memo.filer_committee_id_number = memo.committee_account.committee_id
-        return report_level_memos
-    else:
-        logger.info(f"no report level memos found for report: {report_id}")
-        return []
-
-
 class Header:
     def __init__(
         self,
@@ -195,17 +180,16 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             )
             if transaction.memo_text:
                 memo = transaction.memo_text
-                # memo.filer_committee_id_number = memo.committee_account.committee_id
-                # memo.back_reference_tran_id_number = transaction.transaction_id
-                # memo.back_reference_sched_form_name = transaction.form_type
                 serialized_memo = serialize_instance("Text", memo)
                 logger.debug("Serialized Memo:")
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
-        report_level_memos = compose_report_level_memos(report_id)
+        report_level_memos = MemoText.objects.filter(
+            report_id=report_id,
+            transaction_uuid=None,
+        )
         for memo in report_level_memos:
-            # memo.back_reference_sched_form_name = report.form_type
             serialized_memo = serialize_instance("Text", memo)
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
