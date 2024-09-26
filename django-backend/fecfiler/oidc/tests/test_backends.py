@@ -1,25 +1,10 @@
-"""
-This source code has been copied from the mozilla-django-oidc
-project:
-https://mozilla-django-oidc.readthedocs.io/en/stable/index.html#
-https://github.com/mozilla/mozilla-django-oidc/tree/main
-
-It has been modified in places to meet the needs of the project and
-the original version can be found on Github:
-https://github.com/mozilla/mozilla-django-oidc/blob/main/tests/test_auth.py
-"""
-
 from unittest.mock import Mock, patch
 from requests.exceptions import HTTPError
 from django.core.exceptions import SuspiciousOperation
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 from fecfiler.oidc.backends import OIDCAuthenticationBackend
 
 
-@override_settings(OIDC_OP_TOKEN_ENDPOINT="https://server.example.com/token")
-@override_settings(OIDC_OP_USER_ENDPOINT="https://server.example.com/user")
-@override_settings(OIDC_RP_CLIENT_ID="example_id")
-@override_settings(OIDC_RP_CLIENT_SECRET="client_secret")
 class OIDCAuthenticationBackendTestCase(TestCase):
     def setUp(self):
         self.backend = OIDCAuthenticationBackend()
