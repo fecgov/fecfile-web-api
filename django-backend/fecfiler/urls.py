@@ -3,7 +3,7 @@ from django.urls import re_path, path
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.views.generic.base import RedirectView
-from fecfiler.settings import LOGIN_REDIRECT_CLIENT_URL
+from fecfiler.settings import LOGIN_REDIRECT_CLIENT_URL, ALTERNATIVE_LOGIN
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 BASE_V1_URL = r"^api/v1/"
@@ -38,3 +38,6 @@ urlpatterns = [
     path("", RedirectView.as_view(url=LOGIN_REDIRECT_CLIENT_URL)),
     re_path(BASE_V1_URL + "status/", get_api_status),
 ]
+
+if ALTERNATIVE_LOGIN == "USERNAME_PASSWORD":
+    urlpatterns.append(re_path(BASE_V1_URL, include("fecfiler.mock_oidc_provider.urls")))

@@ -4,7 +4,6 @@ Django settings for the FECFile project.
 
 import os
 import dj_database_url
-import requests
 import structlog
 import sys
 
@@ -79,6 +78,7 @@ INSTALLED_APPS = [
     "fecfiler.mock_openfec",
     "fecfiler.oidc",
     "fecfiler.devops",
+    "fecfiler.mock_oidc_provider",
 ]
 
 MIDDLEWARE = [
@@ -159,16 +159,12 @@ OIDC_RP_UNIQUE_IDENTIFIER = "username"
 # Sometimes the OP (IDP - login.gov)has a different label for the unique ID
 OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 
-OIDC_OP_AUTODISCOVER_ENDPOINT = (
-    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
+    "OIDC_OP_AUTODISCOVER_ENDPOINT",
+    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
-OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
 
-OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
-OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
-OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
-OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
-OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
+MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
