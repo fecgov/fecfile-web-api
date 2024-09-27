@@ -1,0 +1,139 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text.DotFECTextRecordsTestCase
+==========================================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text
+
+.. autoclass:: DotFECTextRecordsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECTextRecordsTestCase.__init__
+      ~DotFECTextRecordsTestCase.addClassCleanup
+      ~DotFECTextRecordsTestCase.addCleanup
+      ~DotFECTextRecordsTestCase.addTypeEqualityFunc
+      ~DotFECTextRecordsTestCase.assertAlmostEqual
+      ~DotFECTextRecordsTestCase.assertAlmostEquals
+      ~DotFECTextRecordsTestCase.assertContains
+      ~DotFECTextRecordsTestCase.assertCountEqual
+      ~DotFECTextRecordsTestCase.assertDictContainsSubset
+      ~DotFECTextRecordsTestCase.assertDictEqual
+      ~DotFECTextRecordsTestCase.assertEqual
+      ~DotFECTextRecordsTestCase.assertEquals
+      ~DotFECTextRecordsTestCase.assertFalse
+      ~DotFECTextRecordsTestCase.assertFieldOutput
+      ~DotFECTextRecordsTestCase.assertFormError
+      ~DotFECTextRecordsTestCase.assertFormSetError
+      ~DotFECTextRecordsTestCase.assertGreater
+      ~DotFECTextRecordsTestCase.assertGreaterEqual
+      ~DotFECTextRecordsTestCase.assertHTMLEqual
+      ~DotFECTextRecordsTestCase.assertHTMLNotEqual
+      ~DotFECTextRecordsTestCase.assertIn
+      ~DotFECTextRecordsTestCase.assertInHTML
+      ~DotFECTextRecordsTestCase.assertIs
+      ~DotFECTextRecordsTestCase.assertIsInstance
+      ~DotFECTextRecordsTestCase.assertIsNone
+      ~DotFECTextRecordsTestCase.assertIsNot
+      ~DotFECTextRecordsTestCase.assertIsNotNone
+      ~DotFECTextRecordsTestCase.assertJSONEqual
+      ~DotFECTextRecordsTestCase.assertJSONNotEqual
+      ~DotFECTextRecordsTestCase.assertLess
+      ~DotFECTextRecordsTestCase.assertLessEqual
+      ~DotFECTextRecordsTestCase.assertListEqual
+      ~DotFECTextRecordsTestCase.assertLogs
+      ~DotFECTextRecordsTestCase.assertMultiLineEqual
+      ~DotFECTextRecordsTestCase.assertNoLogs
+      ~DotFECTextRecordsTestCase.assertNotAlmostEqual
+      ~DotFECTextRecordsTestCase.assertNotAlmostEquals
+      ~DotFECTextRecordsTestCase.assertNotContains
+      ~DotFECTextRecordsTestCase.assertNotEqual
+      ~DotFECTextRecordsTestCase.assertNotEquals
+      ~DotFECTextRecordsTestCase.assertNotIn
+      ~DotFECTextRecordsTestCase.assertNotInHTML
+      ~DotFECTextRecordsTestCase.assertNotIsInstance
+      ~DotFECTextRecordsTestCase.assertNotRegex
+      ~DotFECTextRecordsTestCase.assertNotRegexpMatches
+      ~DotFECTextRecordsTestCase.assertNumQueries
+      ~DotFECTextRecordsTestCase.assertQuerySetEqual
+      ~DotFECTextRecordsTestCase.assertRaises
+      ~DotFECTextRecordsTestCase.assertRaisesMessage
+      ~DotFECTextRecordsTestCase.assertRaisesRegex
+      ~DotFECTextRecordsTestCase.assertRaisesRegexp
+      ~DotFECTextRecordsTestCase.assertRedirects
+      ~DotFECTextRecordsTestCase.assertRegex
+      ~DotFECTextRecordsTestCase.assertRegexpMatches
+      ~DotFECTextRecordsTestCase.assertSequenceEqual
+      ~DotFECTextRecordsTestCase.assertSetEqual
+      ~DotFECTextRecordsTestCase.assertTemplateNotUsed
+      ~DotFECTextRecordsTestCase.assertTemplateUsed
+      ~DotFECTextRecordsTestCase.assertTrue
+      ~DotFECTextRecordsTestCase.assertTupleEqual
+      ~DotFECTextRecordsTestCase.assertURLEqual
+      ~DotFECTextRecordsTestCase.assertWarns
+      ~DotFECTextRecordsTestCase.assertWarnsMessage
+      ~DotFECTextRecordsTestCase.assertWarnsRegex
+      ~DotFECTextRecordsTestCase.assertXMLEqual
+      ~DotFECTextRecordsTestCase.assertXMLNotEqual
+      ~DotFECTextRecordsTestCase.assert_
+      ~DotFECTextRecordsTestCase.captureOnCommitCallbacks
+      ~DotFECTextRecordsTestCase.countTestCases
+      ~DotFECTextRecordsTestCase.debug
+      ~DotFECTextRecordsTestCase.defaultTestResult
+      ~DotFECTextRecordsTestCase.doClassCleanups
+      ~DotFECTextRecordsTestCase.doCleanups
+      ~DotFECTextRecordsTestCase.ensure_connection_patch_method
+      ~DotFECTextRecordsTestCase.enterClassContext
+      ~DotFECTextRecordsTestCase.fail
+      ~DotFECTextRecordsTestCase.failIf
+      ~DotFECTextRecordsTestCase.failIfAlmostEqual
+      ~DotFECTextRecordsTestCase.failIfEqual
+      ~DotFECTextRecordsTestCase.failUnless
+      ~DotFECTextRecordsTestCase.failUnlessAlmostEqual
+      ~DotFECTextRecordsTestCase.failUnlessEqual
+      ~DotFECTextRecordsTestCase.failUnlessRaises
+      ~DotFECTextRecordsTestCase.id
+      ~DotFECTextRecordsTestCase.modify_settings
+      ~DotFECTextRecordsTestCase.run
+      ~DotFECTextRecordsTestCase.setUp
+      ~DotFECTextRecordsTestCase.setUpClass
+      ~DotFECTextRecordsTestCase.setUpTestData
+      ~DotFECTextRecordsTestCase.settings
+      ~DotFECTextRecordsTestCase.shortDescription
+      ~DotFECTextRecordsTestCase.skipTest
+      ~DotFECTextRecordsTestCase.subTest
+      ~DotFECTextRecordsTestCase.tearDown
+      ~DotFECTextRecordsTestCase.tearDownClass
+      ~DotFECTextRecordsTestCase.test_committee_id
+      ~DotFECTextRecordsTestCase.test_record_name
+      ~DotFECTextRecordsTestCase.test_row_contains_report_info
+      ~DotFECTextRecordsTestCase.test_row_contains_text4000
+      ~DotFECTextRecordsTestCase.test_row_contains_transaction_info
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECTextRecordsTestCase.available_apps
+      ~DotFECTextRecordsTestCase.databases
+      ~DotFECTextRecordsTestCase.fixtures
+      ~DotFECTextRecordsTestCase.longMessage
+      ~DotFECTextRecordsTestCase.maxDiff
+      ~DotFECTextRecordsTestCase.reset_sequences
+      ~DotFECTextRecordsTestCase.serialized_rollback
+   
+   

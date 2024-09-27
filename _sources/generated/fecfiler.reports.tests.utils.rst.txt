@@ -22,6 +22,7 @@ fecfiler.reports.tests.utils
       create_form24
       create_form3x
       create_form99
+      create_report_memo
       create_test_report
    
    

@@ -1,0 +1,6 @@
+fecfiler.reports.tests.utils.create\_report\_memo
+=================================================
+
+.. currentmodule:: fecfiler.reports.tests.utils
+
+.. autofunction:: create_report_memo
