@@ -9,6 +9,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import ReportTransaction
+from fecfiler.memo_text.models import MemoText
 
 
 def create_schedule_a(
@@ -247,6 +248,15 @@ def create_report_transaction(report, transaction):
         return ReportTransaction.objects.create(
             report_id=report.id, transaction_id=transaction.id
         )
+
+
+def create_transaction_memo(committee_account, transaction, text4000):
+    return MemoText.objects.create(
+        rec_type="TEXT",
+        text4000=text4000,
+        committee_account_id=committee_account.id,
+        transaction_uuid=transaction.id,
+    )
 
 
 SCHEDULE_CLASS_TO_FIELD = {
