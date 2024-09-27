@@ -35,7 +35,6 @@ fecfiler.transactions.schedule\_c2.tests.test\_utils.ScheduleC2UtilsTestCase
       ~ScheduleC2UtilsTestCase.assertFieldOutput
       ~ScheduleC2UtilsTestCase.assertFormError
       ~ScheduleC2UtilsTestCase.assertFormSetError
-      ~ScheduleC2UtilsTestCase.assertFormsetError
       ~ScheduleC2UtilsTestCase.assertGreater
       ~ScheduleC2UtilsTestCase.assertGreaterEqual
       ~ScheduleC2UtilsTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.schedule\_c2.tests.test\_utils.ScheduleC2UtilsTestCase
       ~ScheduleC2UtilsTestCase.assertNotEqual
       ~ScheduleC2UtilsTestCase.assertNotEquals
       ~ScheduleC2UtilsTestCase.assertNotIn
+      ~ScheduleC2UtilsTestCase.assertNotInHTML
       ~ScheduleC2UtilsTestCase.assertNotIsInstance
       ~ScheduleC2UtilsTestCase.assertNotRegex
       ~ScheduleC2UtilsTestCase.assertNotRegexpMatches
       ~ScheduleC2UtilsTestCase.assertNumQueries
       ~ScheduleC2UtilsTestCase.assertQuerySetEqual
-      ~ScheduleC2UtilsTestCase.assertQuerysetEqual
       ~ScheduleC2UtilsTestCase.assertRaises
       ~ScheduleC2UtilsTestCase.assertRaisesMessage
       ~ScheduleC2UtilsTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.transactions.schedule\_c2.tests.test\_utils.ScheduleC2UtilsTestCase
       ~ScheduleC2UtilsTestCase.defaultTestResult
       ~ScheduleC2UtilsTestCase.doClassCleanups
       ~ScheduleC2UtilsTestCase.doCleanups
+      ~ScheduleC2UtilsTestCase.ensure_connection_patch_method
+      ~ScheduleC2UtilsTestCase.enterClassContext
       ~ScheduleC2UtilsTestCase.fail
       ~ScheduleC2UtilsTestCase.failIf
       ~ScheduleC2UtilsTestCase.failIfAlmostEqual

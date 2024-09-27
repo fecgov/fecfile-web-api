@@ -35,7 +35,6 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.assertFieldOutput
       ~OpenfecViewSetTest.assertFormError
       ~OpenfecViewSetTest.assertFormSetError
-      ~OpenfecViewSetTest.assertFormsetError
       ~OpenfecViewSetTest.assertGreater
       ~OpenfecViewSetTest.assertGreaterEqual
       ~OpenfecViewSetTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.assertNotEqual
       ~OpenfecViewSetTest.assertNotEquals
       ~OpenfecViewSetTest.assertNotIn
+      ~OpenfecViewSetTest.assertNotInHTML
       ~OpenfecViewSetTest.assertNotIsInstance
       ~OpenfecViewSetTest.assertNotRegex
       ~OpenfecViewSetTest.assertNotRegexpMatches
       ~OpenfecViewSetTest.assertNumQueries
       ~OpenfecViewSetTest.assertQuerySetEqual
-      ~OpenfecViewSetTest.assertQuerysetEqual
       ~OpenfecViewSetTest.assertRaises
       ~OpenfecViewSetTest.assertRaisesMessage
       ~OpenfecViewSetTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.defaultTestResult
       ~OpenfecViewSetTest.doClassCleanups
       ~OpenfecViewSetTest.doCleanups
+      ~OpenfecViewSetTest.ensure_connection_patch_method
+      ~OpenfecViewSetTest.enterClassContext
       ~OpenfecViewSetTest.fail
       ~OpenfecViewSetTest.failIf
       ~OpenfecViewSetTest.failIfAlmostEqual

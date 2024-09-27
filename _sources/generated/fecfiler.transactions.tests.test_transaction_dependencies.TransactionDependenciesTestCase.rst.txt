@@ -35,7 +35,6 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.assertFieldOutput
       ~TransactionDependenciesTestCase.assertFormError
       ~TransactionDependenciesTestCase.assertFormSetError
-      ~TransactionDependenciesTestCase.assertFormsetError
       ~TransactionDependenciesTestCase.assertGreater
       ~TransactionDependenciesTestCase.assertGreaterEqual
       ~TransactionDependenciesTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.assertNotEqual
       ~TransactionDependenciesTestCase.assertNotEquals
       ~TransactionDependenciesTestCase.assertNotIn
+      ~TransactionDependenciesTestCase.assertNotInHTML
       ~TransactionDependenciesTestCase.assertNotIsInstance
       ~TransactionDependenciesTestCase.assertNotRegex
       ~TransactionDependenciesTestCase.assertNotRegexpMatches
       ~TransactionDependenciesTestCase.assertNumQueries
       ~TransactionDependenciesTestCase.assertQuerySetEqual
-      ~TransactionDependenciesTestCase.assertQuerysetEqual
       ~TransactionDependenciesTestCase.assertRaises
       ~TransactionDependenciesTestCase.assertRaisesMessage
       ~TransactionDependenciesTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.defaultTestResult
       ~TransactionDependenciesTestCase.doClassCleanups
       ~TransactionDependenciesTestCase.doCleanups
+      ~TransactionDependenciesTestCase.ensure_connection_patch_method
+      ~TransactionDependenciesTestCase.enterClassContext
       ~TransactionDependenciesTestCase.fail
       ~TransactionDependenciesTestCase.failIf
       ~TransactionDependenciesTestCase.failIfAlmostEqual

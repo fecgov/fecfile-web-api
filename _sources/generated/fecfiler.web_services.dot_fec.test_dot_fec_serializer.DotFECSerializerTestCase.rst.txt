@@ -35,7 +35,6 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestC
       ~DotFECSerializerTestCase.assertFieldOutput
       ~DotFECSerializerTestCase.assertFormError
       ~DotFECSerializerTestCase.assertFormSetError
-      ~DotFECSerializerTestCase.assertFormsetError
       ~DotFECSerializerTestCase.assertGreater
       ~DotFECSerializerTestCase.assertGreaterEqual
       ~DotFECSerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestC
       ~DotFECSerializerTestCase.assertNotEqual
       ~DotFECSerializerTestCase.assertNotEquals
       ~DotFECSerializerTestCase.assertNotIn
+      ~DotFECSerializerTestCase.assertNotInHTML
       ~DotFECSerializerTestCase.assertNotIsInstance
       ~DotFECSerializerTestCase.assertNotRegex
       ~DotFECSerializerTestCase.assertNotRegexpMatches
       ~DotFECSerializerTestCase.assertNumQueries
       ~DotFECSerializerTestCase.assertQuerySetEqual
-      ~DotFECSerializerTestCase.assertQuerysetEqual
       ~DotFECSerializerTestCase.assertRaises
       ~DotFECSerializerTestCase.assertRaisesMessage
       ~DotFECSerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_serializer.DotFECSerializerTestC
       ~DotFECSerializerTestCase.defaultTestResult
       ~DotFECSerializerTestCase.doClassCleanups
       ~DotFECSerializerTestCase.doCleanups
+      ~DotFECSerializerTestCase.ensure_connection_patch_method
+      ~DotFECSerializerTestCase.enterClassContext
       ~DotFECSerializerTestCase.fail
       ~DotFECSerializerTestCase.failIf
       ~DotFECSerializerTestCase.failIfAlmostEqual

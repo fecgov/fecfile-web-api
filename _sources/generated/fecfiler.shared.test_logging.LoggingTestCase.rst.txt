@@ -35,7 +35,6 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.assertFieldOutput
       ~LoggingTestCase.assertFormError
       ~LoggingTestCase.assertFormSetError
-      ~LoggingTestCase.assertFormsetError
       ~LoggingTestCase.assertGreater
       ~LoggingTestCase.assertGreaterEqual
       ~LoggingTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.assertNotEqual
       ~LoggingTestCase.assertNotEquals
       ~LoggingTestCase.assertNotIn
+      ~LoggingTestCase.assertNotInHTML
       ~LoggingTestCase.assertNotIsInstance
       ~LoggingTestCase.assertNotRegex
       ~LoggingTestCase.assertNotRegexpMatches
       ~LoggingTestCase.assertNumQueries
       ~LoggingTestCase.assertQuerySetEqual
-      ~LoggingTestCase.assertQuerysetEqual
       ~LoggingTestCase.assertRaises
       ~LoggingTestCase.assertRaisesMessage
       ~LoggingTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.defaultTestResult
       ~LoggingTestCase.doClassCleanups
       ~LoggingTestCase.doCleanups
+      ~LoggingTestCase.ensure_connection_patch_method
+      ~LoggingTestCase.enterClassContext
       ~LoggingTestCase.fail
       ~LoggingTestCase.failIf
       ~LoggingTestCase.failIfAlmostEqual

@@ -35,7 +35,6 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.assertFieldOutput
       ~OidcTest.assertFormError
       ~OidcTest.assertFormSetError
-      ~OidcTest.assertFormsetError
       ~OidcTest.assertGreater
       ~OidcTest.assertGreaterEqual
       ~OidcTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.assertNotEqual
       ~OidcTest.assertNotEquals
       ~OidcTest.assertNotIn
+      ~OidcTest.assertNotInHTML
       ~OidcTest.assertNotIsInstance
       ~OidcTest.assertNotRegex
       ~OidcTest.assertNotRegexpMatches
       ~OidcTest.assertNumQueries
       ~OidcTest.assertQuerySetEqual
-      ~OidcTest.assertQuerysetEqual
       ~OidcTest.assertRaises
       ~OidcTest.assertRaisesMessage
       ~OidcTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.defaultTestResult
       ~OidcTest.doClassCleanups
       ~OidcTest.doCleanups
+      ~OidcTest.ensure_connection_patch_method
+      ~OidcTest.enterClassContext
       ~OidcTest.fail
       ~OidcTest.failIf
       ~OidcTest.failIfAlmostEqual

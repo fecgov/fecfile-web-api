@@ -35,7 +35,6 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertFieldOutput
       ~SharedUtilitiesTestCase.assertFormError
       ~SharedUtilitiesTestCase.assertFormSetError
-      ~SharedUtilitiesTestCase.assertFormsetError
       ~SharedUtilitiesTestCase.assertGreater
       ~SharedUtilitiesTestCase.assertGreaterEqual
       ~SharedUtilitiesTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertNotEqual
       ~SharedUtilitiesTestCase.assertNotEquals
       ~SharedUtilitiesTestCase.assertNotIn
+      ~SharedUtilitiesTestCase.assertNotInHTML
       ~SharedUtilitiesTestCase.assertNotIsInstance
       ~SharedUtilitiesTestCase.assertNotRegex
       ~SharedUtilitiesTestCase.assertNotRegexpMatches
       ~SharedUtilitiesTestCase.assertNumQueries
       ~SharedUtilitiesTestCase.assertQuerySetEqual
-      ~SharedUtilitiesTestCase.assertQuerysetEqual
       ~SharedUtilitiesTestCase.assertRaises
       ~SharedUtilitiesTestCase.assertRaisesMessage
       ~SharedUtilitiesTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.defaultTestResult
       ~SharedUtilitiesTestCase.doClassCleanups
       ~SharedUtilitiesTestCase.doCleanups
+      ~SharedUtilitiesTestCase.ensure_connection_patch_method
+      ~SharedUtilitiesTestCase.enterClassContext
       ~SharedUtilitiesTestCase.fail
       ~SharedUtilitiesTestCase.failIf
       ~SharedUtilitiesTestCase.failIfAlmostEqual

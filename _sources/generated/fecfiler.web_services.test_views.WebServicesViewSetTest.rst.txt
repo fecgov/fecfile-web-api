@@ -35,7 +35,6 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.assertFieldOutput
       ~WebServicesViewSetTest.assertFormError
       ~WebServicesViewSetTest.assertFormSetError
-      ~WebServicesViewSetTest.assertFormsetError
       ~WebServicesViewSetTest.assertGreater
       ~WebServicesViewSetTest.assertGreaterEqual
       ~WebServicesViewSetTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.assertNotEqual
       ~WebServicesViewSetTest.assertNotEquals
       ~WebServicesViewSetTest.assertNotIn
+      ~WebServicesViewSetTest.assertNotInHTML
       ~WebServicesViewSetTest.assertNotIsInstance
       ~WebServicesViewSetTest.assertNotRegex
       ~WebServicesViewSetTest.assertNotRegexpMatches
       ~WebServicesViewSetTest.assertNumQueries
       ~WebServicesViewSetTest.assertQuerySetEqual
-      ~WebServicesViewSetTest.assertQuerysetEqual
       ~WebServicesViewSetTest.assertRaises
       ~WebServicesViewSetTest.assertRaisesMessage
       ~WebServicesViewSetTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.defaultTestResult
       ~WebServicesViewSetTest.doClassCleanups
       ~WebServicesViewSetTest.doCleanups
+      ~WebServicesViewSetTest.ensure_connection_patch_method
+      ~WebServicesViewSetTest.enterClassContext
       ~WebServicesViewSetTest.fail
       ~WebServicesViewSetTest.failIf
       ~WebServicesViewSetTest.failIfAlmostEqual

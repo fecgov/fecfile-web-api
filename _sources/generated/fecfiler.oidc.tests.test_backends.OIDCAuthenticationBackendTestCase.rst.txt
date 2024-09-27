@@ -35,7 +35,6 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.assertFieldOutput
       ~OIDCAuthenticationBackendTestCase.assertFormError
       ~OIDCAuthenticationBackendTestCase.assertFormSetError
-      ~OIDCAuthenticationBackendTestCase.assertFormsetError
       ~OIDCAuthenticationBackendTestCase.assertGreater
       ~OIDCAuthenticationBackendTestCase.assertGreaterEqual
       ~OIDCAuthenticationBackendTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.assertNotEqual
       ~OIDCAuthenticationBackendTestCase.assertNotEquals
       ~OIDCAuthenticationBackendTestCase.assertNotIn
+      ~OIDCAuthenticationBackendTestCase.assertNotInHTML
       ~OIDCAuthenticationBackendTestCase.assertNotIsInstance
       ~OIDCAuthenticationBackendTestCase.assertNotRegex
       ~OIDCAuthenticationBackendTestCase.assertNotRegexpMatches
       ~OIDCAuthenticationBackendTestCase.assertNumQueries
       ~OIDCAuthenticationBackendTestCase.assertQuerySetEqual
-      ~OIDCAuthenticationBackendTestCase.assertQuerysetEqual
       ~OIDCAuthenticationBackendTestCase.assertRaises
       ~OIDCAuthenticationBackendTestCase.assertRaisesMessage
       ~OIDCAuthenticationBackendTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.defaultTestResult
       ~OIDCAuthenticationBackendTestCase.doClassCleanups
       ~OIDCAuthenticationBackendTestCase.doCleanups
+      ~OIDCAuthenticationBackendTestCase.ensure_connection_patch_method
+      ~OIDCAuthenticationBackendTestCase.enterClassContext
       ~OIDCAuthenticationBackendTestCase.fail
       ~OIDCAuthenticationBackendTestCase.failIf
       ~OIDCAuthenticationBackendTestCase.failIfAlmostEqual

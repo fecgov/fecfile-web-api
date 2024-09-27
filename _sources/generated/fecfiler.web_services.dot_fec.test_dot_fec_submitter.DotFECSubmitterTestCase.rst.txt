@@ -35,7 +35,6 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCas
       ~DotFECSubmitterTestCase.assertFieldOutput
       ~DotFECSubmitterTestCase.assertFormError
       ~DotFECSubmitterTestCase.assertFormSetError
-      ~DotFECSubmitterTestCase.assertFormsetError
       ~DotFECSubmitterTestCase.assertGreater
       ~DotFECSubmitterTestCase.assertGreaterEqual
       ~DotFECSubmitterTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCas
       ~DotFECSubmitterTestCase.assertNotEqual
       ~DotFECSubmitterTestCase.assertNotEquals
       ~DotFECSubmitterTestCase.assertNotIn
+      ~DotFECSubmitterTestCase.assertNotInHTML
       ~DotFECSubmitterTestCase.assertNotIsInstance
       ~DotFECSubmitterTestCase.assertNotRegex
       ~DotFECSubmitterTestCase.assertNotRegexpMatches
       ~DotFECSubmitterTestCase.assertNumQueries
       ~DotFECSubmitterTestCase.assertQuerySetEqual
-      ~DotFECSubmitterTestCase.assertQuerysetEqual
       ~DotFECSubmitterTestCase.assertRaises
       ~DotFECSubmitterTestCase.assertRaisesMessage
       ~DotFECSubmitterTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.dot\_fec.test\_dot\_fec\_submitter.DotFECSubmitterTestCas
       ~DotFECSubmitterTestCase.defaultTestResult
       ~DotFECSubmitterTestCase.doClassCleanups
       ~DotFECSubmitterTestCase.doCleanups
+      ~DotFECSubmitterTestCase.ensure_connection_patch_method
+      ~DotFECSubmitterTestCase.enterClassContext
       ~DotFECSubmitterTestCase.fail
       ~DotFECSubmitterTestCase.failIf
       ~DotFECSubmitterTestCase.failIfAlmostEqual

@@ -35,7 +35,6 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.assertFieldOutput
       ~ReportModelTestCase.assertFormError
       ~ReportModelTestCase.assertFormSetError
-      ~ReportModelTestCase.assertFormsetError
       ~ReportModelTestCase.assertGreater
       ~ReportModelTestCase.assertGreaterEqual
       ~ReportModelTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.assertNotEqual
       ~ReportModelTestCase.assertNotEquals
       ~ReportModelTestCase.assertNotIn
+      ~ReportModelTestCase.assertNotInHTML
       ~ReportModelTestCase.assertNotIsInstance
       ~ReportModelTestCase.assertNotRegex
       ~ReportModelTestCase.assertNotRegexpMatches
       ~ReportModelTestCase.assertNumQueries
       ~ReportModelTestCase.assertQuerySetEqual
-      ~ReportModelTestCase.assertQuerysetEqual
       ~ReportModelTestCase.assertRaises
       ~ReportModelTestCase.assertRaisesMessage
       ~ReportModelTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.defaultTestResult
       ~ReportModelTestCase.doClassCleanups
       ~ReportModelTestCase.doCleanups
+      ~ReportModelTestCase.ensure_connection_patch_method
+      ~ReportModelTestCase.enterClassContext
       ~ReportModelTestCase.fail
       ~ReportModelTestCase.failIf
       ~ReportModelTestCase.failIfAlmostEqual

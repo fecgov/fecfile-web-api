@@ -35,7 +35,6 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertFieldOutput
       ~UploadSubmissionTestCase.assertFormError
       ~UploadSubmissionTestCase.assertFormSetError
-      ~UploadSubmissionTestCase.assertFormsetError
       ~UploadSubmissionTestCase.assertGreater
       ~UploadSubmissionTestCase.assertGreaterEqual
       ~UploadSubmissionTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertNotEqual
       ~UploadSubmissionTestCase.assertNotEquals
       ~UploadSubmissionTestCase.assertNotIn
+      ~UploadSubmissionTestCase.assertNotInHTML
       ~UploadSubmissionTestCase.assertNotIsInstance
       ~UploadSubmissionTestCase.assertNotRegex
       ~UploadSubmissionTestCase.assertNotRegexpMatches
       ~UploadSubmissionTestCase.assertNumQueries
       ~UploadSubmissionTestCase.assertQuerySetEqual
-      ~UploadSubmissionTestCase.assertQuerysetEqual
       ~UploadSubmissionTestCase.assertRaises
       ~UploadSubmissionTestCase.assertRaisesMessage
       ~UploadSubmissionTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.defaultTestResult
       ~UploadSubmissionTestCase.doClassCleanups
       ~UploadSubmissionTestCase.doCleanups
+      ~UploadSubmissionTestCase.ensure_connection_patch_method
+      ~UploadSubmissionTestCase.enterClassContext
       ~UploadSubmissionTestCase.fail
       ~UploadSubmissionTestCase.failIf
       ~UploadSubmissionTestCase.failIfAlmostEqual

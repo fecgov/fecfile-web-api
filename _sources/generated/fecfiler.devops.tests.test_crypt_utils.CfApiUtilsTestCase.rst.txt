@@ -35,7 +35,6 @@ fecfiler.devops.tests.test\_crypt\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.assertFieldOutput
       ~CfApiUtilsTestCase.assertFormError
       ~CfApiUtilsTestCase.assertFormSetError
-      ~CfApiUtilsTestCase.assertFormsetError
       ~CfApiUtilsTestCase.assertGreater
       ~CfApiUtilsTestCase.assertGreaterEqual
       ~CfApiUtilsTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.devops.tests.test\_crypt\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.assertNotEqual
       ~CfApiUtilsTestCase.assertNotEquals
       ~CfApiUtilsTestCase.assertNotIn
+      ~CfApiUtilsTestCase.assertNotInHTML
       ~CfApiUtilsTestCase.assertNotIsInstance
       ~CfApiUtilsTestCase.assertNotRegex
       ~CfApiUtilsTestCase.assertNotRegexpMatches
       ~CfApiUtilsTestCase.assertNumQueries
       ~CfApiUtilsTestCase.assertQuerySetEqual
-      ~CfApiUtilsTestCase.assertQuerysetEqual
       ~CfApiUtilsTestCase.assertRaises
       ~CfApiUtilsTestCase.assertRaisesMessage
       ~CfApiUtilsTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.devops.tests.test\_crypt\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.defaultTestResult
       ~CfApiUtilsTestCase.doClassCleanups
       ~CfApiUtilsTestCase.doCleanups
+      ~CfApiUtilsTestCase.ensure_connection_patch_method
+      ~CfApiUtilsTestCase.enterClassContext
       ~CfApiUtilsTestCase.fail
       ~CfApiUtilsTestCase.failIf
       ~CfApiUtilsTestCase.failIfAlmostEqual

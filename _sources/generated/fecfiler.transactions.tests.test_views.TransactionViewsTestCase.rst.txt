@@ -35,7 +35,6 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertFieldOutput
       ~TransactionViewsTestCase.assertFormError
       ~TransactionViewsTestCase.assertFormSetError
-      ~TransactionViewsTestCase.assertFormsetError
       ~TransactionViewsTestCase.assertGreater
       ~TransactionViewsTestCase.assertGreaterEqual
       ~TransactionViewsTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertNotEqual
       ~TransactionViewsTestCase.assertNotEquals
       ~TransactionViewsTestCase.assertNotIn
+      ~TransactionViewsTestCase.assertNotInHTML
       ~TransactionViewsTestCase.assertNotIsInstance
       ~TransactionViewsTestCase.assertNotRegex
       ~TransactionViewsTestCase.assertNotRegexpMatches
       ~TransactionViewsTestCase.assertNumQueries
       ~TransactionViewsTestCase.assertQuerySetEqual
-      ~TransactionViewsTestCase.assertQuerysetEqual
       ~TransactionViewsTestCase.assertRaises
       ~TransactionViewsTestCase.assertRaisesMessage
       ~TransactionViewsTestCase.assertRaisesRegex
@@ -95,6 +94,8 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.delete_request
       ~TransactionViewsTestCase.doClassCleanups
       ~TransactionViewsTestCase.doCleanups
+      ~TransactionViewsTestCase.ensure_connection_patch_method
+      ~TransactionViewsTestCase.enterClassContext
       ~TransactionViewsTestCase.fail
       ~TransactionViewsTestCase.failIf
       ~TransactionViewsTestCase.failIfAlmostEqual

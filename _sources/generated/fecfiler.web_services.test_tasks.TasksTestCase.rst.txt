@@ -35,7 +35,6 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertFieldOutput
       ~TasksTestCase.assertFormError
       ~TasksTestCase.assertFormSetError
-      ~TasksTestCase.assertFormsetError
       ~TasksTestCase.assertGreater
       ~TasksTestCase.assertGreaterEqual
       ~TasksTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertNotEqual
       ~TasksTestCase.assertNotEquals
       ~TasksTestCase.assertNotIn
+      ~TasksTestCase.assertNotInHTML
       ~TasksTestCase.assertNotIsInstance
       ~TasksTestCase.assertNotRegex
       ~TasksTestCase.assertNotRegexpMatches
       ~TasksTestCase.assertNumQueries
       ~TasksTestCase.assertQuerySetEqual
-      ~TasksTestCase.assertQuerysetEqual
       ~TasksTestCase.assertRaises
       ~TasksTestCase.assertRaisesMessage
       ~TasksTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.defaultTestResult
       ~TasksTestCase.doClassCleanups
       ~TasksTestCase.doCleanups
+      ~TasksTestCase.ensure_connection_patch_method
+      ~TasksTestCase.enterClassContext
       ~TasksTestCase.fail
       ~TasksTestCase.failIf
       ~TasksTestCase.failIfAlmostEqual

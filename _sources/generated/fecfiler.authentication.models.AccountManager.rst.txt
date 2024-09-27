@@ -76,7 +76,6 @@ fecfiler.authentication.models.AccountManager
       ~AccountManager.iterator
       ~AccountManager.last
       ~AccountManager.latest
-      ~AccountManager.make_random_password
       ~AccountManager.none
       ~AccountManager.normalize_email
       ~AccountManager.only

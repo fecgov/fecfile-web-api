@@ -35,7 +35,6 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.assertFieldOutput
       ~TransactionModelTestCase.assertFormError
       ~TransactionModelTestCase.assertFormSetError
-      ~TransactionModelTestCase.assertFormsetError
       ~TransactionModelTestCase.assertGreater
       ~TransactionModelTestCase.assertGreaterEqual
       ~TransactionModelTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.assertNotEqual
       ~TransactionModelTestCase.assertNotEquals
       ~TransactionModelTestCase.assertNotIn
+      ~TransactionModelTestCase.assertNotInHTML
       ~TransactionModelTestCase.assertNotIsInstance
       ~TransactionModelTestCase.assertNotRegex
       ~TransactionModelTestCase.assertNotRegexpMatches
       ~TransactionModelTestCase.assertNumQueries
       ~TransactionModelTestCase.assertQuerySetEqual
-      ~TransactionModelTestCase.assertQuerysetEqual
       ~TransactionModelTestCase.assertRaises
       ~TransactionModelTestCase.assertRaisesMessage
       ~TransactionModelTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.defaultTestResult
       ~TransactionModelTestCase.doClassCleanups
       ~TransactionModelTestCase.doCleanups
+      ~TransactionModelTestCase.ensure_connection_patch_method
+      ~TransactionModelTestCase.enterClassContext
       ~TransactionModelTestCase.fail
       ~TransactionModelTestCase.failIf
       ~TransactionModelTestCase.failIfAlmostEqual

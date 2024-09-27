@@ -35,7 +35,6 @@ fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertFieldOutput
       ~F3XSerializerTestCase.assertFormError
       ~F3XSerializerTestCase.assertFormSetError
-      ~F3XSerializerTestCase.assertFormsetError
       ~F3XSerializerTestCase.assertGreater
       ~F3XSerializerTestCase.assertGreaterEqual
       ~F3XSerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertNotEqual
       ~F3XSerializerTestCase.assertNotEquals
       ~F3XSerializerTestCase.assertNotIn
+      ~F3XSerializerTestCase.assertNotInHTML
       ~F3XSerializerTestCase.assertNotIsInstance
       ~F3XSerializerTestCase.assertNotRegex
       ~F3XSerializerTestCase.assertNotRegexpMatches
       ~F3XSerializerTestCase.assertNumQueries
       ~F3XSerializerTestCase.assertQuerySetEqual
-      ~F3XSerializerTestCase.assertQuerysetEqual
       ~F3XSerializerTestCase.assertRaises
       ~F3XSerializerTestCase.assertRaisesMessage
       ~F3XSerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
       ~F3XSerializerTestCase.defaultTestResult
       ~F3XSerializerTestCase.doClassCleanups
       ~F3XSerializerTestCase.doCleanups
+      ~F3XSerializerTestCase.ensure_connection_patch_method
+      ~F3XSerializerTestCase.enterClassContext
       ~F3XSerializerTestCase.fail
       ~F3XSerializerTestCase.failIf
       ~F3XSerializerTestCase.failIfAlmostEqual

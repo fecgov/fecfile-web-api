@@ -35,7 +35,6 @@ fecfiler.mock\_openfec.test\_load\_committee\_data.LoadTestDataCommandTest
       ~LoadTestDataCommandTest.assertFieldOutput
       ~LoadTestDataCommandTest.assertFormError
       ~LoadTestDataCommandTest.assertFormSetError
-      ~LoadTestDataCommandTest.assertFormsetError
       ~LoadTestDataCommandTest.assertGreater
       ~LoadTestDataCommandTest.assertGreaterEqual
       ~LoadTestDataCommandTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.mock\_openfec.test\_load\_committee\_data.LoadTestDataCommandTest
       ~LoadTestDataCommandTest.assertNotEqual
       ~LoadTestDataCommandTest.assertNotEquals
       ~LoadTestDataCommandTest.assertNotIn
+      ~LoadTestDataCommandTest.assertNotInHTML
       ~LoadTestDataCommandTest.assertNotIsInstance
       ~LoadTestDataCommandTest.assertNotRegex
       ~LoadTestDataCommandTest.assertNotRegexpMatches
       ~LoadTestDataCommandTest.assertNumQueries
       ~LoadTestDataCommandTest.assertQuerySetEqual
-      ~LoadTestDataCommandTest.assertQuerysetEqual
       ~LoadTestDataCommandTest.assertRaises
       ~LoadTestDataCommandTest.assertRaisesMessage
       ~LoadTestDataCommandTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.mock\_openfec.test\_load\_committee\_data.LoadTestDataCommandTest
       ~LoadTestDataCommandTest.defaultTestResult
       ~LoadTestDataCommandTest.doClassCleanups
       ~LoadTestDataCommandTest.doCleanups
+      ~LoadTestDataCommandTest.ensure_connection_patch_method
+      ~LoadTestDataCommandTest.enterClassContext
       ~LoadTestDataCommandTest.fail
       ~LoadTestDataCommandTest.failIf
       ~LoadTestDataCommandTest.failIfAlmostEqual

@@ -35,7 +35,6 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.assertFieldOutput
       ~SystemStatusViewTest.assertFormError
       ~SystemStatusViewTest.assertFormSetError
-      ~SystemStatusViewTest.assertFormsetError
       ~SystemStatusViewTest.assertGreater
       ~SystemStatusViewTest.assertGreaterEqual
       ~SystemStatusViewTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.assertNotEqual
       ~SystemStatusViewTest.assertNotEquals
       ~SystemStatusViewTest.assertNotIn
+      ~SystemStatusViewTest.assertNotInHTML
       ~SystemStatusViewTest.assertNotIsInstance
       ~SystemStatusViewTest.assertNotRegex
       ~SystemStatusViewTest.assertNotRegexpMatches
       ~SystemStatusViewTest.assertNumQueries
       ~SystemStatusViewTest.assertQuerySetEqual
-      ~SystemStatusViewTest.assertQuerysetEqual
       ~SystemStatusViewTest.assertRaises
       ~SystemStatusViewTest.assertRaisesMessage
       ~SystemStatusViewTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.defaultTestResult
       ~SystemStatusViewTest.doClassCleanups
       ~SystemStatusViewTest.doCleanups
+      ~SystemStatusViewTest.ensure_connection_patch_method
+      ~SystemStatusViewTest.enterClassContext
       ~SystemStatusViewTest.fail
       ~SystemStatusViewTest.failIf
       ~SystemStatusViewTest.failIfAlmostEqual

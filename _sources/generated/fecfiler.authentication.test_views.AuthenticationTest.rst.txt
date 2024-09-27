@@ -35,7 +35,6 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.assertFieldOutput
       ~AuthenticationTest.assertFormError
       ~AuthenticationTest.assertFormSetError
-      ~AuthenticationTest.assertFormsetError
       ~AuthenticationTest.assertGreater
       ~AuthenticationTest.assertGreaterEqual
       ~AuthenticationTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.assertNotEqual
       ~AuthenticationTest.assertNotEquals
       ~AuthenticationTest.assertNotIn
+      ~AuthenticationTest.assertNotInHTML
       ~AuthenticationTest.assertNotIsInstance
       ~AuthenticationTest.assertNotRegex
       ~AuthenticationTest.assertNotRegexpMatches
       ~AuthenticationTest.assertNumQueries
       ~AuthenticationTest.assertQuerySetEqual
-      ~AuthenticationTest.assertQuerysetEqual
       ~AuthenticationTest.assertRaises
       ~AuthenticationTest.assertRaisesMessage
       ~AuthenticationTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.authentication.test\_views.AuthenticationTest
       ~AuthenticationTest.defaultTestResult
       ~AuthenticationTest.doClassCleanups
       ~AuthenticationTest.doCleanups
+      ~AuthenticationTest.ensure_connection_patch_method
+      ~AuthenticationTest.enterClassContext
       ~AuthenticationTest.fail
       ~AuthenticationTest.failIf
       ~AuthenticationTest.failIfAlmostEqual

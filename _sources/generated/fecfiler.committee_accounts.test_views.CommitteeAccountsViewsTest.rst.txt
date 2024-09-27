@@ -35,7 +35,6 @@ fecfiler.committee\_accounts.test\_views.CommitteeAccountsViewsTest
       ~CommitteeAccountsViewsTest.assertFieldOutput
       ~CommitteeAccountsViewsTest.assertFormError
       ~CommitteeAccountsViewsTest.assertFormSetError
-      ~CommitteeAccountsViewsTest.assertFormsetError
       ~CommitteeAccountsViewsTest.assertGreater
       ~CommitteeAccountsViewsTest.assertGreaterEqual
       ~CommitteeAccountsViewsTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.committee\_accounts.test\_views.CommitteeAccountsViewsTest
       ~CommitteeAccountsViewsTest.assertNotEqual
       ~CommitteeAccountsViewsTest.assertNotEquals
       ~CommitteeAccountsViewsTest.assertNotIn
+      ~CommitteeAccountsViewsTest.assertNotInHTML
       ~CommitteeAccountsViewsTest.assertNotIsInstance
       ~CommitteeAccountsViewsTest.assertNotRegex
       ~CommitteeAccountsViewsTest.assertNotRegexpMatches
       ~CommitteeAccountsViewsTest.assertNumQueries
       ~CommitteeAccountsViewsTest.assertQuerySetEqual
-      ~CommitteeAccountsViewsTest.assertQuerysetEqual
       ~CommitteeAccountsViewsTest.assertRaises
       ~CommitteeAccountsViewsTest.assertRaisesMessage
       ~CommitteeAccountsViewsTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.committee\_accounts.test\_views.CommitteeAccountsViewsTest
       ~CommitteeAccountsViewsTest.defaultTestResult
       ~CommitteeAccountsViewsTest.doClassCleanups
       ~CommitteeAccountsViewsTest.doCleanups
+      ~CommitteeAccountsViewsTest.ensure_connection_patch_method
+      ~CommitteeAccountsViewsTest.enterClassContext
       ~CommitteeAccountsViewsTest.fail
       ~CommitteeAccountsViewsTest.failIf
       ~CommitteeAccountsViewsTest.failIfAlmostEqual

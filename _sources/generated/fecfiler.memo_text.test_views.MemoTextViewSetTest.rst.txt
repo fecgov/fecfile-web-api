@@ -35,7 +35,6 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertFieldOutput
       ~MemoTextViewSetTest.assertFormError
       ~MemoTextViewSetTest.assertFormSetError
-      ~MemoTextViewSetTest.assertFormsetError
       ~MemoTextViewSetTest.assertGreater
       ~MemoTextViewSetTest.assertGreaterEqual
       ~MemoTextViewSetTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertNotEqual
       ~MemoTextViewSetTest.assertNotEquals
       ~MemoTextViewSetTest.assertNotIn
+      ~MemoTextViewSetTest.assertNotInHTML
       ~MemoTextViewSetTest.assertNotIsInstance
       ~MemoTextViewSetTest.assertNotRegex
       ~MemoTextViewSetTest.assertNotRegexpMatches
       ~MemoTextViewSetTest.assertNumQueries
       ~MemoTextViewSetTest.assertQuerySetEqual
-      ~MemoTextViewSetTest.assertQuerysetEqual
       ~MemoTextViewSetTest.assertRaises
       ~MemoTextViewSetTest.assertRaisesMessage
       ~MemoTextViewSetTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.defaultTestResult
       ~MemoTextViewSetTest.doClassCleanups
       ~MemoTextViewSetTest.doCleanups
+      ~MemoTextViewSetTest.ensure_connection_patch_method
+      ~MemoTextViewSetTest.enterClassContext
       ~MemoTextViewSetTest.fail
       ~MemoTextViewSetTest.failIf
       ~MemoTextViewSetTest.failIfAlmostEqual

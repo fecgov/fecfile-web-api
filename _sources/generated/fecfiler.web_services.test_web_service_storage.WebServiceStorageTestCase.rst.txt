@@ -35,7 +35,6 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.assertFieldOutput
       ~WebServiceStorageTestCase.assertFormError
       ~WebServiceStorageTestCase.assertFormSetError
-      ~WebServiceStorageTestCase.assertFormsetError
       ~WebServiceStorageTestCase.assertGreater
       ~WebServiceStorageTestCase.assertGreaterEqual
       ~WebServiceStorageTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.assertNotEqual
       ~WebServiceStorageTestCase.assertNotEquals
       ~WebServiceStorageTestCase.assertNotIn
+      ~WebServiceStorageTestCase.assertNotInHTML
       ~WebServiceStorageTestCase.assertNotIsInstance
       ~WebServiceStorageTestCase.assertNotRegex
       ~WebServiceStorageTestCase.assertNotRegexpMatches
       ~WebServiceStorageTestCase.assertNumQueries
       ~WebServiceStorageTestCase.assertQuerySetEqual
-      ~WebServiceStorageTestCase.assertQuerysetEqual
       ~WebServiceStorageTestCase.assertRaises
       ~WebServiceStorageTestCase.assertRaisesMessage
       ~WebServiceStorageTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.test\_web\_service\_storage.WebServiceStorageTestCase
       ~WebServiceStorageTestCase.defaultTestResult
       ~WebServiceStorageTestCase.doClassCleanups
       ~WebServiceStorageTestCase.doCleanups
+      ~WebServiceStorageTestCase.ensure_connection_patch_method
+      ~WebServiceStorageTestCase.enterClassContext
       ~WebServiceStorageTestCase.fail
       ~WebServiceStorageTestCase.failIf
       ~WebServiceStorageTestCase.failIfAlmostEqual

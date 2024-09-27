@@ -76,7 +76,6 @@ fecfiler.user.managers.UserManager
       ~UserManager.iterator
       ~UserManager.last
       ~UserManager.latest
-      ~UserManager.make_random_password
       ~UserManager.none
       ~UserManager.normalize_email
       ~UserManager.only

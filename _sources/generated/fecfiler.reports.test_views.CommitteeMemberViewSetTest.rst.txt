@@ -35,7 +35,6 @@ fecfiler.reports.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.assertFieldOutput
       ~CommitteeMemberViewSetTest.assertFormError
       ~CommitteeMemberViewSetTest.assertFormSetError
-      ~CommitteeMemberViewSetTest.assertFormsetError
       ~CommitteeMemberViewSetTest.assertGreater
       ~CommitteeMemberViewSetTest.assertGreaterEqual
       ~CommitteeMemberViewSetTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.reports.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.assertNotEqual
       ~CommitteeMemberViewSetTest.assertNotEquals
       ~CommitteeMemberViewSetTest.assertNotIn
+      ~CommitteeMemberViewSetTest.assertNotInHTML
       ~CommitteeMemberViewSetTest.assertNotIsInstance
       ~CommitteeMemberViewSetTest.assertNotRegex
       ~CommitteeMemberViewSetTest.assertNotRegexpMatches
       ~CommitteeMemberViewSetTest.assertNumQueries
       ~CommitteeMemberViewSetTest.assertQuerySetEqual
-      ~CommitteeMemberViewSetTest.assertQuerysetEqual
       ~CommitteeMemberViewSetTest.assertRaises
       ~CommitteeMemberViewSetTest.assertRaisesMessage
       ~CommitteeMemberViewSetTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.reports.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.defaultTestResult
       ~CommitteeMemberViewSetTest.doClassCleanups
       ~CommitteeMemberViewSetTest.doCleanups
+      ~CommitteeMemberViewSetTest.ensure_connection_patch_method
+      ~CommitteeMemberViewSetTest.enterClassContext
       ~CommitteeMemberViewSetTest.fail
       ~CommitteeMemberViewSetTest.failIf
       ~CommitteeMemberViewSetTest.failIfAlmostEqual

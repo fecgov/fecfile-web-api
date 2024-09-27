@@ -35,7 +35,6 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertFieldOutput
       ~F24SerializerTestCase.assertFormError
       ~F24SerializerTestCase.assertFormSetError
-      ~F24SerializerTestCase.assertFormsetError
       ~F24SerializerTestCase.assertGreater
       ~F24SerializerTestCase.assertGreaterEqual
       ~F24SerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertNotEqual
       ~F24SerializerTestCase.assertNotEquals
       ~F24SerializerTestCase.assertNotIn
+      ~F24SerializerTestCase.assertNotInHTML
       ~F24SerializerTestCase.assertNotIsInstance
       ~F24SerializerTestCase.assertNotRegex
       ~F24SerializerTestCase.assertNotRegexpMatches
       ~F24SerializerTestCase.assertNumQueries
       ~F24SerializerTestCase.assertQuerySetEqual
-      ~F24SerializerTestCase.assertQuerysetEqual
       ~F24SerializerTestCase.assertRaises
       ~F24SerializerTestCase.assertRaisesMessage
       ~F24SerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.defaultTestResult
       ~F24SerializerTestCase.doClassCleanups
       ~F24SerializerTestCase.doCleanups
+      ~F24SerializerTestCase.ensure_connection_patch_method
+      ~F24SerializerTestCase.enterClassContext
       ~F24SerializerTestCase.fail
       ~F24SerializerTestCase.failIf
       ~F24SerializerTestCase.failIfAlmostEqual

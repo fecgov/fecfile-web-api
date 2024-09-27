@@ -35,7 +35,6 @@ fecfiler.transactions.schedule\_d.tests.test\_utils.ScheduleDUtilsTestCase
       ~ScheduleDUtilsTestCase.assertFieldOutput
       ~ScheduleDUtilsTestCase.assertFormError
       ~ScheduleDUtilsTestCase.assertFormSetError
-      ~ScheduleDUtilsTestCase.assertFormsetError
       ~ScheduleDUtilsTestCase.assertGreater
       ~ScheduleDUtilsTestCase.assertGreaterEqual
       ~ScheduleDUtilsTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.schedule\_d.tests.test\_utils.ScheduleDUtilsTestCase
       ~ScheduleDUtilsTestCase.assertNotEqual
       ~ScheduleDUtilsTestCase.assertNotEquals
       ~ScheduleDUtilsTestCase.assertNotIn
+      ~ScheduleDUtilsTestCase.assertNotInHTML
       ~ScheduleDUtilsTestCase.assertNotIsInstance
       ~ScheduleDUtilsTestCase.assertNotRegex
       ~ScheduleDUtilsTestCase.assertNotRegexpMatches
       ~ScheduleDUtilsTestCase.assertNumQueries
       ~ScheduleDUtilsTestCase.assertQuerySetEqual
-      ~ScheduleDUtilsTestCase.assertQuerysetEqual
       ~ScheduleDUtilsTestCase.assertRaises
       ~ScheduleDUtilsTestCase.assertRaisesMessage
       ~ScheduleDUtilsTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.transactions.schedule\_d.tests.test\_utils.ScheduleDUtilsTestCase
       ~ScheduleDUtilsTestCase.defaultTestResult
       ~ScheduleDUtilsTestCase.doClassCleanups
       ~ScheduleDUtilsTestCase.doCleanups
+      ~ScheduleDUtilsTestCase.ensure_connection_patch_method
+      ~ScheduleDUtilsTestCase.enterClassContext
       ~ScheduleDUtilsTestCase.fail
       ~ScheduleDUtilsTestCase.failIf
       ~ScheduleDUtilsTestCase.failIfAlmostEqual

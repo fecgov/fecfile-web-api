@@ -35,7 +35,6 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertFieldOutput
       ~TransactionSerializerBaseTestCase.assertFormError
       ~TransactionSerializerBaseTestCase.assertFormSetError
-      ~TransactionSerializerBaseTestCase.assertFormsetError
       ~TransactionSerializerBaseTestCase.assertGreater
       ~TransactionSerializerBaseTestCase.assertGreaterEqual
       ~TransactionSerializerBaseTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertNotEqual
       ~TransactionSerializerBaseTestCase.assertNotEquals
       ~TransactionSerializerBaseTestCase.assertNotIn
+      ~TransactionSerializerBaseTestCase.assertNotInHTML
       ~TransactionSerializerBaseTestCase.assertNotIsInstance
       ~TransactionSerializerBaseTestCase.assertNotRegex
       ~TransactionSerializerBaseTestCase.assertNotRegexpMatches
       ~TransactionSerializerBaseTestCase.assertNumQueries
       ~TransactionSerializerBaseTestCase.assertQuerySetEqual
-      ~TransactionSerializerBaseTestCase.assertQuerysetEqual
       ~TransactionSerializerBaseTestCase.assertRaises
       ~TransactionSerializerBaseTestCase.assertRaisesMessage
       ~TransactionSerializerBaseTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.defaultTestResult
       ~TransactionSerializerBaseTestCase.doClassCleanups
       ~TransactionSerializerBaseTestCase.doCleanups
+      ~TransactionSerializerBaseTestCase.ensure_connection_patch_method
+      ~TransactionSerializerBaseTestCase.enterClassContext
       ~TransactionSerializerBaseTestCase.fail
       ~TransactionSerializerBaseTestCase.failIf
       ~TransactionSerializerBaseTestCase.failIfAlmostEqual

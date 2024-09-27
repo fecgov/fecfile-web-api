@@ -35,7 +35,6 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertFieldOutput
       ~F3XReportTestCase.assertFormError
       ~F3XReportTestCase.assertFormSetError
-      ~F3XReportTestCase.assertFormsetError
       ~F3XReportTestCase.assertGreater
       ~F3XReportTestCase.assertGreaterEqual
       ~F3XReportTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertNotEqual
       ~F3XReportTestCase.assertNotEquals
       ~F3XReportTestCase.assertNotIn
+      ~F3XReportTestCase.assertNotInHTML
       ~F3XReportTestCase.assertNotIsInstance
       ~F3XReportTestCase.assertNotRegex
       ~F3XReportTestCase.assertNotRegexpMatches
       ~F3XReportTestCase.assertNumQueries
       ~F3XReportTestCase.assertQuerySetEqual
-      ~F3XReportTestCase.assertQuerysetEqual
       ~F3XReportTestCase.assertRaises
       ~F3XReportTestCase.assertRaisesMessage
       ~F3XReportTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.defaultTestResult
       ~F3XReportTestCase.doClassCleanups
       ~F3XReportTestCase.doCleanups
+      ~F3XReportTestCase.ensure_connection_patch_method
+      ~F3XReportTestCase.enterClassContext
       ~F3XReportTestCase.fail
       ~F3XReportTestCase.failIf
       ~F3XReportTestCase.failIfAlmostEqual

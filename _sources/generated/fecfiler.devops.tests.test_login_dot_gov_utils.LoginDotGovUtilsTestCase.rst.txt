@@ -35,7 +35,6 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_utils.LoginDotGovUtilsTestCase
       ~LoginDotGovUtilsTestCase.assertFieldOutput
       ~LoginDotGovUtilsTestCase.assertFormError
       ~LoginDotGovUtilsTestCase.assertFormSetError
-      ~LoginDotGovUtilsTestCase.assertFormsetError
       ~LoginDotGovUtilsTestCase.assertGreater
       ~LoginDotGovUtilsTestCase.assertGreaterEqual
       ~LoginDotGovUtilsTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_utils.LoginDotGovUtilsTestCase
       ~LoginDotGovUtilsTestCase.assertNotEqual
       ~LoginDotGovUtilsTestCase.assertNotEquals
       ~LoginDotGovUtilsTestCase.assertNotIn
+      ~LoginDotGovUtilsTestCase.assertNotInHTML
       ~LoginDotGovUtilsTestCase.assertNotIsInstance
       ~LoginDotGovUtilsTestCase.assertNotRegex
       ~LoginDotGovUtilsTestCase.assertNotRegexpMatches
       ~LoginDotGovUtilsTestCase.assertNumQueries
       ~LoginDotGovUtilsTestCase.assertQuerySetEqual
-      ~LoginDotGovUtilsTestCase.assertQuerysetEqual
       ~LoginDotGovUtilsTestCase.assertRaises
       ~LoginDotGovUtilsTestCase.assertRaisesMessage
       ~LoginDotGovUtilsTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_utils.LoginDotGovUtilsTestCase
       ~LoginDotGovUtilsTestCase.defaultTestResult
       ~LoginDotGovUtilsTestCase.doClassCleanups
       ~LoginDotGovUtilsTestCase.doCleanups
+      ~LoginDotGovUtilsTestCase.ensure_connection_patch_method
+      ~LoginDotGovUtilsTestCase.enterClassContext
       ~LoginDotGovUtilsTestCase.fail
       ~LoginDotGovUtilsTestCase.failIf
       ~LoginDotGovUtilsTestCase.failIfAlmostEqual

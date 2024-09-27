@@ -35,7 +35,6 @@ fecfiler.mock\_openfec.test\_mock\_endpoints.MockEndpointsTest
       ~MockEndpointsTest.assertFieldOutput
       ~MockEndpointsTest.assertFormError
       ~MockEndpointsTest.assertFormSetError
-      ~MockEndpointsTest.assertFormsetError
       ~MockEndpointsTest.assertGreater
       ~MockEndpointsTest.assertGreaterEqual
       ~MockEndpointsTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.mock\_openfec.test\_mock\_endpoints.MockEndpointsTest
       ~MockEndpointsTest.assertNotEqual
       ~MockEndpointsTest.assertNotEquals
       ~MockEndpointsTest.assertNotIn
+      ~MockEndpointsTest.assertNotInHTML
       ~MockEndpointsTest.assertNotIsInstance
       ~MockEndpointsTest.assertNotRegex
       ~MockEndpointsTest.assertNotRegexpMatches
       ~MockEndpointsTest.assertNumQueries
       ~MockEndpointsTest.assertQuerySetEqual
-      ~MockEndpointsTest.assertQuerysetEqual
       ~MockEndpointsTest.assertRaises
       ~MockEndpointsTest.assertRaisesMessage
       ~MockEndpointsTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.mock\_openfec.test\_mock\_endpoints.MockEndpointsTest
       ~MockEndpointsTest.defaultTestResult
       ~MockEndpointsTest.doClassCleanups
       ~MockEndpointsTest.doCleanups
+      ~MockEndpointsTest.ensure_connection_patch_method
+      ~MockEndpointsTest.enterClassContext
       ~MockEndpointsTest.fail
       ~MockEndpointsTest.failIf
       ~MockEndpointsTest.failIfAlmostEqual

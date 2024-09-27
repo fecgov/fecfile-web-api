@@ -35,7 +35,6 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertFieldOutput
       ~F1MSerializerTestCase.assertFormError
       ~F1MSerializerTestCase.assertFormSetError
-      ~F1MSerializerTestCase.assertFormsetError
       ~F1MSerializerTestCase.assertGreater
       ~F1MSerializerTestCase.assertGreaterEqual
       ~F1MSerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertNotEqual
       ~F1MSerializerTestCase.assertNotEquals
       ~F1MSerializerTestCase.assertNotIn
+      ~F1MSerializerTestCase.assertNotInHTML
       ~F1MSerializerTestCase.assertNotIsInstance
       ~F1MSerializerTestCase.assertNotRegex
       ~F1MSerializerTestCase.assertNotRegexpMatches
       ~F1MSerializerTestCase.assertNumQueries
       ~F1MSerializerTestCase.assertQuerySetEqual
-      ~F1MSerializerTestCase.assertQuerysetEqual
       ~F1MSerializerTestCase.assertRaises
       ~F1MSerializerTestCase.assertRaisesMessage
       ~F1MSerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.defaultTestResult
       ~F1MSerializerTestCase.doClassCleanups
       ~F1MSerializerTestCase.doCleanups
+      ~F1MSerializerTestCase.ensure_connection_patch_method
+      ~F1MSerializerTestCase.enterClassContext
       ~F1MSerializerTestCase.fail
       ~F1MSerializerTestCase.failIf
       ~F1MSerializerTestCase.failIfAlmostEqual

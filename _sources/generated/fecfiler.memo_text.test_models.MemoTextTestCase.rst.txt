@@ -35,7 +35,6 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertFieldOutput
       ~MemoTextTestCase.assertFormError
       ~MemoTextTestCase.assertFormSetError
-      ~MemoTextTestCase.assertFormsetError
       ~MemoTextTestCase.assertGreater
       ~MemoTextTestCase.assertGreaterEqual
       ~MemoTextTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertNotEqual
       ~MemoTextTestCase.assertNotEquals
       ~MemoTextTestCase.assertNotIn
+      ~MemoTextTestCase.assertNotInHTML
       ~MemoTextTestCase.assertNotIsInstance
       ~MemoTextTestCase.assertNotRegex
       ~MemoTextTestCase.assertNotRegexpMatches
       ~MemoTextTestCase.assertNumQueries
       ~MemoTextTestCase.assertQuerySetEqual
-      ~MemoTextTestCase.assertQuerysetEqual
       ~MemoTextTestCase.assertRaises
       ~MemoTextTestCase.assertRaisesMessage
       ~MemoTextTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.defaultTestResult
       ~MemoTextTestCase.doClassCleanups
       ~MemoTextTestCase.doCleanups
+      ~MemoTextTestCase.ensure_connection_patch_method
+      ~MemoTextTestCase.enterClassContext
       ~MemoTextTestCase.fail
       ~MemoTextTestCase.failIf
       ~MemoTextTestCase.failIfAlmostEqual

@@ -35,7 +35,6 @@ fecfiler.user.test\_views.UserViewSetTest
       ~UserViewSetTest.assertFieldOutput
       ~UserViewSetTest.assertFormError
       ~UserViewSetTest.assertFormSetError
-      ~UserViewSetTest.assertFormsetError
       ~UserViewSetTest.assertGreater
       ~UserViewSetTest.assertGreaterEqual
       ~UserViewSetTest.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.user.test\_views.UserViewSetTest
       ~UserViewSetTest.assertNotEqual
       ~UserViewSetTest.assertNotEquals
       ~UserViewSetTest.assertNotIn
+      ~UserViewSetTest.assertNotInHTML
       ~UserViewSetTest.assertNotIsInstance
       ~UserViewSetTest.assertNotRegex
       ~UserViewSetTest.assertNotRegexpMatches
       ~UserViewSetTest.assertNumQueries
       ~UserViewSetTest.assertQuerySetEqual
-      ~UserViewSetTest.assertQuerysetEqual
       ~UserViewSetTest.assertRaises
       ~UserViewSetTest.assertRaisesMessage
       ~UserViewSetTest.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.user.test\_views.UserViewSetTest
       ~UserViewSetTest.defaultTestResult
       ~UserViewSetTest.doClassCleanups
       ~UserViewSetTest.doCleanups
+      ~UserViewSetTest.ensure_connection_patch_method
+      ~UserViewSetTest.enterClassContext
       ~UserViewSetTest.fail
       ~UserViewSetTest.failIf
       ~UserViewSetTest.failIfAlmostEqual

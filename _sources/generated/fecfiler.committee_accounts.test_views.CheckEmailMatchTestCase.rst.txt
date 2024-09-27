@@ -35,7 +35,6 @@ fecfiler.committee\_accounts.test\_views.CheckEmailMatchTestCase
       ~CheckEmailMatchTestCase.assertFieldOutput
       ~CheckEmailMatchTestCase.assertFormError
       ~CheckEmailMatchTestCase.assertFormSetError
-      ~CheckEmailMatchTestCase.assertFormsetError
       ~CheckEmailMatchTestCase.assertGreater
       ~CheckEmailMatchTestCase.assertGreaterEqual
       ~CheckEmailMatchTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.committee\_accounts.test\_views.CheckEmailMatchTestCase
       ~CheckEmailMatchTestCase.assertNotEqual
       ~CheckEmailMatchTestCase.assertNotEquals
       ~CheckEmailMatchTestCase.assertNotIn
+      ~CheckEmailMatchTestCase.assertNotInHTML
       ~CheckEmailMatchTestCase.assertNotIsInstance
       ~CheckEmailMatchTestCase.assertNotRegex
       ~CheckEmailMatchTestCase.assertNotRegexpMatches
       ~CheckEmailMatchTestCase.assertNumQueries
       ~CheckEmailMatchTestCase.assertQuerySetEqual
-      ~CheckEmailMatchTestCase.assertQuerysetEqual
       ~CheckEmailMatchTestCase.assertRaises
       ~CheckEmailMatchTestCase.assertRaisesMessage
       ~CheckEmailMatchTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.committee\_accounts.test\_views.CheckEmailMatchTestCase
       ~CheckEmailMatchTestCase.defaultTestResult
       ~CheckEmailMatchTestCase.doClassCleanups
       ~CheckEmailMatchTestCase.doCleanups
+      ~CheckEmailMatchTestCase.ensure_connection_patch_method
+      ~CheckEmailMatchTestCase.enterClassContext
       ~CheckEmailMatchTestCase.fail
       ~CheckEmailMatchTestCase.failIf
       ~CheckEmailMatchTestCase.failIfAlmostEqual

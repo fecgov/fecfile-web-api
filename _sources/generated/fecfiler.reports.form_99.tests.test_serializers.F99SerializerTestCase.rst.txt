@@ -35,7 +35,6 @@ fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
       ~F99SerializerTestCase.assertFieldOutput
       ~F99SerializerTestCase.assertFormError
       ~F99SerializerTestCase.assertFormSetError
-      ~F99SerializerTestCase.assertFormsetError
       ~F99SerializerTestCase.assertGreater
       ~F99SerializerTestCase.assertGreaterEqual
       ~F99SerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
       ~F99SerializerTestCase.assertNotEqual
       ~F99SerializerTestCase.assertNotEquals
       ~F99SerializerTestCase.assertNotIn
+      ~F99SerializerTestCase.assertNotInHTML
       ~F99SerializerTestCase.assertNotIsInstance
       ~F99SerializerTestCase.assertNotRegex
       ~F99SerializerTestCase.assertNotRegexpMatches
       ~F99SerializerTestCase.assertNumQueries
       ~F99SerializerTestCase.assertQuerySetEqual
-      ~F99SerializerTestCase.assertQuerysetEqual
       ~F99SerializerTestCase.assertRaises
       ~F99SerializerTestCase.assertRaisesMessage
       ~F99SerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.reports.form\_99.tests.test\_serializers.F99SerializerTestCase
       ~F99SerializerTestCase.defaultTestResult
       ~F99SerializerTestCase.doClassCleanups
       ~F99SerializerTestCase.doCleanups
+      ~F99SerializerTestCase.ensure_connection_patch_method
+      ~F99SerializerTestCase.enterClassContext
       ~F99SerializerTestCase.fail
       ~F99SerializerTestCase.failIf
       ~F99SerializerTestCase.failIfAlmostEqual

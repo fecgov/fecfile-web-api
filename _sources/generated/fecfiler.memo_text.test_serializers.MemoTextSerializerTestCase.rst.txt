@@ -35,7 +35,6 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertFieldOutput
       ~MemoTextSerializerTestCase.assertFormError
       ~MemoTextSerializerTestCase.assertFormSetError
-      ~MemoTextSerializerTestCase.assertFormsetError
       ~MemoTextSerializerTestCase.assertGreater
       ~MemoTextSerializerTestCase.assertGreaterEqual
       ~MemoTextSerializerTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertNotEqual
       ~MemoTextSerializerTestCase.assertNotEquals
       ~MemoTextSerializerTestCase.assertNotIn
+      ~MemoTextSerializerTestCase.assertNotInHTML
       ~MemoTextSerializerTestCase.assertNotIsInstance
       ~MemoTextSerializerTestCase.assertNotRegex
       ~MemoTextSerializerTestCase.assertNotRegexpMatches
       ~MemoTextSerializerTestCase.assertNumQueries
       ~MemoTextSerializerTestCase.assertQuerySetEqual
-      ~MemoTextSerializerTestCase.assertQuerysetEqual
       ~MemoTextSerializerTestCase.assertRaises
       ~MemoTextSerializerTestCase.assertRaisesMessage
       ~MemoTextSerializerTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.defaultTestResult
       ~MemoTextSerializerTestCase.doClassCleanups
       ~MemoTextSerializerTestCase.doCleanups
+      ~MemoTextSerializerTestCase.ensure_connection_patch_method
+      ~MemoTextSerializerTestCase.enterClassContext
       ~MemoTextSerializerTestCase.fail
       ~MemoTextSerializerTestCase.failIf
       ~MemoTextSerializerTestCase.failIfAlmostEqual

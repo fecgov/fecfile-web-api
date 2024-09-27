@@ -35,7 +35,6 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertFieldOutput
       ~CommitteeAccountTestCase.assertFormError
       ~CommitteeAccountTestCase.assertFormSetError
-      ~CommitteeAccountTestCase.assertFormsetError
       ~CommitteeAccountTestCase.assertGreater
       ~CommitteeAccountTestCase.assertGreaterEqual
       ~CommitteeAccountTestCase.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertNotEqual
       ~CommitteeAccountTestCase.assertNotEquals
       ~CommitteeAccountTestCase.assertNotIn
+      ~CommitteeAccountTestCase.assertNotInHTML
       ~CommitteeAccountTestCase.assertNotIsInstance
       ~CommitteeAccountTestCase.assertNotRegex
       ~CommitteeAccountTestCase.assertNotRegexpMatches
       ~CommitteeAccountTestCase.assertNumQueries
       ~CommitteeAccountTestCase.assertQuerySetEqual
-      ~CommitteeAccountTestCase.assertQuerysetEqual
       ~CommitteeAccountTestCase.assertRaises
       ~CommitteeAccountTestCase.assertRaisesMessage
       ~CommitteeAccountTestCase.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.defaultTestResult
       ~CommitteeAccountTestCase.doClassCleanups
       ~CommitteeAccountTestCase.doCleanups
+      ~CommitteeAccountTestCase.ensure_connection_patch_method
+      ~CommitteeAccountTestCase.enterClassContext
       ~CommitteeAccountTestCase.fail
       ~CommitteeAccountTestCase.failIf
       ~CommitteeAccountTestCase.failIfAlmostEqual

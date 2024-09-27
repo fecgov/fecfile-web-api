@@ -35,7 +35,6 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertFieldOutput
       ~FecSchemaValidatorSerializerMixin.assertFormError
       ~FecSchemaValidatorSerializerMixin.assertFormSetError
-      ~FecSchemaValidatorSerializerMixin.assertFormsetError
       ~FecSchemaValidatorSerializerMixin.assertGreater
       ~FecSchemaValidatorSerializerMixin.assertGreaterEqual
       ~FecSchemaValidatorSerializerMixin.assertHTMLEqual
@@ -61,12 +60,12 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertNotEqual
       ~FecSchemaValidatorSerializerMixin.assertNotEquals
       ~FecSchemaValidatorSerializerMixin.assertNotIn
+      ~FecSchemaValidatorSerializerMixin.assertNotInHTML
       ~FecSchemaValidatorSerializerMixin.assertNotIsInstance
       ~FecSchemaValidatorSerializerMixin.assertNotRegex
       ~FecSchemaValidatorSerializerMixin.assertNotRegexpMatches
       ~FecSchemaValidatorSerializerMixin.assertNumQueries
       ~FecSchemaValidatorSerializerMixin.assertQuerySetEqual
-      ~FecSchemaValidatorSerializerMixin.assertQuerysetEqual
       ~FecSchemaValidatorSerializerMixin.assertRaises
       ~FecSchemaValidatorSerializerMixin.assertRaisesMessage
       ~FecSchemaValidatorSerializerMixin.assertRaisesRegex
@@ -93,6 +92,8 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.defaultTestResult
       ~FecSchemaValidatorSerializerMixin.doClassCleanups
       ~FecSchemaValidatorSerializerMixin.doCleanups
+      ~FecSchemaValidatorSerializerMixin.ensure_connection_patch_method
+      ~FecSchemaValidatorSerializerMixin.enterClassContext
       ~FecSchemaValidatorSerializerMixin.fail
       ~FecSchemaValidatorSerializerMixin.failIf
       ~FecSchemaValidatorSerializerMixin.failIfAlmostEqual
