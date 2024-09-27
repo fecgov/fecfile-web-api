@@ -25,5 +25,20 @@
         "street_1": "1234 Street",
         "city": "Washington",
         "zip": "20001"
+    },
+    {
+        "committee_id": "C99999998",
+        "committee_name": "Test Committee PTY",
+        "committee_type": "D",
+        "form_type": "F1",
+        "receipt_date": "2024-01-01T00:00:00",
+        "report_year": 2024,
+        "treasurer_name": "Last, First",
+        "update_date": "2024-01-01",
+        "email": "test@test.com",
+        "state": "DC",
+        "street_1": "1234 Street",
+        "city": "Washington",
+        "zip": "20001"
     }
 ]
