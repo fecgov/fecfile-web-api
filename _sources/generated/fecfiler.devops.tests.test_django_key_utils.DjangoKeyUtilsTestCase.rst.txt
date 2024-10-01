@@ -1,0 +1,138 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
+=====================================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_django_key_utils
+
+.. autoclass:: DjangoKeyUtilsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DjangoKeyUtilsTestCase.__init__
+      ~DjangoKeyUtilsTestCase.addClassCleanup
+      ~DjangoKeyUtilsTestCase.addCleanup
+      ~DjangoKeyUtilsTestCase.addTypeEqualityFunc
+      ~DjangoKeyUtilsTestCase.assertAlmostEqual
+      ~DjangoKeyUtilsTestCase.assertAlmostEquals
+      ~DjangoKeyUtilsTestCase.assertContains
+      ~DjangoKeyUtilsTestCase.assertCountEqual
+      ~DjangoKeyUtilsTestCase.assertDictContainsSubset
+      ~DjangoKeyUtilsTestCase.assertDictEqual
+      ~DjangoKeyUtilsTestCase.assertEqual
+      ~DjangoKeyUtilsTestCase.assertEquals
+      ~DjangoKeyUtilsTestCase.assertFalse
+      ~DjangoKeyUtilsTestCase.assertFieldOutput
+      ~DjangoKeyUtilsTestCase.assertFormError
+      ~DjangoKeyUtilsTestCase.assertFormSetError
+      ~DjangoKeyUtilsTestCase.assertGreater
+      ~DjangoKeyUtilsTestCase.assertGreaterEqual
+      ~DjangoKeyUtilsTestCase.assertHTMLEqual
+      ~DjangoKeyUtilsTestCase.assertHTMLNotEqual
+      ~DjangoKeyUtilsTestCase.assertIn
+      ~DjangoKeyUtilsTestCase.assertInHTML
+      ~DjangoKeyUtilsTestCase.assertIs
+      ~DjangoKeyUtilsTestCase.assertIsInstance
+      ~DjangoKeyUtilsTestCase.assertIsNone
+      ~DjangoKeyUtilsTestCase.assertIsNot
+      ~DjangoKeyUtilsTestCase.assertIsNotNone
+      ~DjangoKeyUtilsTestCase.assertJSONEqual
+      ~DjangoKeyUtilsTestCase.assertJSONNotEqual
+      ~DjangoKeyUtilsTestCase.assertLess
+      ~DjangoKeyUtilsTestCase.assertLessEqual
+      ~DjangoKeyUtilsTestCase.assertListEqual
+      ~DjangoKeyUtilsTestCase.assertLogs
+      ~DjangoKeyUtilsTestCase.assertMultiLineEqual
+      ~DjangoKeyUtilsTestCase.assertNoLogs
+      ~DjangoKeyUtilsTestCase.assertNotAlmostEqual
+      ~DjangoKeyUtilsTestCase.assertNotAlmostEquals
+      ~DjangoKeyUtilsTestCase.assertNotContains
+      ~DjangoKeyUtilsTestCase.assertNotEqual
+      ~DjangoKeyUtilsTestCase.assertNotEquals
+      ~DjangoKeyUtilsTestCase.assertNotIn
+      ~DjangoKeyUtilsTestCase.assertNotInHTML
+      ~DjangoKeyUtilsTestCase.assertNotIsInstance
+      ~DjangoKeyUtilsTestCase.assertNotRegex
+      ~DjangoKeyUtilsTestCase.assertNotRegexpMatches
+      ~DjangoKeyUtilsTestCase.assertNumQueries
+      ~DjangoKeyUtilsTestCase.assertQuerySetEqual
+      ~DjangoKeyUtilsTestCase.assertRaises
+      ~DjangoKeyUtilsTestCase.assertRaisesMessage
+      ~DjangoKeyUtilsTestCase.assertRaisesRegex
+      ~DjangoKeyUtilsTestCase.assertRaisesRegexp
+      ~DjangoKeyUtilsTestCase.assertRedirects
+      ~DjangoKeyUtilsTestCase.assertRegex
+      ~DjangoKeyUtilsTestCase.assertRegexpMatches
+      ~DjangoKeyUtilsTestCase.assertSequenceEqual
+      ~DjangoKeyUtilsTestCase.assertSetEqual
+      ~DjangoKeyUtilsTestCase.assertTemplateNotUsed
+      ~DjangoKeyUtilsTestCase.assertTemplateUsed
+      ~DjangoKeyUtilsTestCase.assertTrue
+      ~DjangoKeyUtilsTestCase.assertTupleEqual
+      ~DjangoKeyUtilsTestCase.assertURLEqual
+      ~DjangoKeyUtilsTestCase.assertWarns
+      ~DjangoKeyUtilsTestCase.assertWarnsMessage
+      ~DjangoKeyUtilsTestCase.assertWarnsRegex
+      ~DjangoKeyUtilsTestCase.assertXMLEqual
+      ~DjangoKeyUtilsTestCase.assertXMLNotEqual
+      ~DjangoKeyUtilsTestCase.assert_
+      ~DjangoKeyUtilsTestCase.captureOnCommitCallbacks
+      ~DjangoKeyUtilsTestCase.countTestCases
+      ~DjangoKeyUtilsTestCase.debug
+      ~DjangoKeyUtilsTestCase.defaultTestResult
+      ~DjangoKeyUtilsTestCase.doClassCleanups
+      ~DjangoKeyUtilsTestCase.doCleanups
+      ~DjangoKeyUtilsTestCase.ensure_connection_patch_method
+      ~DjangoKeyUtilsTestCase.enterClassContext
+      ~DjangoKeyUtilsTestCase.fail
+      ~DjangoKeyUtilsTestCase.failIf
+      ~DjangoKeyUtilsTestCase.failIfAlmostEqual
+      ~DjangoKeyUtilsTestCase.failIfEqual
+      ~DjangoKeyUtilsTestCase.failUnless
+      ~DjangoKeyUtilsTestCase.failUnlessAlmostEqual
+      ~DjangoKeyUtilsTestCase.failUnlessEqual
+      ~DjangoKeyUtilsTestCase.failUnlessRaises
+      ~DjangoKeyUtilsTestCase.id
+      ~DjangoKeyUtilsTestCase.modify_settings
+      ~DjangoKeyUtilsTestCase.run
+      ~DjangoKeyUtilsTestCase.setUp
+      ~DjangoKeyUtilsTestCase.setUpClass
+      ~DjangoKeyUtilsTestCase.setUpTestData
+      ~DjangoKeyUtilsTestCase.settings
+      ~DjangoKeyUtilsTestCase.shortDescription
+      ~DjangoKeyUtilsTestCase.skipTest
+      ~DjangoKeyUtilsTestCase.subTest
+      ~DjangoKeyUtilsTestCase.tearDown
+      ~DjangoKeyUtilsTestCase.tearDownClass
+      ~DjangoKeyUtilsTestCase.test_clear_fallback_django_keys_happy_path
+      ~DjangoKeyUtilsTestCase.test_clear_fallback_django_keys_throws_exception
+      ~DjangoKeyUtilsTestCase.test_gen_and_install_django_key_happy_path
+      ~DjangoKeyUtilsTestCase.test_gen_and_install_django_key_throws_exception
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DjangoKeyUtilsTestCase.available_apps
+      ~DjangoKeyUtilsTestCase.databases
+      ~DjangoKeyUtilsTestCase.fixtures
+      ~DjangoKeyUtilsTestCase.longMessage
+      ~DjangoKeyUtilsTestCase.maxDiff
+      ~DjangoKeyUtilsTestCase.reset_sequences
+      ~DjangoKeyUtilsTestCase.serialized_rollback
+   
+   

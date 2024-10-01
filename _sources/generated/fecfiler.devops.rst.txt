@@ -33,7 +33,8 @@ fecfiler.devops
 
    fecfiler.devops.cf_api_utils
    fecfiler.devops.crypt_utils
-   fecfiler.devops.login_dot_gov_utils
+   fecfiler.devops.django_key_utils
+   fecfiler.devops.login_dot_gov_cert_utils
    fecfiler.devops.management
    fecfiler.devops.tests
    fecfiler.devops.urls

@@ -1,6 +1,0 @@
-fecfiler.devops.login\_dot\_gov\_utils.stage\_login\_dot\_gov\_pk
-=================================================================
-
-.. currentmodule:: fecfiler.devops.login_dot_gov_utils
-
-.. autofunction:: stage_login_dot_gov_pk

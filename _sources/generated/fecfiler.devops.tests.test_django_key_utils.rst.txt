@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
     
-fecfiler.devops.tests.test\_login\_dot\_gov\_utils
-==================================================
+fecfiler.devops.tests.test\_django\_key\_utils
+==============================================
 
-.. automodule:: fecfiler.devops.tests.test_login_dot_gov_utils
+.. automodule:: fecfiler.devops.tests.test_django_key_utils
   
    
    
@@ -22,7 +22,7 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_utils
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      LoginDotGovUtilsTestCase
+      DjangoKeyUtilsTestCase
    
    
 

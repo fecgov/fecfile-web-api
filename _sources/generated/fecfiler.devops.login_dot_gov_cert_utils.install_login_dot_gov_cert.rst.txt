@@ -1,0 +1,6 @@
+fecfiler.devops.login\_dot\_gov\_cert\_utils.install\_login\_dot\_gov\_cert
+===========================================================================
+
+.. currentmodule:: fecfiler.devops.login_dot_gov_cert_utils
+
+.. autofunction:: install_login_dot_gov_cert
