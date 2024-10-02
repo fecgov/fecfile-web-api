@@ -313,5 +313,8 @@ class PollingTasksTestCase(TestCase):
             resolved_submission = WebPrintSubmission.objects.get(
                 id=webprint_submission.id
             )
-            self.assertEqual(resolved_submission.fecfile_task_state, FECSubmissionState.FAILED.value)
+            self.assertEqual(
+                resolved_submission.fecfile_task_state,
+                FECSubmissionState.FAILED.value
+            )
             self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)
