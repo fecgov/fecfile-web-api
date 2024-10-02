@@ -101,7 +101,7 @@ git checkout -b release/sprint-# develop
 git push --set-upstream origin release/sprint-#
 ```
 
-- Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to production.
+- Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to test/production.
 
 ### Create and deploy a hotfix
 
@@ -124,9 +124,9 @@ git push --set-upstream origin hotfix/my-fix
 - Developer creates a hotfix branch, commits changes, and **makes a PR to the `main` and `develop` branches**:
 - Reviewer merges hotfix/my-fix branch into `develop` and `main`
 - [auto] `develop` is deployed to `dev`. Make sure the build passes before deploying to `main`.
-- Developer deploys hotfix/my-fix branch to main using **Deploying a release to production** instructions below
+- Developer deploys hotfix/my-fix branch to main using **Deploying a release to test/production** instructions below
 
-### Deploying a release to production
+### Deploying a release to test/production
 
 - Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 - Check CircleCI for passing pipeline tests
@@ -145,7 +145,7 @@ git push --set-upstream origin hotfix/my-fix
 
 ## Technical Environment Plan
 
-The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, and prod). Each cloud.gov fecfile-web-api application has at least two instances running. Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, and prod). There are also at least two instances running per cloud.gov fecfile-web-app application.
+The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, test, and prod). Each cloud.gov fecfile-web-api application has at least two instances running. Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, test, and prod). There are also at least two instances running per cloud.gov fecfile-web-app application.
 
 The following events occur for fecfile-web-api and fecfile-web-app independently of each other:
 
@@ -153,7 +153,8 @@ The following events occur for fecfile-web-api and fecfile-web-app independently
   - The Dev environment is used for the bulk of sprint integration and QA testing
 - When a release is cut (creating a release tag in git), that release is deployed to the stage environment on cloud.gov.
   - The Stage environment is used for final deployment preparation, integration testing, and final QA testing.
-- When the release is merged into the main branch, it is deployed to the prod environment on cloud.gov
+- When the release is merged into the main branch, it is deployed to the test and prod environments on cloud.gov
+  - The Test environment will be used by alpha users.
   - The Production environment will be used by end users once the application launches.
 
 ## Additional developer notes

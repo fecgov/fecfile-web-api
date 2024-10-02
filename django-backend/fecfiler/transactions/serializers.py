@@ -119,6 +119,7 @@ class TransactionSerializer(
                     "reatt_redes_associations",  # reattribution/redesignation
                     "reporttransaction",
                     "_form_type",
+                    "blocking_reports",
                 ]
             ] + [
                 "parent_transaction_id",
@@ -274,6 +275,7 @@ class TransactionSerializer(
                 }
             )
 
+        representation["can_delete"] = instance.can_delete
         return representation
 
     def validate(self, data):

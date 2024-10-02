@@ -1,8 +1,8 @@
 import json
 from uuid import uuid4 as uuid
 from django.test import TestCase
-from .dot_fec_submitter import MockDotFECSubmitter
-from .web_print_submitter import MockWebPrintSubmitter
+from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.committee_accounts.views import create_committee_view

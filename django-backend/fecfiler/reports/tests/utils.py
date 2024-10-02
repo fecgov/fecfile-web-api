@@ -4,6 +4,7 @@ from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
+from fecfiler.memo_text.models import MemoText
 
 
 def create_form3x(
@@ -53,6 +54,15 @@ def create_test_report(
 
 def create_form(form: Model, data):
     return form.objects.create(**data)
+
+
+def create_report_memo(committee_account, report, text4000):
+    return MemoText.objects.create(
+        rec_type="TEXT",
+        text4000=text4000,
+        committee_account_id=committee_account.id,
+        report_id=report.id,
+    )
 
 
 FORM_CLASS_TO_FIELD = {

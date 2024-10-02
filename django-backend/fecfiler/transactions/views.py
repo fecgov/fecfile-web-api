@@ -96,7 +96,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if hasattr(self, "action") and self.action in [
             "create",
             "update",
-            "delete",
+            "destroy",
             "save_transactions",
         ]:
             queryset = super().get_queryset()
@@ -149,9 +149,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             saved_transaction = self.save_transaction(request.data, request)
         return Response(saved_transaction.id)
 
-    def delete(self, request, *args, **kwargs):
-        response = super().delete(request, *args, **kwargs)
-        update_dependent_parent(self.get_object())
+    def destroy(self, request, *args, **kwargs):
+        # capture copy of transaction before deletion to use in update_dependent_parent
+        transaction = self.get_object()
+        with db_transaction.atomic():
+            response = super().destroy(request, *args, **kwargs)
+            # update parents that depend on this transaction
+            update_dependent_parent(transaction)
         return response
 
     def partial_update(self, request, pk=None):

@@ -113,6 +113,7 @@ services:
       FECFILE_GITHUB_TOKEN:
       EFO_POLLING_MAX_DURATION: 300
       EFO_POLLING_INTERVAL: 30
+      OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
     deploy:
       resources:
         limits:
