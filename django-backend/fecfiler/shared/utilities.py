@@ -18,10 +18,7 @@ def get_model_data(data, model):
 
 def get_float_from_string(string, fallback=None):
     try:
-        value = float(string)
-        if value is not None:
-            return value
-        return fallback
+        return float(string)
     except Exception:
         if fallback is not None:
             return fallback
