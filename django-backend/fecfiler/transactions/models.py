@@ -167,6 +167,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     def can_delete(self):
         return len(self.blocking_reports) == 0
 
+    @property
+    def filer_committee_id_number(self):
+        if not self.committee_account:
+            return None
+
+        return self.committee_account.committee_id
+
     def get_schedule(self):
         for schedule_key in [
             "schedule_a",
