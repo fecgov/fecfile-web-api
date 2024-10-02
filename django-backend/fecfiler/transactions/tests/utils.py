@@ -40,7 +40,11 @@ def create_schedule_a(
         contact_1=contact,
         group=group,
         report=report,
-        schedule_data={"contribution_date": date, "contribution_amount": amount, "contribution_purpose_descrip": purpose_description},
+        schedule_data={
+            "contribution_date": date,
+            "contribution_amount": amount,
+            "contribution_purpose_descrip": purpose_description
+        },
         transaction_data=transaction_data,
     )
 
