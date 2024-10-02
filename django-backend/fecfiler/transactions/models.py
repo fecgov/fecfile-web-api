@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.shared.utilities import generate_fec_uid
@@ -146,6 +147,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     loan_payment_to_date = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    # report ids of reports that have been submitted
+    # and in doing so have blocked this transaction from being deleted
+    blocking_reports = ArrayField(models.UUIDField(), blank=False, default=list())
 
     objects = TransactionManager()
 
@@ -158,6 +162,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     @property
     def children(self):
         return self.transaction_set.all()
+
+    @property
+    def can_delete(self):
+        return len(self.blocking_reports) == 0
 
     def get_schedule(self):
         for schedule_key in [
@@ -178,6 +186,74 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.memo_text.save()
 
         super(Transaction, self).save(*args, **kwargs)
+
+    def delete(self):
+        if not self.can_delete:
+            raise Exception("Transaction cannot be deleted")
+        if not self.deleted:
+            super(Transaction, self).delete()
+
+            # child transactions
+            child_transactions = Transaction.objects.filter(parent_transaction=self)
+            for child in child_transactions:
+                child.delete()
+
+            # transactions related to this debt
+            # delete any carry forwards or repayments related to this debt
+            debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
+            for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
+                carry_forward_or_repayment.delete()
+
+            # transactions related to a loan
+            # delete any carry forwards or repayments related to this loan
+            loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
+            for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
+                carry_forward_or_repayment.delete()
+
+            """
+            REATTRIBUTION/REDESIGNATION
+            """
+            # If this is a reattribution/redesignation 'from' transaction,
+            # delete the 'to' transaction
+            if (
+                self.schedule_a
+                and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
+            ) or (
+                self.schedule_b
+                and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
+            ):
+                self.parent_transaction.delete()
+
+            # If this reattribution/redesignation is tied to a copy of
+            # the original transaction, delete the copy
+            if self.reatt_redes and (
+                (
+                    self.reatt_redes.schedule_a
+                    and self.reatt_redes.schedule_a.reattribution_redesignation_tag
+                    == "REATTRIBUTED"
+                )
+                or (
+                    self.reatt_redes.schedule_b
+                    and self.reatt_redes.schedule_b.reattribution_redesignation_tag
+                    == "REDESIGNATED"
+                )
+            ):
+                self.reatt_redes.delete()
+
+            # Delete any reattribution/redesignation transactions
+            # related to this transaction (copy/from/to)"
+            reatributions_and_redesignations = Transaction.objects.filter(
+                reatt_redes=self
+            )
+            for reatribuiton_or_redesignation in reatributions_and_redesignations:
+                reatribuiton_or_redesignation.delete()
+
+            # coupled transactions
+            if (
+                self.parent_transaction
+                and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
+            ):
+                self.parent_transaction.delete()
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
@@ -240,3 +316,26 @@ SCHEDULE_TO_TABLE = {
     Schedule.D: "schedule_d",
     Schedule.E: "schedule_e",
 }
+
+COUPLED_TRANSACTION_TYPES = [
+    # EARMARK MEMOS
+    "EARMARK_MEMO",
+    "EARMARK_MEMO_CONVENTION_ACCOUNT",
+    "EARMARK_MEMO_HEADQUARTERS_ACCOUNT",
+    "EARMARK_MEMO_RECOUNT_ACCOUNT",
+    "PAC_EARMARK_MEMO",
+    # CONDUIT EARMARK OUTS
+    "CONDUIT_EARMARK_OUT_DEPOSITED",
+    "CONDUIT_EARMARK_OUT_UNDEPOSITED",
+    "PAC_CONDUIT_EARMARK_OUT_DEPOSITED",
+    "PAC_CONDUIT_EARMARK_OUT_UNDEPOSITED",
+    # IN KIND OUTS
+    "IN_KIND_OUT",
+    "PAC_IN_KIND_OUT",
+    "PARTY_IN_KIND_OUT",
+    # LOAN
+    "LOAN_MADE",
+    "LOAN_RECEIVED_FROM_BANK_RECEIPT",
+    "LOAN_RECEIVED_FROM_INDIVIDUAL_RECEIPT",
+    "C1_LOAN_AGREEMENT",
+]

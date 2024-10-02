@@ -22,7 +22,9 @@ applications:
       LOGIN_REDIRECT_SERVER_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/login-redirect
       LOGOUT_REDIRECT_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
       FEC_API: https://api.open.fec.gov/v1/
+      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       MOCK_OPENFEC: REDIS
+      SYSTEM_STATUS_CACHE_AGE: 60

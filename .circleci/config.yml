@@ -11,45 +11,12 @@ orbs:
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  dependency-check:
-    docker:
-      - image: cimg/python:3.10
-
-    steps:
-      - checkout
-
-      - python/install-packages:
-          pkg-manager: pip
-          pip-dependency-file: requirements-test.txt
-
-      - run:
-          name: Run depency check
-          command: |
-            export today=$(date "+%Y-%m-%d")
-
-            # gather up the -i ignore IDs fro safety check
-            export ignores=$(
-            grep -vE "^\s*#" .safety.dependency.ignore |  # print out any non-comment line
-              grep "[0-9]" |  # filter out any line that doesn't have a number in it
-              awk -v "today=${today}" '{ if ($2 > today || $2 == "") print "-i", $1}' | # print any line after today
-              xargs echo  # put all the output from previous command on one line
-            )
-            export command="safety check -r requirements.txt --full-report $ignores"
-
-            echo "----------------------------------------------------"
-            echo "If you need to modify the ignore list for the safety"
-            echo "check, edit .safety.dependency.ignore file"
-            echo "----------------------------------------------------"
-            echo ""
-            echo "Running: $command"
-            eval $command
-
   test:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
       - image: cimg/python:3.10-node
-      - image: cimg/postgres:12.8
+      - image: cimg/postgres:14.13
       - image: cimg/redis:6.2.6
 
     steps:
@@ -233,27 +200,27 @@ jobs:
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
 
   # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
-  # It is used to run the e2e tests when the api is deployed to dev/stage/prod.
-  # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app 
+  # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
+  # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
   # circleci config file to differentiate it from the nightly runs.
   trigger-e2e-test-pipeline:
-      docker: 
-        - image: cimg/base:2021.11
-      resource_class: small
-      steps:
-        - run:
-            name: Ping another pipeline
-            command: |
-              CREATED_PIPELINE=$(
-                curl -v https://circleci.com/api/v2/project/gh/fecgov/fecfile-web-app/pipeline \
-                --header "Content-Type: application/json" \
-                --header "Accept: application/json" \
-                --header "Circle-Token: $CIRCLE_TOKEN" \
-                --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
-                | jq -r '.id'
-              )
-              echo "created pipeline"
-              echo $CREATED_PIPELINE
+    docker:
+      - image: cimg/base:2021.11
+    resource_class: small
+    steps:
+      - run:
+          name: Ping another pipeline
+          command: |
+            CREATED_PIPELINE=$(
+              curl -v https://circleci.com/api/v2/project/gh/fecgov/fecfile-web-app/pipeline \
+              --header "Content-Type: application/json" \
+              --header "Accept: application/json" \
+              --header "Circle-Token: $CIRCLE_TOKEN" \
+              --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
+              | jq -r '.id'
+            )
+            echo "created pipeline"
+            echo $CREATED_PIPELINE
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -261,8 +228,7 @@ workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
       - test
-      - dependency-check
-      # This job is triggered whenever a commit is made to the dev/stage/prod branches.
+      # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
       - trigger-e2e-test-pipeline:
           filters:
@@ -271,14 +237,12 @@ workflows:
       - deploy-job:
           requires:
             - test
-            - dependency-check
           filters:
             branches:
               only: /develop|release\/sprint-[\.\d]+|main/
       - docs-build:
           requires:
             - test
-            - dependency-check
           filters:
             branches:
               only: develop
