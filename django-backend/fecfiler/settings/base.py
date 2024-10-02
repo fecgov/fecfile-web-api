@@ -357,16 +357,11 @@ WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 """EFO POLLING SETTINGS
 """
-EFO_POLLING_MAX_DURATION_DEFAULT = 300  # Max duration of polling in seconds
-EFO_POLLING_INTERVAL_DEFAULT = 30  # Time between requests in seconds
-
 EFO_POLLING_MAX_DURATION = get_float_from_string(
-    env.get_credential("EFO_POLLING_MAX_DURATION"),
-    EFO_POLLING_MAX_DURATION_DEFAULT
+    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
 )
 EFO_POLLING_INTERVAL = get_float_from_string(
-    env.get_credential("EFO_POLLING_INTERVAL"),
-    EFO_POLLING_INTERVAL_DEFAULT
+    env.get_credential("EFO_POLLING_INTERVAL", 30)
 )
 EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
 

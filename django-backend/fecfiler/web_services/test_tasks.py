@@ -198,7 +198,10 @@ class TasksTestCase(TestCase):
         )
 
 
-class TestWebPrintSubmitter(WebPrintSubmitter):
+class UnitTestWebPrintSubmitter(WebPrintSubmitter):
+    # A stand-in WebPrintSubmitter that returns PROCESSING on submission
+    # and always returns PROCESSING except on exactly the 4th polling attempt.
+
     def submit(self, email, dot_fec_bytes):
         """return an accepted message without reaching out to api"""
         return json.dumps(
@@ -254,7 +257,7 @@ class PollingTasksTestCase(TestCase):
         self.test_print_key = "UnitTestWebPrint"
         self.submission_managers = {
             self.mock_web_print_key: MockWebPrintSubmitter,
-            self.test_print_key: TestWebPrintSubmitter
+            self.test_print_key: UnitTestWebPrintSubmitter
 
         }
         self.submission_classes = {
@@ -310,5 +313,5 @@ class PollingTasksTestCase(TestCase):
             resolved_submission = WebPrintSubmission.objects.get(
                 id=webprint_submission.id
             )
-            self.assertEqual(resolved_submission.fec_status, FECStatus.FAILED.value)
+            self.assertEqual(resolved_submission.fecfile_task_state, FECSubmissionState.FAILED.value)
             self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)

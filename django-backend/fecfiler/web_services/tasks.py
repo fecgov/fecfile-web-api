@@ -247,7 +247,7 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
         ):
             if submission.fecfile_polling_attempts >= EFO_POLLING_MAX_ATTEMPTS:
                 logger.warning("POLLING ATTEMPTS EXCEEDED")
-                submission.fec_status = FECStatus.FAILED
+                submission.fecfile_task_state = FECSubmissionState.FAILED.value
             return resolve_final_submission_state(submission)
         else:
             return poll_for_fec_response.apply_async(

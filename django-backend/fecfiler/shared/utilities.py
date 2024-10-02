@@ -16,11 +16,13 @@ def get_model_data(data, model):
     return {field: data[field] for field in field_names if field in data}
 
 
-def get_float_from_string(string, fallback):
+def get_float_from_string(string, fallback=None):
     try:
         value = float(string)
         if value is not None:
             return value
         return fallback
     except Exception:
-        return fallback
+        if fallback is not None:
+            return fallback
+        raise ValueError("String to float conversion failed with no provided fallback")
