@@ -7,7 +7,8 @@ from .tasks import (
     create_dot_fec,
     submit_to_fec,
     submit_to_webprint,
-    poll_for_fec_response
+    poll_for_fec_response,
+    log_polling_notice
 )
 from .models import (
     DotFEC,
@@ -318,3 +319,6 @@ class PollingTasksTestCase(TestCase):
                 FECSubmissionState.FAILED.value
             )
             self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)
+
+    def test_log_polling_notice_does_not_crash(self):
+        self.assertIsNone(log_polling_notice())
