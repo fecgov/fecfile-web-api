@@ -285,6 +285,7 @@ def get_read_model(committee_uuid):
         form_type = models.TextField()
         effective_amount = models.DecimalField()
         back_reference_tran_id_number = models.TextField()
+        back_reference_sched_name = models.TextField()
         loan_key = models.TextField()
         incurred_prior = models.DecimalField()
         payment_prior = models.DecimalField()
