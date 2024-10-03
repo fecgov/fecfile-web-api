@@ -76,6 +76,7 @@ fecfiler.transactions.models.Transaction
       ~Transaction.debt_id
       ~Transaction.deleted
       ~Transaction.entity_type
+      ~Transaction.filer_committee_id_number
       ~Transaction.force_itemized
       ~Transaction.force_unaggregated
       ~Transaction.form_type
