@@ -55,6 +55,7 @@ def create_schedule_b(
     memo_code=False,
     report=None,
     loan_id=None,
+    debt_id=None,
 ):
     return create_test_transaction(
         type,
@@ -68,6 +69,7 @@ def create_schedule_b(
             "_form_type": form_type,
             "memo_code": memo_code,
             "loan_id": loan_id,
+            "debt_id": debt_id,
         },
     )
 
