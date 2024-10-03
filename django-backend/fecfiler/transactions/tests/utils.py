@@ -24,6 +24,7 @@ def create_schedule_a(
     itemized=False,
     report=None,
     parent_id=None,
+    purpose_description=None,
 ):
     transaction_data = {
         "_form_type": form_type,
@@ -39,7 +40,11 @@ def create_schedule_a(
         contact_1=contact,
         group=group,
         report=report,
-        schedule_data={"contribution_date": date, "contribution_amount": amount},
+        schedule_data={
+            "contribution_date": date,
+            "contribution_amount": amount,
+            "contribution_purpose_descrip": purpose_description
+        },
         transaction_data=transaction_data,
     )
 
@@ -231,6 +236,7 @@ def create_test_transaction(
         contact_1=contact_1,
         contact_2=contact_2,
         aggregation_group=group,
+        entity_type=getattr(contact_1, 'type', None),
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
         **(transaction_data or {})
     )
