@@ -23,11 +23,9 @@ from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
-    OIDC_OP_LOGOUT_ENDPOINT,
     FFAPI_COOKIE_DOMAIN,
     FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
     OIDC_ACR_VALUES,
-    OIDC_OP_AUTHORIZATION_ENDPOINT,
     LOGIN_REDIRECT_URL,
 )
 from fecfiler.authentication.utils import delete_user_logged_in_cookies
@@ -37,6 +35,8 @@ from .utils import (
     handle_oidc_callback_error,
     handle_oidc_callback_request,
 )
+
+from . import oidc_op_config
 
 from urllib.parse import urlencode
 import structlog
@@ -61,6 +61,7 @@ def login_redirect(request):
 @require_http_methods(["GET"])
 @permission_classes([])
 def logout_redirect(request):
+    logout(request)
     response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
     delete_user_logged_in_cookies(response)
     return response
@@ -85,7 +86,9 @@ def oidc_authenticate(request):
     }
     add_oidc_nonce_to_session(request, state, nonce)
     query = urlencode(params)
-    redirect_url = "{url}?{query}".format(url=OIDC_OP_AUTHORIZATION_ENDPOINT, query=query)
+    redirect_url = "{url}?{query}".format(
+        url=oidc_op_config.get_authorization_endpoint(), query=query
+    )
     response = HttpResponseRedirect(redirect_url)
     response.set_signed_cookie("oidc_state", state, secure=True, httponly=True)
     return response
@@ -121,7 +124,6 @@ def oidc_logout(request):
             "state": request.get_signed_cookie("oidc_state"),
         }
         query = urlencode(params)
-        op_logout_url = OIDC_OP_LOGOUT_ENDPOINT
+        op_logout_url = oidc_op_config.get_logout_endpoint()
         logout_url = f"{op_logout_url}?{query}"
-        logout(request)
     return HttpResponseRedirect(logout_url or LOGOUT_REDIRECT_URL)
