@@ -112,6 +112,7 @@ class BaseSubmission(models.Model):
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
     fecfile_error = models.TextField(null=True)
+    fecfile_polling_attempts = models.IntegerField(default=0)
 
     """FEC response fields"""
     fec_submission_id = models.CharField(max_length=255, null=True)

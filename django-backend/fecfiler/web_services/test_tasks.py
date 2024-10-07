@@ -1,6 +1,15 @@
+import json
 import timeit
-from django.test import TestCase, tag
-from .tasks import create_dot_fec, submit_to_fec, submit_to_webprint
+from uuid import uuid4
+from django.test import TestCase, tag, override_settings
+from unittest.mock import patch
+from .tasks import (
+    create_dot_fec,
+    submit_to_fec,
+    submit_to_webprint,
+    poll_for_fec_response,
+    log_polling_notice
+)
 from .models import (
     DotFEC,
     FECStatus,
@@ -16,6 +25,10 @@ from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.web_services.dot_fec.web_print_submitter import (
+    WebPrintSubmitter,
+    MockWebPrintSubmitter
+)
 
 import structlog
 
@@ -184,3 +197,128 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             webprint_submission.fec_image_url, "https://www.fec.gov/static/img/seal.svg"
         )
+
+
+class UnitTestWebPrintSubmitter(WebPrintSubmitter):
+    # A stand-in WebPrintSubmitter that returns PROCESSING on submission
+    # and always returns PROCESSING except on exactly the 4th polling attempt.
+
+    def submit(self, email, dot_fec_bytes):
+        """return an accepted message without reaching out to api"""
+        return json.dumps(
+            {
+                "status": FECStatus.PROCESSING.value,
+                "image_url": None,
+                "message": "Unit Test In Progress",
+                "submission_id": str(uuid4()),
+                "batch_id": 123,
+            }
+        )
+
+    def poll_status(self, batch_id, submission_id):
+        submission = WebPrintSubmission.objects.get(id=submission_id)
+        status = FECStatus.PROCESSING.value
+        if submission.fecfile_polling_attempts == 4:
+            status = FECStatus.COMPLETED.value
+        return json.dumps(
+            {
+                "status": status,
+                "image_url": "https://www.fec.gov/static/img/seal.svg",
+                "message": "This did not really come from FEC",
+                "submission_id": submission_id,
+                "batch_id": 123,
+            }
+        )
+
+
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
+class PollingTasksTestCase(TestCase):
+
+    def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        create_committee_view(self.committee.id)
+        self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        self.contact_1 = create_test_individual_contact(
+            "Smith", "John", self.committee.id
+        )
+
+        self.transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2023-01-05",
+            "123.45",
+            "GENERAL",
+            "SA11AI",
+            itemized=True,
+            report=self.f3x,
+        )
+
+        self.mock_web_print_key = "MockWebPrint"
+        self.test_print_key = "UnitTestWebPrint"
+        self.submission_managers = {
+            self.mock_web_print_key: MockWebPrintSubmitter,
+            self.test_print_key: UnitTestWebPrintSubmitter
+
+        }
+        self.submission_classes = {
+            self.mock_web_print_key: WebPrintSubmission,
+            self.test_print_key: WebPrintSubmission,
+        }
+
+    def test_submission_polling_completes(self):
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(
+            str(self.f3x.id)
+        )
+        self.assertNotEqual(webprint_submission.fec_status, FECStatus.COMPLETED)
+        poll_for_fec_response(
+            webprint_submission.id, self.mock_web_print_key, "Unit Testing Web Print"
+        )
+        resolved_submission = WebPrintSubmission.objects.get(id=webprint_submission.id)
+        self.assertEqual(resolved_submission.fec_status, FECStatus.COMPLETED)
+
+    def test_submission_ongoing_polling(self):
+        with patch.multiple(
+            'fecfiler.web_services.tasks',
+            SUBMISSION_MANAGERS=self.submission_managers,
+            SUBMISSION_CLASSES=self.submission_classes
+        ):
+            webprint_submission = WebPrintSubmission.objects.initiate_submission(
+                str(self.f3x.id)
+            )
+            webprint_submission.fec_submission_id = webprint_submission.id
+            webprint_submission.save()
+            self.assertEqual(webprint_submission.fecfile_polling_attempts, 0)
+            poll_for_fec_response(
+                webprint_submission.id, self.test_print_key, "Unit Testing Web Print"
+            )
+            ongoing_submission = WebPrintSubmission.objects.get(id=webprint_submission.id)
+            self.assertEqual(ongoing_submission.fec_status, FECStatus.COMPLETED.value)
+            self.assertEqual(ongoing_submission.fecfile_polling_attempts, 5)
+
+    def test_submission_polling_limit(self):
+        with patch.multiple(
+            'fecfiler.web_services.tasks',
+            SUBMISSION_MANAGERS=self.submission_managers,
+            SUBMISSION_CLASSES=self.submission_classes
+        ):
+            webprint_submission = WebPrintSubmission.objects.initiate_submission(
+                str(self.f3x.id)
+            )
+            webprint_submission.fec_submission_id = webprint_submission.id
+            webprint_submission.fecfile_polling_attempts = 6
+            webprint_submission.save()
+            poll_for_fec_response(
+                webprint_submission.id, self.test_print_key, "Unit Testing Web Print"
+            )
+            resolved_submission = WebPrintSubmission.objects.get(
+                id=webprint_submission.id
+            )
+            self.assertEqual(
+                resolved_submission.fecfile_task_state,
+                FECSubmissionState.FAILED.value
+            )
+            self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)
+
+    def test_log_polling_notice_does_not_crash(self):
+        self.assertIsNone(log_polling_notice())
