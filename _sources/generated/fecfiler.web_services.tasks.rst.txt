@@ -12,6 +12,14 @@ fecfiler.web\_services.tasks
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      log_polling_notice
+      resolve_final_submission_state
+   
    
 
    

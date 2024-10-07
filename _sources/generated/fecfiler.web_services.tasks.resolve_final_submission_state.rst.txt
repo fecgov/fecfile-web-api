@@ -1,0 +1,6 @@
+fecfiler.web\_services.tasks.resolve\_final\_submission\_state
+==============================================================
+
+.. currentmodule:: fecfiler.web_services.tasks
+
+.. autofunction:: resolve_final_submission_state

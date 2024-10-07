@@ -1,0 +1,6 @@
+fecfiler.shared.utilities.get\_float\_from\_string
+==================================================
+
+.. currentmodule:: fecfiler.shared.utilities
+
+.. autofunction:: get_float_from_string

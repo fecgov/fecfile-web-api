@@ -33,4 +33,5 @@ fecfiler.web\_services.migrations
 
    fecfiler.web_services.migrations.0001_initial
    fecfiler.web_services.migrations.0002_uploadsubmission_task_completed_and_more
+   fecfiler.web_services.migrations.0003_uploadsubmission_fecfile_polling_attempts_and_more
 

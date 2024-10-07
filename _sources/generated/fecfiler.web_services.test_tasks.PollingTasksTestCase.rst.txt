@@ -1,0 +1,138 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.test\_tasks.PollingTasksTestCase
+=======================================================
+
+.. currentmodule:: fecfiler.web_services.test_tasks
+
+.. autoclass:: PollingTasksTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PollingTasksTestCase.__init__
+      ~PollingTasksTestCase.addClassCleanup
+      ~PollingTasksTestCase.addCleanup
+      ~PollingTasksTestCase.addTypeEqualityFunc
+      ~PollingTasksTestCase.assertAlmostEqual
+      ~PollingTasksTestCase.assertAlmostEquals
+      ~PollingTasksTestCase.assertContains
+      ~PollingTasksTestCase.assertCountEqual
+      ~PollingTasksTestCase.assertDictContainsSubset
+      ~PollingTasksTestCase.assertDictEqual
+      ~PollingTasksTestCase.assertEqual
+      ~PollingTasksTestCase.assertEquals
+      ~PollingTasksTestCase.assertFalse
+      ~PollingTasksTestCase.assertFieldOutput
+      ~PollingTasksTestCase.assertFormError
+      ~PollingTasksTestCase.assertFormSetError
+      ~PollingTasksTestCase.assertGreater
+      ~PollingTasksTestCase.assertGreaterEqual
+      ~PollingTasksTestCase.assertHTMLEqual
+      ~PollingTasksTestCase.assertHTMLNotEqual
+      ~PollingTasksTestCase.assertIn
+      ~PollingTasksTestCase.assertInHTML
+      ~PollingTasksTestCase.assertIs
+      ~PollingTasksTestCase.assertIsInstance
+      ~PollingTasksTestCase.assertIsNone
+      ~PollingTasksTestCase.assertIsNot
+      ~PollingTasksTestCase.assertIsNotNone
+      ~PollingTasksTestCase.assertJSONEqual
+      ~PollingTasksTestCase.assertJSONNotEqual
+      ~PollingTasksTestCase.assertLess
+      ~PollingTasksTestCase.assertLessEqual
+      ~PollingTasksTestCase.assertListEqual
+      ~PollingTasksTestCase.assertLogs
+      ~PollingTasksTestCase.assertMultiLineEqual
+      ~PollingTasksTestCase.assertNoLogs
+      ~PollingTasksTestCase.assertNotAlmostEqual
+      ~PollingTasksTestCase.assertNotAlmostEquals
+      ~PollingTasksTestCase.assertNotContains
+      ~PollingTasksTestCase.assertNotEqual
+      ~PollingTasksTestCase.assertNotEquals
+      ~PollingTasksTestCase.assertNotIn
+      ~PollingTasksTestCase.assertNotInHTML
+      ~PollingTasksTestCase.assertNotIsInstance
+      ~PollingTasksTestCase.assertNotRegex
+      ~PollingTasksTestCase.assertNotRegexpMatches
+      ~PollingTasksTestCase.assertNumQueries
+      ~PollingTasksTestCase.assertQuerySetEqual
+      ~PollingTasksTestCase.assertRaises
+      ~PollingTasksTestCase.assertRaisesMessage
+      ~PollingTasksTestCase.assertRaisesRegex
+      ~PollingTasksTestCase.assertRaisesRegexp
+      ~PollingTasksTestCase.assertRedirects
+      ~PollingTasksTestCase.assertRegex
+      ~PollingTasksTestCase.assertRegexpMatches
+      ~PollingTasksTestCase.assertSequenceEqual
+      ~PollingTasksTestCase.assertSetEqual
+      ~PollingTasksTestCase.assertTemplateNotUsed
+      ~PollingTasksTestCase.assertTemplateUsed
+      ~PollingTasksTestCase.assertTrue
+      ~PollingTasksTestCase.assertTupleEqual
+      ~PollingTasksTestCase.assertURLEqual
+      ~PollingTasksTestCase.assertWarns
+      ~PollingTasksTestCase.assertWarnsMessage
+      ~PollingTasksTestCase.assertWarnsRegex
+      ~PollingTasksTestCase.assertXMLEqual
+      ~PollingTasksTestCase.assertXMLNotEqual
+      ~PollingTasksTestCase.assert_
+      ~PollingTasksTestCase.captureOnCommitCallbacks
+      ~PollingTasksTestCase.countTestCases
+      ~PollingTasksTestCase.debug
+      ~PollingTasksTestCase.defaultTestResult
+      ~PollingTasksTestCase.doClassCleanups
+      ~PollingTasksTestCase.doCleanups
+      ~PollingTasksTestCase.ensure_connection_patch_method
+      ~PollingTasksTestCase.enterClassContext
+      ~PollingTasksTestCase.fail
+      ~PollingTasksTestCase.failIf
+      ~PollingTasksTestCase.failIfAlmostEqual
+      ~PollingTasksTestCase.failIfEqual
+      ~PollingTasksTestCase.failUnless
+      ~PollingTasksTestCase.failUnlessAlmostEqual
+      ~PollingTasksTestCase.failUnlessEqual
+      ~PollingTasksTestCase.failUnlessRaises
+      ~PollingTasksTestCase.id
+      ~PollingTasksTestCase.modify_settings
+      ~PollingTasksTestCase.run
+      ~PollingTasksTestCase.setUp
+      ~PollingTasksTestCase.setUpClass
+      ~PollingTasksTestCase.setUpTestData
+      ~PollingTasksTestCase.settings
+      ~PollingTasksTestCase.shortDescription
+      ~PollingTasksTestCase.skipTest
+      ~PollingTasksTestCase.subTest
+      ~PollingTasksTestCase.tearDown
+      ~PollingTasksTestCase.tearDownClass
+      ~PollingTasksTestCase.test_log_polling_notice_does_not_crash
+      ~PollingTasksTestCase.test_submission_ongoing_polling
+      ~PollingTasksTestCase.test_submission_polling_completes
+      ~PollingTasksTestCase.test_submission_polling_limit
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PollingTasksTestCase.available_apps
+      ~PollingTasksTestCase.databases
+      ~PollingTasksTestCase.fixtures
+      ~PollingTasksTestCase.longMessage
+      ~PollingTasksTestCase.maxDiff
+      ~PollingTasksTestCase.reset_sequences
+      ~PollingTasksTestCase.serialized_rollback
+   
+   

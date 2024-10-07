@@ -114,6 +114,9 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.subTest
       ~SharedUtilitiesTestCase.tearDown
       ~SharedUtilitiesTestCase.tearDownClass
+      ~SharedUtilitiesTestCase.test_get_fallback_from_invalid_string
+      ~SharedUtilitiesTestCase.test_get_fallback_from_none_string
+      ~SharedUtilitiesTestCase.test_get_float_from_good_string
       ~SharedUtilitiesTestCase.test_uid_all_uppercase
       ~SharedUtilitiesTestCase.test_uid_has_length_20
    

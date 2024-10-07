@@ -65,6 +65,7 @@ fecfiler.web\_services.models.UploadSubmission
       ~UploadSubmission.fec_status
       ~UploadSubmission.fec_submission_id
       ~UploadSubmission.fecfile_error
+      ~UploadSubmission.fecfile_polling_attempts
       ~UploadSubmission.fecfile_task_state
       ~UploadSubmission.id
       ~UploadSubmission.objects

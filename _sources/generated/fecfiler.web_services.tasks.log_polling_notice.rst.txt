@@ -1,0 +1,6 @@
+fecfiler.web\_services.tasks.log\_polling\_notice
+=================================================
+
+.. currentmodule:: fecfiler.web_services.tasks
+
+.. autofunction:: log_polling_notice

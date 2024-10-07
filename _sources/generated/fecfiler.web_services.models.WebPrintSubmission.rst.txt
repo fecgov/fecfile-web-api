@@ -67,6 +67,7 @@ fecfiler.web\_services.models.WebPrintSubmission
       ~WebPrintSubmission.fec_status
       ~WebPrintSubmission.fec_submission_id
       ~WebPrintSubmission.fecfile_error
+      ~WebPrintSubmission.fecfile_polling_attempts
       ~WebPrintSubmission.fecfile_task_state
       ~WebPrintSubmission.id
       ~WebPrintSubmission.objects
