@@ -389,5 +389,8 @@ if MOCK_OPENFEC == "REDIS":
 else:
     MOCK_OPENFEC_REDIS_URL = None
 
+CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
+    "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []
+)
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

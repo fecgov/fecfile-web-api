@@ -2,7 +2,7 @@ from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
 from fecfiler.committee_accounts.views import (
-    register_committee,
+    create_committee_account,
     CommitteeMembershipViewSet,
     check_email_match,
 )
@@ -16,40 +16,51 @@ class CommitteeAccountsViewsTest(TestCase):
         call_command("load_committee_data")
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
         self.other_user = User.objects.create(email="test@fec.com", username="com")
-        self.register_error_message = "could not register committee"
+        self.create_error_message = "could not create committee account"
 
-    def test_register_committee(self):
-        account = register_committee("C12345678", self.test_user)
+    def test_create_committee_account(self):
+        account = create_committee_account("C12345678", self.test_user)
         self.assertEquals(account.committee_id, "C12345678")
 
-    def test_register_committee_existing(self):
-        account = register_committee("C12345678", self.test_user)
+    def test_create_committee_account_existing(self):
+        account = create_committee_account("C12345678", self.test_user)
         self.assertEquals(account.committee_id, "C12345678")
         self.assertRaisesMessage(
             Exception,
-            self.register_error_message,
-            register_committee,
+            self.create_error_message,
+            create_committee_account,
             committee_id="C12345678",
             user=self.test_user,
         )
 
-    def test_register_committee_mismatch_email(self):
+    def test_create_committee_account_mismatch_email(self):
         self.assertRaisesMessage(
             Exception,
-            self.register_error_message,
-            register_committee,
+            self.create_error_message,
+            create_committee_account,
             committee_id="C12345678",
             user=self.other_user,
         )
 
-    def test_register_committee_case_insensitive(self):
+    def test_create_committee_account_unauthorized_email(self):
+        self.assertRaisesMessage(
+            Exception,
+            self.create_error_message,
+            create_committee_account,
+            committee_id="C12345678",
+            user=User.objects.create(
+                email="test@unauthorized_domain.com", username="unauthorized_domeain"
+            ),
+        )
+
+    def test_create_committee_account_case_insensitive(self):
         self.test_user.email = self.test_user.email.upper()
-        account = register_committee("C12345678", self.test_user)
+        account = create_committee_account("C12345678", self.test_user)
         self.assertEquals(account.committee_id, "C12345678")
         self.assertRaisesMessage(
             Exception,
-            self.register_error_message,
-            register_committee,
+            self.create_error_message,
+            create_committee_account,
             committee_id="C12345678",
             user=self.test_user,
         )

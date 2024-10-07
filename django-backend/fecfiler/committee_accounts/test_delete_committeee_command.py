@@ -1,5 +1,5 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.views import register_committee
+from fecfiler.committee_accounts.views import create_committee_account
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
@@ -13,8 +13,8 @@ class CommitteeAccountsViewsTest(TestCase):
         call_command("load_committee_data")
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
 
-    def test_register_committee(self):
-        account = register_committee("C12345678", self.test_user)
+    def test_create_committee_account(self):
+        account = create_committee_account("C12345678", self.test_user)
         self.assertEquals(account.committee_id, "C12345678")
         report = account.report_set.create()
         transaction = report.transactions.create(committee_account=account)
