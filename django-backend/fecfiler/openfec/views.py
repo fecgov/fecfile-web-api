@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.mock_openfec.mock_endpoints import query_filings, committee
 import requests
-import re
 import fecfiler.settings as settings
 
 import structlog
