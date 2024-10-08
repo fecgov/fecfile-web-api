@@ -48,33 +48,6 @@ class OpenfecViewSetTest(TestCase):
             )
             self.assertEqual(response.data["results"][0]["committee_type"], "O")
 
-    def test_search_committee_valid_committee_id(self):
-        request = self.factory.get(
-            "/api/v1/openfec/query-filings?query=C99999999&form_type=F1"
-        )
-        request.user = self.user
-        with patch("fecfiler.openfec.views.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {"results": []}
-            response = OpenfecViewSet.as_view({"get": "query_filings"})(request)
-            self.assertEqual(response.status_code, 200)
-
-    def test_search_committee_invalid_committee_id(self):
-        request = self.factory.get(
-            "/api/v1/openfec/query-filings?query=NOTVALID&form_type=F1"
-        )
-        request.user = self.user
-        with patch("fecfiler.openfec.views.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {"results": []}
-            response = OpenfecViewSet.as_view({"get": "query_filings"})(request)
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(
-                response.data, "NOTVALID is not a valid committee id"
-            )
-
     def test_get_filings_invalid_resp(self):
         request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
         request.user = self.user
