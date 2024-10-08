@@ -1,0 +1,146 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f3x.DotFECForm3XTestCase
+====================================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_form_f3x
+
+.. autoclass:: DotFECForm3XTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECForm3XTestCase.__init__
+      ~DotFECForm3XTestCase.addClassCleanup
+      ~DotFECForm3XTestCase.addCleanup
+      ~DotFECForm3XTestCase.addTypeEqualityFunc
+      ~DotFECForm3XTestCase.assertAlmostEqual
+      ~DotFECForm3XTestCase.assertAlmostEquals
+      ~DotFECForm3XTestCase.assertContains
+      ~DotFECForm3XTestCase.assertCountEqual
+      ~DotFECForm3XTestCase.assertDictContainsSubset
+      ~DotFECForm3XTestCase.assertDictEqual
+      ~DotFECForm3XTestCase.assertEqual
+      ~DotFECForm3XTestCase.assertEquals
+      ~DotFECForm3XTestCase.assertFalse
+      ~DotFECForm3XTestCase.assertFieldOutput
+      ~DotFECForm3XTestCase.assertFormError
+      ~DotFECForm3XTestCase.assertFormSetError
+      ~DotFECForm3XTestCase.assertGreater
+      ~DotFECForm3XTestCase.assertGreaterEqual
+      ~DotFECForm3XTestCase.assertHTMLEqual
+      ~DotFECForm3XTestCase.assertHTMLNotEqual
+      ~DotFECForm3XTestCase.assertIn
+      ~DotFECForm3XTestCase.assertInHTML
+      ~DotFECForm3XTestCase.assertIs
+      ~DotFECForm3XTestCase.assertIsInstance
+      ~DotFECForm3XTestCase.assertIsNone
+      ~DotFECForm3XTestCase.assertIsNot
+      ~DotFECForm3XTestCase.assertIsNotNone
+      ~DotFECForm3XTestCase.assertJSONEqual
+      ~DotFECForm3XTestCase.assertJSONNotEqual
+      ~DotFECForm3XTestCase.assertLess
+      ~DotFECForm3XTestCase.assertLessEqual
+      ~DotFECForm3XTestCase.assertListEqual
+      ~DotFECForm3XTestCase.assertLogs
+      ~DotFECForm3XTestCase.assertMultiLineEqual
+      ~DotFECForm3XTestCase.assertNoLogs
+      ~DotFECForm3XTestCase.assertNotAlmostEqual
+      ~DotFECForm3XTestCase.assertNotAlmostEquals
+      ~DotFECForm3XTestCase.assertNotContains
+      ~DotFECForm3XTestCase.assertNotEqual
+      ~DotFECForm3XTestCase.assertNotEquals
+      ~DotFECForm3XTestCase.assertNotIn
+      ~DotFECForm3XTestCase.assertNotInHTML
+      ~DotFECForm3XTestCase.assertNotIsInstance
+      ~DotFECForm3XTestCase.assertNotRegex
+      ~DotFECForm3XTestCase.assertNotRegexpMatches
+      ~DotFECForm3XTestCase.assertNumQueries
+      ~DotFECForm3XTestCase.assertQuerySetEqual
+      ~DotFECForm3XTestCase.assertRaises
+      ~DotFECForm3XTestCase.assertRaisesMessage
+      ~DotFECForm3XTestCase.assertRaisesRegex
+      ~DotFECForm3XTestCase.assertRaisesRegexp
+      ~DotFECForm3XTestCase.assertRedirects
+      ~DotFECForm3XTestCase.assertRegex
+      ~DotFECForm3XTestCase.assertRegexpMatches
+      ~DotFECForm3XTestCase.assertSequenceEqual
+      ~DotFECForm3XTestCase.assertSetEqual
+      ~DotFECForm3XTestCase.assertTemplateNotUsed
+      ~DotFECForm3XTestCase.assertTemplateUsed
+      ~DotFECForm3XTestCase.assertTrue
+      ~DotFECForm3XTestCase.assertTupleEqual
+      ~DotFECForm3XTestCase.assertURLEqual
+      ~DotFECForm3XTestCase.assertWarns
+      ~DotFECForm3XTestCase.assertWarnsMessage
+      ~DotFECForm3XTestCase.assertWarnsRegex
+      ~DotFECForm3XTestCase.assertXMLEqual
+      ~DotFECForm3XTestCase.assertXMLNotEqual
+      ~DotFECForm3XTestCase.assert_
+      ~DotFECForm3XTestCase.captureOnCommitCallbacks
+      ~DotFECForm3XTestCase.countTestCases
+      ~DotFECForm3XTestCase.debug
+      ~DotFECForm3XTestCase.defaultTestResult
+      ~DotFECForm3XTestCase.doClassCleanups
+      ~DotFECForm3XTestCase.doCleanups
+      ~DotFECForm3XTestCase.ensure_connection_patch_method
+      ~DotFECForm3XTestCase.enterClassContext
+      ~DotFECForm3XTestCase.fail
+      ~DotFECForm3XTestCase.failIf
+      ~DotFECForm3XTestCase.failIfAlmostEqual
+      ~DotFECForm3XTestCase.failIfEqual
+      ~DotFECForm3XTestCase.failUnless
+      ~DotFECForm3XTestCase.failUnlessAlmostEqual
+      ~DotFECForm3XTestCase.failUnlessEqual
+      ~DotFECForm3XTestCase.failUnlessRaises
+      ~DotFECForm3XTestCase.id
+      ~DotFECForm3XTestCase.modify_settings
+      ~DotFECForm3XTestCase.run
+      ~DotFECForm3XTestCase.setUp
+      ~DotFECForm3XTestCase.setUpClass
+      ~DotFECForm3XTestCase.setUpTestData
+      ~DotFECForm3XTestCase.settings
+      ~DotFECForm3XTestCase.shortDescription
+      ~DotFECForm3XTestCase.skipTest
+      ~DotFECForm3XTestCase.subTest
+      ~DotFECForm3XTestCase.tearDown
+      ~DotFECForm3XTestCase.tearDownClass
+      ~DotFECForm3XTestCase.test_address
+      ~DotFECForm3XTestCase.test_change_of_address
+      ~DotFECForm3XTestCase.test_column_a
+      ~DotFECForm3XTestCase.test_column_b
+      ~DotFECForm3XTestCase.test_committee_id
+      ~DotFECForm3XTestCase.test_coverage
+      ~DotFECForm3XTestCase.test_date_signed
+      ~DotFECForm3XTestCase.test_election
+      ~DotFECForm3XTestCase.test_form_type
+      ~DotFECForm3XTestCase.test_qualified_committee
+      ~DotFECForm3XTestCase.test_report_code
+      ~DotFECForm3XTestCase.test_treasurer
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECForm3XTestCase.available_apps
+      ~DotFECForm3XTestCase.databases
+      ~DotFECForm3XTestCase.fixtures
+      ~DotFECForm3XTestCase.longMessage
+      ~DotFECForm3XTestCase.maxDiff
+      ~DotFECForm3XTestCase.reset_sequences
+      ~DotFECForm3XTestCase.serialized_rollback
+   
+   
