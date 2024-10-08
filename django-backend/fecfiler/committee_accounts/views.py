@@ -229,6 +229,7 @@ def check_email_match(email, f1_emails):
 
 
 def register_committee(committee_id, user):
+    case_safe_cid = committee_id.upper()
     email = user.email
 
     if MOCK_OPENFEC_REDIS_URL:
@@ -239,15 +240,15 @@ def register_committee(committee_id, user):
     f1_emails = (f1 or {}).get("email")
     failure_reason = check_email_match(email, f1_emails)
 
-    existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
+    existing_account = CommitteeAccount.objects.filter(committee_id=case_safe_cid).first()
     if existing_account:
-        failure_reason = f"Committee {committee_id} already registered"
+        failure_reason = f"Committee {case_safe_cid} already registered"
 
     if failure_reason:
         logger.error(f"Failure to register committee: {failure_reason}")
         raise ValidationError("could not register committee")
 
-    account = CommitteeAccount.objects.create(committee_id=committee_id)
+    account = CommitteeAccount.objects.create(committee_id=case_safe_cid)
     Membership.objects.create(
         committee_account=account,
         user=user,

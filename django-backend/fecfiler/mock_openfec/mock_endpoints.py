@@ -17,7 +17,7 @@ def committee(committee_id):
             (
                 committee
                 for committee in committees
-                if committee.get("committee_id") == committee_id
+                if committee.get("committee_id", "").upper() == committee_id.upper()
             ),
             None,
         )
@@ -62,5 +62,5 @@ def recent_f1(committee_id):
         return next(
             committee
             for committee in committees
-            if committee.get("committee_id") == committee_id
+            if committee.get("committee_id", "").upper() == committee_id.upper()
         )
