@@ -272,9 +272,7 @@ def create_committee_account(committee_id, user):
         failure_reason = f"Committee account {committee_id} already created"
 
     if not check_email_can_create_committee_account(email):
-        failure_reason = (
-            f"Email {committee_id} is not allowed to create a committee account"
-        )
+        failure_reason = f"Email {email} is not allowed to create a committee account"
 
     if failure_reason:
         logger.error(f"Failure to create committee account: {failure_reason}")

@@ -32,10 +32,6 @@ class OpenfecViewSet(viewsets.GenericViewSet):
         query = request.query_params.get("query")
         form_type = request.query_params.get("form_type")
 
-        committee_id_regex = re.compile('^C\\d{8}$')
-        if not committee_id_regex.match(query):
-            return Response(f"{query} is not a valid committee id", status=400)
-
         if settings.MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
         else:

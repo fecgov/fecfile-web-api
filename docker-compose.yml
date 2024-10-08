@@ -114,6 +114,7 @@ services:
       EFO_POLLING_MAX_DURATION: 300
       EFO_POLLING_INTERVAL: 30
       OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
+      CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST: '["test@test.com"]'
     deploy:
       resources:
         limits:
