@@ -59,6 +59,8 @@ services:
       WEBPRINT_EMAIL:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
     deploy:
       resources:
         limits:
@@ -89,9 +91,9 @@ services:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
       OIDC_RP_CLIENT_ID:
       OIDC_RP_CLIENT_SECRET:
-      LOGIN_REDIRECT_SERVER_URL:
-      LOGIN_REDIRECT_CLIENT_URL:
-      LOGOUT_REDIRECT_URL:
+      LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
+      LOGIN_REDIRECT_CLIENT_URL: http://localhost:4200
+      LOGOUT_REDIRECT_URL: http://localhost:8080/api/v1/oidc/logout-redirect
       SYSTEM_STATUS_CACHE_AGE:
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
@@ -109,6 +111,9 @@ services:
       LOG_FORMAT:
       MOCK_OPENFEC: REDIS
       FECFILE_GITHUB_TOKEN:
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
+      OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
     deploy:
       resources:
         limits:
@@ -117,6 +122,8 @@ services:
   nginx:
     build: https://github.com/fecgov/fecfile-api-proxy.git#develop
     container_name: fecfile-api-proxy
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
     ports:
       - 8080:8080
     depends_on:

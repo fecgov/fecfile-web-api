@@ -43,10 +43,6 @@ def compose_transactions(report_id):
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
         for transaction in transactions:
-            transaction.filer_committee_id_number = (
-                transaction.committee_account.committee_id
-            )
-
             if transaction.schedule_a:
                 add_schedule_a_contact_fields(transaction)
             if transaction.schedule_b:

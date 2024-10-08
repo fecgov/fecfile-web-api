@@ -23,10 +23,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse
-from django.utils.encoding import force_bytes, smart_bytes, smart_str
-from josepy.jwk import JWK
-from josepy.jws import JWS, Header
+from jwcrypto import jwk, jws
 from requests.exceptions import HTTPError
+
+from . import oidc_op_config
 
 from django.conf import settings
 
@@ -84,83 +84,28 @@ class OIDCAuthenticationBackend(ModelBackend):
         user.save()
         return user
 
-    def _verify_jws(self, payload, key):
-        """Verify the given JWS payload with the given key and return the payload"""
-        jws = JWS.from_compact(payload)
-
-        try:
-            alg = jws.signature.combined.alg.name
-        except AttributeError:
-            msg = "No alg value found in header"
-            raise SuspiciousOperation(msg)
-
-        if alg != settings.OIDC_RP_SIGN_ALGO:
-            msg = (
-                "The provider algorithm {!r} does not match the client's "
-                "OIDC_RP_SIGN_ALGO.".format(alg)
-            )
-            raise SuspiciousOperation(msg)
-
-        if isinstance(key, str):
-            # Use smart_bytes here since the key string comes from settings.
-            jwk = JWK.load(smart_bytes(key))
-        else:
-            # The key is a json returned from the IDP JWKS endpoint.
-            jwk = JWK.from_json(key)
-
-        if not jws.verify(jwk):
-            msg = "JWS token verification failed."
-            raise SuspiciousOperation(msg)
-
-        return jws.payload
-
-    def retrieve_matching_jwk(self, token):
-        """Get the signing key by exploring the JWKS endpoint of the OP."""
+    def retrieve_matching_jwk(self, kid):
         response_jwks = requests.get(
-            settings.OIDC_OP_JWKS_ENDPOINT,
+            oidc_op_config.get_jwks_endpoint(),
             verify=True,
             timeout=None,
             proxies=None,
         )
         response_jwks.raise_for_status()
-        jwks = response_jwks.json()
-
-        # Compute the current header from the given token to find a match
-        jws = JWS.from_compact(token)
-        json_header = jws.signature.protected
-        header = Header.json_loads(json_header)
-
-        key = None
-        for jwk in jwks["keys"]:
-            if jwk["kid"] != smart_str(header.kid):
-                continue
-            if "alg" in jwk and jwk["alg"] != smart_str(header.alg):
-                continue
-            key = jwk
-        if key is None:
-            raise SuspiciousOperation("Could not find a valid JWKS.")
-        return key
-
-    def get_payload_data(self, token, key):
-        """Helper method to get the payload of the JWT token."""
-        return self._verify_jws(token, key)
+        jwks = response_jwks.content.decode()
+        keyset = jwk.JWKSet.from_json(jwks)
+        return keyset.get_key(kid)
 
     def verify_token(self, token, **kwargs):
         """Validate the token signature."""
         nonce = kwargs.get("nonce")
 
-        token = force_bytes(token)
-        key = self.retrieve_matching_jwk(token)
-        payload_data = self.get_payload_data(token, key)
+        jwstoken = jws.JWS()
+        jwstoken.deserialize(token)
+        pub_key = self.retrieve_matching_jwk(jwstoken.jose_header.get("kid"))
+        jwstoken.verify(pub_key, settings.OIDC_RP_SIGN_ALGO)
 
-        # The 'token' will always be a byte string since it's
-        # the result of base64.urlsafe_b64decode().
-        # The payload is always the result of base64.urlsafe_b64decode().
-        # In Python 3 and 2, that's always a byte string.
-        # In Python3.6, the json.loads() function can accept a byte string
-        # as it will automagically decode it to a unicode string before
-        # deserializing https://bugs.python.org/issue17909
-        payload = json.loads(payload_data.decode("utf-8"))
+        payload = json.loads(jwstoken.payload)
         token_nonce = payload.get("nonce")
 
         if nonce != token_nonce:
@@ -175,13 +120,19 @@ class OIDCAuthenticationBackend(ModelBackend):
         jwt_args = {
             "iss": settings.OIDC_RP_CLIENT_ID,
             "sub": settings.OIDC_RP_CLIENT_ID,
-            "aud": settings.OIDC_OP_TOKEN_ENDPOINT,
+            "aud": oidc_op_config.get_token_endpoint(),
             "jti": secrets.token_hex(16),
             "exp": int(time.time()) + 300,  # 5 minutes from now
         }
         # Client secret needs to be pem-encoded string
-        encoded_jwt = jwt.encode(
-            jwt_args, settings.OIDC_RP_CLIENT_SECRET, algorithm=settings.OIDC_RP_SIGN_ALGO
+        encoded_jwt = (
+            jwt.encode(
+                jwt_args,
+                settings.OIDC_RP_CLIENT_SECRET,
+                algorithm=settings.OIDC_RP_SIGN_ALGO,
+            )
+            if settings.OIDC_RP_CLIENT_SECRET and settings.OIDC_RP_SIGN_ALGO
+            else None
         )
         token_payload = {
             "client_assertion": encoded_jwt,
@@ -189,7 +140,7 @@ class OIDCAuthenticationBackend(ModelBackend):
             "code": payload.get("code"),
             "grant_type": "authorization_code",
         }
-        response = requests.post(settings.OIDC_OP_TOKEN_ENDPOINT, data=token_payload)
+        response = requests.post(oidc_op_config.get_token_endpoint(), data=token_payload)
         self.raise_token_response_error(response)
         return response.json()
 
@@ -213,7 +164,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         the default implementation, but may be used when overriding this method"""
 
         user_response = requests.get(
-            settings.OIDC_OP_USER_ENDPOINT,
+            oidc_op_config.get_user_endpoint(),
             headers={"Authorization": "Bearer {0}".format(access_token)},
             verify=True,
             timeout=None,
