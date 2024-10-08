@@ -1,0 +1,146 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_c.DotFECScheduleCTestCase
+=========================================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_c
+
+.. autoclass:: DotFECScheduleCTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECScheduleCTestCase.__init__
+      ~DotFECScheduleCTestCase.addClassCleanup
+      ~DotFECScheduleCTestCase.addCleanup
+      ~DotFECScheduleCTestCase.addTypeEqualityFunc
+      ~DotFECScheduleCTestCase.assertAlmostEqual
+      ~DotFECScheduleCTestCase.assertAlmostEquals
+      ~DotFECScheduleCTestCase.assertContains
+      ~DotFECScheduleCTestCase.assertCountEqual
+      ~DotFECScheduleCTestCase.assertDictContainsSubset
+      ~DotFECScheduleCTestCase.assertDictEqual
+      ~DotFECScheduleCTestCase.assertEqual
+      ~DotFECScheduleCTestCase.assertEquals
+      ~DotFECScheduleCTestCase.assertFalse
+      ~DotFECScheduleCTestCase.assertFieldOutput
+      ~DotFECScheduleCTestCase.assertFormError
+      ~DotFECScheduleCTestCase.assertFormSetError
+      ~DotFECScheduleCTestCase.assertGreater
+      ~DotFECScheduleCTestCase.assertGreaterEqual
+      ~DotFECScheduleCTestCase.assertHTMLEqual
+      ~DotFECScheduleCTestCase.assertHTMLNotEqual
+      ~DotFECScheduleCTestCase.assertIn
+      ~DotFECScheduleCTestCase.assertInHTML
+      ~DotFECScheduleCTestCase.assertIs
+      ~DotFECScheduleCTestCase.assertIsInstance
+      ~DotFECScheduleCTestCase.assertIsNone
+      ~DotFECScheduleCTestCase.assertIsNot
+      ~DotFECScheduleCTestCase.assertIsNotNone
+      ~DotFECScheduleCTestCase.assertJSONEqual
+      ~DotFECScheduleCTestCase.assertJSONNotEqual
+      ~DotFECScheduleCTestCase.assertLess
+      ~DotFECScheduleCTestCase.assertLessEqual
+      ~DotFECScheduleCTestCase.assertListEqual
+      ~DotFECScheduleCTestCase.assertLogs
+      ~DotFECScheduleCTestCase.assertMultiLineEqual
+      ~DotFECScheduleCTestCase.assertNoLogs
+      ~DotFECScheduleCTestCase.assertNotAlmostEqual
+      ~DotFECScheduleCTestCase.assertNotAlmostEquals
+      ~DotFECScheduleCTestCase.assertNotContains
+      ~DotFECScheduleCTestCase.assertNotEqual
+      ~DotFECScheduleCTestCase.assertNotEquals
+      ~DotFECScheduleCTestCase.assertNotIn
+      ~DotFECScheduleCTestCase.assertNotInHTML
+      ~DotFECScheduleCTestCase.assertNotIsInstance
+      ~DotFECScheduleCTestCase.assertNotRegex
+      ~DotFECScheduleCTestCase.assertNotRegexpMatches
+      ~DotFECScheduleCTestCase.assertNumQueries
+      ~DotFECScheduleCTestCase.assertQuerySetEqual
+      ~DotFECScheduleCTestCase.assertRaises
+      ~DotFECScheduleCTestCase.assertRaisesMessage
+      ~DotFECScheduleCTestCase.assertRaisesRegex
+      ~DotFECScheduleCTestCase.assertRaisesRegexp
+      ~DotFECScheduleCTestCase.assertRedirects
+      ~DotFECScheduleCTestCase.assertRegex
+      ~DotFECScheduleCTestCase.assertRegexpMatches
+      ~DotFECScheduleCTestCase.assertSequenceEqual
+      ~DotFECScheduleCTestCase.assertSetEqual
+      ~DotFECScheduleCTestCase.assertTemplateNotUsed
+      ~DotFECScheduleCTestCase.assertTemplateUsed
+      ~DotFECScheduleCTestCase.assertTrue
+      ~DotFECScheduleCTestCase.assertTupleEqual
+      ~DotFECScheduleCTestCase.assertURLEqual
+      ~DotFECScheduleCTestCase.assertWarns
+      ~DotFECScheduleCTestCase.assertWarnsMessage
+      ~DotFECScheduleCTestCase.assertWarnsRegex
+      ~DotFECScheduleCTestCase.assertXMLEqual
+      ~DotFECScheduleCTestCase.assertXMLNotEqual
+      ~DotFECScheduleCTestCase.assert_
+      ~DotFECScheduleCTestCase.captureOnCommitCallbacks
+      ~DotFECScheduleCTestCase.countTestCases
+      ~DotFECScheduleCTestCase.debug
+      ~DotFECScheduleCTestCase.defaultTestResult
+      ~DotFECScheduleCTestCase.doClassCleanups
+      ~DotFECScheduleCTestCase.doCleanups
+      ~DotFECScheduleCTestCase.ensure_connection_patch_method
+      ~DotFECScheduleCTestCase.enterClassContext
+      ~DotFECScheduleCTestCase.fail
+      ~DotFECScheduleCTestCase.failIf
+      ~DotFECScheduleCTestCase.failIfAlmostEqual
+      ~DotFECScheduleCTestCase.failIfEqual
+      ~DotFECScheduleCTestCase.failUnless
+      ~DotFECScheduleCTestCase.failUnlessAlmostEqual
+      ~DotFECScheduleCTestCase.failUnlessEqual
+      ~DotFECScheduleCTestCase.failUnlessRaises
+      ~DotFECScheduleCTestCase.id
+      ~DotFECScheduleCTestCase.modify_settings
+      ~DotFECScheduleCTestCase.run
+      ~DotFECScheduleCTestCase.setUp
+      ~DotFECScheduleCTestCase.setUpClass
+      ~DotFECScheduleCTestCase.setUpTestData
+      ~DotFECScheduleCTestCase.settings
+      ~DotFECScheduleCTestCase.shortDescription
+      ~DotFECScheduleCTestCase.skipTest
+      ~DotFECScheduleCTestCase.subTest
+      ~DotFECScheduleCTestCase.tearDown
+      ~DotFECScheduleCTestCase.tearDownClass
+      ~DotFECScheduleCTestCase.test_committee
+      ~DotFECScheduleCTestCase.test_election
+      ~DotFECScheduleCTestCase.test_entity_type
+      ~DotFECScheduleCTestCase.test_form_type
+      ~DotFECScheduleCTestCase.test_lender
+      ~DotFECScheduleCTestCase.test_lender_individual
+      ~DotFECScheduleCTestCase.test_lender_organization
+      ~DotFECScheduleCTestCase.test_loan_individual
+      ~DotFECScheduleCTestCase.test_loan_organization
+      ~DotFECScheduleCTestCase.test_memo
+      ~DotFECScheduleCTestCase.test_receipt_line_number
+      ~DotFECScheduleCTestCase.test_transaction_id
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECScheduleCTestCase.available_apps
+      ~DotFECScheduleCTestCase.databases
+      ~DotFECScheduleCTestCase.fixtures
+      ~DotFECScheduleCTestCase.longMessage
+      ~DotFECScheduleCTestCase.maxDiff
+      ~DotFECScheduleCTestCase.reset_sequences
+      ~DotFECScheduleCTestCase.serialized_rollback
+   
+   
