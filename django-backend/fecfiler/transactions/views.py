@@ -8,7 +8,10 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
-from fecfiler.transactions.transaction_dependencies import update_dependent_descriptions
+from fecfiler.transactions.transaction_dependencies import (
+    update_dependent_children,
+    update_dependent_parent,
+)
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
     Transaction,
@@ -93,7 +96,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if hasattr(self, "action") and self.action in [
             "create",
             "update",
-            "delete",
+            "destroy",
             "save_transactions",
         ]:
             queryset = super().get_queryset()
@@ -138,13 +141,22 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             print(f"transaction ID: {saved_transaction.id}")
-        # transaction_view = self.get_queryset().get(id=saved_transaction.id)
+            update_dependent_parent(saved_transaction)
         return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
         return Response(saved_transaction.id)
+
+    def destroy(self, request, *args, **kwargs):
+        # capture copy of transaction before deletion to use in update_dependent_parent
+        transaction = self.get_object()
+        with db_transaction.atomic():
+            response = super().destroy(request, *args, **kwargs)
+            # update parents that depend on this transaction
+            update_dependent_parent(transaction)
+        return response
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
@@ -323,7 +335,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         EXAMPLE: if this transaction is a JF transfer, update the descriptions of its
         children and grandchildren transactions with any changes to the committee name
         """
-        update_dependent_descriptions(transaction_instance)
+        update_dependent_children(transaction_instance)
 
         return self.queryset.get(id=transaction_instance.id)
 

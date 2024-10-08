@@ -61,3 +61,4 @@ class CeleryStorageType(Enum):
 @app.task(bind=True)
 def debug_task(self):
     logger.debug(f"Request: {self.request!r}")
+    return True

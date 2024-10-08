@@ -4,7 +4,6 @@ Django settings for the FECFile project.
 
 import os
 import dj_database_url
-import requests
 import structlog
 import sys
 
@@ -38,6 +37,7 @@ ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
+SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
 ROOT_URLCONF = "fecfiler.urls"
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "corsheaders",
     "storages",
     "django_structlog",
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     "fecfiler.mock_openfec",
     "fecfiler.oidc",
     "fecfiler.devops",
+    "fecfiler.mock_oidc_provider",
 ]
 
 MIDDLEWARE = [
@@ -158,16 +160,12 @@ OIDC_RP_UNIQUE_IDENTIFIER = "username"
 # Sometimes the OP (IDP - login.gov)has a different label for the unique ID
 OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 
-OIDC_OP_AUTODISCOVER_ENDPOINT = (
-    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
+    "OIDC_OP_AUTODISCOVER_ENDPOINT",
+    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
-OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
 
-OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
-OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
-OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
-OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
-OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
+MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
@@ -220,9 +218,14 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
+}
+
+SPECTACULAR_SETTINGS = {
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
@@ -318,7 +321,11 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-DJANGO_STRUCTLOG_CELERY_ENABLED = True
+"""System status settings
+"""
+SYSTEM_STATUS_CACHE_BACKEND = env.get_credential("REDIS_URL")
+SYSTEM_STATUS_CACHE_AGE = env.get_credential("SYSTEM_STATUS_CACHE_AGE", 60)
+
 
 """Celery configurations
 """
@@ -327,6 +334,7 @@ CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
@@ -334,7 +342,10 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
+MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
+if not MOCK_EFO and FEC_FILING_API is None:
+    raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")

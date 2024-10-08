@@ -1,7 +1,8 @@
 import json
 from uuid import uuid4 as uuid
 from django.test import TestCase
-from .dot_fec_submitter import DotFECSubmitter
+from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.committee_accounts.views import create_committee_view
@@ -22,7 +23,7 @@ class DotFECSubmitterTestCase(TestCase):
         self.dot_fec_record = DotFEC.objects.get(id=self.dot_fec_id)
 
     def test_get_submission_json(self):
-        submitter = DotFECSubmitter(None)
+        submitter = MockDotFECSubmitter()
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password"
         )
@@ -32,7 +33,7 @@ class DotFECSubmitterTestCase(TestCase):
         self.assertFalse(json_obj["wait"])
 
     def test_get_submission_json_for_amendment(self):
-        submitter = DotFECSubmitter(None)
+        submitter = MockDotFECSubmitter()
         self.dot_fec_record.report.report_id = str(uuid())
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password", "test_backdoor_code"
@@ -42,3 +43,14 @@ class DotFECSubmitterTestCase(TestCase):
             json_obj["amendment_id"],
             self.dot_fec_record.report.report_id + "test_backdoor_code",
         )
+
+    def test_poll(self):
+        submitter = MockDotFECSubmitter()
+        response = submitter.poll_status(self.dot_fec_record.id)
+        response_obj = json.loads(response)
+        self.assertEqual(response_obj["status"], "ACCEPTED")
+
+        submitter = MockWebPrintSubmitter()
+        response = submitter.poll_status(123, str(uuid()))
+        response_obj = json.loads(response)
+        self.assertEqual(response_obj["status"], "COMPLETED")
