@@ -27,6 +27,6 @@ applications:
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       SYSTEM_STATUS_CACHE_AGE: 60
-      MOCK_EFO: false
+      MOCK_EFO_FILING: REDIS
       # ---- FEATURE FLAGS ----
       FLAG__COMMITTEE_DATA_SOURCE: PRODUCTION # Values are PRODUCTION, TEST, and REDIS, defaults to TEST
