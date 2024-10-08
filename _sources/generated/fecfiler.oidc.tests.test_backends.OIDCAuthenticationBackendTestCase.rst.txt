@@ -115,15 +115,11 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.tearDown
       ~OIDCAuthenticationBackendTestCase.tearDownClass
       ~OIDCAuthenticationBackendTestCase.test_authenticate_bad_token_response
-      ~OIDCAuthenticationBackendTestCase.test_authenticate_invalid_jwks
       ~OIDCAuthenticationBackendTestCase.test_authenticate_nonce_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_oidc_op_unique_identifier_not_found
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_claims_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_create_new_user_happy_path
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_multiple_users_returned
-      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_failed_alg_does_not_match
-      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_failed_no_alg
-      ~OIDCAuthenticationBackendTestCase.test_authenticate_verify_jws_lib_call_failed
    
    
 
