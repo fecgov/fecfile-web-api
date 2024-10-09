@@ -49,16 +49,17 @@
     "path": "schedule_c.loan_amount"
   },
   "loan_payment_to_date": {
-    "path": "schedule_c.loan_payment_to_date"
+    "path": "loan_payment_to_date"
   },
   "loan_balance": {
-    "path": "schedule_c.loan_balance"
+    "path": "loan_balance"
   },
   "loan_incurred_date": {
     "serializer": "DATE",
     "path": "schedule_c.loan_incurred_date"
   },
   "loan_due_date": {
+    "serializer": "TEXT_TO_DATE",
     "path": "schedule_c.loan_due_date"
   },
   "loan_interest_rate": {

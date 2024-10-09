@@ -1,3 +1,4 @@
+from decimal import Decimal
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
@@ -48,6 +49,18 @@ def compose_transactions(report_id):
             if transaction.schedule_b:
                 add_schedule_b_contact_fields(transaction)
             if transaction.schedule_c:
+                loan_amount = (
+                    transaction.schedule_c.loan_amount
+                    if transaction.schedule_c.loan_amount is not None
+                    else Decimal("0.00")
+                )
+
+                transaction.loan_payment_to_date = (
+                    transaction.loan_payment_to_date
+                    if transaction.loan_payment_to_date is not None
+                    else Decimal("0.00")
+                )
+                transaction.loan_balance = loan_amount - transaction.loan_payment_to_date
                 add_schedule_c_contact_fields(transaction)
             if transaction.schedule_c1:
                 add_schedule_c1_contact_fields(transaction)
