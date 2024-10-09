@@ -347,7 +347,7 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 MOCK_EFO_FILING = env.get_credential("MOCK_EFO_FILING", "False").lower() == "true"
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
 if not MOCK_EFO_FILING and FEC_FILING_API is None:
-    raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
+    raise Exception("FEC_FILING_API must be set if MOCK_EFO_FILING is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
