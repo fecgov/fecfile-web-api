@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.views.check\_email\_can\_create\_committee\_account
+================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autofunction:: check_email_can_create_committee_account

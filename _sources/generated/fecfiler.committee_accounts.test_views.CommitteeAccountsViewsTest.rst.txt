@@ -114,10 +114,11 @@ fecfiler.committee\_accounts.test\_views.CommitteeAccountsViewsTest
       ~CommitteeAccountsViewsTest.subTest
       ~CommitteeAccountsViewsTest.tearDown
       ~CommitteeAccountsViewsTest.tearDownClass
-      ~CommitteeAccountsViewsTest.test_register_committee
-      ~CommitteeAccountsViewsTest.test_register_committee_case_insensitive
-      ~CommitteeAccountsViewsTest.test_register_committee_existing
-      ~CommitteeAccountsViewsTest.test_register_committee_mismatch_email
+      ~CommitteeAccountsViewsTest.test_create_committee_account
+      ~CommitteeAccountsViewsTest.test_create_committee_account_case_insensitive
+      ~CommitteeAccountsViewsTest.test_create_committee_account_existing
+      ~CommitteeAccountsViewsTest.test_create_committee_account_mismatch_email
+      ~CommitteeAccountsViewsTest.test_create_committee_account_unauthorized_email
    
    
 

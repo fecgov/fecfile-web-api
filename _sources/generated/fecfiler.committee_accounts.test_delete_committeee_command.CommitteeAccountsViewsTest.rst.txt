@@ -114,7 +114,7 @@ fecfiler.committee\_accounts.test\_delete\_committeee\_command.CommitteeAccounts
       ~CommitteeAccountsViewsTest.subTest
       ~CommitteeAccountsViewsTest.tearDown
       ~CommitteeAccountsViewsTest.tearDownClass
-      ~CommitteeAccountsViewsTest.test_register_committee
+      ~CommitteeAccountsViewsTest.test_create_committee_account
    
    
 

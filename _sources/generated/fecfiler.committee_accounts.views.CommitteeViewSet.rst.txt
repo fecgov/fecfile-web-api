@@ -26,6 +26,7 @@ fecfiler.committee\_accounts.views.CommitteeViewSet
       ~CommitteeViewSet.check_object_permissions
       ~CommitteeViewSet.check_permissions
       ~CommitteeViewSet.check_throttles
+      ~CommitteeViewSet.create_account
       ~CommitteeViewSet.determine_version
       ~CommitteeViewSet.dispatch
       ~CommitteeViewSet.filter_queryset
@@ -63,7 +64,6 @@ fecfiler.committee\_accounts.views.CommitteeViewSet
       ~CommitteeViewSet.perform_content_negotiation
       ~CommitteeViewSet.permission_denied
       ~CommitteeViewSet.raise_uncaught_exception
-      ~CommitteeViewSet.register
       ~CommitteeViewSet.reverse_action
       ~CommitteeViewSet.setup
       ~CommitteeViewSet.throttled
