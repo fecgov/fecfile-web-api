@@ -111,7 +111,6 @@ services:
             MOCK_EFO_FILING: REDIS
             EFO_POLLING_MAX_DURATION: 300
             EFO_POLLING_INTERVAL: 30
-            OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
             CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST: '["test@test.com"]'
             UNIT_TESTING_ENVIRONMENT: True # True for environments where running unit tests is expected
             # ---- FEATURE FLAGS ----
