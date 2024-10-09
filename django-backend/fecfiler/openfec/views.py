@@ -30,6 +30,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
     def query_filings(self, request):
         query = request.query_params.get("query")
         form_type = request.query_params.get("form_type")
+
         if settings.MOCK_OPENFEC_REDIS_URL:
             response = query_filings(query, form_type)
         else:

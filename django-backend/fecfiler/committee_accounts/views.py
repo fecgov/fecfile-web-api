@@ -13,7 +13,10 @@ from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
+from fecfiler.settings import (
+    MOCK_OPENFEC_REDIS_URL,
+    CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST,
+)
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
@@ -61,11 +64,11 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return Response(self.get_serializer(committee).data)
 
     @action(detail=False, methods=["post"])
-    def register(self, request):
+    def create_account(self, request):
         committee_id = request.data.get("committee_id")
         if not committee_id:
             raise Exception("no committee_id provided")
-        account = register_committee(committee_id, request.user)
+        account = create_committee_account(committee_id, request.user)
 
         return Response(CommitteeAccountSerializer(account).data)
 
@@ -205,6 +208,31 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         return HttpResponse("Member removed")
 
 
+def check_email_can_create_committee_account(email):
+    """
+    Check if the provided email is allowed to create a committee based on domain
+    or exception list.
+
+    Args:
+        email (str): The email to be checked.
+
+    Returns:
+        boolean True if email is allowed, False otherwise.
+    """
+    allowed_domains = ["fec.gov"]
+    allowed_emails = CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
+    if email:
+        email_to_check = email.lower()
+        split_email = email_to_check.split("@")
+        if len(split_email) == 2:
+            domain = split_email[1]
+            if domain and domain in allowed_domains:
+                return True
+        if email_to_check in allowed_emails:
+            return True
+    return False
+
+
 def check_email_match(email, f1_emails):
     """
     Check if the provided email matches any of the committee emails.
@@ -228,7 +256,7 @@ def check_email_match(email, f1_emails):
     return None
 
 
-def register_committee(committee_id, user):
+def create_committee_account(committee_id, user):
     email = user.email
 
     if MOCK_OPENFEC_REDIS_URL:
@@ -241,11 +269,14 @@ def register_committee(committee_id, user):
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
-        failure_reason = f"Committee {committee_id} already registered"
+        failure_reason = f"Committee account {committee_id} already created"
+
+    if not check_email_can_create_committee_account(email):
+        failure_reason = f"Email {email} is not allowed to create a committee account"
 
     if failure_reason:
-        logger.error(f"Failure to register committee: {failure_reason}")
-        raise ValidationError("could not register committee")
+        logger.error(f"Failure to create committee account: {failure_reason}")
+        raise ValidationError("could not create committee account")
 
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
@@ -267,6 +298,4 @@ def create_committee_view(committee_uuid):
             .query.sql_with_params()
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
-        cursor.execute(
-            f"CREATE OR REPLACE VIEW {view_name} as {definition}"
-        )
+        cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
