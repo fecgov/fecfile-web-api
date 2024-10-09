@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from fecfiler.mock_openfec.mock_endpoints import query_filings
 from unittest.mock import patch
+from fecfiler.settings import env
 
 
 class MockEndpointsTest(TestCase):
@@ -10,7 +11,7 @@ class MockEndpointsTest(TestCase):
         pass
 
     def test_query_filings(self):
-        with patch("fecfiler.openfec.views.settings") as settings:
+        with patch("fecfiler.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
 
             call_command("load_committee_data")

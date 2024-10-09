@@ -1,9 +1,13 @@
-from fecfiler.settings import FLAG__COMMITTEE_DATA_SOURCE, MOCK_OPENFEC_REDIS_URL
+from fecfiler.settings import (
+	FLAG__COMMITTEE_DATA_SOURCE,
+    MOCK_OPENFEC_REDIS_URL,
+    UNIT_TESTING_ENVIRONMENT
+)
 import json
 import redis
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
-if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
+if FLAG__COMMITTEE_DATA_SOURCE == "REDIS" or UNIT_TESTING_ENVIRONMENT:
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
 else:
     redis_instance = None

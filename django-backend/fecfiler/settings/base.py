@@ -360,8 +360,19 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
+"""FLAG_UNIT_TESTING_ENVIRONMENT
+If True, the API will set up certain features in anticipation of unit testing
+(e.g, `MOCK_OPENFEC_REDIS_URL` and `redis_instance`)
+"""
+UNIT_TESTING_ENVIRONMENT = env.get_credential(
+    "UNIT_TESTING_ENVIRONMENT", False
+)
 
-"""FEATURE FLAGS"""
+"""FEATURE FLAGS
+"""
+
+# FLAG__COMMITTEE_DATA_SOURCE:
+# Determines whether committee data is pulled from EFO, TestEFO, or REDIS
 FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
 if FLAG__COMMITTEE_DATA_SOURCE not in ["PRODUCTION", "TEST", "REDIS"]:
     FLAG__COMMITTEE_DATA_SOURCE = "TEST"
@@ -382,7 +393,7 @@ FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC_REDIS_URL = None
-if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
+if FLAG__COMMITTEE_DATA_SOURCE == "REDIS" or UNIT_TESTING_ENVIRONMENT:
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
 

@@ -38,14 +38,15 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             "committee_id": pk,
         }
         endpoint = f"{settings.FEC_API_STAGE}/efile/test-form1/"
-        response = requests.get(endpoint, headers=headers, params=params).json()
-        results = response.get('results', [])
+        response = requests.get(endpoint, headers=headers, params=params)
+        response_data = response.json()
+        results = response_data.get('results', [])
         if results:
             results[0]['name'] = results[0].get('committee_name', None)
 
         return {
-            'api_version': response.get('api_version', None),
-            'results': response.get('results', [])[:1],
+            'api_version': response_data.get('api_version', None),
+            'results': response_data.get('results', [])[:1],
         }
 
     def query_filings_from_test_efo(self, query):

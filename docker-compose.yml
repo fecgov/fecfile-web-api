@@ -110,7 +110,8 @@ services:
             OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
             MOCK_EFO_FILING: REDIS
             # ---- FEATURE FLAGS ----
-            FLAG__COMMITTEE_DATA_SOURCE: REDIS # Values are PRODUCTION, TEST, and REDIS, defaults to TEST
+            FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and REDIS, defaults to TEST
+            UNIT_TESTING_ENVIRONMENT: True # True for environments where running unit tests is expected
         deploy:
             resources:
                 limits:

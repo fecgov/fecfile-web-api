@@ -2,6 +2,7 @@ from django.test import TestCase, RequestFactory
 from fecfiler.user.models import User
 from .views import OpenfecViewSet
 from unittest.mock import Mock, patch
+from fecfiler.settings import FEC_API
 
 
 class OpenfecViewSetTest(TestCase):
@@ -33,7 +34,7 @@ class OpenfecViewSetTest(TestCase):
             with patch("fecfiler.openfec.views.requests") as mock_requests:
                 mock_requests.get.return_value = mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = None
+                mock_response.json.return_value = {}
                 response = OpenfecViewSet.as_view({"get": "committee"})(
                     request, pk="C12345678"
                 )
@@ -54,17 +55,22 @@ class OpenfecViewSetTest(TestCase):
         with patch("fecfiler.openfec.views.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             settings.BASE_DIR = "fecfiler/"
+            settings.FEC_API = FEC_API
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
-            response = OpenfecViewSet.as_view({"get": "committee"})(
-                request, pk="C12345678"
-            )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data["results"][0]["committee_id"], "C12345678")
-            self.assertEqual(
-                response.data["results"][0]["name"], "Test Committee"
-            )
-            self.assertEqual(response.data["results"][0]["committee_type"], "O")
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                mock_requests.get.return_value = mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = None
+                response = OpenfecViewSet.as_view({"get": "committee"})(
+                    request, pk="C12345678"
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data["results"][0]["committee_id"], "C12345678")
+                self.assertEqual(
+                    response.data["results"][0]["name"], "Test Committee"
+                )
+                self.assertEqual(response.data["results"][0]["committee_type"], "O")
 
     def test_get_filings_invalid_resp(self):
         with patch("fecfiler.openfec.views.settings") as settings:
