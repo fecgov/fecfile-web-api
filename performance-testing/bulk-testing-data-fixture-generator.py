@@ -317,7 +317,7 @@ def get_sched_transaction(sched_transaction_id, amount, date, schedule_format):
 
 
 def get_transaction(
-    transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule
+    transaction_id, sched_transaction_id, committee_uuid, contact_id, memo_id, schedule
 ):
     return {
         "model": "transactions.transaction",
@@ -327,6 +327,7 @@ def get_transaction(
             "committee_account_id": f"{committee_uuid}",
             "_form_type": "SA11AI",
             "memo_code": choices([True, False], [0.8, 0.2], k=1)[0],
+            "memo_text": memo_id,
             "contact_1_id": f"{contact_id}",
             "aggregation_group": "GENERAL",
             "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
@@ -351,25 +352,58 @@ def get_transaction_report(transaction_id, report_id):
     }
 
 
-def create_transaction(committee_uuid, contact_id, report):
+def get_transaction_memo(memo_id, transaction_id, report_id, committee_id):
+    return {
+        "model": "memo_text.memotext",
+        "pk": memo_id,
+        "fields": {
+            "committee_account": committee_id,
+            "report": report_id,
+            "rec_type": "TEXT",
+            "is_report_level_memo": False,
+            "transaction_uuid": transaction_id,
+            "text4000": random_string(4000, use_digits=True, use_punctuation=True),
+            "text_prefix": None
+        }
+    }
+
+
+def create_transaction(committee_uuid, contact_id, report, big_memos):
     schedule = choice(list(SCHEDULE_FORMATS.values()))
     report_id = get_record_uuid(report)
     report_date = report["fields"]["coverage_from_date"]
 
     sched_transaction_id = uuid4()
     transaction_id = uuid4()
-    return [
+    memo_id = None
+    if big_memos:
+        memo_id = uuid4()
+
+    records = [
         get_sched_transaction(
             sched_transaction_id, randrange(100, 500), report_date, schedule
         ),
         get_transaction(
-            transaction_id, sched_transaction_id, committee_uuid, contact_id, schedule
+            transaction_id,
+            sched_transaction_id,
+            committee_uuid,
+            contact_id,
+            memo_id,
+            schedule
         ),
-        get_transaction_report(transaction_id, report_id)
+        get_transaction_report(transaction_id, report_id),
     ]
+    if big_memos:
+        records.append(
+            get_transaction_memo(memo_id, transaction_id, report_id, committee_uuid)
+        )
+
+    return records
 
 
-def create_records(transaction_count, report_count, contact_count, committee_count):
+def create_records(
+    transaction_count, report_count, contact_count, committee_count, big_memos
+):
     committees = [create_committee("N/A", PRIMARY_COMMITTEE_UUID)]
     for _ in range(max(committee_count, 0)):
         committees.append(create_committee())
@@ -384,7 +418,8 @@ def create_records(transaction_count, report_count, contact_count, committee_cou
             "contacts": [],
             "sched_transactions": [],
             "transactions": [],
-            "transaction_reports": []
+            "transaction_reports": [],
+            "transaction_memos": [],
         }
         committee_record = committee_records[committee_uuid]
 
@@ -401,12 +436,13 @@ def create_records(transaction_count, report_count, contact_count, committee_cou
             report = choice(committee_record["reports"])
             contact = choice(committee_record["contacts"])
             contact_id = get_record_uuid(contact)
-            sched, trans, trans_rep = create_transaction(
-                committee_uuid, contact_id, report
+            sched, trans, trans_rep, memos = create_transaction(
+                committee_uuid, contact_id, report, big_memos
             )
             committee_record["sched_transactions"].append(sched)
             committee_record["transactions"].append(trans)
             committee_record["transaction_reports"].append(trans_rep)
+            committee_record["transaction_memos"].append(memos)
 
     return committee_records
 
@@ -423,6 +459,7 @@ def prepare_records(records):
             + c["reports"]
             + c["contacts"]
             + c["sched_transactions"]
+            + c["transaction_memos"]
             + c["transactions"]
             + c["transaction_reports"]
         )
@@ -445,8 +482,10 @@ def save_records_to_fixture(records):
     file.close()
 
 
-def create_fixture(transactions=1000, reports=5, contacts=100, committees=1):
-    records = create_records(transactions, reports, contacts, committees)
+def create_fixture(
+    transactions=1000, reports=5, contacts=100, committees=1, big_memos=False
+):
+    records = create_records(transactions, reports, contacts, committees, big_memos)
     sorted_records = prepare_records(records)
     save_records_to_fixture(sorted_records)
 
@@ -500,6 +539,12 @@ if __name__ == "__main__":
             This overrides the UUID found in the `LOCAL_TEST_COMMITTEE_UUID`
             environment variable."""
     )
+    parser.add_argument(
+        '--big-memos',
+        default=False,
+        action='store_true',
+        help="""Include max-length memo records for every transaction."""
+    )
     args = parser.parse_args()
 
     if args.committee_uuid is not None:
@@ -517,6 +562,7 @@ if __name__ == "__main__":
         args.transactions,
         args.reports,
         args.contacts,
-        committees=0  # args.committees
+        0,  # args.committees
+        args.big_memos
     )
     print(f"Generated fixture with {'{:,}'.format(len(sorted_records))} records")

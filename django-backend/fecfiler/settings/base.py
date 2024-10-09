@@ -11,6 +11,8 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
+from fecfiler.shared.utilities import get_float_from_string
+from math import floor
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -349,6 +351,17 @@ if not MOCK_EFO_FILING and FEC_FILING_API is None:
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
+
+"""EFO POLLING SETTINGS
+"""
+EFO_POLLING_MAX_DURATION = get_float_from_string(
+    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
+)
+EFO_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("EFO_POLLING_INTERVAL", 30)
+)
+EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
+
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
 WARNING: This will BREAK submitting to fec because it will no longer conform to spec
@@ -396,5 +409,8 @@ MOCK_OPENFEC_REDIS_URL = None
 if FLAG__COMMITTEE_DATA_SOURCE == "REDIS" or UNIT_TESTING_ENVIRONMENT:
     MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
+CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
+    "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []
+)
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

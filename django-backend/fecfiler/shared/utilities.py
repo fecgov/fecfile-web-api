@@ -14,3 +14,12 @@ def get_model_data(data, model):
         [[field.name, field.name + "_id"] for field in model._meta.get_fields()], []
     )
     return {field: data[field] for field in field_names if field in data}
+
+
+def get_float_from_string(string, fallback=None):
+    try:
+        return float(string)
+    except Exception:
+        if fallback is not None:
+            return fallback
+        raise ValueError("String to float conversion failed with no provided fallback")
