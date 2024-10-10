@@ -51,29 +51,65 @@ class OpenfecViewSetTest(TestCase):
             )
             self.assertEqual(response.status_code, 500)
 
-    def test_get_committee_override_happy_path(self):
+    def test_get_committee_from_production(self):
         with patch("fecfiler.openfec.views.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
-            settings.BASE_DIR = "fecfiler/"
-            settings.FEC_API = FEC_API
+            settings.FEC_API = "https://not-real.api/"
+            settings.FEC_API_KEY = "MOCK_KEY"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
-                mock_requests.get.return_value = mock_response = Mock()
+                was_called_with = []
+                mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = None
+                mock_response.json.return_value = {}
+
+                def mock_get(*args, **kwargs):
+                    was_called_with.append([args, kwargs])
+                    return mock_response
+
+                mock_requests.get = mock_get
+
                 response = OpenfecViewSet.as_view({"get": "committee"})(
                     request, pk="C12345678"
                 )
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(
-                    response.data["results"][0]["committee_id"],
-                    "C12345678"
+                self.assertEqual(len(was_called_with), 1)
+                called_with_args = was_called_with[0][0]
+                self.assertIn(
+                    f"https://not-real.api/committee/C12345678/?api_key=MOCK_KEY",
+                    called_with_args
                 )
-                self.assertEqual(
-                    response.data["results"][0]["name"], "Test Committee"
+
+    def test_get_committee_from_test(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
+            settings.FEC_API_STAGE = "https://stage.not-real.api/"
+            settings.FEC_API_KEY = "MOCK_KEY"
+            request = self.factory.get("/api/v1/openfec/C12345678/committee/")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                was_called_with = []
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {}
+
+                def mock_get(*args, **kwargs):
+                    was_called_with.append([args, kwargs])
+                    return mock_response
+
+                mock_requests.get = mock_get
+
+                response = OpenfecViewSet.as_view({"get": "committee"})(
+                    request, pk="C12345678"
                 )
-                self.assertEqual(response.data["results"][0]["committee_type"], "O")
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(was_called_with), 1)
+                called_with_args = was_called_with[0][0]
+                self.assertIn(
+                    f"https://stage.not-real.api/efile/test-form1/",
+                    called_with_args
+                )
 
     def test_get_filings_invalid_resp(self):
         with patch("fecfiler.openfec.views.settings") as settings:

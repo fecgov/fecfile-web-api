@@ -37,7 +37,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             "api_key": settings.FEC_API_KEY,
             "committee_id": pk,
         }
-        endpoint = f"{settings.FEC_API_STAGE}/efile/test-form1/"
+        endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
         response = requests.get(endpoint, headers=headers, params=params)
         response_data = response.json()
         results = response_data.get('results', [])
