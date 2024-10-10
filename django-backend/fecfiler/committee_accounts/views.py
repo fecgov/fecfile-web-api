@@ -14,8 +14,8 @@ from .models import CommitteeAccount, Membership
 from fecfiler.openfec.views import retrieve_recent_f1
 from fecfiler.mock_openfec.mock_endpoints import recent_f1
 from fecfiler.settings import (
-    MOCK_OPENFEC_REDIS_URL,
-    CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST,
+    FLAG__COMMITTEE_DATA_SOURCE,
+    CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
 )
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
@@ -259,12 +259,13 @@ def check_email_match(email, f1_emails):
 def create_committee_account(committee_id, user):
     email = user.email
 
-    if MOCK_OPENFEC_REDIS_URL:
+    if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
         f1 = recent_f1(committee_id)
     else:
         f1 = retrieve_recent_f1(committee_id)
 
     f1_emails = (f1 or {}).get("email")
+    logger.debug(f"\n\nF1 Emails: {f1_emails}\n\n")
     failure_reason = check_email_match(email, f1_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
