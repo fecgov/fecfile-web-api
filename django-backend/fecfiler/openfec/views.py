@@ -27,9 +27,14 @@ class OpenfecViewSet(viewsets.GenericViewSet):
                 response = committee(pk)
                 return Response(response)
             case _:
-                raise Exception(f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+                error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
                     settings.FLAG__COMMITTEE_DATA_SOURCE
-                }""")
+                }"""
+                response = Response()
+                response.status_code = 500
+                response.content = error_message
+                logger.exception(Exception(error_message))
+                return response
 
     def get_committee_from_test_efo(self, pk=None):
         headers = {"Content-Type": "application/json"}
