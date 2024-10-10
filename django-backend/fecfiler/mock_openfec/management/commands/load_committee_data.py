@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
 from fecfiler.settings import (
-	FLAG__COMMITTEE_DATA_SOURCE,
-	MOCK_OPENFEC_REDIS_URL,
-	BASE_DIR,
-	AWS_STORAGE_BUCKET_NAME,
-	UNIT_TESTING_ENVIRONMENT
+    FLAG__COMMITTEE_DATA_SOURCE,
+    MOCK_OPENFEC_REDIS_URL,
+    BASE_DIR,
+    AWS_STORAGE_BUCKET_NAME,
+    UNIT_TESTING_ENVIRONMENT
 )
 import redis
 import os
