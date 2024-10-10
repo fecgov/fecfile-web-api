@@ -2,7 +2,6 @@ from django.test import TestCase, RequestFactory
 from fecfiler.user.models import User
 from .views import OpenfecViewSet
 from unittest.mock import Mock, patch
-from fecfiler.settings import FEC_API
 
 
 class OpenfecViewSetTest(TestCase):
@@ -77,7 +76,7 @@ class OpenfecViewSetTest(TestCase):
                 self.assertEqual(len(was_called_with), 1)
                 called_with_args = was_called_with[0][0]
                 self.assertIn(
-                    f"https://not-real.api/committee/C12345678/?api_key=MOCK_KEY",
+                    "https://not-real.api/committee/C12345678/?api_key=MOCK_KEY",
                     called_with_args
                 )
 
@@ -107,7 +106,7 @@ class OpenfecViewSetTest(TestCase):
                 self.assertEqual(len(was_called_with), 1)
                 called_with_args = was_called_with[0][0]
                 self.assertIn(
-                    f"https://stage.not-real.api/efile/test-form1/",
+                    "https://stage.not-real.api/efile/test-form1/",
                     called_with_args
                 )
 
