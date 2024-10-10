@@ -79,22 +79,17 @@ class OpenfecViewSetTest(TestCase):
 
     def test_get_committee_from_invalid(self):
         with patch("fecfiler.openfec.views.settings") as settings:
-            with patch("fecfiler.utils") as mock_utils:
-                mock_utils.UNIT_TESTS_RUNNING = True
-                def error_raiser(exception, context):
-                    print("I GOT CALLED")
-                    raise exception
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "INVALID"
+            request = self.factory.get("/api/v1/openfec/C12345678/committee/")
+            request.user = self.user
 
-                mock_utils.custom_exception_handler = error_raiser
-
-                settings.FLAG__COMMITTEE_DATA_SOURCE = "INVALID"
-                request = self.factory.get("/api/v1/openfec/C12345678/committee/")
-                request.user = self.user
-
-                expected_error = "FLAG__COMMITTEE_DATA_SOURCE improperly configured: INVALID"
-                response = OpenfecViewSet.as_view({"get": "committee"})(request, pk="C12345678")
-                self.assertEqual(response.status_code, 500)
-                self.assertEqual(response.content.decode(), expected_error)
+            error = "FLAG__COMMITTEE_DATA_SOURCE improperly configured: INVALID"
+            response = OpenfecViewSet.as_view({"get": "committee"})(
+                request,
+                pk="C12345678"
+            )
+            self.assertEqual(response.status_code, 500)
+            self.assertEqual(response.content.decode(), error)
 
     def test_get_filings_invalid_resp(self):
         with patch("fecfiler.openfec.views.settings") as settings:

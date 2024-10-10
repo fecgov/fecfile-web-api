@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.core.management import call_command
 from fecfiler.mock_openfec.mock_endpoints import query_filings
 from unittest.mock import patch
-from fecfiler.settings import env
 
 
 class MockEndpointsTest(TestCase):
