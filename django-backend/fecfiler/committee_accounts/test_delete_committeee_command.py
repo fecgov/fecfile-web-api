@@ -17,21 +17,38 @@ class CommitteeAccountsViewsTest(TestCase):
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
 
     def test_create_committee_account(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
             report = account.report_set.create()
             transaction = report.transactions.create(committee_account=account)
             transaction.contact_1 = Contact.objects.create(committee_account=account)
             transaction.save()
-            self.assertEquals(1, Report.objects.filter(committee_account=account).count())
             self.assertEquals(
-                1, Transaction.objects.filter(committee_account=account).count()
+                Report.objects.filter(committee_account=account).count(),
+                1
             )
-            self.assertEquals(1, Contact.objects.filter(committee_account=account).count())
+            self.assertEquals(
+                Transaction.objects.filter(committee_account=account).count(),
+                1
+            )
+            self.assertEquals(
+                Contact.objects.filter(committee_account=account).count(),
+                1
+            )
             call_command("delete_committee_account", "C12345678")
-            self.assertEquals(0, Report.objects.filter(committee_account=account).count())
             self.assertEquals(
-                0, Transaction.objects.filter(committee_account=account).count()
+                Report.objects.filter(committee_account=account).count(),
+                0
             )
-            self.assertEquals(0, Contact.objects.filter(committee_account=account).count())
+            self.assertEquals(
+                Transaction.objects.filter(committee_account=account).count(),
+                0
+            )
+            self.assertEquals(
+                Contact.objects.filter(committee_account=account).count(),
+                0
+            )

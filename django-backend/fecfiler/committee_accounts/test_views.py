@@ -23,12 +23,18 @@ class CommitteeAccountsViewsTest(TestCase):
         self.create_error_message = "could not create committee account"
 
     def test_create_committee_account(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
             self.assertRaisesMessage(
@@ -40,7 +46,10 @@ class CommitteeAccountsViewsTest(TestCase):
             )
 
     def test_create_committee_account_mismatch_email(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -50,7 +59,10 @@ class CommitteeAccountsViewsTest(TestCase):
             )
 
     def test_create_committee_account_unauthorized_email(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -62,7 +74,10 @@ class CommitteeAccountsViewsTest(TestCase):
             )
 
     def test_create_committee_account_case_insensitive(self):
-        with patch("fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE", "REDIS"):
+        with patch(
+            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
+            "REDIS"
+        ):
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
