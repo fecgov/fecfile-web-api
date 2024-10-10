@@ -139,19 +139,64 @@ class OpenfecViewSetTest(TestCase):
                 )
                 self.assertEqual(response.status_code, 200)
 
-    def test_query_filings_from_test_efo(self):
+    def test_query_filings_from_test(self):
         with patch("fecfiler.openfec.views.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
-            request = self.factory.get("/api/v1/openfec/query_filings/?query=C00")
+            settings.FEC_API_STAGE = "https://stage.not-real.api/"
+            request = self.factory.get("/api/v1/openfec/query_filings/?query=C12345678")
             request.user = self.user
             with patch("fecfiler.openfec.views.requests") as mock_requests:
                 mock_requests.get.return_value = mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response_object = {}
-                mock_response_object["results"] = [{}]
-                mock_response_object["results"][0]["form_type"] = "F1"
-                mock_response.json.return_value = mock_response_object
+                mock_response.json.return_value = {"results": [
+                    {"form_type": "F1"}
+                ]}
                 response = OpenfecViewSet.as_view({"get": "f1_filing"})(
-                    request, pk="C00100230"
+                    request, pk="C12345678"
                 )
                 self.assertEqual(response.status_code, 200)
+                called_with = mock_requests.get.call_args.args or [[]]
+                self.assertIn(
+                    "https://stage.not-real.api/efile/test-form1/",
+                    called_with
+                )
+
+    def test_query_filings_from_production(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            settings.FEC_API = "https://not-real.api/"
+            request = self.factory.get("/api/v1/openfec/query_filings/?query=C12345678")
+            request.user = self.user
+            with patch("fecfiler.openfec.views.requests") as mock_requests:
+                called_with = []
+
+                mock_response_first = Mock()
+                mock_response_first.status_code = 200
+                mock_response_first.json.return_value = {"results":[]}
+                mock_response_second = Mock()
+                mock_response_second.status_code = 200
+                mock_response_second.json.return_value = {"results": [
+                    {"form_type": "F1"}
+                ]}
+                responses = [mock_response_first, mock_response_second]
+
+                def get_mocked_responses(*args, **kwargs):
+                    called_with.append(args)
+                    return responses.pop(0)
+
+                mock_requests.get = get_mocked_responses
+                response = OpenfecViewSet.as_view({"get": "f1_filing"})(
+                    request, pk="C12345678"
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(
+                    "https://not-real.api/efile/form1/",
+                    called_with[0]
+                )
+                self.assertIn(
+                    "https://not-real.api/committee/C12345678/",
+                    called_with[1]
+                )
+
+                # f"{settings.FEC_API}efile/form1/",
+                # f"{settings.FEC_API}committee/{committee_id}/"
