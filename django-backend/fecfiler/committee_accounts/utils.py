@@ -4,7 +4,6 @@ import re
 from django.db import connection
 from rest_framework.exceptions import ValidationError
 from .models import CommitteeAccount, Membership
-from fecfiler.mock_openfec.mock_endpoints import recent_f1
 from fecfiler.transactions.models import (
     Transaction,
     get_committee_view_name,
@@ -14,32 +13,11 @@ from fecfiler.settings import (
     FEC_API_KEY,
     MOCK_OPENFEC_REDIS_URL,
     CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST,
+    COMMITTEE_DATA_SOURCE,
+    STAGE_FEC_API,
 )
 
 logger = logging.getLogger(__name__)
-
-
-def retrieve_recent_f1(committee_id):
-    """Gets the most recent F1 filing
-    First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
-    a request is made to a different endpoint that is updated nightly.
-    The realtime endpoint will have more recent filings, but does not provide
-    filings older than 6 months. The other endpoint returns a committee's current data
-    informed by their most recent F1 and F2 filings."""
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    endpoints = [
-        f"{FEC_API}efile/form1/",
-        f"{FEC_API}committee/{committee_id}/",
-    ]
-    for endpoint in endpoints:
-        response = requests.get(endpoint, headers=headers, params=params).json()
-        results = response["results"]
-        if len(results) > 0:
-            return results[0]
 
 
 def check_email_can_create_committee_account(email):
@@ -93,13 +71,10 @@ def check_email_match(email, f1_emails):
 def check_can_create_committee_account(committee_id, user):
     email = user.email
 
-    if MOCK_OPENFEC_REDIS_URL:
-        f1 = recent_f1(committee_id)
-    else:
-        f1 = retrieve_recent_f1(committee_id)
+    committee = get_committee(committee_id)
 
-    f1_emails = (f1 or {}).get("email")
-    failure_reason = check_email_match(email, f1_emails)
+    emails = (committee or {}).get("email")
+    failure_reason = check_email_match(email, emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
@@ -140,3 +115,75 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
+
+
+def get_committee(committee_id):
+    match COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            return Response(get_production_committee(committee_id))
+        case "TEST":
+            return Response(get_test_committee(committee_id))
+        case "LOCAL":
+            return Response(get_local_committee(committee_id))
+        case _:
+            error_message = f"""COMMITTEE_DATA_SOURCE improperly configured: {
+                    settings.COMMITTEE_DATA_SOURCE
+                }"""
+            response = Response()
+            response.status_code = 500
+            response.content = error_message
+            logger.exception(Exception(error_message))
+            return response
+
+
+def get_production_committee(committee_id):
+    """Gets the most recent F1 filing
+    First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
+    a request is made to a different endpoint that is updated nightly.
+    The realtime endpoint will have more recent filings, but does not provide
+    filings older than 6 months. The other endpoint returns a committee's current data
+    informed by their most recent F1 and F2 filings."""
+    endpoints = [
+        f"{FEC_API}efile/form1/",
+        f"{FEC_API}committee/{committee_id}/",
+    ]
+    for endpoint in endpoints:
+        committee = query_committee(committee_id, endpoint)
+        if committee:
+            return committee
+    return None
+
+
+def get_test_committee(committee_id):
+    """gets committee from test-form1 endpoint"""
+    return query_committee(committee_id, f"{STAGE_FEC_API}efile/test-form1/")
+
+
+def query_committee(committee_id, url):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    response = requests.get(url, headers=headers, params=params)
+    results = response["results"]
+    if len(results) > 0:
+        return results[0]
+    return None
+
+
+def get_local_committee(committee_id):
+    """Gets the committee data from the local redis"""
+    if MOCK_OPENFEC_REDIS_URL:
+        redis_instance = redis.StrictRedis.from_url(MOCK_OPENFEC_REDIS_URL)
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        committee = next(
+            (
+                committee
+                for committee in committees
+                if committee.get("committee_id") == committee_id
+            ),
+            None,
+        )
+        return committee

@@ -381,6 +381,14 @@ FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
 FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
 FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
+"""COMMITTEE ACCOUNT settings"""
+COMMITTEE_DATA_SOURCE = env.get_credential("COMMITTEE_DATA_SOURCE", "LOCAL")
+
+"""STAGE FEC API settings
+Used when COMMITTEE_DATA_SOURCE is set to TEST"""
+STAGE_FEC_API = env.get_credential("STAGE_FEC_API")
+STAGE_FEC_API_KEY = env.get_credential("STAGE_FEC_API_KEY")
+
 
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")

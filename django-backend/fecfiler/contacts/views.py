@@ -164,6 +164,11 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    def candidate(self, request):
+        """just like you've got in the pr"""
+        return Response("Not implemented")
+
+    @action(detail=False)
     def committee_lookup(self, request):
         q = request.GET.get("q")
         if q is None:

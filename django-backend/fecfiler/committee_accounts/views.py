@@ -8,7 +8,7 @@ from fecfiler.transactions.models import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
-from .utils import create_committee_account
+from .utils import create_committee_account, get_committee
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
@@ -62,6 +62,29 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         account = create_committee_account(committee_id, request.user)
 
         return Response(CommitteeAccountSerializer(account).data)
+
+    @action(detail=False, methods=["get"])
+    def get_uncreated_committee(self, request):
+        committee_id = request.data.get("committee_id")
+        committee = get_committee(committee_id)
+        if check_can_create_committee_account(committee_id, request.user)
+            return Response(get_committee(committee_id))
+        return Response(None)
+
+    def list(self, request, *args, **kwargs):
+        committee_accounts = super().list(request, *args, **kwargs)
+        for committee_account in committee_accounts:
+            committee_data = get_committee(committee_account.committee_id)
+            """ merge fecfile committee record with committee data from from configured datasource"""
+            committee_account = {**committee_account, **committee_data}
+        return Response(committee_accounts)
+
+    def retrieve(self, request, pk=None):
+        committee_account = super().retrieve(request, pk)
+        committee_data = get_committee(pk)
+        """ merge fecfile committee record with committee data from from configured datasource"""
+        committee_account = {**committee_account, **committee_data}
+        return Response(committee_account)
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
