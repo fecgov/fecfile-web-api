@@ -60,7 +60,7 @@
     "path": "schedule_e.disbursement_date"
   },
   "calendar_ytd_per_election_office": {
-    "path": "schedule_e.calendar_ytd_per_election_office"
+    "path": "calendar_ytd_per_election_office"
   },
   "expenditure_purpose_descrip": {
     "path": "schedule_e.expenditure_purpose_descrip"

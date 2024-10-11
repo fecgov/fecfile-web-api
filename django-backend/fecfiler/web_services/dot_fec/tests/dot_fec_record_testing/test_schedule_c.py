@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_transactions
 from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance
@@ -74,8 +75,8 @@ class DotFECScheduleCTestCase(TestCase):
         self.loan_individual = create_loan(
             self.committee,
             self.individual,
-            "5000.00",
-            "2024-01-01",
+            Decimal(5000.00),
+            datetime.strptime("2024-01-10", "%Y-%m-%d"),
             "7%",
             loan_incurred_date=datetime.strptime("2024-01-02", "%Y-%m-%d"),
             report=self.f3x,
@@ -165,10 +166,10 @@ class DotFECScheduleCTestCase(TestCase):
 
     def test_loan_individual(self):
         self.assertEqual(self.split_row[18], "5000.00")
-        self.assertEqual(self.split_row[19], "")
-        self.assertEqual(self.split_row[20], "")
+        self.assertEqual(self.split_row[19], "0.00")
+        self.assertEqual(self.split_row[20], "5000.00")
         self.assertEqual(self.split_row[21], "20240102")
-        self.assertEqual(self.split_row[22], "2024-01-01")
+        self.assertEqual(self.split_row[22], "20240110")
         self.assertEqual(self.split_row[23], "7%")
         self.assertEqual(self.split_row[24], "N")
         self.assertEqual(self.split_row[25], "N")
@@ -176,10 +177,10 @@ class DotFECScheduleCTestCase(TestCase):
 
     def test_loan_organization(self):
         self.assertEqual(self.split_row_org[18], "3000.00")
-        self.assertEqual(self.split_row_org[19], "")
-        self.assertEqual(self.split_row_org[20], "")
+        self.assertEqual(self.split_row_org[19], "0.00")
+        self.assertEqual(self.split_row_org[20], "3000.00")
         self.assertEqual(self.split_row_org[21], "20240104")
-        self.assertEqual(self.split_row_org[22], "2024-01-03")
+        self.assertEqual(self.split_row_org[22], "20240103")
         self.assertEqual(self.split_row_org[23], "8%")
         self.assertEqual(self.split_row_org[24], "Y")
         self.assertEqual(self.split_row_org[25], "Y")

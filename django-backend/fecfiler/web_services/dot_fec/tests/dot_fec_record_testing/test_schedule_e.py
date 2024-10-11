@@ -179,7 +179,7 @@ class DotFECScheduleETestCase(TestCase):
         self.assertEqual(self.split_row[19], "20240115")
         self.assertEqual(self.split_row[20], "153.00")
         self.assertEqual(self.split_row[21], "20240112")
-        self.assertEqual(self.split_row[22], "")
+        self.assertEqual(self.split_row[22], "153.00")
         self.assertEqual(self.split_row[23], "EXPENDITURE DESCRIPTION")
 
     def test_category_code(self):
