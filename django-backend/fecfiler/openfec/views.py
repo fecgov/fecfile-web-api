@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.mock_openfec.mock_endpoints import (
     mock_query_filings,
-	mock_committee
+    mock_committee
 )
 import requests
 import fecfiler.settings as settings
@@ -76,15 +76,16 @@ class OpenfecViewSet(viewsets.GenericViewSet):
 
             last_good_response = response
             results += response['results']
-            page += 1
 
             if page >= response['pagination']['pages']:
                 break
 
+            page += 1
+
         matching_results = []
         found_committees = {}
         for result in results:
-            if query in result['committee_name'] or query in result['committee_id']:
+            if query in result['committee_id']:
                 if not found_committees.get(result['committee_id']):
                     found_committees[result['committee_id']] = result['committee_name']
                     matching_results.append(result)
@@ -102,7 +103,12 @@ class OpenfecViewSet(viewsets.GenericViewSet):
 
     @action(detail=True)
     def f1_filing(self, request, pk=None):
-        return Response(retrieve_recent_f1(pk))
+        f1_filing = retrieve_recent_f1(pk)
+
+        if hasattr(f1_filing, "status_code"):
+            return f1_filing
+
+        return Response(f1_filing)
 
     @action(detail=False)
     def query_filings(self, request):
