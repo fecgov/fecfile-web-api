@@ -288,6 +288,7 @@ class OpenfecViewSetTest(TestCase):
                 }
             },
         ]
+
         def mock_filing_pages(*args, **kwargs):
             mock = Mock()
             page = {"results": []}
