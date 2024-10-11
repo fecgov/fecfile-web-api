@@ -339,7 +339,9 @@ class ContactViewSetTest(TestCase):
 
                 with patch("fecfiler.contacts.views.requests") as mock_requests:
                     mock_requests.get = Mock()
-                    mock_requests.get.return_value = Response({"name": "TEST"})
+                    json = Mock()
+                    mock_requests.get.return_value = json
+                    json.return_value = {"name": "TEST"}
 
                     request = self.factory.get(
                         "/api/v1/contacts/committee/?committee_id=C12345678"
