@@ -22,8 +22,6 @@ fecfiler.committee\_accounts.test\_views
       :toctree:                                          
       :template: custom-class-template.rst               
    
-      CheckEmailMatchTestCase
-      CommitteeAccountsViewsTest
       CommitteeMemberViewSetTest
    
    

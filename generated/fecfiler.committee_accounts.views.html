@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.views.check_email_can_create_committee_account" href="fecfiler.committee_accounts.views.check_email_can_create_committee_account.html" />
-    <link rel="prev" title="fecfiler.committee_accounts.urls" href="fecfiler.committee_accounts.urls.html" />
+    <link rel="next" title="fecfiler.committee_accounts.views.CommitteeMemberListPagination" href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html" />
+    <link rel="prev" title="fecfiler.committee_accounts.utils.retrieve_recent_f1" href="fecfiler.committee_accounts.utils.retrieve_recent_f1.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,23 +34,6 @@
             
   <section id="module-fecfiler.committee_accounts.views">
 <span id="fecfiler-committee-accounts-views"></span><h1>fecfiler.committee_accounts.views<a class="headerlink" href="#module-fecfiler.committee_accounts.views" title="Link to this heading">¶</a></h1>
-<p class="rubric">Functions</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.check_email_can_create_committee_account.html#fecfiler.committee_accounts.views.check_email_can_create_committee_account" title="fecfiler.committee_accounts.views.check_email_can_create_committee_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_email_can_create_committee_account</span></code></a>(email)</p></td>
-<td><p>Check if the provided email is allowed to create a committee based on domain or exception list.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.check_email_match.html#fecfiler.committee_accounts.views.check_email_match" title="fecfiler.committee_accounts.views.check_email_match"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_email_match</span></code></a>(email, f1_emails)</p></td>
-<td><p>Check if the provided email matches any of the committee emails.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_account.html#fecfiler.committee_accounts.views.create_committee_account" title="fecfiler.committee_accounts.views.create_committee_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_committee_account</span></code></a>(committee_id, user)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_view.html#fecfiler.committee_accounts.views.create_committee_view" title="fecfiler.committee_accounts.views.create_committee_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_committee_view</span></code></a>(committee_uuid)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -104,13 +87,11 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.signals.html">fecfiler.committee_accounts.signals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_delete_committeee_command.html">fecfiler.committee_accounts.test_delete_committeee_command</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_models.html">fecfiler.committee_accounts.test_models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_utils.html">fecfiler.committee_accounts.test_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_views.html">fecfiler.committee_accounts.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.urls.html">fecfiler.committee_accounts.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.utils.html">fecfiler.committee_accounts.utils</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.views</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.check_email_can_create_committee_account.html">fecfiler.committee_accounts.views.check_email_can_create_committee_account</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.check_email_match.html">fecfiler.committee_accounts.views.check_email_match</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_account.html">fecfiler.committee_accounts.views.create_committee_account</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.create_committee_view.html">fecfiler.committee_accounts.views.create_committee_view</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html">fecfiler.committee_accounts.views.CommitteeMemberListPagination</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMembershipViewSet.html">fecfiler.committee_accounts.views.CommitteeMembershipViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html">fecfiler.committee_accounts.views.CommitteeOwnedViewMixin</a></li>
@@ -155,8 +136,8 @@
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
-      <li>Previous: <a href="fecfiler.committee_accounts.urls.html" title="previous chapter">fecfiler.committee_accounts.urls</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.views.check_email_can_create_committee_account.html" title="next chapter">fecfiler.committee_accounts.views.check_email_can_create_committee_account</a></li>
+      <li>Previous: <a href="fecfiler.committee_accounts.utils.retrieve_recent_f1.html" title="previous chapter">fecfiler.committee_accounts.utils.retrieve_recent_f1</a></li>
+      <li>Next: <a href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html" title="next chapter">fecfiler.committee_accounts.views.CommitteeMemberListPagination</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

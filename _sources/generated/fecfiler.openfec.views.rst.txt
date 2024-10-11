@@ -12,13 +12,6 @@ fecfiler.openfec.views
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      retrieve_recent_f1
-   
    
 
    

@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.views.check\_email\_match
-======================================================
-
-.. currentmodule:: fecfiler.committee_accounts.views
-
-.. autofunction:: check_email_match

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.create\_committee\_account
+=============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: create_committee_account

@@ -117,8 +117,6 @@ fecfiler.openfec.test\_views.OpenfecViewSetTest
       ~OpenfecViewSetTest.test_get_committee_no_override
       ~OpenfecViewSetTest.test_get_committee_override_data_not_found
       ~OpenfecViewSetTest.test_get_committee_override_happy_path
-      ~OpenfecViewSetTest.test_get_filings_happy_path
-      ~OpenfecViewSetTest.test_get_filings_invalid_resp
    
    
 

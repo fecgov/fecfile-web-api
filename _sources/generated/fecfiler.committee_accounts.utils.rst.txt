@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.utils
+==================================
+
+.. automodule:: fecfiler.committee_accounts.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      check_can_create_committee_account
+      check_email_can_create_committee_account
+      check_email_match
+      create_committee_account
+      create_committee_view
+      retrieve_recent_f1
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
