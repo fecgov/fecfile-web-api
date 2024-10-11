@@ -103,8 +103,10 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee = mock_committee(committee_id)
         if committee:
             return Response(committee)
-        return requests.get(
-            f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}"
+        return Response(
+            requests.get(
+                f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}"
+            ).json()
         )
 
     @action(detail=False)
