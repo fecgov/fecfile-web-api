@@ -10,16 +10,9 @@ from rest_framework import viewsets, pagination
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
-from fecfiler.settings import (
-    FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
-    FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
-    FEC_API_CANDIDATE_ENDPOINT,
-    FEC_API_KEY,
-)
 from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
-from django.http.response import HttpResponse
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
@@ -90,10 +83,10 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         try:
             headers = {"Content-Type": "application/json"}
             params = {
-                "api_key": FEC_API_KEY,
+                "api_key": settings.FEC_API_KEY,
                 "sort": "-two_year_period",
             }
-            url = FEC_API_CANDIDATE_ENDPOINT.format(
+            url = settings.FEC_API_CANDIDATE_ENDPOINT.format(
                 validate_and_sanitize_candidate(candidate_id)
             )
             response = requests.get(url, headers=headers, params=params).json()
@@ -107,13 +100,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee_id = request.query_params.get("committee_id")
         if not committee_id:
             return HttpResponseBadRequest()
-        response = mock_committee(committee_id)
-        if response:
-            return Response(response)
-        response = requests.get(
+        committee = mock_committee(committee_id)
+        if committee:
+            return Response(committee)
+        return requests.get(
             f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}"
         )
-        return HttpResponse(response)
 
     @action(detail=False)
     def candidate_lookup(self, request):
@@ -133,12 +125,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": FEC_API_KEY}
+        params = {"q": q, "api_key": settings.FEC_API_KEY}
         if office:
             params["office"] = office
         params = urlencode(params)
         json_results = requests.get(
-            FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
+            settings.FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
         ).json()
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
@@ -197,9 +189,9 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        params = urlencode({"q": q, "api_key": settings.FEC_API_KEY})
         json_results = requests.get(
-            FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
+            settings.FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
         ).json()
 
         fecfile_committees = list(
