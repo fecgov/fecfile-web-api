@@ -12,7 +12,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
 from fecfiler.contacts.tests.utils import create_test_individual_contact
@@ -74,9 +74,7 @@ class DotFECSerializerTestCase(TestCase):
         )
 
         self.report_level_memo_text = create_report_memo(
-            self.committee,
-            self.f3x,
-            "dahtest2"
+            self.committee, self.f3x, "dahtest2"
         )
 
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")

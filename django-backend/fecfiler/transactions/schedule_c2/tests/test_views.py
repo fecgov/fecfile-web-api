@@ -5,7 +5,7 @@ from fecfiler.transactions.schedule_c2.views import save_hook as c2_hook
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 
 
 class ScheduleC2ViewsTestCase(TestCase):
