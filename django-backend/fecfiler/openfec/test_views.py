@@ -66,7 +66,7 @@ class OpenfecViewSetTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
             request = self.factory.get("/api/v1/openfec/C12345678/committee/")
             request.user = self.user
-            with patch("fecfiler.openfec.views.committee") as mock_committee:
+            with patch("fecfiler.openfec.views.mock_committee") as mock_committee:
                 OpenfecViewSet.as_view({"get": "committee"})(
                     request, pk="C12345678"
                 )
@@ -198,5 +198,18 @@ class OpenfecViewSetTest(TestCase):
                     called_with[1]
                 )
 
-                # f"{settings.FEC_API}efile/form1/",
-                # f"{settings.FEC_API}committee/{committee_id}/"
+    def test_query_filings_from_redis(self):
+        with patch("fecfiler.openfec.views.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            request = self.factory.get(
+                "/api/v1/openfec/query_filings/?query=C12345678"
+            )
+            request.user = self.user
+            with patch("fecfiler.openfec.views.mock_committee") as mock_query:
+                mock_query.return_value = {}
+                response = OpenfecViewSet.as_view({"get": "f1_filing"})(
+                    request, pk="C12345678"
+                )
+                self.assertEqual(response.status_code, 200)
+                called_with = mock_query.call_args.args or [[]]
+                self.assertIn("C12345678", called_with)
