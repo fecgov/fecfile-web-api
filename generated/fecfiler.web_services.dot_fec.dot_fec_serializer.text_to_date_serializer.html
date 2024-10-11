@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" />
-    <link rel="prev" title="fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path" href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path.html" />
+    <link rel="next" title="fecfiler.web_services.dot_fec.dot_fec_submitter" href="fecfiler.web_services.dot_fec.dot_fec_submitter.html" />
+    <link rel="prev" title="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,22 +32,12 @@
 
           <div class="body" role="main">
             
-  <section id="fecfiler-web-services-dot-fec-dot-fec-serializer-serialize-field">
-<h1>fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field<a class="headerlink" href="#fecfiler-web-services-dot-fec-dot-fec-serializer-serialize-field" title="Link to this heading">¶</a></h1>
+  <section id="fecfiler-web-services-dot-fec-dot-fec-serializer-text-to-date-serializer">
+<h1>fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer<a class="headerlink" href="#fecfiler-web-services-dot-fec-dot-fec-serializer-text-to-date-serializer" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field">
-<span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.dot_fec_serializer.</span></span><span class="sig-name descname"><span class="pre">serialize_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_mappings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field" title="Link to this definition">¶</a></dt>
-<dd><p>Serialize field to string in FEC standard
-:param model_instance: Instance of <cite>model</cite> that contains
-:type model_instance: django.db.models.Model
-:param field to serialize.  In some cases when serializing a field we need to reference:
-:param another field in the <cite>model_instance</cite>:
-:param so we pass it to the serializer.:
-:param field_name: name of field to serialize
-:type field_name: str
-:param field_mappings: mapping of field to how-to-access it, including special
-:param serializers to use:</p>
-</dd></dl>
+<dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.web_services.dot_fec.dot_fec_serializer.</span></span><span class="sig-name descname"><span class="pre">text_to_date_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -105,12 +95,12 @@
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config.html">fecfiler.web_services.dot_fec.dot_fec_serializer.extract_row_config</a></li>
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings.html">fecfiler.web_services.dot_fec.dot_fec_serializer.get_field_mappings</a></li>
 <li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path.html">fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path</a></li>
-<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field"><code class="docutils literal notranslate"><span class="pre">serialize_field()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer"><code class="docutils literal notranslate"><span class="pre">text_to_date_serializer()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.web_services.dot_fec.dot_fec_submitter.html">fecfiler.web_services.dot_fec.dot_fec_submitter</a></li>
@@ -151,8 +141,8 @@
   <li><a href="fecfiler.web_services.html">fecfiler.web_services</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.html">fecfiler.web_services.dot_fec</a><ul>
   <li><a href="fecfiler.web_services.dot_fec.dot_fec_serializer.html">fecfiler.web_services.dot_fec.dot_fec_serializer</a><ul>
-      <li>Previous: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path.html" title="previous chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.get_value_from_path</a></li>
-      <li>Next: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" title="next chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
+      <li>Previous: <a href="fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance.html" title="previous chapter">fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_instance</a></li>
+      <li>Next: <a href="fecfiler.web_services.dot_fec.dot_fec_submitter.html" title="next chapter">fecfiler.web_services.dot_fec.dot_fec_submitter</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -191,7 +181,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.web_services.dot_fec.dot_fec_serializer.serialize_field.rst.txt"
+      <a href="../_sources/generated/fecfiler.web_services.dot_fec.dot_fec_serializer.text_to_date_serializer.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

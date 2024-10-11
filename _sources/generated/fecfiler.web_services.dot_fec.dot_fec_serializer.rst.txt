@@ -26,6 +26,7 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_serializer
       get_value_from_path
       serialize_field
       serialize_instance
+      text_to_date_serializer
    
    
 
