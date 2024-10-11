@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from django.test import TestCase
 from .tasks import CalculationState, calculate_summary
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.models import Report
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x

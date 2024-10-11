@@ -49,7 +49,7 @@ def _detect_space(repo, branch=None):
 
 
 DEPLOY_RULES = (
-    ("prod", lambda _, branch: branch == "main"),
+    ("test", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
     ("dev", lambda _, branch: branch == "develop"),
 )
@@ -111,7 +111,7 @@ def _print_help_text():
     --space SPACE    If provided, the SPACE space in cloud.gov will be targeted
                      for deployment.
                      Either --space or --branch must be provided
-                     Allowed values are dev, stage, and prod.
+                     Allowed values are dev, stage, test, and prod.
 
 
     --branch BRANCH  Name of the branch to use for deployment. Will auto-detect

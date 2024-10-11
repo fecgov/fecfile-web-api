@@ -6,7 +6,7 @@ from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 import structlog
 
@@ -99,9 +99,7 @@ class CommitteeMemberViewSetTest(TestCase):
         e2e_committee = CommitteeAccount(committee_id="C99999999")
         e2e_committee.save()
 
-        new_report = Report(
-            committee_account=e2e_committee
-        )
+        new_report = Report(committee_account=e2e_committee)
         new_report.save()
 
         new_transaction = Transaction(committee_account=e2e_committee)
@@ -140,9 +138,7 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_delete_all_reports_for_a_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
-        new_report = Report(
-            committee_account=committee
-        )
+        new_report = Report(committee_account=committee)
         new_report.save()
 
         new_transaction = Transaction(committee_account=committee)
@@ -171,9 +167,7 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_delete_all_reports_for_a_different_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
-        new_report = Report(
-            committee_account=committee
-        )
+        new_report = Report(committee_account=committee)
         new_report.save()
 
         new_transaction = Transaction(committee_account=committee)

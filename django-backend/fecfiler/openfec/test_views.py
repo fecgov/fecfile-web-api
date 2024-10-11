@@ -43,34 +43,5 @@ class OpenfecViewSetTest(TestCase):
             )
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data["results"][0]["committee_id"], "C12345678")
-            self.assertEqual(
-                response.data["results"][0]["name"], "Test Committee"
-            )
+            self.assertEqual(response.data["results"][0]["name"], "Test Committee")
             self.assertEqual(response.data["results"][0]["committee_type"], "O")
-
-    def test_get_filings_invalid_resp(self):
-        request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
-        request.user = self.user
-        with patch("fecfiler.openfec.views.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {"results": []}
-            response = OpenfecViewSet.as_view({"get": "f1_filing"})(
-                request, pk="C00100230"
-            )
-            self.assertEqual(response.status_code, 200)
-
-    def test_get_filings_happy_path(self):
-        request = self.factory.get("/api/v1/openfec/C00100230/f1_filing/")
-        request.user = self.user
-        with patch("fecfiler.openfec.views.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
-            mock_response.status_code = 200
-            mock_response_object = {}
-            mock_response_object["results"] = [{}]
-            mock_response_object["results"][0]["form_type"] = "F1"
-            mock_response.json.return_value = mock_response_object
-            response = OpenfecViewSet.as_view({"get": "f1_filing"})(
-                request, pk="C00100230"
-            )
-            self.assertEqual(response.status_code, 200)

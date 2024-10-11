@@ -5,7 +5,7 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, get_read_model
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
     create_schedule_b,
@@ -393,9 +393,9 @@ class TransactionViewTestCase(TestCase):
 
         m2_report = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
         carry_forward_loans(m2_report)
-        carried_forward_loan = view.filter(
-            committee_account_id=self.committee.id
-        ).order_by("created").last()
+        carried_forward_loan = (
+            view.filter(committee_account_id=self.committee.id).order_by("created").last()
+        )
         create_schedule_b(
             "LOAN_REPAYMENT_MADE",
             self.committee,

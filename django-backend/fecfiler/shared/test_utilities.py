@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .utilities import generate_fec_uid
+from .utilities import generate_fec_uid, get_float_from_string
 
 
 class SharedUtilitiesTestCase(TestCase):
@@ -11,3 +11,15 @@ class SharedUtilitiesTestCase(TestCase):
         uid = generate_fec_uid()
         upper = uid.upper()
         self.assertEquals(uid, upper)
+
+    def test_get_fallback_from_invalid_string(self):
+        value = get_float_from_string("Invalid Error", 20.2)
+        self.assertEqual(value, 20.2)
+
+    def test_get_float_from_good_string(self):
+        value = get_float_from_string("10.05", 1)
+        self.assertEqual(value, 10.05)
+
+    def test_get_fallback_from_none_string(self):
+        value = get_float_from_string(None, 1)
+        self.assertEqual(value, 1)
