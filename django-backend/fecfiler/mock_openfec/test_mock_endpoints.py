@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.management import call_command
-from fecfiler.mock_openfec.mock_endpoints import query_filings
+from fecfiler.mock_openfec.mock_endpoints import mock_query_filings
 from unittest.mock import patch
 
 
@@ -14,9 +14,9 @@ class MockEndpointsTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
 
             call_command("load_committee_data")
-            response = query_filings("NOT FINDABLE", "F3")
+            response = mock_query_filings("NOT FINDABLE", "F3")
             self.assertEqual(len(response["results"]), 0)
-            response = query_filings("NOT FINDABLE", "F1")
+            response = mock_query_filings("NOT FINDABLE", "F1")
             self.assertEqual(len(response["results"]), 0)
-            response = query_filings("st Com", "F1")
+            response = mock_query_filings("st Com", "F1")
             self.assertEqual(len(response["results"]), 3)

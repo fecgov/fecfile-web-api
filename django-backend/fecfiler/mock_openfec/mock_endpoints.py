@@ -13,7 +13,7 @@ else:
     redis_instance = None
 
 
-def committee(committee_id):
+def mock_committee(committee_id):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
         committees = json.loads(committee_data) or []
@@ -42,7 +42,7 @@ def committee(committee_id):
         return None
 
 
-def query_filings(query, form_type):
+def mock_query_filings(query, form_type):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
         committees = json.loads(committee_data or "[]")

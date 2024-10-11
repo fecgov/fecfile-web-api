@@ -23,7 +23,7 @@ from django.http.response import HttpResponse
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
-from fecfiler.mock_openfec.mock_endpoints import committee
+from fecfiler.mock_openfec.mock_endpoints import mock_committee
 import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
@@ -107,7 +107,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee_id = request.query_params.get("committee_id")
         if not committee_id:
             return HttpResponseBadRequest()
-        response = committee(committee_id)
+        response = mock_committee(committee_id)
         if response:
             return Response(response)
         response = requests.get(

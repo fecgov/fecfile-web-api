@@ -3,7 +3,10 @@ from rest_framework import viewsets
 from django.http.response import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.mock_openfec.mock_endpoints import query_filings, committee
+from fecfiler.mock_openfec.mock_endpoints import (
+    mock_query_filings,
+	mock_committee
+)
 import requests
 import fecfiler.settings as settings
 
@@ -24,7 +27,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             case "TEST":
                 return Response(self.get_committee_from_test_efo(pk))
             case "REDIS":
-                response = committee(pk)
+                response = mock_committee(pk)
                 return Response(response)
             case _:
                 error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
@@ -120,7 +123,7 @@ class OpenfecViewSet(viewsets.GenericViewSet):
             case "TEST":
                 return Response(self.query_filings_from_test_efo(query))
             case "REDIS":
-                return Response(query_filings(query, form_type))
+                return Response(mock_query_filings(query, form_type))
             case _:
                 error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
                     settings.FLAG__COMMITTEE_DATA_SOURCE
@@ -154,6 +157,8 @@ def retrieve_recent_f1(committee_id):
             ]
         case "TEST":
             endpoints = [f"{settings.FEC_API_STAGE}efile/test-form1/"]
+        case "REDIS":
+            return Response(mock_committee(committee_id))
         case _:
             error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
                 settings.FLAG__COMMITTEE_DATA_SOURCE
