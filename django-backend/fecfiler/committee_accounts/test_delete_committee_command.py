@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from django.test import TestCase
-from fecfiler.committee_accounts.views import create_committee_account
+from fecfiler.committee_accounts.utils import create_committee_account
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
@@ -17,10 +17,8 @@ class CommitteeAccountsViewsTest(TestCase):
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
 
     def test_create_committee_account(self):
-        with patch(
-            "fecfiler.committee_accounts.views.FLAG__COMMITTEE_DATA_SOURCE",
-            "REDIS"
-        ):
+        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
             report = account.report_set.create()

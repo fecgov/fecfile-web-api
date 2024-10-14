@@ -300,6 +300,12 @@ class TransactionSerializer(
                 "contribution_aggregate",
                 "aggregate_amount",
                 "beginning_balance",
+                "donor_candidate_fec_id",
+                "beneficiary_candidate_fec_id",
+                "beneficiary_candidate_last_name",
+                "beneficiary_candidate_first_name",
+                "beneficiary_candidate_office",
+                "beneficiary_candidate_state",
             ],
         )
         super().validate(data_to_validate)

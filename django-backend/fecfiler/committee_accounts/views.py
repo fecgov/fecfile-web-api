@@ -3,11 +3,8 @@ from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins, pagination
 from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.transactions.models import (
-    Transaction,
-    get_committee_view_name,
     get_read_model,
 )
-from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
@@ -17,14 +14,14 @@ from fecfiler.settings import (
     FLAG__COMMITTEE_DATA_SOURCE,
     CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
 )
+from .utils import create_committee_account
+
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
-from django.db import connection
 import structlog
 from django.http import HttpResponse
-import re
 
 logger = structlog.get_logger(__name__)
 
@@ -206,97 +203,3 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         member = self.get_object()
         member.delete()
         return HttpResponse("Member removed")
-
-
-def check_email_can_create_committee_account(email):
-    """
-    Check if the provided email is allowed to create a committee based on domain
-    or exception list.
-
-    Args:
-        email (str): The email to be checked.
-
-    Returns:
-        boolean True if email is allowed, False otherwise.
-    """
-    allowed_domains = ["fec.gov"]
-    allowed_emails = CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
-    if email:
-        email_to_check = email.lower()
-        split_email = email_to_check.split("@")
-        if len(split_email) == 2:
-            domain = split_email[1]
-            if domain and domain in allowed_domains:
-                return True
-        if email_to_check in allowed_emails:
-            return True
-    return False
-
-
-def check_email_match(email, f1_emails):
-    """
-    Check if the provided email matches any of the committee emails.
-
-    Args:
-        email (str): The email to be checked.
-        f1_emails (str): A string containing a list of committee emails separated
-        by commas or semicolons.
-
-    Returns:
-        str or None: If the provided email does not match any of the committee emails,
-        returns a string indicating the mismatch. Otherwise, returns None.
-    """
-    if not f1_emails:
-        return "No email provided in F1"
-    else:
-        f1_email_lowercase = f1_emails.lower()
-        f1_emails = re.split(r"[;,]", f1_email_lowercase)
-        if email.lower() not in f1_emails:
-            return f"Email {email} does not match committee email"
-    return None
-
-
-def create_committee_account(committee_id, user):
-    email = user.email
-
-    if FLAG__COMMITTEE_DATA_SOURCE == "REDIS":
-        f1 = recent_f1(committee_id)
-    else:
-        f1 = retrieve_recent_f1(committee_id)
-
-    f1_emails = (f1 or {}).get("email")
-    logger.debug(f"\n\nF1 Emails: {f1_emails}\n\n")
-    failure_reason = check_email_match(email, f1_emails)
-
-    existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
-    if existing_account:
-        failure_reason = f"Committee account {committee_id} already created"
-
-    if not check_email_can_create_committee_account(email):
-        failure_reason = f"Email {email} is not allowed to create a committee account"
-
-    if failure_reason:
-        logger.error(f"Failure to create committee account: {failure_reason}")
-        raise ValidationError("could not create committee account")
-
-    account = CommitteeAccount.objects.create(committee_id=committee_id)
-    Membership.objects.create(
-        committee_account=account,
-        user=user,
-        role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-    )
-
-    create_committee_view(account.id)
-    return account
-
-
-def create_committee_view(committee_uuid):
-    view_name = get_committee_view_name(committee_uuid)
-    with connection.cursor() as cursor:
-        sql, params = (
-            Transaction.objects.transaction_view()
-            .filter(committee_account_id=committee_uuid)
-            .query.sql_with_params()
-        )
-        definition = cursor.mogrify(sql, params).decode("utf-8")
-        cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")

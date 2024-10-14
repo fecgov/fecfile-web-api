@@ -3,7 +3,7 @@ from fecfiler.web_services.dot_fec.dot_fec_composer import compose_transactions
 from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_ie, create_schedule_a
 from fecfiler.contacts.models import Contact
@@ -179,7 +179,7 @@ class DotFECScheduleETestCase(TestCase):
         self.assertEqual(self.split_row[19], "20240115")
         self.assertEqual(self.split_row[20], "153.00")
         self.assertEqual(self.split_row[21], "20240112")
-        self.assertEqual(self.split_row[22], "")
+        self.assertEqual(self.split_row[22], "153.00")
         self.assertEqual(self.split_row[23], "EXPENDITURE DESCRIPTION")
 
     def test_category_code(self):

@@ -3,7 +3,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_report
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from datetime import datetime
