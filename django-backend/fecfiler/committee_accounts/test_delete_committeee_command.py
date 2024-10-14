@@ -1,5 +1,5 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_account
+from fecfiler.committee_accounts.views import create_committee_account
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction

@@ -3,7 +3,7 @@ from .serializers import MemoTextSerializer
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 
 

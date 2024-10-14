@@ -4,7 +4,7 @@ from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from rest_framework.test import force_authenticate
 

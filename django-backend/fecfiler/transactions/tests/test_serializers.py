@@ -9,7 +9,7 @@ from fecfiler.transactions.serializers import (
     REDESIGNATED,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b
 
 

@@ -7,7 +7,7 @@ from fecfiler.web_services.models import (
     WebPrintSubmission,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.user.models import User
 

@@ -5,7 +5,7 @@ from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC
 from fecfiler.web_services.tasks import create_dot_fec
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 

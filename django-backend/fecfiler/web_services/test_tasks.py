@@ -8,7 +8,7 @@ from .tasks import (
     submit_to_fec,
     submit_to_webprint,
     poll_for_fec_response,
-    log_polling_notice,
+    log_polling_notice
 )
 from .models import (
     DotFEC,
@@ -21,13 +21,13 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from pathlib import Path
 from fecfiler.settings import CELERY_LOCAL_STORAGE_DIRECTORY
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.web_services.dot_fec.web_print_submitter import (
     WebPrintSubmitter,
-    MockWebPrintSubmitter,
+    MockWebPrintSubmitter
 )
 
 import structlog
@@ -258,7 +258,8 @@ class PollingTasksTestCase(TestCase):
         self.test_print_key = "UnitTestWebPrint"
         self.submission_managers = {
             self.mock_web_print_key: MockWebPrintSubmitter,
-            self.test_print_key: UnitTestWebPrintSubmitter,
+            self.test_print_key: UnitTestWebPrintSubmitter
+
         }
         self.submission_classes = {
             self.mock_web_print_key: WebPrintSubmission,
@@ -278,9 +279,9 @@ class PollingTasksTestCase(TestCase):
 
     def test_submission_ongoing_polling(self):
         with patch.multiple(
-            "fecfiler.web_services.tasks",
+            'fecfiler.web_services.tasks',
             SUBMISSION_MANAGERS=self.submission_managers,
-            SUBMISSION_CLASSES=self.submission_classes,
+            SUBMISSION_CLASSES=self.submission_classes
         ):
             webprint_submission = WebPrintSubmission.objects.initiate_submission(
                 str(self.f3x.id)
@@ -297,9 +298,9 @@ class PollingTasksTestCase(TestCase):
 
     def test_submission_polling_limit(self):
         with patch.multiple(
-            "fecfiler.web_services.tasks",
+            'fecfiler.web_services.tasks',
             SUBMISSION_MANAGERS=self.submission_managers,
-            SUBMISSION_CLASSES=self.submission_classes,
+            SUBMISSION_CLASSES=self.submission_classes
         ):
             webprint_submission = WebPrintSubmission.objects.initiate_submission(
                 str(self.f3x.id)
@@ -314,7 +315,8 @@ class PollingTasksTestCase(TestCase):
                 id=webprint_submission.id
             )
             self.assertEqual(
-                resolved_submission.fecfile_task_state, FECSubmissionState.FAILED.value
+                resolved_submission.fecfile_task_state,
+                FECSubmissionState.FAILED.value
             )
             self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)
 

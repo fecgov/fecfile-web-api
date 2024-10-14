@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 
 
 class Command(BaseCommand):
@@ -10,6 +10,6 @@ class Command(BaseCommand):
         for committee in CommitteeAccount.objects.all():
             create_committee_view(committee.id)
 
-        self.stdout.write(
-            self.style.SUCCESS("Successfully created/updated committee views")
+        self.stdout.write(self.style.SUCCESS(
+            "Successfully created/updated committee views")
         )

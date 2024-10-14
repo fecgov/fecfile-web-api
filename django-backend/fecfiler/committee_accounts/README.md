@@ -6,7 +6,7 @@ migration in the Committee Account app and refer to the following boilerplate co
 
 ```
 from django.db import migrations
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 
 def update_committee_views(apps, schema_editor):
     CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")  # noqa

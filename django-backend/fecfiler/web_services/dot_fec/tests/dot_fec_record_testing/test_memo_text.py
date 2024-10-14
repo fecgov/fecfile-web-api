@@ -1,5 +1,5 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.committee_accounts.views import create_committee_view
 from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance, FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
@@ -29,7 +29,7 @@ class DotFECTextRecordsTestCase(TestCase):
             {
                 "text_code": "ABC",
                 "message_text": "\nBEHOLD! A large text string\nwith new lines",
-            },
+            }
         )
 
         contact_1 = create_test_individual_contact(
@@ -56,14 +56,17 @@ class DotFECTextRecordsTestCase(TestCase):
             text4000="F99_MEMO_TEXT",
         )
         self.transaction_memo = create_transaction_memo(
-            self.committee, self.transaction, "TRANSACTION_MEMO_TEXT"
+            self.committee,
+            self.transaction,
+            "TRANSACTION_MEMO_TEXT"
         )
 
         self.f3x_row = serialize_instance("Text", self.f3x_memo).split(FS_STR)
         self.f99_row = serialize_instance("Text", self.f99_memo).split(FS_STR)
-        self.transaction_row = serialize_instance("Text", self.transaction_memo).split(
-            FS_STR
-        )
+        self.transaction_row = serialize_instance(
+            "Text",
+            self.transaction_memo
+        ).split(FS_STR)
 
     def test_record_name(self):
         self.assertEqual(self.f3x_row[0], "TEXT")
