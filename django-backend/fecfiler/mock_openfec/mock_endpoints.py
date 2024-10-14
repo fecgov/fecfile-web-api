@@ -49,8 +49,12 @@ def mock_query_filings(query, form_type):
         filtered_committee_data = [
             committee
             for committee in committees
-            if query.upper() in committee.get("committee_id").upper()
-            or query.upper() in committee.get("committee_name").upper()
+            if (
+                query.upper() in committee.get("committee_id").upper()
+                or query.upper() in committee.get("committee_name").upper()
+            ) and (
+                form_type == committee.get("form_type")
+            )
         ]
         return {  # same as api.open.fec.gov
             "api_version": "1.0",
