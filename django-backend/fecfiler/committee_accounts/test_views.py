@@ -1,4 +1,3 @@
-from unittest.mock import patch
 from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
