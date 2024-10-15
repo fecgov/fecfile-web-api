@@ -7,10 +7,6 @@ from fecfiler.committee_accounts.utils import COMMITTEE_DATA_REDIS_KEY
 
 
 class LoadTestDataCommandTest(TestCase):
-
-    def setUp(self):
-        pass
-
     def test_load_test_data(self):
         call_command("load_committee_data")
         redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
