@@ -100,7 +100,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee_id = request.query_params.get("committee_id")
         if not committee_id:
             return HttpResponseBadRequest()
-        return Response(get_committee(committee_id))
+
+        headers = {"Content-Type": "application/json"}
+        return requests.get(
+            f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
+            headers=headers
+        ).json()
 
     @action(detail=False)
     def candidate_lookup(self, request):
