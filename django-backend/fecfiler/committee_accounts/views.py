@@ -9,7 +9,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils import (
     check_can_create_committee_account,
     create_committee_account,
-    get_committee,
+    get_committee_account_data,
 )
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -73,7 +73,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         ):
             return HttpResponseBadRequest()
 
-        committee = get_committee(pk)
+        committee = get_committee_account_data(pk)
         if hasattr(committee, "status_code"):
             return committee
         else:

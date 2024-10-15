@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
-from fecfiler.committee_accounts.utils import get_committee
 import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
@@ -102,10 +101,14 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return HttpResponseBadRequest()
 
         headers = {"Content-Type": "application/json"}
-        return requests.get(
+        response = requests.get(
             f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
             headers=headers
         ).json()
+        if response.get("results"):
+            return JsonResponse(response["results"][0])
+        else:
+            return JsonResponse({})
 
     @action(detail=False)
     def candidate_lookup(self, request):

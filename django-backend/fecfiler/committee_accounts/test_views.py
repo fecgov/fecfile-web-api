@@ -154,7 +154,7 @@ class CommitteeViewSetTest(TestCase):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
-    def test_get_committee_from_production(self):
+    def test_get_committee_account_data_from_production(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             settings.FEC_API = "https://not-real.api/"
@@ -179,7 +179,7 @@ class CommitteeViewSetTest(TestCase):
                     was_called_with
                 )
 
-    def test_get_committee_from_test(self):
+    def test_get_committee_account_data_from_test(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             settings.FEC_API_STAGE = "https://stage.not-real.api/"
@@ -204,13 +204,13 @@ class CommitteeViewSetTest(TestCase):
                     was_called_with
                 )
 
-    def test_get_committee_from_redis(self):
+    def test_get_committee_account_data_from_redis(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             request = self.factory.get("/api/v1/committee_accounts/C12345678/committee/")
             request.user = self.user
             with patch(
-                "fecfiler.committee_accounts.utils.get_committee_from_redis"
+                "fecfiler.committee_accounts.utils.get_committee_account_data_from_redis"
             ) as mock_committee:
                 mock_committee.return_value = {
                     "name": "TEST"
@@ -226,7 +226,7 @@ class CommitteeViewSetTest(TestCase):
                 )
                 self.assertEqual(response.data["name"], "TEST")
 
-    def test_get_committee_from_invalid(self):
+    def test_get_committee_account_data_from_invalid(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "INVALID"
             request = self.factory.get("/api/v1/committee_accounts/C12345678/committee/")

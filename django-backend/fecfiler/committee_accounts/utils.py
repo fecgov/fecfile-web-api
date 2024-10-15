@@ -132,19 +132,19 @@ def create_committee_view(committee_uuid):
         cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
 
 
-def get_committee(committee_id):
+def get_committee_account_data(committee_id):
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
-            return get_committee_from_efo(committee_id)
+            return get_committee_account_data_from_efo(committee_id)
         case "TEST":
-            return get_committee_from_test_efo(committee_id)
+            return get_committee_account_data_from_test_efo(committee_id)
         case "MOCKED":
-            return get_committee_from_redis(committee_id)
+            return get_committee_account_data_from_redis(committee_id)
         case _:
             return get_response_for_bad_committee_source_config()
 
 
-def get_committee_from_efo(committee_id):
+def get_committee_account_data_from_efo(committee_id):
     headers = {"Content-Type": "application/json"}
     return requests.get(
         f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
@@ -152,7 +152,7 @@ def get_committee_from_efo(committee_id):
     ).json()
 
 
-def get_committee_from_test_efo(committee_id):
+def get_committee_account_data_from_test_efo(committee_id):
     headers = {"Content-Type": "application/json"}
     params = {
         "api_key": settings.FEC_API_KEY,
@@ -171,7 +171,7 @@ def get_committee_from_test_efo(committee_id):
     }
 
 
-def get_committee_from_redis(committee_id):
+def get_committee_account_data_from_redis(committee_id):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
         committees = json.loads(committee_data) or []
