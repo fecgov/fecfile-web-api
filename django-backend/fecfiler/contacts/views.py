@@ -105,9 +105,9 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return Response(committee)
         return Response(
             requests.get(
-                f"{settings.FEC_API}committee/{committee_id}/?api_key={
+                f"""{settings.FEC_API}committee/{committee_id}/?api_key={
                     settings.FEC_API_KEY
-                }"
+                }"""
             ).json()
         )
 
