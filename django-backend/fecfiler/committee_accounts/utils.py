@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
-if settings.FLAG__COMMITTEE_DATA_SOURCE == "REDIS" or settings.UNIT_TESTING_ENVIRONMENT:
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED" or settings.UNIT_TESTING_ENVIRONMENT:
     redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
 else:
     redis_instance = None
@@ -138,7 +138,7 @@ def get_committee(committee_id):
             return get_committee_from_efo(committee_id)
         case "TEST":
             return get_committee_from_test_efo(committee_id)
-        case "REDIS":
+        case "MOCKED":
             return get_committee_from_redis(committee_id)
         case _:
             return get_response_for_bad_committee_source_config()
@@ -200,104 +200,13 @@ def get_committee_from_redis(committee_id):
         return None
 
 
-def get_filings(query, form_type):
-    match settings.FLAG__COMMITTEE_DATA_SOURCE:
-        case "PRODUCTION":
-            return Response(get_filings_from_efo(query, form_type))
-        case "TEST":
-            return Response(get_filings_from_test_efo(query))
-        case "REDIS":
-            return Response(get_filings_from_redis(query, form_type))
-        case _:
-            return get_response_for_bad_committee_source_config()
-
-
-def get_filings_from_efo(query, form_type):
-    params = {
-        "api_key": settings.FEC_API_KEY,
-        "q_filer": query,
-        "sort": "-receipt_date",
-        "form_type": form_type,
-        "most_recent": True,
-    }
-    fec_response = requests.get(f"{settings.FEC_API}filings/", params)
-    response = fec_response.json()
-    return Response(response)
-
-
-def get_filings_from_test_efo(query):
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": settings.FEC_API_KEY,
-        "per_page": 100,
-    }
-    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
-    results = []
-    page = 1
-    last_good_response = {}
-    while True:
-        params["page"] = page
-        response = requests.get(endpoint, headers=headers, params=params).json()
-
-        if not response.get('results'):
-            break
-
-        last_good_response = response
-        results += response['results']
-
-        if page >= response['pagination']['pages']:
-            break
-
-        page += 1
-
-    matching_results = []
-    found_committees = {}
-    for result in results:
-        if query in result['committee_id']:
-            if not found_committees.get(result['committee_id']):
-                found_committees[result['committee_id']] = result['committee_name']
-                matching_results.append(result)
-
-    return {
-        'api_version': last_good_response.get('api_version', None),
-        'results': matching_results[:20],
-        'pagination': {
-            'per_page': 20,
-            'count': len(matching_results),
-            'page': 1,
-            'pages': ceil(len(matching_results) / 20)
-        }
-    }
-
-
-def get_filings_from_redis(query, form_type):
-    if redis_instance:
-        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
-        committees = json.loads(committee_data or "[]")
-        filtered_committee_data = [
-            committee
-            for committee in committees
-            if (
-                query.upper() in committee.get("committee_id").upper()
-                or query.upper() in committee.get("committee_name").upper()
-            ) and (
-                form_type == committee.get("form_type")
-            )
-        ]
-        return {  # same as api.open.fec.gov
-            "api_version": "1.0",
-            "results": filtered_committee_data,
-            "pagination": {"pages": 1, "per_page": 20, "count": 1, "page": 1},
-        }
-
-
 def get_recent_f1(committee_id):
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
             return get_recent_f1_from_efo(committee_id)
         case "TEST":
             return get_recent_f1_from_test_efo(committee_id)
-        case "REDIS":
+        case "MOCKED":
             return get_recent_f1_from_redis(committee_id)
         case _:
             return get_response_for_bad_committee_source_config()

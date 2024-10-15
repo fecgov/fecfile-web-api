@@ -312,7 +312,7 @@ class ContactViewSetTest(TestCase):
 
     def test_get_committee_mocked(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             with patch(
                 "fecfiler.committee_accounts.utils.get_committee_from_redis"
             ) as mock_committee:

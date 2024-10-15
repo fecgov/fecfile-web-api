@@ -114,7 +114,7 @@ services:
             CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST:
             UNIT_TESTING_ENVIRONMENT: True # True for environments where running unit tests is expected
             # ---- FEATURE FLAGS ----
-            FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and REDIS, defaults to TEST
+            FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and MOCKED, defaults to TEST
         deploy:
             resources:
                 limits:

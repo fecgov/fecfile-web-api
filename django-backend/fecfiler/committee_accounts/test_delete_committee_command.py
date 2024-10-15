@@ -12,13 +12,13 @@ class CommitteeAccountsViewsTest(TestCase):
 
     def setUp(self):
         with patch("fecfiler.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             call_command("load_committee_data")
         self.test_user = User.objects.create(email="test@fec.gov", username="gov")
 
-    def test_create_committee_account(self):
+    def test_delete_committee_account(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
             report = account.report_set.create()

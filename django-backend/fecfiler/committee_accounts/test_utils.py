@@ -3,7 +3,6 @@ from django.test import TestCase
 from fecfiler.committee_accounts.utils import (
     create_committee_account,
     check_email_match,
-    get_filings_from_redis
 )
 
 from fecfiler.user.models import User
@@ -14,7 +13,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def setUp(self):
         with patch("fecfiler.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             call_command("load_committee_data")
             self.test_user = User.objects.create(email="test@fec.gov", username="gov")
             self.other_user = User.objects.create(email="test@fec.com", username="com")
@@ -24,13 +23,13 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_create_committee_account(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
             self.assertRaisesMessage(
@@ -43,7 +42,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_create_committee_account_mismatch_email(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -54,7 +53,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_create_committee_account_unauthorized_email(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -67,7 +66,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_create_committee_account_case_insensitive(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
             self.assertEquals(account.committee_id, "C12345678")
@@ -108,15 +107,3 @@ class CommitteeAccountsUtilsTest(TestCase):
         f1_emails = "email1@example.com;email2@example.com"
         result = check_email_match("EMAIL1@example.com", f1_emails)
         self.assertIsNone(result)
-
-    def test_get_filings_from_redis(self):
-        with patch("fecfiler.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
-
-            call_command("load_committee_data")
-            response = get_filings_from_redis("NOT FINDABLE", "F3")
-            self.assertEqual(len(response["results"]), 0)
-            response = get_filings_from_redis("NOT FINDABLE", "F1")
-            self.assertEqual(len(response["results"]), 0)
-            response = get_filings_from_redis("st Com", "F1")
-            self.assertEqual(len(response["results"]), 3)

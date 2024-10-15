@@ -33,15 +33,15 @@ class Migration(migrations.Migration):
 
 ## Setup
 
-If `FLAG__COMMITTEE_DATA_SOURCE` is not set to `REDIS`, everything will hit openfec normally
+If `FLAG__COMMITTEE_DATA_SOURCE` is not set to `MOCKED`, everything will hit openfec normally
 
-Currently, the only backing is redis. Setting this to `REDIS` will automatically
+Currently, the only backing is redis. Setting this to `MOCKED` will automatically
 configure `MOCK_OPENFEC_REDIS_URL` to the `REDIS_URL`
-`FLAG__COMMITTEE_DATA_SOURCE = "REDIS"`
+`FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"`
 
 # Local Development
 
-`FLAG__COMMITEE_DATA_SOURCE` is set to `REDIS` in the docker-compose.yml already, and the Dockerfile runs the load_committee_data command, so nothing is needed to use what's in committee_accounts.json.
+`FLAG__COMMITEE_DATA_SOURCE` is set to `MOCKED` in the docker-compose.yml already, and the Dockerfile runs the load_committee_data command, so nothing is needed to use what's in committee_accounts.json.
 
 If you want to change the data in the redis cache, you can modify `fecfiler/committee_accounts/management/commands/committee_data.json`, then from your docker instance's shell (I use `docker exec -it fecfile-api /bin/bash`) call `python manage.py load_committee_data`. This will load whatever you have in committee_data.json into redis to be used in this module
 

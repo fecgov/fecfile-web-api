@@ -10,8 +10,6 @@ from fecfiler.committee_accounts.utils import (
     check_can_create_committee_account,
     create_committee_account,
     get_committee,
-    get_recent_f1,
-    get_filings
 )
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -80,16 +78,6 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return committee
         else:
             return Response(committee)
-
-    @action(detail=True)
-    def f1_filing(self, request, pk):
-        return get_recent_f1(pk)
-
-    @action(detail=False)
-    def query_filings(self, request):
-        query = request.query_params.get("query")
-        form_type = request.query_params.get("form_type")
-        return get_filings(query, form_type)
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):

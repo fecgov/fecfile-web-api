@@ -32,4 +32,4 @@ applications:
       EFO_POLLING_INTERVAL: 30
       UNIT_TESTING_ENVIRONMENT: False # True for environments where running unit tests is expected
       # ---- FEATURE FLAGS ----
-      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and REDIS, defaults to TEST
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED, defaults to TEST
