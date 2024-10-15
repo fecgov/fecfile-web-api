@@ -1,6 +1,10 @@
 from unittest.mock import patch
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_account, check_email_match, get_filings_from_redis
+from fecfiler.committee_accounts.utils import (
+	create_committee_account,
+    check_email_match,
+    get_filings_from_redis
+)
 
 from fecfiler.user.models import User
 from django.core.management import call_command

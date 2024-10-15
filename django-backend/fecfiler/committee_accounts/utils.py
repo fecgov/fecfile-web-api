@@ -143,6 +143,7 @@ def get_committee(committee_id):
         case _:
             return get_response_for_bad_committee_source_config()
 
+
 def get_committee_from_efo(committee_id):
     headers = {"Content-Type": "application/json"}
     return requests.get(

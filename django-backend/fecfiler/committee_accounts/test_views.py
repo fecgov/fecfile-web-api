@@ -208,7 +208,9 @@ class CommitteeViewSetTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
             request = self.factory.get("/api/v1/committee_accounts/C12345678/committee/")
             request.user = self.user
-            with patch("fecfiler.committee_accounts.utils.get_committee_from_redis") as mock_committee:
+            with patch(
+                "fecfiler.committee_accounts.utils.get_committee_from_redis"
+            ) as mock_committee:
                 mock_committee.return_value = {
                     "name": "TEST"
                 }
@@ -311,7 +313,9 @@ class CommitteeViewSetTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             settings.FEC_API_STAGE = "https://stage.not-real.api/"
-            request = self.factory.get("/api/v1/committee_accounts/query_filings/?query=C2111")
+            request = self.factory.get(
+                "/api/v1/committee_accounts/query_filings/?query=C2111"
+            )
             request.user = self.user
             with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
                 mock_requests.get = mock_filing_pages
@@ -334,7 +338,9 @@ class CommitteeViewSetTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             settings.FEC_API = "https://not-real.api/"
-            request = self.factory.get("/api/v1/committee_accounts/query_filings/?query=C12345678")
+            request = self.factory.get(
+                "/api/v1/committee_accounts/query_filings/?query=C12345678"
+            )
             request.user = self.user
             with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
                 mock_requests.get.return_value = mock_response = Mock()
@@ -359,7 +365,9 @@ class CommitteeViewSetTest(TestCase):
                 "/api/v1/committee_accounts/query_filings/?query=C12345678"
             )
             request.user = self.user
-            with patch("fecfiler.committee_accounts.utils.get_filings_from_redis") as mock_query:
+            with patch(
+                "fecfiler.committee_accounts.utils.get_filings_from_redis"
+            ) as mock_query:
                 mock_query.return_value = {}
                 response = CommitteeViewSet.as_view({"get": "query_filings"})(
                     request
