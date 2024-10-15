@@ -2,8 +2,8 @@ from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
 from fecfiler.committee_accounts.views import (
-	CommitteeMembershipViewSet,
-	CommitteeViewSet
+    CommitteeMembershipViewSet,
+    CommitteeViewSet
 )
 
 from fecfiler.user.models import User
