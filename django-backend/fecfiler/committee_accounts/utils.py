@@ -5,57 +5,34 @@ from django.db import connection
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
-from fecfiler.mock_openfec.mock_endpoints import mock_committee
 from fecfiler.transactions.models import (
     Transaction,
     get_committee_view_name,
 )
 from fecfiler import settings
+import redis
+import json
+from math import ceil
 
 logger = logging.getLogger(__name__)
 
 
-def retrieve_recent_f1(committee_id):
-    """Gets the most recent F1 filing
-    First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
-    a request is made to a different endpoint that is updated nightly.
-    The realtime endpoint will have more recent filings, but does not provide
-    filings older than 6 months. The other endpoint returns a committee's current data
-    informed by their most recent F1 and F2 filings."""
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": settings.FEC_API_KEY,
-        "committee_id": committee_id,
-    }
+COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "REDIS" or settings.UNIT_TESTING_ENVIRONMENT:
+    redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
+else:
+    redis_instance = None
 
-    response = None
-    match settings.FLAG__COMMITTEE_DATA_SOURCE:
-        case "PRODUCTION":
-            endpoints = [
-                f"{settings.FEC_API}efile/form1/",
-                f"{settings.FEC_API}committee/{committee_id}/"
-            ]
-            for endpoint in endpoints:
-                response = requests.get(endpoint, headers=headers, params=params).json()
-                if response.get('results'):
-                    break
-        case "TEST":
-            endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
-            response = requests.get(endpoint, headers=headers, params=params).json()
-        case "REDIS":
-            response = mock_committee(committee_id)
-        case _:
-            error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
-                settings.FLAG__COMMITTEE_DATA_SOURCE
-            }"""
-            response = Response()
-            response.status_code = 500
-            response.content = error_message
-            logger.exception(Exception(error_message))
-            return response
 
-    if response and response.get("results"):
-        return response.get("results")[0]
+def get_response_for_bad_committee_source_config():
+    error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+        settings.FLAG__COMMITTEE_DATA_SOURCE
+    }"""
+    response = Response()
+    response.status_code = 500
+    response.content = error_message
+    logger.exception(Exception(error_message))
+    return response
 
 
 def check_email_allowed_to_create_committee_account(email):
@@ -109,7 +86,7 @@ def check_email_match(email, f1_emails):
 def check_can_create_committee_account(committee_id, user):
     email = user.email
 
-    f1 = retrieve_recent_f1(committee_id)
+    f1 = get_recent_f1(committee_id)
 
     f1_emails = (f1 or {}).get("email")
     failure_reason = check_email_match(email, f1_emails)
@@ -153,3 +130,212 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
+
+
+def get_committee(committee_id):
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            return get_committee_from_efo(committee_id)
+        case "TEST":
+            return get_committee_from_test_efo(committee_id)
+        case "REDIS":
+            return get_committee_from_redis(committee_id)
+        case _:
+            return get_response_for_bad_committee_source_config()
+
+def get_committee_from_efo(committee_id):
+    headers = {"Content-Type": "application/json"}
+    return requests.get(
+        f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
+        headers=headers
+    ).json()
+
+
+def get_committee_from_test_efo(committee_id):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": settings.FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
+    response = requests.get(endpoint, headers=headers, params=params)
+    response_data = response.json()
+    results = response_data.get('results', [])
+    if results:
+        results[0]['name'] = results[0].get('committee_name', None)
+
+    return {
+        'api_version': response_data.get('api_version', None),
+        'results': response_data.get('results', [])[:1],
+    }
+
+
+def get_committee_from_redis(committee_id):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        committee = next(
+            (
+                committee
+                for committee in committees
+                if committee.get("committee_id") == committee_id
+            ),
+            None,
+        )
+        if committee:
+            # rename key so we can use same mock data for both
+            # query_filings and committee details endpoints
+            committee['name'] = committee.pop('committee_name')
+            return {  # same as api.open.fec.gov
+                "api_version": "1.0",
+                "results": [committee],
+                "pagination": {
+                    "pages": 1,
+                    "per_page": 20,
+                    "count": 1,
+                    "page": 1,
+                },
+            }
+        return None
+
+
+def get_filings(query, form_type):
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            return Response(get_filings_from_efo(query, form_type))
+        case "TEST":
+            return Response(get_filings_from_test_efo(query))
+        case "REDIS":
+            return Response(get_filings_from_redis(query, form_type))
+        case _:
+            return get_response_for_bad_committee_source_config()
+
+
+def get_filings_from_efo(query, form_type):
+    params = {
+        "api_key": settings.FEC_API_KEY,
+        "q_filer": query,
+        "sort": "-receipt_date",
+        "form_type": form_type,
+        "most_recent": True,
+    }
+    fec_response = requests.get(f"{settings.FEC_API}filings/", params)
+    response = fec_response.json()
+    return Response(response)
+
+
+def get_filings_from_test_efo(query):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": settings.FEC_API_KEY,
+        "per_page": 100,
+    }
+    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
+    results = []
+    page = 1
+    last_good_response = {}
+    while True:
+        params["page"] = page
+        response = requests.get(endpoint, headers=headers, params=params).json()
+
+        if not response.get('results'):
+            break
+
+        last_good_response = response
+        results += response['results']
+
+        if page >= response['pagination']['pages']:
+            break
+
+        page += 1
+
+    matching_results = []
+    found_committees = {}
+    for result in results:
+        if query in result['committee_id']:
+            if not found_committees.get(result['committee_id']):
+                found_committees[result['committee_id']] = result['committee_name']
+                matching_results.append(result)
+
+    return {
+        'api_version': last_good_response.get('api_version', None),
+        'results': matching_results[:20],
+        'pagination': {
+            'per_page': 20,
+            'count': len(matching_results),
+            'page': 1,
+            'pages': ceil(len(matching_results) / 20)
+        }
+    }
+
+
+def get_filings_from_redis(query, form_type):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data or "[]")
+        filtered_committee_data = [
+            committee
+            for committee in committees
+            if (
+                query.upper() in committee.get("committee_id").upper()
+                or query.upper() in committee.get("committee_name").upper()
+            ) and (
+                form_type == committee.get("form_type")
+            )
+        ]
+        return {  # same as api.open.fec.gov
+            "api_version": "1.0",
+            "results": filtered_committee_data,
+            "pagination": {"pages": 1, "per_page": 20, "count": 1, "page": 1},
+        }
+
+
+def get_recent_f1(committee_id):
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            return get_recent_f1_from_efo(committee_id)
+        case "TEST":
+            return get_recent_f1_from_test_efo(committee_id)
+        case "REDIS":
+            return get_recent_f1_from_redis(committee_id)
+        case _:
+            return get_response_for_bad_committee_source_config()
+
+
+def get_recent_f1_from_efo(committee_id):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": settings.FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    endpoints = [
+        f"{settings.FEC_API}efile/form1/",
+        f"{settings.FEC_API}committee/{committee_id}/"
+    ]
+    for endpoint in endpoints:
+        response = requests.get(endpoint, headers=headers, params=params).json()
+        if response.get('results'):
+            return response['results'][0]
+
+
+def get_recent_f1_from_test_efo(committee_id):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": settings.FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
+    response = requests.get(endpoint, headers=headers, params=params).json()
+    if response.get('results'):
+        return response['results'][0]
+
+
+def get_recent_f1_from_redis(committee_id):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        return next(
+            committee
+            for committee in committees
+            if committee.get("committee_id") == committee_id
+        )

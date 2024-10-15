@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
-from fecfiler.mock_openfec.mock_endpoints import mock_committee
+from fecfiler.committee_accounts.utils import get_committee
 import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
@@ -100,16 +100,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee_id = request.query_params.get("committee_id")
         if not committee_id:
             return HttpResponseBadRequest()
-        committee = mock_committee(committee_id)
-        if committee:
-            return Response(committee)
-        return Response(
-            requests.get(
-                f"""{settings.FEC_API}committee/{committee_id}/?api_key={
-                    settings.FEC_API_KEY
-                }"""
-            ).json()
-        )
+        return Response(get_committee(committee_id))
 
     @action(detail=False)
     def candidate_lookup(self, request):

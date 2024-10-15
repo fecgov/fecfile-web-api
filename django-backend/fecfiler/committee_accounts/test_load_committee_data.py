@@ -3,7 +3,7 @@ from django.core.management import call_command
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import redis
 import json
-from fecfiler.mock_openfec.mock_endpoints import COMMITTEE_DATA_REDIS_KEY
+from fecfiler.committee_accounts.utils import COMMITTEE_DATA_REDIS_KEY
 
 
 class LoadTestDataCommandTest(TestCase):

@@ -9,7 +9,7 @@ from fecfiler.settings import (
 import redis
 import os
 from fecfiler.s3 import S3_SESSION
-from fecfiler.mock_openfec.mock_endpoints import COMMITTEE_DATA_REDIS_KEY
+from fecfiler.committee_accounts.utils import COMMITTEE_DATA_REDIS_KEY
 
 
 class Command(BaseCommand):
@@ -23,7 +23,7 @@ class Command(BaseCommand):
             redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
             if not options.get("s3"):
                 path = os.path.join(
-                    BASE_DIR, "mock_openfec/management/commands/committee_data.json"
+                    BASE_DIR, "committee_accounts/management/commands/committee_data.json"
                 )
                 with open(path) as file:
                     committee_data = file.read()

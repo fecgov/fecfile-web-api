@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_account, check_email_match
+from fecfiler.committee_accounts.utils import create_committee_account, check_email_match, get_filings_from_redis
 
 from fecfiler.user.models import User
 from django.core.management import call_command
@@ -104,3 +104,15 @@ class CommitteeAccountsUtilsTest(TestCase):
         f1_emails = "email1@example.com;email2@example.com"
         result = check_email_match("EMAIL1@example.com", f1_emails)
         self.assertIsNone(result)
+
+    def test_get_filings_from_redis(self):
+        with patch("fecfiler.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "REDIS"
+
+            call_command("load_committee_data")
+            response = get_filings_from_redis("NOT FINDABLE", "F3")
+            self.assertEqual(len(response["results"]), 0)
+            response = get_filings_from_redis("NOT FINDABLE", "F1")
+            self.assertEqual(len(response["results"]), 0)
+            response = get_filings_from_redis("st Com", "F1")
+            self.assertEqual(len(response["results"]), 3)

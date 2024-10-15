@@ -2,20 +2,24 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins, pagination
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.transactions.models import (
-    get_read_model,
-)
+from fecfiler.transactions.models import (get_read_model)
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CommitteeAccount, Membership
-from .utils import create_committee_account
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils import (
+	check_can_create_committee_account,
+    create_committee_account,
+	get_committee,
+	get_recent_f1,
+	get_filings
+)
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 logger = structlog.get_logger(__name__)
 
@@ -62,6 +66,30 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         account = create_committee_account(committee_id, request.user)
 
         return Response(CommitteeAccountSerializer(account).data)
+
+    @action(detail=True)
+    def committee(self, request, pk=None):
+        check_can_create = request.query_params.get("check_can_create")
+        if check_can_create == "true" and not check_can_create_committee_account(
+            pk, request.user
+        ):
+            return HttpResponseBadRequest()
+
+        committee = get_committee(pk)
+        if hasattr(committee, "status_code"):
+            return committee
+        else:
+            return Response(committee)
+
+    @action(detail=True)
+    def f1_filing(self, request, pk):
+        return get_recent_f1(pk)
+
+    @action(detail=False)
+    def query_filings(self, request):
+        query = request.query_params.get("query")
+        form_type = request.query_params.get("form_type")
+        return get_filings(query, form_type)
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
