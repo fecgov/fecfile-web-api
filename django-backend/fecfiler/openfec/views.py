@@ -1,6 +1,6 @@
 from math import ceil
 from rest_framework import viewsets
-from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.http.response import HttpResponseBadRequest
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.mock_openfec.mock_endpoints import (

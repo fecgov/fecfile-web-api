@@ -8,12 +8,6 @@ from fecfiler.transactions.models import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
-from fecfiler.openfec.views import retrieve_recent_f1
-from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.settings import (
-    FLAG__COMMITTEE_DATA_SOURCE,
-    CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
-)
 from .utils import create_committee_account
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer

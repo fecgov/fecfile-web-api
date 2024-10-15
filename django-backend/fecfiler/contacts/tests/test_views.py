@@ -1,7 +1,6 @@
 from unittest.mock import patch, Mock
 from django.test import RequestFactory, TestCase
 from rest_framework.test import force_authenticate
-from rest_framework.response import Response
 import uuid
 
 from fecfiler.user.models import User

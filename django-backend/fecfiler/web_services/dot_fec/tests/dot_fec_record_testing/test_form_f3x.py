@@ -162,7 +162,6 @@ class DotFECForm3XTestCase(TestCase):
 
     def test_date_signed(self):
         today = datetime.now(timezone.utc)
-        date = self.f3x.date_signed
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[21], formatted_date)
 
