@@ -12,7 +12,6 @@ from fecfiler.transactions.models import (
 from fecfiler import settings
 import redis
 import json
-from math import ceil
 
 logger = logging.getLogger(__name__)
 
