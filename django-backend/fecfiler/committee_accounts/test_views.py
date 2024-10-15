@@ -146,6 +146,7 @@ class CommitteeMemberViewSetTest(TestCase):
             "This email is taken by an existing membership to this committee",
         )
 
+
 class CommitteeViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
 
