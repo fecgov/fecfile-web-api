@@ -85,10 +85,16 @@ def check_email_match(email, f1_emails):
 def check_can_create_committee_account(committee_id, user):
     email = user.email
 
-    f1 = get_recent_f1(committee_id)
+    committee = get_committee_account_data(committee_id)
+    committee_emails = (
+        committee or {}
+    ).get(
+        "results", [{}]
+    )[0].get(
+        "email", ""
+    )
 
-    f1_emails = (f1 or {}).get("email")
-    failure_reason = check_email_match(email, f1_emails)
+    failure_reason = check_email_match(email, committee_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
@@ -196,55 +202,3 @@ def get_committee_account_data_from_redis(committee_id):
                     "page": 1,
                 },
             }
-        return None
-
-
-def get_recent_f1(committee_id):
-    match settings.FLAG__COMMITTEE_DATA_SOURCE:
-        case "PRODUCTION":
-            return get_recent_f1_from_efo(committee_id)
-        case "TEST":
-            return get_recent_f1_from_test_efo(committee_id)
-        case "MOCKED":
-            return get_recent_f1_from_redis(committee_id)
-        case _:
-            return get_response_for_bad_committee_source_config()
-
-
-def get_recent_f1_from_efo(committee_id):
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": settings.FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    endpoints = [
-        f"{settings.FEC_API}efile/form1/",
-        f"{settings.FEC_API}committee/{committee_id}/"
-    ]
-    for endpoint in endpoints:
-        response = requests.get(endpoint, headers=headers, params=params).json()
-        if response.get('results'):
-            return response['results'][0]
-
-
-def get_recent_f1_from_test_efo(committee_id):
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": settings.FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
-    response = requests.get(endpoint, headers=headers, params=params).json()
-    if response.get('results'):
-        return response['results'][0]
-
-
-def get_recent_f1_from_redis(committee_id):
-    if redis_instance:
-        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
-        committees = json.loads(committee_data) or []
-        return next(
-            committee
-            for committee in committees
-            if committee.get("committee_id") == committee_id
-        )
