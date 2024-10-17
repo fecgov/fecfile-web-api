@@ -381,7 +381,8 @@ FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
 valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
 if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
     raise Exception(
-        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"must be valid source ({valid_sources})'
+        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
+        + f" must be valid source ({valid_sources})"
     )
 
 

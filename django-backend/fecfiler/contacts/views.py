@@ -110,7 +110,8 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
 
         headers = {"Content-Type": "application/json"}
         response = requests.get(
-            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/?api_key={settings.PRODUCTION_OPEN_FEC_API_KEY}",
+            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
+            params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
             headers=headers,
         ).json()
         if response.get("results"):

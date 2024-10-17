@@ -17,7 +17,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
 
