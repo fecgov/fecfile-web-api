@@ -313,7 +313,8 @@ class ContactViewSetTest(TestCase):
         with patch("fecfiler.contacts.views.settings") as settings:
             settings.PRODUCTION_OPEN_FEC_API = "https://not-real.api/"
             settings.PRODUCTION_OPEN_FEC_API_KEY = "FAKE-KEY"
-            expected_call = "https://not-real.api/committee/C12345678/?api_key=FAKE-KEY"
+            expected_call = "https://not-real.api/committee/C12345678/"
+            expected_params = {"api_key": "FAKE-KEY"}
             with patch("fecfiler.contacts.views.requests") as mock_requests:
                 mock_requests.get = Mock()
                 mock_response = Mock()
@@ -332,7 +333,11 @@ class ContactViewSetTest(TestCase):
 
                 response = ContactViewSet.as_view({"get": "committee"})(request)
                 self.assertEqual(response.status_code, 200)
+                print("AHOY", mock_requests.get.call_args)
                 self.assertIn(expected_call, mock_requests.get.call_args[0])
+                self.assertEqual(
+                    mock_requests.get.call_args.kwargs["params"], expected_params
+                )
                 data = json.loads(str(response.content, encoding="utf8"))
                 self.assertEqual(data["name"], "TEST")
 
