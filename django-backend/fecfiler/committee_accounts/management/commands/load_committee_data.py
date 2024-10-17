@@ -4,7 +4,6 @@ from fecfiler.settings import (
     MOCK_OPENFEC_REDIS_URL,
     BASE_DIR,
     AWS_STORAGE_BUCKET_NAME,
-    UNIT_TESTING_ENVIRONMENT
 )
 import redis
 import os
@@ -19,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument("--s3", action="store_true")
 
     def handle(self, *args, **options):
-        if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED" or UNIT_TESTING_ENVIRONMENT:
+        if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
             redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
             if not options.get("s3"):
                 path = os.path.join(

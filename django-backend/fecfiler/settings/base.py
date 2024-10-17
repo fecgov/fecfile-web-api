@@ -342,10 +342,10 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
-MOCK_EFO_FILING = env.get_credential("MOCK_EFO_FILING", "False").lower() == "true"
+MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
-if not MOCK_EFO_FILING and FEC_FILING_API is None:
-    raise Exception("FEC_FILING_API must be set if MOCK_EFO_FILING is False")
+if not MOCK_EFO and FEC_FILING_API is None:
+    raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
@@ -371,13 +371,6 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
-"""FLAG_UNIT_TESTING_ENVIRONMENT
-If True, the API will set up certain features in anticipation of unit testing
-(e.g, `MOCK_OPENFEC_REDIS_URL` and `redis_instance`)
-"""
-UNIT_TESTING_ENVIRONMENT = env.get_credential(
-    "UNIT_TESTING_ENVIRONMENT", False
-)
 
 """FEATURE FLAGS
 """
@@ -385,27 +378,21 @@ UNIT_TESTING_ENVIRONMENT = env.get_credential(
 # FLAG__COMMITTEE_DATA_SOURCE:
 # Determines whether committee data is pulled from EFO, TestEFO, or REDIS
 FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
-if FLAG__COMMITTEE_DATA_SOURCE not in ["PRODUCTION", "TEST", "MOCKED"]:
-    FLAG__COMMITTEE_DATA_SOURCE = "TEST"
+valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
+if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
+    raise Exception(
+        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"must be valid source ({valid_sources})'
+    )
 
 
-"""FEC API settings
-"""
-if FLAG__COMMITTEE_DATA_SOURCE == "PRODUCTION":
-    FEC_API = env.get_credential("FEC_API_PROD")
-else:
-    FEC_API = env.get_credential("FEC_API_TEST")
-FEC_API_STAGE = env.get_credential("FEC_API_TEST")
-FEC_API_KEY = env.get_credential("FEC_API_KEY")
-FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
-FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
-FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
+PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
+PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
 
+STAGE_OPEN_FEC_API = env.get_credential("STAGE_OPEN_FEC_API")
+STAGE_OPEN_FEC_API_KEY = env.get_credential("STAGE_OPEN_FEC_API_KEY")
 
 """MOCK OPENFEC settings"""
-MOCK_OPENFEC_REDIS_URL = None
-if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED" or UNIT_TESTING_ENVIRONMENT:
-    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
+MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
 CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
     "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []

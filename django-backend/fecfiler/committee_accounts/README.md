@@ -1,7 +1,7 @@
 # Updating Committee Views in the Database
 
 When changes are made to the Committee Account model, it is necessary to update
-the Committee Views for each committee in the database.  To do this, create a new
+the Committee Views for each committee in the database. To do this, create a new
 migration in the Committee Account app and refer to the following boilerplate code:
 
 ```
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
 If `FLAG__COMMITTEE_DATA_SOURCE` is not set to `MOCKED`, everything will hit openfec normally
 
 Currently, the only backing is redis. Setting this to `MOCKED` will automatically
-configure `MOCK_OPENFEC_REDIS_URL` to the `REDIS_URL`
+use the redis instance at `MOCK_OPENFEC_REDIS_URL`
 `FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"`
 
 # Local Development

@@ -21,15 +21,14 @@ applications:
       LOGIN_REDIRECT_CLIENT_URL: https://test.fecfile.fec.gov
       LOGIN_REDIRECT_SERVER_URL: https://test-api.fecfile.fec.gov/api/v1/oidc/login-redirect
       LOGOUT_REDIRECT_URL: https://test-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
-      FEC_API_PROD: https://api.open.fec.gov/v1/
-      FEC_API_TEST: https://api-stage.open.fec.gov/v1/
+      PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
+      STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
+      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
       SYSTEM_STATUS_CACHE_AGE: 60
-      MOCK_EFO_FILING: REDIS
-      UNIT_TESTING_ENVIRONMENT: False # True for environments where running unit tests is expected
       EFO_POLLING_MAX_DURATION: 300
       EFO_POLLING_INTERVAL: 30
       # ---- FEATURE FLAGS ----
-      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and MOCKED, defaults to TEST
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and MOCKED

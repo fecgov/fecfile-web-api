@@ -10,7 +10,7 @@ from fecfiler.web_services.tasks import (
     submit_to_webprint,
 )
 from fecfiler.web_services.summary.tasks import CalculationState, calculate_summary
-from fecfiler.settings import MOCK_EFO_FILING
+from fecfiler.settings import MOCK_EFO
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
@@ -104,7 +104,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
-        if MOCK_EFO_FILING:
+        if MOCK_EFO:
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]
@@ -151,7 +151,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
-        if MOCK_EFO_FILING:
+        if MOCK_EFO:
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]

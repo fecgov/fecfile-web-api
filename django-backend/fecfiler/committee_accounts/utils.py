@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
-if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED" or settings.UNIT_TESTING_ENVIRONMENT:
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
     redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
 else:
     redis_instance = None
@@ -86,13 +86,7 @@ def check_can_create_committee_account(committee_id, user):
     email = user.email
 
     committee = get_committee_account_data(committee_id)
-    committee_emails = (
-        committee or {}
-    ).get(
-        "results", [{}]
-    )[0].get(
-        "email", ""
-    )
+    committee_emails = committee.get("email", "")
 
     failure_reason = check_email_match(email, committee_emails)
 
@@ -140,40 +134,33 @@ def create_committee_view(committee_uuid):
 def get_committee_account_data(committee_id):
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
-            return get_committee_account_data_from_efo(committee_id)
+            committee = get_committee_account_data_from_efo(committee_id)
         case "TEST":
-            return get_committee_account_data_from_test_efo(committee_id)
+            committee = get_committee_account_data_from_test_efo(committee_id)
         case "MOCKED":
-            return get_committee_account_data_from_redis(committee_id)
-        case _:
-            return get_response_for_bad_committee_source_config()
+            committee = get_committee_account_data_from_redis(committee_id)
+    if committee:
+        committee["name"] = committee.get("committee_name", None)
+    return committee
 
 
 def get_committee_account_data_from_efo(committee_id):
-    headers = {"Content-Type": "application/json"}
-    return requests.get(
-        f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
-        headers=headers
-    ).json()
+    return None  # To be implemented https://fecgov.atlassian.net/browse/FECFILE-1706
 
 
 def get_committee_account_data_from_test_efo(committee_id):
     headers = {"Content-Type": "application/json"}
     params = {
-        "api_key": settings.FEC_API_KEY,
+        "api_key": settings.STAGE_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
     }
-    endpoint = f"{settings.FEC_API_STAGE}efile/test-form1/"
+    endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
     response = requests.get(endpoint, headers=headers, params=params)
     response_data = response.json()
-    results = response_data.get('results', [])
+    results = response_data.get("results", [])
     if results:
-        results[0]['name'] = results[0].get('committee_name', None)
-
-    return {
-        'api_version': response_data.get('api_version', None),
-        'results': response_data.get('results', [])[:1],
-    }
+        return results[0]
+    return None
 
 
 def get_committee_account_data_from_redis(committee_id):
@@ -188,17 +175,4 @@ def get_committee_account_data_from_redis(committee_id):
             ),
             None,
         )
-        if committee:
-            # rename key so we can use same mock data for both
-            # query_filings and committee details endpoints
-            committee['name'] = committee.pop('committee_name')
-            return {  # same as api.open.fec.gov
-                "api_version": "1.0",
-                "results": [committee],
-                "pagination": {
-                    "pages": 1,
-                    "per_page": 20,
-                    "count": 1,
-                    "page": 1,
-                },
-            }
+        return committee

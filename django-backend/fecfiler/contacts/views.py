@@ -28,6 +28,14 @@ NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )
 
+FEC_API_COMMITTEE_LOOKUP_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "names/committees/"
+)
+FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(settings.PRODUCTION_OPEN_FEC_API) + "candidates/"
+FEC_API_CANDIDATE_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "candidate/{}/history/"
+)
+
 
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
@@ -82,10 +90,10 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         try:
             headers = {"Content-Type": "application/json"}
             params = {
-                "api_key": settings.FEC_API_KEY,
+                "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
                 "sort": "-two_year_period",
             }
-            url = settings.FEC_API_CANDIDATE_ENDPOINT.format(
+            url = FEC_API_CANDIDATE_ENDPOINT.format(
                 validate_and_sanitize_candidate(candidate_id)
             )
             response = requests.get(url, headers=headers, params=params).json()
@@ -102,8 +110,8 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
 
         headers = {"Content-Type": "application/json"}
         response = requests.get(
-            f"{settings.FEC_API}committee/{committee_id}/?api_key={settings.FEC_API_KEY}",
-            headers=headers
+            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/?api_key={settings.PRODUCTION_OPEN_FEC_API_KEY}",
+            headers=headers,
         ).json()
         if response.get("results"):
             return JsonResponse(response["results"][0])
@@ -128,12 +136,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": settings.FEC_API_KEY}
+        params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
         if office:
             params["office"] = office
         params = urlencode(params)
         json_results = requests.get(
-            settings.FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
+            FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
         ).json()
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
@@ -192,9 +200,9 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = urlencode({"q": q, "api_key": settings.FEC_API_KEY})
+        params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
         json_results = requests.get(
-            settings.FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
+            FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
         ).json()
 
         fecfile_committees = list(
