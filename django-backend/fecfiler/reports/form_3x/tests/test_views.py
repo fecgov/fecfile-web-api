@@ -22,6 +22,7 @@ class Form3XViewSetTest(TestCase):
             {},
             "Q1",
         )
+        Form3X.objects.update(L6a_cash_on_hand_jan_1_ytd="333.01")
 
         self.m4_report = create_form3x(
             self.committee,
@@ -101,7 +102,41 @@ class Form3XViewSetTest(TestCase):
             "F3XA",
         )
 
-    def test_jan1_cash_on_hand_missing_year(self):
+    # get_jan1_cash_on_hand
+
+    def test_get_jan1_cash_on_hand_missing_year(self):
+        request = self.factory.get(
+            f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand"
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"get": "jan1_cash_on_hand"})
+        response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content.decode(), "year query param is required")
+
+    def test_get_jan1_cash_on_hand_happy_path(self):
+        request = self.factory.get(
+            f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand?year=2004"
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"get": "jan1_cash_on_hand"})
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode(), "333.01")
+
+    # update_jan1_cash_on_hand
+
+    def test_update_jan1_cash_on_hand_missing_year(self):
         request = self.factory.put(
             f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
             {
@@ -122,7 +157,7 @@ class Form3XViewSetTest(TestCase):
             response.content.decode(), "year and amount are required in request body"
         )
 
-    def test_jan1_cash_on_hand_missing_no_f3xs_found(self):
+    def test_update_jan1_cash_on_hand_missing_no_f3xs_found(self):
         request = self.factory.put(
             f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
             {
@@ -142,7 +177,7 @@ class Form3XViewSetTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.content.decode(), "no f3x reports found")
 
-    def test_jan1_cash_on_hand_happy_path(self):
+    def test_update_jan1_cash_on_hand_happy_path(self):
         request = self.factory.put(
             f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
             {

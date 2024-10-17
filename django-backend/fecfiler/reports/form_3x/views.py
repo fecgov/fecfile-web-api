@@ -50,27 +50,45 @@ class Form3XViewSet(ReportViewSet):
         )
         return Response(Form3XSerializer(data, many=True).data)
 
-    @action(detail=True, methods=["put"])
+    @action(detail=True, methods=["get", "put"])
     def jan1_cash_on_hand(self, request):
-        year = request.data.get("year")
-        amount = request.data.get("amount")
-        if not year or not amount:
-            return HttpResponseBadRequest("year and amount are required in request body")
-        first_f3x_report = (
-            Report.objects.filter(
-                committee_account=self.get_committee_uuid(),
-                coverage_from_date__year=year,
-                form_3x__isnull=False,
+        if request.method == "GET":
+            year = request.GET.get("year")
+            if year is None:
+                return HttpResponseBadRequest("year query param is required")
+            retval = (
+                Report.objects.filter(
+                    committee_account=self.get_committee_uuid(),
+                    coverage_from_date__year=year,
+                    form_3x__isnull=False,
+                )
+                .order_by("coverage_from_date")
+                .values("form_3x__L6a_cash_on_hand_jan_1_ytd")
+                .first()
             )
-            .order_by("coverage_from_date")
-            .first()
-        )
-        if not first_f3x_report:
-            return HttpResponseBadRequest("no f3x reports found")
-        Form3X.objects.filter(pk=first_f3x_report.form_3x.id).update(
-            L6a_cash_on_hand_jan_1_ytd=amount
-        )
-        return HttpResponse("Cash on hand updated")
+            return HttpResponse(retval.get("form_3x__L6a_cash_on_hand_jan_1_ytd"))
+        if request.method == "PUT":
+            year = request.data.get("year")
+            amount = request.data.get("amount")
+            if not year or not amount:
+                return HttpResponseBadRequest(
+                    "year and amount are required in request body"
+                )
+            first_f3x_report = (
+                Report.objects.filter(
+                    committee_account=self.get_committee_uuid(),
+                    coverage_from_date__year=year,
+                    form_3x__isnull=False,
+                )
+                .order_by("coverage_from_date")
+                .first()
+            )
+            if not first_f3x_report:
+                return HttpResponseBadRequest("no f3x reports found")
+            Form3X.objects.filter(pk=first_f3x_report.form_3x.id).update(
+                L6a_cash_on_hand_jan_1_ytd=amount
+            )
+            return HttpResponse("Cash on hand updated")
 
     def create(self, request):
         return super(ModelViewSet, self).create(request)
