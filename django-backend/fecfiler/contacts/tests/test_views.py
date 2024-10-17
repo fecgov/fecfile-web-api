@@ -299,9 +299,7 @@ class ContactViewSetTest(TestCase):
         self.assertEqual(response.data, "")
 
     def test_get_committee_invalid(self):
-        request = self.factory.get(
-            "/api/v1/contacts/committee/"
-        )
+        request = self.factory.get("/api/v1/contacts/committee/")
         request.user = self.user
         request.session = {
             "committee_uuid": "11111111-2222-3333-4444-555555555555",
@@ -313,16 +311,14 @@ class ContactViewSetTest(TestCase):
 
     def test_get_committee(self):
         with patch("fecfiler.contacts.views.settings") as settings:
-            settings.FEC_API = "https://not-real.api/"
-            settings.FEC_API_KEY = "FAKE-KEY"
-            expected_call = 'https://not-real.api/committee/C12345678/?api_key=FAKE-KEY'
+            settings.PRODUCTION_OPEN_FEC_API = "https://not-real.api/"
+            settings.PRODUCTION_OPEN_FEC_API_KEY = "FAKE-KEY"
+            expected_call = "https://not-real.api/committee/C12345678/?api_key=FAKE-KEY"
             with patch("fecfiler.contacts.views.requests") as mock_requests:
                 mock_requests.get = Mock()
                 mock_response = Mock()
                 mock_response.json = Mock()
-                mock_response.json.return_value = {
-                    "results": [{"name": "TEST"}]
-                }
+                mock_response.json.return_value = {"results": [{"name": "TEST"}]}
                 mock_requests.get.return_value = mock_response
 
                 request = self.factory.get(

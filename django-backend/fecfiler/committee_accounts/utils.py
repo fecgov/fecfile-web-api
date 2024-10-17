@@ -139,7 +139,7 @@ def get_committee_account_data(committee_id):
             committee = get_committee_account_data_from_test_efo(committee_id)
         case "MOCKED":
             committee = get_committee_account_data_from_redis(committee_id)
-    if committee:
+    if committee and "committee_name" in committee:
         committee["name"] = committee.get("committee_name", None)
     return committee
 
