@@ -23,10 +23,10 @@ applications:
       LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
       PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
       STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
-      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
+      MOCK_EFO: True
       SYSTEM_STATUS_CACHE_AGE: 60
       EFO_POLLING_MAX_DURATION: 300
       EFO_POLLING_INTERVAL: 30
