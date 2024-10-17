@@ -1,7 +1,7 @@
 from django.test import TestCase, RequestFactory
 
 from fecfiler.reports.models import Report
-from ..views import Form3XViewSet
+from ..views import Form3XViewSet, Form3X
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
@@ -100,3 +100,65 @@ class Form3XViewSetTest(TestCase):
             Report.objects.filter(id=self.q1_report.id).first().form_type,
             "F3XA",
         )
+
+    def test_jan1_cash_on_hand_missing_year(self):
+        request = self.factory.put(
+            f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
+            {
+                "amount": 123,
+            },
+            "application/json",
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"put": "jan1_cash_on_hand"})
+        response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.content.decode(), "year and amount are required in request body"
+        )
+
+    def test_jan1_cash_on_hand_missing_no_f3xs_found(self):
+        request = self.factory.put(
+            f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
+            {
+                "year": 1776,
+                "amount": 123,
+            },
+            "application/json",
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"put": "jan1_cash_on_hand"})
+        response = view(request)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content.decode(), "no f3x reports found")
+
+    def test_jan1_cash_on_hand_happy_path(self):
+        request = self.factory.put(
+            f"/api/v1/reports/{self.q1_report.id}/form-3x/jan1_cash_on_hand",
+            {
+                "year": 2004,
+                "amount": 123,
+            },
+            "application/json",
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"put": "jan1_cash_on_hand"})
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        updated_form_3x = Form3X.objects.get(pk=self.q1_report.form_3x.id)
+        self.assertEqual(updated_form_3x.L6a_cash_on_hand_jan_1_ytd, 123)
