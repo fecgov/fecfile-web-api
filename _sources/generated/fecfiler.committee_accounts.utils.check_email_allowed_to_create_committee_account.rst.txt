@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.check\_email\_allowed\_to\_create\_committee\_account
+========================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: check_email_allowed_to_create_committee_account

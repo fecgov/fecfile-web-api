@@ -1,0 +1,6 @@
+fecfiler.settings.base.STAGE\_OPEN\_FEC\_API\_KEY
+=================================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: STAGE_OPEN_FEC_API_KEY

@@ -40,7 +40,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.check_can_create_committee_account.html#fecfiler.committee_accounts.utils.check_can_create_committee_account" title="fecfiler.committee_accounts.utils.check_can_create_committee_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_can_create_committee_account</span></code></a>(...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_can_create_committee_account.html#fecfiler.committee_accounts.utils.check_email_can_create_committee_account" title="fecfiler.committee_accounts.utils.check_email_can_create_committee_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_email_can_create_committee_account</span></code></a>(email)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_allowed_to_create_committee_account.html#fecfiler.committee_accounts.utils.check_email_allowed_to_create_committee_account" title="fecfiler.committee_accounts.utils.check_email_allowed_to_create_committee_account"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_email_allowed_to_create_committee_account</span></code></a>(email)</p></td>
 <td><p>Check if the provided email is allowed to create a committee based on domain or exception list.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_match.html#fecfiler.committee_accounts.utils.check_email_match" title="fecfiler.committee_accounts.utils.check_email_match"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_email_match</span></code></a>(email, f1_emails)</p></td>
@@ -52,8 +52,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.create_committee_view.html#fecfiler.committee_accounts.utils.create_committee_view" title="fecfiler.committee_accounts.utils.create_committee_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_committee_view</span></code></a>(committee_uuid)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.retrieve_recent_f1.html#fecfiler.committee_accounts.utils.retrieve_recent_f1" title="fecfiler.committee_accounts.utils.retrieve_recent_f1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_recent_f1</span></code></a>(committee_id)</p></td>
-<td><p>Gets the most recent F1 filing First checks the realtime enpdpoint for a recent F1 filing.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data.html#fecfiler.committee_accounts.utils.get_committee_account_data" title="fecfiler.committee_accounts.utils.get_committee_account_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_account_data</span></code></a>(committee_id)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_efo.html#fecfiler.committee_accounts.utils.get_committee_account_data_from_efo" title="fecfiler.committee_accounts.utils.get_committee_account_data_from_efo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_account_data_from_efo</span></code></a>(committee_id)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_redis.html#fecfiler.committee_accounts.utils.get_committee_account_data_from_redis" title="fecfiler.committee_accounts.utils.get_committee_account_data_from_redis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_account_data_from_redis</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo.html#fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo" title="fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_account_data_from_test_efo</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config.html#fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config" title="fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_response_for_bad_committee_source_config</span></code></a>()</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -88,18 +100,23 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.models.html">fecfiler.committee_accounts.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.serializers.html">fecfiler.committee_accounts.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.signals.html">fecfiler.committee_accounts.signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_delete_committeee_command.html">fecfiler.committee_accounts.test_delete_committeee_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_delete_committee_command.html">fecfiler.committee_accounts.test_delete_committee_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_load_committee_data.html">fecfiler.committee_accounts.test_load_committee_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_models.html">fecfiler.committee_accounts.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_utils.html">fecfiler.committee_accounts.test_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_views.html">fecfiler.committee_accounts.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.urls.html">fecfiler.committee_accounts.urls</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.utils</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_can_create_committee_account.html">fecfiler.committee_accounts.utils.check_can_create_committee_account</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_can_create_committee_account.html">fecfiler.committee_accounts.utils.check_email_can_create_committee_account</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_allowed_to_create_committee_account.html">fecfiler.committee_accounts.utils.check_email_allowed_to_create_committee_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_match.html">fecfiler.committee_accounts.utils.check_email_match</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.create_committee_account.html">fecfiler.committee_accounts.utils.create_committee_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.create_committee_view.html">fecfiler.committee_accounts.utils.create_committee_view</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.retrieve_recent_f1.html">fecfiler.committee_accounts.utils.retrieve_recent_f1</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data.html">fecfiler.committee_accounts.utils.get_committee_account_data</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_efo.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_efo</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_redis.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_redis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config.html">fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.views.html">fecfiler.committee_accounts.views</a></li>
@@ -112,9 +129,7 @@
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_oidc_provider.html">fecfiler.mock_oidc_provider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.oidc.html">fecfiler.oidc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>

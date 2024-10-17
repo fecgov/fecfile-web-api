@@ -1,0 +1,6 @@
+fecfiler.contacts.tests.utils.create\_test\_candidate\_contact
+==============================================================
+
+.. currentmodule:: fecfiler.contacts.tests.utils
+
+.. autofunction:: create_test_candidate_contact

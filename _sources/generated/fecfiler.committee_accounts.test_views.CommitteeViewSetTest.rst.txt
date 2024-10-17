@@ -1,0 +1,137 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
+=============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.test_views
+
+.. autoclass:: CommitteeViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeViewSetTest.__init__
+      ~CommitteeViewSetTest.addClassCleanup
+      ~CommitteeViewSetTest.addCleanup
+      ~CommitteeViewSetTest.addTypeEqualityFunc
+      ~CommitteeViewSetTest.assertAlmostEqual
+      ~CommitteeViewSetTest.assertAlmostEquals
+      ~CommitteeViewSetTest.assertContains
+      ~CommitteeViewSetTest.assertCountEqual
+      ~CommitteeViewSetTest.assertDictContainsSubset
+      ~CommitteeViewSetTest.assertDictEqual
+      ~CommitteeViewSetTest.assertEqual
+      ~CommitteeViewSetTest.assertEquals
+      ~CommitteeViewSetTest.assertFalse
+      ~CommitteeViewSetTest.assertFieldOutput
+      ~CommitteeViewSetTest.assertFormError
+      ~CommitteeViewSetTest.assertFormSetError
+      ~CommitteeViewSetTest.assertGreater
+      ~CommitteeViewSetTest.assertGreaterEqual
+      ~CommitteeViewSetTest.assertHTMLEqual
+      ~CommitteeViewSetTest.assertHTMLNotEqual
+      ~CommitteeViewSetTest.assertIn
+      ~CommitteeViewSetTest.assertInHTML
+      ~CommitteeViewSetTest.assertIs
+      ~CommitteeViewSetTest.assertIsInstance
+      ~CommitteeViewSetTest.assertIsNone
+      ~CommitteeViewSetTest.assertIsNot
+      ~CommitteeViewSetTest.assertIsNotNone
+      ~CommitteeViewSetTest.assertJSONEqual
+      ~CommitteeViewSetTest.assertJSONNotEqual
+      ~CommitteeViewSetTest.assertLess
+      ~CommitteeViewSetTest.assertLessEqual
+      ~CommitteeViewSetTest.assertListEqual
+      ~CommitteeViewSetTest.assertLogs
+      ~CommitteeViewSetTest.assertMultiLineEqual
+      ~CommitteeViewSetTest.assertNoLogs
+      ~CommitteeViewSetTest.assertNotAlmostEqual
+      ~CommitteeViewSetTest.assertNotAlmostEquals
+      ~CommitteeViewSetTest.assertNotContains
+      ~CommitteeViewSetTest.assertNotEqual
+      ~CommitteeViewSetTest.assertNotEquals
+      ~CommitteeViewSetTest.assertNotIn
+      ~CommitteeViewSetTest.assertNotInHTML
+      ~CommitteeViewSetTest.assertNotIsInstance
+      ~CommitteeViewSetTest.assertNotRegex
+      ~CommitteeViewSetTest.assertNotRegexpMatches
+      ~CommitteeViewSetTest.assertNumQueries
+      ~CommitteeViewSetTest.assertQuerySetEqual
+      ~CommitteeViewSetTest.assertRaises
+      ~CommitteeViewSetTest.assertRaisesMessage
+      ~CommitteeViewSetTest.assertRaisesRegex
+      ~CommitteeViewSetTest.assertRaisesRegexp
+      ~CommitteeViewSetTest.assertRedirects
+      ~CommitteeViewSetTest.assertRegex
+      ~CommitteeViewSetTest.assertRegexpMatches
+      ~CommitteeViewSetTest.assertSequenceEqual
+      ~CommitteeViewSetTest.assertSetEqual
+      ~CommitteeViewSetTest.assertTemplateNotUsed
+      ~CommitteeViewSetTest.assertTemplateUsed
+      ~CommitteeViewSetTest.assertTrue
+      ~CommitteeViewSetTest.assertTupleEqual
+      ~CommitteeViewSetTest.assertURLEqual
+      ~CommitteeViewSetTest.assertWarns
+      ~CommitteeViewSetTest.assertWarnsMessage
+      ~CommitteeViewSetTest.assertWarnsRegex
+      ~CommitteeViewSetTest.assertXMLEqual
+      ~CommitteeViewSetTest.assertXMLNotEqual
+      ~CommitteeViewSetTest.assert_
+      ~CommitteeViewSetTest.captureOnCommitCallbacks
+      ~CommitteeViewSetTest.countTestCases
+      ~CommitteeViewSetTest.debug
+      ~CommitteeViewSetTest.defaultTestResult
+      ~CommitteeViewSetTest.doClassCleanups
+      ~CommitteeViewSetTest.doCleanups
+      ~CommitteeViewSetTest.ensure_connection_patch_method
+      ~CommitteeViewSetTest.enterClassContext
+      ~CommitteeViewSetTest.fail
+      ~CommitteeViewSetTest.failIf
+      ~CommitteeViewSetTest.failIfAlmostEqual
+      ~CommitteeViewSetTest.failIfEqual
+      ~CommitteeViewSetTest.failUnless
+      ~CommitteeViewSetTest.failUnlessAlmostEqual
+      ~CommitteeViewSetTest.failUnlessEqual
+      ~CommitteeViewSetTest.failUnlessRaises
+      ~CommitteeViewSetTest.id
+      ~CommitteeViewSetTest.modify_settings
+      ~CommitteeViewSetTest.run
+      ~CommitteeViewSetTest.setUp
+      ~CommitteeViewSetTest.setUpClass
+      ~CommitteeViewSetTest.setUpTestData
+      ~CommitteeViewSetTest.settings
+      ~CommitteeViewSetTest.shortDescription
+      ~CommitteeViewSetTest.skipTest
+      ~CommitteeViewSetTest.subTest
+      ~CommitteeViewSetTest.tearDown
+      ~CommitteeViewSetTest.tearDownClass
+      ~CommitteeViewSetTest.test_get_committee_account_data_from_production
+      ~CommitteeViewSetTest.test_get_committee_account_data_from_redis
+      ~CommitteeViewSetTest.test_get_committee_account_data_from_test
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeViewSetTest.available_apps
+      ~CommitteeViewSetTest.databases
+      ~CommitteeViewSetTest.fixtures
+      ~CommitteeViewSetTest.longMessage
+      ~CommitteeViewSetTest.maxDiff
+      ~CommitteeViewSetTest.reset_sequences
+      ~CommitteeViewSetTest.serialized_rollback
+   
+   

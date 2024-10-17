@@ -18,11 +18,15 @@ fecfiler.committee\_accounts.utils
       :toctree:                                          
    
       check_can_create_committee_account
-      check_email_can_create_committee_account
+      check_email_allowed_to_create_committee_account
       check_email_match
       create_committee_account
       create_committee_view
-      retrieve_recent_f1
+      get_committee_account_data
+      get_committee_account_data_from_efo
+      get_committee_account_data_from_redis
+      get_committee_account_data_from_test_efo
+      get_response_for_bad_committee_source_config
    
    
 

@@ -23,6 +23,7 @@ fecfiler.committee\_accounts.test\_views
       :template: custom-class-template.rst               
    
       CommitteeMemberViewSetTest
+      CommitteeViewSetTest
    
    
 

@@ -1,6 +1,0 @@
-fecfiler.settings.base.FEC\_API\_CANDIDATE\_ENDPOINT
-====================================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: FEC_API_CANDIDATE_ENDPOINT

@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.retrieve\_recent\_f1
-=======================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: retrieve_recent_f1

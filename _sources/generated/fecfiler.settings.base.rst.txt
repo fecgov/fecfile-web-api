@@ -19,7 +19,7 @@ fecfiler.settings.base
       WEBPRINT_EMAIL
       EFO_POLLING_MAX_ATTEMPTS
       AWS_REGION
-      FEC_API_CANDIDATE_ENDPOINT
+      STAGE_OPEN_FEC_API_KEY
    
    
 

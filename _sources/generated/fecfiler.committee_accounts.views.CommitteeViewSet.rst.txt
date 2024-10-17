@@ -22,6 +22,7 @@ fecfiler.committee\_accounts.views.CommitteeViewSet
       ~CommitteeViewSet.__init__
       ~CommitteeViewSet.activate
       ~CommitteeViewSet.active
+      ~CommitteeViewSet.add_committee_account_data
       ~CommitteeViewSet.as_view
       ~CommitteeViewSet.check_object_permissions
       ~CommitteeViewSet.check_permissions
@@ -33,6 +34,7 @@ fecfiler.committee\_accounts.views.CommitteeViewSet
       ~CommitteeViewSet.finalize_response
       ~CommitteeViewSet.get_authenticate_header
       ~CommitteeViewSet.get_authenticators
+      ~CommitteeViewSet.get_available_committee
       ~CommitteeViewSet.get_content_negotiator
       ~CommitteeViewSet.get_exception_handler
       ~CommitteeViewSet.get_exception_handler_context

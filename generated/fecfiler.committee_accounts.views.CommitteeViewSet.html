@@ -57,38 +57,44 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">active</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.as_view" title="fecfiler.committee_accounts.views.CommitteeViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
-<td><p>Because of the way class based views create a closure around the instantiated view, we need to totally reimplement <cite>.as_view</cite>, and slightly modify the view function that is created and returned.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_object_permissions" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
-<td><p>Check if the request should be permitted for a given object.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_permissions" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_permissions</span></code></a>(request)</p></td>
-<td><p>Check if the request should be permitted.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_throttles" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
-<td><p>Check if request should be throttled.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_account</span></code>(request)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_committee_account_data</span></code>(committee_account)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.determine_version" title="fecfiler.committee_accounts.views.CommitteeViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.as_view" title="fecfiler.committee_accounts.views.CommitteeViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
+<td><p>Because of the way class based views create a closure around the instantiated view, we need to totally reimplement <cite>.as_view</cite>, and slightly modify the view function that is created and returned.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_object_permissions" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
+<td><p>Check if the request should be permitted for a given object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_permissions" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_permissions</span></code></a>(request)</p></td>
+<td><p>Check if the request should be permitted.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.check_throttles" title="fecfiler.committee_accounts.views.CommitteeViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
+<td><p>Check if request should be throttled.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_account</span></code>(request)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.determine_version" title="fecfiler.committee_accounts.views.CommitteeViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.dispatch" title="fecfiler.committee_accounts.views.CommitteeViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.dispatch" title="fecfiler.committee_accounts.views.CommitteeViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.filter_queryset" title="fecfiler.committee_accounts.views.CommitteeViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.filter_queryset" title="fecfiler.committee_accounts.views.CommitteeViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.finalize_response" title="fecfiler.committee_accounts.views.CommitteeViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.finalize_response" title="fecfiler.committee_accounts.views.CommitteeViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticate_header" title="fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticate_header" title="fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticators" title="fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticators" title="fecfiler.committee_accounts.views.CommitteeViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_available_committee</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.CommitteeViewSet.get_content_negotiator" title="fecfiler.committee_accounts.views.CommitteeViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
@@ -619,7 +625,8 @@ will instead be performed lazily, the first time either
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.models.html">fecfiler.committee_accounts.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.serializers.html">fecfiler.committee_accounts.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.signals.html">fecfiler.committee_accounts.signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_delete_committeee_command.html">fecfiler.committee_accounts.test_delete_committeee_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_delete_committee_command.html">fecfiler.committee_accounts.test_delete_committee_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_load_committee_data.html">fecfiler.committee_accounts.test_load_committee_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_models.html">fecfiler.committee_accounts.test_models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_utils.html">fecfiler.committee_accounts.test_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.test_views.html">fecfiler.committee_accounts.test_views</a></li>
@@ -695,9 +702,7 @@ will instead be performed lazily, the first time either
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_oidc_provider.html">fecfiler.mock_oidc_provider</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_openfec.html">fecfiler.mock_openfec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.oidc.html">fecfiler.oidc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.openfec.html">fecfiler.openfec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>

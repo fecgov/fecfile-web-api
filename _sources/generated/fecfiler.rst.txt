@@ -41,9 +41,7 @@ fecfiler
    fecfiler.memo_text
    fecfiler.middleware
    fecfiler.mock_oidc_provider
-   fecfiler.mock_openfec
    fecfiler.oidc
-   fecfiler.openfec
    fecfiler.reports
    fecfiler.s3
    fecfiler.settings

@@ -1,6 +1,0 @@
-fecfiler.mock\_openfec.mock\_endpoints.recent\_f1
-=================================================
-
-.. currentmodule:: fecfiler.mock_openfec.mock_endpoints
-
-.. autofunction:: recent_f1
