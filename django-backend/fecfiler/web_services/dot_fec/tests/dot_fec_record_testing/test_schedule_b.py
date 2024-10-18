@@ -85,7 +85,6 @@ class DotFECScheduleBTestCase(TestCase):
         schedule_b = self.disbursment_individual.schedule_b
         schedule_b.election_code = "H"
         schedule_b.election_other_description = "ELECTION DESCRIPTION"
-        # schedule_b.semi_annual_refunded_bundled_amt
         schedule_b.expenditure_purpose_descrip = "Exp Desc"
         schedule_b.category_code = "CODE"
         self.disbursment_individual.contact_2 = self.candidate
