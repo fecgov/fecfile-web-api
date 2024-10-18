@@ -1,0 +1,23 @@
+---
+applications:
+  - name: fecfile-web-services
+    instances: 2
+    stack: cflinuxfs4
+    buildpacks:
+      - python_buildpack
+    memory: 1G
+    no-route: true
+    health-check-type: process
+    command: bin/run-celery-worker.sh
+    services:
+      - fecfile-api-rds
+      - fecfile-api-s3
+      - fecfile-api-redis
+      - fecfile-api-creds-test
+    env:
+      DISABLE_COLLECTSTATIC: 1
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      FEC_AGENCY_ID: FEC
+      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
+      LOG_FORMAT: KEY_VALUE
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED

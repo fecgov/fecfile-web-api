@@ -4,7 +4,7 @@ from rest_framework.test import force_authenticate
 from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import (
     create_form3x,
     create_form24,

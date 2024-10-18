@@ -21,10 +21,14 @@ applications:
       LOGIN_REDIRECT_CLIENT_URL: https://stage.fecfile.fec.gov
       LOGIN_REDIRECT_SERVER_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/login-redirect
       LOGOUT_REDIRECT_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
-      FEC_API: https://api.open.fec.gov/v1/
+      PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
+      STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
       FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
-      MOCK_OPENFEC: REDIS
       SYSTEM_STATUS_CACHE_AGE: 60
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
+      # ---- FEATURE FLAGS ----
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are TEST and PRODUCTION

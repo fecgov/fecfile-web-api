@@ -1,12 +1,13 @@
 from django.test import TestCase, RequestFactory
 from unittest.mock import patch
-from fecfiler.devops.login_dot_gov_utils import (
+from fecfiler.devops.login_dot_gov_cert_utils import (
     stage_login_dot_gov_cert,
     stage_login_dot_gov_pk,
     gen_and_stage_login_dot_gov_cert,
     install_login_dot_gov_cert,
     backout_login_dot_gov_cert,
 )
+from django.core import management
 
 
 class LoginDotGovUtilsTestCase(TestCase):
@@ -16,7 +17,7 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # backout_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_utils.retrieve_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
     def test_backout_login_dot_gov_cert_throws_exception(
         self,
         retrieve_credentials_mock,
@@ -35,8 +36,8 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_utils.retrieve_credentials")
-    @patch("fecfiler.devops.login_dot_gov_utils.update_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
     def test_backout_login_dot_gov_cert_happy_path(
         self,
         update_credentials_mock,
@@ -46,15 +47,18 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        backout_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "backout_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once()
 
     # install_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_utils.retrieve_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
     def test_install_login_dot_gov_cert_throws_exception(
         self,
         retrieve_credentials_mock,
@@ -73,8 +77,8 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_utils.retrieve_credentials")
-    @patch("fecfiler.devops.login_dot_gov_utils.update_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
     def test_install_login_dot_gov_cert_happy_path(
         self,
         update_credentials_mock,
@@ -84,15 +88,18 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        install_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "install_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once()
 
     # gen_and_stage_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_utils.gen_rsa_pk")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_rsa_pk")
     def test_gen_and_stage_login_dot_gov_cert_throws_exception(
         self,
         gen_rsa_pk_mock,
@@ -111,10 +118,10 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_utils.gen_rsa_pk")
-    @patch("fecfiler.devops.login_dot_gov_utils.gen_x509_cert")
-    @patch("fecfiler.devops.login_dot_gov_utils.stage_login_dot_gov_cert")
-    @patch("fecfiler.devops.login_dot_gov_utils.stage_login_dot_gov_pk")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_rsa_pk")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_x509_cert")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.stage_login_dot_gov_cert")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.stage_login_dot_gov_pk")
     def test_gen_and_stage_login_dot_gov_cert_happy_path(
         self,
         stage_login_dot_gov_pk_mock,
@@ -126,8 +133,11 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
-        gen_and_stage_login_dot_gov_cert(
-            test_token, test_space_name, test_service_instance_name
+        management.call_command(
+            "gen_and_stage_login_dot_gov_cert",
+            test_token,
+            test_space_name,
+            test_service_instance_name,
         )
 
         stage_login_dot_gov_pk_mock.assert_called_once()
@@ -135,7 +145,7 @@ class LoginDotGovUtilsTestCase(TestCase):
     # stage_login_dot_gov_pk
 
     @patch("fecfiler.devops.crypt_utils.rsa_pk_to_bytes")
-    @patch("fecfiler.devops.login_dot_gov_utils.update_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_stage_login_dot_gov_pk_throws_exception(
         self,
@@ -158,7 +168,7 @@ class LoginDotGovUtilsTestCase(TestCase):
             )
 
     @patch("fecfiler.devops.crypt_utils.rsa_pk_to_bytes")
-    @patch("fecfiler.devops.login_dot_gov_utils.update_credentials")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_stage_login_dot_gov_pk_happy_path(
         self,
@@ -195,7 +205,7 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     @patch("fecfiler.devops.crypt_utils.x509_cert_to_bytes")
     @patch("fecfiler.devops.crypt_utils.x509")
-    @patch("fecfiler.devops.login_dot_gov_utils.S3_SESSION")
+    @patch("fecfiler.devops.login_dot_gov_cert_utils.S3_SESSION")
     def test_stage_login_dot_gov_cert_happy_path(
         self,
         s3_session_mock,
