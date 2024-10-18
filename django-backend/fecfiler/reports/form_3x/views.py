@@ -50,13 +50,13 @@ class Form3XViewSet(ReportViewSet):
         )
         return Response(Form3XSerializer(data, many=True).data)
 
-    @action(detail=True, methods=["get", "put"])
+    @action(detail=False, methods=["get", "put"])
     def jan1_cash_on_hand(self, request):
         if request.method == "GET":
             year = request.GET.get("year")
             if year is None:
                 return HttpResponseBadRequest("year query param is required")
-            retval = (
+            report = (
                 Report.objects.filter(
                     committee_account=self.get_committee_uuid(),
                     coverage_from_date__year=year,
@@ -66,7 +66,8 @@ class Form3XViewSet(ReportViewSet):
                 .values("form_3x__L6a_cash_on_hand_jan_1_ytd")
                 .first()
             )
-            return HttpResponse(retval.get("form_3x__L6a_cash_on_hand_jan_1_ytd"))
+            retval = report.get("form_3x__L6a_cash_on_hand_jan_1_ytd") if report else 0
+            return HttpResponse(retval)
         if request.method == "PUT":
             year = request.data.get("year")
             amount = request.data.get("amount")
