@@ -6,7 +6,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
-from datetime import datetime
+from datetime import datetime, timezone
 from fecfiler.web_services.models import UploadSubmission
 import structlog
 
@@ -161,7 +161,7 @@ class DotFECForm3XTestCase(TestCase):
         self.assertEqual(self.split_row[20], "Junior")
 
     def test_date_signed(self):
-        today = datetime.today()
+        today = datetime.now(timezone.utc)
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[21], formatted_date)
 

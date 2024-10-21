@@ -3,46 +3,38 @@ import requests
 import re
 from django.db import connection
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
-from fecfiler.mock_openfec.mock_endpoints import recent_f1
 from fecfiler.transactions.models import (
     Transaction,
     get_committee_view_name,
 )
-from fecfiler.settings import (
-    FEC_API,
-    FEC_API_KEY,
-    MOCK_OPENFEC_REDIS_URL,
-    CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST,
-)
+from fecfiler import settings
+import redis
+import json
 
 logger = logging.getLogger(__name__)
 
 
-def retrieve_recent_f1(committee_id):
-    """Gets the most recent F1 filing
-    First checks the realtime enpdpoint for a recent F1 filing.  If none is found,
-    a request is made to a different endpoint that is updated nightly.
-    The realtime endpoint will have more recent filings, but does not provide
-    filings older than 6 months. The other endpoint returns a committee's current data
-    informed by their most recent F1 and F2 filings."""
-    headers = {"Content-Type": "application/json"}
-    params = {
-        "api_key": FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    endpoints = [
-        f"{FEC_API}efile/form1/",
-        f"{FEC_API}committee/{committee_id}/",
-    ]
-    for endpoint in endpoints:
-        response = requests.get(endpoint, headers=headers, params=params).json()
-        results = response["results"]
-        if len(results) > 0:
-            return results[0]
+COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
+    redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
+else:
+    redis_instance = None
 
 
-def check_email_can_create_committee_account(email):
+def get_response_for_bad_committee_source_config():
+    error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
+        settings.FLAG__COMMITTEE_DATA_SOURCE
+    }"""
+    response = Response()
+    response.status_code = 500
+    response.content = error_message
+    logger.exception(Exception(error_message))
+    return response
+
+
+def check_email_allowed_to_create_committee_account(email):
     """
     Check if the provided email is allowed to create a committee based on domain
     or exception list.
@@ -54,7 +46,7 @@ def check_email_can_create_committee_account(email):
         boolean True if email is allowed, False otherwise.
     """
     allowed_domains = ["fec.gov"]
-    allowed_emails = CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
+    allowed_emails = settings.CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
     if email:
         email_to_check = email.lower()
         split_email = email_to_check.split("@")
@@ -93,19 +85,16 @@ def check_email_match(email, f1_emails):
 def check_can_create_committee_account(committee_id, user):
     email = user.email
 
-    if MOCK_OPENFEC_REDIS_URL:
-        f1 = recent_f1(committee_id)
-    else:
-        f1 = retrieve_recent_f1(committee_id)
+    committee = get_committee_account_data(committee_id)
+    committee_emails = committee.get("email", "")
 
-    f1_emails = (f1 or {}).get("email")
-    failure_reason = check_email_match(email, f1_emails)
+    failure_reason = check_email_match(email, committee_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
         failure_reason = f"Committee account {committee_id} already created"
 
-    if not check_email_can_create_committee_account(email):
+    if not check_email_allowed_to_create_committee_account(email):
         failure_reason = f"Email {email} is not allowed to create a committee account"
 
     if failure_reason:
@@ -140,3 +129,50 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
+
+
+def get_committee_account_data(committee_id):
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            committee = get_committee_account_data_from_efo(committee_id)
+        case "TEST":
+            committee = get_committee_account_data_from_test_efo(committee_id)
+        case "MOCKED":
+            committee = get_committee_account_data_from_redis(committee_id)
+    if committee and "committee_name" in committee:
+        committee["name"] = committee.get("committee_name", None)
+    return committee
+
+
+def get_committee_account_data_from_efo(committee_id):
+    return None  # To be implemented https://fecgov.atlassian.net/browse/FECFILE-1706
+
+
+def get_committee_account_data_from_test_efo(committee_id):
+    headers = {"Content-Type": "application/json"}
+    params = {
+        "api_key": settings.STAGE_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
+    response = requests.get(endpoint, headers=headers, params=params)
+    response_data = response.json()
+    results = response_data.get("results", [])
+    if results:
+        return results[0]
+    return None
+
+
+def get_committee_account_data_from_redis(committee_id):
+    if redis_instance:
+        committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
+        committees = json.loads(committee_data) or []
+        committee = next(
+            (
+                committee
+                for committee in committees
+                if committee.get("committee_id") == committee_id
+            ),
+            None,
+        )
+        return committee
