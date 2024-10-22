@@ -6,6 +6,9 @@ from fecfiler.utils import save_copy
 def add_schedule_c2_contact_fields(instance, representation=None):
     data = {}
     if instance.contact_1:
+        data["guarantor_entity"] = instance.contact_1.type
+        data["guarantor_organization_name"] = instance.contact_1.name
+        data["guarantor_committee_fec_id"] = instance.contact_1.committee_id
         data["guarantor_last_name"] = instance.contact_1.last_name
         data["guarantor_first_name"] = instance.contact_1.first_name
         data["guarantor_middle_name"] = instance.contact_1.middle_name
