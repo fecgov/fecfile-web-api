@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f1m
+===============================================================================
+
+.. automodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_form_f1m
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      DotFECForm1MTestCase
+   
+   
+
+   
+   
+   
+
+
+
