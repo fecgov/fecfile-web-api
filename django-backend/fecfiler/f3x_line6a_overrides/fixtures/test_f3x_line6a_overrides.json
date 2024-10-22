@@ -1,0 +1,22 @@
+[
+    {
+        "model": "f3x_line6a_overrides.f3xline6aoverride",
+        "pk": "c113e49f-d3b2-42d0-9128-13a70d2b936f",
+        "fields": {
+            "L6a_cash_on_hand_jan_1_ytd": 123.45,
+            "L6a_year_for_above_ytd": "2021",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "f3x_line6a_overrides.f3xline6aoverride",
+        "pk": "16b40dcf-20b7-4256-942e-e7b1dacb45c8",
+        "fields": {
+            "L6a_cash_on_hand_jan_1_ytd": 543.21,
+            "L6a_year_for_above_ytd": "2019",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    }
+]
