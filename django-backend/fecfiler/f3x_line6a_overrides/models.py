@@ -11,10 +11,10 @@ class F3xLine6aOverride(models.Model):
         unique=True,
     )
 
-    L6a_cash_on_hand_jan_1_ytd = models.DecimalField(
+    year = models.TextField(null=False, blank=False, unique=True)
+    cash_on_hand = models.DecimalField(
         null=False, blank=False, max_digits=11, decimal_places=2
     )
-    L6a_year_for_above_ytd = models.TextField(null=False, blank=False, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

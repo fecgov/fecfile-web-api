@@ -11,12 +11,25 @@ class F3xLine6aOverrideViewSetTest(TestCase):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
+    def test_get_f3x_line6a_overrides_by_year_happy_path(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+
+        response = client.get(
+            "/api/v1/f3x_line6a_overrides/?year=2019",
+            secure=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["year"], "2019")
+        self.assertEqual(response.data[0]["cash_on_hand"], "543.21")
+
     def test_create_f3x_line6a_overrides_happy_path(self):
         client = APIClient()
         client.force_authenticate(user=self.user)
         test_post_data = {
-            "L6a_cash_on_hand_jan_1_ytd": 333.25,
-            "L6a_year_for_above_ytd": "2024",
+            "year": "2024",
+            "cash_on_hand": 333.25,
         }
 
         response = client.post(
@@ -24,8 +37,8 @@ class F3xLine6aOverrideViewSetTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["L6a_cash_on_hand_jan_1_ytd"], "333.25")
-        self.assertEqual(response.data["L6a_year_for_above_ytd"], "2024")
+        self.assertEqual(response.data["year"], "2024")
+        self.assertEqual(response.data["cash_on_hand"], "333.25")
 
     def test_update_f3x_line6a_overrides_happy_path(self):
         client = APIClient()
@@ -36,12 +49,12 @@ class F3xLine6aOverrideViewSetTest(TestCase):
             secure=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["L6a_cash_on_hand_jan_1_ytd"], "123.45")
-        self.assertEqual(response.data["L6a_year_for_above_ytd"], "2021")
+        self.assertEqual(response.data["year"], "2021")
+        self.assertEqual(response.data["cash_on_hand"], "123.45")
 
         test_put_data = {
-            "L6a_cash_on_hand_jan_1_ytd": 678.90,
-            "L6a_year_for_above_ytd": 2021,
+            "year": 2021,
+            "cash_on_hand": 678.90,
         }
 
         response = client.put(
@@ -50,5 +63,5 @@ class F3xLine6aOverrideViewSetTest(TestCase):
             secure=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["L6a_cash_on_hand_jan_1_ytd"], "678.90")
-        self.assertEqual(response.data["L6a_year_for_above_ytd"], "2021")
+        self.assertEqual(response.data["year"], "2021")
+        self.assertEqual(response.data["cash_on_hand"], "678.90")
