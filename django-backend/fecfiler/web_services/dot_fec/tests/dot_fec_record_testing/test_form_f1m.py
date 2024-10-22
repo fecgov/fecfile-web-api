@@ -126,12 +126,13 @@ class DotFECForm1MTestCase(TestCase):
         self.f1m.form_1m.V_date_of_contribution = datetime.strptime(
             "2024-01-06", "%Y-%m-%d"
         )
-        self.f1m.form_1m.date_of_original_registration = datetime.strptime(
+        self.f1m.form_1m.date_of_51st_contributor = datetime.strptime(
             "2024-01-07", "%Y-%m-%d"
         )
-        self.f1m.form_1m.date_of_51st_contributor = datetime.strptime(
+        self.f1m.form_1m.date_of_original_registration = datetime.strptime(
             "2024-01-08", "%Y-%m-%d"
         )
+
         self.f1m.form_1m.date_committee_met_requirements = datetime.strptime(
             "2024-01-09", "%Y-%m-%d"
         )
