@@ -1,0 +1,139 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_24.DotFECForm24TestCase
+===================================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_form_24
+
+.. autoclass:: DotFECForm24TestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECForm24TestCase.__init__
+      ~DotFECForm24TestCase.addClassCleanup
+      ~DotFECForm24TestCase.addCleanup
+      ~DotFECForm24TestCase.addTypeEqualityFunc
+      ~DotFECForm24TestCase.assertAlmostEqual
+      ~DotFECForm24TestCase.assertAlmostEquals
+      ~DotFECForm24TestCase.assertContains
+      ~DotFECForm24TestCase.assertCountEqual
+      ~DotFECForm24TestCase.assertDictContainsSubset
+      ~DotFECForm24TestCase.assertDictEqual
+      ~DotFECForm24TestCase.assertEqual
+      ~DotFECForm24TestCase.assertEquals
+      ~DotFECForm24TestCase.assertFalse
+      ~DotFECForm24TestCase.assertFieldOutput
+      ~DotFECForm24TestCase.assertFormError
+      ~DotFECForm24TestCase.assertFormSetError
+      ~DotFECForm24TestCase.assertGreater
+      ~DotFECForm24TestCase.assertGreaterEqual
+      ~DotFECForm24TestCase.assertHTMLEqual
+      ~DotFECForm24TestCase.assertHTMLNotEqual
+      ~DotFECForm24TestCase.assertIn
+      ~DotFECForm24TestCase.assertInHTML
+      ~DotFECForm24TestCase.assertIs
+      ~DotFECForm24TestCase.assertIsInstance
+      ~DotFECForm24TestCase.assertIsNone
+      ~DotFECForm24TestCase.assertIsNot
+      ~DotFECForm24TestCase.assertIsNotNone
+      ~DotFECForm24TestCase.assertJSONEqual
+      ~DotFECForm24TestCase.assertJSONNotEqual
+      ~DotFECForm24TestCase.assertLess
+      ~DotFECForm24TestCase.assertLessEqual
+      ~DotFECForm24TestCase.assertListEqual
+      ~DotFECForm24TestCase.assertLogs
+      ~DotFECForm24TestCase.assertMultiLineEqual
+      ~DotFECForm24TestCase.assertNoLogs
+      ~DotFECForm24TestCase.assertNotAlmostEqual
+      ~DotFECForm24TestCase.assertNotAlmostEquals
+      ~DotFECForm24TestCase.assertNotContains
+      ~DotFECForm24TestCase.assertNotEqual
+      ~DotFECForm24TestCase.assertNotEquals
+      ~DotFECForm24TestCase.assertNotIn
+      ~DotFECForm24TestCase.assertNotInHTML
+      ~DotFECForm24TestCase.assertNotIsInstance
+      ~DotFECForm24TestCase.assertNotRegex
+      ~DotFECForm24TestCase.assertNotRegexpMatches
+      ~DotFECForm24TestCase.assertNumQueries
+      ~DotFECForm24TestCase.assertQuerySetEqual
+      ~DotFECForm24TestCase.assertRaises
+      ~DotFECForm24TestCase.assertRaisesMessage
+      ~DotFECForm24TestCase.assertRaisesRegex
+      ~DotFECForm24TestCase.assertRaisesRegexp
+      ~DotFECForm24TestCase.assertRedirects
+      ~DotFECForm24TestCase.assertRegex
+      ~DotFECForm24TestCase.assertRegexpMatches
+      ~DotFECForm24TestCase.assertSequenceEqual
+      ~DotFECForm24TestCase.assertSetEqual
+      ~DotFECForm24TestCase.assertTemplateNotUsed
+      ~DotFECForm24TestCase.assertTemplateUsed
+      ~DotFECForm24TestCase.assertTrue
+      ~DotFECForm24TestCase.assertTupleEqual
+      ~DotFECForm24TestCase.assertURLEqual
+      ~DotFECForm24TestCase.assertWarns
+      ~DotFECForm24TestCase.assertWarnsMessage
+      ~DotFECForm24TestCase.assertWarnsRegex
+      ~DotFECForm24TestCase.assertXMLEqual
+      ~DotFECForm24TestCase.assertXMLNotEqual
+      ~DotFECForm24TestCase.assert_
+      ~DotFECForm24TestCase.captureOnCommitCallbacks
+      ~DotFECForm24TestCase.countTestCases
+      ~DotFECForm24TestCase.debug
+      ~DotFECForm24TestCase.defaultTestResult
+      ~DotFECForm24TestCase.doClassCleanups
+      ~DotFECForm24TestCase.doCleanups
+      ~DotFECForm24TestCase.ensure_connection_patch_method
+      ~DotFECForm24TestCase.enterClassContext
+      ~DotFECForm24TestCase.fail
+      ~DotFECForm24TestCase.failIf
+      ~DotFECForm24TestCase.failIfAlmostEqual
+      ~DotFECForm24TestCase.failIfEqual
+      ~DotFECForm24TestCase.failUnless
+      ~DotFECForm24TestCase.failUnlessAlmostEqual
+      ~DotFECForm24TestCase.failUnlessEqual
+      ~DotFECForm24TestCase.failUnlessRaises
+      ~DotFECForm24TestCase.id
+      ~DotFECForm24TestCase.modify_settings
+      ~DotFECForm24TestCase.run
+      ~DotFECForm24TestCase.setUp
+      ~DotFECForm24TestCase.setUpClass
+      ~DotFECForm24TestCase.setUpTestData
+      ~DotFECForm24TestCase.settings
+      ~DotFECForm24TestCase.shortDescription
+      ~DotFECForm24TestCase.skipTest
+      ~DotFECForm24TestCase.subTest
+      ~DotFECForm24TestCase.tearDown
+      ~DotFECForm24TestCase.tearDownClass
+      ~DotFECForm24TestCase.test_address
+      ~DotFECForm24TestCase.test_committee_id
+      ~DotFECForm24TestCase.test_date_signed
+      ~DotFECForm24TestCase.test_form_type
+      ~DotFECForm24TestCase.test_treasurer
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECForm24TestCase.available_apps
+      ~DotFECForm24TestCase.databases
+      ~DotFECForm24TestCase.fixtures
+      ~DotFECForm24TestCase.longMessage
+      ~DotFECForm24TestCase.maxDiff
+      ~DotFECForm24TestCase.reset_sequences
+      ~DotFECForm24TestCase.serialized_rollback
+   
+   
