@@ -191,7 +191,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
-
+        if self.id:
+            self.reports.update(calculation_status=None)
         super(Transaction, self).save(*args, **kwargs)
 
     def delete(self):
