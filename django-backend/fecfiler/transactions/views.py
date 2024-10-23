@@ -305,6 +305,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
+        Report.objects.filter(id__in=report_ids).update(calculation_status=None)
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
