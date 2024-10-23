@@ -8,6 +8,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from .tests.utils import generate_data
+from fecfiler.f3x_line6a_overrides.models import F3xLine6aOverride
 
 
 class F3XSerializerTestCase(TestCase):
@@ -37,6 +38,10 @@ class F3XSerializerTestCase(TestCase):
             datetime.strptime("2005-10-01", "%Y-%m-%d").date(),
             {},
             "Q3",
+        )
+        F3xLine6aOverride.objects.create(
+            year="2005",
+            cash_on_hand=61,
         )
 
     def test_summary_task(self):

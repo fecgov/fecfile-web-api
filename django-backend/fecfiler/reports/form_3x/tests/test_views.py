@@ -2,6 +2,7 @@ from django.test import TestCase, RequestFactory
 
 from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
+from ..models import Form3X
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
@@ -22,6 +23,7 @@ class Form3XViewSetTest(TestCase):
             {},
             "Q1",
         )
+        Form3X.objects.update(L6a_cash_on_hand_jan_1_ytd="333.01")
 
         self.m4_report = create_form3x(
             self.committee,

@@ -7,6 +7,7 @@ from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from .tests.utils import generate_data
+from fecfiler.f3x_line6a_overrides.models import F3xLine6aOverride
 
 
 class F3XReportTestCase(TestCase):
@@ -116,6 +117,10 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_calculate_summary_column_b(self):
+        F3xLine6aOverride.objects.create(
+            year="2005",
+            cash_on_hand=61,
+        )
         f3x = create_form3x(
             self.committee,
             datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
@@ -133,6 +138,7 @@ class F3XReportTestCase(TestCase):
         if self.debt is not None:
             self.assertEqual(self.debt.force_itemized, False)
 
+        self.assertEqual(summary_b["line_6a"], Decimal("61"))
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
         self.assertEqual(
             summary_b["line_6d"],
