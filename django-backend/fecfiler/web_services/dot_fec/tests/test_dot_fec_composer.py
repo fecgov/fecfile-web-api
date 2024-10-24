@@ -1,10 +1,16 @@
 from django.test import TestCase
-from fecfiler.memo_text.models import MemoText
-from .dot_fec_composer import compose_dot_fec, add_row_to_content
-from fecfiler.committee_accounts.views import create_committee_view
-from .dot_fec_serializer import serialize_instance, CRLF_STR, FS_STR
+from fecfiler.web_services.dot_fec.dot_fec_composer import (
+    compose_dot_fec,
+    add_row_to_content,
+)
+from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.web_services.dot_fec.dot_fec_serializer import (
+    serialize_instance,
+    CRLF_STR,
+    FS_STR,
+)
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.tests.utils import create_form3x, create_form99
+from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from datetime import datetime
@@ -45,12 +51,10 @@ class DotFECSerializerTestCase(TestCase):
         )
         self.transaction.reports.add(self.f3x)
         self.transaction.save()
-        self.report_level_memo_text = MemoText(
-            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
-            rec_type="TEXT",
+        self.report_level_memo = create_report_memo(
+            self.committee,
+            self.f3x,
             text4000="dahtest2",
-            committee_account_id=self.committee.id,
-            report_id=self.f3x.id,
         )
 
     def test_compose_dot_fec(self):
@@ -58,7 +62,7 @@ class DotFECSerializerTestCase(TestCase):
             compose_dot_fec(100000000, None)
 
         file_content = compose_dot_fec(self.f3x.id, None)
-        self.assertEqual(file_content.count(CRLF_STR), 2)
+        self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):
         summary_row = serialize_instance("F3X", self.f3x)
@@ -67,7 +71,7 @@ class DotFECSerializerTestCase(TestCase):
         transaction_row = serialize_instance("SchA", self.transaction)
         dot_fec_str = add_row_to_content(dot_fec_str, transaction_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
-        report_level_memo_row = serialize_instance("Text", self.report_level_memo_text)
+        report_level_memo_row = serialize_instance("Text", self.report_level_memo)
         dot_fec_str = add_row_to_content(dot_fec_str, report_level_memo_row)
         self.assertEqual(dot_fec_str[-2:], CRLF_STR)
         split_dot_fec_str = dot_fec_str.split(CRLF_STR)

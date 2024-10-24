@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.devops.login_dot_gov_utils import backout_login_dot_gov_cert
+from fecfiler.devops.login_dot_gov_cert_utils import backout_login_dot_gov_cert
 
 
 class Command(BaseCommand):
@@ -16,8 +16,14 @@ class Command(BaseCommand):
             cf_space_name = options["cf_space_name"]
             cf_service_instance_name = options["cf_service_instance_name"]
 
-            self.stdout.write(self.style.NOTICE("STARTING backout_cert command"))
+            self.stdout.write(
+                self.style.NOTICE("STARTING backout_login_dot_gov_cert command")
+            )
             backout_login_dot_gov_cert(cf_token, cf_space_name, cf_service_instance_name)
-            self.stdout.write(self.style.NOTICE("FINISHED backout_cert command"))
+            self.stdout.write(
+                self.style.NOTICE("FINISHED backout_login_dot_gov_cert command")
+            )
         except Exception:
-            self.stdout.write(self.style.ERROR("FAILED to execute backout_cert command"))
+            self.stdout.write(
+                self.style.ERROR("FAILED to execute backout_login_dot_gov_cert command")
+            )

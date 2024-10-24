@@ -1,20 +1,19 @@
 from django.test import TestCase
 from decimal import Decimal
-from .dot_fec_serializer import (
+from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     serialize_field,
     serialize_instance,
     get_field_mappings,
     get_value_from_path,
 )
-from .dot_fec_composer import Header
+from fecfiler.web_services.dot_fec.dot_fec_composer import Header
 from fecfiler.reports.models import Report
-from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
-from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.reports.tests.utils import create_form3x, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from datetime import datetime, date
@@ -74,17 +73,10 @@ class DotFECSerializerTestCase(TestCase):
             "2.0",
         )
 
-        self.report_level_memo_text = MemoText(
-            id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b",
-            rec_type="TEXT",
-            text4000="dahtest2",
-            committee_account_id=self.committee.id,
-            report_id=self.f3x.id,
-            transaction_id_number="REPORT_MEMO_TEXT_1",
+        self.report_level_memo_text = create_report_memo(
+            self.committee, self.f3x, "dahtest2"
         )
 
-        self.report_level_memo_text.filer_committee_id_number = "C00000000"
-        self.report_level_memo_text.back_reference_sched_form_name = "F3XN"
         self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
 
     def test_serialize_field(self):
@@ -186,7 +178,7 @@ class DotFECSerializerTestCase(TestCase):
         split_row = report_level_memo_row.split(FS_STR)
         self.assertEqual(split_row[0], "TEXT")
         self.assertEqual(split_row[1], "C00000000")
-        self.assertEqual(split_row[2], "REPORT_MEMO_TEXT_1")
+        self.assertEqual(split_row[2], "REPORT_MEMO_TEXT1")
         self.assertEqual(split_row[4], "F3XN")
         self.assertEqual(split_row[5], "dahtest2")
 
