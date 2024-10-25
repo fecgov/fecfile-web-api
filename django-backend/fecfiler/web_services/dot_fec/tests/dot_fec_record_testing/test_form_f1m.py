@@ -244,8 +244,8 @@ class DotFECForm1MTestCase(TestCase):
         self.assertEqual(self.split_row[61], "20240106")
 
     def test_dates(self):
-        self.assertEqual(self.split_row[62], "20240107")
-        self.assertEqual(self.split_row[63], "20240108")
+        self.assertEqual(self.split_row[62], "20240108")
+        self.assertEqual(self.split_row[63], "20240107")
         self.assertEqual(self.split_row[64], "20240109")
 
     def test_treasurer(self):
