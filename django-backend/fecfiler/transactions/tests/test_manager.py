@@ -485,7 +485,7 @@ class TransactionViewTestCase(TestCase):
             candidate_a,
         )
         obs = Transaction.objects.transaction_view().filter(id=ie.id)
-        self.assertFalse(obs[0]._itemized)
+        self.assertTrue(obs[0]._itemized)
 
         ie = create_ie(
             self.committee,
