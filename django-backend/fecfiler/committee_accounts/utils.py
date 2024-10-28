@@ -149,7 +149,7 @@ def get_committee_account_data(committee_id):
 def get_committee_account_data_from_efo(committee_id):
     # To be verified in https://fecgov.atlassian.net/browse/FECFILE-1706
     committee_data = query_production_efo(committee_id)
-    if committee_data == None:
+    if committee_data is None:
         return None
 
     # Committee Type Label
@@ -158,8 +158,8 @@ def get_committee_account_data_from_efo(committee_id):
     )
 
     # PAC/PTY
-    committee_data["isPTY"] = is_production_efo_PTY(committee_data)
-    committee_data["isPAC"] = is_production_efo_PAC(committee_data)
+    committee_data["isPTY"] = is_production_efo_pty(committee_data)
+    committee_data["isPAC"] = is_production_efo_pac(committee_data)
 
     # Qualified
     committee_data["qualified"] = (
@@ -169,15 +169,15 @@ def get_committee_account_data_from_efo(committee_id):
     return committee_data
 
 
-def is_production_efo_PTY(committee_data):
+def is_production_efo_pty(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
-    return designation != None and (
+    return designation is not None and (
         committee_type == "Y" or (committee_type == "X" and designation != "U")
     )
 
 
-def is_production_efo_PAC(committee_data):
+def is_production_efo_pac(committee_data):
     return committee_data.get("committee_type") in PRODUCTION_PAC_COMMITTEE_TYPES
 
 
@@ -213,7 +213,7 @@ def get_committee_account_data_from_test_efo(committee_id):
     }
     endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
     committee_data = query_efo_api(endpoint, params)
-    if committee_data == None:
+    if committee_data is None:
         return None
 
     # PAC/PTY

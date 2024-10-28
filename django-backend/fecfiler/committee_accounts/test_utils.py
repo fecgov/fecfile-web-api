@@ -1,10 +1,8 @@
-from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.committee_accounts.utils import (
     create_committee_account,
     check_email_match,
     get_committee_account_data_from_test_efo,
-    get_committee_account_data_from_efo,
 )
 
 from fecfiler.user.models import User
@@ -122,7 +120,7 @@ class CommitteeAccountsUtilsTest(TestCase):
         mock_requests.get = Mock()
         mock_requests.get.return_value = mock_response
 
-    def test_get_committee_account_data_from_test_efo_PAC(self):
+    def test_get_committee_account_data_from_test_efo_PAC(self):  # noqa N802
         with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
             test_efo_committee_data = {
                 "committee_id": "C12345678",
@@ -149,7 +147,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
 
-    def test_get_committee_account_data_from_test_efo_PTY(self):
+    def test_get_committee_account_data_from_test_efo_PTY(self):  # noqa N802
         with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
             test_efo_committee_data = {
                 "committee_id": "C12345678",
