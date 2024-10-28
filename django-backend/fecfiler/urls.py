@@ -30,7 +30,6 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.transactions.urls")),
     re_path(BASE_V1_URL, include("fecfiler.authentication.urls")),
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),
-    re_path(BASE_V1_URL, include("fecfiler.openfec.urls")),
     re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
