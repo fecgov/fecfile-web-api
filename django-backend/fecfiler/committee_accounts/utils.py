@@ -217,7 +217,7 @@ def get_committee_account_data_from_test_efo(committee_id):
         return None
 
     # PAC/PTY
-    committee_data["isPTY"] = is_test_efo_PTY(committee_data)
+    committee_data["isPTY"] = is_test_efo_pty(committee_data)
     committee_data["isPAC"] = not committee_data["isPTY"]
 
     # Committee type label
@@ -247,7 +247,7 @@ def get_committee_account_data_from_test_efo(committee_id):
     return committee_data
 
 
-def is_test_efo_PTY(committee_data):
+def is_test_efo_pty(committee_data):
     return committee_data.get("committee_type") == "D"
 
 
