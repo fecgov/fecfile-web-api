@@ -158,9 +158,19 @@ def get_committee_account_data_from_test_efo(committee_id):
     response = requests.get(endpoint, headers=headers, params=params)
     response_data = response.json()
     results = response_data.get("results", [])
-    if results:
-        return results[0]
-    return None
+    committee_data = results[0] if results else None
+    if committee_data == None:
+        return None
+    committee_data["isPTY"] = is_test_efo_PTY(committee_data)
+    committee_data["isPAC"] = not committee_data["isPTY"]
+    committee_data["committee_type_label"] = (
+        f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
+    )
+    committee_data["qualified"] = True
+
+
+def is_test_efo_PTY(committee_data):
+    return committee_data.get("committee_type") == "D"
 
 
 def get_committee_account_data_from_redis(committee_id):
