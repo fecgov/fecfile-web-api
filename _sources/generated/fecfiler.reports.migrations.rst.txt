@@ -41,4 +41,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more
    fecfiler.reports.migrations.0009_report_can_delete
    fecfiler.reports.migrations.0010_report_can_unammend
+   fecfiler.reports.migrations.0011_remove_form3x_cash_on_hand_date
 
