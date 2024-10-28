@@ -37,6 +37,7 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_form_f99
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_reattributions
+   fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_redesignations
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_b
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_c
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_c1
