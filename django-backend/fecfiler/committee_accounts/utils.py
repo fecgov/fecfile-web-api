@@ -165,6 +165,7 @@ def get_committee_account_data_from_test_efo(committee_id):
         f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
     )
     committee_data["qualified"] = True
+    committee_data["filing_frequency"] = "Q"
 
     # map some fields to their names as prod has them
     committee_data["name"] = committee_data.get("committee_name", None)
@@ -180,6 +181,7 @@ def get_committee_account_data_from_test_efo(committee_id):
     committee_data["city"] = committee_data.get("committee_city", None)
     committee_data["state"] = committee_data.get("committee_state", None)
     committee_data["zip"] = committee_data.get("committee_zip", None)
+    return committee_data
 
 
 def is_test_efo_PTY(committee_data):
