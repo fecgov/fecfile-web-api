@@ -23,6 +23,10 @@ else:
     redis_instance = None
 
 
+PRODUCTION_PAC_COMMITTEE_TYPES = ["O", "U", "D", "N", "Q", "V", "W"]
+PRODUCTION_QUALIFIED_COMMITTEES = ["Q", "W", "Y"]
+
+
 def get_response_for_bad_committee_source_config():
     error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
         settings.FLAG__COMMITTEE_DATA_SOURCE
@@ -143,28 +147,87 @@ def get_committee_account_data(committee_id):
 
 
 def get_committee_account_data_from_efo(committee_id):
-    return None  # To be implemented https://fecgov.atlassian.net/browse/FECFILE-1706
+    # To be verified in https://fecgov.atlassian.net/browse/FECFILE-1706
+    committee_data = query_production_efo(committee_id)
+    if committee_data == None:
+        return None
+
+    # Committee Type Label
+    committee_data["committee_type_label"] = committee_data.get(
+        "committee_type_full", None
+    )
+
+    # PAC/PTY
+    committee_data["isPTY"] = is_production_efo_PTY(committee_data)
+    committee_data["isPAC"] = is_production_efo_PAC(committee_data)
+
+    # Qualified
+    committee_data["qualified"] = (
+        committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
+    )
+
+    return committee_data
+
+
+def is_production_efo_PTY(committee_data):
+    designation = committee_data.get("designation", None)
+    committee_type = committee_data.get("committee_type", None)
+    return designation != None and (
+        committee_type == "Y" or (committee_type == "X" and designation != "U")
+    )
+
+
+def is_production_efo_PAC(committee_data):
+    return committee_data.get("committee_type") in PRODUCTION_PAC_COMMITTEE_TYPES
+
+
+def query_production_efo(committee_id):
+    raw_and_processed_endpoints = [
+        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
+        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
+    ]
+
+    params = {
+        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    for endpoint in raw_and_processed_endpoints:
+        committee_data = query_efo_api(endpoint, params)
+        if committee_data:
+            return committee_data
+    return None
+
+
+def query_efo_api(endpoint, params):
+    headers = {"Content-Type": "application/json"}
+    response = requests.get(endpoint, headers=headers, params=params)
+    response_data = response.json()
+    committee_results = response_data.get("results", [])
+    return committee_results[0] if committee_results else None
 
 
 def get_committee_account_data_from_test_efo(committee_id):
-    headers = {"Content-Type": "application/json"}
     params = {
         "api_key": settings.STAGE_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
     }
     endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
-    response = requests.get(endpoint, headers=headers, params=params)
-    response_data = response.json()
-    results = response_data.get("results", [])
-    committee_data = results[0] if results else None
+    committee_data = query_efo_api(endpoint, params)
     if committee_data == None:
         return None
+
+    # PAC/PTY
     committee_data["isPTY"] = is_test_efo_PTY(committee_data)
     committee_data["isPAC"] = not committee_data["isPTY"]
+
+    # Committee type label
     committee_data["committee_type_label"] = (
         f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
     )
+    # Qualified
     committee_data["qualified"] = True
+
+    # Filing Frequency
     committee_data["filing_frequency"] = "Q"
 
     # map some fields to their names as prod has them
