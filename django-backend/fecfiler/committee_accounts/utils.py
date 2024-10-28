@@ -139,8 +139,6 @@ def get_committee_account_data(committee_id):
             committee = get_committee_account_data_from_test_efo(committee_id)
         case "MOCKED":
             committee = get_committee_account_data_from_redis(committee_id)
-    if committee and "committee_name" in committee:
-        committee["name"] = committee.get("committee_name", None)
     return committee
 
 
@@ -167,6 +165,21 @@ def get_committee_account_data_from_test_efo(committee_id):
         f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
     )
     committee_data["qualified"] = True
+
+    # map some fields to their names as prod has them
+    committee_data["name"] = committee_data.get("committee_name", None)
+    committee_data["treasurer_name_1"] = committee_data.get("treasurer_first_name", None)
+    committee_data["treasurer_name_2"] = committee_data.get("treasurer_last_name", None)
+    committee_data["treasurer_name_middle"] = committee_data.get(
+        "treasurer_middle_name", None
+    )
+    committee_data["treasurer_street_1"] = committee_data.get("treasurer_str1", None)
+    committee_data["treasurer_street_2"] = committee_data.get("treasurer_str2", None)
+    committee_data["street_1"] = committee_data.get("committee_str1", None)
+    committee_data["street_2"] = committee_data.get("committee_str2", None)
+    committee_data["city"] = committee_data.get("committee_city", None)
+    committee_data["state"] = committee_data.get("committee_state", None)
+    committee_data["zip"] = committee_data.get("committee_zip", None)
 
 
 def is_test_efo_PTY(committee_data):
