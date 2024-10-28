@@ -182,6 +182,9 @@ def is_production_efo_pac(committee_data):
 
 
 def query_production_efo(committee_id):
+    """Queries the production EFO API for committee data
+    First tries raw endpoint and then falls back to processed endpoint
+    """
     raw_and_processed_endpoints = [
         f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
         f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
@@ -199,6 +202,7 @@ def query_production_efo(committee_id):
 
 
 def query_efo_api(endpoint, params):
+    """Shared method to query an EFO API"""
     headers = {"Content-Type": "application/json"}
     response = requests.get(endpoint, headers=headers, params=params)
     response_data = response.json()
@@ -207,6 +211,11 @@ def query_efo_api(endpoint, params):
 
 
 def get_committee_account_data_from_test_efo(committee_id):
+    """
+    Retrieves committee data from the test EFO API.
+    derives committee_type_label, isPTY, isPAC, qualified, filing_frequency,
+    and maps some fields to their names as prod has them
+    """
     params = {
         "api_key": settings.STAGE_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
