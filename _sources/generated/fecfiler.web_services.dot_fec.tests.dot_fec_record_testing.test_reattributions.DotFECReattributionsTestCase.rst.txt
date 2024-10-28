@@ -1,0 +1,140 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_reattributions.DotFECReattributionsTestCase
+=================================================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_reattributions
+
+.. autoclass:: DotFECReattributionsTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DotFECReattributionsTestCase.__init__
+      ~DotFECReattributionsTestCase.addClassCleanup
+      ~DotFECReattributionsTestCase.addCleanup
+      ~DotFECReattributionsTestCase.addTypeEqualityFunc
+      ~DotFECReattributionsTestCase.assertAlmostEqual
+      ~DotFECReattributionsTestCase.assertAlmostEquals
+      ~DotFECReattributionsTestCase.assertContains
+      ~DotFECReattributionsTestCase.assertCountEqual
+      ~DotFECReattributionsTestCase.assertDictContainsSubset
+      ~DotFECReattributionsTestCase.assertDictEqual
+      ~DotFECReattributionsTestCase.assertEqual
+      ~DotFECReattributionsTestCase.assertEquals
+      ~DotFECReattributionsTestCase.assertFalse
+      ~DotFECReattributionsTestCase.assertFieldOutput
+      ~DotFECReattributionsTestCase.assertFormError
+      ~DotFECReattributionsTestCase.assertFormSetError
+      ~DotFECReattributionsTestCase.assertGreater
+      ~DotFECReattributionsTestCase.assertGreaterEqual
+      ~DotFECReattributionsTestCase.assertHTMLEqual
+      ~DotFECReattributionsTestCase.assertHTMLNotEqual
+      ~DotFECReattributionsTestCase.assertIn
+      ~DotFECReattributionsTestCase.assertInHTML
+      ~DotFECReattributionsTestCase.assertIs
+      ~DotFECReattributionsTestCase.assertIsInstance
+      ~DotFECReattributionsTestCase.assertIsNone
+      ~DotFECReattributionsTestCase.assertIsNot
+      ~DotFECReattributionsTestCase.assertIsNotNone
+      ~DotFECReattributionsTestCase.assertJSONEqual
+      ~DotFECReattributionsTestCase.assertJSONNotEqual
+      ~DotFECReattributionsTestCase.assertLess
+      ~DotFECReattributionsTestCase.assertLessEqual
+      ~DotFECReattributionsTestCase.assertListEqual
+      ~DotFECReattributionsTestCase.assertLogs
+      ~DotFECReattributionsTestCase.assertMultiLineEqual
+      ~DotFECReattributionsTestCase.assertNoLogs
+      ~DotFECReattributionsTestCase.assertNotAlmostEqual
+      ~DotFECReattributionsTestCase.assertNotAlmostEquals
+      ~DotFECReattributionsTestCase.assertNotContains
+      ~DotFECReattributionsTestCase.assertNotEqual
+      ~DotFECReattributionsTestCase.assertNotEquals
+      ~DotFECReattributionsTestCase.assertNotIn
+      ~DotFECReattributionsTestCase.assertNotInHTML
+      ~DotFECReattributionsTestCase.assertNotIsInstance
+      ~DotFECReattributionsTestCase.assertNotRegex
+      ~DotFECReattributionsTestCase.assertNotRegexpMatches
+      ~DotFECReattributionsTestCase.assertNumQueries
+      ~DotFECReattributionsTestCase.assertQuerySetEqual
+      ~DotFECReattributionsTestCase.assertRaises
+      ~DotFECReattributionsTestCase.assertRaisesMessage
+      ~DotFECReattributionsTestCase.assertRaisesRegex
+      ~DotFECReattributionsTestCase.assertRaisesRegexp
+      ~DotFECReattributionsTestCase.assertRedirects
+      ~DotFECReattributionsTestCase.assertRegex
+      ~DotFECReattributionsTestCase.assertRegexpMatches
+      ~DotFECReattributionsTestCase.assertSequenceEqual
+      ~DotFECReattributionsTestCase.assertSetEqual
+      ~DotFECReattributionsTestCase.assertTemplateNotUsed
+      ~DotFECReattributionsTestCase.assertTemplateUsed
+      ~DotFECReattributionsTestCase.assertTrue
+      ~DotFECReattributionsTestCase.assertTupleEqual
+      ~DotFECReattributionsTestCase.assertURLEqual
+      ~DotFECReattributionsTestCase.assertWarns
+      ~DotFECReattributionsTestCase.assertWarnsMessage
+      ~DotFECReattributionsTestCase.assertWarnsRegex
+      ~DotFECReattributionsTestCase.assertXMLEqual
+      ~DotFECReattributionsTestCase.assertXMLNotEqual
+      ~DotFECReattributionsTestCase.assert_
+      ~DotFECReattributionsTestCase.captureOnCommitCallbacks
+      ~DotFECReattributionsTestCase.countTestCases
+      ~DotFECReattributionsTestCase.debug
+      ~DotFECReattributionsTestCase.defaultTestResult
+      ~DotFECReattributionsTestCase.doClassCleanups
+      ~DotFECReattributionsTestCase.doCleanups
+      ~DotFECReattributionsTestCase.ensure_connection_patch_method
+      ~DotFECReattributionsTestCase.enterClassContext
+      ~DotFECReattributionsTestCase.fail
+      ~DotFECReattributionsTestCase.failIf
+      ~DotFECReattributionsTestCase.failIfAlmostEqual
+      ~DotFECReattributionsTestCase.failIfEqual
+      ~DotFECReattributionsTestCase.failUnless
+      ~DotFECReattributionsTestCase.failUnlessAlmostEqual
+      ~DotFECReattributionsTestCase.failUnlessEqual
+      ~DotFECReattributionsTestCase.failUnlessRaises
+      ~DotFECReattributionsTestCase.id
+      ~DotFECReattributionsTestCase.modify_settings
+      ~DotFECReattributionsTestCase.run
+      ~DotFECReattributionsTestCase.setUp
+      ~DotFECReattributionsTestCase.setUpClass
+      ~DotFECReattributionsTestCase.setUpTestData
+      ~DotFECReattributionsTestCase.settings
+      ~DotFECReattributionsTestCase.shortDescription
+      ~DotFECReattributionsTestCase.skipTest
+      ~DotFECReattributionsTestCase.subTest
+      ~DotFECReattributionsTestCase.tearDown
+      ~DotFECReattributionsTestCase.tearDownClass
+      ~DotFECReattributionsTestCase.test_back_reference
+      ~DotFECReattributionsTestCase.test_committee
+      ~DotFECReattributionsTestCase.test_contribution_purpose_descrip
+      ~DotFECReattributionsTestCase.test_contributor
+      ~DotFECReattributionsTestCase.test_form_type
+      ~DotFECReattributionsTestCase.test_transaction_id
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DotFECReattributionsTestCase.available_apps
+      ~DotFECReattributionsTestCase.databases
+      ~DotFECReattributionsTestCase.fixtures
+      ~DotFECReattributionsTestCase.longMessage
+      ~DotFECReattributionsTestCase.maxDiff
+      ~DotFECReattributionsTestCase.reset_sequences
+      ~DotFECReattributionsTestCase.serialized_rollback
+   
+   
