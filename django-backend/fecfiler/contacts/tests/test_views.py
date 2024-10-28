@@ -333,7 +333,6 @@ class ContactViewSetTest(TestCase):
 
                 response = ContactViewSet.as_view({"get": "committee"})(request)
                 self.assertEqual(response.status_code, 200)
-                print("AHOY", mock_requests.get.call_args)
                 self.assertIn(expected_call, mock_requests.get.call_args[0])
                 self.assertEqual(
                     mock_requests.get.call_args.kwargs["params"], expected_params
