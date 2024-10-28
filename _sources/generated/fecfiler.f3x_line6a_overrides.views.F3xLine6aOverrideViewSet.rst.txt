@@ -1,0 +1,109 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_line6a\_overrides.views.F3xLine6aOverrideViewSet
+==============================================================
+
+.. currentmodule:: fecfiler.f3x_line6a_overrides.views
+
+.. autoclass:: F3xLine6aOverrideViewSet
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3xLine6aOverrideViewSet.__init__
+      ~F3xLine6aOverrideViewSet.as_view
+      ~F3xLine6aOverrideViewSet.check_object_permissions
+      ~F3xLine6aOverrideViewSet.check_permissions
+      ~F3xLine6aOverrideViewSet.check_throttles
+      ~F3xLine6aOverrideViewSet.create
+      ~F3xLine6aOverrideViewSet.destroy
+      ~F3xLine6aOverrideViewSet.determine_version
+      ~F3xLine6aOverrideViewSet.dispatch
+      ~F3xLine6aOverrideViewSet.filter_queryset
+      ~F3xLine6aOverrideViewSet.finalize_response
+      ~F3xLine6aOverrideViewSet.get_authenticate_header
+      ~F3xLine6aOverrideViewSet.get_authenticators
+      ~F3xLine6aOverrideViewSet.get_content_negotiator
+      ~F3xLine6aOverrideViewSet.get_exception_handler
+      ~F3xLine6aOverrideViewSet.get_exception_handler_context
+      ~F3xLine6aOverrideViewSet.get_extra_action_url_map
+      ~F3xLine6aOverrideViewSet.get_extra_actions
+      ~F3xLine6aOverrideViewSet.get_format_suffix
+      ~F3xLine6aOverrideViewSet.get_object
+      ~F3xLine6aOverrideViewSet.get_paginated_response
+      ~F3xLine6aOverrideViewSet.get_parser_context
+      ~F3xLine6aOverrideViewSet.get_parsers
+      ~F3xLine6aOverrideViewSet.get_permissions
+      ~F3xLine6aOverrideViewSet.get_queryset
+      ~F3xLine6aOverrideViewSet.get_renderer_context
+      ~F3xLine6aOverrideViewSet.get_renderers
+      ~F3xLine6aOverrideViewSet.get_serializer
+      ~F3xLine6aOverrideViewSet.get_serializer_class
+      ~F3xLine6aOverrideViewSet.get_serializer_context
+      ~F3xLine6aOverrideViewSet.get_success_headers
+      ~F3xLine6aOverrideViewSet.get_throttles
+      ~F3xLine6aOverrideViewSet.get_view_description
+      ~F3xLine6aOverrideViewSet.get_view_name
+      ~F3xLine6aOverrideViewSet.handle_exception
+      ~F3xLine6aOverrideViewSet.http_method_not_allowed
+      ~F3xLine6aOverrideViewSet.initial
+      ~F3xLine6aOverrideViewSet.initialize_request
+      ~F3xLine6aOverrideViewSet.list
+      ~F3xLine6aOverrideViewSet.options
+      ~F3xLine6aOverrideViewSet.paginate_queryset
+      ~F3xLine6aOverrideViewSet.partial_update
+      ~F3xLine6aOverrideViewSet.perform_authentication
+      ~F3xLine6aOverrideViewSet.perform_content_negotiation
+      ~F3xLine6aOverrideViewSet.perform_create
+      ~F3xLine6aOverrideViewSet.perform_destroy
+      ~F3xLine6aOverrideViewSet.perform_update
+      ~F3xLine6aOverrideViewSet.permission_denied
+      ~F3xLine6aOverrideViewSet.raise_uncaught_exception
+      ~F3xLine6aOverrideViewSet.retrieve
+      ~F3xLine6aOverrideViewSet.reverse_action
+      ~F3xLine6aOverrideViewSet.setup
+      ~F3xLine6aOverrideViewSet.throttled
+      ~F3xLine6aOverrideViewSet.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3xLine6aOverrideViewSet.allowed_methods
+      ~F3xLine6aOverrideViewSet.authentication_classes
+      ~F3xLine6aOverrideViewSet.basename
+      ~F3xLine6aOverrideViewSet.default_response_headers
+      ~F3xLine6aOverrideViewSet.description
+      ~F3xLine6aOverrideViewSet.detail
+      ~F3xLine6aOverrideViewSet.filter_backends
+      ~F3xLine6aOverrideViewSet.http_method_names
+      ~F3xLine6aOverrideViewSet.lookup_field
+      ~F3xLine6aOverrideViewSet.lookup_url_kwarg
+      ~F3xLine6aOverrideViewSet.name
+      ~F3xLine6aOverrideViewSet.pagination_class
+      ~F3xLine6aOverrideViewSet.paginator
+      ~F3xLine6aOverrideViewSet.parser_classes
+      ~F3xLine6aOverrideViewSet.permission_classes
+      ~F3xLine6aOverrideViewSet.queryset
+      ~F3xLine6aOverrideViewSet.renderer_classes
+      ~F3xLine6aOverrideViewSet.schema
+      ~F3xLine6aOverrideViewSet.settings
+      ~F3xLine6aOverrideViewSet.suffix
+      ~F3xLine6aOverrideViewSet.throttle_classes
+      ~F3xLine6aOverrideViewSet.versioning_class
+      ~F3xLine6aOverrideViewSet.view_is_async
+   
+   

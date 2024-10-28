@@ -37,6 +37,7 @@ fecfiler
    fecfiler.contacts
    fecfiler.dcf_importer
    fecfiler.devops
+   fecfiler.f3x_line6a_overrides
    fecfiler.feedback
    fecfiler.memo_text
    fecfiler.middleware

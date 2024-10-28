@@ -1,0 +1,136 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.f3x\_line6a\_overrides.test\_models.F3xLine6aOverrideTestCase
+======================================================================
+
+.. currentmodule:: fecfiler.f3x_line6a_overrides.test_models
+
+.. autoclass:: F3xLine6aOverrideTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~F3xLine6aOverrideTestCase.__init__
+      ~F3xLine6aOverrideTestCase.addClassCleanup
+      ~F3xLine6aOverrideTestCase.addCleanup
+      ~F3xLine6aOverrideTestCase.addTypeEqualityFunc
+      ~F3xLine6aOverrideTestCase.assertAlmostEqual
+      ~F3xLine6aOverrideTestCase.assertAlmostEquals
+      ~F3xLine6aOverrideTestCase.assertContains
+      ~F3xLine6aOverrideTestCase.assertCountEqual
+      ~F3xLine6aOverrideTestCase.assertDictContainsSubset
+      ~F3xLine6aOverrideTestCase.assertDictEqual
+      ~F3xLine6aOverrideTestCase.assertEqual
+      ~F3xLine6aOverrideTestCase.assertEquals
+      ~F3xLine6aOverrideTestCase.assertFalse
+      ~F3xLine6aOverrideTestCase.assertFieldOutput
+      ~F3xLine6aOverrideTestCase.assertFormError
+      ~F3xLine6aOverrideTestCase.assertFormSetError
+      ~F3xLine6aOverrideTestCase.assertGreater
+      ~F3xLine6aOverrideTestCase.assertGreaterEqual
+      ~F3xLine6aOverrideTestCase.assertHTMLEqual
+      ~F3xLine6aOverrideTestCase.assertHTMLNotEqual
+      ~F3xLine6aOverrideTestCase.assertIn
+      ~F3xLine6aOverrideTestCase.assertInHTML
+      ~F3xLine6aOverrideTestCase.assertIs
+      ~F3xLine6aOverrideTestCase.assertIsInstance
+      ~F3xLine6aOverrideTestCase.assertIsNone
+      ~F3xLine6aOverrideTestCase.assertIsNot
+      ~F3xLine6aOverrideTestCase.assertIsNotNone
+      ~F3xLine6aOverrideTestCase.assertJSONEqual
+      ~F3xLine6aOverrideTestCase.assertJSONNotEqual
+      ~F3xLine6aOverrideTestCase.assertLess
+      ~F3xLine6aOverrideTestCase.assertLessEqual
+      ~F3xLine6aOverrideTestCase.assertListEqual
+      ~F3xLine6aOverrideTestCase.assertLogs
+      ~F3xLine6aOverrideTestCase.assertMultiLineEqual
+      ~F3xLine6aOverrideTestCase.assertNoLogs
+      ~F3xLine6aOverrideTestCase.assertNotAlmostEqual
+      ~F3xLine6aOverrideTestCase.assertNotAlmostEquals
+      ~F3xLine6aOverrideTestCase.assertNotContains
+      ~F3xLine6aOverrideTestCase.assertNotEqual
+      ~F3xLine6aOverrideTestCase.assertNotEquals
+      ~F3xLine6aOverrideTestCase.assertNotIn
+      ~F3xLine6aOverrideTestCase.assertNotInHTML
+      ~F3xLine6aOverrideTestCase.assertNotIsInstance
+      ~F3xLine6aOverrideTestCase.assertNotRegex
+      ~F3xLine6aOverrideTestCase.assertNotRegexpMatches
+      ~F3xLine6aOverrideTestCase.assertNumQueries
+      ~F3xLine6aOverrideTestCase.assertQuerySetEqual
+      ~F3xLine6aOverrideTestCase.assertRaises
+      ~F3xLine6aOverrideTestCase.assertRaisesMessage
+      ~F3xLine6aOverrideTestCase.assertRaisesRegex
+      ~F3xLine6aOverrideTestCase.assertRaisesRegexp
+      ~F3xLine6aOverrideTestCase.assertRedirects
+      ~F3xLine6aOverrideTestCase.assertRegex
+      ~F3xLine6aOverrideTestCase.assertRegexpMatches
+      ~F3xLine6aOverrideTestCase.assertSequenceEqual
+      ~F3xLine6aOverrideTestCase.assertSetEqual
+      ~F3xLine6aOverrideTestCase.assertTemplateNotUsed
+      ~F3xLine6aOverrideTestCase.assertTemplateUsed
+      ~F3xLine6aOverrideTestCase.assertTrue
+      ~F3xLine6aOverrideTestCase.assertTupleEqual
+      ~F3xLine6aOverrideTestCase.assertURLEqual
+      ~F3xLine6aOverrideTestCase.assertWarns
+      ~F3xLine6aOverrideTestCase.assertWarnsMessage
+      ~F3xLine6aOverrideTestCase.assertWarnsRegex
+      ~F3xLine6aOverrideTestCase.assertXMLEqual
+      ~F3xLine6aOverrideTestCase.assertXMLNotEqual
+      ~F3xLine6aOverrideTestCase.assert_
+      ~F3xLine6aOverrideTestCase.captureOnCommitCallbacks
+      ~F3xLine6aOverrideTestCase.countTestCases
+      ~F3xLine6aOverrideTestCase.debug
+      ~F3xLine6aOverrideTestCase.defaultTestResult
+      ~F3xLine6aOverrideTestCase.doClassCleanups
+      ~F3xLine6aOverrideTestCase.doCleanups
+      ~F3xLine6aOverrideTestCase.ensure_connection_patch_method
+      ~F3xLine6aOverrideTestCase.enterClassContext
+      ~F3xLine6aOverrideTestCase.fail
+      ~F3xLine6aOverrideTestCase.failIf
+      ~F3xLine6aOverrideTestCase.failIfAlmostEqual
+      ~F3xLine6aOverrideTestCase.failIfEqual
+      ~F3xLine6aOverrideTestCase.failUnless
+      ~F3xLine6aOverrideTestCase.failUnlessAlmostEqual
+      ~F3xLine6aOverrideTestCase.failUnlessEqual
+      ~F3xLine6aOverrideTestCase.failUnlessRaises
+      ~F3xLine6aOverrideTestCase.id
+      ~F3xLine6aOverrideTestCase.modify_settings
+      ~F3xLine6aOverrideTestCase.run
+      ~F3xLine6aOverrideTestCase.setUp
+      ~F3xLine6aOverrideTestCase.setUpClass
+      ~F3xLine6aOverrideTestCase.setUpTestData
+      ~F3xLine6aOverrideTestCase.settings
+      ~F3xLine6aOverrideTestCase.shortDescription
+      ~F3xLine6aOverrideTestCase.skipTest
+      ~F3xLine6aOverrideTestCase.subTest
+      ~F3xLine6aOverrideTestCase.tearDown
+      ~F3xLine6aOverrideTestCase.tearDownClass
+      ~F3xLine6aOverrideTestCase.test_f3x_line6a_override_crud
+      ~F3xLine6aOverrideTestCase.test_marks_future_reports_calculation_status_none
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~F3xLine6aOverrideTestCase.available_apps
+      ~F3xLine6aOverrideTestCase.databases
+      ~F3xLine6aOverrideTestCase.fixtures
+      ~F3xLine6aOverrideTestCase.longMessage
+      ~F3xLine6aOverrideTestCase.maxDiff
+      ~F3xLine6aOverrideTestCase.reset_sequences
+      ~F3xLine6aOverrideTestCase.serialized_rollback
+   
+   

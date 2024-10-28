@@ -1,0 +1,26 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.f3x\_line6a\_overrides.urls
+====================================
+
+.. automodule:: fecfiler.f3x_line6a_overrides.urls
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

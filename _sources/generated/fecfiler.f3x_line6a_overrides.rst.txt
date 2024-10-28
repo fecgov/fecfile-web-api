@@ -1,0 +1,41 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.f3x\_line6a\_overrides
+===============================
+
+.. automodule:: fecfiler.f3x_line6a_overrides
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.f3x_line6a_overrides.migrations
+   fecfiler.f3x_line6a_overrides.models
+   fecfiler.f3x_line6a_overrides.serializers
+   fecfiler.f3x_line6a_overrides.test_models
+   fecfiler.f3x_line6a_overrides.test_views
+   fecfiler.f3x_line6a_overrides.urls
+   fecfiler.f3x_line6a_overrides.views
+
