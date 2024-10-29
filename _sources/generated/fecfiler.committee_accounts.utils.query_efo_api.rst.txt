@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.query\_efo\_api
+==================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: query_efo_api

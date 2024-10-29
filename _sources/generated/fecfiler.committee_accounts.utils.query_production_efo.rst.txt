@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.query\_production\_efo
+=========================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: query_production_efo
