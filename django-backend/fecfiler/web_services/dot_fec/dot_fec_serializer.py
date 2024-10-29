@@ -1,3 +1,4 @@
+from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
 from curses import ascii
@@ -42,6 +43,33 @@ def date_serializer(model_instance, field_name, mapping):
     return date.strftime("%Y%m%d") if date else ""
 
 
+date_formats = [
+    "%Y-%m-%d %H:%M:%S",  # "2024-01-10 00:00:00"
+    "%m/%d/%Y",  # "01/02/2024"
+    "%m/%d/%y",  # "01/02/24"
+    "%m-%d-%Y",  # "01-02-2024"
+    "%m-%d-%y",  # "01-02-24"
+    "%Y-%m-%d",  # "2024-01-10" without time
+]
+
+
+def text_to_date_serializer(model_instance, field_name, mapping):
+    date_string = get_value_from_path(
+        model_instance, mapping.get("path", None) or field_name
+    )
+    for date_format in date_formats:
+        try:
+            # Try parsing with each format in the list
+            date_object = datetime.strptime(date_string, date_format).date()
+            return date_object.strftime("%Y%m%d") if date_object else ""
+        except ValueError:
+            continue  # If it fails, try the next format
+    logger.error(
+        f"failed to match manually entered date {date_string} with any known formats"
+    )
+    return date_string
+
+
 def default_serializer(model_instance, field_name, mapping):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
@@ -59,6 +87,7 @@ FIELD_SERIALIZERS = {
     "BOOLEAN_X": boolean_x_serializer,
     "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
+    "TEXT_TO_DATE": text_to_date_serializer,
     None: default_serializer,
 }
 

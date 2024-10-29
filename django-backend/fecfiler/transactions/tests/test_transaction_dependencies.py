@@ -7,7 +7,7 @@ from fecfiler.transactions.transaction_dependencies import (
     update_dependent_parent,
 )
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 
 
 class TransactionDependenciesTestCase(TestCase):

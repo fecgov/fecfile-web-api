@@ -53,7 +53,7 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
-        if "cloud.gov" in self.client.base_url:
+        if "fec.gov" in self.client.base_url:
             self.client.headers = {
                 "cookie": f"sessionid={SESSION_ID};",
                 "user-agent": "Locust testing",

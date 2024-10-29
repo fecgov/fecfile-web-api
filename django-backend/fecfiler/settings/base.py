@@ -11,6 +11,8 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
+from fecfiler.shared.utilities import get_float_from_string
+from math import floor
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -37,6 +39,7 @@ ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
+SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
 ROOT_URLCONF = "fecfiler.urls"
@@ -73,9 +76,7 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "fecfiler.openfec",
     "fecfiler.user",
-    "fecfiler.mock_openfec",
     "fecfiler.oidc",
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
@@ -348,6 +349,17 @@ if not MOCK_EFO and FEC_FILING_API is None:
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
+
+"""EFO POLLING SETTINGS
+"""
+EFO_POLLING_MAX_DURATION = get_float_from_string(
+    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
+)
+EFO_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("EFO_POLLING_INTERVAL", 30)
+)
+EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
+
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
 WARNING: This will BREAK submitting to fec because it will no longer conform to spec
@@ -359,21 +371,32 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
-"""FEC API settings
-"""
-FEC_API = env.get_credential("FEC_API")
-FEC_API_KEY = env.get_credential("FEC_API_KEY")
-FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
-FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
-FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
+"""FEATURE FLAGS
+"""
+
+# FLAG__COMMITTEE_DATA_SOURCE:
+# Determines whether committee data is pulled from EFO, TestEFO, or REDIS
+FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
+valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
+if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
+    raise Exception(
+        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
+        + f" must be valid source ({valid_sources})"
+    )
+
+
+PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
+PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
+
+STAGE_OPEN_FEC_API = env.get_credential("STAGE_OPEN_FEC_API")
+STAGE_OPEN_FEC_API_KEY = env.get_credential("STAGE_OPEN_FEC_API_KEY")
 
 """MOCK OPENFEC settings"""
-MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
-if MOCK_OPENFEC == "REDIS":
-    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
-else:
-    MOCK_OPENFEC_REDIS_URL = None
+MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
+CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
+    "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []
+)
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"

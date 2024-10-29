@@ -10,18 +10,13 @@ from rest_framework import viewsets, pagination
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
-from fecfiler.settings import (
-    FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
-    FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
-    FEC_API_CANDIDATE_ENDPOINT,
-    FEC_API_KEY,
-)
 from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
+import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
 
@@ -31,6 +26,14 @@ max_allowed_results = 100
 NAME_CLAUSE = Concat("first_name", Value(" "), "last_name", output_field=CharField())
 NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
+)
+
+FEC_API_COMMITTEE_LOOKUP_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "names/committees/"
+)
+FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(settings.PRODUCTION_OPEN_FEC_API) + "candidates/"
+FEC_API_CANDIDATE_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "candidate/{}/history/"
 )
 
 
@@ -87,7 +90,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         try:
             headers = {"Content-Type": "application/json"}
             params = {
-                "api_key": FEC_API_KEY,
+                "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
                 "sort": "-two_year_period",
             }
             url = FEC_API_CANDIDATE_ENDPOINT.format(
@@ -98,6 +101,23 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
+
+    @action(detail=False)
+    def committee(self, request):
+        committee_id = request.query_params.get("committee_id")
+        if not committee_id:
+            return HttpResponseBadRequest()
+
+        headers = {"Content-Type": "application/json"}
+        response = requests.get(
+            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
+            params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
+            headers=headers,
+        ).json()
+        if response.get("results"):
+            return JsonResponse(response["results"][0])
+        else:
+            return JsonResponse({})
 
     @action(detail=False)
     def candidate_lookup(self, request):
@@ -117,7 +137,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": FEC_API_KEY}
+        params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
         if office:
             params["office"] = office
         params = urlencode(params)
@@ -181,7 +201,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
         json_results = requests.get(
             FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
         ).json()

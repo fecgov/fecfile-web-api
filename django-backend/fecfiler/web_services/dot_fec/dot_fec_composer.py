@@ -1,3 +1,4 @@
+from decimal import Decimal
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
 from fecfiler.web_services.models import UploadSubmission
@@ -43,15 +44,23 @@ def compose_transactions(report_id):
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
         for transaction in transactions:
-            transaction.filer_committee_id_number = (
-                transaction.committee_account.committee_id
-            )
-
             if transaction.schedule_a:
                 add_schedule_a_contact_fields(transaction)
             if transaction.schedule_b:
                 add_schedule_b_contact_fields(transaction)
             if transaction.schedule_c:
+                loan_amount = (
+                    transaction.schedule_c.loan_amount
+                    if transaction.schedule_c.loan_amount is not None
+                    else Decimal("0.00")
+                )
+
+                transaction.loan_payment_to_date = (
+                    transaction.loan_payment_to_date
+                    if transaction.loan_payment_to_date is not None
+                    else Decimal("0.00")
+                )
+                transaction.loan_balance = loan_amount - transaction.loan_payment_to_date
                 add_schedule_c_contact_fields(transaction)
             if transaction.schedule_c1:
                 add_schedule_c1_contact_fields(transaction)
@@ -65,21 +74,6 @@ def compose_transactions(report_id):
         return [t for t in transactions if (t.itemized or report.form_24 is not None)]
     else:
         logger.info(f"no transactions found for report: {report_id}")
-        return []
-
-
-def compose_report_level_memos(report_id):
-    report_level_memos = MemoText.objects.filter(
-        report_id=report_id,
-        transaction_uuid=None,
-    )
-    if report_level_memos.exists():
-        logger.info(f"composing report level memos: {report_id}")
-        for memo in report_level_memos:
-            memo.filer_committee_id_number = memo.committee_account.committee_id
-        return report_level_memos
-    else:
-        logger.info(f"no report level memos found for report: {report_id}")
         return []
 
 
@@ -195,17 +189,16 @@ def compose_dot_fec(report_id, upload_submission_record_id):
             )
             if transaction.memo_text:
                 memo = transaction.memo_text
-                memo.filer_committee_id_number = memo.committee_account.committee_id
-                memo.back_reference_tran_id_number = transaction.transaction_id
-                memo.back_reference_sched_form_name = transaction.form_type
                 serialized_memo = serialize_instance("Text", memo)
                 logger.debug("Serialized Memo:")
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
-        report_level_memos = compose_report_level_memos(report_id)
+        report_level_memos = MemoText.objects.filter(
+            report_id=report_id,
+            transaction_uuid=None,
+        )
         for memo in report_level_memos:
-            memo.back_reference_sched_form_name = report.form_type
             serialized_memo = serialize_instance("Text", memo)
             logger.debug("Serialized Report Level Memo:")
             logger.debug(memo)
