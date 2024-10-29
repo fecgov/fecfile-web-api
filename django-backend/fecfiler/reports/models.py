@@ -151,6 +151,12 @@ class Report(CommitteeOwnedModel):
         self.can_unamend = False
         self.save()
 
+    def flag_for_recalculation(self):
+        reports_to_flag = self.get_future_in_progress_reports() | Report.objects.filter(id=self.id)
+        reports_to_flag.update(calculation_status=None)
+        flagged_count = reports_to_flag.count()
+        logger.info(f"{flagged_count} Reports marked for recalculation")
+
     def delete(self):
         if not self.can_delete:
             raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)

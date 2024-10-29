@@ -35,6 +35,7 @@ def get_reports_to_calculate_by_coverage_date(primary_report):
         return reports_to_recalculate
     return primary_report
 
+
 @shared_task
 def calculate_summary(report_id):
     try:
@@ -45,9 +46,6 @@ def calculate_summary(report_id):
     if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
         return primary_report.id
 
-    # reports_to_recalculate = get_reports_to_calculate_by_coverage_date(
-    #     primary_report
-    # )
     reports_to_recalculate = Report.objects.all().order_by("coverage_through_date")
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
