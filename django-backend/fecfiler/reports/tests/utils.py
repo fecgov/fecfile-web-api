@@ -11,7 +11,7 @@ def create_form3x(
     committee,
     coverage_from,
     coverage_through,
-    data,
+    data={},
     report_code="Q1",
 ):
     return create_test_report(

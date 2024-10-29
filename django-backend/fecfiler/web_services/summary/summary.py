@@ -23,7 +23,7 @@ class SummaryService:
             .first()
         )
 
-    def calculate_summary(self):
+    def calculate_summary_columns(self):
         column_a = self.calculate_summary_column_a()
         column_b = self.calculate_summary_column_b()
 
@@ -247,7 +247,7 @@ class SummaryService:
             )  # noqa: E501
         else:
             # user defined cash on hand
-            column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            column_a["line_6b"] = column_b["line_6a"]
 
         # if we have cash on hand values
         if column_a.get("line_6b") is not None and column_b.get("line_6a") is not None:
