@@ -21,7 +21,6 @@ class Form3X(models.Model):
     date_of_election = models.DateField(null=True, blank=True)
     state_of_election = models.TextField(null=True, blank=True)
     qualified_committee = models.BooleanField(default=False, null=True, blank=True)
-    cash_on_hand_date = models.DateField(null=True, blank=True)
     L6b_cash_on_hand_beginning_period = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
