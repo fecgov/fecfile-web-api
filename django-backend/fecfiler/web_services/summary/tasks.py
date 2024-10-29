@@ -46,7 +46,9 @@ def calculate_summary(report_id):
     if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
         return primary_report.id
 
-    reports_to_recalculate = Report.objects.filter(form_3x__isnull=False).order_by("coverage_through_date")
+    reports_to_recalculate = Report.objects.filter(
+        form_3x__isnull=False
+    ).order_by("coverage_through_date")
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
         calculation_token=calculation_token,
