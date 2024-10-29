@@ -160,10 +160,17 @@ class CommitteeViewSetTest(TestCase):
             request.user = self.user
             request.query_params = {"committee_id": "C12345678"}
 
-            response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
-                request
-            )
-            self.assertEqual(response.status_code, 500)
+            with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_requests.get = Mock()
+                mock_requests.get.return_value = mock_response
+
+                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
+                    request
+                )
+                self.assertEqual(response.status_code, 200)
 
     def test_get_committee_account_data_from_test(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
@@ -204,7 +211,7 @@ class CommitteeViewSetTest(TestCase):
                 "fecfiler.committee_accounts.utils.get_committee_account_data_from_redis"
             ) as mock_committee:
                 mock_committee.return_value = {
-                    "committee_name": "TEST",
+                    "name": "TEST",
                     "email": "test@fec.gov",
                 }
                 response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
