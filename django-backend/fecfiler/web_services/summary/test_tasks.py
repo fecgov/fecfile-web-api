@@ -174,7 +174,6 @@ class F3XSerializerTestCase(TestCase):
         self.q2_report.refresh_from_db()
         self.q3_report.refresh_from_db()
 
-
         self.assertEqual(
             self.q2_report.form_3x.L8_cash_on_hand_close_ytd,
             Decimal("12061.28"),
