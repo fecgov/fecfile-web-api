@@ -12,11 +12,12 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_report = (
+        self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),
                 committee_account=report.committee_account,
                 form_3x__isnull=False,
+                coverage_through_date__year=report.coverage_from_date.year,
                 coverage_through_date__lt=report.coverage_from_date,
             )
             .order_by("-coverage_through_date")
@@ -241,9 +242,9 @@ class SummaryService:
             # user defined cash on hand
             column_b["line_6a"] = 0
 
-        if self.previous_report:
+        if self.previous_report_this_year:
             column_a["line_6b"] = (
-                self.previous_report.form_3x.L8_cash_on_hand_at_close_period
+                self.previous_report_this_year.form_3x.L8_cash_on_hand_at_close_period
             )  # noqa: E501
         else:
             # user defined cash on hand
