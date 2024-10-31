@@ -347,3 +347,17 @@ COUPLED_TRANSACTION_TYPES = [
     "LOAN_RECEIVED_FROM_INDIVIDUAL_RECEIPT",
     "C1_LOAN_AGREEMENT",
 ]
+
+
+class OverTwoHundredTypes(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    type = models.TextField()
+
+    class Meta:
+        indexes = [models.Index(fields=["type"])]
