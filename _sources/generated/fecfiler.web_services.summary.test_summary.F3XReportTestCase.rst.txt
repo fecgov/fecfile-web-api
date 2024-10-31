@@ -117,7 +117,6 @@ fecfiler.web\_services.summary.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.test_calculate_summary_column_a
       ~F3XReportTestCase.test_calculate_summary_column_b
       ~F3XReportTestCase.test_report_with_no_transactions
-      ~F3XReportTestCase.test_report_with_none_cash_on_hand
       ~F3XReportTestCase.test_report_with_zero_cash_on_hand
    
    

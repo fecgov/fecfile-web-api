@@ -21,9 +21,9 @@ fecfiler.web\_services.summary.summary.SummaryService
    
       ~SummaryService.__init__
       ~SummaryService.calculate_cash_on_hand_fields
-      ~SummaryService.calculate_summary
       ~SummaryService.calculate_summary_column_a
       ~SummaryService.calculate_summary_column_b
+      ~SummaryService.calculate_summary_columns
       ~SummaryService.get_line
    
    
