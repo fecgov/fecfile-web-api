@@ -12,18 +12,19 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_report = (
+        self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),
                 committee_account=report.committee_account,
                 form_3x__isnull=False,
+                coverage_through_date__year=report.coverage_from_date.year,
                 coverage_through_date__lt=report.coverage_from_date,
             )
             .order_by("-coverage_through_date")
             .first()
         )
 
-    def calculate_summary(self):
+    def calculate_summary_columns(self):
         column_a = self.calculate_summary_column_a()
         column_b = self.calculate_summary_column_b()
 
@@ -241,13 +242,13 @@ class SummaryService:
             # user defined cash on hand
             column_b["line_6a"] = 0
 
-        if self.previous_report:
+        if self.previous_report_this_year:
             column_a["line_6b"] = (
-                self.previous_report.form_3x.L8_cash_on_hand_at_close_period
+                self.previous_report_this_year.form_3x.L8_cash_on_hand_at_close_period
             )  # noqa: E501
         else:
             # user defined cash on hand
-            column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            column_a["line_6b"] = column_b["line_6a"]
 
         # if we have cash on hand values
         if column_a.get("line_6b") is not None and column_b.get("line_6a") is not None:

@@ -20,18 +20,21 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_calculate_summary_column_a(self):
+        F3xLine6aOverride.objects.create(
+            year="2005",
+            cash_on_hand=61,
+        )
         f3x = create_form3x(
             self.committee,
             datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
             datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
-            {"L6a_cash_on_hand_jan_1_ytd": 61},
-            "12C",
+            report_code="12C",
         )
         self.debt = generate_data(
             self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
         )
         summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary()
+        summary_a, _ = summary_service.calculate_summary_columns()
 
         self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
         self.assertEqual(
@@ -125,14 +128,13 @@ class F3XReportTestCase(TestCase):
             self.committee,
             datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
             datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
-            {"L6a_cash_on_hand_jan_1_ytd": 61},
-            "12C",
+            report_code="12C",
         )
         self.debt = generate_data(
             self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
         )
         summary_service = SummaryService(f3x)
-        _, summary_b = summary_service.calculate_summary()
+        _, summary_b = summary_service.calculate_summary_columns()
 
         self.assertIsNotNone(self.debt)
         if self.debt is not None:
@@ -222,10 +224,9 @@ class F3XReportTestCase(TestCase):
             self.committee,
             datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
             datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
-            {},
         )
         summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary()
+        summary_a, _ = summary_service.calculate_summary_columns()
         self.assertEqual(summary_a["line_15"], Decimal("0"))
         self.assertEqual(summary_a["line_17"], Decimal("0"))
 
@@ -234,19 +235,7 @@ class F3XReportTestCase(TestCase):
             self.committee,
             datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
             datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
-            {"L6a_cash_on_hand_jan_1_ytd": 0},
         )
         summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary()
+        summary_a, _ = summary_service.calculate_summary_columns()
         self.assertTrue("line_8" in summary_a)
-
-    def test_report_with_none_cash_on_hand(self):
-        f3x = create_form3x(
-            self.committee,
-            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
-            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
-            {"L6a_cash_on_hand_jan_1_ytd": None},
-        )
-        summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary()
-        self.assertFalse("line_8" in summary_a)
