@@ -46,7 +46,7 @@ class DotFECSubmitterTestCase(TestCase):
 
     def test_poll(self):
         submitter = MockDotFECSubmitter()
-        response = submitter.poll_status(self.dot_fec_record.id)
+        response = submitter.poll_status(123, self.dot_fec_record.id)
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 

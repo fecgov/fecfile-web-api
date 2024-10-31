@@ -22,7 +22,7 @@ class DotFECSubmitter(ABC):
         pass
 
     @abstractmethod
-    def poll_status(self, submission_id):
+    def poll_status(self, batch_id, submission_id):
         pass
 
     def get_submission_json(self, dot_fec_record, e_filing_password, backdoor_code=None):
@@ -63,7 +63,7 @@ class EFODotFECSubmitter(DotFECSubmitter):
         logger.debug(f"FEC upload response: {response}")
         return response
 
-    def poll_status(self, submission_id):
+    def poll_status(self, batch_id, submission_id):
         response = self.fec_soap_client.service.status(submission_id)
         logger.debug(f"FEC polling response: {response}")
         return response
@@ -82,7 +82,7 @@ class MockDotFECSubmitter(DotFECSubmitter):
             }
         )
 
-    def poll_status(self, submission_id):
+    def poll_status(self, batch_id, submission_id):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",

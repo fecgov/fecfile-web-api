@@ -29,6 +29,8 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     WebPrintSubmitter,
     MockWebPrintSubmitter,
 )
+from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
+from uuid import uuid4 as uuid
 
 import structlog
 
@@ -231,6 +233,19 @@ class UnitTestWebPrintSubmitter(WebPrintSubmitter):
         )
 
 
+class UnitTestDotFecSubmitter(MockDotFECSubmitter):
+    # A stand-in DotFECSubmitter that returns PROCESSING on submission
+    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
+        return json.dumps(
+            {
+                "submission_id": "fake_submission_id",
+                "status": FECStatus.PROCESSING.value,
+                "message": "We didn't really send anything to FEC",
+                "report_id": fec_report_id or str(uuid()),
+            }
+        )
+
+
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
 class PollingTasksTestCase(TestCase):
 
@@ -264,6 +279,35 @@ class PollingTasksTestCase(TestCase):
             self.mock_web_print_key: WebPrintSubmission,
             self.test_print_key: WebPrintSubmission,
         }
+
+        self.mock_dot_fec_key = "MockDotFEC"
+        self.test_dot_fec_key = "UnitTestDotFec"
+        self.test_dot_fec_submission_managers = {
+            self.mock_dot_fec_key: MockDotFECSubmitter,
+            self.test_dot_fec_key: UnitTestDotFecSubmitter,
+        }
+        self.test_dot_fec_submission_classes = {
+            self.mock_dot_fec_key: UploadSubmission,
+            self.test_dot_fec_key: UploadSubmission,
+        }
+
+    def test_dotfec_submission_polling_completes(self):
+        with patch.multiple(
+            "fecfiler.web_services.tasks",
+            SUBMISSION_MANAGERS=self.test_dot_fec_submission_managers,
+            SUBMISSION_CLASSES=self.test_dot_fec_submission_classes,
+        ):
+            upload_submission = UploadSubmission.objects.initiate_submission(
+                str(self.f3x.id)
+            )
+            self.assertNotEqual(upload_submission.fec_status, FECStatus.COMPLETED)
+            poll_for_fec_response(
+                upload_submission.id,
+                self.mock_dot_fec_key,
+                "Unit Testing Upload Submission",
+            )
+            resolved_submission = UploadSubmission.objects.get(id=upload_submission.id)
+            self.assertEqual(resolved_submission.fec_status, FECStatus.ACCEPTED)
 
     def test_submission_polling_completes(self):
         webprint_submission = WebPrintSubmission.objects.initiate_submission(
