@@ -1,6 +1,5 @@
 from .models import CashOnHandYearly
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-from rest_framework import serializers
 import logging
 
 logger = logging.getLogger(__name__)

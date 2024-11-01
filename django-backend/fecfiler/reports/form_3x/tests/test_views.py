@@ -119,7 +119,7 @@ class Form3XViewSetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["coverage_from_date"], "2004-01-01")
 
-        q2_report = create_form3x(
+        create_form3x(
             self.committee,
             "2004-05-28",
             "2004-05-30",
