@@ -1,0 +1,40 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.cash\_on\_hand
+=======================
+
+.. automodule:: fecfiler.cash_on_hand
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.cash_on_hand.migrations
+   fecfiler.cash_on_hand.models
+   fecfiler.cash_on_hand.serializers
+   fecfiler.cash_on_hand.tests
+   fecfiler.cash_on_hand.urls
+   fecfiler.cash_on_hand.views
+

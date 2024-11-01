@@ -1,0 +1,26 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.cash\_on\_hand.urls
+============================
+
+.. automodule:: fecfiler.cash_on_hand.urls
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

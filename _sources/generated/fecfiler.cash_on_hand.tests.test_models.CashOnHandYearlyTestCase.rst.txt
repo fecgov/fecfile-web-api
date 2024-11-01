@@ -1,0 +1,136 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.cash\_on\_hand.tests.test\_models.CashOnHandYearlyTestCase
+===================================================================
+
+.. currentmodule:: fecfiler.cash_on_hand.tests.test_models
+
+.. autoclass:: CashOnHandYearlyTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CashOnHandYearlyTestCase.__init__
+      ~CashOnHandYearlyTestCase.addClassCleanup
+      ~CashOnHandYearlyTestCase.addCleanup
+      ~CashOnHandYearlyTestCase.addTypeEqualityFunc
+      ~CashOnHandYearlyTestCase.assertAlmostEqual
+      ~CashOnHandYearlyTestCase.assertAlmostEquals
+      ~CashOnHandYearlyTestCase.assertContains
+      ~CashOnHandYearlyTestCase.assertCountEqual
+      ~CashOnHandYearlyTestCase.assertDictContainsSubset
+      ~CashOnHandYearlyTestCase.assertDictEqual
+      ~CashOnHandYearlyTestCase.assertEqual
+      ~CashOnHandYearlyTestCase.assertEquals
+      ~CashOnHandYearlyTestCase.assertFalse
+      ~CashOnHandYearlyTestCase.assertFieldOutput
+      ~CashOnHandYearlyTestCase.assertFormError
+      ~CashOnHandYearlyTestCase.assertFormSetError
+      ~CashOnHandYearlyTestCase.assertGreater
+      ~CashOnHandYearlyTestCase.assertGreaterEqual
+      ~CashOnHandYearlyTestCase.assertHTMLEqual
+      ~CashOnHandYearlyTestCase.assertHTMLNotEqual
+      ~CashOnHandYearlyTestCase.assertIn
+      ~CashOnHandYearlyTestCase.assertInHTML
+      ~CashOnHandYearlyTestCase.assertIs
+      ~CashOnHandYearlyTestCase.assertIsInstance
+      ~CashOnHandYearlyTestCase.assertIsNone
+      ~CashOnHandYearlyTestCase.assertIsNot
+      ~CashOnHandYearlyTestCase.assertIsNotNone
+      ~CashOnHandYearlyTestCase.assertJSONEqual
+      ~CashOnHandYearlyTestCase.assertJSONNotEqual
+      ~CashOnHandYearlyTestCase.assertLess
+      ~CashOnHandYearlyTestCase.assertLessEqual
+      ~CashOnHandYearlyTestCase.assertListEqual
+      ~CashOnHandYearlyTestCase.assertLogs
+      ~CashOnHandYearlyTestCase.assertMultiLineEqual
+      ~CashOnHandYearlyTestCase.assertNoLogs
+      ~CashOnHandYearlyTestCase.assertNotAlmostEqual
+      ~CashOnHandYearlyTestCase.assertNotAlmostEquals
+      ~CashOnHandYearlyTestCase.assertNotContains
+      ~CashOnHandYearlyTestCase.assertNotEqual
+      ~CashOnHandYearlyTestCase.assertNotEquals
+      ~CashOnHandYearlyTestCase.assertNotIn
+      ~CashOnHandYearlyTestCase.assertNotInHTML
+      ~CashOnHandYearlyTestCase.assertNotIsInstance
+      ~CashOnHandYearlyTestCase.assertNotRegex
+      ~CashOnHandYearlyTestCase.assertNotRegexpMatches
+      ~CashOnHandYearlyTestCase.assertNumQueries
+      ~CashOnHandYearlyTestCase.assertQuerySetEqual
+      ~CashOnHandYearlyTestCase.assertRaises
+      ~CashOnHandYearlyTestCase.assertRaisesMessage
+      ~CashOnHandYearlyTestCase.assertRaisesRegex
+      ~CashOnHandYearlyTestCase.assertRaisesRegexp
+      ~CashOnHandYearlyTestCase.assertRedirects
+      ~CashOnHandYearlyTestCase.assertRegex
+      ~CashOnHandYearlyTestCase.assertRegexpMatches
+      ~CashOnHandYearlyTestCase.assertSequenceEqual
+      ~CashOnHandYearlyTestCase.assertSetEqual
+      ~CashOnHandYearlyTestCase.assertTemplateNotUsed
+      ~CashOnHandYearlyTestCase.assertTemplateUsed
+      ~CashOnHandYearlyTestCase.assertTrue
+      ~CashOnHandYearlyTestCase.assertTupleEqual
+      ~CashOnHandYearlyTestCase.assertURLEqual
+      ~CashOnHandYearlyTestCase.assertWarns
+      ~CashOnHandYearlyTestCase.assertWarnsMessage
+      ~CashOnHandYearlyTestCase.assertWarnsRegex
+      ~CashOnHandYearlyTestCase.assertXMLEqual
+      ~CashOnHandYearlyTestCase.assertXMLNotEqual
+      ~CashOnHandYearlyTestCase.assert_
+      ~CashOnHandYearlyTestCase.captureOnCommitCallbacks
+      ~CashOnHandYearlyTestCase.countTestCases
+      ~CashOnHandYearlyTestCase.debug
+      ~CashOnHandYearlyTestCase.defaultTestResult
+      ~CashOnHandYearlyTestCase.doClassCleanups
+      ~CashOnHandYearlyTestCase.doCleanups
+      ~CashOnHandYearlyTestCase.ensure_connection_patch_method
+      ~CashOnHandYearlyTestCase.enterClassContext
+      ~CashOnHandYearlyTestCase.fail
+      ~CashOnHandYearlyTestCase.failIf
+      ~CashOnHandYearlyTestCase.failIfAlmostEqual
+      ~CashOnHandYearlyTestCase.failIfEqual
+      ~CashOnHandYearlyTestCase.failUnless
+      ~CashOnHandYearlyTestCase.failUnlessAlmostEqual
+      ~CashOnHandYearlyTestCase.failUnlessEqual
+      ~CashOnHandYearlyTestCase.failUnlessRaises
+      ~CashOnHandYearlyTestCase.id
+      ~CashOnHandYearlyTestCase.modify_settings
+      ~CashOnHandYearlyTestCase.run
+      ~CashOnHandYearlyTestCase.setUp
+      ~CashOnHandYearlyTestCase.setUpClass
+      ~CashOnHandYearlyTestCase.setUpTestData
+      ~CashOnHandYearlyTestCase.settings
+      ~CashOnHandYearlyTestCase.shortDescription
+      ~CashOnHandYearlyTestCase.skipTest
+      ~CashOnHandYearlyTestCase.subTest
+      ~CashOnHandYearlyTestCase.tearDown
+      ~CashOnHandYearlyTestCase.tearDownClass
+      ~CashOnHandYearlyTestCase.test_calcualtion_status_flag
+      ~CashOnHandYearlyTestCase.test_permissions
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CashOnHandYearlyTestCase.available_apps
+      ~CashOnHandYearlyTestCase.databases
+      ~CashOnHandYearlyTestCase.fixtures
+      ~CashOnHandYearlyTestCase.longMessage
+      ~CashOnHandYearlyTestCase.maxDiff
+      ~CashOnHandYearlyTestCase.reset_sequences
+      ~CashOnHandYearlyTestCase.serialized_rollback
+   
+   

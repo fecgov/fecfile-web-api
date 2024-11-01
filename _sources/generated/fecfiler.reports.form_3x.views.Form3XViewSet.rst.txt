@@ -43,6 +43,7 @@ fecfiler.reports.form\_3x.views.Form3XViewSet
       ~Form3XViewSet.get_exception_handler_context
       ~Form3XViewSet.get_extra_action_url_map
       ~Form3XViewSet.get_extra_actions
+      ~Form3XViewSet.get_final_report
       ~Form3XViewSet.get_format_suffix
       ~Form3XViewSet.get_object
       ~Form3XViewSet.get_paginated_response

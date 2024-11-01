@@ -55,6 +55,7 @@ fecfiler.committee\_accounts.models.CommitteeAccount
    .. autosummary::
    
       ~CommitteeAccount.all_objects
+      ~CommitteeAccount.cashonhandyearly_set
       ~CommitteeAccount.committee_id
       ~CommitteeAccount.contact_set
       ~CommitteeAccount.created

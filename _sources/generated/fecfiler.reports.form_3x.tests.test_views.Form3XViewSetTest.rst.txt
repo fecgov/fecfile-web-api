@@ -116,6 +116,7 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.tearDownClass
       ~Form3XViewSetTest.test_amend
       ~Form3XViewSetTest.test_coverage_dates_happy_path
+      ~Form3XViewSetTest.test_final
    
    
 

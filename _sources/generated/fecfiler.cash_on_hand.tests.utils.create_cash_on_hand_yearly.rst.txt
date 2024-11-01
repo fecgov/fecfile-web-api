@@ -1,0 +1,6 @@
+fecfiler.cash\_on\_hand.tests.utils.create\_cash\_on\_hand\_yearly
+==================================================================
+
+.. currentmodule:: fecfiler.cash_on_hand.tests.utils
+
+.. autofunction:: create_cash_on_hand_yearly

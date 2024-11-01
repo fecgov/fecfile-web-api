@@ -1,0 +1,81 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.cash\_on\_hand.serializers.CashOnHandYearlySerializer
+==============================================================
+
+.. currentmodule:: fecfiler.cash_on_hand.serializers
+
+.. autoclass:: CashOnHandYearlySerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CashOnHandYearlySerializer.__init__
+      ~CashOnHandYearlySerializer.bind
+      ~CashOnHandYearlySerializer.build_field
+      ~CashOnHandYearlySerializer.build_nested_field
+      ~CashOnHandYearlySerializer.build_property_field
+      ~CashOnHandYearlySerializer.build_relational_field
+      ~CashOnHandYearlySerializer.build_standard_field
+      ~CashOnHandYearlySerializer.build_unknown_field
+      ~CashOnHandYearlySerializer.build_url_field
+      ~CashOnHandYearlySerializer.create
+      ~CashOnHandYearlySerializer.fail
+      ~CashOnHandYearlySerializer.get_attribute
+      ~CashOnHandYearlySerializer.get_committee_uuid
+      ~CashOnHandYearlySerializer.get_default
+      ~CashOnHandYearlySerializer.get_default_field_names
+      ~CashOnHandYearlySerializer.get_extra_kwargs
+      ~CashOnHandYearlySerializer.get_field_names
+      ~CashOnHandYearlySerializer.get_fields
+      ~CashOnHandYearlySerializer.get_initial
+      ~CashOnHandYearlySerializer.get_unique_for_date_validators
+      ~CashOnHandYearlySerializer.get_unique_together_constraints
+      ~CashOnHandYearlySerializer.get_unique_together_validators
+      ~CashOnHandYearlySerializer.get_uniqueness_extra_kwargs
+      ~CashOnHandYearlySerializer.get_validators
+      ~CashOnHandYearlySerializer.get_value
+      ~CashOnHandYearlySerializer.include_extra_kwargs
+      ~CashOnHandYearlySerializer.is_valid
+      ~CashOnHandYearlySerializer.many_init
+      ~CashOnHandYearlySerializer.run_validation
+      ~CashOnHandYearlySerializer.run_validators
+      ~CashOnHandYearlySerializer.save
+      ~CashOnHandYearlySerializer.set_value
+      ~CashOnHandYearlySerializer.to_internal_value
+      ~CashOnHandYearlySerializer.to_representation
+      ~CashOnHandYearlySerializer.update
+      ~CashOnHandYearlySerializer.validate
+      ~CashOnHandYearlySerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CashOnHandYearlySerializer.context
+      ~CashOnHandYearlySerializer.data
+      ~CashOnHandYearlySerializer.default_error_messages
+      ~CashOnHandYearlySerializer.default_validators
+      ~CashOnHandYearlySerializer.errors
+      ~CashOnHandYearlySerializer.fields
+      ~CashOnHandYearlySerializer.initial
+      ~CashOnHandYearlySerializer.root
+      ~CashOnHandYearlySerializer.serializer_field_mapping
+      ~CashOnHandYearlySerializer.url_field_name
+      ~CashOnHandYearlySerializer.validated_data
+      ~CashOnHandYearlySerializer.validators
+   
+   

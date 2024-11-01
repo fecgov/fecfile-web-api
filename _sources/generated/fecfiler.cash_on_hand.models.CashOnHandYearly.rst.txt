@@ -1,0 +1,66 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.cash\_on\_hand.models.CashOnHandYearly
+===============================================
+
+.. currentmodule:: fecfiler.cash_on_hand.models
+
+.. autoclass:: CashOnHandYearly
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CashOnHandYearly.__init__
+      ~CashOnHandYearly.adelete
+      ~CashOnHandYearly.arefresh_from_db
+      ~CashOnHandYearly.asave
+      ~CashOnHandYearly.check
+      ~CashOnHandYearly.clean
+      ~CashOnHandYearly.clean_fields
+      ~CashOnHandYearly.date_error_message
+      ~CashOnHandYearly.delete
+      ~CashOnHandYearly.from_db
+      ~CashOnHandYearly.full_clean
+      ~CashOnHandYearly.get_constraints
+      ~CashOnHandYearly.get_deferred_fields
+      ~CashOnHandYearly.get_next_by_created
+      ~CashOnHandYearly.get_next_by_updated
+      ~CashOnHandYearly.get_previous_by_created
+      ~CashOnHandYearly.get_previous_by_updated
+      ~CashOnHandYearly.prepare_database_save
+      ~CashOnHandYearly.refresh_from_db
+      ~CashOnHandYearly.save
+      ~CashOnHandYearly.save_base
+      ~CashOnHandYearly.serializable_value
+      ~CashOnHandYearly.unique_error_message
+      ~CashOnHandYearly.validate_constraints
+      ~CashOnHandYearly.validate_unique
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CashOnHandYearly.cash_on_hand
+      ~CashOnHandYearly.committee_account
+      ~CashOnHandYearly.committee_account_id
+      ~CashOnHandYearly.created
+      ~CashOnHandYearly.id
+      ~CashOnHandYearly.objects
+      ~CashOnHandYearly.pk
+      ~CashOnHandYearly.updated
+      ~CashOnHandYearly.year
+   
+   
