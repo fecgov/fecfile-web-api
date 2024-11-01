@@ -63,7 +63,9 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             raise Exception("no committee_id provided")
         account = create_committee_account(committee_id, request.user)
 
-        return Response(CommitteeAccountSerializer(account).data)
+        return Response(
+            self.add_committee_account_data(CommitteeAccountSerializer(account).data)
+        )
 
     @action(detail=False, methods=["get"], url_path="get-available-committee")
     def get_available_committee(self, request):
