@@ -165,7 +165,24 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     @property
     def can_delete(self):
-        return len(self.blocking_reports) == 0
+        if len(self.blocking_reports) > 0:
+            return False
+        # For loan and debts, if there's a previous report you can't delete
+        if self.schedule_d or self.schedule_c:
+            for report in self.reports.all():
+                if report.previous_report:
+                    return False
+        # For loan and debts including repayments,
+        # if there's a following report you can't delete
+        if (
+            "loan" in self.transaction_type_identifier.lower()
+            or "debt" in self.transaction_type_identifier.lower()
+        ):
+            for report in self.reports.all():
+                if report.get_future_reports():
+                    return False
+
+        return True
 
     @property
     def filer_committee_id_number(self):

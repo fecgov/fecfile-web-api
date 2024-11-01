@@ -30,6 +30,15 @@ class TransactionModelTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         create_committee_view(self.committee.id)
+        self.committee2 = CommitteeAccount.objects.create(committee_id="C00000001")
+        self.com2_q1_report = create_form3x(
+            self.committee2, "2024-01-01", "2024-02-01", {}
+        )
+        self.com2_contact_1 = create_test_individual_contact(
+            "last name", "First name", self.committee.id
+        )
+        create_committee_view(self.committee2.id)
+
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.m1_report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
         self.m2_report = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
@@ -201,84 +210,86 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNone(Transaction.objects.filter(id=self.earmark_receipt.id).first())
 
     def test_delete_debt_transactions(self):
-        """Deleting a debt must delete any payments made towards the debt and
-        carried forward copies of it (along with repayments to them)"""
-        original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
-        original_debt.save()
-        original_debt.reports.add(self.q1_report)
-        carried_forward_debt = carry_forward_debt(original_debt, self.m1_report)
+        """Deleting a debt must delete any payments made towards the debt, but
+        cannot delete if there are carried forward copies of it"""
+        original_debt = create_debt(
+            self.committee2,
+            self.com2_contact_1,
+            Decimal("123.00"),
+            report=self.com2_q1_report,
+        )
         first_repayment = create_schedule_b(
-            "OPERATING_EXPENDITURE",
-            self.committee,
-            self.contact_1,
+            "DEBT_REPAYMENT_MADE",
+            self.committee2,
+            self.com2_contact_1,
             "2024-01-02",
             Decimal("1.23"),
             "GENERAL_DISBURSEMENT",
+            report=self.com2_q1_report,
         )
-        first_repayment.debt = carried_forward_debt
+        first_repayment.debt = original_debt
         first_repayment.save()
-        second_repayment = create_schedule_b(
-            "OPERATING_EXPENDITURE",
-            self.committee,
-            self.contact_1,
-            "2024-01-02",
-            Decimal("2.27"),
-            "GENERAL_DISBURSEMENT",
-        )
-        second_repayment.debt = carried_forward_debt
-        second_repayment.save()
 
         original_debt.delete()
         original_debt.refresh_from_db()
-        carried_forward_debt.refresh_from_db()
         first_repayment.refresh_from_db()
-        second_repayment.refresh_from_db()
         self.assertIsNotNone(original_debt.deleted)
-        self.assertIsNotNone(carried_forward_debt.deleted)
         self.assertIsNotNone(first_repayment.deleted)
-        self.assertIsNotNone(second_repayment.deleted)
-
-        undelete(original_debt)
-        undelete(carried_forward_debt)
-        undelete(first_repayment)
-        undelete(second_repayment)
 
     def test_delete_loan_by_committee(self):
-        self.assertIsNone(self.loan.deleted)
-        self.assertIsNone(self.loan_made.deleted)
-        self.assertIsNone(self.carried_forward_loan.deleted)
-        self.assertIsNone(self.payment_1.deleted)
-        self.assertIsNone(self.payment_2.deleted)
 
-        self.loan.delete()
-        self.loan.refresh_from_db()
-        self.loan_made.refresh_from_db()
+        loan2 = create_loan(
+            self.committee2,
+            self.com2_contact_1,
+            "5000.00",
+            "2024-07-01",
+            "7%",
+            loan_incurred_date="2024-01-01",
+            report=self.com2_q1_report,
+        )
+        loan2_made = create_schedule_b(
+            "LOAN_RECEIVED_FROM_INDIVIDUAL_RECEIPT",
+            self.committee2,
+            self.com2_contact_1,
+            "2024-01-02",
+            "1000.00",
+            loan_id=loan2.id,
+            report=self.com2_q1_report,
+        )
+        payment_1 = create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee2,
+            self.com2_contact_1,
+            "2024-01-02",
+            "1000.00",
+            loan_id=loan2.id,
+            report=self.com2_q1_report,
+        )
+
+        self.assertIsNone(loan2.deleted)
+        self.assertIsNone(loan2_made.deleted)
+        self.assertIsNone(payment_1.deleted)
+
+        loan2.delete()
+        loan2.refresh_from_db()
+        loan2_made.refresh_from_db()
         self.carried_forward_loan.refresh_from_db()
-        self.payment_1.refresh_from_db()
-        self.payment_2.refresh_from_db()
+        payment_1.refresh_from_db()
 
-        self.assertIsNotNone(self.loan.deleted)
-        self.assertIsNotNone(self.loan_made.deleted)
-        self.assertIsNotNone(self.carried_forward_loan.deleted)
-        self.assertIsNotNone(self.payment_1.deleted)
-        self.assertIsNotNone(self.payment_2.deleted)
-
-        undelete(self.loan)
-        undelete(self.loan_made)
-        undelete(self.carried_forward_loan)
-        undelete(self.payment_1)
-        undelete(self.payment_2)
+        self.assertIsNotNone(loan2.deleted)
+        self.assertIsNotNone(loan2_made.deleted)
+        self.assertIsNotNone(payment_1.deleted)
 
     def test_delete_loan_received_from_bank(self):
         loan, loan_receipt, loan_aggreement, guarantor = create_loan_from_bank(
-            self.committee,
-            self.contact_1,
+            self.committee2,
+            self.com2_contact_1,
             "5000.00",
             "2024-07-01",
             "7%",
             False,
             "2024-01-01",
-            report=self.q1_report,
+            report=self.com2_q1_report,
         )
         # deleting guarantor does not delete loan
         guarantor.delete()
@@ -646,11 +657,11 @@ class TransactionModelTestCase(TestCase):
         self.carried_forward_loan.refresh_from_db()
         self.payment_1.refresh_from_db()
         self.payment_2.refresh_from_db()
-        self.assertTrue(self.loan.can_delete)
-        self.assertTrue(self.loan_made.can_delete)
+        self.assertFalse(self.loan.can_delete)
+        self.assertFalse(self.loan_made.can_delete)
         # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
-        self.assertTrue(self.payment_1.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
         self.m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
@@ -669,7 +680,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(self.loan_made.can_delete)
         self.assertFalse(self.payment_1.can_delete)
         # Can delete carried forward loan, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
         # Payment 2 can still be deleted because
         # it is a repayment on the loan in an active report
         self.assertTrue(self.payment_2.can_delete)
@@ -681,11 +692,11 @@ class TransactionModelTestCase(TestCase):
         self.carried_forward_loan.refresh_from_db()
         self.payment_1.refresh_from_db()
         self.payment_2.refresh_from_db()
-        self.assertTrue(self.loan.can_delete)
-        self.assertTrue(self.loan_made.can_delete)
+        self.assertFalse(self.loan.can_delete)
+        self.assertFalse(self.loan_made.can_delete)
         # Can delete carried forward loan, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
-        self.assertTrue(self.payment_1.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
     def test_can_delete_reattributed_transaction(self):
@@ -774,7 +785,7 @@ class TransactionModelTestCase(TestCase):
             self.committee, self.contact_1, Decimal("123.00"), report=m1_report
         )
         m1_repayment = create_schedule_b(
-            "OPERATING_EXPENDITURE",
+            "LOAN_REPAYMENT_RECEIVED",
             self.committee,
             self.contact_1,
             "2024-01-02",
@@ -786,7 +797,7 @@ class TransactionModelTestCase(TestCase):
         m1_repayment.save()
         carried_forward_debt = carry_forward_debt(original_debt, m2_report)
         m2_repayment = create_schedule_b(
-            "OPERATING_EXPENDITURE",
+            "LOAN_REPAYMENT_RECEIVED",
             self.committee,
             self.contact_1,
             "2024-02-02",
@@ -797,10 +808,10 @@ class TransactionModelTestCase(TestCase):
         m2_repayment.debt = carried_forward_debt
         m2_repayment.save()
 
-        self.assertTrue(original_debt.can_delete)
-        self.assertTrue(m1_repayment.can_delete)
+        self.assertFalse(original_debt.can_delete)
+        self.assertFalse(m1_repayment.can_delete)
         # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
         m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
@@ -830,7 +841,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(original_debt.can_delete)
         self.assertFalse(m1_repayment.can_delete)
         # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
         m1_report.upload_submission = None
@@ -859,7 +870,7 @@ class TransactionModelTestCase(TestCase):
         m3_report.save()
         original_debt.refresh_from_db()
         print(f"blocking reports {original_debt.blocking_reports}")
-        self.assertTrue(original_debt.can_delete)
+        self.assertFalse(original_debt.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(
