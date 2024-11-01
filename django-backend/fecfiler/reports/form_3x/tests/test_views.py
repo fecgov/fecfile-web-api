@@ -102,3 +102,30 @@ class Form3XViewSetTest(TestCase):
             Report.objects.filter(id=self.q1_report.id).first().form_type,
             "F3XA",
         )
+
+    def test_final(self):
+        request = self.factory.get("/api/v1/reports/form-f3x/final")
+        request.user = self.user
+        request.query_params = {"year": "2004"}
+        request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+        force_authenticate(request, self.user)
+        view = Form3XViewSet.as_view({"get": "get_final_report"})
+        view.request = request
+        view.request.GET = {"year": "2004"}
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["coverage_from_date"], "2004-01-01")
+
+        q2_report = create_form3x(
+            self.committee,
+            "2004-05-28",
+            "2004-05-30",
+            {},
+            "Q2",
+        )
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["coverage_from_date"], "2004-05-28")
