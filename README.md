@@ -128,9 +128,15 @@ git push --set-upstream origin hotfix/my-fix
 
 ### Deploying a release to test/production
 
+**All repositories**
+- API: https://github.com/fecgov/fecfile-web-api
+- API proxy: https://github.com/fecgov/fecfile-api-proxy
+- Web APP: https://github.com/fecgov/fecfile-web-app
+- Validator: https://github.com/fecgov/fecfile-validate
+
 - Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 - Check CircleCI for passing pipeline tests
-- If tests pass, continue
+- If all tests pass, continue
 - (If commits were made to release/sprint-#) Developer creates a PR in GitHub to merge release/sprint-# branch into the `develop` branch
 - Reviewer approves PR and merges into `develop`
 - Delete release/sprint-# branch
