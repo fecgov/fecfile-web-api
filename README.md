@@ -10,6 +10,7 @@ finance information. The project code is distributed across these repositories:
 
 - [fecfile-web-app](https://github.com/fecgov/fecfile-web-app): this is the browser-based front-end developed in Angular
 - [fecfile-web-api](https://github.com/fecgov/fecfile-web-api): RESTful endpoint supporting the front-end
+- [fecfile-api-proxy](https://github.com/fecgov/fecfile-api-proxy): Reverse proxy for API for IP blocking and rate limiting
 - [fecfile-validate](https://github.com/fecgov/fecfile-validate): data validation rules and engine
 
 ---
@@ -68,6 +69,13 @@ export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 
 # Deployment (FEC team only)
 
+### Repositories
+
+- API: https://github.com/fecgov/fecfile-web-api
+- API proxy: https://github.com/fecgov/fecfile-api-proxy
+- Web APP: https://github.com/fecgov/fecfile-web-app
+- Validator: https://github.com/fecgov/fecfile-validate
+
 _Special Note:_ If the fecfile-validate repo was updated, the commit of the update needs to be updated in the requirements.txt file otherwise the CircleCI cache will not roll out the change.
 
 ### Create a feature branch
@@ -85,6 +93,8 @@ Without the git-flow extensions:
 - [auto] `develop` is deployed to `dev`
 
 ### Create a release branch
+
+See [Repositories](#repositories) for full list 
 
 - Using git-flow extensions:
 
@@ -128,11 +138,7 @@ git push --set-upstream origin hotfix/my-fix
 
 ### Deploying a release to test/production
 
-**All repositories**
-- API: https://github.com/fecgov/fecfile-web-api
-- API proxy: https://github.com/fecgov/fecfile-api-proxy
-- Web APP: https://github.com/fecgov/fecfile-web-app
-- Validator: https://github.com/fecgov/fecfile-validate
+See [Repositories](#repositories) for full list 
 
 - Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 - Check CircleCI for passing pipeline tests
