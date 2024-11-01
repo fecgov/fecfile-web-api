@@ -7,7 +7,7 @@ from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from .tests.utils import generate_data
-from fecfiler.f3x_line6a_overrides.models import F3xLine6aOverride
+from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 
 
 class F3XReportTestCase(TestCase):
@@ -20,7 +20,8 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_calculate_summary_column_a(self):
-        F3xLine6aOverride.objects.create(
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
             year="2005",
             cash_on_hand=61,
         )
@@ -120,7 +121,8 @@ class F3XReportTestCase(TestCase):
         )
 
     def test_calculate_summary_column_b(self):
-        F3xLine6aOverride.objects.create(
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
             year="2005",
             cash_on_hand=61,
         )
