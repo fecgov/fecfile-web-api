@@ -8,6 +8,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for committee in CommitteeAccount.objects.all():
+            self.stdout.write(
+                self.style.NOTICE(f"Running create_committee_view on {committee.id}")
+            )
             create_committee_view(committee.id)
 
         self.stdout.write(
