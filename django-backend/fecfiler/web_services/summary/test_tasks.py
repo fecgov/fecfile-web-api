@@ -9,7 +9,7 @@ from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
 from .tests.utils import generate_data
-from fecfiler.f3x_line6a_overrides.models import F3xLine6aOverride
+from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 
 
 class F3XSerializerTestCase(TestCase):
@@ -40,7 +40,8 @@ class F3XSerializerTestCase(TestCase):
             {},
             "Q3",
         )
-        F3xLine6aOverride.objects.create(
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
             year="2005",
             cash_on_hand=61,
         )
@@ -121,7 +122,7 @@ class F3XSerializerTestCase(TestCase):
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
-                "report": self.q1_report
+                "report": self.q1_report,
             },
             {
                 "date": "2005-05-01",
@@ -131,7 +132,7 @@ class F3XSerializerTestCase(TestCase):
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
-                "report": self.q2_report
+                "report": self.q2_report,
             },
             {
                 "date": "2005-07-01",
@@ -141,7 +142,7 @@ class F3XSerializerTestCase(TestCase):
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
-                "report": self.q3_report
+                "report": self.q3_report,
             },
             {
                 "date": "2006-02-01",
@@ -151,7 +152,7 @@ class F3XSerializerTestCase(TestCase):
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
-                "report": next_year_report
+                "report": next_year_report,
             },
         ]
         for data in transaction_data:
