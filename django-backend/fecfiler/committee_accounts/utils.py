@@ -132,7 +132,10 @@ def create_committee_view(committee_uuid):
             .query.sql_with_params()
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
-        cursor.execute(f"CREATE OR REPLACE VIEW {view_name} as {definition}")
+        cursor.execute(
+            f"DROP VIEW IF EXISTS {view_name};"
+            f"CREATE VIEW {view_name} as {definition}"
+        )
 
 
 def get_committee_account_data(committee_id):
