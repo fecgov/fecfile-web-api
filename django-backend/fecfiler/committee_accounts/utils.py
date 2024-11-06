@@ -133,8 +133,10 @@ def create_committee_view(committee_uuid):
         )
         definition = cursor.mogrify(sql, params).decode("utf-8")
         cursor.execute(
+            f"DROP VIEW IF EXISTS {view_name}_tmp;"
+            f"CREATE VIEW {view_name}_tmp as {definition};"
             f"DROP VIEW IF EXISTS {view_name};"
-            f"CREATE VIEW {view_name} as {definition}"
+            f"ALTER VIEW {view_name}_tmp RENAME TO {view_name};"
         )
 
 
