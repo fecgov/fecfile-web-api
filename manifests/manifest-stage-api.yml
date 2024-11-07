@@ -1,7 +1,7 @@
 ---
 applications:
   - name: fecfile-web-api
-    instances: 2
+    instances: 4
     routes:
       - route: fecfile-web-api-stage.apps.internal
     stack: cflinuxfs4
