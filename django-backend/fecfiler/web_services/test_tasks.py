@@ -16,6 +16,7 @@ from .models import (
     FECSubmissionState,
     UploadSubmission,
     WebPrintSubmission,
+    BaseSubmission,
 )
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from pathlib import Path
@@ -217,8 +218,8 @@ class UnitTestWebPrintSubmitter(WebPrintSubmitter):
             }
         )
 
-    def poll_status(self, batch_id, submission_id):
-        submission = WebPrintSubmission.objects.get(id=submission_id)
+    def poll_status(self, submission: BaseSubmission):
+        submission = WebPrintSubmission.objects.get(id=submission.fec_submission_id)
         status = FECStatus.PROCESSING.value
         if submission.fecfile_polling_attempts == 4:
             status = FECStatus.COMPLETED.value
@@ -227,7 +228,7 @@ class UnitTestWebPrintSubmitter(WebPrintSubmitter):
                 "status": status,
                 "image_url": "https://www.fec.gov/static/img/seal.svg",
                 "message": "This did not really come from FEC",
-                "submission_id": submission_id,
+                "submission_id": submission.fec_submission_id,
                 "batch_id": 123,
             }
         )

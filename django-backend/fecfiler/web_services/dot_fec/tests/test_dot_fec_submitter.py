@@ -3,7 +3,7 @@ from uuid import uuid4 as uuid
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
-from fecfiler.web_services.models import DotFEC
+from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -46,11 +46,11 @@ class DotFECSubmitterTestCase(TestCase):
 
     def test_poll(self):
         submitter = MockDotFECSubmitter()
-        response = submitter.poll_status(123, self.dot_fec_record.id)
+        response = submitter.poll_status(UploadSubmission())
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 
         submitter = MockWebPrintSubmitter()
-        response = submitter.poll_status(123, str(uuid()))
+        response = submitter.poll_status(WebPrintSubmission())
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "COMPLETED")

@@ -236,9 +236,7 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
                 submission.fecfile_polling_attempts
             } / {EFO_POLLING_MAX_ATTEMPTS}"""
         )
-        status_response_string = submitter.poll_status(
-            getattr(submission, "fec_batch_id", None), submission.fec_submission_id
-        )
+        status_response_string = submitter.poll_status(submission)
         submission.save_fec_response(status_response_string)
         if (
             submission.fec_status in FECStatus.get_terminal_statuses_strings()
