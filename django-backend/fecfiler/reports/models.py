@@ -110,15 +110,6 @@ class Report(CommitteeOwnedModel):
                 carry_forward_loans(self)
                 carry_forward_debts(self)
 
-    def get_future_reports(
-        self,
-    ):
-        return Report.objects.get_queryset().filter(
-            ~Q(id=self.id),
-            committee_account=self.committee_account_id,
-            coverage_through_date__gte=self.coverage_through_date,
-        )
-
     def get_future_in_progress_reports(
         self,
     ):

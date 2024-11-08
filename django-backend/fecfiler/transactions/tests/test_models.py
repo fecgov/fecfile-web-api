@@ -808,6 +808,10 @@ class TransactionModelTestCase(TestCase):
         m2_repayment.debt = carried_forward_debt
         m2_repayment.save()
 
+        original_debt.refresh_from_db()
+        m1_repayment.refresh_from_db()
+        carried_forward_debt.refresh_from_db()
+        m2_repayment.refresh_from_db()
         self.assertFalse(original_debt.can_delete)
         self.assertFalse(m1_repayment.can_delete)
         # Can delete carried forward debt, but the UI won't let you
