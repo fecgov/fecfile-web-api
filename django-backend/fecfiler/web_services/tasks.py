@@ -22,7 +22,7 @@ from fecfiler.settings import (
     WEBPRINT_EMAIL,
     EFO_POLLING_MAX_DURATION,
     EFO_POLLING_INTERVAL,
-    EFO_POLLING_MAX_ATTEMPTS
+    EFO_POLLING_MAX_ATTEMPTS,
 )
 
 import structlog
@@ -102,7 +102,8 @@ def log_polling_notice():
     elif duration_in_minutes >= 1:
         duration_string = f"{duration_in_minutes} minutes(s)"
 
-    logger.info(f"""Submission queued for processing.  Polling every {
+    logger.info(
+        f"""Submission queued for processing.  Polling every {
         EFO_POLLING_INTERVAL} seconds for {
             EFO_POLLING_MAX_ATTEMPTS
         } attempts over {duration_string}"""
@@ -162,7 +163,7 @@ def submit_to_fec(
             need them."""
             return poll_for_fec_response.apply_async(
                 [submission.id, submission_type_key, "Dot FEC"],
-                countdown=EFO_POLLING_INTERVAL
+                countdown=EFO_POLLING_INTERVAL,
             )
         else:
             return resolve_final_submission_state(submission)
@@ -211,7 +212,7 @@ def submit_to_webprint(
             need them."""
             return poll_for_fec_response.apply_async(
                 [submission.id, submission_type_key, "WebPrint"],
-                countdown=EFO_POLLING_INTERVAL
+                countdown=EFO_POLLING_INTERVAL,
             )
         else:
             return resolve_final_submission_state(submission)
@@ -229,17 +230,13 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
 
         submission.fecfile_polling_attempts += 1
         logger.info(f"Polling status for {submission.fec_submission_id}.")
-        logger.info(
-            f"Status: {submission.fec_status}, Message: {submission.fec_message}"
-        )
+        logger.info(f"Status: {submission.fec_status}, Message: {submission.fec_message}")
         logger.info(
             f"""Submission Polling - Attempt {
                 submission.fecfile_polling_attempts
             } / {EFO_POLLING_MAX_ATTEMPTS}"""
         )
-        status_response_string = submitter.poll_status(
-            submission.fec_batch_id, submission.fec_submission_id
-        )
+        status_response_string = submitter.poll_status(submission)
         submission.save_fec_response(status_response_string)
         if (
             submission.fec_status in FECStatus.get_terminal_statuses_strings()
@@ -252,7 +249,7 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
         else:
             return poll_for_fec_response.apply_async(
                 [submission_id, submission_type_key, submission_name],
-                countdown=EFO_POLLING_INTERVAL
+                countdown=EFO_POLLING_INTERVAL,
             )
     except Exception as e:
         logger.error(f"Error in polling: {str(e)}")

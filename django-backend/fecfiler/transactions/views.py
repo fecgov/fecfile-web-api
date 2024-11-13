@@ -245,6 +245,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        committee_id = request.session["committee_uuid"]
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
@@ -278,7 +279,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         contact_instances = {
             contact_key: create_or_update_contact(
-                transaction_data, contact_key, request.session["committee_uuid"]
+                transaction_data, contact_key, committee_id
             )
             for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
@@ -305,6 +306,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
+        Report.objects.filter(committee_account_id=committee_id).update(
+            calculation_status=None
+        )
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"

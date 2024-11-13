@@ -46,9 +46,9 @@ def calculate_summary(report_id):
     if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
         return primary_report.id
 
-    reports_to_recalculate = get_reports_to_calculate_by_coverage_date(
-        primary_report
-    )
+    reports_to_recalculate = Report.objects.filter(
+        form_3x__isnull=False
+    ).order_by("coverage_through_date")
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
         calculation_token=calculation_token,
@@ -58,7 +58,7 @@ def calculate_summary(report_id):
 
     for report in claimed_reports:
         summary_service = SummaryService(report)
-        a, b = summary_service.calculate_summary()
+        a, b = summary_service.calculate_summary_columns()
 
         # line 6a
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", None)
@@ -295,7 +295,7 @@ def calculate_summary(report_id):
                 "recalculation cancelled"
             )
             break
-
-        logger.info(f"Report: {report.id} recalculated")
+        else:
+            logger.info(f"Report: {report.id} recalculated")
 
     return primary_report.id
