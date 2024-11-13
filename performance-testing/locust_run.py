@@ -60,19 +60,7 @@ class Tasks(TaskSet):
             self.report_ids = self.fetch_values("reports", "id")
             self.contacts = self.scrape_endpoint("contacts")
         else:
-            authenticate_response = self.client.get(
-                "/api/v1/oidc/authenticate", allow_redirects=False
-            )
-            authorize_response = self.client.get(
-                authenticate_response._next.url.removeprefix("http://localhost:8080"),
-                allow_redirects=False,
-            )
-            callback_response = self.client.get(
-                authorize_response._next.url,
-                allow_redirects=False,
-            )
-            csrftoken = callback_response.cookies.get("csrftoken")
-            self.client.headers = {"X-CSRFToken": csrftoken}
+            self.login_via_mock_oidc()
             committees = self.fetch_values("committees", "id")
             committee_uuid = committees[0]
             print("committee_uuid", committee_uuid)
@@ -100,6 +88,21 @@ class Tasks(TaskSet):
                 triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
                 self.create_single_transactions(singles_needed)
                 self.create_triple_transactions(triples_needed)
+
+    def login_via_mock_oidc(self):
+        authenticate_response = self.client.get(
+            "/api/v1/oidc/authenticate", allow_redirects=False
+        )
+        authorize_response = self.client.get(
+            authenticate_response._next.url.removeprefix("http://localhost:8080"),
+            allow_redirects=False,
+        )
+        callback_response = self.client.get(
+            authorize_response._next.url,
+            allow_redirects=False,
+        )
+        csrftoken = callback_response.cookies.get("csrftoken")
+        self.client.headers = {"X-CSRFToken": csrftoken}
 
     def create_reports(self, count=1):
         fields_to_validate = [
