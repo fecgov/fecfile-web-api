@@ -194,3 +194,29 @@ class F3XSerializerTestCase(TestCase):
             next_year_report.form_3x.L8_cash_on_hand_at_close_period,  # noqa: E501
             Decimal("12661.53"),
         )
+
+    def test_only_update_committees_reports(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        create_committee_view(other_committee.id)
+        other_committees_f3x = create_form3x(
+            other_committee,
+            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
+        )
+        f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
+        )
+        other_f3x = create_form3x(
+            self.committee,
+            datetime.strptime("2023-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2023-02-01", "%Y-%m-%d").date(),
+        )
+        calculate_summary(f3x.id)
+        f3x.refresh_from_db()
+        other_committees_f3x.refresh_from_db()
+        other_f3x.refresh_from_db()
+        self.assertIsNone(other_committees_f3x.calculation_status)
+        self.assertEqual(f3x.calculation_status, CalculationState.SUCCEEDED.value)
+        self.assertEqual(other_f3x.calculation_status, CalculationState.SUCCEEDED.value)
