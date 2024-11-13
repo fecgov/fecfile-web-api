@@ -51,7 +51,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("test", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "test-1774"),
 )
 
 
