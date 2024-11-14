@@ -8,7 +8,6 @@ def generate_form_3x(count=1, collision_maximum=1000):
         ["Q1", "01-01", "03-31"],
         ["Q2", "04-01", "06-30"],
         ["Q3", "07-01", "09-30"],
-        ["Q4", "10-01", "12-31"]
     ]
     form_3x_list = []
     dates_taken = set()
@@ -18,7 +17,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
         quarter, from_date, through_date = choice(reports_and_dates)
         year = randrange(1000, 9999)
         hashable_date = f"{year}, {quarter}"
-        if (hashable_date in dates_taken):
+        if hashable_date in dates_taken:
             collision_count += 1
             continue
 
@@ -55,23 +54,25 @@ def generate_contacts(count=1):
     contacts = []
     for _ in range(count):
         street_1 = f"{randrange(1, 999)} {choice(street_names)} {choice(street_types)}"
-        contacts.append({
-            "type": "IND",
-            "street_1": street_1,
-            "city": "Testville",
-            "state": "AK",
-            "zip": "12345",
-            "country": "USA",
-            "last_name": choice(last_names),
-            "first_name": choice(first_names),
-            "middle_name": choice(first_names),
-            "prefix": choice(prefixes),
-            "suffix": choice(suffixes),
-            "street_2": None,
-            "telephone": None,
-            "employer": "Business Inc.",
-            "occupation": "Job"
-        })
+        contacts.append(
+            {
+                "type": "IND",
+                "street_1": street_1,
+                "city": "Testville",
+                "state": "AK",
+                "zip": "12345",
+                "country": "USA",
+                "last_name": choice(last_names),
+                "first_name": choice(first_names),
+                "middle_name": choice(first_names),
+                "prefix": choice(prefixes),
+                "suffix": choice(suffixes),
+                "street_2": None,
+                "telephone": None,
+                "employer": "Business Inc.",
+                "occupation": "Job",
+            }
+        )
 
     return contacts
 
@@ -106,7 +107,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "memo_code": None,
             "contact_1": contact,
             "contact_1_id": contact.get("id", None),
-            "schedule_id": "A"
+            "schedule_id": "A",
         }
 
         transactions.append(new_transaction)
@@ -153,12 +154,17 @@ class LocustDataGenerator:
         except ValueError:
             print("Non-integer value passed as argument")
 
-        if sum([
-            self.form3x_count,
-            self.contact_count,
-            self.single_transaction_count,
-            self.triple_transaction_count
-        ]) == 0:
+        if (
+            sum(
+                [
+                    self.form3x_count,
+                    self.contact_count,
+                    self.single_transaction_count,
+                    self.triple_transaction_count,
+                ]
+            )
+            == 0
+        ):
             print("No arguments provided.  Run with --help or -h for instructions")
 
     def build(self):
@@ -168,13 +174,11 @@ class LocustDataGenerator:
             self.contact_list = generate_contacts(self.contact_count)
         if self.single_transaction_count > 0:
             self.single_transaction_list = generate_single_transactions(
-                self.single_transaction_count,
-                self.contact_list
+                self.single_transaction_count, self.contact_list
             )
         if self.triple_transaction_count > 0:
             self.triple_transaction_list = generate_triple_transactions(
-                self.triple_transaction_count,
-                self.contact_list
+                self.triple_transaction_count, self.contact_list
             )
 
     def dump(self):
