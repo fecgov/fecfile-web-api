@@ -24,6 +24,7 @@ fecfiler.web\_services.test\_tasks
    
       PollingTasksTestCase
       TasksTestCase
+      UnitTestDotFecSubmitter
       UnitTestWebPrintSubmitter
    
    
