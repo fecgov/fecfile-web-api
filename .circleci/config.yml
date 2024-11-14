@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Check migrations
           command: |
-            python3 manage.py makemigrations --check
+            python manage.py makemigrations --check
           working_directory: ~/project/django-backend/
 
       - run:
