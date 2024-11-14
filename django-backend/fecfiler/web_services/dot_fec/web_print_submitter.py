@@ -2,7 +2,7 @@ import json
 from uuid import uuid4 as uuid
 from abc import ABC, abstractmethod
 from zeep import Client
-from fecfiler.web_services.models import FECStatus
+from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import FEC_FILING_API_KEY, FEC_FILING_API
 
 import structlog
@@ -18,7 +18,7 @@ class WebPrintSubmitter(ABC):
         pass
 
     @abstractmethod
-    def poll_status(self, batch_id, submission_id):
+    def poll_status(self, submission: BaseSubmission):
         pass
 
 
@@ -35,8 +35,10 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
         logger.debug(f"FEC upload response: {response}")
         return response
 
-    def poll_status(self, batch_id, submission_id):
-        response = self.fec_soap_client.service.status(batch_id, submission_id)
+    def poll_status(self, submission: BaseSubmission):
+        response = self.fec_soap_client.service.status(
+            getattr(submission, "fec_batch_id", None), submission.fec_submission_id
+        )
         logger.debug(f"FEC polling response: {response}")
         return response
 
@@ -56,7 +58,7 @@ class MockWebPrintSubmitter(WebPrintSubmitter):
             }
         )
 
-    def poll_status(self, batch_id, submission_id):
+    def poll_status(self, submission: BaseSubmission):
         return json.dumps(
             {
                 "status": FECStatus.COMPLETED.value,
