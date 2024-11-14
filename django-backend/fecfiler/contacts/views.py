@@ -40,7 +40,19 @@ FEC_API_CANDIDATE_ENDPOINT = (
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
-    return candidate_id
+    if re.match(r"^[a-zA-Z0-9]+$", candidate_id):
+        return candidate_id
+    else:
+        raise AssertionError("Candidate ID provided invalid")
+
+
+def validate_and_sanitize_committee(committee_id):
+    if committee_id is None:
+        raise AssertionError("No Committee ID provided")
+    if re.match(r"^[a-zA-Z0-9]+$", committee_id):
+        return committee_id
+    else:
+        raise AssertionError("Committee ID provided invalid")
 
 
 class ContactListPagination(pagination.PageNumberPagination):
@@ -88,14 +100,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if not candidate_id:
             return HttpResponseBadRequest()
         try:
+            sanitized_candidate_id = validate_and_sanitize_candidate(candidate_id)
             headers = {"Content-Type": "application/json"}
             params = {
                 "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
                 "sort": "-two_year_period",
             }
-            url = FEC_API_CANDIDATE_ENDPOINT.format(
-                validate_and_sanitize_candidate(candidate_id)
-            )
+            url = FEC_API_CANDIDATE_ENDPOINT.format(sanitized_candidate_id)
             response = requests.get(url, headers=headers, params=params).json()
             results = response["results"]
             return JsonResponse(results[0] if len(results) > 0 else {})
@@ -107,17 +118,20 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         committee_id = request.query_params.get("committee_id")
         if not committee_id:
             return HttpResponseBadRequest()
-
-        headers = {"Content-Type": "application/json"}
-        response = requests.get(
-            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
-            params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
-            headers=headers,
-        ).json()
-        if response.get("results"):
-            return JsonResponse(response["results"][0])
-        else:
-            return JsonResponse({})
+        try:
+            sanitized_committee_id = validate_and_sanitize_committee(committee_id)
+            headers = {"Content-Type": "application/json"}
+            response = requests.get(
+                f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/",
+                params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
+                headers=headers,
+            ).json()
+            if response.get("results"):
+                return JsonResponse(response["results"][0])
+            else:
+                return JsonResponse({})
+        except AssertionError:
+            return HttpResponseBadRequest()
 
     @action(detail=False)
     def candidate_lookup(self, request):
