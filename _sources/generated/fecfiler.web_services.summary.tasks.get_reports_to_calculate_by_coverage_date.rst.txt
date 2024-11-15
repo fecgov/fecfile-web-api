@@ -1,6 +1,0 @@
-fecfiler.web\_services.summary.tasks.get\_reports\_to\_calculate\_by\_coverage\_date
-====================================================================================
-
-.. currentmodule:: fecfiler.web_services.summary.tasks
-
-.. autofunction:: get_reports_to_calculate_by_coverage_date

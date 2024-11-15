@@ -12,13 +12,6 @@ fecfiler.web\_services.summary.tasks
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      get_reports_to_calculate_by_coverage_date
-   
    
 
    
