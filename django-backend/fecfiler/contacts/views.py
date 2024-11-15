@@ -40,7 +40,7 @@ FEC_API_CANDIDATE_ENDPOINT = (
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
-    if re.match(r"^[a-zA-Z0-9]+$", candidate_id):
+    if re.match(r"^[a-zA-Z0-9]{9}$", candidate_id):
         return candidate_id
     else:
         raise AssertionError("Candidate ID provided invalid")
@@ -49,7 +49,7 @@ def validate_and_sanitize_candidate(candidate_id):
 def validate_and_sanitize_committee(committee_id):
     if committee_id is None:
         raise AssertionError("No Committee ID provided")
-    if re.match(r"^[a-zA-Z0-9]+$", committee_id):
+    if re.match(r"^[a-zA-Z0-9]{9}$", committee_id):
         return committee_id
     else:
         raise AssertionError("Committee ID provided invalid")
