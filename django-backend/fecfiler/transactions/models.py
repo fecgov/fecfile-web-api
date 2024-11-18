@@ -167,6 +167,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     def can_delete(self):
         return len(self.blocking_reports) == 0
 
+    @property
+    def filer_committee_id_number(self):
+        if not self.committee_account:
+            return None
+
+        return self.committee_account.committee_id
+
     def get_schedule(self):
         for schedule_key in [
             "schedule_a",
@@ -184,7 +191,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
             self.memo_text.save()
-
         super(Transaction, self).save(*args, **kwargs)
 
     def delete(self):
@@ -279,6 +285,7 @@ def get_read_model(committee_uuid):
         form_type = models.TextField()
         effective_amount = models.DecimalField()
         back_reference_tran_id_number = models.TextField()
+        back_reference_sched_name = models.TextField()
         loan_key = models.TextField()
         incurred_prior = models.DecimalField()
         payment_prior = models.DecimalField()

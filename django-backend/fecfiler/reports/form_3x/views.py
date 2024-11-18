@@ -49,6 +49,23 @@ class Form3XViewSet(ReportViewSet):
         )
         return Response(Form3XSerializer(data, many=True).data)
 
+    @action(detail=False, methods=["get"], url_path=r"final")
+    def get_final_report(self, request):
+        year = request.GET.get("year", "")
+        logger.info(f"Getting final report for year {year}")
+        if not year:
+            return Response("Year is required", status=400)
+
+        final_report = (
+            self.get_queryset()
+            .filter(coverage_through_date__year=year)
+            .order_by("-coverage_through_date")
+            .first()
+        )
+        if not final_report:
+            return Response(None)
+        return Response(Form3XSerializer(final_report).data)
+
     def create(self, request):
         return super(ModelViewSet, self).create(request)
 

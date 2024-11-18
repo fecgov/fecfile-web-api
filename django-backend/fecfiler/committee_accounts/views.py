@@ -1,27 +1,23 @@
 from uuid import UUID
 from fecfiler.user.models import User
-from rest_framework import filters, viewsets, mixins, pagination
+from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.transactions.models import (
-    Transaction,
-    get_committee_view_name,
-    get_read_model,
-)
-from rest_framework.exceptions import ValidationError
+from fecfiler.transactions.models import get_read_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CommitteeAccount, Membership
-from fecfiler.openfec.views import retrieve_recent_f1
-from fecfiler.mock_openfec.mock_endpoints import recent_f1
-from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils import (
+    check_can_create_committee_account,
+    create_committee_account,
+    get_committee_account_data,
+)
+
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
-from django.db import connection
 import structlog
 from django.http import HttpResponse
-import re
 
 logger = structlog.get_logger(__name__)
 
@@ -61,13 +57,36 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return Response(self.get_serializer(committee).data)
 
     @action(detail=False, methods=["post"])
-    def register(self, request):
+    def create_account(self, request):
         committee_id = request.data.get("committee_id")
         if not committee_id:
             raise Exception("no committee_id provided")
-        account = register_committee(committee_id, request.user)
+        account = create_committee_account(committee_id, request.user)
 
-        return Response(CommitteeAccountSerializer(account).data)
+        return Response(
+            self.add_committee_account_data(CommitteeAccountSerializer(account).data)
+        )
+
+    @action(detail=False, methods=["get"], url_path="get-available-committee")
+    def get_available_committee(self, request):
+        committee_id = request.query_params.get("committee_id")
+        committee = get_committee_account_data(committee_id)
+        if check_can_create_committee_account(committee_id, request.user):
+            return Response(committee)
+        response = {"message": "No available committee found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def list(self, request, *args, **kwargs):
+        response = super(CommitteeViewSet, self).list(request, *args, **kwargs)
+        response.data["results"] = [
+            self.add_committee_account_data(committee_account)
+            for committee_account in response.data["results"]
+        ]
+        return response
+
+    def add_committee_account_data(self, committee_account):
+        committee_data = get_committee_account_data(committee_account["committee_id"])
+        return {**committee_account, **(committee_data or {})}
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
@@ -203,70 +222,3 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         member = self.get_object()
         member.delete()
         return HttpResponse("Member removed")
-
-
-def check_email_match(email, f1_emails):
-    """
-    Check if the provided email matches any of the committee emails.
-
-    Args:
-        email (str): The email to be checked.
-        f1_emails (str): A string containing a list of committee emails separated
-        by commas or semicolons.
-
-    Returns:
-        str or None: If the provided email does not match any of the committee emails,
-        returns a string indicating the mismatch. Otherwise, returns None.
-    """
-    if not f1_emails:
-        return "No email provided in F1"
-    else:
-        f1_email_lowercase = f1_emails.lower()
-        f1_emails = re.split(r"[;,]", f1_email_lowercase)
-        if email.lower() not in f1_emails:
-            return f"Email {email} does not match committee email"
-    return None
-
-
-def register_committee(committee_id, user):
-    email = user.email
-
-    if MOCK_OPENFEC_REDIS_URL:
-        f1 = recent_f1(committee_id)
-    else:
-        f1 = retrieve_recent_f1(committee_id)
-
-    f1_emails = (f1 or {}).get("email")
-    failure_reason = check_email_match(email, f1_emails)
-
-    existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
-    if existing_account:
-        failure_reason = f"Committee {committee_id} already registered"
-
-    if failure_reason:
-        logger.error(f"Failure to register committee: {failure_reason}")
-        raise ValidationError("could not register committee")
-
-    account = CommitteeAccount.objects.create(committee_id=committee_id)
-    Membership.objects.create(
-        committee_account=account,
-        user=user,
-        role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-    )
-
-    create_committee_view(account.id)
-    return account
-
-
-def create_committee_view(committee_uuid):
-    view_name = get_committee_view_name(committee_uuid)
-    with connection.cursor() as cursor:
-        sql, params = (
-            Transaction.objects.transaction_view()
-            .filter(committee_account_id=committee_uuid)
-            .query.sql_with_params()
-        )
-        definition = cursor.mogrify(sql, params).decode("utf-8")
-        cursor.execute(
-            f"CREATE OR REPLACE VIEW {view_name} as {definition}"
-        )

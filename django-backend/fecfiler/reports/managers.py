@@ -1,4 +1,4 @@
-from django.db.models import Case, When, Value, OuterRef, Exists, Manager, Q, CharField
+from django.db.models import Case, When, Value, Manager, Q, CharField
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
@@ -36,15 +36,6 @@ def get_status_mapping():
 
 class ReportManager(Manager):
     def get_queryset(self):
-        older_f3x = (
-            super()
-            .get_queryset()
-            .filter(
-                form_3x__isnull=False,
-                committee_account_id=OuterRef("committee_account_id"),
-                created__lt=OuterRef("created"),
-            )
-        )
         queryset = (
             super()
             .get_queryset()
@@ -55,7 +46,6 @@ class ReportManager(Manager):
                     When(form_99__isnull=False, then=ReportType.F99.value),
                     When(form_1m__isnull=False, then=ReportType.F1M.value),
                 ),
-                is_first=~Exists(older_f3x),
                 # report status must be in queryset because it is sorted on
                 report_status=get_status_mapping(),
             )

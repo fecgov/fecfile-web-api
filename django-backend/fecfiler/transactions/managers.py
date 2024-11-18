@@ -10,7 +10,6 @@ from fecfiler.transactions.schedule_b.managers import (
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
 from fecfiler.transactions.schedule_e.managers import (
-    over_two_hundred_types as schedule_e_over_two_hundred_types,
     line_labels as line_labels_e,
 )
 from django.db.models.functions import Coalesce, Concat
@@ -27,6 +26,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    CharField,
     Manager,
 )
 from decimal import Decimal
@@ -54,29 +54,6 @@ class TransactionManager(SoftDeleteManager):
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
                 then=Q(aggregate__gt=Value(Decimal(200))),
-            ),
-            When(
-                transaction_type_identifier__in=schedule_e_over_two_hundred_types,
-                then=Case(
-                    When(
-                        parent_transaction__parent_transaction___calendar_ytd_per_election_office__gt=Value(  # noqa
-                            Decimal(200)
-                        ),
-                        then=True,
-                    ),
-                    When(
-                        parent_transaction___calendar_ytd_per_election_office__gt=Value(
-                            Decimal(200)
-                        ),
-                        then=True,
-                    ),
-                    When(
-                        _calendar_ytd_per_election_office__gt=Value(Decimal(200)),
-                        then=True,
-                    ),
-                    default=False,
-                    output_field=BooleanField(),
-                ),
             ),
             default=Value(True),
             output_field=BooleanField(),
@@ -198,7 +175,10 @@ class TransactionManager(SoftDeleteManager):
                         "LOAN_REPAYMENT_MADE",
                     ]
                 ),
-                then=Concat(F("loan__transaction_id"), F("date")),
+                then=Concat(
+                    F("loan__transaction_id"),
+                    F("date"), output_field=CharField()
+                )
             ),
             When(
                 schedule_c__isnull=False,
@@ -206,6 +186,7 @@ class TransactionManager(SoftDeleteManager):
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
                     Value("LOAN"),
+                    output_field=CharField()
                 ),
             ),
             default=None,

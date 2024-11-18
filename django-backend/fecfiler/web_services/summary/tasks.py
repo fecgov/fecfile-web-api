@@ -1,7 +1,6 @@
 from enum import Enum
 from celery import shared_task
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
-from django.db.models import Q
 from .summary import SummaryService
 import uuid
 import structlog
@@ -20,22 +19,6 @@ class CalculationState(Enum):
         return str(self.value)
 
 
-def get_reports_to_calculate_by_coverage_date(primary_report):
-    if not hasattr(primary_report, "coverage_from_date"):
-        return primary_report
-
-    report_year = primary_report.coverage_from_date.year
-    reports_to_recalculate = Report.objects.filter(
-        ~Q(calculation_status=CalculationState.SUCCEEDED),
-        coverage_from_date__year=report_year,
-        coverage_through_date__lte=primary_report.coverage_through_date,
-    ).order_by("coverage_through_date")
-
-    if len(reports_to_recalculate) > 0:
-        return reports_to_recalculate
-    return primary_report
-
-
 @shared_task
 def calculate_summary(report_id):
     try:
@@ -46,9 +29,9 @@ def calculate_summary(report_id):
     if primary_report.get_form_name() not in FORMS_TO_CALCULATE:
         return primary_report.id
 
-    reports_to_recalculate = get_reports_to_calculate_by_coverage_date(
-        primary_report
-    )
+    reports_to_recalculate = Report.objects.filter(
+        committee_account=primary_report.committee_account, form_3x__isnull=False
+    ).order_by("coverage_through_date")
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
         calculation_token=calculation_token,
@@ -58,7 +41,7 @@ def calculate_summary(report_id):
 
     for report in claimed_reports:
         summary_service = SummaryService(report)
-        a, b = summary_service.calculate_summary()
+        a, b = summary_service.calculate_summary_columns()
 
         # line 6a
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", None)
@@ -93,9 +76,7 @@ def calculate_summary(report_id):
         report.form_3x.L11b_political_party_committees_period = a.get("line_11b", 0)
         report.form_3x.L11b_political_party_committees_ytd = b.get("line_11b", 0)
         # line 11c
-        report.form_3x.L11c_other_political_committees_pacs_period = a.get(
-            "line_11c", 0
-        )
+        report.form_3x.L11c_other_political_committees_pacs_period = a.get("line_11c", 0)
         report.form_3x.L11c_other_political_committees_pacs_ytd = b.get("line_11c", 0)
         # line 11d
         report.form_3x.L11d_total_contributions_period = a.get("line_11d", 0)
@@ -137,16 +118,12 @@ def calculate_summary(report_id):
         report.form_3x.L18b_transfers_from_nonfederal_levin_h5_period = a.get(
             "line_18b", 0
         )  # noqa: E501
-        report.form_3x.L18b_transfers_from_nonfederal_levin_h5_ytd = b.get(
-            "line_18b", 0
-        )
+        report.form_3x.L18b_transfers_from_nonfederal_levin_h5_ytd = b.get("line_18b", 0)
         # line 18c
         report.form_3x.L18c_total_nonfederal_transfers_18a_18b_period = a.get(
             "line_18c", 0
         )  # noqa: E501
-        report.form_3x.L18c_total_nonfederal_transfers_18a_18b_ytd = b.get(
-            "line_18c", 0
-        )
+        report.form_3x.L18c_total_nonfederal_transfers_18a_18b_ytd = b.get("line_18c", 0)
         # line 19
         report.form_3x.L19_total_receipts_period = a.get("line_19", 0)
         report.form_3x.L19_total_receipts_ytd = b.get("line_19", 0)
@@ -232,13 +209,9 @@ def calculate_summary(report_id):
         report.form_3x.L30b_nonallocable_fed_election_activity_period = a.get(
             "line_30b", 0
         )  # noqa: E501
-        report.form_3x.L30b_nonallocable_fed_election_activity_ytd = b.get(
-            "line_30b", 0
-        )
+        report.form_3x.L30b_nonallocable_fed_election_activity_ytd = b.get("line_30b", 0)
         # line 30c
-        report.form_3x.L30c_total_federal_election_activity_period = a.get(
-            "line_30c", 0
-        )
+        report.form_3x.L30c_total_federal_election_activity_period = a.get("line_30c", 0)
         report.form_3x.L30c_total_federal_election_activity_ytd = b.get("line_30c", 0)
         # line 31
         report.form_3x.L31_total_disbursements_period = a.get("line_31", 0)
@@ -259,13 +232,9 @@ def calculate_summary(report_id):
         report.form_3x.L36_total_federal_operating_expenditures_period = a.get(
             "line_36", 0
         )  # noqa: E501
-        report.form_3x.L36_total_federal_operating_expenditures_ytd = b.get(
-            "line_36", 0
-        )
+        report.form_3x.L36_total_federal_operating_expenditures_ytd = b.get("line_36", 0)
         # line 37
-        report.form_3x.L37_offsets_to_operating_expenditures_period = a.get(
-            "line_37", 0
-        )
+        report.form_3x.L37_offsets_to_operating_expenditures_period = a.get("line_37", 0)
         report.form_3x.L37_offsets_to_operating_expenditures_ytd = b.get("line_37", 0)
         # line 38
         report.form_3x.L38_net_operating_expenditures_period = a.get("line_38", 0)
@@ -283,8 +252,7 @@ def calculate_summary(report_id):
             Report.objects.filter(
                 id=report.id, calculation_token=calculation_token
             ).update(
-                calculation_status=CalculationState.SUCCEEDED,
-                calculation_token=None
+                calculation_status=CalculationState.SUCCEEDED, calculation_token=None
             )
         )
 
@@ -295,7 +263,7 @@ def calculate_summary(report_id):
                 "recalculation cancelled"
             )
             break
-
-        logger.info(f"Report: {report.id} recalculated")
+        else:
+            logger.info(f"Report: {report.id} recalculated")
 
     return primary_report.id

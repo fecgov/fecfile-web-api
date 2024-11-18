@@ -1,152 +1,163 @@
-version: "3"
+version: '3'
 
 services:
-  db:
-    build:
-      context: "./db"
-      dockerfile: ${DB_DOCKERFILE:-Dockerfile}
-      args:
-        ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
-    image: fecfile-db
-    container_name: fecfile-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_NAME: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 5432:5432
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    db:
+        build:
+            context: './db'
+            dockerfile: ${DB_DOCKERFILE:-Dockerfile}
+            args:
+                ENCRYPTION_PASSWORD: ${ENCRYPTION_PASSWORD}
+        image: fecfile-db
+        container_name: fecfile-db
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_NAME: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - 5432:5432
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
 
-  redis:
-    image: redis:6.2-alpine
-    ports:
-      - "6379:6379"
-    command: redis-server
+    redis:
+        image: redis:6.2-alpine
+        ports:
+            - '6379:6379'
+        command: redis-server
 
-  api-worker:
-    build:
-      context: "./"
-      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
-    image: fecfile-celery-worker
-    container_name: fecfile-celery-worker
-    volumes:
-      - ./django-backend:/opt/nxg_fec
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - db
-      - redis
-    links:
-      - redis
-    environment:
-      REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
-      DJANGO_SETTINGS_MODULE: fecfiler.settings.local
-      DJANGO_SECRET_KEY:
-      FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
-      AWS_STORAGE_BUCKET_NAME:
-      AWS_REGION:
-      CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
-      FEC_FILING_API:
-      FEC_FILING_API_KEY:
-      FEC_AGENCY_ID:
-      WEBPRINT_EMAIL:
-      OUTPUT_TEST_INFO_IN_DOT_FEC:
-      LOG_FORMAT:
-    deploy:
-      resources:
-        limits:
-          memory: 1G
+    api-worker:
+        build:
+            context: './'
+            dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
+        image: fecfile-celery-worker
+        container_name: fecfile-celery-worker
+        volumes:
+            - ./django-backend:/opt/nxg_fec
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        depends_on:
+            - db
+            - redis
+        links:
+            - redis
+        environment:
+            REDIS_URL: redis://redis:6379
+            DATABASE_URL:
+            FECFILE_TEST_DB_NAME:
+            DJANGO_SETTINGS_MODULE: fecfiler.settings.local
+            DJANGO_SECRET_KEY:
+            FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
+            AWS_ACCESS_KEY_ID:
+            AWS_SECRET_ACCESS_KEY:
+            AWS_STORAGE_BUCKET_NAME:
+            AWS_REGION:
+            CELERY_WORKER_STORAGE:
+            MOCK_EFO: True
+            FEC_FILING_API:
+            FEC_FILING_API_KEY:
+            FEC_AGENCY_ID:
+            WEBPRINT_EMAIL:
+            OUTPUT_TEST_INFO_IN_DOT_FEC:
+            LOG_FORMAT:
+            FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
 
-  api:
-    build:
-      context: "./"
-      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
-    image: fecfile-api
-    container_name: fecfile-api
-    volumes:
-      - ./django-backend:/opt/nxg_fec
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      - db
-      - redis
-    links:
-      - redis
-    environment:
-      ALTERNATIVE_LOGIN: USERNAME_PASSWORD
-      REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
-      DJANGO_SETTINGS_MODULE: fecfiler.settings.local
-      DJANGO_SECRET_KEY:
-      FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
-      OIDC_RP_CLIENT_ID:
-      OIDC_RP_CLIENT_SECRET:
-      LOGIN_REDIRECT_SERVER_URL:
-      LOGIN_REDIRECT_CLIENT_URL:
-      LOGOUT_REDIRECT_URL:
-      SYSTEM_STATUS_CACHE_AGE:
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
-      AWS_STORAGE_BUCKET_NAME:
-      AWS_REGION:
-      CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
-      FEC_FILING_API:
-      FEC_FILING_API_KEY:
-      FEC_AGENCY_ID:
-      WEBPRINT_EMAIL:
-      OUTPUT_TEST_INFO_IN_DOT_FEC:
-      FEC_API:
-      FEC_API_KEY:
-      LOG_FORMAT:
-      MOCK_OPENFEC: REDIS
-      FECFILE_GITHUB_TOKEN:
-    deploy:
-      resources:
-        limits:
-          memory: 2G
+    api:
+        build:
+            context: './'
+            dockerfile: '${API_DOCKERFILE:-Dockerfile}'
+        image: fecfile-api
+        container_name: fecfile-api
+        volumes:
+            - ./django-backend:/opt/nxg_fec
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        depends_on:
+            - db
+            - redis
+        links:
+            - redis
+        environment:
+            ALTERNATIVE_LOGIN: USERNAME_PASSWORD
+            REDIS_URL: redis://redis:6379
+            DATABASE_URL:
+            FECFILE_TEST_DB_NAME:
+            DJANGO_SETTINGS_MODULE: fecfiler.settings.local
+            DJANGO_SECRET_KEY:
+            FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
+            OIDC_RP_CLIENT_ID:
+            OIDC_RP_CLIENT_SECRET:
+            LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
+            LOGIN_REDIRECT_CLIENT_URL: http://localhost:4200
+            LOGOUT_REDIRECT_URL: http://localhost:8080/api/v1/oidc/logout-redirect
+            SYSTEM_STATUS_CACHE_AGE:
+            AWS_ACCESS_KEY_ID:
+            AWS_SECRET_ACCESS_KEY:
+            AWS_STORAGE_BUCKET_NAME:
+            AWS_REGION:
+            CELERY_WORKER_STORAGE:
+            MOCK_EFO: True
+            FEC_FILING_API:
+            FEC_FILING_API_KEY:
+            FEC_AGENCY_ID:
+            WEBPRINT_EMAIL:
+            OUTPUT_TEST_INFO_IN_DOT_FEC:
+            PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
+            PRODUCTION_OPEN_FEC_API_KEY: DEMO_KEY
+            STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
+            STAGE_OPEN_FEC_API_KEY: DEMO_KEY
+            LOG_FORMAT:
+            FECFILE_GITHUB_TOKEN:
+            OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
+            EFO_POLLING_MAX_DURATION: 300
+            EFO_POLLING_INTERVAL: 30
+            CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST:
 
-  nginx:
-    build: https://github.com/fecgov/fecfile-api-proxy.git#develop
-    container_name: fecfile-api-proxy
-    ports:
-      - 8080:8080
-    depends_on:
-      - api
-    deploy:
-      resources:
-        limits:
-          memory: 256M
+            # ---- FEATURE FLAGS ----
+            FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
+        deploy:
+            resources:
+                limits:
+                    memory: 2G
 
-  locust-leader:
-    image: locustio/locust
-    ports:
-      - "8089:8089"
-    volumes:
-      - ./:/mnt/locust
-    command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
-    profiles: [ locust ]
-    environment:
-      LOCAL_TEST_USER:
-      LOCAL_TEST_PWD:
-      OIDC_SESSION_ID:
+    nginx:
+        build: https://github.com/fecgov/fecfile-api-proxy.git#develop
+        container_name: fecfile-api-proxy
+        sysctls:
+            - net.ipv6.conf.all.disable_ipv6=1
+        ports:
+            - 8080:8080
+        depends_on:
+            - api
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+
+    locust-leader:
+        image: locustio/locust
+        ports:
+            - '8089:8089'
+        volumes:
+            - ./:/mnt/locust
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
+        profiles: [ locust ]
+        environment:
+            LOCAL_TEST_USER:
+            LOCAL_TEST_PWD:
+            OIDC_SESSION_ID:
 
 
-  locust-follower:
-    image: locustio/locust
-    volumes:
-      - ./:/mnt/locust
-    command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [ locust ]
-    environment:
-      LOCAL_TEST_USER:
-      LOCAL_TEST_PWD:
-      OIDC_SESSION_ID:
+    locust-follower:
+        image: locustio/locust
+        volumes:
+            - ./:/mnt/locust
+        command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
+        profiles: [ locust ]
+        environment:
+            LOCAL_TEST_USER:
+            LOCAL_TEST_PWD:
+            OIDC_SESSION_ID:

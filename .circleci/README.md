@@ -12,13 +12,16 @@ Notes:
 CircleCI will attempt to deploy commits made to specific branches:
 * branch __develop__ -> cloud.gov dev space
 * branch __release__* (any branch starting with release) -> cloud.gov staging space
-* branch __prod__ -> cloud.gov prod space
+* branch __main__ -> cloud.gov test space
+* branch __main__ -> cloud.gov prod space
 
 Authentication must be configured in a set of evironment variables:
 * $FEC_CF_USERNAME_DEV
 * $FEC_CF_PASSWORD_DEV
 * $FEC_CF_USERNAME_STAGE
 * $FEC_CF_PASSWORD_STAGE
+* $FEC_CF_USERNAME_TEST
+* $FEC_CF_PASSWORD_TEST
 * $FEC_CF_USERNAME_PROD
 * $FEC_CF_PASSWORD_PROD
 

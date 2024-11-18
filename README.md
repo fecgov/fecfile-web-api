@@ -10,6 +10,7 @@ finance information. The project code is distributed across these repositories:
 
 - [fecfile-web-app](https://github.com/fecgov/fecfile-web-app): this is the browser-based front-end developed in Angular
 - [fecfile-web-api](https://github.com/fecgov/fecfile-web-api): RESTful endpoint supporting the front-end
+- [fecfile-api-proxy](https://github.com/fecgov/fecfile-api-proxy): Reverse proxy for API for IP blocking and rate limiting
 - [fecfile-validate](https://github.com/fecgov/fecfile-validate): data validation rules and engine
 
 ---
@@ -68,6 +69,13 @@ export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 
 # Deployment (FEC team only)
 
+### Repositories
+
+- API: https://github.com/fecgov/fecfile-web-api
+- API proxy: https://github.com/fecgov/fecfile-api-proxy
+- Web APP: https://github.com/fecgov/fecfile-web-app
+- Validator: https://github.com/fecgov/fecfile-validate
+
 _Special Note:_ If the fecfile-validate repo was updated, the commit of the update needs to be updated in the requirements.txt file otherwise the CircleCI cache will not roll out the change.
 
 ### Create a feature branch
@@ -86,6 +94,8 @@ Without the git-flow extensions:
 
 ### Create a release branch
 
+See [Repositories](#repositories) for full list 
+
 - Using git-flow extensions:
 
 ```
@@ -101,7 +111,7 @@ git checkout -b release/sprint-# develop
 git push --set-upstream origin release/sprint-#
 ```
 
-- Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to production.
+- Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to test/production.
 
 ### Create and deploy a hotfix
 
@@ -124,13 +134,15 @@ git push --set-upstream origin hotfix/my-fix
 - Developer creates a hotfix branch, commits changes, and **makes a PR to the `main` and `develop` branches**:
 - Reviewer merges hotfix/my-fix branch into `develop` and `main`
 - [auto] `develop` is deployed to `dev`. Make sure the build passes before deploying to `main`.
-- Developer deploys hotfix/my-fix branch to main using **Deploying a release to production** instructions below
+- Developer deploys hotfix/my-fix branch to main using **Deploying a release to test/production** instructions below
 
-### Deploying a release to production
+### Deploying a release to test/production
+
+See [Repositories](#repositories) for full list 
 
 - Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
 - Check CircleCI for passing pipeline tests
-- If tests pass, continue
+- If all tests pass, continue
 - (If commits were made to release/sprint-#) Developer creates a PR in GitHub to merge release/sprint-# branch into the `develop` branch
 - Reviewer approves PR and merges into `develop`
 - Delete release/sprint-# branch
@@ -145,7 +157,7 @@ git push --set-upstream origin hotfix/my-fix
 
 ## Technical Environment Plan
 
-The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, and prod). Each cloud.gov fecfile-web-api application has at least two instances running. Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, and prod). There are also at least two instances running per cloud.gov fecfile-web-app application.
+The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, test, and prod). Each cloud.gov fecfile-web-api application has at least two instances running. Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, test, and prod). There are also at least two instances running per cloud.gov fecfile-web-app application.
 
 The following events occur for fecfile-web-api and fecfile-web-app independently of each other:
 
@@ -153,7 +165,8 @@ The following events occur for fecfile-web-api and fecfile-web-app independently
   - The Dev environment is used for the bulk of sprint integration and QA testing
 - When a release is cut (creating a release tag in git), that release is deployed to the stage environment on cloud.gov.
   - The Stage environment is used for final deployment preparation, integration testing, and final QA testing.
-- When the release is merged into the main branch, it is deployed to the prod environment on cloud.gov
+- When the release is merged into the main branch, it is deployed to the test and prod environments on cloud.gov
+  - The Test environment will be used by alpha users.
   - The Production environment will be used by end users once the application launches.
 
 ## Additional developer notes
@@ -199,9 +212,10 @@ See here for comment style rules: https://google.github.io/styleguide/pyguide.ht
 A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer who will log into the [Snyk Dashboard](https://app.snyk.io/invite/link/accept?invite=93042de6-4eca-4bb5-bf76-9c2e9f895e24&utm_source=link_invite&utm_medium=referral&utm_campaign=product-link-invite&from=link_invite) and perform the following tasks:
 
 1. Review the vulnerability reports for each of the FECFile Online GitHub repository.
-2. Write up a ticket (1 for each reported "Critical" or "High" severity vulnerability) to remediate the vulnerability.
+2. Write up a ticket (1 for each vulnerable package, ok to combine per package if multiple found on the same day) to remediate the vulnerability.
 3. Point and mark each ticket with the following tags: "security", "high priority".
-4. Move each new ticket into the current sprint and sprint backlog.
-5. Update weekly assignment log with tickets created or "None".
+4. Ticket title should contain the deadline (Critical/high: 30 days, Medium: 60 days, Low: 90 days)
+5. Move each new ticket into the sprint that will be deployed before the deadline.
+6. Update weekly assignment log with tickets created or "None".
 
 The weekly assignment log can be found in the Google drive 🔒 [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
