@@ -1,7 +1,7 @@
 from decimal import Decimal
 from fecfiler.transactions.models import get_read_model
 from fecfiler.reports.models import Report
-from fecfiler.f3x_line6a_overrides.models import F3xLine6aOverride
+from fecfiler.cash_on_hand.models import CashOnHandYearly
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 import structlog
@@ -12,6 +12,13 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
+        cash_on_hand_override = CashOnHandYearly.objects.filter(
+            committee_account=report.committee_account,
+            year=self.report.coverage_from_date.year,
+        ).first()
+        self.cash_on_hand_override = (
+            cash_on_hand_override.cash_on_hand if cash_on_hand_override else None
+        )
         self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),
@@ -223,17 +230,14 @@ class SummaryService:
         return column_b
 
     def calculate_cash_on_hand_fields(self, column_a, column_b):
-        override_value = F3xLine6aOverride.objects.filter(
-            year=self.report.coverage_from_date.year,
-        ).first()
         reports_from_prior_years = Report.objects.filter(
             committee_account=self.report.committee_account,
             coverage_through_date__year__lt=self.report.coverage_from_date.year,
             form_3x__isnull=False,
         ).order_by("coverage_from_date")
 
-        if override_value:
-            column_b["line_6a"] = override_value.cash_on_hand
+        if self.cash_on_hand_override:
+            column_b["line_6a"] = self.cash_on_hand_override
         elif reports_from_prior_years.count() > 0:
             column_b["line_6a"] = (
                 reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd

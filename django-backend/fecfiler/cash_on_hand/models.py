@@ -1,9 +1,11 @@
 from django.db import models, transaction as db_transaction
 from fecfiler.reports.models import Report
+from fecfiler.committee_accounts.models import CommitteeOwnedModel
 import uuid
 
 
-class F3xLine6aOverride(models.Model):
+class CashOnHandYearly(CommitteeOwnedModel):
+
     id = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -21,10 +23,10 @@ class F3xLine6aOverride(models.Model):
 
     def save(self, *args, **kwargs):
         with db_transaction.atomic():
-            super(F3xLine6aOverride, self).save(*args, **kwargs)
-            Report.objects.get_queryset().filter(
-                coverage_from_date__year__gte=self.year,
+            super(CashOnHandYearly, self).save(*args, **kwargs)
+            Report.objects.filter(
+                committee_account=self.committee_account,
             ).update(calculation_status=None)
 
     class Meta:
-        db_table = "f3x_line6a_overrides"
+        db_table = "cash_on_hand_yearly"
