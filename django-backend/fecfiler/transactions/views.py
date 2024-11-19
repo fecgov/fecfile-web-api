@@ -140,7 +140,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            print(f"transaction ID: {saved_transaction.id}")
+            logger.info(f"Created new transaction: {saved_transaction.id}")
             update_dependent_parent(saved_transaction)
         return Response(saved_transaction.id)
 
@@ -413,12 +413,12 @@ def get_save_hook(transaction: Transaction):
 def stringify_queryset(qs):
     database_uri = os.environ.get("DATABASE_URL")
     if not database_uri:
-        print(
+        logger.error(
             """Environment variable DATABASE_URL not found.
             Please check your settings and try again"""
         )
         exit(1)
-    print("Testing connection...")
+    logger.info("Testing connection...")
     conn = psycopg2.connect(database_uri)
     sql, params = qs.query.sql_with_params()
     with conn.cursor() as cursor:
