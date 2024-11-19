@@ -5,13 +5,16 @@ import django.utils.timezone
 import uuid
 from fecfiler.shared.utilities import get_model_data
 from django.core.management.utils import get_random_secret_key
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def copy_users(apps, schema_editor):
     if not apps.is_installed(
         "authentication"
     ):  # "authentication" not in [app_name for app_name, app in apps.get_models()]:
-        print("no authentication app")
+        logger.error("The authentication app isn't installed")
         return
     OldAccount = apps.get_model("authentication", "Account")  # noqa
     User = apps.get_model("user", "User")  # noqa
