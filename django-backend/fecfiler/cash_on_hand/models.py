@@ -14,7 +14,7 @@ class CashOnHandYearly(CommitteeOwnedModel):
         unique=True,
     )
 
-    year = models.TextField(null=False, blank=False, unique=True)
+    year = models.TextField(null=False, blank=False)
     cash_on_hand = models.DecimalField(
         null=False, blank=False, max_digits=11, decimal_places=2
     )
