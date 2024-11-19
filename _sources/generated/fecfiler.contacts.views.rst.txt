@@ -18,6 +18,7 @@ fecfiler.contacts.views
       :toctree:                                          
    
       validate_and_sanitize_candidate
+      validate_and_sanitize_committee
    
    
 
