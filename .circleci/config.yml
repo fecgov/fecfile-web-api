@@ -53,7 +53,13 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Create/run migrations
+          name: Check migrations
+          command: |
+            python manage.py makemigrations --check
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Run migrations
           command: |
             python manage.py migrate --no-input --traceback --verbosity 3
           working_directory: ~/project/django-backend/
