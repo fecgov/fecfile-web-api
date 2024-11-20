@@ -63,3 +63,29 @@ class CashOnHandYearlyViewSetTest(TestCase):
             committee_account=self.committee, year="2024"
         )
         self.assertEqual(cash_on_hand.cash_on_hand, 2)
+        self.assertEqual(response.data["cash_on_hand"], "2.00")
+
+    def test_set_override_multiple_cmtes(self):
+        new_committee = CommitteeAccount.objects.create(
+            committee_id="C00000000"
+        )
+
+        for committee in (self.committee, new_committee):
+            request = self.factory.post(
+                "/api/v1/cash_on_hand/year/2024/", {"cash_on_hand": 2}
+            )
+            request.user = self.user
+            request.session = {
+                "committee_uuid": str(committee.id),
+                "committee_id": str(committee.committee_id),
+            }
+            force_authenticate(request, self.user)
+            response = CashOnHandYearlyViewSet.as_view({"post": "cash_on_hand_for_year"})(
+                request, year="2024"
+            )
+            self.assertEqual(response.status_code, 200)
+            cash_on_hand = CashOnHandYearly.objects.get(
+                committee_account=committee, year="2024"
+            )
+            self.assertEqual(cash_on_hand.cash_on_hand, 2)
+            self.assertEqual(response.data["cash_on_hand"], "2.00")
