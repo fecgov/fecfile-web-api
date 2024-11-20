@@ -7,7 +7,7 @@ from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_ie, create_schedule_a
 from fecfiler.contacts.models import Contact
-from datetime import datetime
+from datetime import datetime, timezone
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.serializers import REATTRIBUTED
 import structlog
@@ -84,6 +84,7 @@ class DotFECScheduleETestCase(TestCase):
             self.contact_1,
             datetime.strptime("2024-01-12", "%Y-%m-%d"),
             datetime.strptime("2024-01-15", "%Y-%m-%d"),
+            datetime.strptime("2024-01-15", "%Y-%m-%d"),
             "153.00",
             "C2012",
             self.contact_2,
@@ -97,7 +98,6 @@ class DotFECScheduleETestCase(TestCase):
         self.ie.schedule_e.support_oppose_code = "S"
         self.ie.schedule_e.memo_text_description = "MEMO TEXT DESCRIPTION"
         self.ie.memo_code = True
-        self.ie.schedule_e.date_signed = datetime.today()
         self.ie.force_itemized = True
         self.ie.reatt_redes = self.transaction
 
@@ -115,6 +115,7 @@ class DotFECScheduleETestCase(TestCase):
             self.committee,
             self.contact_3,
             datetime.strptime("2024-01-12", "%Y-%m-%d"),
+            datetime.strptime("2024-01-15", "%Y-%m-%d"),
             datetime.strptime("2024-01-15", "%Y-%m-%d"),
             "153.00",
             "C2012",
@@ -205,9 +206,7 @@ class DotFECScheduleETestCase(TestCase):
         self.assertEqual(self.split_row[40], "Junior")
 
     def test_date_signed(self):
-        today = datetime.today()
-        formatted_date = today.strftime("%Y%m%d")
-        self.assertEqual(self.split_row[41], formatted_date)
+        self.assertEqual(self.split_row[41], "20240115")
 
     def test_memo(self):
         self.assertEqual(self.split_row[42], "X")

@@ -52,6 +52,7 @@ class TransactionViewsTestCase(TestCase):
             self.contact_1,
             "2023-01-12",
             "2023-01-15",
+            "2023-01-15",
             "153.00",
             "C2012",
             self.contact_2,
