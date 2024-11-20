@@ -84,7 +84,7 @@ class DotFECScheduleETestCase(TestCase):
             self.contact_1,
             datetime.strptime("2024-01-12", "%Y-%m-%d"),
             datetime.strptime("2024-01-15", "%Y-%m-%d"),
-            datetime.strptime("2024-01-15", "%Y-%m-%d"),
+            datetime.strptime("2024-01-20", "%Y-%m-%d"),
             "153.00",
             "C2012",
             self.contact_2,
@@ -206,7 +206,7 @@ class DotFECScheduleETestCase(TestCase):
         self.assertEqual(self.split_row[40], "Junior")
 
     def test_date_signed(self):
-        self.assertEqual(self.split_row[41], "20240115")
+        self.assertEqual(self.split_row[41], "20240120")
 
     def test_memo(self):
         self.assertEqual(self.split_row[42], "X")
