@@ -7,7 +7,7 @@ from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_ie, create_schedule_a
 from fecfiler.contacts.models import Contact
-from datetime import datetime, timezone
+from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.serializers import REATTRIBUTED
 import structlog
