@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0012\_alter\_transactions\_blocking\_reports.update\_blocking\_reports\_default
+================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports
+
+.. autofunction:: update_blocking_reports_default
