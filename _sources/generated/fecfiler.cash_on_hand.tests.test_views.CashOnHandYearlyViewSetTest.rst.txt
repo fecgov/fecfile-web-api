@@ -117,6 +117,7 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.test_get_override
       ~CashOnHandYearlyViewSetTest.test_no_override
       ~CashOnHandYearlyViewSetTest.test_set_override
+      ~CashOnHandYearlyViewSetTest.test_set_override_multiple_cmtes
    
    
 
