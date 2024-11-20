@@ -64,12 +64,6 @@ jobs:
             python manage.py migrate --no-input --traceback --verbosity 3
           working_directory: ~/project/django-backend/
 
-      # Only use SonarCloud security checking for now.
-      #      - run:
-      #          name: Bandit security checks
-      #          command: |
-      #            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
-
       - run:
           name: Run tests
           # Use built-in Django test module
