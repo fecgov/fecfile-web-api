@@ -30,13 +30,6 @@ LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
-"""
-Enables alternative log in method.
-See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
-and :py:meth:`fecfiler.authentication.views.authenticate_login`
-"""
-ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
@@ -66,7 +59,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "storages",
     "django_structlog",
-    "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
@@ -86,7 +78,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
-    "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
+    "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -165,6 +157,7 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
 
+MOCK_OIDC_PROVIDER = env.get_credential("MOCK_OIDC_PROVIDER", "False").lower() == "true"
 MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
