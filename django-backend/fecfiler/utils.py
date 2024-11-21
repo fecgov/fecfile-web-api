@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from django.http import HttpResponseServerError
-from fecfiler.authentication.utils import delete_user_logged_in_cookies
+from fecfiler.oidc.utils import delete_user_logged_in_cookies
 from rest_framework.views import exception_handler
 import structlog
 

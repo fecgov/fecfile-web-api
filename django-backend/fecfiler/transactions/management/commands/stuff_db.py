@@ -1,11 +1,11 @@
 import datetime
 from django.core.management.base import BaseCommand
-from fecfiler.authentication.models import Account
-from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.models import Transaction
+from fecfiler.user.models import User
 from fecfiler.transactions.schedule_a.models import ScheduleA
 
 
@@ -19,7 +19,12 @@ class Command(BaseCommand):
         # create committee
         committee = CommitteeAccount.objects.create(committee_id="C12123434")
         # create user
-        Account.objects.create(cmtee_id="C12123434")
+        user = User.objects.create(email="test@fec.gov", username="gov")
+        Membership.objects.create(
+            committee_account=committee,
+            user=user,
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
         # create a report
         f3x = Form3X.objects.create()
         report = Report.objects.create(
