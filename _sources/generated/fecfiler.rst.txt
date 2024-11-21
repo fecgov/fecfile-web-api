@@ -31,7 +31,6 @@ fecfiler
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.authentication
    fecfiler.cash_on_hand
    fecfiler.celery
    fecfiler.committee_accounts

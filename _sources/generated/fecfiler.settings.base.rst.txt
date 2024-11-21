@@ -13,7 +13,6 @@ fecfiler.settings.base
    .. autosummary::
       :toctree:                                          
    
-      CSRF_TRUSTED_ORIGINS
       SYSTEM_STATUS_CACHE_AGE
       CELERY_WORKER_STORAGE
       WEBPRINT_EMAIL

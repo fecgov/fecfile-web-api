@@ -12,13 +12,6 @@ fecfiler.user.migrations.0001\_initial
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      copy_users
-   
    
 
    

@@ -1,6 +1,0 @@
-fecfiler.authentication.views.logger
-====================================
-
-.. currentmodule:: fecfiler.authentication.views
-
-.. autodata:: logger

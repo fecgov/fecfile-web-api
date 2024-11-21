@@ -18,6 +18,7 @@ fecfiler.oidc.utils
       :toctree:                                          
    
       add_oidc_nonce_to_session
+      delete_user_logged_in_cookies
       handle_oidc_callback_error
       handle_oidc_callback_request
    

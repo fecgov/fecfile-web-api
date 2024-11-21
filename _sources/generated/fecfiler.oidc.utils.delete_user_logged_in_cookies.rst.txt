@@ -1,0 +1,6 @@
+fecfiler.oidc.utils.delete\_user\_logged\_in\_cookies
+=====================================================
+
+.. currentmodule:: fecfiler.oidc.utils
+
+.. autofunction:: delete_user_logged_in_cookies
