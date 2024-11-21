@@ -3,8 +3,6 @@ import django.contrib.auth.validators
 from django.db import migrations, models
 import django.utils.timezone
 import uuid
-from fecfiler.shared.utilities import get_model_data
-from django.core.management.utils import get_random_secret_key
 import structlog
 
 logger = structlog.get_logger(__name__)
