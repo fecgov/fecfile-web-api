@@ -74,9 +74,11 @@ The Setup phase has two jobs: logging in to the target API and preparing data be
 
 ### Log In
 
-Logging in locally works with a simple request to the API using the legacy debug login.  When testing
-against a remote service, Locust doesn't actually log in.  Instead, Locust uses the session ID stored
-in the `OIDC_SESSION_ID` env variable, using a session that you manually created rather than automating
+Logging in locally works with a request to the mock_oidc_provider endpoints exposed in the application
+for testing purposes.  This application automatically authenticates the test user and returns an 
+appropriate sessionid and csrftoken for use throughout the application.  When testing against a remote 
+service, Locust doesn't actually log in.  Instead, Locust uses the session ID stored in the 
+`OIDC_SESSION_ID` env variable, using a session that you manually created rather than automating
 the log in process.  This is needed because Login.gov uses two-factor authentication that cannot be
 automated at this time.
 

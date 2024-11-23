@@ -53,16 +53,16 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Create/run migrations
+          name: Check migrations
+          command: |
+            python manage.py makemigrations --check
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Run migrations
           command: |
             python manage.py migrate --no-input --traceback --verbosity 3
           working_directory: ~/project/django-backend/
-
-      # Only use SonarCloud security checking for now.
-      #      - run:
-      #          name: Bandit security checks
-      #          command: |
-      #            bandit -f json --output bandit.out  -ii -ll -r . || echo "Bandit found issues" && cat bandit.out
 
       - run:
           name: Run tests
