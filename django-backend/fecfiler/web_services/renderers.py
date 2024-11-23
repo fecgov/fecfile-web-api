@@ -6,6 +6,7 @@ class DotFECRenderer(renderers.BaseRenderer):
 
     media_type = "application/octet-stream"
     render_style = "binary"
+    format = "binary"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data

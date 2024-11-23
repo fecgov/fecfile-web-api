@@ -5,14 +5,16 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction, get_read_model
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
     create_schedule_b,
     create_schedule_a,
     create_ie,
     create_debt,
+    create_loan,
 )
+from fecfiler.transactions.schedule_c.utils import carry_forward_loans
 from decimal import Decimal
 from django.db import transaction
 import structlog
@@ -301,7 +303,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))
-        print("DEBT SUCCESS")
 
     def test_line_label(self):
         create_schedule_a(
@@ -348,3 +349,151 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")
         self.assertEqual(view[3].line_label, "21(b)")
+
+    def test_loan_payment_to_date(self):
+        m1_report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        loan = create_loan(
+            self.committee,
+            self.contact_1,
+            "5000.00",
+            "2024-07-01",
+            "7%",
+            loan_incurred_date="2024-01-01",
+            report=m1_report,
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "1000.00",
+            loan_id=loan.id,
+            report=m1_report,
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.contact_1,
+            "2024-01-03",
+            "500.00",
+            loan_id=loan.id,
+            report=m1_report,
+        )
+        view: QuerySet = Transaction.objects.transaction_view()
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "date"
+        )
+        self.assertEqual(transactions[0].amount, Decimal("5000.00"))
+        self.assertEqual(transactions[0].loan_payment_to_date, Decimal("1500.00"))
+        self.assertEqual(transactions[1].amount, Decimal("1000.00"))
+        self.assertEqual(transactions[2].amount, Decimal("500.00"))
+
+        # Pull loan forward and make sure payments are still correct
+
+        m2_report = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
+        carry_forward_loans(m2_report)
+        carried_forward_loan = (
+            view.filter(committee_account_id=self.committee.id).order_by("created").last()
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.contact_1,
+            "2024-02-05",
+            "600.00",
+            loan_id=carried_forward_loan.id,
+            report=m2_report,
+        )
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "created"
+        )
+        self.assertEqual(transactions[0].amount, Decimal("5000.00"))
+        self.assertEqual(transactions[0].loan_payment_to_date, Decimal("1500.00"))
+        self.assertEqual(transactions[1].amount, Decimal("1000.00"))
+        self.assertEqual(transactions[2].amount, Decimal("500.00"))
+        self.assertEqual(transactions[4].amount, Decimal("5000.00"))
+        self.assertEqual(transactions[4].loan_payment_to_date, Decimal("2100.00"))
+        self.assertEqual(transactions[5].amount, Decimal("600.00"))
+
+    def test_itemization(self):
+        scha = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "20.00",
+            "GENERAL",
+            "SA11AI",
+            False,
+            None,
+        )
+        obs = Transaction.objects.transaction_view().filter(id=scha.id)
+        self.assertFalse(obs[0]._itemized)
+
+        schb = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-04",
+            "20.00",
+            "GENERAL_DISBURSEMENT",
+            "SB21B",
+        )
+        obs = Transaction.objects.transaction_view().filter(id=schb.id)
+        self.assertFalse(obs[0]._itemized)
+
+        scha = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "250.00",
+            "GENERAL",
+            "SA11AI",
+            False,
+            None,
+        )
+        obs = Transaction.objects.transaction_view().filter(id=scha.id)
+        self.assertTrue(obs[0]._itemized)
+
+        schb = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-04",
+            "250.00",
+            "GENERAL_DISBURSEMENT",
+            "SB21B",
+        )
+        obs = Transaction.objects.transaction_view().filter(id=schb.id)
+        self.assertTrue(obs[0]._itemized)
+
+        candidate_a = Contact.objects.create(
+            committee_account_id=self.committee.id,
+            candidate_office="H",
+            candidate_state="MD",
+            candidate_district="99",
+        )
+        ie = create_ie(
+            self.committee,
+            candidate_a,
+            "2023-01-01",
+            "2023-01-01",
+            "123.45",
+            "H2024",
+            candidate_a,
+        )
+        obs = Transaction.objects.transaction_view().filter(id=ie.id)
+        self.assertTrue(obs[0]._itemized)
+
+        ie = create_ie(
+            self.committee,
+            candidate_a,
+            "2023-01-01",
+            "2023-01-01",
+            "250.45",
+            "H2024",
+            candidate_a,
+        )
+        obs = Transaction.objects.transaction_view().filter(id=ie.id)
+        self.assertTrue(obs[0]._itemized)

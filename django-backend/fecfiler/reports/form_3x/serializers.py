@@ -23,13 +23,11 @@ COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
 class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
-    is_first = BooleanField(read_only=True, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
     state_of_election = CharField(required=False, allow_null=True)
     qualified_committee = BooleanField(required=False, allow_null=True)
-    cash_on_hand_date = DateField(required=False, allow_null=True)
     L6b_cash_on_hand_beginning_period = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
@@ -386,7 +384,7 @@ class Form3XSerializer(ReportSerializer):
         fields = (
             ReportSerializer.Meta.get_fields()
             + [f.name for f in Form3X._meta.get_fields() if f.name not in ["report"]]
-            + ["fields_to_validate", "is_first"]
+            + ["fields_to_validate"]
         )
 
-        read_only_fields = ["id", "created", "updated", "is_first"]
+        read_only_fields = ["id", "created", "updated"]

@@ -1,6 +1,7 @@
 from enum import Enum
 import json
 import uuid
+from datetime import datetime, timezone
 from django.db import models
 from fecfiler.reports.models import Report, ReportMixin
 import structlog
@@ -111,6 +112,7 @@ class BaseSubmission(models.Model):
     """state of internal fecfile submission task"""
     fecfile_task_state = models.CharField(max_length=255)
     fecfile_error = models.TextField(null=True)
+    fecfile_polling_attempts = models.IntegerField(default=0)
 
     """FEC response fields"""
     fec_submission_id = models.CharField(max_length=255, null=True)
@@ -119,6 +121,7 @@ class BaseSubmission(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    task_completed = models.DateTimeField(null=True)
 
     def save_fec_response(self, response_string):
         logger.debug(f"FEC response: {response_string}")
@@ -126,19 +129,29 @@ class BaseSubmission(models.Model):
         self.fec_submission_id = fec_response_json.get("submission_id")
         self.fec_status = fec_response_json.get("status")
         self.fec_message = fec_response_json.get("message")
-
         self.save()
 
     def save_error(self, error):
         self.fecfile_task_state = FECSubmissionState.FAILED
         self.fecfile_error = error
         logger.error(f"Submission {self.id} FAILED {self.fecfile_error}")
+        self.mark_task_completed()
         self.save()
 
     def save_state(self, new_state):
         self.fecfile_task_state = new_state
         logger.info(f"Submission {self.id} is {self.fecfile_task_state}")
+        if new_state == FECSubmissionState.SUCCEEDED:
+            self.mark_task_completed()
+
         self.save()
+
+    def mark_task_completed(self):
+        self.task_completed = datetime.now(timezone.utc)
+        if self.created is not None:
+            logger.info(f"task completed in {self.task_completed - self.created}")
+        else:
+            logger.warning("task completed but no created timestamp")
 
     class Meta:
         abstract = True

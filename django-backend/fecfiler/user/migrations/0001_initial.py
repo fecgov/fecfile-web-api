@@ -3,25 +3,9 @@ import django.contrib.auth.validators
 from django.db import migrations, models
 import django.utils.timezone
 import uuid
-from fecfiler.shared.utilities import get_model_data
-from django.core.management.utils import get_random_secret_key
+import structlog
 
-
-def copy_users(apps, schema_editor):
-    if not apps.is_installed(
-        "authentication"
-    ):  # "authentication" not in [app_name for app_name, app in apps.get_models()]:
-        print("no authentication app")
-        return
-    OldAccount = apps.get_model("authentication", "Account")  # noqa
-    User = apps.get_model("user", "User")  # noqa
-    db_alias = schema_editor.connection.alias
-    old_users = OldAccount.objects.using(db_alias).all()
-    for old_user in old_users:
-        user_data = get_model_data(old_user.__dict__, User)
-        user_data["id"] = uuid.uuid4()
-        user_data["password"] = old_user.password or get_random_secret_key()
-        User.objects.create(**user_data)
+logger = structlog.get_logger(__name__)
 
 
 class Migration(migrations.Migration):
@@ -126,5 +110,4 @@ class Migration(migrations.Migration):
                 ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
-        migrations.RunPython(copy_users),
     ]

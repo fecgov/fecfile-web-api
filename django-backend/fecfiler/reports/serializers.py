@@ -3,7 +3,6 @@ from rest_framework.serializers import (
     ModelSerializer,
     CharField,
     UUIDField,
-    BooleanField,
 )
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
@@ -98,7 +97,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     )
     report_code_label = CharField(read_only=True)
     version_label = CharField(read_only=True)
-    is_first = BooleanField(read_only=True)
 
     form_3x = Form3XSerializer(required=False)
     form_24 = Form24Serializer(required=False)
@@ -134,11 +132,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 if not representation.get(property):
                     representation[property] = form_1m[property]
 
-        if not representation.get("is_first"):
-            this_report = Report.objects.get(id=representation["id"])
-            representation["is_first"] = this_report.is_first if this_report else True
-
-        representation["can_delete"] = instance.can_delete()
+        representation["can_delete"] = instance.can_delete
+        representation["can_unamend"] = instance.can_unamend
 
         return representation
 
@@ -162,6 +157,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     "webprintsubmission",
                     "memotext",
                     "transaction",
+                    "transactions",
                     "dotfec",
                     "report",
                     "reporttransaction",
@@ -171,8 +167,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 "fields_to_validate",
                 "report_code_label",
                 "version_label",
-                "is_first",
             ]
 
         fields = get_fields()
-        read_only_fields = ["id", "created", "updated", "is_first"]
+        read_only_fields = ["id", "created", "updated"]

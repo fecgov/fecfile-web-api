@@ -1,57 +1,10 @@
 from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
-from fecfiler.committee_accounts.views import (
-    register_committee,
-    CommitteeMembershipViewSet,
-)
+from fecfiler.committee_accounts.views import CommitteeMembershipViewSet, CommitteeViewSet
+
 from fecfiler.user.models import User
-from django.core.management import call_command
-
-
-class CommitteeAccountsViewsTest(TestCase):
-
-    def setUp(self):
-        call_command("load_committee_data")
-        self.test_user = User.objects.create(email="test@fec.gov", username="gov")
-        self.other_user = User.objects.create(email="test@fec.com", username="com")
-        self.register_error_message = "could not register committee"
-
-    def test_register_committee(self):
-        account = register_committee("C12345678", self.test_user)
-        self.assertEquals(account.committee_id, "C12345678")
-
-    def test_register_committee_existing(self):
-        account = register_committee("C12345678", self.test_user)
-        self.assertEquals(account.committee_id, "C12345678")
-        self.assertRaisesMessage(
-            Exception,
-            self.register_error_message,
-            register_committee,
-            committee_id="C12345678",
-            user=self.test_user,
-        )
-
-    def test_register_committee_mismatch_email(self):
-        self.assertRaisesMessage(
-            Exception,
-            self.register_error_message,
-            register_committee,
-            committee_id="C12345678",
-            user=self.other_user,
-        )
-
-    def test_register_committee_case_insensitive(self):
-        self.test_user.email = self.test_user.email.upper()
-        account = register_committee("C12345678", self.test_user)
-        self.assertEquals(account.committee_id, "C12345678")
-        self.assertRaisesMessage(
-            Exception,
-            self.register_error_message,
-            register_committee,
-            committee_id="C12345678",
-            user=self.test_user,
-        )
+from unittest.mock import Mock, patch
 
 
 class CommitteeMemberViewSetTest(TestCase):
@@ -189,3 +142,82 @@ class CommitteeMemberViewSetTest(TestCase):
             response.data,
             "This email is taken by an existing membership to this committee",
         )
+
+
+class CommitteeViewSetTest(TestCase):
+    fixtures = ["C01234567_user_and_committee"]
+
+    def setUp(self):
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+        self.factory = RequestFactory()
+
+    def test_get_committee_account_data_from_production(self):
+        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            request = self.factory.get(
+                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
+            )
+            request.user = self.user
+            request.query_params = {"committee_id": "C12345678"}
+
+            with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_requests.get = Mock()
+                mock_requests.get.return_value = mock_response
+
+                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
+                    request
+                )
+                self.assertEqual(response.status_code, 200)
+
+    def test_get_committee_account_data_from_test(self):
+        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
+            settings.STAGE_OPEN_FEC_API = "https://stage.not-real.api/"
+            settings.STAGE_OPEN_FEC_API_KEY = "MOCK_KEY"
+            request = self.factory.get(
+                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
+            )
+            request.user = self.user
+            request.query_params = {"committee_id": "C12345678"}
+            with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+                mock_response = Mock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_requests.get = Mock()
+                mock_requests.get.return_value = mock_response
+
+                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
+                    request
+                )
+                was_called_with = mock_requests.get.call_args.args
+                self.assertEqual(response.status_code, 200)
+                self.assertNotEqual(len(was_called_with), 0)
+                self.assertIn(
+                    "https://stage.not-real.api/efile/test-form1/", was_called_with
+                )
+
+    def test_get_committee_account_data_from_redis(self):
+        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
+            request = self.factory.get(
+                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
+            )
+            request.user = self.user
+            request.query_params = {"committee_id": "C12345678"}
+            with patch(
+                "fecfiler.committee_accounts.utils.get_committee_account_data_from_redis"
+            ) as mock_committee:
+                mock_committee.return_value = {
+                    "name": "TEST",
+                    "email": "test@fec.gov",
+                }
+                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
+                    request
+                )
+                was_called_with = mock_committee.call_args.args or []
+                self.assertNotEqual(len(was_called_with), 0)
+                self.assertIn("C12345678", was_called_with)
+                self.assertEqual(response.data["name"], "TEST")

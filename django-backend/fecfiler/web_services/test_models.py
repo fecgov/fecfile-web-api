@@ -7,7 +7,7 @@ from fecfiler.web_services.models import (
     WebPrintSubmission,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.views import create_committee_view
+from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.user.models import User
 
@@ -33,6 +33,7 @@ class UploadSubmissionTestCase(TestCase):
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,
         )
+        self.assertIsNone(submission.task_completed)
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.upload_submission_id, submission.id)
 
@@ -53,6 +54,9 @@ class UploadSubmissionTestCase(TestCase):
         self.assertEqual(from_db.fec_status, "ACCEPTED")
         self.assertEqual(from_db.fec_message, "Test Save Response")
         self.assertEqual(from_db.fec_report_id, "1234")
+        self.assertIsNone(from_db.task_completed)
+        from_db.save_state(FECSubmissionState.SUCCEEDED)
+        self.assertIsNotNone(from_db.task_completed)
 
     def test_save_error(self):
         self.assertIsNone(self.upload_submission.fecfile_error)
@@ -60,6 +64,7 @@ class UploadSubmissionTestCase(TestCase):
         from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
         self.assertEqual(from_db.fecfile_error, "OH NO!")
         self.assertEqual(from_db.fecfile_task_state, FECSubmissionState.FAILED.value)
+        self.assertIsNotNone(from_db.task_completed)
 
     """
     WEBPRINT

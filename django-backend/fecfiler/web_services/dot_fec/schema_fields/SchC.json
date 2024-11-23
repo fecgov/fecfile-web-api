@@ -1,111 +1,112 @@
 {
-    "form_type": {},
-    "filer_committee_id_number": {},
-    "transaction_id": {},
-    "receipt_line_number": {
-        "path": "schedule_c.receipt_line_number"
-    },
-    "entity_type": {},
-    "lender_organization_name": {
-        "path": "lender_organization_name"
-    },
-    "lender_last_name": {
-        "path": "lender_last_name"
-    },
-    "lender_first_name": {
-        "path": "lender_first_name"
-    },
-    "lender_middle_name": {
-        "path": "lender_middle_name"
-    },
-    "lender_prefix": {
-        "path": "lender_prefix"
-    },
-    "lender_suffix": {
-        "path": "lender_suffix"
-    },
-    "lender_street_1": {
-        "path": "lender_street_1"
-    },
-    "lender_street_2": {
-        "path": "lender_street_2"
-    },
-    "lender_city": {
-        "path": "lender_city"
-    },
-    "lender_state": {
-        "path": "lender_state"
-    },
-    "lender_zip": {
-        "path": "lender_zip"
-    },
-    "election_code": {
-        "path": "schedule_c.election_code"
-    },
-    "election_other_description": {
-        "path": "schedule_c.election_other_description"
-    },
-    "loan_amount": {
-        "path": "schedule_c.loan_amount"
-    },
-    "loan_payment_to_date": {
-        "path": "schedule_c.loan_payment_to_date"
-    },
-    "loan_balance": {
-        "path": "schedule_c.loan_balance"
-    },
-    "loan_incurred_date": {
-        "serializer": "DATE",
-        "path": "schedule_c.loan_incurred_date"
-    },
-    "loan_due_date": {
-        "path": "schedule_c.loan_due_date"
-    },
-    "loan_interest_rate": {
-        "path": "schedule_c.loan_interest_rate"
-    },
-    "secured": {
-        "serializer": "BOOLEAN_YN",
-        "path": "schedule_c.secured"
-    },
-    "personal_funds": {
-        "serializer": "BOOLEAN_YN",
-        "path": "schedule_c.personal_funds"
-    },
-    "lender_committee_id_number": {
-        "path": "lender_committee_id_number"
-    },
-    "lender_candidate_id_number": {
-        "path": "lender_candidate_id_number"
-    },
-    "lender_candidate_last_name": {
-        "path": "lender_candidate_last_name"
-    },
-    "lender_candidate_first_name": {
-        "path": "lender_candidate_first_name"
-    },
-    "lender_candidate_middle_name": {
-        "path": "lender_candidate_middle_name"
-    },
-    "lender_candidate_prefix": {
-        "path": "lender_candidate_prefix"
-    },
-    "lender_candidate_suffix": {
-        "path": "lender_candidate_suffix"
-    },
-    "lender_candidate_office": {
-        "path": "lender_candidate_office"
-    },
-    "lender_candidate_state": {
-        "path": "lender_candidate_state"
-    },
-    "lender_candidate_district": {
-        "path": "lender_candidate_district"
-    },
-    "memo_code": {
-        "serializer": "BOOLEAN_X"
-    },
-    "memo_text_description": {
-        "path": "schedule_c.memo_text_description"
-    }
+  "form_type": {},
+  "filer_committee_id_number": {},
+  "transaction_id": {},
+  "receipt_line_number": {
+    "path": "schedule_c.receipt_line_number"
+  },
+  "entity_type": {},
+  "lender_organization_name": {
+    "path": "lender_organization_name"
+  },
+  "lender_last_name": {
+    "path": "lender_last_name"
+  },
+  "lender_first_name": {
+    "path": "lender_first_name"
+  },
+  "lender_middle_name": {
+    "path": "lender_middle_name"
+  },
+  "lender_prefix": {
+    "path": "lender_prefix"
+  },
+  "lender_suffix": {
+    "path": "lender_suffix"
+  },
+  "lender_street_1": {
+    "path": "lender_street_1"
+  },
+  "lender_street_2": {
+    "path": "lender_street_2"
+  },
+  "lender_city": {
+    "path": "lender_city"
+  },
+  "lender_state": {
+    "path": "lender_state"
+  },
+  "lender_zip": {
+    "path": "lender_zip"
+  },
+  "election_code": {
+    "path": "schedule_c.election_code"
+  },
+  "election_other_description": {
+    "path": "schedule_c.election_other_description"
+  },
+  "loan_amount": {
+    "path": "schedule_c.loan_amount"
+  },
+  "loan_payment_to_date": {
+    "path": "loan_payment_to_date"
+  },
+  "loan_balance": {
+    "path": "loan_balance"
+  },
+  "loan_incurred_date": {
+    "serializer": "DATE",
+    "path": "schedule_c.loan_incurred_date"
+  },
+  "loan_due_date": {
+    "serializer": "TEXT_TO_DATE",
+    "path": "schedule_c.loan_due_date"
+  },
+  "loan_interest_rate": {
+    "path": "schedule_c.loan_interest_rate"
+  },
+  "secured": {
+    "serializer": "BOOLEAN_YN",
+    "path": "schedule_c.secured"
+  },
+  "personal_funds": {
+    "serializer": "BOOLEAN_YN",
+    "path": "schedule_c.personal_funds"
+  },
+  "lender_committee_id_number": {
+    "path": "lender_committee_id_number"
+  },
+  "lender_candidate_id_number": {
+    "path": "lender_candidate_id_number"
+  },
+  "lender_candidate_last_name": {
+    "path": "lender_candidate_last_name"
+  },
+  "lender_candidate_first_name": {
+    "path": "lender_candidate_first_name"
+  },
+  "lender_candidate_middle_name": {
+    "path": "lender_candidate_middle_name"
+  },
+  "lender_candidate_prefix": {
+    "path": "lender_candidate_prefix"
+  },
+  "lender_candidate_suffix": {
+    "path": "lender_candidate_suffix"
+  },
+  "lender_candidate_office": {
+    "path": "lender_candidate_office"
+  },
+  "lender_candidate_state": {
+    "path": "lender_candidate_state"
+  },
+  "lender_candidate_district": {
+    "path": "lender_candidate_district"
+  },
+  "memo_code": {
+    "serializer": "BOOLEAN_X"
+  },
+  "memo_text_description": {
+    "path": "schedule_c.memo_text_description"
+  }
 }

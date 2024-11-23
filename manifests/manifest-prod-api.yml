@@ -1,7 +1,7 @@
 ---
 applications:
   - name: fecfile-web-api
-    instances: 2
+    instances: 0
     routes:
       - route: fecfile-web-api-prod.apps.internal
     stack: cflinuxfs4
@@ -19,10 +19,16 @@ applications:
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
       FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
       LOGIN_REDIRECT_CLIENT_URL: https://fecfile.fec.gov
-      LOGIN_REDIRECT_SERVER_URL: https://api.fecfile.fec.gov/api/v1/auth/login-redirect
-      LOGOUT_REDIRECT_URL: https://api.fecfile.fec.gov/api/v1/auth/logout-redirect
-      FEC_API: https://api.open.fec.gov/v1/
+      LOGIN_REDIRECT_SERVER_URL: https://api.fecfile.fec.gov/api/v1/oidc/login-redirect
+      LOGOUT_REDIRECT_URL: https://api.fecfile.fec.gov/api/v1/oidc/logout-redirect
+      PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
+      STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
+      FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
       LOG_FORMAT: KEY_VALUE
-      MOCK_OPENFEC: REDIS
+      SYSTEM_STATUS_CACHE_AGE: 60
+      EFO_POLLING_MAX_DURATION: 300
+      EFO_POLLING_INTERVAL: 30
+      # ---- FEATURE FLAGS ----
+      FLAG__COMMITTEE_DATA_SOURCE: PRODUCTION # Values are PRODUCTION, TEST, and MOCKED

@@ -10,12 +10,6 @@ from rest_framework import viewsets, pagination
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
-from fecfiler.settings import (
-    FEC_API_CANDIDATE_LOOKUP_ENDPOINT,
-    FEC_API_COMMITTEE_LOOKUP_ENDPOINT,
-    FEC_API_CANDIDATE_ENDPOINT,
-    FEC_API_KEY,
-)
 from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
@@ -23,6 +17,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
 from silk.profiling.profiler import silk_profile
+import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
 
@@ -34,12 +29,32 @@ NAME_REVERSED_CLAUSE = Concat(
     "last_name", Value(" "), "first_name", output_field=CharField()
 )
 
+FEC_API_COMMITTEE_LOOKUP_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "names/committees/"
+)
+FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(settings.PRODUCTION_OPEN_FEC_API) + "candidates/"
+FEC_API_CANDIDATE_ENDPOINT = (
+    str(settings.PRODUCTION_OPEN_FEC_API) + "candidate/{}/history/"
+)
 
-@silk_profile(name='contact__validate_and_sanitize_candidate')
+
+@silk_profile(name="contact__validate_and_sanitize_candidate")
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
-    return candidate_id
+    if re.match(r"^[a-zA-Z0-9]{9}$", candidate_id):
+        return candidate_id
+    else:
+        raise AssertionError("Candidate ID provided invalid")
+
+
+def validate_and_sanitize_committee(committee_id):
+    if committee_id is None:
+        raise AssertionError("No Committee ID provided")
+    if re.match(r"^[a-zA-Z0-9]{9}$", committee_id):
+        return committee_id
+    else:
+        raise AssertionError("Committee ID provided invalid")
 
 
 class ContactListPagination(pagination.PageNumberPagination):
@@ -82,20 +97,19 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     ordering = ["-created"]
 
     @action(detail=False)
-    @silk_profile(name='contact__candidate')
+    @silk_profile(name="contact__candidate")
     def candidate(self, request):
         candidate_id = request.query_params.get("candidate_id")
         if not candidate_id:
             return HttpResponseBadRequest()
         try:
+            sanitized_candidate_id = validate_and_sanitize_candidate(candidate_id)
             headers = {"Content-Type": "application/json"}
             params = {
-                "api_key": FEC_API_KEY,
+                "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
                 "sort": "-two_year_period",
             }
-            url = FEC_API_CANDIDATE_ENDPOINT.format(
-                validate_and_sanitize_candidate(candidate_id)
-            )
+            url = FEC_API_CANDIDATE_ENDPOINT.format(sanitized_candidate_id)
             response = requests.get(url, headers=headers, params=params).json()
             results = response["results"]
             return JsonResponse(results[0] if len(results) > 0 else {})
@@ -103,7 +117,27 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return HttpResponseBadRequest()
 
     @action(detail=False)
-    @silk_profile(name='contact__candidate_lookup')
+    @silk_profile(name="contact__candidate_lookup")
+    def committee(self, request):
+        committee_id = request.query_params.get("committee_id")
+        if not committee_id:
+            return HttpResponseBadRequest()
+        try:
+            sanitized_committee_id = validate_and_sanitize_committee(committee_id)
+            headers = {"Content-Type": "application/json"}
+            response = requests.get(
+                f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/",
+                params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
+                headers=headers,
+            ).json()
+            if response.get("results"):
+                return JsonResponse(response["results"][0])
+            else:
+                return JsonResponse({})
+        except AssertionError:
+            return HttpResponseBadRequest()
+
+    @action(detail=False)
     def candidate_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -121,7 +155,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": FEC_API_KEY}
+        params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
         if office:
             params["office"] = office
         params = urlencode(params)
@@ -168,7 +202,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
-    @silk_profile(name='contact__committee_lookup')
+    @silk_profile(name="contact__committee_lookup")
     def committee_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -186,7 +220,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = urlencode({"q": q, "api_key": FEC_API_KEY})
+        params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
         json_results = requests.get(
             FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
         ).json()
@@ -215,7 +249,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
-    @silk_profile(name='contact__individual_lookup')
+    @silk_profile(name="contact__individual_lookup")
     def individual_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -252,7 +286,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
-    @silk_profile(name='contact__organization_lookup')
+    @silk_profile(name="contact__organization_lookup")
     def organization_lookup(self, request):
         q = request.GET.get("q")
         if q is None:
@@ -277,7 +311,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
-    @silk_profile(name='contact__get_contact_id')
+    @silk_profile(name="contact__get_contact_id")
     def get_contact_id(self, request):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:
@@ -289,12 +323,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return Response(match.id if match else "")
 
-    @silk_profile(name='contact__update')
+    @silk_profile(name="contact__update")
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             return super().update(request, *args, **kwargs)
 
-    @silk_profile(name='contact__get_int_param_value')
+    @silk_profile(name="contact__get_int_param_value")
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
     ):
@@ -307,7 +341,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
                 return max_param_value
         return default_param_value
 
-    @silk_profile(name='contact__get_max_results')
+    @silk_profile(name="contact__get_max_results")
     def get_max_results(self, request):
         max_fecfile_results = self.get_int_param_value(
             request,
@@ -352,7 +386,7 @@ class DeletedContactsViewSet(
     ordering = ["-created"]
 
     @action(detail=False, methods=["post"])
-    @silk_profile(name='contact__restore')
+    @silk_profile(name="contact__restore")
     def restore(self, request):
         ids_to_restore = request.data
         contacts = self.queryset.filter(id__in=ids_to_restore)

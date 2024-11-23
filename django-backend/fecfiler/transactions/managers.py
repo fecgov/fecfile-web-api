@@ -10,7 +10,6 @@ from fecfiler.transactions.schedule_b.managers import (
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
 from fecfiler.transactions.schedule_e.managers import (
-    over_two_hundred_types as schedule_e_over_two_hundred_types,
     line_labels as line_labels_e,
 )
 from django.db.models.functions import Coalesce, Concat
@@ -26,6 +25,7 @@ from django.db.models import (
     BooleanField,
     TextField,
     DecimalField,
+    CharField,
     Manager,
 )
 from decimal import Decimal
@@ -47,9 +47,7 @@ class TransactionManager(SoftDeleteManager):
 
     def ITEMIZATION_CLAUSE(self):  # noqa: N802
         over_two_hundred_types = (
-            schedule_a_over_two_hundred_types
-            + schedule_b_over_two_hundred_types
-            + schedule_e_over_two_hundred_types
+            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
         return Case(
             When(force_itemized__isnull=False, then=F("force_itemized")),
@@ -161,7 +159,10 @@ class TransactionManager(SoftDeleteManager):
                         "LOAN_REPAYMENT_MADE",
                     ]
                 ),
-                then=Concat(F("loan__transaction_id"), F("date")),
+                then=Concat(
+                    F("loan__transaction_id"),
+                    F("date"), output_field=CharField()
+                )
             ),
             When(
                 schedule_c__isnull=False,
@@ -169,6 +170,7 @@ class TransactionManager(SoftDeleteManager):
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
                     Value("LOAN"),
+                    output_field=CharField()
                 ),
             ),
             default=None,

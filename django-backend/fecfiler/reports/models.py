@@ -2,7 +2,7 @@ import uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import OuterRef, Subquery, Exists, Q
+from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3x.models import Form3X
@@ -81,6 +81,8 @@ class Report(CommitteeOwnedModel):
     form_1m = models.ForeignKey(Form1M, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ReportManager()
+    can_delete = models.BooleanField(default=True)
+    can_unamend = models.BooleanField(default=False)
 
     @property
     def previous_report(self):
@@ -94,15 +96,13 @@ class Report(CommitteeOwnedModel):
             .last()
         )
 
-
-    @silk_profile(name='report__save')
+    @silk_profile(name="report__save")
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
         from fecfiler.transactions.schedule_d.utils import carry_forward_debts
 
         # Record if the is a create or update operation
         create_action = self.created is None
-
         with db_transaction.atomic():
             super(Report, self).save(*args, **kwargs)
 
@@ -111,7 +111,6 @@ class Report(CommitteeOwnedModel):
             if create_action and self.coverage_through_date:
                 carry_forward_loans(self)
                 carry_forward_debts(self)
-                flag_reports_for_recalculation(self)
 
     def get_future_in_progress_reports(
         self,
@@ -137,10 +136,25 @@ class Report(CommitteeOwnedModel):
             self.form_24.save()
 
         self.upload_submission = None
+        self.can_unamend = True
+        self.save()
+
+    def unamend(self, latest_submission):
+        self.report_version = int(self.report_version or "1") - 1
+        if self.report_version == 0:
+            self.report_version = None
+            self.form_type = self.get_form_name() + "N"
+
+        if self.form_type == "F24":
+            self.form_24.original_amendment_date = None
+            self.form_24.save()
+
+        self.upload_submission = latest_submission
+        self.can_unamend = False
         self.save()
 
     def delete(self):
-        if not self.can_delete():
+        if not self.can_delete:
             raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
         if not self.form_24:
             """only delete transactions if the report is the source of the
@@ -159,62 +173,6 @@ class Report(CommitteeOwnedModel):
 
         super(CommitteeOwnedModel, self).delete()
 
-    @silk_profile(name='report__can_delete')
-    def can_delete(self):
-        """
-        can't delete if submitted
-        can't delete if amended
-        can't delete form3x if there exists any transactions in this report or
-        where any transactions in a different report back reference to them
-        """
-        return (
-            not self.upload_submission
-            and (
-                self.report_version is None
-                or self.report_version == "0"
-                or self.report_version == 0
-            )
-            and (
-                not self.form_3x
-                or (
-                    not bool(self.form_24)
-                    and not ReportTransaction.objects.filter(
-                        Exists(
-                            Subquery(
-                                ReportTransaction.objects.filter(
-                                    ~Q(report_id=self.id),
-                                    Q(
-                                        Q(transaction__id=OuterRef("transaction_id"))
-                                        | Q(
-                                            transaction__reatt_redes_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__parent_transaction_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__debt_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                        | Q(
-                                            transaction__loan_id=OuterRef(
-                                                "transaction_id"
-                                            )
-                                        )
-                                    ),
-                                )
-                            )
-                        ),
-                        report_id=self.id,
-                    ).exists()
-                )
-            )
-        )
-
 
 TABLE_TO_FORM = {
     "form_3x": "F3X",
@@ -226,32 +184,6 @@ TABLE_TO_FORM = {
 FORMS_TO_CALCULATE = [
     "F3X",
 ]
-
-
-@silk_profile(name='report__flag_reports_for_recalculation')
-def flag_reports_for_recalculation(report: Report):
-    if report and report.get_form_name() in FORMS_TO_CALCULATE:
-        committee = report.committee_account
-        report_date = report.coverage_from_date
-        reports_to_flag = []
-        if report_date is None:
-            reports_to_flag = Report.objects.get(id=report.id)
-        else:
-            reports_to_flag = Report.objects.filter(
-                committee_account=committee,
-                coverage_from_date__gte=report_date
-            )
-
-        flagged_count = reports_to_flag.update(
-            calculation_status=None
-        )
-        logger.info(
-            f"""Report {
-                report.id
-            } marked for recalculation along with {
-                flagged_count-1
-            } subsequent reports"""
-        )
 
 
 class ReportMixin(models.Model):

@@ -8,6 +8,10 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
+from fecfiler.transactions.transaction_dependencies import (
+    update_dependent_children,
+    update_dependent_parent,
+)
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
     Transaction,
@@ -19,7 +23,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.reports.models import Report, flag_reports_for_recalculation
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -44,15 +48,15 @@ class TransactionOrderingFilter(OrderingFilter):
         ordering_fields = getattr(view, "ordering_fields", [])
 
         if ordering_query_param:
-            fields = [param.strip() for param in ordering_query_param.split(',')]
+            fields = [param.strip() for param in ordering_query_param.split(",")]
             ordering = []
             for field in fields:
-                if field.strip('-') in ordering_fields:
-                    if field == '-memo_code' and not (
+                if field.strip("-") in ordering_fields:
+                    if field == "-memo_code" and not (
                         queryset.filter(memo_code=True).exists()
                         and queryset.exclude(memo_code=True).exists()
                     ):
-                        field = 'memo_code'
+                        field = "memo_code"
                     ordering.append(field)
             if ordering:
                 return ordering
@@ -92,7 +96,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if hasattr(self, "action") and self.action in [
             "create",
             "update",
-            "delete",
+            "destroy",
             "save_transactions",
         ]:
             queryset = super().get_queryset()
@@ -136,14 +140,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            print(f"transaction ID: {saved_transaction.id}")
-        # transaction_view = self.get_queryset().get(id=saved_transaction.id)
+            logger.info(f"Created new transaction: {saved_transaction.id}")
+            update_dependent_parent(saved_transaction)
         return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
         return Response(saved_transaction.id)
+
+    def destroy(self, request, *args, **kwargs):
+        # capture copy of transaction before deletion to use in update_dependent_parent
+        transaction = self.get_object()
+        with db_transaction.atomic():
+            response = super().destroy(request, *args, **kwargs)
+            # update parents that depend on this transaction
+            update_dependent_parent(transaction)
+        return response
 
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
@@ -232,6 +245,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        committee_id = request.session["committee_uuid"]
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
@@ -265,7 +279,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         contact_instances = {
             contact_key: create_or_update_contact(
-                transaction_data, contact_key, request.session["committee_uuid"]
+                transaction_data, contact_key, committee_id
             )
             for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
@@ -292,7 +306,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
-            flag_reports_for_recalculation(report)
+        Report.objects.filter(committee_account_id=committee_id).update(
+            calculation_status=None
+        )
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -318,6 +334,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     del child_transaction_data["contact_1"]
 
                 self.save_transaction(child_transaction_data, request)
+
+        """ trigger updates to transactions with fields that depend on this one
+        EXAMPLE: if this transaction is a JF transfer, update the descriptions of its
+        children and grandchildren transactions with any changes to the committee name
+        """
+        update_dependent_children(transaction_instance)
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -356,7 +378,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.add(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction added to report")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
@@ -372,7 +393,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response("No transaction matching id provided", status=404)
 
         transaction.reports.remove(report)
-        flag_reports_for_recalculation(report)
         return Response("Transaction removed from report")
 
 
@@ -393,12 +413,12 @@ def get_save_hook(transaction: Transaction):
 def stringify_queryset(qs):
     database_uri = os.environ.get("DATABASE_URL")
     if not database_uri:
-        print(
+        logger.error(
             """Environment variable DATABASE_URL not found.
             Please check your settings and try again"""
         )
         exit(1)
-    print("Testing connection...")
+    logger.info("Testing connection...")
     conn = psycopg2.connect(database_uri)
     sql, params = qs.query.sql_with_params()
     with conn.cursor() as cursor:

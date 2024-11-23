@@ -9,6 +9,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import ReportTransaction
+from fecfiler.memo_text.models import MemoText
 
 
 def create_schedule_a(
@@ -22,7 +23,16 @@ def create_schedule_a(
     memo_code=False,
     itemized=False,
     report=None,
+    parent_id=None,
+    purpose_description=None,
 ):
+    transaction_data = {
+        "_form_type": form_type,
+        "memo_code": memo_code,
+        "force_itemized": itemized,
+    }
+    if parent_id is not None:
+        transaction_data["parent_transaction_id"] = parent_id
     return create_test_transaction(
         type,
         ScheduleA,
@@ -30,12 +40,12 @@ def create_schedule_a(
         contact_1=contact,
         group=group,
         report=report,
-        schedule_data={"contribution_date": date, "contribution_amount": amount},
-        transaction_data={
-            "_form_type": form_type,
-            "memo_code": memo_code,
-            "force_itemized": itemized,
+        schedule_data={
+            "contribution_date": date,
+            "contribution_amount": amount,
+            "contribution_purpose_descrip": purpose_description
         },
+        transaction_data=transaction_data,
     )
 
 
@@ -49,6 +59,8 @@ def create_schedule_b(
     form_type="SB",
     memo_code=False,
     report=None,
+    loan_id=None,
+    debt_id=None,
 ):
     return create_test_transaction(
         type,
@@ -58,7 +70,12 @@ def create_schedule_b(
         group=group,
         report=report,
         schedule_data={"expenditure_date": date, "expenditure_amount": amount},
-        transaction_data={"_form_type": form_type, "memo_code": memo_code},
+        transaction_data={
+            "_form_type": form_type,
+            "memo_code": memo_code,
+            "loan_id": loan_id,
+            "debt_id": debt_id,
+        },
     )
 
 
@@ -122,7 +139,10 @@ def create_loan(
     secured=False,
     type="LOAN_RECEIVED_FROM_INDIVIDUAL",
     form_type="SC/9",
+    loan_incurred_date=None,
+    report=None,
 ):
+    report_coverage_through_date = report.coverage_through_date if report else None
     return create_test_transaction(
         type,
         ScheduleC,
@@ -133,9 +153,71 @@ def create_loan(
             "loan_due_date": loan_due_date,
             "loan_interest_rate": loan_interest_rate,
             "secured": secured,
+            "loan_incurred_date": loan_incurred_date,
+            "report_coverage_through_date": report_coverage_through_date,
         },
         transaction_data={"_form_type": form_type},
+        report=report,
     )
+
+
+def create_loan_from_bank(
+    committee,
+    contact,
+    loan_amount,
+    loan_due_date,
+    loan_interest_rate,
+    secured=False,
+    loan_incurred_date=None,
+    report=None,
+):
+    loan = create_loan(
+        committee,
+        contact,
+        loan_amount,
+        loan_due_date,
+        loan_interest_rate,
+        secured,
+        "LOAN_RECEIVED_FROM_BANK",
+        "SC/10",
+        loan_incurred_date,
+        report,
+    )
+    loan_receipt = create_schedule_a(
+        "LOAN_RECEIVED_FROM_BANK_RECEIPT",
+        committee,
+        contact,
+        loan_incurred_date,
+        loan_amount,
+        report=report,
+        parent_id=loan.id,
+    )
+    loan_agreement = create_test_transaction(
+        "C1_LOAN_AGREEMENT",
+        ScheduleC1,
+        committee,
+        contact_1=contact,
+        group=None,
+        report=report,
+        schedule_data={
+            "loan_incurred_date": loan_incurred_date,
+            "loan_amount": loan_amount,
+            "loan_due_date": loan_due_date,
+            "loan_interest_rate": loan_interest_rate,
+        },
+        transaction_data={"_form_type": "SC1/10", "parent_transaction_id": loan.id},
+    )
+    guarantor = create_test_transaction(
+        "C2_LOAN_GUARANTOR",
+        ScheduleC2,
+        committee,
+        contact_1=contact,
+        group=None,
+        report=report,
+        schedule_data={},
+        transaction_data={"_form_type": "SC2/10", "parent_transaction_id": loan.id},
+    )
+    return loan, loan_receipt, loan_agreement, guarantor
 
 
 def create_test_transaction(
@@ -156,6 +238,7 @@ def create_test_transaction(
         contact_1=contact_1,
         contact_2=contact_2,
         aggregation_group=group,
+        entity_type=getattr(contact_1, 'type', None),
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
         **(transaction_data or {})
     )
@@ -173,6 +256,15 @@ def create_report_transaction(report, transaction):
         return ReportTransaction.objects.create(
             report_id=report.id, transaction_id=transaction.id
         )
+
+
+def create_transaction_memo(committee_account, transaction, text4000):
+    return MemoText.objects.create(
+        rec_type="TEXT",
+        text4000=text4000,
+        committee_account_id=committee_account.id,
+        transaction_uuid=transaction.id,
+    )
 
 
 SCHEDULE_CLASS_TO_FIELD = {

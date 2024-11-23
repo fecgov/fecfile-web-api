@@ -4,7 +4,6 @@ Django settings for the FECFile project.
 
 import os
 import dj_database_url
-import requests
 import structlog
 import sys
 
@@ -12,6 +11,8 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
+from fecfiler.shared.utilities import get_float_from_string
+from math import floor
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -29,15 +30,9 @@ LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
-"""
-Enables alternative log in method.
-See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
-and :py:meth:`fecfiler.authentication.views.authenticate_login`
-"""
-ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
+SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
 ROOT_URLCONF = "fecfiler.urls"
@@ -56,16 +51,14 @@ SESSION_SAVE_EVERY_REQUEST = True
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
-    "mozilla_django_oidc",  # Load after auth
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "corsheaders",
     "storages",
     "django_structlog",
-    "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
@@ -74,17 +67,18 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "fecfiler.openfec",
     "fecfiler.user",
-    "fecfiler.mock_openfec",
-    "silk"
+    "silk" "fecfiler.oidc",
+    "fecfiler.devops",
+    "fecfiler.mock_oidc_provider",
+    "fecfiler.cash_on_hand",
 ]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
-    "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
+    "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -111,9 +105,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://(.*?).fecfile\.fec\.gov$"
-]
+CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
@@ -141,20 +133,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
 
-# OpenID Connect settings start
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "mozilla_django_oidc.auth.OIDCAuthenticationBackend",
+    "fecfiler.oidc.backends.OIDCAuthenticationBackend",
 ]
 
-OIDC_CREATE_USER = True
-OIDC_STORE_ID_TOKEN = True
 # Maximum number of concurrent sessions
 OIDC_MAX_STATES = 3
 
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_RP_CLIENT_ID = env.get_credential("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET_STAGING = env.get_credential("OIDC_RP_CLIENT_SECRET_STAGING")
 OIDC_RP_CLIENT_SECRET = env.get_credential("OIDC_RP_CLIENT_SECRET")
+OIDC_RP_CLIENT_SECRET_BACKUP = env.get_credential("OIDC_RP_CLIENT_SECRET_BACKUP")
 
 # The Django field used to identify users - default is email
 OIDC_RP_UNIQUE_IDENTIFIER = "username"
@@ -162,20 +153,15 @@ OIDC_RP_UNIQUE_IDENTIFIER = "username"
 # Sometimes the OP (IDP - login.gov)has a different label for the unique ID
 OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 
-# Default implicit_flow is considered vulnerable
-OIDC_OP_CLIENT_AUTH_METHOD = "private_key_jwt"
-
-OIDC_OP_AUTODISCOVER_ENDPOINT = (
-    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration"
+OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
+    "OIDC_OP_AUTODISCOVER_ENDPOINT",
+    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
-OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
 
-OIDC_OP_JWKS_ENDPOINT = OIDC_OP_CONFIG.get("jwks_uri")
-OIDC_OP_AUTHORIZATION_ENDPOINT = OIDC_OP_CONFIG.get("authorization_endpoint")
-OIDC_OP_TOKEN_ENDPOINT = OIDC_OP_CONFIG.get("token_endpoint")
-OIDC_OP_USER_ENDPOINT = OIDC_OP_CONFIG.get("userinfo_endpoint")
-OIDC_OP_LOGOUT_ENDPOINT = OIDC_OP_CONFIG.get("end_session_endpoint")
-ALLOW_LOGOUT_GET_METHOD = True
+MOCK_OIDC_PROVIDER = env.get_credential("MOCK_OIDC_PROVIDER", "False").lower() == "true"
+MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
+
+OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
@@ -185,14 +171,18 @@ LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
 LOGOUT_REDIRECT_URL = env.get_credential("LOGOUT_REDIRECT_URL")
 
-OIDC_AUTH_REQUEST_EXTRA_PARAMS = {
-    "acr_values": "http://idmanagement.gov/ns/assurance/ial/1"
-}
-
-OIDC_OP_LOGOUT_URL_METHOD = "fecfiler.authentication.views.login_dot_gov_logout"
-
-OIDC_USERNAME_ALGO = "fecfiler.authentication.views.generate_username"
-# OpenID Connect settings end
+# keygen settings
+LOGIN_DOT_GOV_RSA_PK_SIZE = int(env.get_credential("LOGIN_DOT_GOV_RSA_PK_SIZE", "2048"))
+LOGIN_DOT_GOV_X509_DAYS_VALID = float(
+    env.get_credential("LOGIN_DOT_GOV_X509_DAYS_VALID", "365")
+)
+LOGIN_DOT_GOV_X509_COUNTRY = env.get_credential("LOGIN_DOT_GOV_X509_COUNTRY")
+LOGIN_DOT_GOV_X509_STATE = env.get_credential("LOGIN_DOT_GOV_X509_STATE")
+LOGIN_DOT_GOV_X509_LOCALITY = env.get_credential("LOGIN_DOT_GOV_X509_LOCALITY")
+LOGIN_DOT_GOV_X509_ORG = env.get_credential("LOGIN_DOT_GOV_X509_ORG")
+LOGIN_DOT_GOV_X509_ORG_UNIT = env.get_credential("LOGIN_DOT_GOV_X509_ORG_UNIT")
+LOGIN_DOT_GOV_X509_COMMON_NAME = env.get_credential("LOGIN_DOT_GOV_X509_COMMON_NAME")
+LOGIN_DOT_GOV_X509_EMAIL_ADDRESS = env.get_credential("LOGIN_DOT_GOV_X509_EMAIL_ADDRESS")
 
 USE_X_FORWARDED_HOST = True
 
@@ -203,18 +193,6 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-STATIC_URL = "/static/"
-
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-
-STATIC_ROOT = "static"
-
-# the sub-directories of media and static files
-STATICFILES_LOCATION = "static"
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -222,9 +200,14 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "fecfiler.utils.custom_exception_handler",
+}
+
+SPECTACULAR_SETTINGS = {
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
@@ -320,7 +303,11 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-DJANGO_STRUCTLOG_CELERY_ENABLED = True
+"""System status settings
+"""
+SYSTEM_STATUS_CACHE_BACKEND = env.get_credential("REDIS_URL")
+SYSTEM_STATUS_CACHE_AGE = env.get_credential("SYSTEM_STATUS_CACHE_AGE", 60)
+
 
 """Celery configurations
 """
@@ -329,6 +316,7 @@ CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
@@ -336,10 +324,24 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
+MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
+if not MOCK_EFO and FEC_FILING_API is None:
+    raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
+
+"""EFO POLLING SETTINGS
+"""
+EFO_POLLING_MAX_DURATION = get_float_from_string(
+    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
+)
+EFO_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("EFO_POLLING_INTERVAL", 30)
+)
+EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
+
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
 WARNING: This will BREAK submitting to fec because it will no longer conform to spec
@@ -351,18 +353,32 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
-"""FEC API settings
-"""
-FEC_API = env.get_credential("FEC_API")
-FEC_API_KEY = env.get_credential("FEC_API_KEY")
-FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
-FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
-FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
+"""FEATURE FLAGS
+"""
+
+# FLAG__COMMITTEE_DATA_SOURCE:
+# Determines whether committee data is pulled from EFO, TestEFO, or REDIS
+FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
+valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
+if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
+    raise Exception(
+        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
+        + f" must be valid source ({valid_sources})"
+    )
+
+
+PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
+PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
+
+STAGE_OPEN_FEC_API = env.get_credential("STAGE_OPEN_FEC_API")
+STAGE_OPEN_FEC_API_KEY = env.get_credential("STAGE_OPEN_FEC_API_KEY")
 
 """MOCK OPENFEC settings"""
-MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
-if MOCK_OPENFEC == "REDIS":
-    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
-else:
-    MOCK_OPENFEC_REDIS_URL = None
+MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
+
+CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
+    "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []
+)
+
+TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
