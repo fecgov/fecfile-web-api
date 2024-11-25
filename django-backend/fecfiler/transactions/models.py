@@ -149,7 +149,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     )
     # report ids of reports that have been submitted
     # and in doing so have blocked this transaction from being deleted
-    blocking_reports = ArrayField(models.UUIDField(), blank=False, default=list())
+    blocking_reports = ArrayField(models.UUIDField(), blank=False, default=list)
 
     objects = TransactionManager()
 
