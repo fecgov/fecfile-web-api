@@ -1,10 +1,8 @@
 from fecfiler.soft_delete.managers import SoftDeleteManager
 from fecfiler.transactions.schedule_a.managers import (
-    over_two_hundred_types as schedule_a_over_two_hundred_types,
     line_labels as line_labels_a,
 )
 from fecfiler.transactions.schedule_b.managers import (
-    over_two_hundred_types as schedule_b_over_two_hundred_types,
     line_labels as line_labels_b,
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
@@ -42,21 +40,6 @@ class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
         return super().get_queryset()
-
-    def ITEMIZATION_CLAUSE(self):  # noqa: N802
-        over_two_hundred_types = (
-            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
-        )
-        return Case(
-            When(force_itemized__isnull=False, then=F("force_itemized")),
-            When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
-            When(
-                transaction_type_identifier__in=over_two_hundred_types,
-                then=Q(aggregate__gt=Value(Decimal(200))),
-            ),
-            default=Value(True),
-            output_field=BooleanField(),
-        )
 
     EFFECTIVE_AMOUNT_CLAUSE = Case(
         When(
@@ -158,9 +141,8 @@ class TransactionManager(SoftDeleteManager):
                     ]
                 ),
                 then=Concat(
-                    F("loan__transaction_id"),
-                    F("date"), output_field=CharField()
-                )
+                    F("loan__transaction_id"), F("date"), output_field=CharField()
+                ),
             ),
             When(
                 schedule_c__isnull=False,
@@ -168,7 +150,7 @@ class TransactionManager(SoftDeleteManager):
                     F("transaction_id"),
                     F("schedule_c__report_coverage_through_date"),
                     Value("LOAN"),
-                    output_field=CharField()
+                    output_field=CharField(),
                 ),
             ),
             default=None,
@@ -262,7 +244,6 @@ class TransactionManager(SoftDeleteManager):
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 loan_key=self.LOAN_KEY_CLAUSE(),
-                _itemized=self.ITEMIZATION_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
@@ -314,11 +295,6 @@ class TransactionViewManager(Manager):
                         schedule_c__isnull=False,
                         then=Coalesce(F("loan_balance"), Decimal(0)),
                     ),
-                ),
-                itemized=Coalesce(
-                    "view_parent_transaction__view_parent_transaction___itemized",
-                    "view_parent_transaction___itemized",
-                    "_itemized",
                 ),
                 calendar_ytd_per_election_office=Coalesce(
                     "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",  # noqa
