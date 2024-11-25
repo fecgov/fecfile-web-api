@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
-set -e
-
 GIT_DIR=$(git rev-parse --git-dir)
+
+set -e
 
 if ! git secrets --list | grep -q "patterns" ;
 then
-    printf "Commit failure\n\ngit secrets failed to run.  Is it installed?\n"
+    printf "Commit failure\n\ngit secrets is not installed or has no installed patterns.  Have you run the API repo's install script?\n"
     exit 1
 fi
 
 git secrets --pre_commit_hook -- "$@";
 
-# As of writing this script, these are the allowed lines necessary to pass the git secrets check
+# As of writing this script, these are the git config exceptions necessary to pass the git secrets check
 #
-# [secrets]
 # 	allowed = \\[https://amaral\\.northwestern\\.edu/resources/guides/pyenv-tutorial\\]\\(https://amaral\\.northwestern\\.edu/resources/guides/pyenv-tutorial\\)
 # 	allowed = ENV POSTGRES_PASSWORD=postgres
 # 	allowed = expected_params = \\{\"api_key\": \"FAKE-KEY\"\\}
