@@ -12,14 +12,11 @@ fi
 
 git secrets --pre_commit_hook -- "$@";
 
-# secrets_list = subprocess.run(['git', 'secrets', '--list'], capture_output=True)
-
-# secrets_config = str(secrets_list.stdout)
-# if not ("patterns =" in secrets_config and "provider " in secrets_config):
-#     print("Commit failure\n\ngit secrets has no installed patterns.  Have you run the local install script?", file=sys.stderr)
-#     exit(1)
-
-# scan_results = subprocess.run(['git', 'secrets', '--pre_commit_hook', '--', '"$@"'])
-
-# print("Returning with return code:", scan_results.returncode)
-# exit(scan_results.returncode)
+# As of writing this script, these are the allowed lines necessary to pass the git secrets check
+#
+# [secrets]
+# 	allowed = \\[https://amaral\\.northwestern\\.edu/resources/guides/pyenv-tutorial\\]\\(https://amaral\\.northwestern\\.edu/resources/guides/pyenv-tutorial\\)
+# 	allowed = ENV POSTGRES_PASSWORD=postgres
+# 	allowed = expected_params = \\{\"api_key\": \"FAKE-KEY\"\\}
+# 	allowed = env.get_credential\\(\"DJANGO_SECRET_KEY\", get_random_string\\(50\\)\\)
+# 	allowed = \"/api/v1/web-services/dot-fec/\", \\{\"report_id\": report.id, \"password\": \"123\"\\}
