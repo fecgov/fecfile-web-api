@@ -3,7 +3,6 @@
         "model": "user.user",
         "pk": "12345678-aaaa-bbbb-cccc-111122223333",
         "fields": {
-            "password": "pbkdf2_sha256$260000$8lcKqWHCEOwOMqtzTV6oDr$/fvcNuEmdyOaEpKjISOJuwngn5enhl3uSaEDI7N+RNk=",
             "is_superuser": false,
             "email": "test@fec.gov",
             "username": "C01234567@fec.gov",
