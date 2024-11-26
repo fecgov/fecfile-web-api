@@ -106,7 +106,11 @@ class Migration(migrations.Migration):
                     FROM over_two_hundred_types 
                     WHERE type = NEW.transaction_type_identifier
                 ) THEN
-                    NEW._itemized := NEW.aggregate > 200;
+                    IF NEW.aggregate > 200 THEN
+                        NEW._itemized := TRUE;
+                    ELSE
+                        NEW._itemized := FALSE;
+                    END IF;
                 ELSE
                     NEW._itemized := TRUE;
                 END IF;
