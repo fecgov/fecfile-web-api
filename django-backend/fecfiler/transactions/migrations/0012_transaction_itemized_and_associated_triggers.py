@@ -111,8 +111,8 @@ class Migration(migrations.Migration):
                     NEW._itemized := TRUE;
                 END IF;
                 NEW.itemized = NEW._itemized;
-                RETURN NEW;
             END IF;
+            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -125,6 +125,7 @@ class Migration(migrations.Migration):
             ) THEN
                 PERFORM on_itemized_changed(NEW);
             END IF;
+            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -137,27 +138,35 @@ class Migration(migrations.Migration):
             parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
             children_and_grandchildren_ids := get_children_and_grandchildren_transaction_ids(txn);
             IF txn._itemized THEN
-                UPDATE transactions_transaction
-                SET 
-                    relationally_itemized_count = txn.relationally_itemized_count + 1,
-                    relationally_unitemized_count = 0,
-                    itemized = TRUE
-                WHERE id IN (parent_and_grandparent_ids);
-                UPDATE transactions_transaction
-                SET 
-                    relationally_unitemized_count = txn.relationally_unitemized_count - 1
-                WHERE id IN (children_and_grandchildren_ids);
+                IF cardinality(parent_and_grandparent_ids) > 0 THEN
+                    UPDATE transactions_transaction
+                    SET 
+                        relationally_itemized_count = txn.relationally_itemized_count + 1,
+                        relationally_unitemized_count = 0,
+                        itemized = TRUE
+                    WHERE id IN (parent_and_grandparent_ids);
+                END IF;
+                IF cardinality(children_and_grandchildren_ids) > 0 THEN
+                    UPDATE transactions_transaction
+                    SET 
+                        relationally_unitemized_count = txn.relationally_unitemized_count - 1
+                    WHERE id IN (children_and_grandchildren_ids);
+                END IF;
             ELSE
-                UPDATE transactions_transaction
-                SET 
-                    relationally_itemized_count = txn.relationally_itemized_count - 1
-                WHERE id IN (parent_and_grandparent_ids);
-                UPDATE transactions_transaction
-                SET 
-                    relationally_unitemized_count = txn.relationally_unitemized_count + 1,
-                    relationally_itemized_count = 0,
-                    itemized = FALSE
-                WHERE id IN (children_and_grandchildren_ids);
+                IF cardinality(parent_and_grandparent_ids) > 0 THEN
+                    UPDATE transactions_transaction
+                    SET 
+                        relationally_itemized_count = txn.relationally_itemized_count - 1
+                    WHERE id IN (parent_and_grandparent_ids);
+                END IF;
+                IF cardinality(children_and_grandchildren_ids) > 0 THEN
+                    UPDATE transactions_transaction
+                    SET 
+                        relationally_unitemized_count = txn.relationally_unitemized_count + 1,
+                        relationally_itemized_count = 0,
+                        itemized = FALSE
+                    WHERE id IN (children_and_grandchildren_ids);
+                END IF;
             END IF;
         END;
         $$ LANGUAGE plpgsql;
@@ -169,14 +178,18 @@ class Migration(migrations.Migration):
         DECLARE
             retval uuid[];
         BEGIN
-            SELECT array(SELECT (
-                txn.parent_transaction_id,
-                (
-                    SELECT parent_transaction_id
-                    FROM transactions_transaction
-                    WHERE id = txn.parent_transaction_id
+            SELECT array(
+                SELECT id
+                FROM transactions_transaction
+                WHERE id IN (
+                    txn.parent_transaction_id,
+                    (
+                        SELECT parent_transaction_id
+                        FROM transactions_transaction
+                        WHERE id = txn.parent_transaction_id
+                    )
                 )
-            )) into retval;
+            ) into retval;
             RETURN retval;
         END;
         $$ LANGUAGE plpgsql;
@@ -188,7 +201,7 @@ class Migration(migrations.Migration):
         DECLARE
             retval uuid[];
         BEGIN
-            SELECT array(SELECT (
+            SELECT array(
                 SELECT id
                 FROM transactions_transaction
                 WHERE parent_transaction_id IN (
@@ -199,7 +212,7 @@ class Migration(migrations.Migration):
                         WHERE parent_transaction_id = txn.id
                     )
                 )
-            )) into retval;
+            ) into retval;
             RETURN retval;
         END;
         $$ LANGUAGE plpgsql;
