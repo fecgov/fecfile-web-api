@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "storages",
     "django_structlog",
+    "django_migration_linter",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
