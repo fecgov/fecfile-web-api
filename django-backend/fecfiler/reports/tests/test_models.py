@@ -81,6 +81,7 @@ class ReportModelTestCase(TestCase):
             candidate_a,
             "2023-01-01",
             "2023-02-01",
+            "2023-02-01",
             "123.45",
             "H2024",
             candidate_a,
