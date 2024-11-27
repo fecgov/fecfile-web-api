@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 class MemoTextViewSet(CommitteeOwnedViewMixin, ReportViewMixin, ModelViewSet):
     def get_queryset(self):
-        memos = MemoText.objects.all()
+        memos = super().get_queryset()
         query_params = self.request.query_params.keys()
         if "report_id" in query_params:
             report_id = self.request.query_params["report_id"]
