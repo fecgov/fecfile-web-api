@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "django_structlog",
+    "django_migration_linter",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
