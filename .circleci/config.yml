@@ -53,9 +53,16 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Check migrations
+          name: Check for missing migrations
           command: |
             python manage.py makemigrations --check
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Check for breaking change migrations
+          # After Sprint 50
+          command: |
+            python manage.py lintmigrations --git-commit-id d7a8a0506f83fc2478c5ab80b90c8f9c960ec673 --project-root-path '.'
           working_directory: ~/project/django-backend/
 
       - run:
