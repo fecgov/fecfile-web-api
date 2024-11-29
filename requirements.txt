@@ -7,6 +7,7 @@ decorator==5.1.1
 dj-database-url==2.2.0
 Django==5.1.1
 django-cors-headers==4.4.0
+django-deprecate-fields==0.1.2
 django-migration-linter==5.1.0
 django-storages==1.14.4
 djangorestframework==3.15.2

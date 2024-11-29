@@ -60,9 +60,9 @@ jobs:
 
       - run:
           name: Check for breaking change migrations
-          # After Sprint 50
+          # After 11/27
           command: |
-            python manage.py lintmigrations --git-commit-id d7a8a0506f83fc2478c5ab80b90c8f9c960ec673 --project-root-path '.'
+            python manage.py lintmigrations --git-commit-id aae7f6453f1d2acd792546f3dd86aec5b732880b --project-root-path '.'
           working_directory: ~/project/django-backend/
 
       - run:
