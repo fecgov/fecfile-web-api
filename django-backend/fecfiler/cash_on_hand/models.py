@@ -19,7 +19,7 @@ class CashOnHandYearly(CommitteeOwnedModel):
         null=False, blank=False, max_digits=11, decimal_places=2
     )
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    # updated = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         with db_transaction.atomic():
