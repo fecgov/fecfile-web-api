@@ -211,6 +211,7 @@ class TransactionViewTestCase(TestCase):
             {  # same election previous year
                 "disbursement_date": "2023-01-01",
                 "dissemination_date": "2023-01-01",
+                "date_signed": "2023-01-01",
                 "amount": "123.45",
                 "contact": candidate_a,
                 "code": "H2024",
@@ -218,6 +219,7 @@ class TransactionViewTestCase(TestCase):
             {  # same election same year
                 "disbursement_date": "2024-01-01",
                 "dissemination_date": "2024-01-01",
+                "date_signed": "2024-01-01",
                 "amount": "1.00",
                 "contact": candidate_a,
                 "code": "H2024",
@@ -225,6 +227,7 @@ class TransactionViewTestCase(TestCase):
             {  # same election same year
                 "disbursement_date": "2024-01-02",
                 "dissemination_date": "2024-01-02",
+                "date_signed": "2024-01-02",
                 "amount": "1.00",
                 "contact": candidate_a,
                 "code": "H2024",
@@ -232,6 +235,7 @@ class TransactionViewTestCase(TestCase):
             {  # same election same year
                 "disbursement_date": "2024-01-03",
                 "dissemination_date": "2024-01-03",
+                "date_signed": "2024-01-03",
                 "amount": "2.00",
                 "contact": candidate_b,
                 "code": "H2024",
@@ -239,6 +243,7 @@ class TransactionViewTestCase(TestCase):
             {  # different election same year
                 "disbursement_date": "2024-01-04",
                 "dissemination_date": "2024-01-04",
+                "date_signed": "2024-01-04",
                 "amount": "3.00",
                 "contact": candidate_c,
                 "code": "H2024",
@@ -246,6 +251,7 @@ class TransactionViewTestCase(TestCase):
             {  # different election same year
                 "disbursement_date": "2024-01-05",
                 "dissemination_date": "2024-01-05",
+                "date_signed": "2024-01-05",
                 "amount": "4.00",
                 "contact": candidate_a,
                 "code": "Z2024",
@@ -258,6 +264,7 @@ class TransactionViewTestCase(TestCase):
                 ie["contact"],
                 ie["disbursement_date"],
                 ie["dissemination_date"],
+                ie["date_signed"],
                 ie["amount"],
                 ie["code"],
                 ie["contact"],
@@ -479,6 +486,7 @@ class TransactionViewTestCase(TestCase):
             candidate_a,
             "2023-01-01",
             "2023-01-01",
+            "2023-01-01",
             "123.45",
             "H2024",
             candidate_a,
@@ -489,6 +497,7 @@ class TransactionViewTestCase(TestCase):
         ie = create_ie(
             self.committee,
             candidate_a,
+            "2023-01-01",
             "2023-01-01",
             "2023-01-01",
             "250.45",

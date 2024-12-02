@@ -84,6 +84,7 @@ def create_ie(
     contact: Contact,
     disbursement_date,
     dissemination_date,
+    date_signed,
     amount,
     code,
     candidate: Contact,
@@ -103,6 +104,7 @@ def create_ie(
             "dissemination_date": dissemination_date,
             "expenditure_amount": amount,
             "election_code": code,
+            "date_signed": date_signed
         },
         transaction_data={
             "_form_type": "SE",
