@@ -1,0 +1,80 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.ReportForm3XSerializer
+===================================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: ReportForm3XSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportForm3XSerializer.__init__
+      ~ReportForm3XSerializer.bind
+      ~ReportForm3XSerializer.build_field
+      ~ReportForm3XSerializer.build_nested_field
+      ~ReportForm3XSerializer.build_property_field
+      ~ReportForm3XSerializer.build_relational_field
+      ~ReportForm3XSerializer.build_standard_field
+      ~ReportForm3XSerializer.build_unknown_field
+      ~ReportForm3XSerializer.build_url_field
+      ~ReportForm3XSerializer.create
+      ~ReportForm3XSerializer.fail
+      ~ReportForm3XSerializer.get_attribute
+      ~ReportForm3XSerializer.get_default
+      ~ReportForm3XSerializer.get_default_field_names
+      ~ReportForm3XSerializer.get_extra_kwargs
+      ~ReportForm3XSerializer.get_field_names
+      ~ReportForm3XSerializer.get_fields
+      ~ReportForm3XSerializer.get_initial
+      ~ReportForm3XSerializer.get_unique_for_date_validators
+      ~ReportForm3XSerializer.get_unique_together_constraints
+      ~ReportForm3XSerializer.get_unique_together_validators
+      ~ReportForm3XSerializer.get_uniqueness_extra_kwargs
+      ~ReportForm3XSerializer.get_validators
+      ~ReportForm3XSerializer.get_value
+      ~ReportForm3XSerializer.include_extra_kwargs
+      ~ReportForm3XSerializer.is_valid
+      ~ReportForm3XSerializer.many_init
+      ~ReportForm3XSerializer.run_validation
+      ~ReportForm3XSerializer.run_validators
+      ~ReportForm3XSerializer.save
+      ~ReportForm3XSerializer.set_value
+      ~ReportForm3XSerializer.to_internal_value
+      ~ReportForm3XSerializer.to_representation
+      ~ReportForm3XSerializer.update
+      ~ReportForm3XSerializer.validate
+      ~ReportForm3XSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportForm3XSerializer.context
+      ~ReportForm3XSerializer.data
+      ~ReportForm3XSerializer.default_error_messages
+      ~ReportForm3XSerializer.default_validators
+      ~ReportForm3XSerializer.errors
+      ~ReportForm3XSerializer.fields
+      ~ReportForm3XSerializer.initial
+      ~ReportForm3XSerializer.root
+      ~ReportForm3XSerializer.serializer_field_mapping
+      ~ReportForm3XSerializer.url_field_name
+      ~ReportForm3XSerializer.validated_data
+      ~ReportForm3XSerializer.validators
+   
+   

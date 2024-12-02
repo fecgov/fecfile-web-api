@@ -1,0 +1,80 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.ReportForm99Serializer
+===================================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: ReportForm99Serializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportForm99Serializer.__init__
+      ~ReportForm99Serializer.bind
+      ~ReportForm99Serializer.build_field
+      ~ReportForm99Serializer.build_nested_field
+      ~ReportForm99Serializer.build_property_field
+      ~ReportForm99Serializer.build_relational_field
+      ~ReportForm99Serializer.build_standard_field
+      ~ReportForm99Serializer.build_unknown_field
+      ~ReportForm99Serializer.build_url_field
+      ~ReportForm99Serializer.create
+      ~ReportForm99Serializer.fail
+      ~ReportForm99Serializer.get_attribute
+      ~ReportForm99Serializer.get_default
+      ~ReportForm99Serializer.get_default_field_names
+      ~ReportForm99Serializer.get_extra_kwargs
+      ~ReportForm99Serializer.get_field_names
+      ~ReportForm99Serializer.get_fields
+      ~ReportForm99Serializer.get_initial
+      ~ReportForm99Serializer.get_unique_for_date_validators
+      ~ReportForm99Serializer.get_unique_together_constraints
+      ~ReportForm99Serializer.get_unique_together_validators
+      ~ReportForm99Serializer.get_uniqueness_extra_kwargs
+      ~ReportForm99Serializer.get_validators
+      ~ReportForm99Serializer.get_value
+      ~ReportForm99Serializer.include_extra_kwargs
+      ~ReportForm99Serializer.is_valid
+      ~ReportForm99Serializer.many_init
+      ~ReportForm99Serializer.run_validation
+      ~ReportForm99Serializer.run_validators
+      ~ReportForm99Serializer.save
+      ~ReportForm99Serializer.set_value
+      ~ReportForm99Serializer.to_internal_value
+      ~ReportForm99Serializer.to_representation
+      ~ReportForm99Serializer.update
+      ~ReportForm99Serializer.validate
+      ~ReportForm99Serializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportForm99Serializer.context
+      ~ReportForm99Serializer.data
+      ~ReportForm99Serializer.default_error_messages
+      ~ReportForm99Serializer.default_validators
+      ~ReportForm99Serializer.errors
+      ~ReportForm99Serializer.fields
+      ~ReportForm99Serializer.initial
+      ~ReportForm99Serializer.root
+      ~ReportForm99Serializer.serializer_field_mapping
+      ~ReportForm99Serializer.url_field_name
+      ~ReportForm99Serializer.validated_data
+      ~ReportForm99Serializer.validators
+   
+   

@@ -1,0 +1,80 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.serializers.ReportForm1MSerializer
+===================================================
+
+.. currentmodule:: fecfiler.reports.serializers
+
+.. autoclass:: ReportForm1MSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportForm1MSerializer.__init__
+      ~ReportForm1MSerializer.bind
+      ~ReportForm1MSerializer.build_field
+      ~ReportForm1MSerializer.build_nested_field
+      ~ReportForm1MSerializer.build_property_field
+      ~ReportForm1MSerializer.build_relational_field
+      ~ReportForm1MSerializer.build_standard_field
+      ~ReportForm1MSerializer.build_unknown_field
+      ~ReportForm1MSerializer.build_url_field
+      ~ReportForm1MSerializer.create
+      ~ReportForm1MSerializer.fail
+      ~ReportForm1MSerializer.get_attribute
+      ~ReportForm1MSerializer.get_default
+      ~ReportForm1MSerializer.get_default_field_names
+      ~ReportForm1MSerializer.get_extra_kwargs
+      ~ReportForm1MSerializer.get_field_names
+      ~ReportForm1MSerializer.get_fields
+      ~ReportForm1MSerializer.get_initial
+      ~ReportForm1MSerializer.get_unique_for_date_validators
+      ~ReportForm1MSerializer.get_unique_together_constraints
+      ~ReportForm1MSerializer.get_unique_together_validators
+      ~ReportForm1MSerializer.get_uniqueness_extra_kwargs
+      ~ReportForm1MSerializer.get_validators
+      ~ReportForm1MSerializer.get_value
+      ~ReportForm1MSerializer.include_extra_kwargs
+      ~ReportForm1MSerializer.is_valid
+      ~ReportForm1MSerializer.many_init
+      ~ReportForm1MSerializer.run_validation
+      ~ReportForm1MSerializer.run_validators
+      ~ReportForm1MSerializer.save
+      ~ReportForm1MSerializer.set_value
+      ~ReportForm1MSerializer.to_internal_value
+      ~ReportForm1MSerializer.to_representation
+      ~ReportForm1MSerializer.update
+      ~ReportForm1MSerializer.validate
+      ~ReportForm1MSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportForm1MSerializer.context
+      ~ReportForm1MSerializer.data
+      ~ReportForm1MSerializer.default_error_messages
+      ~ReportForm1MSerializer.default_validators
+      ~ReportForm1MSerializer.errors
+      ~ReportForm1MSerializer.fields
+      ~ReportForm1MSerializer.initial
+      ~ReportForm1MSerializer.root
+      ~ReportForm1MSerializer.serializer_field_mapping
+      ~ReportForm1MSerializer.url_field_name
+      ~ReportForm1MSerializer.validated_data
+      ~ReportForm1MSerializer.validators
+   
+   
