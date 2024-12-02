@@ -34,6 +34,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
     path("", RedirectView.as_view(url="/api/docs/")),
+    re_path(r"", include("fecfiler.devops.urls")),
     re_path(BASE_V1_URL + "status/", get_api_status),
 ]
 
