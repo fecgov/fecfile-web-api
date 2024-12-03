@@ -20,10 +20,9 @@ TIMEOUT = 30  # seconds
 WANTED_REPORTS = int(os.environ.get("LOCUST_WANTED_REPORTS", 10))
 WANTED_CONTACTS = int(os.environ.get("LOCUST_WANTED_CONTACTS", 100))
 WANTED_TRANSACTIONS = int(os.environ.get("LOCUST_WANTED_TRANSACTIONS", 500))
-SINGLE_TO_TRIPLE_RATIO = float(os.environ.get(
-    "LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO",
-    9 / 10
-))
+SINGLE_TO_TRIPLE_RATIO = float(
+    os.environ.get("LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO", 9 / 10)
+)
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
@@ -61,14 +60,7 @@ class Tasks(TaskSet):
             self.report_ids = self.fetch_values("reports", "id")
             self.contacts = self.scrape_endpoint("contacts")
         else:
-            login_response = self.client.post(
-                "/api/v1/user/login/authenticate",
-                json={"username": TEST_USER, "password": TEST_PWD}
-            )
-            csrftoken = login_response.cookies.get('csrftoken')
-            self.client.headers = {
-                "X-CSRFToken": csrftoken
-            }
+            self.login_via_mock_oidc()
             committees = self.fetch_values("committees", "id")
             committee_uuid = committees[0]
             print("committee_uuid", committee_uuid)
@@ -97,6 +89,21 @@ class Tasks(TaskSet):
                 self.create_single_transactions(singles_needed)
                 self.create_triple_transactions(triples_needed)
 
+    def login_via_mock_oidc(self):
+        authenticate_response = self.client.get(
+            "/api/v1/oidc/authenticate", allow_redirects=False
+        )
+        authorize_response = self.client.get(
+            authenticate_response._next.url.removeprefix("http://localhost:8080"),
+            allow_redirects=False,
+        )
+        callback_response = self.client.get(
+            authorize_response._next.url,
+            allow_redirects=False,
+        )
+        csrftoken = callback_response.cookies.get("csrftoken")
+        self.client.headers = {"X-CSRFToken": csrftoken}
+
     def create_reports(self, count=1):
         fields_to_validate = [
             "filing_frequency",
@@ -106,11 +113,9 @@ class Tasks(TaskSet):
             "coverage_through_date",
             "date_of_election",
             "state_of_election",
-            "form_type"
+            "form_type",
         ]
-        params = {
-            "fields_to_validate": fields_to_validate
-        }
+        params = {"fields_to_validate": fields_to_validate}
 
         reports = get_json_data("form-3x")
         if len(reports) < count:
@@ -122,7 +127,7 @@ class Tasks(TaskSet):
                 name="create_report",
                 # TODO: does it make sense to pass both the params and json here?
                 params=params,
-                json=report
+                json=report,
             )
 
     def create_contacts(self, count=1):
@@ -137,7 +142,7 @@ class Tasks(TaskSet):
                 # TODO: does it make sense to pass both the params and json here?
                 # Same with create_reports
                 json=contact,
-                timeout=TIMEOUT
+                timeout=TIMEOUT,
             )
 
     def create_single_transactions(self, count=1):
@@ -146,9 +151,7 @@ class Tasks(TaskSet):
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_single_transactions(
-                difference,
-                self.contacts,
-                self.report_ids
+                difference, self.contacts, self.report_ids
             )
 
         for transaction in transactions[:count]:
@@ -160,9 +163,7 @@ class Tasks(TaskSet):
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_triple_transactions(
-                difference,
-                self.contacts,
-                self.report_ids
+                difference, self.contacts, self.report_ids
             )
 
         for transaction in transactions[:count]:
@@ -206,17 +207,15 @@ class Tasks(TaskSet):
             "contributor_occupation",
             "memo_code",
             "memo_text_description",
-            "reattribution_redesignation_tag"
+            "reattribution_redesignation_tag",
         ]
-        params = {
-            "fields_to_validate": fields_to_validate
-        }
+        params = {"fields_to_validate": fields_to_validate}
         self.client.post(
             "/api/v1/transactions/",
             name="create_transactions",
             params=params,
             json=transaction,
-            timeout=TIMEOUT
+            timeout=TIMEOUT,
         )
 
     def fetch_count(self, endpoint):
@@ -252,18 +251,12 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         return self.client.get(
-            f"/api/v1/{endpoint}",
-            params=params,
-            name=f"preload_{endpoint}_ids"
+            f"/api/v1/{endpoint}", params=params, name=f"preload_{endpoint}_ids"
         )
 
     @task
     def celery_test(self):
-        self.client.get(
-            "/celery-test/",
-            name="celery-test",
-            timeout=TIMEOUT
-        )
+        self.client.get("/celery-test/", name="celery-test", timeout=TIMEOUT)
 
     @task
     def load_contacts(self):
@@ -272,10 +265,7 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         self.client.get(
-            "/api/v1/contacts/",
-            name="load_contacts",
-            timeout=TIMEOUT,
-            params=params
+            "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
         )
 
     @task
@@ -285,10 +275,7 @@ class Tasks(TaskSet):
             "ordering": "form_type",
         }
         self.client.get(
-            "/api/v1/reports/",
-            name="load_reports",
-            timeout=TIMEOUT,
-            params=params
+            "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
         )
 
     @task
@@ -305,7 +292,7 @@ class Tasks(TaskSet):
             "/api/v1/transactions/",
             name="load_transactions",
             timeout=TIMEOUT,
-            params=params
+            params=params,
         )
 
 

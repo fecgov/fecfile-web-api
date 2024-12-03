@@ -846,19 +846,15 @@ class TransactionModelTestCase(TestCase):
             m3_report.id
         )
         m3_report.save()
-        print(f"reports: {m1_report.id}, {m2_report.id}, {m3_report.id}")
         original_debt.refresh_from_db()
         # self.assertFalse(original_debt.can_delete)
-        print(f"blocking reports {original_debt.blocking_reports}")
         m2_report.upload_submission = None
         m2_report.save()
         original_debt.refresh_from_db()
-        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertFalse(original_debt.can_delete)
         m3_report.upload_submission = None
         m3_report.save()
         original_debt.refresh_from_db()
-        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertTrue(original_debt.can_delete)
 
     def set_up_jf_transfer(self):

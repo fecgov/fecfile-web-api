@@ -303,7 +303,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))
-        print("DEBT SUCCESS")
 
     def test_line_label(self):
         create_schedule_a(
