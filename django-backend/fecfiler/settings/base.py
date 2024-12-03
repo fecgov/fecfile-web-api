@@ -217,11 +217,15 @@ def get_logging_config(log_format=LINE):
         "formatters": {
             "json_formatter": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.JSONRenderer(),
+                "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.JSONRenderer(),
+                ],
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     )
@@ -230,6 +234,7 @@ def get_logging_config(log_format=LINE):
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
@@ -285,7 +290,6 @@ def get_logging_processors():
     return [
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
