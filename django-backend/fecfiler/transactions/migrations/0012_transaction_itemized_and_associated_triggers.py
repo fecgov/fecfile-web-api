@@ -148,20 +148,20 @@ class Migration(migrations.Migration):
                         relationally_itemized_count = txn.relationally_itemized_count + 1,
                         relationally_unitemized_count = 0,
                         itemized = TRUE
-                    WHERE id IN (parent_and_grandparent_ids);
+                    WHERE id = ANY (parent_and_grandparent_ids);
                 END IF;
                 IF cardinality(children_and_grandchildren_ids) > 0 THEN
                     UPDATE transactions_transaction
                     SET 
                         relationally_unitemized_count = txn.relationally_unitemized_count - 1
-                    WHERE id IN (children_and_grandchildren_ids);
+                    WHERE id = ANY (children_and_grandchildren_ids);
                 END IF;
             ELSE
                 IF cardinality(parent_and_grandparent_ids) > 0 THEN
                     UPDATE transactions_transaction
                     SET 
                         relationally_itemized_count = txn.relationally_itemized_count - 1
-                    WHERE id IN (parent_and_grandparent_ids);
+                    WHERE id = ANY (parent_and_grandparent_ids);
                 END IF;
                 IF cardinality(children_and_grandchildren_ids) > 0 THEN
                     UPDATE transactions_transaction
@@ -169,7 +169,7 @@ class Migration(migrations.Migration):
                         relationally_unitemized_count = txn.relationally_unitemized_count + 1,
                         relationally_itemized_count = 0,
                         itemized = FALSE
-                    WHERE id IN (children_and_grandchildren_ids);
+                    WHERE id = ANY (children_and_grandchildren_ids);
                 END IF;
             END IF;
         END;
@@ -224,13 +224,11 @@ class Migration(migrations.Migration):
         CREATE TRIGGER before_transaction_insert_or_update_trigger
         BEFORE INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION before_transaction_insert_or_update();
 
         CREATE TRIGGER after_transaction_insert_or_update_trigger
         AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION after_transaction_insert_or_update();
         """
         ),
