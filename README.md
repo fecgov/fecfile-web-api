@@ -69,7 +69,7 @@ export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 
 # Deployment (FEC team only)
 
-[Deployment instructions...](https://github.com/fecgov/fecfile-web-api/wiki/Deployment-(FECFile-Team-Only))
+[Deployment instructions...](https://github.com/fecgov/fecfile-web-api/wiki/Deployment)
 
 ## Technical Environment Plan
 
