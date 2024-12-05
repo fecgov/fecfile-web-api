@@ -13,18 +13,18 @@ class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
 
-        self.reports_from_prior_years = Report.objects.filter(
+        reports_from_prior_years = Report.objects.filter(
             committee_account=self.report.committee_account,
             coverage_through_date__year__lt=self.report.coverage_from_date.year,
             form_3x__isnull=False,
         ).order_by("coverage_from_date")
-        self.most_recent_report_from_prior_years = self.reports_from_prior_years.last()
+        self.closest_report_from_prior_years = reports_from_prior_years.last()
 
-        if self.most_recent_report_from_prior_years is not None:
+        if self.closest_report_from_prior_years is not None:
             cash_on_hand_override = CashOnHandYearly.objects.filter(
                 committee_account=report.committee_account,
                 year__lte=self.report.coverage_from_date.year,
-                year__gt=self.most_recent_report_from_prior_years.coverage_through_date.year
+                year__gt=self.closest_report_from_prior_years.coverage_through_date.year
             ).first()
         else:
             cash_on_hand_override = CashOnHandYearly.objects.filter(
@@ -255,9 +255,9 @@ class SummaryService:
 
         if self.cash_on_hand_override:
             column_b["line_6a"] = self.cash_on_hand_override
-        elif reports_from_prior_years.count() > 0:
+        elif self.closest_report_from_prior_years is not None:
             column_b["line_6a"] = (
-                reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd
+                self.closest_report_from_prior_years.form_3x.L8_cash_on_hand_close_ytd
             )  # noqa: E501
         else:
             # user defined cash on hand
