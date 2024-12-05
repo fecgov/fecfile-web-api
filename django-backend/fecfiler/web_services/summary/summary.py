@@ -247,12 +247,6 @@ class SummaryService:
         return column_b
 
     def calculate_cash_on_hand_fields(self, column_a, column_b):
-        reports_from_prior_years = Report.objects.filter(
-            committee_account=self.report.committee_account,
-            coverage_through_date__year__lt=self.report.coverage_from_date.year,
-            form_3x__isnull=False,
-        ).order_by("coverage_from_date")
-
         if self.cash_on_hand_override:
             column_b["line_6a"] = self.cash_on_hand_override
         elif self.closest_report_from_prior_years is not None:
