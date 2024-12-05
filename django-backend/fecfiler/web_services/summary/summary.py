@@ -12,13 +12,30 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        cash_on_hand_override = CashOnHandYearly.objects.filter(
-            committee_account=report.committee_account,
-            year=self.report.coverage_from_date.year,
-        ).first()
+
+        self.reports_from_prior_years = Report.objects.filter(
+            committee_account=self.report.committee_account,
+            coverage_through_date__year__lt=self.report.coverage_from_date.year,
+            form_3x__isnull=False,
+        ).order_by("coverage_from_date")
+        self.most_recent_report_from_prior_years = self.reports_from_prior_years.last()
+
+        if self.most_recent_report_from_prior_years is not None:
+            cash_on_hand_override = CashOnHandYearly.objects.filter(
+                committee_account=report.committee_account,
+                year__lte=self.report.coverage_from_date.year,
+                year__gt=self.most_recent_report_from_prior_years.coverage_through_date.year
+            ).first()
+        else:
+            cash_on_hand_override = CashOnHandYearly.objects.filter(
+                committee_account=report.committee_account,
+                year__lte=self.report.coverage_from_date.year,
+            ).first()
+
         self.cash_on_hand_override = (
             cash_on_hand_override.cash_on_hand if cash_on_hand_override else None
         )
+
         self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),

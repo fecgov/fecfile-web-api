@@ -251,3 +251,71 @@ class F3XSerializerTestCase(TestCase):
 
         self.assertEqual(first_report.form_3x.L8_cash_on_hand_close_ytd, 4010)
         self.assertEqual(years_later_report.form_3x.L6a_cash_on_hand_jan_1_ytd, 4010)
+
+    def test_cash_on_hand_override_between_reports(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        create_committee_view(other_committee.id)
+        create_cash_on_hand_yearly(
+            committee_account=other_committee,
+            year="2007",
+            cash_on_hand=4010,
+        )
+        first_report = create_form3x(
+            other_committee,
+            datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
+            datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
+            report_code="12C",
+        )
+        first_report.save()
+
+        transaction_data = [
+            {
+                "date": "2005-02-01",
+                "amount": "100",
+                "group": "GENERAL",
+                "form_type": "SA11AI",
+                "tti": "INDIVIDUAL_RECEIPT",
+                "memo": False,
+                "itemized": True,
+                "report": first_report,
+            },
+            {
+                "date": "2005-02-02",
+                "amount": "200",
+                "group": "GENERAL",
+                "form_type": "SA11AI",
+                "tti": "INDIVIDUAL_RECEIPT",
+                "memo": False,
+                "itemized": True,
+                "report": first_report,
+            },
+        ]
+        for data in transaction_data:
+            scha = create_schedule_a(
+                data["tti"],
+                other_committee,
+                self.contact_1,
+                data["date"],
+                data["amount"],
+                data["group"],
+                data["form_type"],
+                data["memo"],
+                data["itemized"],
+            )
+            scha.reports.add(data["report"])
+            scha.save()
+
+        years_later_report = create_form3x(
+            other_committee,
+            datetime.strptime("2010-01-30", "%Y-%m-%d").date(),
+            datetime.strptime("2010-02-28", "%Y-%m-%d").date(),
+            report_code="Q1",
+        )
+        years_later_report.save()
+
+        calculate_summary(years_later_report.id)
+        first_report.refresh_from_db()
+        years_later_report.refresh_from_db()
+
+        self.assertEqual(first_report.form_3x.L8_cash_on_hand_close_ytd, 300)
+        self.assertEqual(years_later_report.form_3x.L6a_cash_on_hand_jan_1_ytd, 4010)
