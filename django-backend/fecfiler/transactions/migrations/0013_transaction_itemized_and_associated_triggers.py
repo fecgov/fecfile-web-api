@@ -156,7 +156,6 @@ class Migration(migrations.Migration):
                 IF NEW._itemized THEN
                     PERFORM relational_itemize_parent_and_grandparent(NEW);
                 ELSE
-                    get_parent_grandparent_transaction_ids(NEW);
                     PERFORM relational_unitemize_children_and_grandchildren(NEW);
                     PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
                 END IF;
@@ -204,8 +203,7 @@ class Migration(migrations.Migration):
                         parent_and_grandparent_ids[
                             cardinality(parent_and_grandparent_ids)
                         ]
-                    )
-                );
+                    );
                 PERFORM undo_relational_unitemize_children_and_grandchildren(
                     parent_or_grandparent_children_and_grandchildren_ids
                 );
@@ -288,7 +286,7 @@ class Migration(migrations.Migration):
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION get_children_and_grandchildren_transaction_ids(
-            transaction_id uuid
+            txn_id uuid
         )
         RETURNS uuid[] AS $$
         DECLARE
@@ -297,12 +295,13 @@ class Migration(migrations.Migration):
             SELECT array(
                 SELECT id
                 FROM transactions_transaction
-                WHERE parent_transaction_id IN (
-                    transaction_id,
-                    (
-                        SELECT id
-                        FROM transactions_transaction
-                        WHERE parent_transaction_id = transaction_id
+                WHERE parent_transaction_id = ANY (
+                    array_prepend(txn_id,
+                        array(
+                            SELECT id
+                            FROM transactions_transaction
+                            WHERE parent_transaction_id = txn_id
+                        )
                     )
                 )
             ) into retval;
