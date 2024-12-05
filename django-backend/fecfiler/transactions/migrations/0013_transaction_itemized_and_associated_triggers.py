@@ -116,12 +116,12 @@ class Migration(migrations.Migration):
                 ELSE
                     NEW._itemized := TRUE;
                 END IF;
-                NEW.itemized := NEW._itemized;
-                IF NEW.itemized is TRUE THEN
+                IF NEW._itemized is TRUE THEN
                     NEW.relationally_unitemized_count := 0;
                 ELSE
                     NEW.relationally_itemized_count := 0;
                 END IF;
+                NEW.itemized := NEW._itemized;
             END IF;
             RETURN NEW;
         END;
@@ -130,17 +130,10 @@ class Migration(migrations.Migration):
         CREATE OR REPLACE FUNCTION after_transactions_transaction_insert()
         RETURNS TRIGGER AS $$
         DECLARE
-            parent_and_grandparent_ids uuid[];
-            children_and_grandchildren_ids uuid[];
             parent_itemized_flag boolean;
         BEGIN
-            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
-            children_and_grandchildren_ids :=
-                get_children_and_grandchildren_transaction_ids(NEW);
             IF NEW._itemized THEN
-                PERFORM relational_itemize_parent_and_grandparent(
-                    parent_and_grandparent_ids
-                );
+                PERFORM relational_itemize_parent_and_grandparent(NEW);
             ELSIF NEW.parent_transaction_id IS NOT NULL THEN
                 SELECT itemized
                 INTO parent_itemized_flag
@@ -158,28 +151,14 @@ class Migration(migrations.Migration):
 
         CREATE OR REPLACE FUNCTION after_transactions_transaction_update()
         RETURNS TRIGGER AS $$
-        DECLARE
-            parent_and_grandparent_ids uuid[];
-            children_and_grandchildren_ids uuid[];
         BEGIN
             IF OLD._itemized <> NEW._itemized THEN
-                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
-                children_and_grandchildren_ids :=
-                    get_children_and_grandchildren_transaction_ids(NEW);
                 IF NEW._itemized THEN
-                    PERFORM relational_itemize_parent_and_grandparent(
-                        parent_and_grandparent_ids
-                    );
-                    PERFORM undo_relational_unitemize_children_and_grandchildren(
-                        children_and_grandchildren_ids
-                    );
+                    PERFORM relational_itemize_parent_and_grandparent(NEW);
                 ELSE
-                    PERFORM relational_unitemize_children_and_grandchildren(
-                        children_and_grandchildren_ids
-                    );
-                    PERFORM undo_relational_itemize_parent_and_grandparent(
-                        parent_and_grandparent_ids
-                    );
+                    get_parent_grandparent_transaction_ids(NEW);
+                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
+                    PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
                 END IF;
             END IF;
             RETURN NEW;
@@ -189,17 +168,13 @@ class Migration(migrations.Migration):
         CREATE OR REPLACE FUNCTION after_transactions_transaction_delete()
         RETURNS TRIGGER AS $$
         DECLARE
-            parent_and_grandparent_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
-            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(OLD);
-            children_and_grandchildren_ids :=
-                get_children_and_grandchildren_transaction_ids(OLD);
             IF OLD._itemized THEN
-                PERFORM undo_relational_itemize_parent_and_grandparent(
-                    parent_and_grandparent_ids
-                );
+                PERFORM undo_relational_itemize_parent_and_grandparent(OLD);
             ELSE
+                children_and_grandchildren_ids :=
+                    get_children_and_grandchildren_transaction_ids(OLD.id);
                 PERFORM undo_relational_unitemize_children_and_grandchildren(
                     children_and_grandchildren_ids
                 );
@@ -209,10 +184,14 @@ class Migration(migrations.Migration):
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION relational_itemize_parent_and_grandparent(
-            parent_and_grandparent_ids uuid[]
+            txn RECORD
         )
         RETURNS VOID AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
+            parent_or_grandparent_children_and_grandchildren_ids uuid[];
         BEGIN
+            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
             IF cardinality(parent_and_grandparent_ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
@@ -220,15 +199,28 @@ class Migration(migrations.Migration):
                     relationally_unitemized_count = 0,
                     itemized = TRUE
                 WHERE id = ANY (parent_and_grandparent_ids);
+                parent_or_grandparent_children_and_grandchildren_ids :=
+                    get_children_and_grandchildren_transaction_ids(
+                        parent_and_grandparent_ids[
+                            cardinality(parent_and_grandparent_ids)
+                        ]
+                    )
+                );
+                PERFORM undo_relational_unitemize_children_and_grandchildren(
+                    parent_or_grandparent_children_and_grandchildren_ids
+                );
             END IF;
         END;
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION undo_relational_itemize_parent_and_grandparent(
-            parent_and_grandparent_ids uuid[]
+            txn RECORD
         )
         RETURNS VOID AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
         BEGIN
+            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
             IF cardinality(parent_and_grandparent_ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
@@ -239,14 +231,18 @@ class Migration(migrations.Migration):
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION relational_unitemize_children_and_grandchildren(
-            children_and_grandchildren_ids uuid[]
+            txn RECORD
         )
         RETURNS VOID AS $$
+        DECLARE
+            children_and_grandchildren_ids uuid[];
         BEGIN
+            children_and_grandchildren_ids :=
+                get_children_and_grandchildren_transaction_ids(txn.id);
             IF cardinality(children_and_grandchildren_ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
-                    relationally_unitemized_count = relationally_unitemized_count + 1,
+                    relationally_unitemized_count = 1,
                     relationally_itemized_count = 0,
                     itemized = FALSE
                 WHERE id = ANY (children_and_grandchildren_ids);
@@ -262,7 +258,7 @@ class Migration(migrations.Migration):
             IF cardinality(children_and_grandchildren_ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
-                    relationally_unitemized_count = relationally_unitemized_count - 1
+                    relationally_unitemized_count = 0
                 WHERE id = ANY (children_and_grandchildren_ids);
             END IF;
         END;
@@ -292,7 +288,7 @@ class Migration(migrations.Migration):
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION get_children_and_grandchildren_transaction_ids(
-            txn RECORD
+            transaction_id uuid
         )
         RETURNS uuid[] AS $$
         DECLARE
@@ -302,11 +298,11 @@ class Migration(migrations.Migration):
                 SELECT id
                 FROM transactions_transaction
                 WHERE parent_transaction_id IN (
-                    txn.id,
+                    transaction_id,
                     (
                         SELECT id
                         FROM transactions_transaction
-                        WHERE parent_transaction_id = txn.id
+                        WHERE parent_transaction_id = transaction_id
                     )
                 )
             ) into retval;
