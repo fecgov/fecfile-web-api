@@ -20,7 +20,6 @@ from django.db.models import (
     Case,
     When,
     Value,
-    BooleanField,
     TextField,
     DecimalField,
     CharField,
