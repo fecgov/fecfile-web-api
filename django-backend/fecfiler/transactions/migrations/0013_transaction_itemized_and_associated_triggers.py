@@ -116,7 +116,12 @@ class Migration(migrations.Migration):
                 ELSE
                     NEW._itemized := TRUE;
                 END IF;
-                NEW.itemized = NEW._itemized;
+                NEW.itemized := NEW._itemized;
+                IF NEW.itemized is TRUE THEN
+                    NEW.relationally_unitemized_count := 0;
+                ELSE
+                    NEW.relationally_itemized_count := 0;
+                END IF;
             END IF;
             RETURN NEW;
         END;
@@ -127,6 +132,7 @@ class Migration(migrations.Migration):
         DECLARE
             parent_and_grandparent_ids uuid[];
             children_and_grandchildren_ids uuid[];
+            parent_itemized_flag boolean;
         BEGIN
             parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
             children_and_grandchildren_ids :=
@@ -135,10 +141,16 @@ class Migration(migrations.Migration):
                 PERFORM relational_itemize_parent_and_grandparent(
                     parent_and_grandparent_ids
                 );
-            ELSE
-                PERFORM relational_unitemize_children_and_grandchildren(
-                    children_and_grandchildren_ids
-                );
+            ELSIF NEW.parent_transaction_id IS NOT NULL THEN
+                SELECT itemized
+                INTO parent_itemized_flag
+                FROM transactions_transaction
+                WHERE id = NEW.parent_transaction_id;
+                IF parent_itemized_flag IS FALSE THEN
+                    UPDATE transactions_transaction
+                    SET relationally_unitemized_count = 1
+                    WHERE id = NEW.id;
+                END IF;
             END IF;
             RETURN NEW;
         END;
