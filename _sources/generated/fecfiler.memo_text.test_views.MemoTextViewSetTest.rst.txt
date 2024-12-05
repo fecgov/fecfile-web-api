@@ -114,6 +114,8 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.subTest
       ~MemoTextViewSetTest.tearDown
       ~MemoTextViewSetTest.tearDownClass
+      ~MemoTextViewSetTest.test_can_get_own_committee_memos
+      ~MemoTextViewSetTest.test_cannot_get_other_committee_memos
       ~MemoTextViewSetTest.test_create_existing_report_memo_text
       ~MemoTextViewSetTest.test_create_new_report_memo_text
       ~MemoTextViewSetTest.test_get_memo_texts_for_report_id
