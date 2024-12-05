@@ -322,7 +322,6 @@ class Migration(migrations.Migration):
         CREATE TRIGGER after_transactions_transaction_update_trigger
         AFTER UPDATE ON transactions_transaction
         FOR EACH ROW
-        WHEN (pg_trigger_depth() < 2) -- Prevent infinite trigger loop
         EXECUTE FUNCTION after_transactions_transaction_update();
 
         CREATE TRIGGER after_transactions_transaction_delete_trigger
