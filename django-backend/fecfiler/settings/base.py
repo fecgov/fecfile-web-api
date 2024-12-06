@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
-    "storages",
     "django_structlog",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
