@@ -88,8 +88,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
 
-    _itemized = models.BooleanField(default=False)
-    itemized = models.BooleanField(default=False)
+    _itemized = models.BooleanField(default=True)
+    itemized = models.BooleanField(default=True)
     relationally_itemized_count = models.IntegerField(default=0)
     relationally_unitemized_count = models.IntegerField(default=0)
 

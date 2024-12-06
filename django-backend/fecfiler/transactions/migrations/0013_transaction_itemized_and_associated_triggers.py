@@ -31,12 +31,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="transaction",
             name="_itemized",
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name="transaction",
             name="itemized",
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name="transaction",
