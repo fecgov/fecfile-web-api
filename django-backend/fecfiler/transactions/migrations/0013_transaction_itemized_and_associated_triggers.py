@@ -141,7 +141,10 @@ class Migration(migrations.Migration):
                 WHERE id = NEW.parent_transaction_id;
                 IF parent_itemized_flag IS FALSE THEN
                     UPDATE transactions_transaction
-                    SET relationally_unitemized_count = 1
+                    SET
+                        relationally_unitemized_count = 1,
+                        relationally_itemized_count = 0,
+                        itemized = FALSE
                     WHERE id = NEW.id;
                 END IF;
             END IF;
@@ -157,7 +160,7 @@ class Migration(migrations.Migration):
                     PERFORM relational_itemize_parent_and_grandparent(NEW);
                 ELSE
                     PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
-                    PERFORM relational_unitemize_children_and_grandchildren(NEW); // TODO: Call this on parent and grandparent ids instead of NEW
+                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
                 END IF;
             END IF;
             RETURN NEW;
@@ -206,7 +209,7 @@ class Migration(migrations.Migration):
                     );
                 PERFORM undo_relational_unitemize_children_and_grandchildren(
                     parent_or_grandparent_children_and_grandchildren_ids
-                ); // TODO - reverse this in TODO above
+                );
             END IF;
         END;
         $$ LANGUAGE plpgsql;
