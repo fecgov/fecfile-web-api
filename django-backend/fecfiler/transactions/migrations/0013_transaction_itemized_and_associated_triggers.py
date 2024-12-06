@@ -156,8 +156,8 @@ class Migration(migrations.Migration):
                 IF NEW._itemized THEN
                     PERFORM relational_itemize_parent_and_grandparent(NEW);
                 ELSE
-                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
                     PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
+                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
                 END IF;
             END IF;
             RETURN NEW;
