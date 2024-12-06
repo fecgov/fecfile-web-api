@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
         DECLARE
             parent_itemized_flag boolean;
         BEGIN
-            IF NEW.itemized THEN
+            IF NEW._itemized THEN
                 PERFORM relational_itemize_parent_and_grandparent(NEW);
             ELSIF NEW.parent_transaction_id IS NOT NULL THEN
                 SELECT itemized
@@ -152,12 +152,12 @@ class Migration(migrations.Migration):
         CREATE OR REPLACE FUNCTION after_transactions_transaction_update()
         RETURNS TRIGGER AS $$
         BEGIN
-            IF OLD.itemized <> NEW.itemized THEN
-                IF NEW.itemized THEN
+            IF OLD._itemized <> NEW._itemized THEN
+                IF NEW._itemized THEN
                     PERFORM relational_itemize_parent_and_grandparent(NEW);
                 ELSE
                     PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
-                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
+                    PERFORM relational_unitemize_children_and_grandchildren(NEW); // TODO: Call this on parent and grandparent ids instead of NEW
                 END IF;
             END IF;
             RETURN NEW;
@@ -169,7 +169,7 @@ class Migration(migrations.Migration):
         DECLARE
             children_and_grandchildren_ids uuid[];
         BEGIN
-            IF OLD.itemized THEN
+            IF OLD._itemized THEN
                 PERFORM undo_relational_itemize_parent_and_grandparent(OLD);
             ELSE
                 children_and_grandchildren_ids :=
@@ -206,7 +206,7 @@ class Migration(migrations.Migration):
                     );
                 PERFORM undo_relational_unitemize_children_and_grandchildren(
                     parent_or_grandparent_children_and_grandchildren_ids
-                );
+                ); // TODO - reverse this in TODO above
             END IF;
         END;
         $$ LANGUAGE plpgsql;
