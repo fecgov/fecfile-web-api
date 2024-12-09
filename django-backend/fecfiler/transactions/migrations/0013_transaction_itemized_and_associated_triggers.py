@@ -81,103 +81,155 @@ class Migration(migrations.Migration):
         CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
         BEGIN
-            IF (TG_OP = 'INSERT')
-            OR (
-                TG_OP = 'UPDATE'
-                AND (
-                    OLD.force_itemized IS DISTINCT FROM NEW.force_itemized
-                    OR OLD.aggregate IS DISTINCT FROM NEW.aggregate
-                    OR (
-                        (
-                            OLD.relationally_itemized_count <>
-                                NEW.relationally_itemized_count
-                            OR OLD.relationally_unitemized_count <>
-                                NEW.relationally_unitemized_count
-                        )
-                        AND NEW.relationally_itemized_count = 0
-                        AND NEW.relationally_unitemized_count = 0
+            IF (TG_OP = 'INSERT') THEN
+                PERFORM calculate_and_set_internal_itemization(NEW);
+                PERFORM after_transactions_transaction_insert(NEW);
+            ELSIF (TG_OP = 'UPDATE') AND (
+                OLD.force_itemized IS DISTINCT FROM NEW.force_itemized
+                OR OLD.aggregate IS DISTINCT FROM NEW.aggregate
+                OR (
+                    (
+                        OLD.relationally_itemized_count <>
+                            NEW.relationally_itemized_count
+                        OR OLD.relationally_unitemized_count <>
+                            NEW.relationally_unitemized_count
                     )
+                    AND NEW.relationally_itemized_count = 0
+                    AND NEW.relationally_unitemized_count = 0
                 )
             ) THEN
-                IF NEW.force_itemized IS NOT NULL THEN
-                    NEW._itemized := NEW.force_itemized;
-                ELSIF NEW.aggregate < 0 THEN
-                    NEW._itemized := TRUE;
-                ELSIF EXISTS (
-                    SELECT type
-                    FROM over_two_hundred_types
-                    WHERE type = NEW.transaction_type_identifier
-                ) THEN
-                    IF NEW.aggregate > 200 THEN
-                        NEW._itemized := TRUE;
-                    ELSE
-                        NEW._itemized := FALSE;
-                    END IF;
-                ELSE
-                    NEW._itemized := TRUE;
-                END IF;
-                IF NEW._itemized is TRUE THEN
-                    NEW.relationally_unitemized_count := 0;
-                ELSE
-                    NEW.relationally_itemized_count := 0;
-                END IF;
-                NEW.itemized := NEW._itemized;
+                PERFORM calculate_and_set_internal_itemization(NEW);
+                PERFORM after_transactions_transaction__itemized_update(NEW);
             END IF;
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert()
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
+        BEGIN
+            IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') AND (
+                (
+                    OLD.relationally_itemized_count <>
+                        NEW.relationally_itemized_count
+                    OR OLD.relationally_unitemized_count <>
+                        NEW.relationally_unitemized_count
+                )
+            ) THEN
+                PERFORM calculate_and_set_relational_itemization(NEW);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION calculate_and_set_internal_itemization(
+            txn RECORD
+        )
+        RETURNS VOID AS $$
+        BEGIN
+            IF txn.force_itemized IS NOT NULL THEN
+                txn._itemized := txn.force_itemized;
+            ELSIF txn.aggregate < 0 THEN
+                txn._itemized := TRUE;
+            ELSIF EXISTS (
+                SELECT type
+                FROM over_two_hundred_types
+                WHERE type = txn.transaction_type_identifier
+            ) THEN
+                IF txn.aggregate > 200 THEN
+                    txn._itemized := TRUE;
+                ELSE
+                    txn._itemized := FALSE;
+                END IF;
+            ELSE
+                txn._itemized := TRUE;
+            END IF;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION calculate_and_set_relational_itemization(
+            txn RECORD
+        )
+        RETURNS VOID AS $$
+        BEGIN
+            IF txn.relationally_itemized_count > 0 THEN
+                txn.itemized := TRUE;
+            ELSIF txn.relationally_unitemized_count > 0 THEN
+                txn.itemized := FALSE;
+            ELSIF txn.relationally_itemized_count = 0 
+                AND txn.relationally_unitemized_count = 0 THEN
+                    txn.itemized := txn._itemized;
+            END IF;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert(
+            txn RECORD
+        )
+        RETURNS VOID AS $$
         DECLARE
+            parent_and_grandparent_ids uuid[];
             parent_itemized_flag boolean;
         BEGIN
-            IF NEW._itemized THEN
-                PERFORM relational_itemize_parent_and_grandparent(NEW);
-            ELSIF NEW.parent_transaction_id IS NOT NULL THEN
+            IF txn._itemized THEN
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
+                PERFORM relational_itemize_ids(parent_and_grandparent_ids);
+            ELSIF txn.parent_transaction_id IS NOT NULL THEN
                 SELECT itemized
                 INTO parent_itemized_flag
                 FROM transactions_transaction
-                WHERE id = NEW.parent_transaction_id;
+                WHERE id = txn.parent_transaction_id;
                 IF parent_itemized_flag IS FALSE THEN
-                    UPDATE transactions_transaction
-                    SET
-                        relationally_unitemized_count = 1,
-                        relationally_itemized_count = 0,
-                        itemized = FALSE
-                    WHERE id = NEW.id;
+                    PERFORM relational_unitemize_ids(ARRAY[id]); 
                 END IF;
             END IF;
-            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_update()
-        RETURNS TRIGGER AS $$
+        CREATE OR REPLACE FUNCTION after_transactions_transaction__itemized_update(
+            txn RECORD
+        )
+        RETURNS VOID AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
+            parent_or_grandparent_children_and_grandchildren_ids uuid[];
+            children_and_grandchildren_ids uuid[];
         BEGIN
-            IF OLD._itemized <> NEW._itemized THEN
-                IF NEW._itemized THEN
-                    PERFORM relational_itemize_parent_and_grandparent(NEW);
-                ELSE
-                    PERFORM undo_relational_itemize_parent_and_grandparent(NEW);
-                    PERFORM relational_unitemize_children_and_grandchildren(NEW);
-                END IF;
+            IF NEW._itemized THEN
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
+                PERFORM relational_itemize_ids(parent_and_grandparent_ids);
+                parent_or_grandparent_children_and_grandchildren_ids :=
+                    get_children_and_grandchildren_transaction_ids(
+                        parent_and_grandparent_ids[
+                            cardinality(parent_and_grandparent_ids)
+                        ]
+                    );
+                PERFORM undo_relational_unitemize_ids(
+                    parent_or_grandparent_children_and_grandchildren_ids
+                );
+            ELSE
+                children_and_grandchildren_ids :=
+                    get_children_and_grandchildren_transaction_ids(txn.id);
+                PERFORM relational_unitemize_ids(children_and_grandchildren_ids);
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
+                PERFORM undo_relational_itemize_ids(parent_and_grandparent_ids);
             END IF;
-            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
         CREATE OR REPLACE FUNCTION after_transactions_transaction_delete()
         RETURNS TRIGGER AS $$
         DECLARE
+            parent_and_grandparent_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
             IF OLD._itemized THEN
-                PERFORM undo_relational_itemize_parent_and_grandparent(OLD);
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
+                PERFORM undo_relational_itemize_ids(OLD);
             ELSE
                 children_and_grandchildren_ids :=
                     get_children_and_grandchildren_transaction_ids(OLD.id);
-                PERFORM undo_relational_unitemize_children_and_grandchildren(
+                PERFORM undo_relational_unitemize_ids(
                     children_and_grandchildren_ids
                 );
             END IF;
@@ -185,82 +237,60 @@ class Migration(migrations.Migration):
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION relational_itemize_parent_and_grandparent(
-            txn RECORD
+        CREATE OR REPLACE FUNCTION relational_itemize_ids(
+            ids uuid[]
         )
         RETURNS VOID AS $$
-        DECLARE
-            parent_and_grandparent_ids uuid[];
-            parent_or_grandparent_children_and_grandchildren_ids uuid[];
         BEGIN
-            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
-            IF cardinality(parent_and_grandparent_ids) > 0 THEN
+            IF cardinality(ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
                     relationally_itemized_count = relationally_itemized_count + 1,
-                    relationally_unitemized_count = 0,
-                    itemized = TRUE
-                WHERE id = ANY (parent_and_grandparent_ids);
-                parent_or_grandparent_children_and_grandchildren_ids :=
-                    get_children_and_grandchildren_transaction_ids(
-                        parent_and_grandparent_ids[
-                            cardinality(parent_and_grandparent_ids)
-                        ]
-                    );
-                PERFORM undo_relational_unitemize_children_and_grandchildren(
-                    parent_or_grandparent_children_and_grandchildren_ids
-                );
+                    relationally_unitemized_count = 0
+                WHERE id = ANY (ids);
             END IF;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION undo_relational_itemize_parent_and_grandparent(
-            txn RECORD
+        CREATE OR REPLACE FUNCTION undo_relational_itemize_ids(
+            ids uuid[]
         )
         RETURNS VOID AS $$
-        DECLARE
-            parent_and_grandparent_ids uuid[];
         BEGIN
-            parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
-            IF cardinality(parent_and_grandparent_ids) > 0 THEN
+            IF cardinality(ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
                     relationally_itemized_count = relationally_itemized_count - 1
-                WHERE id = ANY (parent_and_grandparent_ids);
+                WHERE id = ANY (ids);
             END IF;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION relational_unitemize_children_and_grandchildren(
-            txn RECORD
+        CREATE OR REPLACE FUNCTION relational_unitemize_ids(
+            ids uuid[]
         )
         RETURNS VOID AS $$
-        DECLARE
-            children_and_grandchildren_ids uuid[];
         BEGIN
-            children_and_grandchildren_ids :=
-                get_children_and_grandchildren_transaction_ids(txn.id);
-            IF cardinality(children_and_grandchildren_ids) > 0 THEN
+            IF cardinality(ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
                     relationally_unitemized_count = 1,
-                    relationally_itemized_count = 0,
-                    itemized = FALSE
-                WHERE id = ANY (children_and_grandchildren_ids);
+                    relationally_itemized_count = 0
+                WHERE id = ANY (ids);
             END IF;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION undo_relational_unitemize_children_and_grandchildren(
-            children_and_grandchildren_ids uuid[]
+        CREATE OR REPLACE FUNCTION undo_relational_unitemize_ids(
+            ids uuid[]
         )
         RETURNS VOID AS $$
         BEGIN
-            IF cardinality(children_and_grandchildren_ids) > 0 THEN
+            IF cardinality(ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
                     relationally_unitemized_count = 0
-                WHERE id = ANY (children_and_grandchildren_ids);
+                WHERE id = ANY (ids);
             END IF;
         END;
         $$ LANGUAGE plpgsql;
@@ -317,15 +347,10 @@ class Migration(migrations.Migration):
         FOR EACH ROW
         EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
-        CREATE TRIGGER after_transactions_transaction_insert_trigger
-        AFTER INSERT ON transactions_transaction
+        CREATE TRIGGER after_transactions_transaction_insert_or_update_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        EXECUTE FUNCTION after_transactions_transaction_insert();
-
-        CREATE TRIGGER after_transactions_transaction_update_trigger
-        AFTER UPDATE ON transactions_transaction
-        FOR EACH ROW
-        EXECUTE FUNCTION after_transactions_transaction_update();
+        EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER after_transactions_transaction_delete_trigger
         AFTER DELETE ON transactions_transaction
