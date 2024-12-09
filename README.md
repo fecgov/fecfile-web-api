@@ -125,13 +125,4 @@ See here for comment style rules: https://google.github.io/styleguide/pyguide.ht
 
 ### Snyk security scanning
 
-A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer who will log into the [Snyk Dashboard](https://app.snyk.io/org/fecfile/projects) (Invitation link [here](https://app.snyk.io/invite/link/accept?invite=93042de6-4eca-4bb5-bf76-9c2e9f895e24&utm_source=link_invite&utm_medium=referral&utm_campaign=product-link-invite&from=link_invite)) and perform the following tasks:
-
-1. Review the vulnerability reports for each of the FECFile Online GitHub repository.
-2. Write up a ticket (1 for each vulnerable package, ok to combine per package if multiple found on the same day) to remediate the vulnerability.
-3. Point and mark each ticket with the following tags: "security", "high priority".
-4. Ticket title should contain the deadline (Critical/high: 30 days, Medium: 60 days, Low: 90 days)
-5. Move each new ticket into the sprint that will be deployed before the deadline.
-6. Update weekly assignment log with tickets created or "None".
-
-The weekly assignment log can be found in the Google drive 🔒 [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
+A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer.  For more information, consult the Snyk security scannning [wiki page](https://github.com/fecgov/fecfile-web-api/wiki/Snyk-security-scanning).
