@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
         migrations.RunPython(populate_over_two_hundred_types),
         migrations.RunSQL(
             """
-        CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
         BEGIN
             IF (TG_OP = 'INSERT') THEN
@@ -101,13 +101,7 @@ class Migration(migrations.Migration):
                 PERFORM calculate_and_set_internal_itemization(NEW);
                 PERFORM after_transactions_transaction__itemized_update(NEW);
             END IF;
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
-        RETURNS TRIGGER AS $$
-        BEGIN
             IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') AND (
                 (
                     OLD.relationally_itemized_count <>
@@ -144,6 +138,11 @@ class Migration(migrations.Migration):
             ELSE
                 txn._itemized := TRUE;
             END IF;
+
+            UPDATE transactions_transaction
+            SET
+                _itemized = txn._itemized
+            WHERE id = txn.id;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -160,6 +159,11 @@ class Migration(migrations.Migration):
                 AND txn.relationally_unitemized_count = 0 THEN
                     txn.itemized := txn._itemized;
             END IF;
+
+            UPDATE transactions_transaction
+            SET
+                itemized = txn.itemized
+            WHERE id = txn.id;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -195,7 +199,7 @@ class Migration(migrations.Migration):
             parent_or_grandparent_children_and_grandchildren_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
-            IF NEW._itemized THEN
+            IF txn._itemized THEN
                 parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
                 PERFORM relational_itemize_ids(parent_and_grandparent_ids);
                 parent_or_grandparent_children_and_grandchildren_ids :=
@@ -341,11 +345,6 @@ class Migration(migrations.Migration):
             RETURN retval;
         END;
         $$ LANGUAGE plpgsql;
-
-        CREATE TRIGGER before_transactions_transaction_insert_or_update_trigger
-        BEFORE INSERT OR UPDATE ON transactions_transaction
-        FOR EACH ROW
-        EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER after_transactions_transaction_insert_or_update_trigger
         AFTER INSERT OR UPDATE ON transactions_transaction
