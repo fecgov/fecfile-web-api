@@ -1,5 +1,5 @@
 import math
-from datetime import date, datetime
+from datetime import datetime, timezone
 from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -116,7 +116,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Set the date signed for the report"""
         report = Report.objects.get(id=report_id)
-        report.date_signed = date.today()
+        report.date_signed = datetime.now(timezone.utc)
         report.save()
 
         """Start Celery tasks in chain
