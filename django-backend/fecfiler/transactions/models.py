@@ -88,6 +88,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
 
+    _itemized = models.BooleanField(default=True)
+    itemized = models.BooleanField(default=True)
+    relationally_itemized_count = models.IntegerField(default=0)
+    relationally_unitemized_count = models.IntegerField(default=0)
+
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
 
@@ -278,7 +283,6 @@ def get_read_model(committee_uuid):
             blank=True,
         )
         schedule = models.TextField()
-        _itemized = models.BooleanField()
         amount = models.DecimalField()
         date = models.DateField()
         form_type = models.TextField()
@@ -346,3 +350,18 @@ COUPLED_TRANSACTION_TYPES = [
     "LOAN_RECEIVED_FROM_INDIVIDUAL_RECEIPT",
     "C1_LOAN_AGREEMENT",
 ]
+
+
+class OverTwoHundredTypes(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    type = models.TextField()
+
+    class Meta:
+        db_table = "over_two_hundred_types"
+        indexes = [models.Index(fields=["type"])]
