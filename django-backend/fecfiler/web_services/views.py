@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import date, datetime
 from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -113,6 +113,11 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Start tracking submission"""
         submission_id = UploadSubmission.objects.initiate_submission(report_id).id
+
+        """Set the date signed for the report"""
+        report = Report.objects.get(id=report_id)
+        report.date_signed = date.today()
+        report.save()
 
         """Start Celery tasks in chain
         Check to see if calculating the summary is necessary. If not, just start
