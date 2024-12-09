@@ -22,7 +22,7 @@ class SummaryService:
         year_of_closest_report = (
             self.closest_report_from_prior_years.coverage_from_date.year
             if self.closest_report_from_prior_years
-            else None
+            else 0
         )
 
         """ Get the most recent cash on hand override that is

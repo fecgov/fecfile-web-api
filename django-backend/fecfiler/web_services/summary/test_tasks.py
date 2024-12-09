@@ -368,6 +368,12 @@ class F3XSerializerTestCase(TestCase):
     def test_cash_on_hand_override_for_last_year_with_no_prior_report(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
         create_committee_view(other_committee.id)
+        # confirm order of override years
+        create_cash_on_hand_yearly(
+            committee_account=other_committee,
+            year="2004",
+            cash_on_hand=2004,
+        )
         create_cash_on_hand_yearly(
             committee_account=other_committee,
             year="2005",
@@ -375,8 +381,8 @@ class F3XSerializerTestCase(TestCase):
         )
         report = create_form3x(
             other_committee,
-            datetime.strptime("2005-01-30", "%Y-%m-%d").date(),
-            datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
+            datetime.strptime("2006-01-30", "%Y-%m-%d").date(),
+            datetime.strptime("2006-02-28", "%Y-%m-%d").date(),
             report_code="12C",
         )
 
