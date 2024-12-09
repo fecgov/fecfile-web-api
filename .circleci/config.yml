@@ -53,9 +53,16 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: Check migrations
+          name: Check for missing migrations
           command: |
             python manage.py makemigrations --check
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Check for breaking change migrations
+          # After December 2024
+          command: |
+            python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
           working_directory: ~/project/django-backend/
 
       - run:
