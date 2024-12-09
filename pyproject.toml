@@ -1,2 +1,10 @@
 [tool.black]
 line-length = 90
+
+[tool.deptry]
+requirements_files_dev  = ["requirements-test.txt"]
+known_first_party = ["fecfiler", "locust_data_generator"]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["locust"]
+DEP002 = ["gunicorn"]
