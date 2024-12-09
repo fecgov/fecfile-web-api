@@ -362,7 +362,8 @@ class F3XSerializerTestCase(TestCase):
         next_year_report.refresh_from_db()
 
         self.assertEqual(first_report.form_3x.L8_cash_on_hand_close_ytd, 4110)
-        # Cash on hand should be the L8 of the previous year's final report and not the override for the previous year
+        # Cash on hand should be the L8 of the previous year's final
+        # report and not the override for the previous year
         self.assertEqual(next_year_report.form_3x.L6a_cash_on_hand_jan_1_ytd, 4110)
 
     def test_cash_on_hand_override_for_last_year_with_no_prior_report(self):
