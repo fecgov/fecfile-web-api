@@ -16,7 +16,7 @@ from .utils import (
     create_debt,
     create_loan,
     create_loan_from_bank,
-    create_tier3_transactions,
+    create_tier123_transactions,
 )
 from fecfiler.transactions.schedule_c.utils import carry_forward_loans
 from fecfiler.transactions.schedule_d.utils import carry_forward_debt
@@ -114,55 +114,141 @@ class TransactionModelTestCase(TestCase):
         self.earmark_memo.parent_transaction = self.earmark_receipt
         self.earmark_memo.save()
 
+        self.test_com_contact = create_test_committee_contact(
+            "test-com-name1",
+            "C00000000",
+            self.committee.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        self.test_org_contact = create_test_organization_contact(
+            "test-org-name1",
+            self.committee.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        self.test_ind_contact = create_test_individual_contact(
+            "test_ln1",
+            "test_fn1",
+            self.committee.id,
+        )
+        (
+            self.test_tier1_transaction,
+            self.test_tier2_transaction,
+            self.test_tier3_transaction,
+        ) = create_tier123_transactions(
+            self.committee,
+            self.test_com_contact,
+            self.test_org_contact,
+            self.test_ind_contact,
+        )
+
     def test_tier3_itemization_creation(self):
-        transactions = create_tier3_transactions(self.committee)
+        transactions = list(
+            Transaction.objects.filter(
+                id__in=[
+                    self.test_tier1_transaction.id,
+                    self.test_tier2_transaction.id,
+                    self.test_tier3_transaction.id,
+                ]
+            ).order_by("created")
+        )
 
         self.assertEqual(
-            transactions[0].transaction_type_identifier, "JOINT_FUNDRAISING_TRANSFER"
+            transactions[0].transaction_type_identifier,
+            "JOINT_FUNDRAISING_TRANSFER",
         )
         self.assertEqual(transactions[0].itemized, True)
 
         self.assertEqual(
-            transactions[1].transaction_type_identifier, "PARTNERSHIP_JF_TRANSFER_MEMO"
+            transactions[1].transaction_type_identifier,
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
         )
-        self.assertEqual(transactions[1].itemized, True)
+        self.assertEqual(transactions[1].itemized, False)
 
         self.assertEqual(
             transactions[2].transaction_type_identifier,
             "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
         )
         self.assertEqual(transactions[2].itemized, False)
+        self.assertEqual(transactions[2].relationally_unitemized_count, 1)
+
+    def test_tier3_itemization_add_new_itemized_grandchild(self):
+        self.test_new_tier3_transaction = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.test_ind_contact,
+            "2024-01-04",
+            amount="250.00",
+            parent_id=self.test_tier2_transaction.id,
+        )
+
+        transactions = list(
+            Transaction.objects.filter(
+                id__in=[
+                    self.test_tier1_transaction.id,
+                    self.test_tier2_transaction.id,
+                    self.test_tier3_transaction.id,
+                    self.test_new_tier3_transaction.id,
+                ]
+            ).order_by("created")
+        )
+
+        self.assertEqual(
+            transactions[1].transaction_type_identifier,
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+        )
+        self.assertEqual(transactions[1].itemized, True)
 
         self.assertEqual(
             transactions[3].transaction_type_identifier,
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
         )
-        self.assertEqual(transactions[3].itemized, False)
+        self.assertEqual(transactions[3].itemized, True)
+        self.assertEqual(transactions[3].relationally_unitemized_count, 0)
 
-        self.assertEqual(
-            transactions[4].transaction_type_identifier,
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-        )
-        self.assertEqual(transactions[4].itemized, True)
-
-    def test_tier3_itemization_update(self):
-        transactions = create_tier3_transactions(self.committee)
-
-        self.assertEqual(
-            transactions[4].transaction_type_identifier,
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-        )
-        self.assertEqual(transactions[4].itemized, True)
-
+    def test_tier3_itemization_update_new_itemized_grandchild(self):
         Transaction.objects.filter(
-            pk=transactions[4].id,
-        ).update(amount="6.00")
+            pk=self.test_new_tier3_transaction.id,
+        ).update(amount="2")
 
-        self.assertEqual(transactions[4].itemized, False)
+        transactions = list(
+            Transaction.objects.filter(
+                id__in=[
+                    self.test_tier1_transaction.id,
+                    self.test_tier2_transaction.id,
+                    self.test_tier3_transaction.id,
+                    self.test_new_tier3_transaction.id,
+                ]
+            ).order_by("created")
+        )
+
         self.assertEqual(
-            transactions[1].transaction_type_identifier, "PARTNERSHIP_JF_TRANSFER_MEMO"
+            transactions[1].transaction_type_identifier,
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
         )
         self.assertEqual(transactions[1].itemized, False)
+
+        self.assertEqual(
+            transactions[3].transaction_type_identifier,
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+        )
+        self.assertEqual(transactions[3].itemized, False)
+        self.assertEqual(transactions[3].relationally_unitemized_count, 1)
 
     def test_delete_transaction(self):
         partnership_receipt = Transaction.objects.filter(
