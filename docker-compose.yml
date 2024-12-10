@@ -56,7 +56,6 @@ services:
             FEC_FILING_API:
             FEC_FILING_API_KEY:
             FEC_AGENCY_ID:
-            WEBPRINT_EMAIL:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
@@ -103,7 +102,6 @@ services:
             FEC_FILING_API:
             FEC_FILING_API_KEY:
             FEC_AGENCY_ID:
-            WEBPRINT_EMAIL:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
             PRODUCTION_OPEN_FEC_API_KEY: DEMO_KEY
