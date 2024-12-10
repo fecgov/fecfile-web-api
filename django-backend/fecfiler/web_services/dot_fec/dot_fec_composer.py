@@ -1,7 +1,6 @@
 from decimal import Decimal
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
-from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import get_read_model
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
@@ -21,16 +20,12 @@ logger = structlog.get_logger(__name__)
 
 def compose_report(report_id, upload_submission_record_id):
     report_result = Report.objects.filter(id=report_id)
-    upload_submission_result = UploadSubmission.objects.filter(
-        id=upload_submission_record_id
-    )
     if report_result.exists():
         logger.info(f"composing report: {report_id}")
         report = report_result.first()
         """Compose derived fields"""
         report.filer_committee_id_number = report.committee_account.committee_id
-        if upload_submission_result.exists():
-            report.date_signed = upload_submission_result.first().created
+
         return report
     else:
         raise ObjectDoesNotExist(f"report: {report_id} not found")
