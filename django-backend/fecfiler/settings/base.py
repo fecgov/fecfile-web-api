@@ -380,3 +380,5 @@ CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
 )
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
+
+ENABLE_DEVELOPER_COMMANDS = env.get_credential("ENABLE_DEVELOPER_COMMANDS")
