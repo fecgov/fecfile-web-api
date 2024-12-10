@@ -10,6 +10,11 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.memo_text.models import MemoText
+from fecfiler.contacts.tests.utils import (
+    create_test_committee_contact,
+    create_test_individual_contact,
+    create_test_organization_contact,
+)
 
 
 def create_schedule_a(
@@ -29,7 +34,6 @@ def create_schedule_a(
     transaction_data = {
         "_form_type": form_type,
         "memo_code": memo_code,
-        "force_itemized": itemized,
     }
     if parent_id is not None:
         transaction_data["parent_transaction_id"] = parent_id
@@ -193,7 +197,6 @@ def create_loan_from_bank(
         loan_amount,
         report=report,
         parent_id=loan.id,
-        itemized=None,
     )
     loan_agreement = create_test_transaction(
         "C1_LOAN_AGREEMENT",
@@ -268,6 +271,94 @@ def create_transaction_memo(committee_account, transaction, text4000):
         committee_account_id=committee_account.id,
         transaction_uuid=transaction.id,
     )
+
+
+def create_tier3_transactions(committee_account):
+    test_com_contact = create_test_committee_contact(
+        "test-com-name1",
+        "C00000000",
+        committee_account.id,
+        {
+            "street_1": "test_sa1",
+            "street_2": "test_sa2",
+            "city": "test_c1",
+            "state": "AL",
+            "zip": "12345",
+            "telephone": "555-555-5555",
+            "country": "USA",
+        },
+    )
+    test_joint_fundraising_transfer = create_schedule_a(
+        "JOINT_FUNDRAISING_TRANSFER",
+        committee_account,
+        test_com_contact,
+        "2024-01-01",
+        amount="100.00",
+    )
+
+    test_org_contact = create_test_organization_contact(
+        "test-org-name1",
+        committee_account.id,
+        {
+            "street_1": "test_sa1",
+            "street_2": "test_sa2",
+            "city": "test_c1",
+            "state": "AL",
+            "zip": "12345",
+            "telephone": "555-555-5555",
+            "country": "USA",
+        },
+    )
+    test_partnership_receipt_jf_transfer_memo = create_schedule_a(
+        "PARTNERSHIP_JF_TRANSFER_MEMO",
+        committee_account,
+        test_org_contact,
+        "2024-01-02",
+        amount="90.00",
+        parent_id=test_joint_fundraising_transfer.id,
+    )
+
+    test_ind_contact = create_test_individual_contact(
+        "test_ln1", "test_fn1", committee_account.id
+    )
+    test_partnership_attribution_jf_transfer_memo1 = create_schedule_a(
+        "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+        committee_account,
+        test_ind_contact,
+        "2024-01-03",
+        amount="80.00",
+        parent_id=test_partnership_receipt_jf_transfer_memo.id,
+    )
+    test_partnership_attribution_jf_transfer_memo2 = create_schedule_a(
+        "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+        committee_account,
+        test_ind_contact,
+        "2024-01-04",
+        amount="70.00",
+        parent_id=test_partnership_receipt_jf_transfer_memo.id,
+    )
+    test_partnership_attribution_jf_transfer_memo3 = create_schedule_a(
+        "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+        committee_account,
+        test_ind_contact,
+        "2024-01-05",
+        amount="60.00",
+        parent_id=test_partnership_receipt_jf_transfer_memo.id,
+    )
+
+    transactions = list(
+        Transaction.objects.filter(
+            id__in=[
+                test_joint_fundraising_transfer.id,
+                test_partnership_receipt_jf_transfer_memo.id,
+                test_partnership_attribution_jf_transfer_memo1.id,
+                test_partnership_attribution_jf_transfer_memo2.id,
+                test_partnership_attribution_jf_transfer_memo3.id,
+            ]
+        ).order_by("created")
+    )
+
+    return transactions
 
 
 SCHEDULE_CLASS_TO_FIELD = {
