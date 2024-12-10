@@ -78,13 +78,34 @@ class Migration(migrations.Migration):
         migrations.RunPython(populate_over_two_hundred_types),
         migrations.RunSQL(
             """
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
+        CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
+        DECLARE
+            needs_internal_itemized_set boolean;
+            needs_relational_itemized_set boolean;
+            internal_itemization boolean;
+            relational_itemization boolean;
         BEGIN
-            IF (TG_OP = 'INSERT') THEN
-                PERFORM calculate_and_set_internal_itemization(NEW);
-                PERFORM after_transactions_transaction_insert(NEW);
-            ELSIF (TG_OP = 'UPDATE') AND (
+            needs_internal_itemized_set := needs_internal_itemized_set(OLD, NEW);
+            IF needs_internal_itemized_set THEN
+                NEW._itemized := calculate_internal_itemization(NEW);
+            END IF;
+
+            needs_relational_itemized_set := needs_relational_itemized_set(OLD, NEW);
+            IF needs_relational_itemized_set THEN
+                NEW.itemized := calculate_relational_itemization(NEW);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION needs_internal_itemized_set(
+            OLD RECORD,
+            NEW RECORD
+        )
+        RETURNS BOOLEAN AS $$
+        BEGIN
+            return OLD IS NULL OR (
                 OLD.force_itemized IS DISTINCT FROM NEW.force_itemized
                 OR OLD.aggregate IS DISTINCT FROM NEW.aggregate
                 OR (
@@ -97,73 +118,80 @@ class Migration(migrations.Migration):
                     AND NEW.relationally_itemized_count = 0
                     AND NEW.relationally_unitemized_count = 0
                 )
-            ) THEN
-                PERFORM calculate_and_set_internal_itemization(NEW);
-                PERFORM after_transactions_transaction__itemized_update(NEW);
-            END IF;
-
-            IF (TG_OP = 'INSERT') OR (TG_OP = 'UPDATE') AND (
-                (
-                    OLD.relationally_itemized_count <>
-                        NEW.relationally_itemized_count
-                    OR OLD.relationally_unitemized_count <>
-                        NEW.relationally_unitemized_count
-                )
-            ) THEN
-                PERFORM calculate_and_set_relational_itemization(NEW);
-            END IF;
-            RETURN NEW;
+            );
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION calculate_and_set_internal_itemization(
+        CREATE OR REPLACE FUNCTION calculate_internal_itemization(
             txn RECORD
         )
-        RETURNS VOID AS $$
+        RETURNS BOOLEAN AS $$
+        DECLARE
+            itemized boolean;
         BEGIN
+            itemized := TRUE;
             IF txn.force_itemized IS NOT NULL THEN
-                txn._itemized := txn.force_itemized;
+                itemized := txn.force_itemized;
             ELSIF txn.aggregate < 0 THEN
-                txn._itemized := TRUE;
+                itemized := TRUE;
             ELSIF EXISTS (
                 SELECT type
                 FROM over_two_hundred_types
                 WHERE type = txn.transaction_type_identifier
             ) THEN
                 IF txn.aggregate > 200 THEN
-                    txn._itemized := TRUE;
+                    itemized := TRUE;
                 ELSE
-                    txn._itemized := FALSE;
+                    itemized := FALSE;
                 END IF;
-            ELSE
-                txn._itemized := TRUE;
             END IF;
-
-            UPDATE transactions_transaction
-            SET
-                _itemized = txn._itemized
-            WHERE id = txn.id;
+            return itemized;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION calculate_and_set_relational_itemization(
+        CREATE OR REPLACE FUNCTION needs_relational_itemized_set(
+            OLD RECORD,
+            NEW RECORD
+        )
+        RETURNS BOOLEAN AS $$
+        BEGIN
+            return OLD IS NULL OR (
+                OLD.relationally_itemized_count IS DISTINCT FROM
+                    NEW.relationally_itemized_count
+                OR OLD.relationally_unitemized_count IS DISTINCT FROM
+                    NEW.relationally_unitemized_count
+            );
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION calculate_relational_itemization(
             txn RECORD
         )
-        RETURNS VOID AS $$
+        RETURNS BOOLEAN AS $$
         BEGIN
             IF txn.relationally_itemized_count > 0 THEN
-                txn.itemized := TRUE;
+                return TRUE;
             ELSIF txn.relationally_unitemized_count > 0 THEN
-                txn.itemized := FALSE;
-            ELSIF txn.relationally_itemized_count = 0 
-                AND txn.relationally_unitemized_count = 0 THEN
-                    txn.itemized := txn._itemized;
+                return FALSE;
             END IF;
+            return txn._itemized;
+        END;
+        $$ LANGUAGE plpgsql;
 
-            UPDATE transactions_transaction
-            SET
-                itemized = txn.itemized
-            WHERE id = txn.id;
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            needs_internal_itemized_set boolean;
+        BEGIN
+            IF (TG_OP = 'INSERT') THEN
+                PERFORM after_transactions_transaction_insert(NEW);
+            ELSIF (TG_OP = 'UPDATE') THEN
+                needs_internal_itemized_set := needs_internal_itemized_set(OLD, NEW);
+                IF needs_internal_itemized_set = TRUE THEN
+                    PERFORM after_transactions_transaction_internal_itemized_update(NEW);
+                END IF;
+            END IF;
+            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -184,13 +212,13 @@ class Migration(migrations.Migration):
                 FROM transactions_transaction
                 WHERE id = txn.parent_transaction_id;
                 IF parent_itemized_flag IS FALSE THEN
-                    PERFORM relational_unitemize_ids(ARRAY[id]); 
+                    PERFORM relational_unitemize_ids(ARRAY[txn.id]); 
                 END IF;
             END IF;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction__itemized_update(
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_internal_itemized_update(
             txn RECORD
         )
         RETURNS VOID AS $$
@@ -304,7 +332,7 @@ class Migration(migrations.Migration):
         )
         RETURNS uuid[] AS $$
         DECLARE
-            retval uuid[];
+            ids uuid[];
         BEGIN
             SELECT array(
                 SELECT id
@@ -317,8 +345,8 @@ class Migration(migrations.Migration):
                         WHERE id = txn.parent_transaction_id
                     )
                 )
-            ) into retval;
-            RETURN retval;
+            ) into ids;
+            RETURN ids;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -327,7 +355,7 @@ class Migration(migrations.Migration):
         )
         RETURNS uuid[] AS $$
         DECLARE
-            retval uuid[];
+            ids uuid[];
         BEGIN
             SELECT array(
                 SELECT id
@@ -341,14 +369,20 @@ class Migration(migrations.Migration):
                         )
                     )
                 )
-            ) into retval;
-            RETURN retval;
+            ) into ids;
+            RETURN ids;
         END;
         $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER before_transactions_transaction_insert_or_update_trigger
+        BEFORE INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER after_transactions_transaction_insert_or_update_trigger
         AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER after_transactions_transaction_delete_trigger
