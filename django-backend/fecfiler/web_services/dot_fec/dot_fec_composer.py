@@ -18,7 +18,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def compose_report(report_id, upload_submission_record_id):
+def compose_report(report_id):
     report_result = Report.objects.filter(id=report_id)
     if report_result.exists():
         logger.info(f"composing report: {report_id}")
@@ -156,7 +156,7 @@ def get_test_info_prefix(transaction):
     return ""
 
 
-def compose_dot_fec(report_id, upload_submission_record_id):
+def compose_dot_fec(report_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
         header = compose_header(report_id)
@@ -165,7 +165,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
-        report = compose_report(report_id, upload_submission_record_id)
+        report = compose_report(report_id)
         report_row = serialize_instance(report.get_form_name(), report)
         logger.debug("Serialized Report:")
         logger.debug(report_row)

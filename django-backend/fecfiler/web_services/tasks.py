@@ -63,7 +63,7 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
     try:
-        file_content = compose_dot_fec(report_id, upload_submission_id)
+        file_content = compose_dot_fec(report_id)
         if file_name is None:
             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
