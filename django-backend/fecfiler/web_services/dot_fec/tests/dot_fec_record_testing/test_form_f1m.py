@@ -150,13 +150,13 @@ class DotFECForm1MTestCase(TestCase):
         self.f1m.treasurer_middle_name = "Middlename"
         self.f1m.treasurer_prefix = "Mr."
         self.f1m.treasurer_suffix = "Junior"
-
-        upload_submission = UploadSubmission.objects.initiate_submission(self.f1m.id)
-        self.f1m.upload_submission = upload_submission
         self.f1m.form_1m.save()
         self.f1m.save()
 
-        report = compose_report(self.f1m.id, upload_submission.id)
+        UploadSubmission.objects.initiate_submission(self.f1m.id)
+        self.f1m.refresh_from_db()
+
+        report = compose_report(self.f1m.id)
         report_row = serialize_instance(report.get_form_name(), report)
         self.split_row = report_row.split(FS_STR)
 

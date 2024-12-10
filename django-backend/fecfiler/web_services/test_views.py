@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework.test import force_authenticate
 
@@ -142,6 +143,8 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
         # assert that summary was caclulated
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
+        now = datetime.now(timezone.utc).date()
+        self.assertEqual(report.date_signed, now)
 
         """view does not recalculate summary if report is not dirty"""
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = 2

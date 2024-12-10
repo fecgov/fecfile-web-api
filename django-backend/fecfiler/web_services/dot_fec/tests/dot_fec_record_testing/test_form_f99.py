@@ -35,11 +35,11 @@ class DotFECForm99TestCase(TestCase):
         self.f99.treasurer_middle_name = "Middlename"
         self.f99.treasurer_prefix = "Mr."
         self.f99.treasurer_suffix = "Junior"
-        upload_submission = UploadSubmission.objects.initiate_submission(self.f99.id)
-        self.f99.upload_submission = upload_submission
         self.f99.save()
+        UploadSubmission.objects.initiate_submission(self.f99.id)
+        self.f99.refresh_from_db()
 
-        report = compose_report(self.f99.id, upload_submission.id)
+        report = compose_report(self.f99.id)
         report_row = serialize_instance(report.get_form_name(), report)
         self.split_row = report_row.split(FS_STR)
 
