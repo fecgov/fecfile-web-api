@@ -1,6 +1,6 @@
-fecfiler.settings.base.WEBPRINT\_EMAIL
+fecfiler.settings.base.FEC\_AGENCY\_ID
 ======================================
 
 .. currentmodule:: fecfiler.settings.base
 
-.. autodata:: WEBPRINT_EMAIL
+.. autodata:: FEC_AGENCY_ID
