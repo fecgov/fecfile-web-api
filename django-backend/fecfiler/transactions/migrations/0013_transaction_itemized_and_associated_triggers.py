@@ -374,18 +374,18 @@ class Migration(migrations.Migration):
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE TRIGGER before_transactions_transaction_insert_or_update_trigger
+        CREATE TRIGGER zbefore_transactions_transaction_insert_or_update_trigger
         BEFORE INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
         EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
-        CREATE TRIGGER after_transactions_transaction_insert_or_update_trigger
+        CREATE TRIGGER zafter_transactions_transaction_insert_or_update_trigger
         AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
         WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
 
-        CREATE TRIGGER after_transactions_transaction_delete_trigger
+        CREATE TRIGGER zafter_transactions_transaction_delete_trigger
         AFTER DELETE ON transactions_transaction
         FOR EACH ROW
         EXECUTE FUNCTION after_transactions_transaction_delete();
