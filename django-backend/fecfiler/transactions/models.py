@@ -159,6 +159,24 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 return TABLE_TO_SCHEDULE[schedule_key]
         return None
 
+    def get_family(self):
+        return [self] + self.get_parents() + self.get_children()
+
+    def get_parents(self):
+        if self.parent_transaction is None:
+            return []
+        else:
+            return [self.parent_transaction] + self.parent_transaction.get_parents()
+
+    def get_children(self):
+        if len(self.children) == 0:
+            return []
+        else:
+            grandchildren = []
+            for child in self.children:
+                grandchildren += child.get_children()
+            return list(self.children) + grandchildren
+
     @property
     def children(self):
         return self.transaction_set.all()
