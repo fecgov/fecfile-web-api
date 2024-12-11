@@ -374,7 +374,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         try:
             transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
-            transactions = transaction.get_family()
+            transactions = transaction.get_transaction_family()
             for t in transactions:
                 t.reports.add(report)
         except Transaction.DoesNotExist:
