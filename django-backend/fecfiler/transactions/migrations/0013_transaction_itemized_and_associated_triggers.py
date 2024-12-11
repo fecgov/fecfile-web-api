@@ -187,7 +187,7 @@ class Migration(migrations.Migration):
                 PERFORM after_transactions_transaction_insert(NEW);
             ELSIF (TG_OP = 'UPDATE') THEN
                 needs_internal_itemized_set := needs_internal_itemized_set(OLD, NEW);
-                IF needs_internal_itemized_set = TRUE THEN
+                IF needs_internal_itemized_set IS TRUE THEN
                     PERFORM after_transactions_transaction_internal_itemized_update(NEW);
                 END IF;
             END IF;
@@ -203,7 +203,7 @@ class Migration(migrations.Migration):
             parent_and_grandparent_ids uuid[];
             parent_itemized_flag boolean;
         BEGIN
-            IF txn._itemized THEN
+            IF txn._itemized IS TRUE THEN
                 parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
                 PERFORM relational_itemize_ids(parent_and_grandparent_ids);
             ELSIF txn.parent_transaction_id IS NOT NULL THEN
@@ -227,7 +227,7 @@ class Migration(migrations.Migration):
             parent_or_grandparent_children_and_grandchildren_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
-            IF txn._itemized THEN
+            IF txn._itemized is TRUE THEN
                 parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
                 PERFORM relational_itemize_ids(parent_and_grandparent_ids);
                 parent_or_grandparent_children_and_grandchildren_ids :=
@@ -255,7 +255,7 @@ class Migration(migrations.Migration):
             parent_and_grandparent_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
-            IF OLD._itemized THEN
+            IF OLD._itemized IS TRUE THEN
                 parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
                 PERFORM undo_relational_itemize_ids(OLD);
             ELSE
