@@ -254,6 +254,54 @@ class TransactionModelTestCase(TestCase):
             partnership_attribution_jf_transfer_memo_60.relationally_unitemized_count, 0
         )
 
+        ### UNITEMIZE PARENTS ###
+        partnership_attribution_jf_transfer_memo_60.schedule_a.contribution_amount = 6.00
+        partnership_attribution_jf_transfer_memo_60.schedule_a.save()
+        partnership_attribution_jf_transfer_memo_60.save()
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_60.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100._itemized, True)
+        self.assertEqual(jf_transfer_100.itemized, True)
+        self.assertEqual(jf_transfer_100.relationally_itemized_count, 0)
+        self.assertEqual(jf_transfer_100.relationally_unitemized_count, 0)
+
+        self.assertEqual(partnership_jf_transfer_memo_90._itemized, False)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, False)
+        self.assertEqual(partnership_jf_transfer_memo_90.relationally_itemized_count, 0)
+        self.assertEqual(partnership_jf_transfer_memo_90.relationally_unitemized_count, 0)
+
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80._itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_80.relationally_itemized_count, 0
+        )
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_80.relationally_unitemized_count, 1
+        )
+
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70._itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_70.relationally_itemized_count, 0
+        )
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_70.relationally_unitemized_count, 1
+        )
+
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60._itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, False)
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_60.relationally_itemized_count, 0
+        )
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_60.relationally_unitemized_count, 1
+        )
+
     def xtest_tier3_itemization_add_new_itemized_grandchild(self):
         self.test_new_tier3_transaction = create_schedule_a(
             "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
