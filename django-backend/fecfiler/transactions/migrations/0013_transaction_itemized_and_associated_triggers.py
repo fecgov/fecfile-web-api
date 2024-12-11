@@ -181,54 +181,13 @@ class Migration(migrations.Migration):
         CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
         DECLARE
-            needs_internal_itemized_set boolean;
-        BEGIN
-            IF (TG_OP = 'INSERT') THEN
-                PERFORM after_transactions_transaction_insert(NEW);
-            ELSIF (TG_OP = 'UPDATE') THEN
-                needs_internal_itemized_set := needs_internal_itemized_set(OLD, NEW);
-                IF needs_internal_itemized_set IS TRUE THEN
-                    PERFORM after_transactions_transaction_internal_itemized_update(NEW);
-                END IF;
-            END IF;
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert(
-            txn RECORD
-        )
-        RETURNS VOID AS $$
-        DECLARE
-            parent_and_grandparent_ids uuid[];
-            parent_itemized_flag boolean;
-        BEGIN
-            IF txn._itemized IS TRUE THEN
-                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
-                PERFORM relational_itemize_ids(parent_and_grandparent_ids);
-            ELSIF txn.parent_transaction_id IS NOT NULL THEN
-                SELECT itemized
-                INTO parent_itemized_flag
-                FROM transactions_transaction
-                WHERE id = txn.parent_transaction_id;
-                IF parent_itemized_flag IS FALSE THEN
-                    PERFORM relational_unitemize_ids(ARRAY[txn.id]); 
-                END IF;
-            END IF;
-        END;
-        $$ LANGUAGE plpgsql;
-
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_internal_itemized_update(
-            txn RECORD
-        )
-        RETURNS VOID AS $$
-        DECLARE
             parent_and_grandparent_ids uuid[];
             parent_or_grandparent_children_and_grandchildren_ids uuid[];
             children_and_grandchildren_ids uuid[];
+            parent_itemized_flag boolean;
         BEGIN
-            IF txn._itemized is TRUE THEN
-                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
+            IF NEW._itemized is TRUE THEN
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
                 PERFORM relational_itemize_ids(parent_and_grandparent_ids);
                 parent_or_grandparent_children_and_grandchildren_ids :=
                     get_children_and_grandchildren_transaction_ids(
@@ -241,11 +200,22 @@ class Migration(migrations.Migration):
                 );
             ELSE
                 children_and_grandchildren_ids :=
-                    get_children_and_grandchildren_transaction_ids(txn.id);
+                    get_children_and_grandchildren_transaction_ids(NEW.id);
                 PERFORM relational_unitemize_ids(children_and_grandchildren_ids);
-                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(txn);
-                PERFORM undo_relational_itemize_ids(parent_and_grandparent_ids);
+                IF OLD._itemized IS NOT NULL THEN
+                    parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
+                    PERFORM undo_relational_itemize_ids(parent_and_grandparent_ids);
+                ELSIF NEW.parent_transaction_id IS NOT NULL THEN
+                    SELECT itemized
+                    INTO parent_itemized_flag
+                    FROM transactions_transaction
+                    WHERE id = NEW.parent_transaction_id;
+                    IF parent_itemized_flag IS FALSE THEN
+                        PERFORM relational_unitemize_ids(ARRAY[NEW.id]); 
+                    END IF;
+                END IF;
             END IF;
+            RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
@@ -380,15 +350,9 @@ class Migration(migrations.Migration):
         EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER zafter_transactions_transaction_insert_or_update_trigger
-        AFTER INSERT OR UPDATE ON transactions_transaction
+        AFTER INSERT OR UPDATE OF _itemized ON transactions_transaction
         FOR EACH ROW
-        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
         EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
-
-        CREATE TRIGGER zafter_transactions_transaction_delete_trigger
-        AFTER DELETE ON transactions_transaction
-        FOR EACH ROW
-        EXECUTE FUNCTION after_transactions_transaction_delete();
         """
         ),
     ]
