@@ -384,7 +384,6 @@ class TransactionViewsTestCase(TestCase):
         partnership_jf_transfer_memo.parent_transaction = jf_transfer
         partnership_jf_transfer_memo.save()
 
-
         transaction_id = str(partnership_jf_transfer_memo.id)
         report_id = str(self.q2_report.id)
         payload = {"transaction_id": transaction_id, "report_id": report_id}
