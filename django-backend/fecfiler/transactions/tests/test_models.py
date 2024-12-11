@@ -933,6 +933,11 @@ class TransactionModelTestCase(TestCase):
         self.assertIn(c, c_family)
         self.assertNotIn(b2, c_family)
 
+    def test_get_children(self):
+        a, b, c = self.set_up_jf_transfer()
+        self.assertNotIn(c, a.children)
+        self.assertIn(b, a.children)
+
 
 def undelete(transaction):
     transaction.deleted = None
