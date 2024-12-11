@@ -160,13 +160,20 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return None
 
     def get_transaction_family(self):
-        return [self] + self.get_ancestor_transactions() + self.get_descendant_transactions()
+        return [
+            self,
+            *self.get_ancestor_transactions(),
+            *self.get_descendant_transactions()
+        ]
 
     def get_ancestor_transactions(self):
         if self.parent_transaction is None:
             return []
         else:
-            return [self.parent_transaction] + self.parent_transaction.get_ancestor_transactions()
+            return [
+                self.parent_transaction,
+                *self.parent_transaction.get_ancestor_transactions()
+            ]
 
     def get_descendant_transactions(self):
         if len(self.children) == 0:
@@ -175,7 +182,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             grandchildren = []
             for child in self.children:
                 grandchildren += child.get_descendant_transactions()
-            return list(self.children) + grandchildren
+            return [
+                *self.children,
+                *grandchildren
+            ]
 
     @property
     def children(self):
