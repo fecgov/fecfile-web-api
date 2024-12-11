@@ -186,32 +186,34 @@ class Migration(migrations.Migration):
             children_and_grandchildren_ids uuid[];
             parent_itemized_flag boolean;
         BEGIN
-            IF NEW._itemized is TRUE THEN
-                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
-                PERFORM relational_itemize_ids(parent_and_grandparent_ids);
-                parent_or_grandparent_children_and_grandchildren_ids :=
-                    get_children_and_grandchildren_transaction_ids(
-                        parent_and_grandparent_ids[
-                            cardinality(parent_and_grandparent_ids)
-                        ]
-                    );
-                PERFORM undo_relational_unitemize_ids(
-                    parent_or_grandparent_children_and_grandchildren_ids
-                );
-            ELSE
-                children_and_grandchildren_ids :=
-                    get_children_and_grandchildren_transaction_ids(NEW.id);
-                PERFORM relational_unitemize_ids(children_and_grandchildren_ids);
-                IF OLD._itemized IS NOT NULL THEN
+            IF OLD._itemized IS DISTINCT FROM NEW._itemized THEN
+                IF NEW._itemized is TRUE THEN
                     parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
-                    PERFORM undo_relational_itemize_ids(parent_and_grandparent_ids);
-                ELSIF NEW.parent_transaction_id IS NOT NULL THEN
-                    SELECT itemized
-                    INTO parent_itemized_flag
-                    FROM transactions_transaction
-                    WHERE id = NEW.parent_transaction_id;
-                    IF parent_itemized_flag IS FALSE THEN
-                        PERFORM relational_unitemize_ids(ARRAY[NEW.id]); 
+                    PERFORM relational_itemize_ids(parent_and_grandparent_ids);
+                    parent_or_grandparent_children_and_grandchildren_ids :=
+                        get_children_and_grandchildren_transaction_ids(
+                            parent_and_grandparent_ids[
+                                cardinality(parent_and_grandparent_ids)
+                            ]
+                        );
+                    PERFORM undo_relational_unitemize_ids(
+                        parent_or_grandparent_children_and_grandchildren_ids
+                    );
+                ELSE
+                    children_and_grandchildren_ids :=
+                        get_children_and_grandchildren_transaction_ids(NEW.id);
+                    PERFORM relational_unitemize_ids(children_and_grandchildren_ids);
+                    IF OLD._itemized IS NOT NULL THEN
+                        parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
+                        PERFORM undo_relational_itemize_ids(parent_and_grandparent_ids);
+                    ELSIF NEW.parent_transaction_id IS NOT NULL THEN
+                        SELECT itemized
+                        INTO parent_itemized_flag
+                        FROM transactions_transaction
+                        WHERE id = NEW.parent_transaction_id;
+                        IF parent_itemized_flag IS FALSE THEN
+                            PERFORM relational_unitemize_ids(ARRAY[NEW.id]); 
+                        END IF;
                     END IF;
                 END IF;
             END IF;
@@ -350,7 +352,7 @@ class Migration(migrations.Migration):
         EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
 
         CREATE TRIGGER zafter_transactions_transaction_insert_or_update_trigger
-        AFTER INSERT OR UPDATE OF _itemized ON transactions_transaction
+        AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
         EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
         """
