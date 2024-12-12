@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 import os
 import sys
+import structlog
 from fecfiler import settings
+
+logger = structlog.get_logger(__name__)
 
 core = [
     "help",
@@ -9,7 +12,7 @@ core = [
     "migrate",
     "makemigrations",
     "showmigrations",
-    # devops
+    # DEVOPS COMMANDS #
     "backout_login_dot_gov_cert",
     "clear_fallback_django_keys",
     "gen_and_install_django_key",
@@ -21,10 +24,10 @@ developer = [
     "loaddata",
     "test",
     "shell",
-    # committee_accounts
+    # COMMITTEE ACCOUNT COMMANDS #
     "load_committee_data",
     "delete_committee_account",
-    # reports
+    # REPORT COMMANDS #
     "delete_committee_reports",
     # users
     "reset_security_consent_date"
@@ -39,3 +42,6 @@ if __name__ == "__main__":
         from django.core.management import execute_from_command_line
 
         execute_from_command_line(sys.argv)
+    else:
+        logger.error(f"Command '{subcommand}' is not allowed")
+        sys.exit(1)
