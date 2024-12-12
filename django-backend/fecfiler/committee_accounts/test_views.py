@@ -1,8 +1,15 @@
+from importlib import import_module
+import inspect
+import os
 from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
-from fecfiler.committee_accounts.views import CommitteeMembershipViewSet, CommitteeViewSet
-
+from fecfiler.committee_accounts.views import (
+    CommitteeMembershipViewSet,
+    CommitteeOwnedViewMixin,
+    CommitteeViewSet,
+)
+from rest_framework.viewsets import ViewSetMixin
 from fecfiler.user.models import User
 from unittest.mock import Mock, patch
 
@@ -221,3 +228,67 @@ class CommitteeViewSetTest(TestCase):
                 self.assertNotEqual(len(was_called_with), 0)
                 self.assertIn("C12345678", was_called_with)
                 self.assertEqual(response.data["name"], "TEST")
+
+    def test_all_viewsets_include_mixin(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.join(script_dir, "../..")
+        exclude_dirs = ["venv", "__pycache__"]
+
+        exclude_list = [
+            "CommitteeViewSet",
+            "UserViewSet",
+            "SystemStatusViewSet",
+            "WebServicesViewSet",
+            "SummaryViewSet",
+            "FeedbackViewSet",
+        ]
+
+        subclasses = find_subclasses(ViewSetMixin, project_root, exclude_dirs)
+        missing_mixin = [
+            subclass
+            for subclass in subclasses
+            if not issubclass(subclass, CommitteeOwnedViewMixin)
+            and subclass.__name__ not in exclude_list
+        ]
+
+        self.assertEqual(
+            len(missing_mixin),
+            0,
+            f"The following subclasses of GenericViewSet "
+            f"do not include CommitteeOwnedViewMixin:"
+            f"{', '.join([f'{cls.__module__}.{cls.__name__}' for cls in missing_mixin])}",
+        )
+
+
+def find_subclasses(base_class, project_path, exclude_dirs=None):
+    subclasses = []
+    exclude_dirs = exclude_dirs or []
+
+    for root, dirs, files in os.walk(project_path):
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+
+        for file in files:
+            if (
+                file.endswith("views.py")
+                and not file.startswith("__init__")
+                and "test_views" not in file
+            ):
+                module_path = os.path.join(root, file)
+                module_name = (
+                    module_path.replace(project_path, "")
+                    .replace(os.sep, ".")
+                    .lstrip(".")
+                    .replace(".py", "")
+                )
+                try:
+                    module = import_module(module_name)
+                except (ModuleNotFoundError, ImportError):
+                    print(f"module not found: {module_name}")
+                    continue
+
+                for name, obj in inspect.getmembers(module, inspect.isclass):
+                    if obj.__module__ == module.__name__:
+                        if issubclass(obj, base_class) and obj != base_class:
+                            subclasses.append(obj)
+
+    return subclasses
