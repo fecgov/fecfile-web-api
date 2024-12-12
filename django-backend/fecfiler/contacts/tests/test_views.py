@@ -1,4 +1,5 @@
-from unittest import mock
+import json
+from unittest.mock import patch, Mock
 from django.test import RequestFactory, TestCase
 from rest_framework.test import force_authenticate
 import uuid
@@ -59,7 +60,7 @@ class ContactViewSetTest(TestCase):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_no_candidate_id(self, mock_get):
         request = self.factory.get("/api/v1/contacts/candidate")
         request.user = self.user
@@ -67,7 +68,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
         request = self.factory.get("/api/v1/contacts/candidate?candidate_id=P60012143")
         request.user = self.user
@@ -88,7 +89,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_no_q(self, mock_get):
         request = self.factory.get("/api/v1/contacts/candidate_lookup")
         request.user = self.user
@@ -97,7 +98,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_candidates)
+    @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
         request = self.factory.get(
             "/api/v1/contacts/candidate_lookup?"
@@ -136,7 +137,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
+    @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_no_q(self, mock_get):
         request = self.factory.get("/api/v1/contacts/committee_lookup")
         request.user = self.user
@@ -149,7 +150,7 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch("requests.get", side_effect=mocked_requests_get_committees)
+    @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
         request = self.factory.get(
             "/api/v1/contacts/committee_lookup?"
@@ -296,6 +297,48 @@ class ContactViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, "")
+
+    def test_get_committee_invalid(self):
+        request = self.factory.get("/api/v1/contacts/committee/")
+        request.user = self.user
+        request.session = {
+            "committee_uuid": "11111111-2222-3333-4444-555555555555",
+            "committee_id": "C01234567",
+        }
+
+        response = ContactViewSet.as_view({"get": "committee"})(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_committee(self):
+        with patch("fecfiler.contacts.views.settings") as settings:
+            settings.PRODUCTION_OPEN_FEC_API = "https://not-real.api/"
+            settings.PRODUCTION_OPEN_FEC_API_KEY = "FAKE-KEY"
+            expected_call = "https://not-real.api/committee/C12345678/"
+            expected_params = {"api_key": "FAKE-KEY"}
+            with patch("fecfiler.contacts.views.requests") as mock_requests:
+                mock_requests.get = Mock()
+                mock_response = Mock()
+                mock_response.json = Mock()
+                mock_response.json.return_value = {"results": [{"name": "TEST"}]}
+                mock_requests.get.return_value = mock_response
+
+                request = self.factory.get(
+                    "/api/v1/contacts/committee/?committee_id=C12345678"
+                )
+                request.user = self.user
+                request.session = {
+                    "committee_uuid": "11111111-2222-3333-4444-555555555555",
+                    "committee_id": "C01234567",
+                }
+
+                response = ContactViewSet.as_view({"get": "committee"})(request)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(expected_call, mock_requests.get.call_args[0])
+                self.assertEqual(
+                    mock_requests.get.call_args.kwargs["params"], expected_params
+                )
+                data = json.loads(str(response.content, encoding="utf8"))
+                self.assertEqual(data["name"], "TEST")
 
     def test_restore_no_match(self):
         request = self.factory.post(

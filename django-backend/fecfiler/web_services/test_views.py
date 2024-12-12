@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework.test import force_authenticate
 
@@ -5,6 +6,7 @@ from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
+from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 from fecfiler.reports.tests.utils import (
     create_form3x,
     create_form24,
@@ -29,9 +31,12 @@ class WebServicesViewSetTest(TestCase):
         self.task_id = "testTaskId"
 
     def test_create_dot_fec(self):
-        report = create_form3x(
-            self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
+            year="2024",
+            cash_on_hand=1,
         )
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
         request = self.factory.post(
             "/api/v1/web-services/dot-fec/", {"report_id": report.id}
@@ -92,9 +97,12 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
 
     def test_submit_to_webprint(self):
-        report = create_form3x(
-            self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
+            year="2024",
+            cash_on_hand=1,
         )
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
         request = self.factory.post(
             "/api/v1/web-services/dot-fec/", {"report_id": report.id}
@@ -118,9 +126,12 @@ class WebServicesViewSetTest(TestCase):
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
 
     def test_submit_to_fec(self):
-        report = create_form3x(
-            self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
+            year="2024",
+            cash_on_hand=1,
         )
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
         request = self.factory.post(
             "/api/v1/web-services/dot-fec/", {"report_id": report.id, "password": "123"}
@@ -132,6 +143,8 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
         # assert that summary was caclulated
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
+        now = datetime.now(timezone.utc).date()
+        self.assertEqual(report.date_signed, now)
 
         """view does not recalculate summary if report is not dirty"""
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = 2
@@ -168,9 +181,12 @@ class WebServicesViewSetTest(TestCase):
         self.assertEqual(response.data, {"done": False})
 
     def test_get_dot_fec_not_exists(self):
-        report = create_form3x(
-            self.committee, "2024-01-01", "2024-02-01", {"L6a_cash_on_hand_jan_1_ytd": 1}
+        create_cash_on_hand_yearly(
+            committee_account=self.committee,
+            year="2024",
+            cash_on_hand=1,
         )
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
         test_id = report.id
         request = self.factory.get(f"api/v1/web-services/dot-fec/{test_id}")
         request.session = {

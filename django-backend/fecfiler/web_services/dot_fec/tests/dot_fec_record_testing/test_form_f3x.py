@@ -6,7 +6,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
-from datetime import datetime
+from datetime import datetime, timezone
 from fecfiler.web_services.models import UploadSubmission
 import structlog
 
@@ -105,16 +105,16 @@ class DotFECForm3XTestCase(TestCase):
         self.f3x.treasurer_middle_name = "Middlename"
         self.f3x.treasurer_prefix = "Mr."
         self.f3x.treasurer_suffix = "Junior"
-
-        upload_submission = UploadSubmission.objects.initiate_submission(self.f3x.id)
-        self.f3x.upload_submission = upload_submission
         self.f3x.save()
+
+        UploadSubmission.objects.initiate_submission(self.f3x.id)
+        self.f3x.refresh_from_db()
 
         self.contact_1 = create_test_individual_contact(
             "last name", "First name", self.committee.id
         )
 
-        report = compose_report(self.f3x.id, upload_submission.id)
+        report = compose_report(self.f3x.id)
         report_row = serialize_instance(report.get_form_name(), report)
         self.split_row = report_row.split(FS_STR)
 
@@ -161,7 +161,7 @@ class DotFECForm3XTestCase(TestCase):
         self.assertEqual(self.split_row[20], "Junior")
 
     def test_date_signed(self):
-        today = datetime.today()
+        today = datetime.now(timezone.utc)
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[21], formatted_date)
 

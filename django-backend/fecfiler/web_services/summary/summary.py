@@ -1,6 +1,7 @@
 from decimal import Decimal
 from fecfiler.transactions.models import get_read_model
 from fecfiler.reports.models import Report
+from fecfiler.cash_on_hand.models import CashOnHandYearly
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 import structlog
@@ -11,18 +12,48 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        self.previous_report = (
+
+        reports_from_prior_years = Report.objects.filter(
+            committee_account=self.report.committee_account,
+            coverage_through_date__year__lt=self.report.coverage_from_date.year,
+            form_3x__isnull=False,
+        ).order_by("coverage_from_date")
+        self.closest_report_from_prior_years = reports_from_prior_years.last()
+        year_of_closest_report = (
+            self.closest_report_from_prior_years.coverage_from_date.year
+            if self.closest_report_from_prior_years
+            else 0
+        )
+
+        """ Get the most recent cash on hand override that is
+         for a year after the closest report from prior years """
+        cash_on_hand_override = (
+            CashOnHandYearly.objects.filter(
+                committee_account=report.committee_account,
+                year__lte=self.report.coverage_from_date.year,
+                year__gt=year_of_closest_report,
+            )
+            .order_by("-year")
+            .first()
+        )
+
+        self.cash_on_hand_override = (
+            cash_on_hand_override.cash_on_hand if cash_on_hand_override else None
+        )
+
+        self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),
                 committee_account=report.committee_account,
                 form_3x__isnull=False,
+                coverage_through_date__year=report.coverage_from_date.year,
                 coverage_through_date__lt=report.coverage_from_date,
             )
             .order_by("-coverage_through_date")
             .first()
         )
 
-    def calculate_summary(self):
+    def calculate_summary_columns(self):
         column_a = self.calculate_summary_column_a()
         column_b = self.calculate_summary_column_b()
 
@@ -221,31 +252,23 @@ class SummaryService:
         return column_b
 
     def calculate_cash_on_hand_fields(self, column_a, column_b):
-        reports_from_prior_years = Report.objects.filter(
-            committee_account=self.report.committee_account,
-            coverage_through_date__year__lt=self.report.coverage_from_date.year,
-            form_3x__isnull=False,
-        ).order_by("coverage_from_date")
-
-        if reports_from_prior_years.count() > 0:
+        if self.cash_on_hand_override is not None:
+            column_b["line_6a"] = self.cash_on_hand_override
+        elif self.closest_report_from_prior_years is not None:
             column_b["line_6a"] = (
-                reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd
-            )  # noqa: E501
-        elif self.previous_report:
-            column_b["line_6a"] = (
-                self.previous_report.form_3x.L6a_cash_on_hand_jan_1_ytd
+                self.closest_report_from_prior_years.form_3x.L8_cash_on_hand_close_ytd
             )  # noqa: E501
         else:
             # user defined cash on hand
-            column_b["line_6a"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            column_b["line_6a"] = 0
 
-        if self.previous_report:
+        if self.previous_report_this_year:
             column_a["line_6b"] = (
-                self.previous_report.form_3x.L8_cash_on_hand_at_close_period
+                self.previous_report_this_year.form_3x.L8_cash_on_hand_at_close_period
             )  # noqa: E501
         else:
             # user defined cash on hand
-            column_a["line_6b"] = self.report.form_3x.L6a_cash_on_hand_jan_1_ytd
+            column_a["line_6b"] = column_b["line_6a"]
 
         # if we have cash on hand values
         if column_a.get("line_6b") is not None and column_b.get("line_6a") is not None:

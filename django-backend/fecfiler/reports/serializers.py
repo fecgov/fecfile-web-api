@@ -3,7 +3,6 @@ from rest_framework.serializers import (
     ModelSerializer,
     CharField,
     UUIDField,
-    BooleanField,
 )
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
@@ -22,25 +21,25 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class Form3XSerializer(ModelSerializer):
+class ReportForm3XSerializer(ModelSerializer):
     class Meta:
         fields = [f.name for f in Form3X._meta.get_fields() if f.name not in ["report"]]
         model = Form3X
 
 
-class Form24Serializer(ModelSerializer):
+class ReportForm24Serializer(ModelSerializer):
     class Meta:
         fields = [f.name for f in Form24._meta.get_fields() if f.name not in ["report"]]
         model = Form24
 
 
-class Form99Serializer(ModelSerializer):
+class ReportForm99Serializer(ModelSerializer):
     class Meta:
         fields = [f.name for f in Form99._meta.get_fields() if f.name not in ["report"]]
         model = Form99
 
 
-class Form1MSerializer(ModelSerializer):
+class ReportForm1MSerializer(ModelSerializer):
 
     contact_affiliated_id = UUIDField(allow_null=True, required=False)
     contact_candidate_I_id = UUIDField(allow_null=True, required=False)  # noqa: N815
@@ -97,12 +96,11 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     )
     report_code_label = CharField(read_only=True)
     version_label = CharField(read_only=True)
-    is_first = BooleanField(read_only=True)
 
-    form_3x = Form3XSerializer(required=False)
-    form_24 = Form24Serializer(required=False)
-    form_99 = Form99Serializer(required=False)
-    form_1m = Form1MSerializer(required=False)
+    form_3x = ReportForm3XSerializer(required=False)
+    form_24 = ReportForm24Serializer(required=False)
+    form_99 = ReportForm99Serializer(required=False)
+    form_1m = ReportForm1MSerializer(required=False)
 
     def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
@@ -131,10 +129,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
             for property in form_1m:
                 if not representation.get(property):
                     representation[property] = form_1m[property]
-
-        if not representation.get("is_first"):
-            this_report = Report.objects.get(id=representation["id"])
-            representation["is_first"] = this_report.is_first if this_report else True
 
         representation["can_delete"] = instance.can_delete
         representation["can_unamend"] = instance.can_unamend
@@ -171,8 +165,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                 "fields_to_validate",
                 "report_code_label",
                 "version_label",
-                "is_first",
             ]
 
         fields = get_fields()
-        read_only_fields = ["id", "created", "updated", "is_first"]
+        read_only_fields = ["id", "created", "updated"]

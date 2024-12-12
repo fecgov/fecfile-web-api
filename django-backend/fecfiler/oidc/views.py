@@ -28,12 +28,12 @@ from fecfiler.settings import (
     OIDC_ACR_VALUES,
     LOGIN_REDIRECT_URL,
 )
-from fecfiler.authentication.utils import delete_user_logged_in_cookies
 
 from .utils import (
     add_oidc_nonce_to_session,
     handle_oidc_callback_error,
     handle_oidc_callback_request,
+    delete_user_logged_in_cookies,
 )
 
 from . import oidc_op_config
@@ -108,7 +108,7 @@ def oidc_callback(request):
             handle_oidc_callback_request(request)
             return HttpResponseRedirect(LOGIN_REDIRECT_URL)
         handle_oidc_callback_error(request)
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
     except Exception as error:
         logger.error(f"Failed to process oidc_callback request {str(error)}")
         return HttpResponseServerError()

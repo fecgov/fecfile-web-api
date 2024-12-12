@@ -30,13 +30,6 @@ LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
-"""
-Enables alternative log in method.
-See :py:const:`fecfiler.authentication.views.USERNAME_PASSWORD`
-and :py:meth:`fecfiler.authentication.views.authenticate_login`
-"""
-ALTERNATIVE_LOGIN = env.get_credential("ALTERNATIVE_LOGIN")
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
@@ -61,13 +54,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
-    "storages",
     "django_structlog",
-    "fecfiler.authentication",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
@@ -76,19 +66,18 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
-    "fecfiler.openfec",
     "fecfiler.user",
-    "fecfiler.mock_openfec",
     "fecfiler.oidc",
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
+    "fecfiler.cash_on_hand",
 ]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
-    "fecfiler.authentication.middleware.TimeoutMiddleware.TimeoutMiddleware",
+    "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -167,6 +156,7 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
 
+MOCK_OIDC_PROVIDER = env.get_credential("MOCK_OIDC_PROVIDER", "False").lower() == "true"
 MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
@@ -200,18 +190,6 @@ TIME_ZONE = "America/New_York"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-STATIC_URL = "/static/"
-
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-
-STATIC_ROOT = "static"
-
-# the sub-directories of media and static files
-STATICFILES_LOCATION = "static"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -350,7 +328,6 @@ if not MOCK_EFO and FEC_FILING_API is None:
     raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
-WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 """EFO POLLING SETTINGS
 """
@@ -373,21 +350,29 @@ AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
 
-"""FEC API settings
-"""
-FEC_API = env.get_credential("FEC_API")
-FEC_API_KEY = env.get_credential("FEC_API_KEY")
-FEC_API_COMMITTEE_LOOKUP_ENDPOINT = str(FEC_API) + "names/committees/"
-FEC_API_CANDIDATE_LOOKUP_ENDPOINT = str(FEC_API) + "candidates/"
-FEC_API_CANDIDATE_ENDPOINT = str(FEC_API) + "candidate/{}/history/"
 
+"""FEATURE FLAGS
+"""
+
+# FLAG__COMMITTEE_DATA_SOURCE:
+# Determines whether committee data is pulled from EFO, TestEFO, or REDIS
+FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
+valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
+if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
+    raise Exception(
+        f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
+        + f" must be valid source ({valid_sources})"
+    )
+
+
+PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
+PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
+
+STAGE_OPEN_FEC_API = env.get_credential("STAGE_OPEN_FEC_API")
+STAGE_OPEN_FEC_API_KEY = env.get_credential("STAGE_OPEN_FEC_API_KEY")
 
 """MOCK OPENFEC settings"""
-MOCK_OPENFEC = env.get_credential("MOCK_OPENFEC")
-if MOCK_OPENFEC == "REDIS":
-    MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
-else:
-    MOCK_OPENFEC_REDIS_URL = None
+MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
 CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
     "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []

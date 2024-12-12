@@ -1,14 +1,16 @@
 from uuid import UUID
 from fecfiler.user.models import User
-from rest_framework import filters, viewsets, mixins, pagination
+from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.transactions.models import (
-    get_read_model,
-)
+from fecfiler.transactions.models import get_read_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import CommitteeAccount, Membership
-from .utils import create_committee_account
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils import (
+    check_can_create_committee_account,
+    create_committee_account,
+    get_committee_account_data,
+)
 
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
@@ -61,7 +63,30 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             raise Exception("no committee_id provided")
         account = create_committee_account(committee_id, request.user)
 
-        return Response(CommitteeAccountSerializer(account).data)
+        return Response(
+            self.add_committee_account_data(CommitteeAccountSerializer(account).data)
+        )
+
+    @action(detail=False, methods=["get"], url_path="get-available-committee")
+    def get_available_committee(self, request):
+        committee_id = request.query_params.get("committee_id")
+        committee = get_committee_account_data(committee_id)
+        if check_can_create_committee_account(committee_id, request.user):
+            return Response(committee)
+        response = {"message": "No available committee found."}
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def list(self, request, *args, **kwargs):
+        response = super(CommitteeViewSet, self).list(request, *args, **kwargs)
+        response.data["results"] = [
+            self.add_committee_account_data(committee_account)
+            for committee_account in response.data["results"]
+        ]
+        return response
+
+    def add_committee_account_data(self, committee_account):
+        committee_data = get_committee_account_data(committee_account["committee_id"])
+        return {**committee_account, **(committee_data or {})}
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):

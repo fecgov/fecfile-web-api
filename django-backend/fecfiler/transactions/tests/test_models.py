@@ -846,19 +846,15 @@ class TransactionModelTestCase(TestCase):
             m3_report.id
         )
         m3_report.save()
-        print(f"reports: {m1_report.id}, {m2_report.id}, {m3_report.id}")
         original_debt.refresh_from_db()
         # self.assertFalse(original_debt.can_delete)
-        print(f"blocking reports {original_debt.blocking_reports}")
         m2_report.upload_submission = None
         m2_report.save()
         original_debt.refresh_from_db()
-        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertFalse(original_debt.can_delete)
         m3_report.upload_submission = None
         m3_report.save()
         original_debt.refresh_from_db()
-        print(f"blocking reports {original_debt.blocking_reports}")
         self.assertTrue(original_debt.can_delete)
 
     def set_up_jf_transfer(self):
@@ -904,6 +900,43 @@ class TransactionModelTestCase(TestCase):
             partnership_jf_transfer_memo,
             partnership_attribution_jf_transfer_memo,
         )
+
+    def test_get_transaction_family(self):
+        a, b, c = self.set_up_jf_transfer()
+        b2 = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        b2.parent_transaction = a
+        b2.save()
+
+        a_family = a.get_transaction_family()
+        self.assertIn(a, a_family)
+        self.assertIn(b, a_family)
+        self.assertIn(c, a_family)
+        self.assertIn(b2, a_family)
+
+        b_family = b.get_transaction_family()
+        self.assertIn(a, b_family)
+        self.assertIn(b, b_family)
+        self.assertIn(c, b_family)
+        self.assertNotIn(b2, b_family)
+
+        c_family = c.get_transaction_family()
+        self.assertIn(a, c_family)
+        self.assertIn(b, c_family)
+        self.assertIn(c, c_family)
+        self.assertNotIn(b2, c_family)
+
+    def test_get_children(self):
+        a, b, c = self.set_up_jf_transfer()
+        self.assertNotIn(c, a.children)
+        self.assertIn(b, a.children)
 
 
 def undelete(transaction):

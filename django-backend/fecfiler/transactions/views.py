@@ -140,7 +140,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
-            print(f"transaction ID: {saved_transaction.id}")
+            logger.info(f"Created new transaction: {saved_transaction.id}")
             update_dependent_parent(saved_transaction)
         return Response(saved_transaction.id)
 
@@ -245,6 +245,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        committee_id = request.session["committee_uuid"]
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
@@ -278,7 +279,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         contact_instances = {
             contact_key: create_or_update_contact(
-                transaction_data, contact_key, request.session["committee_uuid"]
+                transaction_data, contact_key, committee_id
             )
             for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
@@ -305,6 +306,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = report.coverage_from_date
                 schedule_instance.save()
 
+        Report.objects.filter(committee_account_id=committee_id).update(
+            calculation_status=None
+        )
         logger.info(
             f"Transaction {transaction_instance.id} "
             f"linked to report(s): {', '.join(report_ids)}"
@@ -370,11 +374,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         try:
             transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transactions = transaction.get_transaction_family()
+            for t in transactions:
+                t.reports.add(report)
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
-        transaction.reports.add(report)
-        return Response("Transaction added to report")
+        return Response(f"Transaction(s) added to report: {[x.id for x in transactions]}")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
@@ -409,12 +415,12 @@ def get_save_hook(transaction: Transaction):
 def stringify_queryset(qs):
     database_uri = os.environ.get("DATABASE_URL")
     if not database_uri:
-        print(
+        logger.error(
             """Environment variable DATABASE_URL not found.
             Please check your settings and try again"""
         )
         exit(1)
-    print("Testing connection...")
+    logger.info("Testing connection...")
     conn = psycopg2.connect(database_uri)
     sql, params = qs.query.sql_with_params()
     with conn.cursor() as cursor:

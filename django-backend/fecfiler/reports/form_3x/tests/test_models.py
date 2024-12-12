@@ -22,7 +22,6 @@ class F3XTestCase(TestCase):
             date_of_election="2020-12-31",
             state_of_election="AK",
             qualified_committee=True,
-            cash_on_hand_date="2020-01-01",
         )
 
     def test_get_f3x_summary(self):
