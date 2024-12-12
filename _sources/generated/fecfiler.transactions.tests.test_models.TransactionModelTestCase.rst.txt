@@ -128,6 +128,8 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_delete_reattribution_with_copy
       ~TransactionModelTestCase.test_delete_transaction
       ~TransactionModelTestCase.test_delete_transaction_with_children
+      ~TransactionModelTestCase.test_get_children
+      ~TransactionModelTestCase.test_get_transaction_family
    
    
 

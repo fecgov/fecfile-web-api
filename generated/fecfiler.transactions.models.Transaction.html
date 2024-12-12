@@ -79,11 +79,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.full_clean" title="fecfiler.transactions.models.Transaction.full_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">full_clean</span></code></a>([exclude, validate_unique, ...])</p></td>
 <td><p>Call clean_fields(), clean(), validate_unique(), and validate_constraints() on the model.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraints</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ancestor_transactions</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.get_deferred_fields" title="fecfiler.transactions.models.Transaction.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_constraints</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.get_deferred_fields" title="fecfiler.transactions.models.Transaction.get_deferred_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deferred_fields</span></code></a>()</p></td>
 <td><p>Return a set containing names of deferred fields for this instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_descendant_transactions</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_by_created</span></code>(*[, field, is_next])</p></td>
 <td><p></p></td>
@@ -103,31 +109,34 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_schedule_name</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_transaction_family</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hard_delete</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.refresh_from_db" title="fecfiler.transactions.models.Transaction.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields, from_queryset])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_database_save</span></code>(field)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.refresh_from_db" title="fecfiler.transactions.models.Transaction.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields, from_queryset])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.save" title="fecfiler.transactions.models.Transaction.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.save" title="fecfiler.transactions.models.Transaction.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.save_base" title="fecfiler.transactions.models.Transaction.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.save_base" title="fecfiler.transactions.models.Transaction.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
 <td><p>Handle the parts of saving which should be done only once per save, yet need to be done in raw saves, too.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.serializable_value" title="fecfiler.transactions.models.Transaction.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.serializable_value" title="fecfiler.transactions.models.Transaction.serializable_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializable_value</span></code></a>(field_name)</p></td>
 <td><p>Return the value of the field name for this instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unique_error_message</span></code>(model_class, unique_check)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_constraints</span></code>([exclude])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_constraints</span></code>([exclude])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.validate_unique" title="fecfiler.transactions.models.Transaction.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.models.Transaction.validate_unique" title="fecfiler.transactions.models.Transaction.validate_unique"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_unique</span></code></a>([exclude])</p></td>
 <td><p>Check unique constraints on the model and raise ValidationError if any failed.</p></td>
 </tr>
 </tbody>
