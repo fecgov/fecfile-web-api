@@ -23,4 +23,3 @@ class ResetSecurityConsentDateCommandTest(TestCase):
         call_command("reset_security_consent_date", "t@fec.gov")
         self.test_user.refresh_from_db()
         self.assertIsNotNone(self.test_user.security_consent_exp_date)
-
