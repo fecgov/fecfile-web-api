@@ -17,6 +17,7 @@ fecfiler.web\_services.tasks
    .. autosummary::
       :toctree:                                          
    
+      calculate_polling_interval
       log_polling_notice
       resolve_final_submission_state
    

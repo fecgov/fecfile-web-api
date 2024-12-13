@@ -1,6 +1,0 @@
-fecfiler.settings.base.EFO\_POLLING\_MAX\_ATTEMPTS
-==================================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: EFO_POLLING_MAX_ATTEMPTS

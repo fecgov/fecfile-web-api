@@ -1,0 +1,6 @@
+fecfiler.web\_services.tasks.calculate\_polling\_interval
+=========================================================
+
+.. currentmodule:: fecfiler.web_services.tasks
+
+.. autofunction:: calculate_polling_interval

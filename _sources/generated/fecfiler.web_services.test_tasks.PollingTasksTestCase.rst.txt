@@ -114,6 +114,7 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.subTest
       ~PollingTasksTestCase.tearDown
       ~PollingTasksTestCase.tearDownClass
+      ~PollingTasksTestCase.test_calculate_polling_interval_throws_exception_when_more_than_max
       ~PollingTasksTestCase.test_dotfec_submission_polling_completes
       ~PollingTasksTestCase.test_log_polling_notice_does_not_crash
       ~PollingTasksTestCase.test_submission_ongoing_polling
